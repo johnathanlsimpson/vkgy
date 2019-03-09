@@ -1,3 +1,3 @@
 # vkgy
 Visual kei library, vkgy.
-Test.
+Test2.
