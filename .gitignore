@@ -13,6 +13,7 @@ php/*social_media.php
 php/deploy/*
 php/class-login.php
 google*
+test*
 
 # Ignore error logs
 error_log
