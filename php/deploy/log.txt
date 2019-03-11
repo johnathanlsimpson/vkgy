@@ -1,0 +1,830 @@
+2019-03-11 06:13:41	---
+
+
+2019-03-11 06:14:32	COMMAND: git --git-dir=vkgy.git fetch
+2019-03-11 06:14:32	RESPONSE: 
+2019-03-11 06:14:32	COMMAND: git --work-tree=files checkout -f master
+2019-03-11 06:14:32	RESPONSE: 
+2019-03-11 06:14:32	COMMAND: git rev-parse --short master
+2019-03-11 06:14:32	RESPONSE: 
+2019-03-11 06:14:32	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+    [HTTP_ACCEPT_ENCODING] => gzip, deflate, br
+    [HTTP_ACCEPT_LANGUAGE] => en-US,en;q=0.9
+    [HTTP_COOKIE] => gsScrollPos-1515=; _ga=GA1.2.610665806.1533944856; __utmz=155007807.1539247940.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utma=155007807.610665806.1533944856.1543783516.1543787511.13; site_lang=0; PHPSESSID=7f4a229fcd3fa7430c9a1230a0b96218; _gid=GA1.2.638108435.1552099392; gsScrollPos-854=0; remember_me=1%3A70.32.0.77%3A0c95ae4b36d7095ec9960ce7e17f63a2%3A86bc6b483590346c63eb6111f637c3ed9a7e7e4767506a7b172370e15a96f04d; sc_is_visitor_unique=rx7964501.1552269622.CDCFFA87101A4F26E9FA57B9E946D91E.577.481.419.384.324.268.217.191.176; gsScrollPos-1515=0
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36
+    [HTTP_CACHE_CONTROL] => max-age=0
+    [HTTP_UPGRADE_INSECURE_REQUESTS] => 1
+    [HTTP_DNT] => 1
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 70.32.0.77
+    [REMOTE_PORT] => 58186
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [X_SPDY] => QUIC
+    [SSL_PROTOCOL] => QUIC
+    [SSL_CIPHER] => aes-128-gcm
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => GET
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552284872.4347
+    [REQUEST_TIME] => 1552284872
+)
+
+2019-03-11 06:14:32	
+
+---
+2019-03-11 06:15:59	COMMAND: git --git-dir=../0154-deploy/vkgy.git fetch
+2019-03-11 06:15:59	RESPONSE: 0
+2019-03-11 06:15:59	COMMAND: git --work-tree=../0154-deploy/files checkout -f master
+2019-03-11 06:15:59	RESPONSE: 128
+2019-03-11 06:15:59	COMMAND: git rev-parse --short master
+2019-03-11 06:15:59	RESPONSE: 128
+2019-03-11 06:15:59	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+    [HTTP_ACCEPT_ENCODING] => gzip, deflate, br
+    [HTTP_ACCEPT_LANGUAGE] => en-US,en;q=0.9
+    [HTTP_COOKIE] => gsScrollPos-1515=; _ga=GA1.2.610665806.1533944856; __utmz=155007807.1539247940.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utma=155007807.610665806.1533944856.1543783516.1543787511.13; site_lang=0; PHPSESSID=7f4a229fcd3fa7430c9a1230a0b96218; _gid=GA1.2.638108435.1552099392; gsScrollPos-854=0; remember_me=1%3A70.32.0.77%3A0c95ae4b36d7095ec9960ce7e17f63a2%3A86bc6b483590346c63eb6111f637c3ed9a7e7e4767506a7b172370e15a96f04d; sc_is_visitor_unique=rx7964501.1552269622.CDCFFA87101A4F26E9FA57B9E946D91E.577.481.419.384.324.268.217.191.176; gsScrollPos-1515=0
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36
+    [HTTP_CACHE_CONTROL] => max-age=0
+    [HTTP_UPGRADE_INSECURE_REQUESTS] => 1
+    [HTTP_DNT] => 1
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 70.32.0.77
+    [REMOTE_PORT] => 53914
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [X_SPDY] => QUIC
+    [SSL_PROTOCOL] => QUIC
+    [SSL_CIPHER] => aes-128-gcm
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => GET
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552284959.4752
+    [REQUEST_TIME] => 1552284959
+)
+
+2019-03-11 06:15:59	
+
+---
+2019-03-11 06:17:48	COMMAND: git --git-dir=../0154-deploy/vkgy.git fetch
+2019-03-11 06:17:48	RESPONSE: 0
+2019-03-11 06:17:48	COMMAND: git --git-dir=../0154-deploy/vkgy.git --work-tree=../0154-deploy/files checkout -f master
+2019-03-11 06:17:48	RESPONSE: 0
+2019-03-11 06:17:48	COMMAND: git rev-parse --short master
+2019-03-11 06:17:48	RESPONSE: 128
+2019-03-11 06:17:48	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+    [HTTP_ACCEPT_ENCODING] => gzip, deflate, br
+    [HTTP_ACCEPT_LANGUAGE] => en-US,en;q=0.9
+    [HTTP_COOKIE] => gsScrollPos-1515=; _ga=GA1.2.610665806.1533944856; __utmz=155007807.1539247940.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utma=155007807.610665806.1533944856.1543783516.1543787511.13; site_lang=0; PHPSESSID=7f4a229fcd3fa7430c9a1230a0b96218; _gid=GA1.2.638108435.1552099392; gsScrollPos-854=0; gsScrollPos-1515=0; remember_me=1%3A70.32.0.77%3A3e385c3daaaec219ac1570504fbf2476%3A91024a476ae22a556cb874e21bdad181668b89a57036b31bc16346688cd63d4b; sc_is_visitor_unique=rx7964501.1552284969.CDCFFA87101A4F26E9FA57B9E946D91E.578.482.420.385.324.268.217.191.176
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36
+    [HTTP_CACHE_CONTROL] => max-age=0
+    [HTTP_UPGRADE_INSECURE_REQUESTS] => 1
+    [HTTP_DNT] => 1
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 70.32.0.77
+    [REMOTE_PORT] => 51856
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [X_SPDY] => QUIC
+    [SSL_PROTOCOL] => QUIC
+    [SSL_CIPHER] => aes-128-gcm
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => GET
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552285068.1637
+    [REQUEST_TIME] => 1552285068
+)
+
+2019-03-11 06:17:48	
+
+---
+2019-03-11 06:18:20	COMMAND: git --git-dir=../0154-deploy/vkgy.git fetch
+2019-03-11 06:18:20	RESPONSE: 0
+2019-03-11 06:18:20	COMMAND: git --git-dir=../0154-deploy/vkgy.git --work-tree=../0154-deploy/files checkout -f master
+2019-03-11 06:18:20	RESPONSE: 0
+2019-03-11 06:18:20	COMMAND: git --git-dir=../0154-deploy/vkgy.git rev-parse --short master
+2019-03-11 06:18:20	RESPONSE: 0
+2019-03-11 06:18:20	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+    [HTTP_ACCEPT_ENCODING] => gzip, deflate, br
+    [HTTP_ACCEPT_LANGUAGE] => en-US,en;q=0.9
+    [HTTP_COOKIE] => gsScrollPos-1515=; _ga=GA1.2.610665806.1533944856; __utmz=155007807.1539247940.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utma=155007807.610665806.1533944856.1543783516.1543787511.13; site_lang=0; PHPSESSID=7f4a229fcd3fa7430c9a1230a0b96218; _gid=GA1.2.638108435.1552099392; gsScrollPos-854=0; gsScrollPos-1515=0; remember_me=1%3A70.32.0.77%3A3e385c3daaaec219ac1570504fbf2476%3A91024a476ae22a556cb874e21bdad181668b89a57036b31bc16346688cd63d4b; sc_is_visitor_unique=rx7964501.1552284969.CDCFFA87101A4F26E9FA57B9E946D91E.578.482.420.385.324.268.217.191.176
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36
+    [HTTP_CACHE_CONTROL] => max-age=0
+    [HTTP_UPGRADE_INSECURE_REQUESTS] => 1
+    [HTTP_DNT] => 1
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 70.32.0.77
+    [REMOTE_PORT] => 63927
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [X_SPDY] => QUIC
+    [SSL_PROTOCOL] => QUIC
+    [SSL_CIPHER] => aes-128-gcm
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => GET
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552285099.7733
+    [REQUEST_TIME] => 1552285099
+)
+
+2019-03-11 06:18:20	
+
+---
+2019-03-11 06:19:52	COMMAND: git --git-dir=../0154-deploy/vkgy.git fetch
+2019-03-11 06:19:52	RESPONSE: 0
+2019-03-11 06:19:52	COMMAND: git --git-dir=../0154-deploy/vkgy.git --work-tree=../0154-deploy/files checkout -f master
+2019-03-11 06:19:52	RESPONSE: 0
+2019-03-11 06:19:52	COMMAND: git --git-dir=../0154-deploy/vkgy.git rev-parse --short master
+2019-03-11 06:19:52	RESPONSE: 0
+2019-03-11 06:19:52	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => */*
+    [CONTENT_TYPE] => application/json
+    [CONTENT_LENGTH] => 7659
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => GitHub-Hookshot/123faed
+    [HTTP_X_GITHUB_EVENT] => push
+    [HTTP_X_GITHUB_DELIVERY] => ae114232-43c5-11e9-9f0d-9e717ca111b4
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 192.30.252.37
+    [REMOTE_PORT] => 47936
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [SSL_PROTOCOL] => TLSv1.2
+    [SSL_SESSION_ID] => 5c78b0c4313ff1effe6fe5817b74c28a0a051a4dad71678ba2e535bf439ae6d6
+    [SSL_CIPHER] => ECDHE-RSA-AES128-GCM-SHA256
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => POST
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552285192.4668
+    [REQUEST_TIME] => 1552285192
+)
+
+2019-03-11 06:19:52	
+
+---
+
+
+2019-03-11 06:21:04	COMMAND: git --git-dir=../0154-deploy/vkgy.git fetch
+2019-03-11 06:21:04	RESPONSE: 0
+2019-03-11 06:21:04	COMMAND: git --git-dir=../0154-deploy/vkgy.git --work-tree=../0154-deploy/files checkout -f master
+2019-03-11 06:21:04	RESPONSE: 0
+2019-03-11 06:21:04	COMMAND: git --git-dir=../0154-deploy/vkgy.git rev-parse --short master
+2019-03-11 06:21:04	RESPONSE: 0
+2019-03-11 06:21:04	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => */*
+    [CONTENT_TYPE] => application/json
+    [CONTENT_LENGTH] => 7659
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => GitHub-Hookshot/123faed
+    [HTTP_X_GITHUB_EVENT] => push
+    [HTTP_X_GITHUB_DELIVERY] => d84697b4-43c5-11e9-9bf9-fa25c405616c
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 192.30.252.34
+    [REMOTE_PORT] => 55902
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [SSL_PROTOCOL] => TLSv1.2
+    [SSL_SESSION_ID] => 7cb2f6ea9dbc491592801535ec74a753e1186e1ed56a374d31ce0604e3285358
+    [SSL_CIPHER] => ECDHE-RSA-AES128-GCM-SHA256
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => POST
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552285263.1858
+    [REQUEST_TIME] => 1552285263
+)
+
+2019-03-11 06:21:04	
+
+---
+
+
+2019-03-11 06:21:14	COMMAND: git --git-dir=../0154-deploy/vkgy.git fetch
+2019-03-11 06:21:14	RESPONSE: 0
+2019-03-11 06:21:14	COMMAND: git --git-dir=../0154-deploy/vkgy.git --work-tree=../0154-deploy/files checkout -f master
+2019-03-11 06:21:14	RESPONSE: 0
+2019-03-11 06:21:14	COMMAND: git --git-dir=../0154-deploy/vkgy.git rev-parse --short master
+2019-03-11 06:21:14	RESPONSE: 0
+2019-03-11 06:21:14	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => */*
+    [CONTENT_TYPE] => application/json
+    [CONTENT_LENGTH] => 7663
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => GitHub-Hookshot/123faed
+    [HTTP_X_GITHUB_EVENT] => push
+    [HTTP_X_GITHUB_DELIVERY] => dec4d8f8-43c5-11e9-93f1-004484061667
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 192.30.253.29
+    [REMOTE_PORT] => 42026
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [SSL_PROTOCOL] => TLSv1.2
+    [SSL_SESSION_ID] => e2dc2965e69941bd907c9653b1a094e16cdee730eb8a432b33e363487a01c7bd
+    [SSL_CIPHER] => ECDHE-RSA-AES128-GCM-SHA256
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => POST
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552285274.1015
+    [REQUEST_TIME] => 1552285274
+)
+
+2019-03-11 06:21:14	
+
+---
+
+
+2019-03-11 06:29:14	COMMAND: git --git-dir=../0154-deploy/vkgy.git fetch
+2019-03-11 06:29:14	RESPONSE: 0
+2019-03-11 06:29:14	COMMAND: git --git-dir=../0154-deploy/vkgy.git --work-tree=../0154-deploy/files checkout -f master
+2019-03-11 06:29:14	RESPONSE: 0
+2019-03-11 06:29:14	COMMAND: git --git-dir=../0154-deploy/vkgy.git rev-parse --short master
+2019-03-11 06:29:14	RESPONSE: 0
+2019-03-11 06:29:14	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+    [HTTP_ACCEPT_ENCODING] => gzip, deflate, br
+    [HTTP_ACCEPT_LANGUAGE] => en-US,en;q=0.9
+    [HTTP_COOKIE] => gsScrollPos-1515=; _ga=GA1.2.610665806.1533944856; __utmz=155007807.1539247940.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utma=155007807.610665806.1533944856.1543783516.1543787511.13; site_lang=0; PHPSESSID=7f4a229fcd3fa7430c9a1230a0b96218; _gid=GA1.2.638108435.1552099392; gsScrollPos-854=0; gsScrollPos-1515=0; remember_me=1%3A70.32.0.77%3A3e385c3daaaec219ac1570504fbf2476%3A91024a476ae22a556cb874e21bdad181668b89a57036b31bc16346688cd63d4b; sc_is_visitor_unique=rx7964501.1552284969.CDCFFA87101A4F26E9FA57B9E946D91E.578.482.420.385.324.268.217.191.176
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36
+    [HTTP_CACHE_CONTROL] => max-age=0
+    [HTTP_UPGRADE_INSECURE_REQUESTS] => 1
+    [HTTP_DNT] => 1
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 70.32.0.77
+    [REMOTE_PORT] => 58213
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [X_SPDY] => QUIC
+    [SSL_PROTOCOL] => QUIC
+    [SSL_CIPHER] => aes-128-gcm
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => GET
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552285754.1019
+    [REQUEST_TIME] => 1552285754
+)
+
+2019-03-11 06:29:14	
+
+---
+
+
+2019-03-11 06:29:52	COMMAND: git --git-dir=../0154-deploy/vkgy.git fetch
+2019-03-11 06:29:52	RESPONSE: 0
+2019-03-11 06:29:52	COMMAND: git --git-dir=../0154-deploy/vkgy.git --work-tree=../0154-deploy/files checkout -f master
+2019-03-11 06:29:52	RESPONSE: 0
+2019-03-11 06:29:52	COMMAND: git --git-dir=../0154-deploy/vkgy.git rev-parse --short master
+2019-03-11 06:29:52	RESPONSE: 0
+2019-03-11 06:29:52	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => */*
+    [CONTENT_TYPE] => application/json
+    [CONTENT_LENGTH] => 7662
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => GitHub-Hookshot/123faed
+    [HTTP_X_GITHUB_EVENT] => push
+    [HTTP_X_GITHUB_DELIVERY] => 1394b03e-43c7-11e9-8638-700ed5bae641
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 192.30.252.44
+    [REMOTE_PORT] => 44448
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [SSL_PROTOCOL] => TLSv1.2
+    [SSL_SESSION_ID] => 6e761ee58adf5f0ade4b1cd198f77f68670bf51f96ba5b854c4ea7bffa6ce1d7
+    [SSL_CIPHER] => ECDHE-RSA-AES128-GCM-SHA256
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => POST
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552285792.1792
+    [REQUEST_TIME] => 1552285792
+)
+
+2019-03-11 06:29:52	
+
+---
+
+
+2019-03-11 06:35:22	COMMAND: git --git-dir=../0154-deploy/vkgy.git fetch
+2019-03-11 06:35:22	RESPONSE: 0
+2019-03-11 06:35:22	COMMAND: git --git-dir=../0154-deploy/vkgy.git --work-tree=../0154-deploy/files checkout -f master
+2019-03-11 06:35:22	RESPONSE: 0
+2019-03-11 06:35:22	COMMAND: git --git-dir=../0154-deploy/vkgy.git rev-parse --short master
+2019-03-11 06:35:22	RESPONSE: 0
+2019-03-11 06:35:22	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => */*
+    [CONTENT_TYPE] => application/json
+    [CONTENT_LENGTH] => 7662
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => GitHub-Hookshot/123faed
+    [HTTP_X_GITHUB_EVENT] => push
+    [HTTP_X_GITHUB_DELIVERY] => d8278b38-43c7-11e9-9a3c-deb6b6fec3be
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 192.30.252.35
+    [REMOTE_PORT] => 41606
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [SSL_PROTOCOL] => TLSv1.2
+    [SSL_SESSION_ID] => 3c8cf4305a66169cbf42818990868e4e039364e84cd6a55d0dbf059ae1beef81
+    [SSL_CIPHER] => ECDHE-RSA-AES128-GCM-SHA256
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => POST
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552286122.096
+    [REQUEST_TIME] => 1552286122
+)
+
+2019-03-11 06:35:22	
+
+---
+
+
+2019-03-11 06:35:28	COMMAND: git --git-dir=../0154-deploy/vkgy.git fetch
+2019-03-11 06:35:28	RESPONSE: 0
+2019-03-11 06:35:28	COMMAND: git --git-dir=../0154-deploy/vkgy.git --work-tree=../0154-deploy/files checkout -f master
+2019-03-11 06:35:28	RESPONSE: 0
+2019-03-11 06:35:28	COMMAND: git --git-dir=../0154-deploy/vkgy.git rev-parse --short master
+2019-03-11 06:35:28	RESPONSE: 0
+2019-03-11 06:35:28	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => */*
+    [CONTENT_TYPE] => application/json
+    [CONTENT_LENGTH] => 7658
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => GitHub-Hookshot/123faed
+    [HTTP_X_GITHUB_EVENT] => push
+    [HTTP_X_GITHUB_DELIVERY] => dc095aa6-43c7-11e9-9cd1-ebf3e6c81c7e
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 192.30.252.44
+    [REMOTE_PORT] => 59669
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [SSL_PROTOCOL] => TLSv1.2
+    [SSL_SESSION_ID] => d3c2ccfc36967bbefac319a89d47fb90988adc561d288f4571c500e4d0b3351e
+    [SSL_CIPHER] => ECDHE-RSA-AES128-GCM-SHA256
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => POST
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552286128.3026
+    [REQUEST_TIME] => 1552286128
+)
+
+2019-03-11 06:35:28	
+
+---
+
+
+2019-03-11 06:35:53	COMMAND: git --git-dir=../0154-deploy/vkgy.git fetch
+2019-03-11 06:35:53	RESPONSE: 0
+2019-03-11 06:35:53	COMMAND: git --git-dir=../0154-deploy/vkgy.git --work-tree=../0154-deploy/files checkout -f master
+2019-03-11 06:35:53	RESPONSE: 0
+2019-03-11 06:35:53	COMMAND: git --git-dir=../0154-deploy/vkgy.git rev-parse --short master
+2019-03-11 06:35:53	RESPONSE: 0
+2019-03-11 06:35:53	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => */*
+    [CONTENT_TYPE] => application/json
+    [CONTENT_LENGTH] => 7662
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => GitHub-Hookshot/123faed
+    [HTTP_X_GITHUB_EVENT] => push
+    [HTTP_X_GITHUB_DELIVERY] => eac86596-43c7-11e9-8519-50fc3405f36d
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 192.30.252.37
+    [REMOTE_PORT] => 56686
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [SSL_PROTOCOL] => TLSv1.2
+    [SSL_SESSION_ID] => f9ef30bbc28e47b39edf5106fb05fa14df60e1d2a2bc0bd91f36b2f750fe9612
+    [SSL_CIPHER] => ECDHE-RSA-AES128-GCM-SHA256
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => POST
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552286153.0449
+    [REQUEST_TIME] => 1552286153
+)
+
+2019-03-11 06:35:53	
+
+---
+
+
+2019-03-11 06:37:11	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => */*
+    [HTTP_ACCEPT_ENCODING] => gzip
+    [HTTP_CONNECTION] => close
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/600.1.25 (KHTML, like Gecko) Version/8.0 Safari/600.1.25
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 54.175.74.27
+    [REMOTE_PORT] => 38578
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [SSL_PROTOCOL] => TLSv1.2
+    [SSL_SESSION_ID] => c63573ded909c9bd85f1733fac63906c6861311d70232da5b7e1a40db7c2e34d
+    [SSL_CIPHER] => ECDHE-RSA-AES128-GCM-SHA256
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => GET
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552286231.9976
+    [REQUEST_TIME] => 1552286231
+)
+
+2019-03-11 06:37:11	
+
+---
+
+
+2019-03-11 06:45:05	COMMAND: git --git-dir=../0154-deploy/vkgy.git fetch
+2019-03-11 06:45:05	RESPONSE: 0
+2019-03-11 06:45:05	COMMAND: git --git-dir=../0154-deploy/vkgy.git --work-tree=../0154-deploy/files checkout -f master
+2019-03-11 06:45:05	RESPONSE: 0
+2019-03-11 06:45:05	COMMAND: git --git-dir=../0154-deploy/vkgy.git rev-parse --short master
+2019-03-11 06:45:05	RESPONSE: 0
+2019-03-11 06:45:05	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => */*
+    [CONTENT_TYPE] => application/json
+    [CONTENT_LENGTH] => 7696
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => GitHub-Hookshot/123faed
+    [HTTP_X_GITHUB_EVENT] => push
+    [HTTP_X_GITHUB_DELIVERY] => 3205c3bc-43c9-11e9-83f7-496c048c5f7c
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 192.30.252.44
+    [REMOTE_PORT] => 39045
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [SSL_PROTOCOL] => TLSv1.2
+    [SSL_SESSION_ID] => ccceb3d11ecdf44c67d945a7fa422ddc32ed317125e4730f4b0badf626379e79
+    [SSL_CIPHER] => ECDHE-RSA-AES128-GCM-SHA256
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => POST
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552286702.1593
+    [REQUEST_TIME] => 1552286702
+)
+
+2019-03-11 06:45:05	
+
+---
+
+
+2019-03-11 06:46:07	COMMAND: git --git-dir=../0154-deploy/vkgy.git fetch
+2019-03-11 06:46:07	RESPONSE: 0
+2019-03-11 06:46:07	COMMAND: git --git-dir=../0154-deploy/vkgy.git --work-tree=../0154-deploy/files checkout -f master
+2019-03-11 06:46:07	RESPONSE: 0
+2019-03-11 06:46:07	COMMAND: git --git-dir=../0154-deploy/vkgy.git rev-parse --short master
+2019-03-11 06:46:07	RESPONSE: 0
+2019-03-11 06:46:07	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => */*
+    [CONTENT_TYPE] => application/json
+    [CONTENT_LENGTH] => 7698
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => GitHub-Hookshot/123faed
+    [HTTP_X_GITHUB_EVENT] => push
+    [HTTP_X_GITHUB_DELIVERY] => 58630196-43c9-11e9-9721-4e63e21e7a35
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 192.30.252.35
+    [REMOTE_PORT] => 39722
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [SSL_PROTOCOL] => TLSv1.2
+    [SSL_SESSION_ID] => f74525e80c5451cc61087bdd9a126ffd86c6684b3ae98088c7d9271aca1dd60b
+    [SSL_CIPHER] => ECDHE-RSA-AES128-GCM-SHA256
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => POST
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552286766.4169
+    [REQUEST_TIME] => 1552286766
+)
+
+2019-03-11 06:46:07	
+
+---
+
+
+2019-03-11 08:24:25	COMMAND: git --git-dir=../0154-deploy/vkgy.git fetch
+2019-03-11 08:24:25	RESPONSE: 0
+2019-03-11 08:24:35	COMMAND: git --git-dir=../0154-deploy/vkgy.git --work-tree=../0154-deploy/files checkout -f master
+2019-03-11 08:24:35	RESPONSE: 0
+2019-03-11 08:24:35	COMMAND: git --git-dir=../0154-deploy/vkgy.git rev-parse --short master
+2019-03-11 08:24:35	RESPONSE: 0
+2019-03-11 08:24:35	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => */*
+    [CONTENT_TYPE] => application/json
+    [CONTENT_LENGTH] => 49453
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => GitHub-Hookshot/123faed
+    [HTTP_X_GITHUB_EVENT] => push
+    [HTTP_X_GITHUB_DELIVERY] => 10a72a2c-43d7-11e9-8330-e361fc6a9bb5
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 192.30.252.44
+    [REMOTE_PORT] => 36738
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [SSL_PROTOCOL] => TLSv1.2
+    [SSL_SESSION_ID] => dc4478fffb7257bcbf9f6788d187ec7a58460ef4b2c5f41f60b21a402540d44c
+    [SSL_CIPHER] => ECDHE-RSA-AES128-GCM-SHA256
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => POST
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552292659.4835
+    [REQUEST_TIME] => 1552292659
+)
+
+2019-03-11 08:24:35	
+
+---
+
+
+2019-03-11 08:36:01	COMMAND: git --git-dir=../0154-deploy/vkgy.git fetch
+2019-03-11 08:36:01	RESPONSE: 0
+2019-03-11 08:36:01	COMMAND: git --git-dir=../0154-deploy/vkgy.git --work-tree=../0154-deploy/files checkout -f master
+2019-03-11 08:36:01	RESPONSE: 0
+2019-03-11 08:36:01	COMMAND: git --git-dir=../0154-deploy/vkgy.git rev-parse --short master
+2019-03-11 08:36:01	RESPONSE: 0
+2019-03-11 08:36:01	SERVER: Array
+(
+    [PATH] => /bin:/usr/bin:/usr/local/bin
+    [HTTP_ACCEPT] => */*
+    [CONTENT_TYPE] => application/json
+    [CONTENT_LENGTH] => 19132
+    [HTTP_HOST] => vk.gy
+    [HTTP_USER_AGENT] => GitHub-Hookshot/123faed
+    [HTTP_X_GITHUB_EVENT] => push
+    [HTTP_X_GITHUB_DELIVERY] => b2a3756e-43d8-11e9-94b2-acf8a679bbbe
+    [DOCUMENT_ROOT] => /home/xurelndl/public_html
+    [REMOTE_ADDR] => 192.30.252.35
+    [REMOTE_PORT] => 39663
+    [SERVER_ADDR] => 192.138.189.181
+    [SERVER_NAME] => vk.gy
+    [SERVER_ADMIN] => webmaster@weloveucp.com
+    [SERVER_PORT] => 443
+    [REQUEST_URI] => /test/0154-deploy/deploy.php
+    [HTTPS] => on
+    [SSL_PROTOCOL] => TLSv1.2
+    [SSL_SESSION_ID] => d25d53a99fde7fdeabd68cb7aa652db2b9d6fe1cb58680e6c8c87e57cb73c62d
+    [SSL_CIPHER] => ECDHE-RSA-AES128-GCM-SHA256
+    [SSL_CIPHER_USEKEYSIZE] => 128
+    [SSL_CIPHER_ALGKEYSIZE] => 128
+    [SCRIPT_FILENAME] => /home/xurelndl/public_html/test/0154-deploy/deploy.php
+    [QUERY_STRING] => 
+    [SCRIPT_URI] => https://vk.gy/test/0154-deploy/deploy.php
+    [SCRIPT_URL] => /test/0154-deploy/deploy.php
+    [SCRIPT_NAME] => /test/0154-deploy/deploy.php
+    [SERVER_PROTOCOL] => HTTP/1.1
+    [SERVER_SOFTWARE] => LiteSpeed
+    [REQUEST_METHOD] => POST
+    [X-LSCACHE] => on
+    [PHP_SELF] => /test/0154-deploy/deploy.php
+    [REQUEST_TIME_FLOAT] => 1552293360.6986
+    [REQUEST_TIME] => 1552293360
+)
+
+2019-03-11 08:36:01	
+
+---
+
+
