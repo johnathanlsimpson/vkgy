@@ -15,6 +15,7 @@ google*
 test*
 */config-*.php
 */*/config-*.php
+php/deploy/log.txt
 
 # Ignore error logs
 error_log
