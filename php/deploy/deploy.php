@@ -15,8 +15,11 @@ function create_repo() {
 
 function update_repo() {
 	global $config;
+	global $payload;
 	
 	if(isset($_SERVER['HTTP_X_GITHUB_EVENT'])) {
+		$payload = json_decode(file_get_contents('php://input'));
+		
 		$cmds['update_repo']  = 'git --git-dir='.$config['path_to_repo'].' fetch';
 		$cmds['update_files'] = 'git --git-dir='.$config['path_to_repo'].' --work-tree='.$config['path_to_files'].' checkout -f '.$config['branch_name'];
 		$cmds['get_changes']  = 'git --git-dir='.$config['path_to_repo'].' rev-parse --short '.$config['branch_name'];
@@ -29,6 +32,7 @@ function update_repo() {
 	}
 	
 	log_git('SERVER: '.print_r($_SERVER, true));
+	log_git('PAYLOAD: '.print_r($payload, true));
 	log_git("\n\n".'---'."\n\n");
 }
 
