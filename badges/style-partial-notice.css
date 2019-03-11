@@ -1,0 +1,139 @@
+/* New badge: text blocks */
+.badge__description {
+	display: inline-block;
+	margin-right: 1rem;
+	max-width: 150px;
+	opacity: 0;
+	vertical-align: top;
+}
+
+/* New badge: reveal button styling */
+.badge__label, .badge__label::before, .badge__label::after {
+	border-radius: 50%;
+	bottom: 0;
+	color: var(--background--faint);
+	left: 0;
+	opacity: 0;
+	position: absolute;
+	right: 0;
+	text-indent: 3px;
+	top: 0;
+	touch-action: manipulation;
+	transition: opacity 0.2s ease-in;
+	z-index: 2;
+}
+.badge__label::before {
+	background: var(--background--bold);
+	content: "?";
+	display: block;
+	font-size: 100px;
+	line-height: 120px;
+	margin: -5px;
+}
+.badge__label::after {
+	border: 3px solid var(--interactive--faint);
+	color: var(--interactive--faint);
+	content: "Click to reveal badge";
+	cursor: pointer;
+	display: none;
+	padding: 10px;
+	padding-top: 30px;
+	z-index: 3;
+}
+.badge__label:hover::after {
+	border-color: var(--interactive);
+	color: var(--interactive);
+}
+
+/* New badge: unopened */
+.badge__input:checked + .badge__container {
+	transform: scale(0.5);
+}
+.badge__input:checked + .badge__container::after,
+.badge__input:checked + .badge__container .badge__deco-a,
+.badge__input:checked + .badge__container .badge__deco-b {
+	opacity: 0;
+}
+.badge__input:checked + .badge__container .badge__label {
+	animation: fadeIn 0.2s;
+	opacity: 1;
+	transform: scale(2);
+}
+.badge__input:checked + .badge__container .badge__label,
+.badge__input:checked + .badge__container .badge__label::before,
+.badge__input:checked + .badge__container .badge__label::after {
+	opacity: 1;
+	display: block;
+}
+.badge__input:checked + .badge__container + .badge__description {
+	height: 0;
+	overflow: hidden;
+	width: 0;
+}
+.badge__input:checked + .badge__container[data-level] {
+	background-color: var(--background--faint);
+	color: var(--background--faint);
+}
+
+/* New badge: when opening */
+.badge__container::after,
+.badge__description {
+	transition: opacity 0.2s linear;
+	transition-delay: 0.5s;
+}
+.badge__description {
+	transition-delay: 0.7s;
+}
+.badge__input:not(:checked) + .badge__container/*,
+.badge__input:not(:checked) + .badge__container .badge__deco-b,
+.badge__input:not(:checked) + .badge__container **/ {
+	animation: bounceIn 0.5s;
+	opacity: 1;
+}
+.badge__input:not(:checked) + .badge__container::after,
+.badge__input:not(:checked) + .badge__container + .badge__description {
+	opacity: 1;
+}
+
+/* Animations */
+@keyframes fadeIn {
+	0% {
+		opacity: 0;
+		transform: scale(4);
+	}
+	80% {
+		opacity: 1;
+		transform: scale(1.8);
+	}
+	to {
+		transform: scale(2);
+	}
+}
+@keyframes bounceIn {
+	from,
+	20%,
+	40%,
+	60%,
+	80%,
+	to {
+		animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+	}
+
+	0% {
+		opacity: 0;
+		transform: scale(0.3);
+	}
+	40% {
+		transform: scale(1.1);
+	}
+	50% {
+		transform: scale(0.9);
+	}
+	60% {
+		transform: scale(1.01);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}

@@ -1,0 +1,53 @@
+/**
+	* ========================================================
+	* ARTIST CARDS
+	* ========================================================
+**/
+.card {
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 0;
+	padding-bottom: 0;
+}
+.card::before {
+	display: none;
+}
+.card--small, .card--small .card {
+	background-size: cover;
+}
+.card--small::before, .card--small .card::before {
+	display: block;
+}
+.card__inner {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+.card__name, .card__links {
+	margin-bottom: 1rem;
+}
+.card__name-link {
+	display: inline-block;
+	margin-bottom: 0;
+}
+@media(max-width: 799.9px) {
+	.card__name-link {
+		font-size: inherit;
+		font-weight: inherit;
+	}
+}
+.card--small .card__name-link {
+	font-size: inherit;
+	font-weight: inherit;
+}
+@media(max-width: 799.9px) {
+	.card__link {
+		border: none;
+		padding: 0;
+	}
+}
+.card--small .card__link {
+	border: none;
+	padding: 0;
+}

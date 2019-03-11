@@ -1,0 +1,315 @@
+.support__container {
+	overflow: hidden;
+	white-space: nowrap;
+}
+.support__link {
+	display: inline-block;
+}
+.support__image {
+	max-width: 100%;
+	vertical-align: middle;
+}
+.news__container {
+	flex-wrap: wrap;
+	overflow: hidden;
+	padding: 0;
+}
+.news__main {
+	background-position: center;
+	background-size: cover;
+	box-shadow: 0 0 2rem var(--background--bold);
+	flex: 1;
+	flex-basis: 300px;
+	padding: 1rem;
+	z-index: 1;
+}
+.news__main::before, .news__entry::before {
+	background: var(--background);
+	opacity: 0.9;
+}
+.news__entry::before {
+	box-shadow: inset 0 2rem 2rem -2rem var(--background--bold);
+}
+.news__user {
+	margin-left: auto;
+}
+.news__content {
+	margin-bottom: 1rem;
+}
+.news__additional {
+	flex-basis: 300px;
+	flex-grow: 2;
+	flex-shrink: 1;
+}
+.news__entry {
+	background-position: center;
+	background-size: cover;
+	border-top: none;
+	padding: 1rem;
+	padding-bottom: 0;
+}
+.news__entry:first-of-type {
+	padding-top: 1rem;
+}
+.news__new {
+	border-radius: 2px;
+	box-shadow: inset 0 0 0 1px var(--accent);
+	color: var(--accent);
+	padding: 0 2px;
+}
+.news__vip {
+	align-items: center;
+	padding-bottom: 1rem;
+	width: 100%;
+}
+
+.comment__avatar-container {
+	border: 1px solid var(--background--faint);
+	border-radius: 50%;
+	flex-shrink: 0;
+	height: 38px;
+	margin-right: 1ch;
+	overflow: hidden;
+	width: 38px;
+}
+.comment__avatar {
+	display: inline-block;
+	float: left;
+	height: 50px;
+	margin-left: -7px;
+	margin-top: -12px;
+	width: 50px;
+}
+.comment__no-avatar {
+	border: none;
+}
+.comment__no-avatar .head__base {
+	fill: transparent;
+	stroke: var(--text--faint);
+	stroke-width: 3pt;
+}
+.comment__content {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.comment__next {
+	margin-left: auto;
+	padding-left: 1ch;
+	white-space: nowrap;
+}
+.comment__user {
+	margin-right: auto;
+}
+.comment__comment {
+	flex-grow: 1;
+	max-width: 100%;
+	overflow: hidden;
+}
+@media(max-width: 799.99px) {
+	.main__left {
+		order: 3;
+	}
+	.main__middle {
+		order: 1;
+	}
+	.main__right {
+		order: 2;
+	}
+}
+@media(min-width: 800px) {
+	.main__right {
+		align-self: stretch;
+		max-height: 100%;
+	}
+	.main__right::after {
+		background: linear-gradient(transparent, var(--background--faint));
+		bottom: 0;
+		content: "";
+		display: block;
+		height: 3rem;
+		left: 0;
+		pointer-events: none;
+		position: absolute;
+		right: 0;
+	}
+	.main__updates {
+		bottom: 0;
+		left: 0;
+		overflow: hidden;
+		position: absolute;
+		right: 0;
+		top: 0;
+	}
+}
+
+.iod__container {
+	text-align: center;
+}
+.iod__link {
+	display: inline-block;
+	max-height: 100%;
+	max-width: 100%;
+	vertical-align: middle;
+	width: auto;
+}
+.iod__link::after {
+	bottom: 0;
+	box-shadow: inset 0 0 0 2px var(--background--faint);
+	content: "";
+	left: 0;
+	pointer-events: none;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+.iod__image {
+	display: block;
+	height: auto;
+	max-height: 100%;
+	max-width: 100%;
+	width: 200px;
+}
+.iod--wide {
+	width: 280px;
+}
+.section__main {
+	margin-bottom: 3rem;
+}
+.section__join {
+	background: hsl(146,10%,85%);
+	padding-top: 3rem;
+}
+.section__support {
+	align-items: stretch;
+	overflow: hidden;
+	padding-bottom: 3rem;
+	padding-top: 3rem;
+}
+.section__support::before {
+	background-color: var(--background);
+	background-image: url(/main/pattern.png);
+	background-position: center;
+	background-size: 400px 126px;
+	bottom: -50%;
+	content: "";
+	display: block;
+	left: -50%;
+	position: absolute;
+	top: -50%;
+	transform: rotate(-5deg);
+	right: -50%;
+	z-index: -1;
+}
+.support__list {
+	display: inline;
+	line-height: 2;
+}
+.support__list li {
+	margin-right: 3ch;
+}
+.support__why {
+	align-items: center;
+}
+.support__why::before {
+	background: linear-gradient(transparent, var(--background) 1.5rem);
+	content: "";
+	display: block;
+	left: -3rem;
+	bottom: -3rem;
+	right: -3rem;
+	top: -3rem;
+	position: absolute;
+}
+@media(min-width: 800px) {
+	.support__why::before {
+		background: linear-gradient(to right, transparent, var(--background) 1.5rem);
+	}
+}
+.support__text {
+	margin-bottom: 0;
+	padding-left: 2rem;
+	text-indent: -1rem;
+}
+.cta__container {
+	flex: 1;
+	margin-left: auto;
+	max-width: 200px;
+	text-align: center;
+}
+.cta__link {
+	width: 100%;
+}
+
+.register__wrapper.register__wrapper {
+	margin-left: -3rem;
+	padding-right: 3rem;
+}
+@media(min-width: 800px) {
+	.register__wrapper.register__wrapper {
+		padding-right: 0;
+	}
+}
+.register__status {
+	margin-left: 1rem;
+}
+.register__status:not(.symbol__success):not(.symbol__error):not(.symbol__loading) {
+	display: none;
+}
+.register__note {
+	margin-top: 1rem;
+}
+.register__result {
+	margin-bottom: 0;
+	margin-top: 1rem;
+}
+.register__result:empty {
+	display: none;
+}
+.register__show:checked + .register__show-label {
+	color: var(--text);
+}
+.register__show:checked + .register__show-label::before {
+	clip-path: url(#symbol__checked);
+}
+.register__container {
+	flex-basis: 400px;
+}
+.register__section {
+	flex-grow: 1;
+	margin-left: 3rem;
+}
+.register__face {
+	background: url('/main/avback.gif');
+	background-position: center;
+	background-size: calc(200px * 0.5);
+	height: calc(200px * 0.5);
+	margin-top: 0.5rem;
+	width: calc(170px * 0.5);
+}
+.register__face::after {
+	bottom: 0;
+	background-image: url('/main/avfront.gif');
+	background-position: center 0;
+	background-size: calc(200px * 0.5);
+	content: '';
+	display: block;
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+#register__radio--bat:checked ~ .register__avatar-container .register__face::after {
+	background-position: center calc(-200px * 0.5);
+}
+#register__radio--bat:checked ~ .register__avatar-container .register__bat,
+#register__radio--gecko:checked ~ .register__avatar-container .register__gecko {
+	color: var(--text);
+}
+#register__radio--bat:checked ~ .register__avatar-container .register__bat::before,
+#register__radio--gecko:checked ~ .register__avatar-container .register__gecko::before {
+	clip-path: url(#symbol__checked);
+}
+.obscure__input:checked + .comments__container .obscure__item:nth-of-type(n+7) {
+	display: none;
+}

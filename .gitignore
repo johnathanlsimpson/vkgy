@@ -1,0 +1,26 @@
+# Ignore images
+images/*/*
+!images/*/.gitkeep
+usericons/*
+!usericons/.gitkeep
+uploads/*
+!uploads/.gitkeep
+
+# Ignore sensitive data
+php/database-variables.php
+php/external/function-init_facebook.php
+php/*social_media.php
+php/deploy/*
+php/class-login.php
+google*
+
+# Ignore error logs
+error_log
+errors/*
+!errors/.gitkeep
+
+# Ignore old backups
+# \(*\)*
+
+# Ignore bitbucket log
+php/deploy/bitbucket.log

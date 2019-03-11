@@ -1,0 +1,216 @@
+@media(max-width: 799.9px) {
+	.artist__details--second {
+		display: none;
+	}
+	.bio__item {
+		display: block;
+	}
+	.bio__date {
+		margin-bottom: 0.5rem;
+	}
+	.bio__date--multiple {
+		/*height: 0;
+		margin: 0;
+		overflow: hidden;*/
+	}
+}
+@media(min-width: 800px) {
+	.artist__details--first {
+		display: none;
+	}
+	.bio__item {
+		display: flex;
+	}
+	.bio__date--multiple {
+		color: transparent;
+	}
+}
+
+.lineup__container {
+	background-image: radial-gradient(circle at top center, var(--background--bold) 1px, transparent 0);
+	background-clip: content-box;
+	background-position: left bottom;
+	background-repeat: repeat;
+	background-size: 3px 2rem;
+	line-height: 0;
+}
+.lineup__container::before {
+	content: "";
+	display: block;
+	height: 1px;
+	margin-bottom: -2px;
+	width: 100%;
+}
+.lineup__period {
+	color: var(--text--faint);
+	display: inline;
+	line-height: 2rem;
+	margin: 0;
+	padding: 0;
+	vertical-align: top;
+}
+.lineup__period::before {
+	margin-right: 0.5rem;
+	margin-top: 0.5rem;
+}
+.lineup__period:first-of-type::before {
+	display: none;
+}
+.lineup__period::before {
+	color: var(--attention--faint);
+}
+.lineup__artist-container {
+	display: inline-block;
+	height: 2rem;
+	line-height: 2rem;
+	margin: 0;
+	max-height: 2rem;
+	max-width: 100%;
+	overflow: hidden;
+	vertical-align: top;
+	white-space: nowrap;
+}
+.lineup__artist-container:last-of-type {
+	padding-right: 0.5rem;
+}
+.lineup__artist-container::after {
+	content: ", ";
+	display: inline-block;
+	margin: 0;
+	vertical-align: top;
+}
+.lineup__artist-container:last-of-type::after {
+	display: none;
+}
+.lineup__artist {
+	display: inline-block;
+}
+.lineup__artist .any--jp {
+	opacity: 0.75;
+}
+
+.label__container {
+	text-align: center;
+}
+.label__comma {
+	display: block;
+	margin: 1rem;
+}
+.label__company {
+	text-align: center;
+}
+.label__line {
+}
+.label__next {
+	align-self: center;
+	color: var(--attention--faint);
+	margin-left: 1rem;
+	margin-right: 1rem;
+}
+.label__period {
+	align-items: center;
+	border: 1px solid var(--background);
+	border-radius: 3px;
+	padding: 0.5rem;
+}
+
+.bio__container {
+	counter-reset: lineup;
+}
+.bio__item {
+	margin-left: -1rem;
+}
+.bio__item[data-item-type~="lineup"] {
+	counter-increment: lineup;
+}
+.bio__item[data-item-type~="lineup"] h5::after {
+	content: "Lineup #" counter(lineup);
+}
+.bio__item[data-item-type~="lineup"] .bio__content {
+	border: 3px solid var(--background--bold);
+	border-radius: 3px;
+	padding: 0.5rem;
+}
+.bio__item[data-item-type~="disbandment"] .bio__content {
+	border: 3px solid var(--accent);
+	border-radius: 3px;
+	color: var(--accent) !important;
+	padding: 0.5rem;
+}
+.bio__item[data-item-type~="formation"] .bio__content {
+	border: 3px solid var(--attention--faint);
+	border-radius: 3px;
+	color: var(--attention--faint) !important;
+	padding: 0.5rem;
+}
+.bio__item[data-item-type~="disbandment"] p:last-of-type::after {
+	content: "...";
+}
+.bio__item:not([data-item-num="0"]) .h4 {
+	color: transparent;
+}
+.bio__item:not([data-item-type~="release"]):not([data-item-type~="lineup"]):not([data-item-type~="schedule"]):not([data-item-type~="setlist"]) .bio__content {
+	color: inherit;
+	font-size: inherit;
+}
+.bio__item p {
+	line-height: inherit;
+}
+.bio__date, .bio__content {
+	box-sizing: border-box;
+	line-height: inherit;
+	margin-left: 1rem;
+	vertical-align: top;
+}
+.bio__date {
+	white-space: nowrap;
+}
+.bio__content {
+	flex-grow: 1;
+	white-space: normal;
+}
+
+.artist__main-image-link {
+	display: inline-block; width: 100%; vertical-align: middle;
+}
+.artist__main-image {vertical-align: middle; width: 100%;}
+
+.artist__main-image-link + .artist__stats, .artist__description:not(:empty) {
+	margin-top: 1rem;
+}
+.artist__stat {
+	border-left: 1px dotted var(--background--bold); margin-right: 0.5rem;
+}
+
+.images__container {
+	justify-content: space-between;
+	flex-wrap: wrap;
+	margin: -0.5rem;
+}
+.images__item.images__item {
+	display: block;
+	height: 4rem;
+	margin: 0.5rem;
+	padding: 0;
+	width: 4rem;
+}
+.images__link {
+	background-size: cover;
+	display: block;
+	height: 100%;
+}
+
+.artist__next .h5::after { content: "next artist"; }
+.artist__previous .h5::after { content: "previous artist"; }
+.artist__rand .h5::after { content: "random artist"; }
+
+.artist__next { order: 3; }
+.artist__rand { order: 2; }
+.artist__previous { order: 1; }
+
+.artist__rand .symbol__rand::before { display: none; }
+
+@media(min-width: 800px) {
+	.artist__next { text-align: right; }
+	.artist__rand { text-align: center; }
+}

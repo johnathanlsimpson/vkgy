@@ -1,0 +1,90 @@
+[Name]=vk.gy
+[BasedOn]=http://vk.gy/
+[IndexUrl]=http://vk.gy/tag-source/?username={username}&hash={hash}&artist_album=
+[AlbumUrl]=http://vk.gy
+[WordSeperator]=+
+[IndexFormat]=%artist%|%_url%|%album%
+[SearchBy]=%artist%|%album%
+[Encoding]=url-utf-8
+[UserAgent]=1
+
+
+[ParserScriptIndex]=...
+# ###################################################################
+#					I  N  D  E  X
+# ###################################################################
+# debug "on" "C:/mp3tag-vkgy-debug.txt" "10"
+# debugwriteinput "C:/mp3tag-vkgy-debug-input.txt"
+
+do
+	movechar 1
+	sayrest
+	saynewline
+	moveline 1
+while "|" 500
+
+[ParserScriptAlbum]=...
+# ###################################################################
+#					A  L  B  U  M
+# ###################################################################
+# debug "on" "C:/mp3tag-vkgy-debug.txt" "10"
+
+outputto "artist"
+RegexpReplace "^ " ""
+sayrest
+moveline 1
+
+outputto "artistsort"
+RegexpReplace "^ " ""
+sayrest
+moveline 1
+
+outputto "album"
+RegexpReplace "^ " ""
+sayrest
+moveline 1
+
+outputto "albumsort"
+RegexpReplace "^ " ""
+sayrest
+moveline 1
+
+outputto "grouping"
+RegexpReplace "^ " ""
+sayrest
+moveline 1
+
+outputto "vkgy_release_url"
+RegexpReplace "^ " ""
+sayrest
+moveline 1
+
+outputto "coverurl"
+RegexpReplace "^ " ""
+sayrest
+moveline 1
+
+outputto "year"
+RegexpReplace "^ " ""
+sayrest
+moveline 1
+
+outputto "comment"
+RegexpReplace "^ " ""
+sayrest
+moveline 1
+
+outputto "genre"
+RegexpReplace "^ " ""
+sayrest
+moveline 1
+
+outputto "tracks"
+RegexpReplace "^ " ""
+sayrest
+moveline 1
+
+outputto "titlesort"
+RegexpReplace "^ " ""
+sayrest
+#moveline 1

@@ -1,0 +1,50 @@
+.search__sort {
+	display: inline-block;
+	float: left;
+	margin-right: 0.5rem;
+}
+.search__filter {
+	display: inline-block;
+	float: right;
+	margin-left: 0.5rem;
+}
+.search__clear {
+	clear: both;
+	height: 0;
+}
+.search__new {
+	align-items: center;
+	align-self: stretch;
+}
+
+#filter--cd:checked    ~ .search__results .search__item:not([data-medium*="cd"]),
+#filter--dvd:checked   ~ .search__results .search__item:not([data-medium*="dvd"]),
+#filter--other:checked ~ .search__results .search__item[data-medium*="cd"],
+#filter--other:checked ~ .search__results .search__item[data-medium*="dvd"] {
+	display: none;
+}
+.search__item {
+	display: flex;
+	flex-direction: column;
+}
+@media(min-width: 800px) {
+	.search__item {
+		flex-direction: row;
+	}
+	.search__artist {
+		display: inline-block;
+		width: 200px;
+	}
+	.search__artist, .search__release {
+		margin-left: 1rem;
+	}
+	.search__release {
+		margin-right: auto;
+	}
+}
+.search__pages {
+	margin: 1rem 0;
+}
+.search__pages:last-of-type {
+	margin: -2rem 0 3rem 0;
+}

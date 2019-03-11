@@ -1,0 +1,19 @@
+{
+    "name": "vk.gy",
+    "short_name": "vk.gy",
+    "icons": [
+        {
+            "src": "/style/icons/android-chrome-192x192.png?v=kPx5XXPBb0",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/style/icons/android-chrome-256x256.png?v=kPx5XXPBb0",
+            "sizes": "256x256",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#6f1131",
+    "background_color": "#6f1131",
+    "display": "standalone"
+}

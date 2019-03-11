@@ -1,0 +1,13 @@
+User-agent: *
+Disallow: /releases/add/$
+Disallow: /releases/*/edit/$
+Disallow: /blog/add/$
+Disallow: /blog/*/edit/$
+Disallow: /musicians/add/$
+Disallow: /musicians/*/edit/$
+Disallow: /labels/add/$
+Disallow: /labels/*/edit/$
+Disallow: /artists/add/$
+Disallow: /artists/*/edit/$
+Disallow: /vip/add/$
+Disallow: /php*$

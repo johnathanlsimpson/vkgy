@@ -1,0 +1,38 @@
+.artist-list__container {
+	column-gap: 2rem;
+	column-rule: 1px dotted var(--background--bold);
+	column-width: 200px;
+}
+.artist-list__container:not(:empty)::before { display: none; }
+.artist-list__link {
+	display: inline-block;
+}
+.artist-list__item {
+	border: none;
+	page-break-after: avoid;
+	page-break-before: avoid;
+	page-break-inside: avoid;
+}
+.artist-list__item:first-of-type {
+	padding-top: 1rem;
+}
+.artist-list__hint:empty {
+	display: none;
+}
+.artist-list__history {
+	display: none;
+}
+.controls__letters, .controls__title, .controls__search {
+	flex-grow: 1;
+}
+.controls__control {
+	display: inline-block;
+}
+.controls__container {
+	flex-wrap: wrap;
+}
+
+
+#exclusive:checked ~ .text .artist-list__item[data-is_exclusive="0"] { display: none; }
+#recent:checked ~ .text .artist-list__item[data-recent="false"] { display: none; }
+#recent:checked ~ .text .artist-list__item[data-recent="true"] .artist-list__history { display: block; }

@@ -1,0 +1,6 @@
+[id="admin"]:checked ~ .text tr:not([data-admin]) {
+	display: none;
+}
+[id="vip"]:checked ~ .text tr:not([data-vip]) {
+	display: none;
+}

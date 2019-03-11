@@ -1,0 +1,74 @@
+.upcoming__date, .upcoming__artist {
+	white-space: nowrap;
+}
+
+.search__note {
+	margin-top: 1rem;
+}select[name][name][name] + .selectize-control .item + .item::before {
+	color: var(--text--faint);
+	content: ", ";
+}
+.input.input.input.input.selectize-control * {
+	background-color: transparent;
+	border: none;
+	border-radius: 0;
+	box-shadow: none;
+	color: inherit;
+	height: auto;
+	font-family: inherit;
+	font-size: 1rem;
+	line-height: 1;
+	margin: 0;
+	padding: 0;
+}
+.input.input.input.input .selectize-input {
+	border-radius: 3px;
+	margin-left: -0.5rem;
+	margin-top: -0.5rem;
+	padding: 0.5rem;
+	width: calc(0.5rem + 100% + 0.5rem);
+}
+.input.input.input.input .selectize-input input {
+	height: 1rem;
+}
+.input.input.input.input .selectize-input {
+	background-image: linear-gradient(to right, var(--interactive--faint) 50%, transparent 0);
+	background-position: bottom right;
+	background-repeat: no-repeat;
+	background-size: 201% 2px;
+	transition: background-position 0.1s ease-in-out;
+}
+.input.input.input.input .selectize-input.focus {
+	background-position: bottom left;
+}
+.input.input.input.input .selectize-input.dropdown-active::before {
+	display: none;
+}
+.input.input.input.input .selectize-dropdown {
+	background: var(--background--bold);
+	border-radius: 0 0 3px 3px;
+	box-shadow:
+		inset 0 -2px 0 0 var(--interactive--faint),
+		inset -2px 0 0 0 var(--interactive--faint),
+		inset 2px 0 0 0 var(--interactive--faint);
+	box-sizing: content-box;
+	margin-left: -0.5rem;
+	padding: 0.5rem;
+	width: 100%;
+}
+.input.input.input.input .selectize-dropdown-content .option {
+	border-radius: 3px;
+	padding: 0.5rem;
+}
+.input.input.input.input .highlight {
+	background: var(--attention--faint);
+}
+.input.input.input.input .option.active {
+	box-shadow: inset 0 0 0 2px rgba(255,255,255, 0.1);
+}
+.input.input.input.input .has-items:not(.input-active) {
+	white-space: nowrap;
+}
+.input.input.input.input .selectize-control.multi .item {
+	margin-right: 0.5rem;
+}

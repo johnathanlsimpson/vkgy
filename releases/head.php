@@ -1,0 +1,5 @@
+<?php
+	breadcrumbs([
+		"Releases" => "/releases/"
+	]);
+?>

@@ -1,0 +1,58 @@
+svg {
+	height: auto;
+	max-width: 100%;
+	width: 400px;
+	vertical-align: top;
+}
+.avatar__column {
+}
+.avatar__container {
+	padding: 0;
+	text-align: center;
+	overflow: hidden;
+}
+@media (min-height: 600px) and (max-width: 799.99px) {
+	.avatar__column {
+		position: -webkit-sticky;
+		position: sticky;
+		top: 1rem;
+		z-index: 2;
+	}
+	.avatar__container {
+		margin-bottom: 0;
+	}
+	svg {
+		width: 200px;
+	}
+}
+@media (min-width: 800px) {
+	.avatar__column {
+		position: -webkit-sticky;
+		position: sticky;
+		top: 4rem;
+		width: 400px;
+	}
+	.avatar__container {
+		margin-bottom: 0;
+	}
+	.controls__column {
+		flex: 1;
+		margin-left: 3rem;
+		width: auto;
+	}
+}
+.avatar__result:empty {
+	display: none;
+}
+.avatar__result {
+	margin-bottom: 0;
+}
+.avatar--vip::after {
+	border-radius: 2px;
+	box-shadow: inset 0 0 0 1px var(--accent);
+	color: var(--accent);
+	content: "VIP";
+	font-size: 0.75em;
+	margin-left: 2px;
+	padding: 0 2px;
+}

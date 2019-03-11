@@ -1,0 +1,13 @@
+.list__header th {
+	padding-bottom: 1rem;
+	text-align: left;
+	vertical-align: top;
+	white-space: nowrap;
+}
+.list__friendly {
+	align-self: flex-start;
+	word-break: break-all;
+}
+.list__nicknames {
+	margin-top: 0.5rem;
+}

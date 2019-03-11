@@ -1,0 +1,29 @@
+.entry__image-container {
+	margin: -1rem;
+	margin-bottom: 1rem;
+	text-align: center;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+.entry__image-link {
+	display: inline-block;
+	max-width: 100%;
+}
+.entry__image-container::before {
+	background: rgba(17,17,17, 0.9);
+	bottom: 0;
+	content: "";
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 2;
+}
+.entry__image {
+	max-height: 1600px;
+	max-width: 100%;
+	vertical-align: bottom;
+	width: 800px;
+	z-index: 3;
+}

@@ -1,0 +1,19 @@
+.search__blog-link {
+	flex-shrink: 0;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.search__blog-content  {
+	margin-left: 0.5rem;
+	max-width: 100%;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.search__show-more {
+	margin-top: 3rem;
+	width: 100%;
+}

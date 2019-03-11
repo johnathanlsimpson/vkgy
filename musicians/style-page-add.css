@@ -1,0 +1,16 @@
+.add__list {
+	padding-bottom: 0;
+}
+.add__list label {
+	margin-bottom: 1rem;
+	margin-right: 1rem;
+}
+.add__example {
+	display: block;
+	margin-bottom: 1rem;
+	width: 100%;
+}
+.add__result:not(:empty) {
+	margin-bottom: 0;
+	margin-top: 1rem;
+}

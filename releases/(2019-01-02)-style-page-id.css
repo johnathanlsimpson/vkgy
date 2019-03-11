@@ -1,0 +1,248 @@
+.comment__container li:first-of-type {
+	margin-top: 3rem;
+}
+.comment__sign-in .input__row {
+	justify-content: space-between;
+}
+.comment__sign-in .input__group {
+	align-items: center;
+}
+.comment__status, .comment__result {
+	text-indent: 0.5rem;
+	align-self: center;
+}
+.comment__delete {
+	margin-right: 0.5rem;
+}
+.comment__info {
+	margin-right: auto;
+}
+.comment__delete, .comment__like {
+	font-size: 1rem;
+}
+.release__prev-next {
+	margin-bottom: 3rem;
+	max-width: calc(50% - 0.5rem);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: calc(50% - 0.5rem);
+}
+.release__prev-next:nth-of-type(2) {
+	text-align: right;
+}
+.release__tracklist {
+	text-align: left;
+}
+.track__artist {
+	display: inline-block;
+	max-width: 100%;
+	width: 100%;
+}
+.track__artist-link {
+	display: inline-block;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.track__artist-romaji {
+	display: inline-block;
+}
+.track__artist-romaji:not(:empty)::before {
+	content: "(";
+}
+.track__artist-romaji:not(:empty)::after {
+	content: ")";
+}
+.track__num {
+	display: table-cell;
+	max-width: 4ch;
+}
+.track__name {
+	display: block;
+	width: 100%;
+}
+.track__num {
+	white-space: nowrap;
+}
+.release__disc {
+	padding-bottom: 1rem;
+}
+.release__section {
+	padding-bottom: 1rem;
+	padding-top: 1rem;
+}
+.release__data {
+	padding-left: 1rem;
+	text-align: right;
+	white-space: nowrap;
+}
+
+@media(max-width: 799.9px) {
+	.track__name {
+		padding-top: 0;
+	}
+	.track__num, .track__artist {
+		display: block;
+		padding: 0;
+		padding-top: 0.5rem;
+		width: auto;
+	}
+	.track__artist:empty {
+		padding: 0;
+	}
+	.track__name {
+		display: block;
+		padding: 0;
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+	}
+}
+@media(min-width: 800px) {
+	.track__num, .track__artist, .track__name {
+		display: table-cell;
+	}
+	.track__artist:empty {
+		max-width: 0;
+		min-width: 0;
+		padding-left: 0;
+		padding-right: 0;
+		width: 0;
+	}
+	.track__artist:not(:empty) {
+		max-width: 150px;
+		min-width: 150px;
+		width: 150px;
+	}
+	.track__artist-romaji {
+		display: block;
+	}
+	.track__artist-romaji::before, .track__artist-romaji::after {
+		content: none;
+		display: none;
+	}
+}
+
+.credits__title-container {
+	text-align: right;
+}
+.credits__title {
+	box-sizing: content-box;
+	display: inline-block;
+	max-width: calc(50vw - 2rem - 2px);
+}
+.credits__credit {
+	width: 100%;
+}
+.release__data {
+	order: 2;
+}
+.marketing__row {
+	flex-direction: column;
+}
+.marketing__cell {
+	text-align: center;
+}
+@media(max-width: 799.99px) {
+	.marketing__cell {
+		padding-left: 0;
+		padding-right: 0;
+	}
+	.marketing__cell + .marketing__cell {
+		padding-top: 0.5rem;
+	}
+	.release__tracklist-container {
+		flex-direction: column;
+	}
+	.release__data {
+		border-bottom: 1px dotted var(--text--faint);
+		display: flex;
+		justify-content: space-between;
+		margin: 0;
+		margin-bottom: 1rem;
+		order: 0;
+		padding-bottom: 1rem;
+		padding-left: 0;
+	}
+	.release__data ul {
+		border: none;
+		display: inline-block;
+		margin-top: 0;
+		padding-top: 0;
+	}
+}
+@media(min-width: 800px) {
+	.marketing__row {
+		flex-direction: row;
+	}
+	.marketing__cell {
+		flex: 1;
+	}
+}
+
+.rate__item::before {
+	opacity: 1;
+}
+
+.comment__sign-in {
+	padding-top: 1rem;
+}
+.data__item {
+	border-left: 1px dotted var(--background--bold);
+	margin-right: 0.5rem;
+}
+
+
+
+.release__head {
+	flex-direction: column;
+}
+.release__image-link {
+	margin-top: 1rem;
+	order: 2;
+}
+.release__image-link, .release__image-link img {
+	display: block;
+	width: 100%;
+}
+
+
+@media(min-width: 800px) {
+	.release__head {
+		flex-direction: row;
+	}
+	.release__image-link {
+		margin-right: 1rem;
+		margin-top: 0;
+		order: 1;
+	}
+	.release__image-link + * {
+		order: 2;
+	}
+	.release__image-link, .release__image-link img {
+		max-width: 300px;
+	}
+}
+
+.collect__result {
+	margin-bottom: 0;
+	margin-top: 1rem;
+}
+.collect__result:empty {
+	display: none;
+}
+
+.release__images {
+	overflow-x: auto;
+	padding-bottom: 0;
+	white-space: nowrap;
+}
+.release__images a {
+	display: inline-block;
+	margin-bottom: 1rem;
+}
+.release__thumbnail {
+	height: 100px;
+	vertical-align: middle;
+	width: auto;
+}

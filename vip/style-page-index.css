@@ -1,0 +1,22 @@
+.images__container {
+	justify-content: space-between;
+	flex-wrap: wrap;
+	margin: -0.5rem;
+}
+.images__item.images__item {
+	display: block;
+	height: 4rem;
+	margin: 0.5rem;
+	padding: 0;
+	width: 4rem;
+}
+.images__link {
+	background-size: cover;
+	display: block;
+	height: 100%;
+}
+@media(min-width: 800px) {
+	.vip__sidebar {
+		order: 2;
+	}
+}
