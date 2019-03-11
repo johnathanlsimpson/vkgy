@@ -1,5 +1,8 @@
 <?php
 include('config-deploy.php');
+include('../function-post_deploy.php');
+
+$payload;
 
 function log_git($input) {
 	global $config;
@@ -37,3 +40,4 @@ function update_repo() {
 }
 
 update_repo();
+post_deploy();
