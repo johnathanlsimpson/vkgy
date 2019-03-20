@@ -50,147 +50,135 @@
 
 							}
 
-							
-
-							if(is_array($label["president"]) || is_array($label["parent_label"])) {
-
 								?>
 
-									<ul class="ul--inline">
-										<li>
-											<h5>
-												ID
-											</h5>
-											<span class="any__note">
-												<?php echo $label["id"]; ?>
-											</span>
-										</li>
-										<?php
+								<ul class="ul--inline">
+									<li>
+										<h5>
+											ID
+										</h5>
+										<span class="any__note">
+											<?php echo $label["id"]; ?>
+										</span>
+									</li>
+									<?php
 
-											if(is_array($label["parent_label"])) {
+										if(is_array($label["parent_label"])) {
 
-												?>
+											?>
 
-													<li>
+												<li>
 
-														<h5>
+													<h5>
 
-															Parent company
+														Parent company
 
-														</h5>
+													</h5>
 
-														<span class="any__note">
+													<span class="any__note">
 
-															<a class="a--inherit symbol__company" href="/labels/<?php echo $label["parent_label"]["friendly"]; ?>/"><?php echo $label["parent_label"]["quick_name"]; ?></a>
+														<a class="a--inherit symbol__company" href="/labels/<?php echo $label["parent_label"]["friendly"]; ?>/"><?php echo $label["parent_label"]["quick_name"]; ?></a>
 
-														</span>
+													</span>
 
-														<span class="any--weaken-jp"><?php echo $label["parent_label"]["romaji"] ? ' ('.$label["parent_label"]["name"].')' : null; ?></span>
+													<span class="any--weaken-jp"><?php echo $label["parent_label"]["romaji"] ? ' ('.$label["parent_label"]["name"].')' : null; ?></span>
 
-													</li>
+												</li>
 
-												<?php
+											<?php
 
-											}
+										}
 
-											
+										
 
-											if(is_array($label["sublabels"]) && !empty($label["sublabels"])) {
+										if(is_array($label["sublabels"]) && !empty($label["sublabels"])) {
 
-												?>
+											?>
 
-													<li>
+												<li>
 
-														<h5>
+													<h5>
 
-															Sublabel<?php echo count($label["sublabels"]) === 1 ? null : "s"; ?>
+														Sublabel<?php echo count($label["sublabels"]) === 1 ? null : "s"; ?>
 
-														</h5>
+													</h5>
 
-														<?php
+													<?php
 
-															for($i = 0; $i < count($label["sublabels"]); $i++) {
+														for($i = 0; $i < count($label["sublabels"]); $i++) {
 
-																?>
+															?>
 
-																	<span class="any__note">
+																<span class="any__note">
 
-																		<a class="a--inherit symbol__company" href="/labels/<?php echo $label["sublabels"][$i]["friendly"]; ?>/"><?php echo $label["sublabels"][$i]["quick_name"]; ?></a>
+																	<a class="a--inherit symbol__company" href="/labels/<?php echo $label["sublabels"][$i]["friendly"]; ?>/"><?php echo $label["sublabels"][$i]["quick_name"]; ?></a>
 
-																	</span>
+																</span>
 
-																	<span class="any--weaken-jp"><?php echo $label["sublabels"][$i]["romaji"] ? ' ('.$label["sublabels"][$i]["name"].')' : null; ?></span>
+																<span class="any--weaken-jp"><?php echo $label["sublabels"][$i]["romaji"] ? ' ('.$label["sublabels"][$i]["name"].')' : null; ?></span>
 
-																<?php
+															<?php
 
-																echo $i + 1 != count($label["sublabels"]) ? ", " : null;
+															echo $i + 1 != count($label["sublabels"]) ? ", " : null;
 
-															}
+														}
 
-														?>
+													?>
 
-													</li>
+												</li>
 
-												<?php
+											<?php
 
-											}
+										}
 
-											
+										
 
-											if(is_array($label["president"])) {
+										if(is_array($label["president"])) {
 
-												?>
+											?>
 
-													<li>
+												<li>
 
-														<h5>
+													<h5>
 
-															President
+														President
 
-														</h5>
+													</h5>
 
-														<?php
+													<?php
 
-															if(!empty($label["president"]["friendly"])) {
+														if(!empty($label["president"]["friendly"])) {
 
-																?>
+															?>
 
-																	<a class="a--inherit" href="/musicians/<?php echo $label["president"]["id"]."/".$label["president"]["friendly"]; ?>/"><?php echo $label["president"]["quick_name"]; ?></a>
+																<a class="a--inherit" href="/musicians/<?php echo $label["president"]["id"]."/".$label["president"]["friendly"]; ?>/"><?php echo $label["president"]["quick_name"]; ?></a>
 
-																	<span class="any--weaken-jp"><?php echo $label["president"]["romaji"] ? ' ('.$label["president"]["name"].')' : null; ?></span>
+																<span class="any--weaken-jp"><?php echo $label["president"]["romaji"] ? ' ('.$label["president"]["name"].')' : null; ?></span>
 
-																<?php
+															<?php
 
-															}
+														}
 
-															else {
+														else {
 
-																echo $label["president"]["romaji"] ? $label["president"]["romaji"]." (".$label["president"]["name"].")" : $label["president"]["name"];
+															echo $label["president"]["romaji"] ? $label["president"]["romaji"]." (".$label["president"]["name"].")" : $label["president"]["name"];
 
-															}
+														}
 
-														?>
+													?>
 
-													</li>
+												</li>
 
-												<?php
+											<?php
 
-											}
+										}
 
-										?>
+									?>
 
-										</ul>
+									</ul>
 
-								<?php
-
-							}
-
-						?>
-
-					</div>
-
+				</div>
 					
-
 					<?php
 
 						if(!empty($label["official_links"])) {
