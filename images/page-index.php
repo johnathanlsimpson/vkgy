@@ -13,9 +13,20 @@
 		'vip' => 'images.is_exclusive=1',
 	];
 	$sql_images = 
-		'SELECT images.*, users.username, artists.name AS artist_name, artists.romaji AS artist_romaji, artists.friendly AS artist_friendly FROM images '.
+		"SELECT
+			images.*,
+			users.username,
+			artists.name AS artist_name,
+			artists.romaji AS artist_romaji,
+			artists.friendly AS artist_friendly,
+			CONCAT_WS(' ', COALESCE(releases.romaji, releases.name, ''), COALESCE(releases.press_romaji, releases.press_name, ''), COALESCE(releases.type_romaji, releases.type_name, '')) AS release_romaji,
+			CONCAT_WS(' ', COALESCE(releases.name, ''), COALESCE(releases.press_name, ''), COALESCE(releases.type_name, '')) AS release_name,
+			releases.friendly AS release_friendly,
+			releases.id AS release_id
+			FROM images ".
 		'LEFT JOIN users ON users.id=images.user_id '.
 		"LEFT JOIN artists ON artists.id REGEXP CONCAT('^\(', images.artist_id, '\)$') ".
+		"LEFT JOIN releases ON releases.id REGEXP CONCAT('^\(', images.release_id, '\)$') ".
 		($where_images[$search_type] ? 'WHERE '.$where_images[$search_type] : null).' '.
 		'ORDER BY images.date_added '.$search_order.' '.
 		'LIMIT '.$limit_images;
@@ -96,16 +107,24 @@
 				<?php
 					foreach($rslt_images as $image) {
 						?>
-							<li>
-								<a href="https://vk.gy/images/<?php echo $image['id'].($image['friendly'] ? '-'.$image['friendly'] : null).'.'.$image['extension']; ?>">
-									<img src="https://vk.gy/images/<?php echo $image['id'].'.thumbnail.'.$image['extension']; ?>" style="vertical-align: middle;" />
+							<li style="padding-bottom: 0;">
+								<a href="https://vk.gy/images/<?php echo $image['id'].($image['friendly'] ? '-'.$image['friendly'] : null).'.'.$image['extension']; ?>" style="margin-right: 0.75rem;margin-bottom: 1rem;vertical-align: top; display: inline-block; z-index: 2;">
+									<img src="https://vk.gy/images/<?php echo $image['id'].'.thumbnail.'.$image['extension']; ?>" style="vertical-align: top;" />
 								</a>
 								
+								<div class="data__container" style="display: inline-block; margin-bottom: 0.5rem;">
 								<div class="data__item">
 									<h5>
 										Uploaded
 									</h5>
 									<?php echo substr($image['date_added'], 0, 10).' <span class="any--weaken-color">'.substr($image['date_added'], 11).'</span>'; ?>
+								</div>
+								
+								<div class="data__item">
+									<h5>
+										Uploaded by
+									</h5>
+									<a class="user" href="<?php echo '/users/'.$image['username'].'/'; ?>"><?php echo $image['username']; ?></a>
 								</div>
 								
 								<?php
@@ -121,14 +140,38 @@
 											</div>
 										<?php
 									}
+									if($image['release_name'] && $image['release_friendly']) {
+										?>
+											<div class="data__item">
+												<h5>
+													Release
+												</h5>
+												<a href="<?php echo '/releases/'.$image['artist_friendly'].'/'.$image['release_id'].'/'.$image['release_friendly'].'/'; ?>">
+													<?php echo lang(($image['release_romaji'] ?: $image['release_name']), $image['release_name'], ['container' => 'span', 'secondary_class' => 'any--hidden']); ?>
+												</a>
+											</div>
+										<?php
+									}
+									if($image['description']) {
+										?>
+											<div class="data__item any--weaken-color">
+												<h5>
+													Description
+												</h5>
+												<?php echo $image['description']; ?>
+											</div>
+										<?php
+									}
+									if($image['is_exclusive']) {
+										?>
+											<div class="data__item any--weaken-color" style="display: block;">
+												<span class="symbol__vip" style="border: 1px solid; border-radius: 3px; color: var(--accent); padding: 0 2px;">VIP</span>
+												<a href="https://patreon.com/vkgy" target="_blank">Become VIP</a> for high-res, unwatermarked version.
+											</div>
+										<?php
+									}
 								?>
-								<div class="data__item">
-									<h5>
-										Releases
-									</h5>
-									<?php echo $image['release_id']; ?>
 								</div>
-								<?php print_r($image); ?>
 							</li>
 						<?php
 					}
