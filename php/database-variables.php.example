@@ -1,0 +1,20 @@
+<?php
+// Set database connection variables here; used in /php/database-connect.php
+// Rename to database-variables.php
+$pdo_config = [
+	'mysql_host'     => 'localhost',
+	'mysql_username' => '',
+	'mysql_password' => '',
+	'db_name'        => '',
+	'db_charset'     => 'utf8mb4',
+	'db_collation'   => 'utf8mb4_unicode_520_ci',
+	'db_dummy_data'  => true, // when building DB for first time, will populate with dummy data if true
+];
+
+// Default connection options; probably don't need to change these unless turning on stricter error handling
+$pdo_options = [
+	PDO::ATTR_ERRMODE            => PDO::ERRMODE_SILENT,
+	PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+	PDO::ATTR_EMULATE_PREPARES   => false,
+	PDO::ATTR_PERSISTENT         => false
+];
