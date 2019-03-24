@@ -259,7 +259,7 @@
 					<a class="artist" data-name="<?php echo $image["artist_name"]; ?>" href="/artists/<?php echo $image["artist_friendly"]; ?>/"><?php echo $image["artist_quick_name"]; ?></a>
 				</p>
 				<p class="any--weaken">
-					<a class="a--inherit symbol__vip" href="https://patreon.com/vkgy/" target="_blank">VIP members</a> can view these at high-res without watermarks. <a class="a--inherit" href="https://patreon.com/vkgy/" target="_blank">Support vkgy</a> to access VIP membership.
+					<a class="symbol__vip" href="https://patreon.com/vkgy/" target="_blank">VIP members</a> can access high-res, unwatermarked version. <a href="/images/&type=flyer">View past flyers?</a>
 				</p>
 			</div>
 		</div>
