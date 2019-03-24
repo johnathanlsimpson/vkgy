@@ -1,9 +1,13 @@
 <?php
+	style([
+		'/images/style-page-index.css',
+	]);
+	
 	$search_page = (int) $_GET['page'] == $_GET['page'] && $_GET['page'] > 0 ? (int) $_GET['page'] : 1;
 	$search_type = in_array(strtolower($_GET['type']), ['all', 'flyer', 'artist', 'release', 'vip']) ? strtolower($_GET['type']) : 'all';
 	$search_order = in_array(strtoupper($_GET['order']), ['ASC', 'DESC']) ? strtoupper($_GET['order']) : 'DESC';
 	
-	$limit_num = 6;
+	$limit_num = 25;
 	$limit_images = (($search_page * $limit_num) - $limit_num).', '.$limit_num;
 	$where_images = [
 		'all' => null,
@@ -39,26 +43,21 @@
 	$stmt_num_images->execute();
 	$num_images = $stmt_num_images->fetchColumn();
 	$num_pages = ceil($num_images / $limit_num);
-	
-	echo $sql_images;
-	//echo $num_images.'*'.$num_pages;
-	//echo '<pre>'.print_r($rslt_images, true).'</pre>';
 ?>
 
-<div class="col c1 images__container">
+<div class="col c1">
 	<div>
 		<h2>
-			<?php echo lang('Images list', 'イメージ一覧', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
+			<?php echo lang('Images list', '画像一覧', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
 		</h2>
 	</div>
 	
-	<div class="col c2" style="margin-bottom: 1rem;">
+	<div class="col c2 images__controls">
 		<div>
 			<a href="/images/&type=<?php echo $search_type; ?>&order=desc" class="input__checkbox-label symbol__down-caret <?php echo strtolower($search_order) === 'desc' ? 'input__checkbox-label--selected' : null; ?>">Date uploaded</a>
 			<a href="/images/&type=<?php echo $search_type; ?>&order=asc" class="input__checkbox-label symbol__up-caret <?php echo strtolower($search_order) === 'asc' ? 'input__checkbox-label--selected' : null; ?>">Date uploaded</a>
 		</div>
-		
-		<div style="text-align: right;">
+		<div>
 			<a href="/images/&type=all&order=<?php echo strtolower($search_order); ?>" class="input__checkbox-label <?php echo $_GET['type'] === 'all' ? 'symbol__checked input__checkbox-label--selected' : 'symbol__unchecked'; ?>">All</a>
 			<a href="/images/&type=flyer&order=<?php echo strtolower($search_order); ?>" class="input__checkbox-label <?php echo $_GET['type'] === 'flyer' ? 'symbol__checked input__checkbox-label--selected' : 'symbol__unchecked'; ?>">Flyer</a>
 			<a href="/images/&type=artist&order=<?php echo strtolower($search_order); ?>" class="input__checkbox-label <?php echo $_GET['type'] === 'artist' ? 'symbol__checked input__checkbox-label--selected' : 'symbol__unchecked'; ?>">Artist</a>
@@ -67,7 +66,7 @@
 		</div>
 	</div>
 	
-	<div class="col c3 any--weaken-color" style="margin-bottom: 1rem;">
+	<div class="col c3 any--weaken-color images__controls">
 		<div>
 			<?php
 				if($search_page > 1) {
@@ -82,10 +81,10 @@
 				}
 			?>
 		</div>
-		<div style="text-align: center;">
+		<div>
 			Results <?php echo (($search_page - 1) * $limit_num + 1).' to '.(($search_page - 1) * $limit_num + $limit_num); ?>
 		</div>
-		<div style="text-align: right;">
+		<div>
 			<?php
 				if($search_page < $num_pages) {
 					?>
@@ -103,74 +102,74 @@
 	
 	<div>
 		<div class="text">
-			<ul>
+			<ul class="images__container">
 				<?php
 					foreach($rslt_images as $image) {
 						?>
-							<li style="padding-bottom: 0;">
-								<a href="https://vk.gy/images/<?php echo $image['id'].($image['friendly'] ? '-'.$image['friendly'] : null).'.'.$image['extension']; ?>" style="margin-right: 0.75rem;margin-bottom: 1rem;vertical-align: top; display: inline-block; z-index: 2;">
-									<img src="https://vk.gy/images/<?php echo $image['id'].'.thumbnail.'.$image['extension']; ?>" style="vertical-align: top;" />
+							<li class="image__wrapper">
+								<a class="image__link" href="https://vk.gy/images/<?php echo $image['id'].($image['friendly'] ? '-'.$image['friendly'] : null).'.'.$image['extension']; ?>">
+									<img class="image__thumbnail lazy" data-src="https://vk.gy/images/<?php echo $image['id'].'.thumbnail.'.$image['extension']; ?>" />
 								</a>
 								
-								<div class="data__container" style="display: inline-block; margin-bottom: 0.5rem;">
-								<div class="data__item">
-									<h5>
-										Uploaded
-									</h5>
-									<?php echo substr($image['date_added'], 0, 10).' <span class="any--weaken-color">'.substr($image['date_added'], 11).'</span>'; ?>
-								</div>
-								
-								<div class="data__item">
-									<h5>
-										Uploaded by
-									</h5>
-									<a class="user" href="<?php echo '/users/'.$image['username'].'/'; ?>"><?php echo $image['username']; ?></a>
-								</div>
-								
-								<?php
-									if($image['artist_name'] && $image['artist_friendly']) {
-										?>
-											<div class="data__item">
-												<h5>
-													Artist
-												</h5>
-												<a href="<?php echo '/artists/'.$image['artist_friendly'].'/'; ?>">
-													<?php echo lang(($image['artist_romaji'] ?: $image['artist_name']), $image['artist_name'], ['container' => 'span', 'secondary_class' => 'any--hidden']); ?>
-												</a>
-											</div>
-										<?php
-									}
-									if($image['release_name'] && $image['release_friendly']) {
-										?>
-											<div class="data__item">
-												<h5>
-													Release
-												</h5>
-												<a href="<?php echo '/releases/'.$image['artist_friendly'].'/'.$image['release_id'].'/'.$image['release_friendly'].'/'; ?>">
-													<?php echo lang(($image['release_romaji'] ?: $image['release_name']), $image['release_name'], ['container' => 'span', 'secondary_class' => 'any--hidden']); ?>
-												</a>
-											</div>
-										<?php
-									}
-									if($image['description']) {
-										?>
-											<div class="data__item any--weaken-color">
-												<h5>
-													Description
-												</h5>
-												<?php echo $image['description']; ?>
-											</div>
-										<?php
-									}
-									if($image['is_exclusive']) {
-										?>
-											<div class="data__item any--weaken-color" style="display: block;">
-												<span class="symbol__vip" style="border: 1px solid; border-radius: 3px; color: var(--accent); padding: 0 2px;">VIP</span>
-												<a href="https://patreon.com/vkgy" target="_blank">Become VIP</a> for high-res, unwatermarked version.
-											</div>
-										<?php
-									}
-								?>
+								<div class="data__container image__data">
+									<div class="data__item">
+										<h5>
+											Uploaded
+										</h5>
+										<?php echo substr($image['date_added'], 0, 10).' <span class="any--weaken-color">'.substr($image['date_added'], 11).'</span>'; ?>
+									</div>
+									
+									<div class="data__item">
+										<h5>
+											Uploaded by
+										</h5>
+										<a class="user" href="<?php echo '/users/'.$image['username'].'/'; ?>"><?php echo $image['username']; ?></a>
+									</div>
+									
+									<?php
+										if($image['artist_name'] && $image['artist_friendly']) {
+											?>
+												<div class="data__item">
+													<h5>
+														Artist
+													</h5>
+													<a href="<?php echo '/artists/'.$image['artist_friendly'].'/'; ?>">
+														<?php echo lang(($image['artist_romaji'] ?: $image['artist_name']), $image['artist_name'], ['container' => 'span', 'secondary_class' => 'any--hidden']); ?>
+													</a>
+												</div>
+											<?php
+										}
+										if($image['release_name'] && $image['release_friendly']) {
+											?>
+												<div class="data__item">
+													<h5>
+														Release
+													</h5>
+													<a href="<?php echo '/releases/'.$image['artist_friendly'].'/'.$image['release_id'].'/'.$image['release_friendly'].'/'; ?>">
+														<?php echo lang(($image['release_romaji'] ?: $image['release_name']), $image['release_name'], ['container' => 'span', 'secondary_class' => 'any--hidden']); ?>
+													</a>
+												</div>
+											<?php
+										}
+										if($image['description']) {
+											?>
+												<div class="data__item any--weaken-color">
+													<h5>
+														Description
+													</h5>
+													<?php echo $image['description']; ?>
+												</div>
+											<?php
+										}
+										if($image['is_exclusive']) {
+											?>
+												<div class="data__item any--weaken-color image__vip">
+													<span class="symbol__vip">VIP</span>
+													<a href="https://patreon.com/vkgy" target="_blank">Become VIP</a> for high-res, unwatermarked version.
+												</div>
+											<?php
+										}
+									?>
 								</div>
 							</li>
 						<?php
@@ -180,9 +179,3 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	.images__container .input__checkbox-label {
-		display: inline-block;
-	}
-</style>
