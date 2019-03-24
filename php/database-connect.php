@@ -1,39 +1,67 @@
 <?php
-require '../php/database-variables.php';
 
-if(!isset($pdo) || !$pdo->getAttribute(PDO::ATTR_CONNECTION_STATUS)) {
-	$pdo_dsn      = "mysql:host=$pdo_host;dbname=$pdo_dbname1;charset=$pdo_charset";
-	$pdo_options  = array(
-		PDO::ATTR_ERRMODE            => PDO::ERRMODE_SILENT,
-		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-		PDO::ATTR_EMULATE_PREPARES   => false,
-		PDO::ATTR_PERSISTENT         => false
-	);
+// Get $pdo_config and $pdo_opctions from this file
+require_once '../php/database-variables.php';
 
-	try {
-		$pdo = new PDO($pdo_dsn, $pdo_username, $pdo_password, $pdo_options);
-	}
-	catch(PDOException $e) {
-		file_put_contents ("../errors/mysql".str_replace ("/", "|", $_SERVER ["REQUEST_URI"].$_SERVER["PATH_INFO"].$_SERVER["QUERY_STRING"])."-".$_SERVER["REQUEST_METHOD"]."-".$_SERVER["REMOTE_ADDR"], $e->getMessage());
-		
-		if($e->getMessage() === "SQLSTATE[HY000] [2002] Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (2 \"No such file or directory\")") {
-			$pdo_host = "127.0.0.1";
-			try {
-				$pdo = new PDO($pdo_dsn, $pdo_username, $pdo_password, $pdo_options);
+// Create connection to MySQL; if unable to connect first time, try switching host; return false if fails twice (unable to connect to MySQL)
+function try_pdo_connection($attempts = 0) {
+	global $pdo;
+	global $pdo_config;
+	global $pdo_options;
+	
+	if($attempts < 2) {
+		try {
+			if($attempts > 0) {
+				$pdo_config['mysql_host'] = '127.0.0.1';
 			}
-			catch(PDOException $e) {
-				file_put_contents ("../errors/mysql".str_replace ("/", "|", $_SERVER ["REQUEST_URI"].$_SERVER["PATH_INFO"].$_SERVER["QUERY_STRING"])."-".$_SERVER["REQUEST_METHOD"]."-".$_SERVER["REMOTE_ADDR"], $e->getMessage());
+			
+			$pdo_query = 'mysql:host='.$pdo_config['mysql_host'].';charset='.$pdo_config['db_charset'];
+			$pdo = new PDO($pdo_query, $pdo_config['mysql_username'], $pdo_config['mysql_password'], $pdo_options);
+			
+			return true;
+		}
+		catch(PDOException $e) {
+			file_put_contents ("../errors/mysql".str_replace ("/", "|", $_SERVER ["REQUEST_URI"].$_SERVER["PATH_INFO"].$_SERVER["QUERY_STRING"])."-".$_SERVER["REQUEST_METHOD"]."-".$_SERVER["REMOTE_ADDR"], $e->getMessage());
+			$attempts++;
+			
+			if($e->getMessage() === "SQLSTATE[HY000] [2002] Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (2 \"No such file or directory\")") {
+				try_pdo_connection($attempts);
 			}
 		}
 	}
+	else {
+		return false;
+	}
+}
+
+// Helper function to separate prepared queries and run them (for creating/populating database, if necessary)
+function database_creation_helper($database_query, $pdo) {
+	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	
-	if($pdo) {
-		$sql_check_db = "SHOW DATABASES LIKE '".$pdo_dbname."'";
-		$stmt_check_db = $pdo->prepare($sql_check_db);
-		$stmt_check_db->execute();
-		if(!$stmt_check_db->fetch()) {
-			include('../php/database-create.php');
-			create_vkgy_database($pdo);
+	if($pdo->exec(trim($database_query)) === false) {
+		file_put_contents ("../errors/mysql".str_replace ("/", "|", $_SERVER ["REQUEST_URI"].$_SERVER["PATH_INFO"].$_SERVER["QUERY_STRING"])."-".$_SERVER["REQUEST_METHOD"]."-".$_SERVER["REMOTE_ADDR"], $pdo->errorInfo());
+	}
+}
+
+// If no DB connection set ($pdo), try to connect, then choose appropriate DB
+if(!isset($pdo) || !$pdo->getAttribute(PDO::ATTR_CONNECTION_STATUS)) {
+	
+	if(strlen($pdo_config['mysql_host']) && strlen($pdo_config['mysql_username']) && strlen($pdo_config['db_name'])) {
+		if(try_pdo_connection() && $pdo && $pdo->getAttribute(PDO::ATTR_CONNECTION_STATUS)) {
+			
+			// If connected to MySQL but DB doesn't exist, create DB and optionally populate it with sample data
+			if($pdo->exec('USE '.$pdo_config['db_name']) === false) {
+				include('../php/database-create.php');
+				database_creation_helper($sql_create_database, $pdo);
+				
+				if($pdo_config['db_dummy_data']) {
+					include('../php/database-data.php');
+					database_creation_helper($sql_sample_data, $pdo);
+				}
+			}
+		}
+		else {
+			// Unable to connect to MySQL
 		}
 	}
 }
