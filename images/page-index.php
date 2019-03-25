@@ -16,9 +16,9 @@
 		'release' => 'images.release_id IS NOT NULL',
 		'vip' => 'images.is_exclusive=1',
 	];
-	$sql_images = 
-		"SELECT
-			images.*,
+	$sql_images = "
+		SELECT
+			result.*,
 			users.username,
 			artists.name AS artist_name,
 			artists.romaji AS artist_romaji,
@@ -27,13 +27,17 @@
 			CONCAT_WS(' ', COALESCE(releases.name, ''), COALESCE(releases.press_name, ''), COALESCE(releases.type_name, '')) AS release_name,
 			releases.friendly AS release_friendly,
 			releases.id AS release_id
+		FROM
+		(
+			SELECT images.*
 			FROM images ".
-		'LEFT JOIN users ON users.id=images.user_id '.
-		"LEFT JOIN artists ON artists.id REGEXP CONCAT('^\(', images.artist_id, '\)$') ".
-		"LEFT JOIN releases ON releases.id REGEXP CONCAT('^\(', images.release_id, '\)$') ".
-		($where_images[$search_type] ? 'WHERE '.$where_images[$search_type] : null).' '.
-		'ORDER BY images.date_added '.$search_order.' '.
-		'LIMIT '.$limit_images;
+			($where_images[$search_type] ? 'WHERE '.$where_images[$search_type] : null).' '.
+			'ORDER BY images.date_added '.$search_order.' '.
+			'LIMIT '.$limit_images."
+		) result ".
+		'LEFT JOIN users ON users.id=result.user_id '.
+		"LEFT JOIN artists ON artists.id REGEXP CONCAT('^\(', result.artist_id, '\)$') ".
+		"LEFT JOIN releases ON releases.id REGEXP CONCAT('^\(', result.release_id, '\)$') ";
 	$stmt_images = $pdo->prepare($sql_images);
 	$stmt_images->execute();
 	$rslt_images = $stmt_images->fetchAll();
