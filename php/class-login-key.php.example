@@ -1,0 +1,5 @@
+<?php
+
+// Secret key used when generating cookies in php/class-login.php
+// Make copy and rename to class-login-key.php
+$secret_key = '';

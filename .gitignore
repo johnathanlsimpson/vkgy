@@ -10,7 +10,7 @@ uploads/*
 php/database-variables.php
 php/external/function-init_facebook.php
 php/*social_media.php
-php/class-login.php
+php/class-login-key.php
 google*
 test*
 */config-*.php
