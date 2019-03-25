@@ -1,0 +1,42 @@
+.images__controls {
+	margin-bottom: 1rem;
+}
+@media(min-width: 800px) {
+	.images__controls > div:nth-of-type(2) {
+		text-align: center;
+	}
+	.images__controls > div:last-of-type {
+		text-align: right;
+	}
+}
+.images__controls .input__checkbox-label {
+	display: inline-block;
+}
+.image__wrapper {
+	padding-bottom: 0;
+}
+.image__wrapper:last-of-type {
+	margin-bottom: -1rem;
+}
+.image__link {
+	display: inline-block;
+	margin-bottom: 1rem;
+	margin-right: 0.75rem;
+	z-index: 2;
+}
+.image__link, .image__thumbnail {
+	vertical-align: top;
+}
+.image__data {
+	display: inline-block;
+	margin-bottom: 0.25rem;
+}
+.image__vip {
+	display: block;
+}
+.image__vip span {
+	border: 1px solid;
+	border-radius: 3px;
+	color: var(--accent);
+	padding: 0 2px;
+}
