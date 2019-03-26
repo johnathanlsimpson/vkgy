@@ -32,6 +32,9 @@
 		.bangs__base {
 			fill-opacity: 0.9;
 		}
+		.avatar__filter--opacity-90 {
+			fill-opacity: 0.9;
+		}
 		.avatar__filter--smear {
 			filter: url(#avatar__filter--smear);
 		}
