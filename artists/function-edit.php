@@ -33,6 +33,7 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 		$update_values["active"] = is_numeric($update_values["active"]) ? $update_values["active"] : 0;
 		$update_values["friendly"] = $update_values["friendly"] ? friendly($update_values["friendly"]) : (friendly($update_values["romaji"] ?: $update_values["name"]));
 		$update_values["description"] = $update_values["description"] ? sanitize($markdown_parser->validate_markdown($update_values["description"])) : null;
+		$update_values['is_exclusive'] = $update_values['is_exclusive'] ? 1 : 0;
 		
 		
 		if(!empty($update_values["name"])) {
@@ -233,6 +234,7 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 			}
 			else {
 				$output["status"] = "error";
+				$output['result'] = print_r($pdo->errorInfo(), true);
 			}
 		}
 		
