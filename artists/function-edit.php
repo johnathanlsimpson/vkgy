@@ -291,6 +291,43 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 				
 				unset($history[$i]);
 			}
+			
+			// Loop through and scrape activity areas
+			if(is_numeric($history[$i]['area_id'])) {
+				$area_ids[] = $history[$i]['area_id'];
+			}
+		}
+		
+		// Update activity areas in DB
+		if(is_array($area_ids) && !empty($area_ids)) {
+			$sql_current_areas = 'SELECT * FROM areas_artists WHERE artist_id=?';
+			$stmt_current_areas = $pdo->prepare($sql_current_areas);
+			$stmt_current_areas->execute([ $artist_id ]);
+			$rslt_current_areas = $stmt_current_areas->fetchAll();
+			
+			if(is_array($rslt_current_areas) && !empty($rslt_current_areas)) {
+				foreach($rslt_current_areas as $current_area) {
+					if(in_array($current_area['area_id'], $area_ids)) {
+						$area_key = array_search($current_area['area_id'], $area_ids);
+						unset($area_ids[$area_key]);
+					}
+					else {
+						$sql_delete_area = 'DELETE FROM areas_artists WHERE id=? LIMIT 1';
+						$stmt_delete_area = $pdo->prepare($sql_delete_area);
+						if($stmt_delete_area->execute([ $current_area['id'] ])) {
+						}
+					}
+				}
+			}
+			
+			if(is_array($area_ids) && !empty($area_ids)) {
+				foreach($area_ids as $area_id) {
+					$sql_add_area = 'INSERT INTO areas_artists (artist_id, area_id) VALUES (?, ?)';
+					$stmt_add_area = $pdo->prepare($sql_add_area);
+					if($stmt_add_area->execute([ $artist_id, $area_id ])) {
+					}
+				}
+			}
 		}
 		
 		$sql_history = "SELECT id FROM artists_bio WHERE artist_id=?";
