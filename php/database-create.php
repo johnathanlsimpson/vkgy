@@ -57,6 +57,12 @@ USE `'.$pdo_config['db_name'].'`;
 	    AUTO_INCREMENT query (search Step 3),
 	    and CONSTRAINTS (search Step 4).
    =========================================== */
+	 
+CREATE TABLE IF NOT EXISTS `areas_artists` (
+  `id` int(11) NOT NULL,
+  `artist_id` int(11) NOT NULL,
+  `area_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
 CREATE TABLE IF NOT EXISTS `artists` (
   `id` int(11) NOT NULL,
@@ -682,7 +688,11 @@ CREATE TABLE IF NOT EXISTS `vip_views` (
 /* ===========================================
    Step 2. INDEXES/KEY
    =========================================== */
-	 
+ALTER TABLE `areas_artists`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `artist_id` (`artist_id`),
+  ADD KEY `area_id` (`area_id`);
+
 ALTER TABLE `artists`
 	ADD PRIMARY KEY (`id`),
 	ADD UNIQUE KEY `friendly` (`friendly`);
@@ -915,6 +925,8 @@ ALTER TABLE `vip_views`
    Step 3. AUTO_INCREMENT
    =========================================== */
 
+ALTER TABLE `areas_artists`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `artists`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `artists_bio`
@@ -1030,6 +1042,10 @@ ALTER TABLE `vip_views`
 /* ===========================================
    Step 4. CONSTRAINTS
    =========================================== */
+
+ALTER TABLE `areas_artists`
+  ADD CONSTRAINT `areas_artists_ibfk_1` FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `areas_artists_ibfk_2` FOREIGN KEY (`area_id`) REFERENCES `areas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `artists_bio`
 	ADD CONSTRAINT `artists_bio_ibfk_1` FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
