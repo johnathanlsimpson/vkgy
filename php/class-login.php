@@ -144,6 +144,10 @@
 			
 			// After successful sign in, set session and cookie w/ user info
 			public function set_login_data($user_data) {
+				$sql_set_ip = 'UPDATE users SET ip_address=? WHERE id=? LIMIT 1';
+				$stmt_set_ip = $this->pdo->prepare($sql_set_ip);
+				$stmt_set_ip->execute([ ip2long($_SERVER['REMOTE_ADDR']), $user_data['userID'] ]);
+				
 				$user_data["loggedIn"] = 1;
 				$fields = [
 					"userID",
