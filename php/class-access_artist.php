@@ -310,7 +310,25 @@
 							}
 						}
 						
-						//if(is_array($line_type) && count($line_type) === 1 && ($line_type[0] === 14 || $line_type[0] === 15)) {
+						if(is_array($line_type) && (in_array(10, $line_type) || in_array(1, $line_type))) {
+							$active_area_pattern = '(?:in|to) ([A-z0-9&#;]+)(?: \(([A-z0-9&#;]+)\))?';
+							
+							if(preg_match('/'.$active_area_pattern.'/', $line, $active_area_match)) {
+								if(strlen($active_area_match[2])) {
+									$area_name = $active_area_match[2];
+									$area_romaji = $active_area_match[1];
+								}
+								elseif(strlen($active_area_match[1])) {
+									$area_name = $active_area_match[1];
+								}
+								
+								$sql_check_area = 'SELECT id FROM lives_areas WHERE name=? OR romaji=?';
+								$stmt_check_area = $this->pdo->prepare($sql_check_area);
+								$stmt_check_area->execute([ $area_name, ($area_romaji ?: $area_name) ]);
+								$rslt_check_area = $stmt_check_area->fetchColumn();
+							}
+						}
+						
 						if(is_array($line_type) && (in_array(14, $line_type) || in_array(15, $line_type))) {
 							if(!is_object($this->live_parser)) {
 								$this->live_parser = new parse_live($this->pdo);
