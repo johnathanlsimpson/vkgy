@@ -329,6 +329,7 @@
 								
 								if(is_numeric($rslt_check_area['id'])) {
 									$line = str_replace($active_area_match[0], $active_area_match[1].' '.$rslt_check_area['romaji'].' ('.$rslt_check_area['name'].')', $line);
+									$area_id = $rslt_check_area['id'];
 								}
 							}
 						}
