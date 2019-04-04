@@ -311,23 +311,25 @@
 						}
 						
 						if(is_array($line_type) && (in_array(10, $line_type) || in_array(1, $line_type))) {
-							$active_area_pattern = '(?:in|to) ([A-z0-9&#;]+)(?: \(([A-z0-9&#;]+)\))?';
+							$active_area_pattern = '(in|to) ([A-z0-9&#;]+)(?: \(([A-z0-9&#;]+)\))?';
 							
 							if(preg_match('/'.$active_area_pattern.'/', $line, $active_area_match)) {
-								if(strlen($active_area_match[2])) {
-									$area_name = $active_area_match[2];
-									$area_romaji = $active_area_match[1];
+								if(strlen($active_area_match[3])) {
+									$area_name = $active_area_match[3];
+									$area_romaji = $active_area_match[2];
 								}
-								elseif(strlen($active_area_match[1])) {
-									$area_name = $active_area_match[1];
+								elseif(strlen($active_area_match[2])) {
+									$area_name = $active_area_match[2];
 								}
 								
-								$sql_check_area = 'SELECT id FROM areas WHERE name=? OR romaji=?';
+								$sql_check_area = 'SELECT * FROM areas WHERE name=? OR romaji=? LIMIT 1';
 								$stmt_check_area = $this->pdo->prepare($sql_check_area);
 								$stmt_check_area->execute([ $area_name, ($area_romaji ?: $area_name) ]);
-								$rslt_check_area = $stmt_check_area->fetchColumn();
+								$rslt_check_area = $stmt_check_area->fetch();
 								
-								$line .= print_r($rslt_check_area, true);
+								if(is_numeric($rslt_check_area['id'])) {
+									$line = str_replace($active_area_match[0], $active_area_match[1].' '.$rslt_check_area['romaji'].' ('.$rslt_check_area['name'].')', $line);
+								}
 							}
 						}
 						
@@ -377,11 +379,12 @@
 							"type" => "(".implode(")(", $line_type).")",
 							"artist_id" => $artist_id,
 							"user_id" => $_SESSION["userID"],
+							'area_id' => $area_id,
 							"parsed_live" => $parsed_live,
 							"note" => $note
 						];
 						
-						unset($parsed_live, $note);
+						unset($parsed_live, $note, $area_id);
 					}
 				}
 			}
@@ -580,7 +583,6 @@
 					$sql_where[] = "artists.friendly=? OR artists.name=? OR artists.romaji=?";
 					array_push($sql_values, friendly($args["name"]), sanitize($args["name"]), sanitize($args["name"]));
 				}
-				
 			}
 			if(is_numeric($args["label_id"])) {
 				$sql_where[] = "label_history LIKE CONCAT('%(', ?, ')%')";
@@ -590,16 +592,6 @@
 				$sql_where[] = "artists.affiliation <= ?";
 				$sql_values[] = $args["affiliation"];
 			}
-			/*if(preg_match("/"."\d{4}-\d{2}-\d{2}"."/", $args["edit_history"])) {
-				if($args["edit_history"] < date("Y-m-d")) {
-					$sql_where[] = "artists.edit_history < ?";
-					$sql_values[] = $args["edit_history"];
-					$sql_order[] = "artists.edit_history DESC";
-				}
-				else {
-					$sql_order[] = "artists.edit_history DESC";
-				}
-			}*/
 			
 			// DEFAULTS
 			$sql_select = $sql_select ?: [];
@@ -659,6 +651,12 @@
 									$artists[$i]["next_artist"] = $this->access_artist(["friendly" => $artists[$i]["friendly"], "get" => "next"]);
 									$artists[$i]["history"] = $this->get_history($artists[$i]["id"]);
 									$artists[$i]["images"] = $this->get_artist_images($artists[$i]["id"]);
+									
+									$sql_areas = 'SELECT areas.* FROM areas_artists LEFT JOIN areas ON areas.id=areas_artists.area_id WHERE areas_artists.artist_id=? ORDER BY areas.friendly ASC';
+									$stmt_areas = $this->pdo->prepare($sql_areas);
+									if($stmt_areas->execute([ $artists[$i]['id'] ])) {
+										$artists[$i]['areas'] = $stmt_areas->fetchAll();
+									}
 								}
 							}
 							
