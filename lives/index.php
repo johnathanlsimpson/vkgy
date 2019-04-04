@@ -43,7 +43,7 @@
 	
 	// Get data: add/edit livehouses
 	if($add_livehouses || $edit_livehouses) {
-		$sql_areas = "SELECT id, name, romaji FROM lives_areas ORDER BY friendly ASC";
+		$sql_areas = "SELECT id, name, romaji FROM areas ORDER BY friendly ASC";
 		$stmt_areas = $pdo->prepare($sql_areas);
 		$stmt_areas->execute();
 		$rslt_areas = $stmt_areas->fetchAll();
@@ -99,15 +99,15 @@
 			SELECT
 				lives_livehouses.*,
 				GROUP_CONCAT(lives_nicknames.nickname) AS nicknames,
-				lives_areas.name AS area_name,
-				lives_areas.romaji AS area_romaji,
+				areas.name AS area_name,
+				areas.romaji AS area_romaji,
 				labels.name AS parent_name,
 				labels.romaji AS parent_romaji,
 				renamed_to.name AS renamed_name,
 				renamed_to.romaji AS renamed_romaji,
-				CONCAT_WS(' ', COALESCE(lives_areas.romaji, lives_areas.name), COALESCE(lives_livehouses.romaji, lives_livehouses.name)) AS quick_name
+				CONCAT_WS(' ', COALESCE(areas.romaji, areas.name), COALESCE(lives_livehouses.romaji, lives_livehouses.name)) AS quick_name
 			FROM lives_livehouses
-			LEFT JOIN lives_areas ON lives_areas.id = lives_livehouses.area_id
+			LEFT JOIN areas ON areas.id = lives_livehouses.area_id
 			LEFT JOIN lives_nicknames ON lives_nicknames.livehouse_id = lives_livehouses.id
 			LEFT JOIN labels ON labels.id = lives_livehouses.parent_id
 			LEFT JOIN lives_livehouses renamed_to ON renamed_to.id = lives_livehouses.renamed_to
@@ -128,7 +128,7 @@
 			"Edit areas" => "/lives/edit/areas/",
 		]);
 		
-		$sql_areas = "SELECT * FROM lives_areas ORDER BY friendly ASC";
+		$sql_areas = "SELECT * FROM areas ORDER BY friendly ASC";
 		$stmt_areas = $pdo->prepare($sql_areas);
 		$stmt_areas->execute();
 		$rslt_areas = $stmt_areas->fetchAll();
@@ -146,7 +146,7 @@
 			'Livehouses' => '/lives/livehouses/'
 		]);
 		
-		$sql_livehouses = 'SELECT lives_livehouses.id, lives_livehouses.name, lives_livehouses.romaji, lives_livehouses.friendly, lives_livehouses.capacity, lives_areas.name AS area_name, lives_areas.romaji AS area_romaji, GROUP_CONCAT(lives_nicknames.nickname) AS nicknames FROM lives_livehouses LEFT JOIN lives_areas ON lives_areas.id=lives_livehouses.area_id LEFT JOIN lives_nicknames ON lives_nicknames.livehouse_id=lives_livehouses.id GROUP BY lives_livehouses.id ORDER BY lives_livehouses.friendly ASC';
+		$sql_livehouses = 'SELECT lives_livehouses.id, lives_livehouses.name, lives_livehouses.romaji, lives_livehouses.friendly, lives_livehouses.capacity, areas.name AS area_name, areas.romaji AS area_romaji, GROUP_CONCAT(lives_nicknames.nickname) AS nicknames FROM lives_livehouses LEFT JOIN areas ON areas.id=lives_livehouses.area_id LEFT JOIN lives_nicknames ON lives_nicknames.livehouse_id=lives_livehouses.id GROUP BY lives_livehouses.id ORDER BY lives_livehouses.friendly ASC';
 		$stmt_livehouses = $pdo->prepare($sql_livehouses);
 		$stmt_livehouses->execute();
 		$rslt_livehouses = $stmt_livehouses->fetchAll();

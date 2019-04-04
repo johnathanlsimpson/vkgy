@@ -335,7 +335,7 @@ INSERT INTO `labels` VALUES
 (49, 'Elective System', NULL, 0, NULL, '&#34276;&#20117; &#31168;&#26126; (ex-DAS:VASSER)', 'Fujii HIDEAKI (ex-DAS:VASSER)', '2007-07-01', NULL, 'elective-system', NULL, '2017-05-18 02:15:54', NULL, NULL, NULL),
 (50, 'Office KURONEKO', NULL, 0, NULL, 'SAN (ex-NEGA) (&#63;)', NULL, '2014-07-01', NULL, 'office-kuroneko', NULL, '2017-05-18 02:15:54', NULL, NULL, NULL);
 
-INSERT INTO `lives_areas` VALUES
+INSERT INTO `areas` VALUES
 (1, '&#28171;&#35895;', 'Shibuya', 'shibuya', 103, '2018-06-26 09:22:25', 1, NULL, NULL),
 (2, '&#21407;&#23487;', 'Harajuku', 'harajuku', 103, '2018-06-26 09:22:25', 1, NULL, NULL),
 (3, '&#24693;&#27604;&#23551;', 'Ebisu', 'ebisu', 103, '2018-06-26 09:22:25', 1, NULL, NULL),

@@ -16,7 +16,7 @@
 					$parent_id = is_numeric($_POST["parent_id"][$key]) ? $_POST["parent_id"][$key] : null;
 					$nicknames = sanitize($_POST["nicknames"][$key]);
 					
-					$sql_area = "SELECT name, romaji FROM lives_areas WHERE id=?";
+					$sql_area = "SELECT name, romaji FROM areas WHERE id=?";
 					$stmt_area = $pdo->prepare($sql_area);
 					$stmt_area->execute([ $area_id ]);
 					$rslt_area = $stmt_area->fetch();

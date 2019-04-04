@@ -32,8 +32,8 @@
 				$sql_select = [
 					"lives.date_occurred",
 					"lives_livehouses.id AS livehouse_id",
-					"CONCAT_WS(' ', lives_areas.name, lives_livehouses.name) AS livehouse_name",
-					"CONCAT_WS(' ', IF(lives_livehouses.romaji, COALESCE(lives_areas.romaji, lives_areas.name), ''), lives_livehouses.romaji) AS livehouse_romaji",
+					"CONCAT_WS(' ', areas.name, lives_livehouses.name) AS livehouse_name",
+					"CONCAT_WS(' ', IF(lives_livehouses.romaji, COALESCE(areas.romaji, areas.name), ''), lives_livehouses.romaji) AS livehouse_romaji",
 					"COALESCE(lives_livehouses.romaji, lives_livehouses.name) AS livehouse_quick_name",
 					"lives.name",
 					"lives.romaji",
@@ -49,7 +49,7 @@
 				$sql_from = [
 					"lives",
 					"LEFT JOIN lives_livehouses ON lives_livehouses.id = lives.livehouse_id",
-					"LEFT JOIN lives_areas ON lives_areas.id = lives_livehouses.area_id"
+					"LEFT JOIN areas ON areas.id = lives_livehouses.area_id"
 				];
 			}
 			

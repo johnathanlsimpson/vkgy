@@ -322,10 +322,12 @@
 									$area_name = $active_area_match[1];
 								}
 								
-								$sql_check_area = 'SELECT id FROM lives_areas WHERE name=? OR romaji=?';
+								$sql_check_area = 'SELECT id FROM areas WHERE name=? OR romaji=?';
 								$stmt_check_area = $this->pdo->prepare($sql_check_area);
 								$stmt_check_area->execute([ $area_name, ($area_romaji ?: $area_name) ]);
 								$rslt_check_area = $stmt_check_area->fetchColumn();
+								
+								$line .= print_r($rslt_check_area, true);
 							}
 						}
 						
@@ -433,12 +435,12 @@
 				// Add live schedule to artist bio
 				$sql_schedule = "
 					SELECT
-						CONCAT_WS(' ', COALESCE(lives_areas.romaji, lives_areas.name), COALESCE(lives_livehouses.romaji, lives_livehouses.name)) AS quick_name,
+						CONCAT_WS(' ', COALESCE(areas.romaji, areas.name), COALESCE(lives_livehouses.romaji, lives_livehouses.name)) AS quick_name,
 						lives.date_occurred
 					FROM lives_artists
 					LEFT JOIN lives ON lives.id=lives_artists.live_id
 					LEFT JOIN lives_livehouses ON lives_livehouses.id=lives.livehouse_id
-					LEFT JOIN lives_areas ON lives_areas.id=lives_livehouses.area_id
+					LEFT JOIN areas ON areas.id=lives_livehouses.area_id
 					WHERE lives_artists.artist_id=?
 					ORDER BY lives.date_occurred DESC";
 				$stmt_schedule = $this->pdo->prepare($sql_schedule);

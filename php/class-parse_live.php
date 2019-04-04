@@ -91,21 +91,21 @@
 				$sql_name = "
 					SELECT
 						lives_livehouses.*,
-						lives_areas.name AS area_name,
-						lives_areas.romaji AS area_romaji,
-						CONCAT(lives_areas.romaji, ' ', COALESCE(lives_livehouses.romaji, lives_livehouses.name)) AS test
+						areas.name AS area_name,
+						areas.romaji AS area_romaji,
+						CONCAT(areas.romaji, ' ', COALESCE(lives_livehouses.romaji, lives_livehouses.name)) AS test
 					FROM lives_livehouses
-					LEFT JOIN lives_areas ON lives_areas.id=lives_livehouses.area_id
+					LEFT JOIN areas ON areas.id=lives_livehouses.area_id
 					WHERE
 						lives_livehouses.name=? OR
 						lives_livehouses.romaji=? OR
 						lives_livehouses.friendly=? OR
 						REPLACE(lives_livehouses.name, ' ', '')=? OR
 						REPLACE(lives_livehouses.romaji, ' ', '')=? OR
-						CONCAT(lives_areas.name, lives_livehouses.name)=? OR
-						CONCAT(lives_areas.romaji, ' ', COALESCE(lives_livehouses.romaji, lives_livehouses.name))=? OR
-						CONCAT(lives_areas.name, REPLACE(lives_livehouses.name, ' ', ''))=? OR
-						CONCAT(lives_areas.romaji, REPLACE(COALESCE(lives_livehouses.romaji, lives_livehouses.name), ' ', ''))=?
+						CONCAT(areas.name, lives_livehouses.name)=? OR
+						CONCAT(areas.romaji, ' ', COALESCE(lives_livehouses.romaji, lives_livehouses.name))=? OR
+						CONCAT(areas.name, REPLACE(lives_livehouses.name, ' ', ''))=? OR
+						CONCAT(areas.romaji, REPLACE(COALESCE(lives_livehouses.romaji, lives_livehouses.name), ' ', ''))=?
 					LIMIT 1
 				";
 				$values_name = [
@@ -129,10 +129,10 @@
 			if(is_numeric($rslt_id)) {
 				$sql_get_name = "
 					SELECT
-						CONCAT_WS(' ', COALESCE(lives_areas.romaji, lives_areas.name), COALESCE(lives_livehouses.romaji, lives_livehouses.name)) AS name
+						CONCAT_WS(' ', COALESCE(areas.romaji, areas.name), COALESCE(lives_livehouses.romaji, lives_livehouses.name)) AS name
 					FROM
 						lives_livehouses
-					LEFT JOIN lives_areas ON lives_areas.id=lives_livehouses.area_id
+					LEFT JOIN areas ON areas.id=lives_livehouses.area_id
 					WHERE lives_livehouses.id=?
 					LIMIT 1
 				";

@@ -72,7 +72,7 @@
 	$total_avg_capacity = $total_avg_capacity > 1800 ? 1800 : $total_avg_capacity;
 	
 	if(is_numeric($largest_oneman_venue_id)) {
-		$sql_livehouse = "SELECT COALESCE(lives_areas.romaji, lives_areas.name) AS area, COALESCE(lives_livehouses.romaji, lives_livehouses.name) AS name FROM lives_livehouses LEFT JOIN lives_areas ON lives_areas.id=lives_livehouses.area_id WHERE lives_livehouses.id=? LIMIT 1";
+		$sql_livehouse = "SELECT COALESCE(areas.romaji, areas.name) AS area, COALESCE(lives_livehouses.romaji, lives_livehouses.name) AS name FROM lives_livehouses LEFT JOIN areas ON areas.id=lives_livehouses.area_id WHERE lives_livehouses.id=? LIMIT 1";
 		$stmt_livehouse = $pdo->prepare($sql_livehouse);
 		$stmt_livehouse->execute([ $largest_oneman_venue_id ]);
 		$rslt_livehouse = $stmt_livehouse->fetch();

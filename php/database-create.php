@@ -313,7 +313,7 @@ CREATE TABLE IF NOT EXISTS `lives` (
 	`user_id` int(11) DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
-CREATE TABLE IF NOT EXISTS `lives_areas` (
+CREATE TABLE IF NOT EXISTS `areas` (
 	`id` int(11) NOT NULL,
 	`name` varchar(100) COLLATE ".$pdo_config['db_collation']." NOT NULL,
 	`romaji` text COLLATE ".$pdo_config['db_collation'].",
@@ -784,7 +784,7 @@ ALTER TABLE `lives`
 	ADD KEY `date_occurred` (`date_occurred`),
 	ADD KEY `livehouse_id` (`livehouse_id`);
 
-ALTER TABLE `lives_areas`
+ALTER TABLE `areas`
 	ADD PRIMARY KEY (`id`),
 	ADD UNIQUE KEY `name` (`name`),
 	ADD UNIQUE KEY `friendly` (`friendly`);
@@ -959,7 +959,7 @@ ALTER TABLE `labels_bio`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `lives`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-ALTER TABLE `lives_areas`
+ALTER TABLE `areas`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `lives_artists`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
