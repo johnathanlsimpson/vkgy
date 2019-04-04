@@ -61,8 +61,8 @@
 									}
 								?>
 								
-								<div class="input__row artist__stats">
-									<div class="input__group data__item artist__stat">
+								<div class="data__container">
+									<div class="data__item">
 										<div>
 											<h5>
 												<?php echo lang('Type', 'タイプ', ['secondary_class' => 'any--hidden']); ?>
@@ -70,7 +70,7 @@
 											<?php echo ["unknown", "band", "session", "alter-ego", "solo", "special project"][$artist["type"]]; ?>
 										</div>
 									</div>
-									<div class="input__group data__item artist__stat">
+									<div class="data__item">
 										<div>
 											<h5>
 												<?php echo lang('Status', '活動状況', ['secondary_class' => 'any--hidden']); ?>
@@ -81,7 +81,7 @@
 									<?php
 										if(!empty($artist["date_occurred"]) || !empty($artist["date_ended"])) {
 											?>
-												<div class="input__group data__item artist__stat">
+												<div class="data__item">
 													<div>
 														<h5>
 															<?php echo lang('Active', '活動期間', ['secondary_class' => 'any--hidden']); ?>
@@ -92,6 +92,21 @@
 											<?php
 										}
 									?>
+									<div class="data__item">
+										<h5>
+											<?php echo lang('Area', '地域', ['secondary_class' => 'any--hidden']); ?>
+										</h5>
+										<?php
+											if(is_array($artist['areas']) && !empty($artist['areas'])) {
+												foreach($artist['areas'] as $area) {
+													echo lang($area['romaji'], $area['name'], ['secondary_class' => 'any--hidden']);
+												}
+											}
+											else {
+												echo lang('Japan', '日本', ['secondary_class' => 'any--hidden']);
+											}
+										?>
+									</div>
 								</div>
 								
 								<div class="any--weaken artist__description"><?php echo $markdown_parser->parse_markdown($artist["description"], true); ?></div>
@@ -404,8 +419,8 @@
 										<?php
 									}
 								?>
-								<div class="input__row artist__stats">
-									<div class="input__group data__item artist__stat">
+								<div class="data__container">
+									<div class="data__item">
 										<div>
 											<h5>
 												<?php echo lang('Type', 'タイプ', ['secondary_class' => 'any--hidden']); ?>
@@ -413,7 +428,7 @@
 											<?php echo ["unknown", "band", "session", "alter-ego", "solo", "special project"][$artist["type"]]; ?>
 										</div>
 									</div>
-									<div class="input__group data__item artist__stat">
+									<div class="data__item">
 										<div>
 											<h5>
 												<?php echo lang('Status', '活動状況', ['secondary_class' => 'any--hidden']); ?>
@@ -424,7 +439,7 @@
 									<?php
 										if(!empty($artist["date_occurred"]) || !empty($artist["date_ended"])) {
 											?>
-												<div class="input__group data__item artist__stat">
+												<div class="data__item">
 													<div>
 														<h5>
 															<?php echo lang('Active', '活動期間', ['secondary_class' => 'any--hidden']); ?>
@@ -435,6 +450,21 @@
 											<?php
 										}
 									?>
+									<div class="data__item">
+										<h5>
+											<?php echo lang('Area', '地域', ['secondary_class' => 'any--hidden']); ?>
+										</h5>
+										<?php
+											if(is_array($artist['areas']) && !empty($artist['areas'])) {
+												foreach($artist['areas'] as $area) {
+													echo lang($area['romaji'], $area['name'], ['secondary_class' => 'any--hidden']);
+												}
+											}
+											else {
+												echo lang('Japan', '日本', ['secondary_class' => 'any--hidden']);
+											}
+										?>
+									</div>
 								</div>
 								
 								<div class="any--weaken artist__description"><?php echo $markdown_parser->parse_markdown($artist["description"], true); ?></div>
