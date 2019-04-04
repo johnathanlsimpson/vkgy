@@ -1,7 +1,7 @@
 <?php
 
 // Database structure
-// Updated 2019-03-23
+// Updated 2019-04-04
 $sql_create_database = '
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -10,21 +10,69 @@ USE `'.$pdo_config['db_name'].'`;
 
 '."
 
+
+
+
+/* ===========================================
+   Step 0. README
+    
+	 Updating DB:
+	 1. Make changes in phpadmin.
+	 2. Update this file (see Step 1).
+	 3. Manually delete your DB via phpadmin
+	    (Operations > Drop Database).
+   4. Update php/database-variables.php and
+	    turn on dummy data creation.
+	 5. Navigate to / in your browser, and the
+	    DB should be reconstructed.
+   =========================================== */
+
+
+
+
+/* ===========================================
+   Step 1. CREATE TABLE
+	 
+	 Updating this file:
+	 1. Make your DB changes via phpmyadmin.
+	 2. For each table that has been changed:
+	    Export > Custom > Output as Text
+      > Structure Only > in Add Statements,
+      select only 'Add Create Table' and
+      'Create Table If Not Exists'
+	 3. From the resulting SQL, copy the 'CREATE
+	    TABLE IF NOT EXISTS' query.
+	 4. Paste it into the section below (copying
+	    over the previous query for the table,
+      if the table already existed).
+   5. !!!! Replace each COLLATE string with:
+	    ".$pdo_config['db_collation']."
+      Usually it's utf8mb4_unicode_520_ci
+	 6. !!!! Do the same for each CHARSET
+	    string:
+	    ".$pdo_config['db_charset']."
+	    See below for examples.
+   7. Repeat 3~6 for INDEXES/KEY query
+	    (search for Step 2 in this document),
+	    AUTO_INCREMENT query (search Step 3),
+	    and CONSTRAINTS (search Step 4).
+   =========================================== */
+
 CREATE TABLE IF NOT EXISTS `artists` (
-	`id` int(11) NOT NULL,
-	`name` mediumtext COLLATE ".$pdo_config['db_collation']." NOT NULL,
-	`romaji` mediumtext COLLATE ".$pdo_config['db_collation'].",
-	`is_exclusive` int(11) NOT NULL DEFAULT '0',
-	`type` int(1) DEFAULT '1',
-	`active` tinyint(2) NOT NULL DEFAULT '0',
-	`friendly` varchar(100) COLLATE ".$pdo_config['db_collation']." NOT NULL,
-	`concept_name` mediumtext COLLATE ".$pdo_config['db_collation'].",
-	`concept_romaji` mediumtext COLLATE ".$pdo_config['db_collation'].",
-	`description` mediumtext COLLATE ".$pdo_config['db_collation'].",
-	`label_history` mediumtext COLLATE ".$pdo_config['db_collation'].",
-	`official_links` mediumtext COLLATE ".$pdo_config['db_collation'].",
-	`date_occurred` date DEFAULT NULL,
-	`date_ended` date DEFAULT NULL
+  `id` int(11) NOT NULL,
+  `name` mediumtext COLLATE ".$pdo_config['db_collation']." NOT NULL,
+  `romaji` mediumtext COLLATE ".$pdo_config['db_collation'].",
+  `is_exclusive` int(11) NOT NULL DEFAULT '0',
+  `type` int(1) DEFAULT '1',
+  `active` tinyint(2) NOT NULL DEFAULT '0',
+  `friendly` varchar(100) COLLATE ".$pdo_config['db_collation']." NOT NULL,
+  `concept_name` mediumtext COLLATE ".$pdo_config['db_collation'].",
+  `concept_romaji` mediumtext COLLATE ".$pdo_config['db_collation'].",
+  `description` mediumtext COLLATE ".$pdo_config['db_collation'].",
+  `label_history` mediumtext COLLATE ".$pdo_config['db_collation'].",
+  `official_links` mediumtext COLLATE ".$pdo_config['db_collation'].",
+  `date_occurred` date DEFAULT NULL,
+  `date_ended` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
 CREATE TABLE IF NOT EXISTS `artists_bio` (
@@ -629,6 +677,12 @@ CREATE TABLE IF NOT EXISTS `vip_views` (
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
 
+
+
+/* ===========================================
+   Step 2. INDEXES/KEY
+   =========================================== */
+	 
 ALTER TABLE `artists`
 	ADD PRIMARY KEY (`id`),
 	ADD UNIQUE KEY `friendly` (`friendly`);
@@ -855,6 +909,12 @@ ALTER TABLE `vip_views`
 	ADD PRIMARY KEY (`id`);
 
 
+
+
+/* ===========================================
+   Step 3. AUTO_INCREMENT
+   =========================================== */
+
 ALTER TABLE `artists`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `artists_bio`
@@ -963,6 +1023,13 @@ ALTER TABLE `vip_thanks`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `vip_views`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+
+
+
+/* ===========================================
+   Step 4. CONSTRAINTS
+   =========================================== */
 
 ALTER TABLE `artists_bio`
 	ADD CONSTRAINT `artists_bio_ibfk_1` FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
