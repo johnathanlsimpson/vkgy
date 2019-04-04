@@ -449,7 +449,7 @@
 																			foreach($access_artist->positions as $pos_num => $pos_name) {
 																				$y++;
 																				?>
-																					<input class="input__checkbox" id="<?php echo $y; ?>" name="musicians[<?php echo $m; ?>][position]" type="radio" value="<?php echo $pos_num; ?>" <?php echo $musician["position"] === "".$pos_num ? "checked" : null; ?> />
+																					<input class="input__checkbox" id="<?php echo $y; ?>" name="musicians[<?php echo $m; ?>][position]" type="radio" value="<?php echo $pos_num; ?>" <?php echo $musician["position"] == $pos_num ? "checked" : null; ?> />
 																					<label class="input__checkbox-label symbol__unchecked" for="<?php echo $y; ?>"><?php echo strtolower($pos_name); ?></label>
 																				<?php
 																			}
@@ -506,7 +506,7 @@
 																			foreach($access_artist->positions as $pos_num => $pos_name) {
 																				$y++;
 																				?>
-																					<input class="input__checkbox" id="<?php echo $y; ?>" name="musicians[<?php echo $m; ?>][usual_position]" type="radio" value="<?php echo $pos_num; ?>" <?php echo $musician["usual_position"] === "".$pos_num ? "checked" : null; ?> />
+																					<input class="input__checkbox" id="<?php echo $y; ?>" name="musicians[<?php echo $m; ?>][usual_position]" type="radio" value="<?php echo $pos_num; ?>" <?php echo $musician["usual_position"] == $pos_num ? "checked" : null; ?> />
 																					<label class="input__checkbox-label symbol__unchecked" for="<?php echo $y; ?>"><?php echo strtolower($pos_name); ?></label>
 																				<?php
 																			}
