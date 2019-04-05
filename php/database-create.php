@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS `artists` (
   `type` int(1) DEFAULT '1',
   `active` tinyint(2) NOT NULL DEFAULT '0',
   `friendly` varchar(100) COLLATE ".$pdo_config['db_collation']." NOT NULL,
+  `pronunciation` text COLLATE ".$pdo_config['db_collation'].",
   `concept_name` mediumtext COLLATE ".$pdo_config['db_collation'].",
   `concept_romaji` mediumtext COLLATE ".$pdo_config['db_collation'].",
   `description` mediumtext COLLATE ".$pdo_config['db_collation'].",
