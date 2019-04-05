@@ -310,6 +310,7 @@
 							}
 						}
 						
+						// Activity area
 						if(is_array($line_type) && (in_array(10, $line_type) || in_array(1, $line_type))) {
 							$active_area_pattern = '(in|to) ([A-z0-9&#;]+)(?: \(([A-z0-9&#;]+)\))?';
 							
@@ -330,6 +331,22 @@
 								if(is_numeric($rslt_check_area['id'])) {
 									$line = str_replace($active_area_match[0], $active_area_match[1].' '.$rslt_check_area['romaji'].' ('.$rslt_check_area['name'].')', $line);
 									$area_id = $rslt_check_area['id'];
+								}
+							}
+						}
+						
+						// Name pronunciation
+						if(is_array($line_type) && (in_array(10, $line_type) || in_array(4, $line_type))) {
+							$pronunciation_pattern = '(?:\(\d+\)|\/|\]) \(([&#; A-z0-9]+)\)[ \.]';
+							$katakana_pattern = '^[ぁ-んァ-ン 　・]+$';
+							
+							if(preg_match('/'.$pronunciation_pattern.'/', $line, $pronunciation_match)) {
+								if(strlen($pronunciation_match[1])) {
+									$pronunciation_string = html_entity_decode($pronunciation_match[1], ENT_QUOTES, 'UTF-8');
+									
+									if(preg_match('/'.$katakana_pattern.'/', $pronunciation_string)) {
+										$pronunciation = sanitize($pronunciation_string);
+									}
 								}
 							}
 						}
@@ -382,10 +399,11 @@
 							"user_id" => $_SESSION["userID"],
 							'area_id' => $area_id,
 							"parsed_live" => $parsed_live,
-							"note" => $note
+							"note" => $note,
+							'pronunciation' => $pronunciation
 						];
 						
-						unset($parsed_live, $note, $area_id);
+						unset($parsed_live, $note, $area_id, $pronunciation);
 					}
 				}
 			}

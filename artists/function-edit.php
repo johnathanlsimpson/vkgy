@@ -296,6 +296,11 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 			if(is_numeric($history[$i]['area_id'])) {
 				$area_ids[] = $history[$i]['area_id'];
 			}
+			
+			// Loop through, look for pronunciation, save for later (use final pronunciation, for now)
+			if(strlen($history[$i]['pronunciation'])) {
+				$pronunciation = $history[$i]['pronunciation'];
+			}
 		}
 		
 		// Update activity areas in DB
@@ -327,6 +332,14 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 					if($stmt_add_area->execute([ $artist_id, $area_id ])) {
 					}
 				}
+			}
+		}
+		
+		// Update pronunciation
+		if($pronunciation) {
+			$sql_pronunciation = 'UPDATE artists SET pronunciation=? WHERE id=? LIMIT 1';
+			$stmt_pronunciation = $pdo->prepare($sql_pronunciation);
+			if($stmt_pronunciation->execute([ $pronunciation, $artist_id ])) {
 			}
 		}
 		
