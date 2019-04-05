@@ -57,6 +57,7 @@
 			chdir('../');
 		}
 		include_once("../php/include.php");
+		file_put_contents('log.txt', date("Y-m-d H:i:s").' '.getcwd().'+++'.print_r($pdo, true), FILE_APPEND | LOCK_EX);
 		
 		if(is_array($array_payload) && is_array($array_payload['commits'])) {
 			//$commits = $array_payload["push"]["changes"][0]["commits"];
