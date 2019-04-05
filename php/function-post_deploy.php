@@ -55,8 +55,8 @@
 		
 		if(preg_match('/'.'deploy$'.'/', getcwd())) {
 			chdir('../');
-			include_once("../php/include.php");
 		}
+		include_once("../php/include.php");
 		
 		if(is_array($array_payload) && is_array($array_payload['commits'])) {
 			//$commits = $array_payload["push"]["changes"][0]["commits"];
