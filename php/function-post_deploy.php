@@ -53,14 +53,7 @@
 		
 		$array_payload = object_to_array($payload);
 		
-		if(preg_match('/'.'deploy$'.'/', getcwd())) {
-			chdir('../');
-		}
-		include_once("../php/include.php");
-		file_put_contents('log.txt', date("Y-m-d H:i:s").' '.getcwd().'+++'.print_r($pdo, true), FILE_APPEND | LOCK_EX);
-		
 		if(is_array($array_payload) && is_array($array_payload['commits'])) {
-			//$commits = $array_payload["push"]["changes"][0]["commits"];
 			$commits = $array_payload['commits'];
 			
 			if(is_array($commits)) {
@@ -68,7 +61,6 @@
 					$content = trim($commit["message"]);
 					
 					if(strpos($content, 'Merge branch') === false) {
-						//if(preg_match('/'.'<(.+?)>'.'/', $commit["author"]["raw"], $user_email) && is_array($user_email) && !is_array($user_email[1]) && strlen($user_email[1])) {
 						if(strlen($commit['author']['email'])) {
 							$sql_user = "SELECT id FROM users WHERE email=? LIMIT 1";
 							$stmt_user = $pdo->prepare($sql_user);

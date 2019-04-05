@@ -1,6 +1,5 @@
 <?php
 include('config-deploy.php');
-include('../function-post_deploy.php');
 
 $payload;
 
@@ -40,4 +39,10 @@ function update_repo() {
 }
 
 update_repo();
+
+if(preg_match('/'.'deploy$'.'/', getcwd())) {
+	chdir('../');
+}
+include_once('include.php');
+include('function-post_deploy.php');
 post_deploy();
