@@ -5,7 +5,8 @@
 		]);
 		
 		script([
-			"/artists/script-page-artist.js"
+			'/scripts/script-pronounce.js',
+			'/artists/script-page-artist.js',
 		]);
 		
 		?>
@@ -106,6 +107,15 @@
 												echo lang('Japan', '日本', ['secondary_class' => 'any--hidden']);
 											}
 										?>
+									</div>
+									<div class="data__item <?php echo $artist['pronunciation'] ? null : 'any--hidden'; ?>">
+										<h5>
+											<?php echo lang('Pronunciation', '発音', ['secondary_class' => 'any--hidden']); ?>
+										</h5>
+										<span>
+											<?php echo $artist['pronunciation']; ?>
+											<button class="symbol--standalone symbol__caret-right" data-pronunciation="<?php echo html_entity_decode($artist['pronunciation'], ENT_NOQUOTES, "UTF-8"); ?>" type="button"></button>
+										</span>
 									</div>
 								</div>
 								
@@ -464,6 +474,15 @@
 												echo lang('Japan', '日本', ['secondary_class' => 'any--hidden']);
 											}
 										?>
+									</div>
+									<div class="data__item <?php echo $artist['pronunciation'] ? null : 'any--hidden'; ?>">
+										<h5>
+											<?php echo lang('Pronunciation', '発音', ['secondary_class' => 'any--hidden']); ?>
+										</h5>
+										<span>
+											<?php echo $artist['pronunciation']; ?>
+											<button class="symbol--standalone symbol__caret-right" data-pronunciation="<?php echo html_entity_decode($artist['pronunciation'], ENT_NOQUOTES, "UTF-8"); ?>" type="button"></button>
+										</span>
 									</div>
 								</div>
 								
