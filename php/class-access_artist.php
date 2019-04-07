@@ -403,7 +403,7 @@
 							'pronunciation' => $pronunciation
 						];
 						
-						unset($parsed_live, $note, $area_id, $pronunciation);
+						unset($parsed_live, $note, $area_id, $area_name, $area_romaji, $pronunciation);
 					}
 				}
 			}
