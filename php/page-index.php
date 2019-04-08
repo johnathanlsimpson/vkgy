@@ -115,29 +115,14 @@
 		
 		<div class="underhead__wrapper col c1 any--margin any--weaken-color">
 			<div class="underhead__container any--flex">
+				
+				<label class="input__checkbox-label symbol__unchecked" for="language-en">EN</label>&nbsp;
+				<label class="input__checkbox-label symbol__unchecked" for="language-ja"><?php echo sanitize('日本語'); ?></label>&nbsp;<span style="color: var(--accent);">&beta;</span>
+				
 				<div class="underhead__account">
-					<a class="a--inherit any--signed-out-only head__item symbol__help" href="/account/"><?php echo lang('account', 'アカウント', ['secondary_class' => 'any--hidden']); ?></a>
+					<a class="a--inherit any--signed-out-only head__item symbol__help" href="/account/"><?php echo lang('account', 'アカウント', ['secondary_class' => 'any--hidden']); ?></a>&nbsp;
 					<a class="a--inherit any--signed-in-only head__item head__signout symbol__exit" href="/sign-out/&request=<?php echo $_SERVER["REQUEST_URI"]; ?>"><?php echo lang('sign out', 'サインアウトする', ['secondary_class' => 'any--hidden']); ?></a>
-					<?php
-					if($_SESSION['username'] === 'inartistic') { ?> 
 					<a class="a--inherit any--signed-in-only head__item head__user user" href="/users/<?php echo $_SERVER["username"]; ?>/"><?php echo $_SESSION['username']; ?></a>
-					<?php } ?>
-					
-					<?php
-						if($_SESSION['loggedIn']) {
-							$sql_vip = 'SELECT 1 FROM users WHERE id=? AND is_vip=? LIMIT 1';
-							$stmt_vip = $pdo->prepare($sql_vip);
-							$stmt_vip->execute([ $_SESSION['userID'], 1 ]);
-							$rslt_vip = $stmt_vip->fetchColumn();
-						}
-						
-						if($rslt_vip) {
-							?>
-								<label class="input__checkbox-label symbol__unchecked" for="language-en">EN</label>
-								<label class="input__checkbox-label symbol__unchecked" for="language-ja"><?php echo sanitize('日本語'); ?>&beta;</label>
-							<?php
-						}
-					?>
 				</div>
 				
 				<script>
@@ -162,11 +147,11 @@
 					jaButton.addEventListener('click', setLang);
 				</script>
 				
-				<form action="/account/function-sign_in.php" class="underhead__sign-in any--flex any--signed-out-only input__row sign-in__container" enctype="multipart/form-data" method="post" name="form__signin">
+				<form action="/account/function-sign_in.php" class="underhead__sign-in any--flex any--signed-out-only input__row sign-in__container sign-in--refresh" enctype="multipart/form-data" method="post" name="form__signin">
 					<div class="input__group">
-						<input name="username" placeholder="username" />
-						<input class="input--secondary" name="password" placeholder="password" type="password" />
-						<button name="submit" type="submit">Sign in</button>
+						<input name="username" placeholder="username (ユーザー名)" />
+						<input class="input--secondary" name="password" placeholder="password (パスワード)" type="password" />
+						<button name="submit" type="submit"><?php echo lang('Sign in', 'サインイン', ['secondary_class' => 'any--hidden']); ?></button>
 						<span class="signin__status" data-role="status" data-status=""></span>
 						<span class="signin__status-message" data-role="status-message"></span>
 					</div>
@@ -275,6 +260,7 @@
 					<div>
 						SINCE 2004
 					</div>
+					<a class="a--padded a--outlined cta__link a--patreon" href="https://patreon.com/vkgy/" target="_blank"><img src="/style/logo-patreon.png" style="height: 1rem;" /> <?php echo lang('Support vkgy', 'パトレオン', ['secondary_class' => 'any--hidden']); ?></a>
 				</div>
 				
 				<div class="any--weaken footer__right">
