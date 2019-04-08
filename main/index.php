@@ -230,7 +230,7 @@
 	</div>
 	
 	<div class="cta__container">
-		<a class="a--padded a--outlined cta__link" href="https://patreon.com/vkgy/" target="_blank"><?php echo lang('Support vkgy', 'パトレオン', ['secondary_class' => 'any--hidden']); ?></a>
+		<a class="a--padded a--outlined cta__link a--patreon" href="https://patreon.com/vkgy/" target="_blank"><img src="/style/logo-patreon.png" style="height: 1rem;" /> <?php echo lang('Support vkgy', 'パトレオン', ['secondary_class' => 'any--hidden']); ?></a>
 	</div>
 </div>
 
@@ -498,9 +498,9 @@
 					<li>
 						<div class="input__row">
 							<div class="input__group">
-								<label class="input__label"><?php echo lang('Username', 'ユーザ名', ['secondary_class' => 'any--hidden']); ?></label>
+								<label class="input__label"><?php echo lang('Username', 'ユーザー名', ['secondary_class' => 'any--hidden']); ?></label>
 							</div>
-							<input class="any--flex-grow" name="register_username" pattern="[A-z0-9-]+" placeholder="username (ユーザ名)" title="A-z, 0-9, -" />
+							<input class="any--flex-grow" name="register_username" pattern="[A-z0-9-]+" placeholder="username (ユーザー名)" title="A-z, 0-9, -" />
 						</div>
 						
 						<div class="any--weaken register__note">
