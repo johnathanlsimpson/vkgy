@@ -296,7 +296,7 @@
 															</div>
 															<div class="any--flex-grow image__data">
 																<input data-get="image_id" data-get-into="value" name="image_id" value="<?php $n++; echo $input[$n]; ?>" hidden />
-
+																
 																<div class="input__row">
 																	<div class="input__group any--flex-grow">
 																		<label class="input__label">Description</label>
@@ -310,7 +310,7 @@
 																		<label class="input__checkbox-label symbol__trash symbol--standalone image__delete" data-get="image_id" data-get-into="data-id" data-id="<?php $n++; echo $input[$n]; ?>"></label>
 																	</div>
 																</div>
-
+																
 																<div class="input__row">
 																	<div class="input__group any--flex-grow">
 																		<label class="input__label">Artists</label>
@@ -331,7 +331,7 @@
 																		</select>
 																	</div>
 																</div>
-
+																
 																<div class="input__row">
 																	<div class="input__group any--flex-grow">
 																		<label class="input__label">Credit</label>
@@ -348,7 +348,7 @@
 													</li>
 												<?php
 											}
-
+											
 											image_template([
 												"any--hidden",
 												"",
@@ -362,25 +362,25 @@
 												"",
 												""
 											]);
-
+											
 											if(is_array($artist["images"]) && !empty($artist["images"])) {
 												foreach($artist["images"] as $image) {
-
+													
 													$image_artist = "";
 													foreach(array_filter(array_unique(explode("(", str_replace(")", "", $image["artist_id"])))) as $tmp_image_artist) {
 														$image_artist .= '<option data-name="'.$artist_list[$tmp_image_artist][2].'" value="'.$tmp_image_artist.'" selected>'.$artist_list[$tmp_image_artist][2].'</option>';
 													}
-
+													
 													$image_musician = "";
 													foreach(array_filter(array_unique(explode("(", str_replace(")", "", $image["musician_id"])))) as $tmp_image_musician) {
 														$image_musician .= '<option data-name="'.$musician_list[$tmp_image_musician][2].'" value="'.$tmp_image_musician.'" selected>'.$musician_list[$tmp_image_musician][2].'</option>';
 													}
-
+													
 													$image_release = "";
 													foreach(array_filter(array_unique(explode("(", str_replace(")", "", $image["release_id"])))) as $tmp_image_release) {
 														$image_release .= '<option data-name="'.$release_list[$tmp_image_release][2].'" value="'.$tmp_image_release.'" selected>'.$release_list[$tmp_image_release][2].'</option>';
 													}
-
+													
 													image_template([
 														"",
 														"background-image: url(".str_replace(".", ".small.", $image["url"]).")",
@@ -421,13 +421,13 @@
 											?>
 												<div class="edit__musician">
 													<h3>
-														<?php echo $musician["quick_name"]; ?>
-														<span class="any--jp">
-															<?php
-																echo $musician["as_name"] && $musician["quick_name"] === $musician["as_romaji"] ? "(".$musician["as_name"].")" : null;
-																echo !$musician["as_name"] && $musician["quick_name"] === $musician["romaji"] ? "(".$musician["name"].")" : null;
-															?>
-														</span>
+														<?php
+															echo $musician["quick_name"].' ';
+															echo '<span class="any--jp">';
+															echo $musician["as_name"] && $musician["quick_name"] === $musician["as_romaji"] ? "(".$musician["as_name"].")" : null;
+															echo !$musician["as_name"] && $musician["quick_name"] === $musician["romaji"] ? "(".$musician["name"].")" : null;
+															echo '</span>';
+														?>
 													</h3>
 													<div class="text">
 														<ul>
