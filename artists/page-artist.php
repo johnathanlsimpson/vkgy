@@ -10,18 +10,22 @@
 		]);
 		
 		?>
-			<div class="col c3 any--margin">
+			<div class="col c3 artist__other">
 				<?php
-					foreach($rslt_next as $rslt) {
+					foreach($rslt_next as $prevnext_key => $rslt) {
+						$type = $rslt['type'];
+						$name = lang(($rslt['romaji'] ?: $rslt['name']), $rslt['name'], ['secondary_class' => 'any--hidden']);
+						$symbol = $type === 'rand' ? 'random' : ($type === 'previous' ? $type : null);
+						
+						echo $prevnext_key === 0 && $type != 'previous' ? '<div>&nbsp;</div>' : null;
+						
 						?>
-							<div class="artist__<?php echo $rslt["type"]; ?>">
-								<div class="h5"></div>
-								<a class="symbol__<?php echo $rslt["type"]; echo $rslt["type"] === "next" ? " symbol--right" : null; ?>" href="/artists/<?php echo $rslt["friendly"]; ?>/"><?php echo $rslt["romaji"] ? $rslt["romaji"]." (".$rslt["name"].")" : $rslt["name"]; ?></a>
+							<div class="artist__<?php echo $type; ?>">
+								<a class="<?php echo $symbol ? 'symbol__'.$symbol : null; ?>" href="/artists/<?php echo $rslt["friendly"]; ?>/"><?php echo $name; echo $type === 'next' ? '<span class="symbol__next"></span>' : null; ?></a>
 							</div>
 						<?php
-					}
-					for($i=count($rslt_next); $i<3; $i++) {
-						echo '<div><div class="h5"></div></div>';
+						
+						echo $prevnext_key === 1 && $type === 'rand' && !$rslt_next[2] ? '<div>&nbsp;</div>' : null;
 					}
 				?>
 			</div>
@@ -37,89 +41,21 @@
 				<div class="artist__nav">
 					<ul class="ul--compact">
 						<?php
-							echo is_array($artist['musicians'][1]) ? '<li><a href="#lineup">'.lang('Lineup', 'メンバー', ['container' => 'div']).'</a></li>' : null;
-							echo is_array($artist['musicians'][2]) ? '<li><a href="#former">'.lang('Former', '元メンバー', ['container' => 'div']).'</a></li>' : null;
-							echo is_array($artist['musicians'][3]) ? '<li><a href="#staff">'.lang('Staff', 'スタッフ', ['container' => 'div']).'</a></li>' : null;
-							echo is_array($artist['history']) ?      '<li><a href="#history">'.lang('History', '活動', ['container' => 'div']).'</a></li>' : null;
-							echo is_array($artist['schedule']) ?     '<li><a href="#schedule">'.lang('Lives', 'ライブ', ['container' => 'div']).'</a></li>' : null;
-							echo                                     '<li><a href="#comments">'.lang('Comment', 'コメント', ['container' => 'div']).'</a></li>';
+							echo is_array($artist['musicians'][1]) ? '<a class="li" href="#lineup">'.lang('Lineup', 'メンバー', ['container' => 'div']).'</a>' : null;
+							echo is_array($artist['musicians'][2]) ? '<a class="li" href="#former">'.lang('Former', '元メンバー', ['container' => 'div']).'</a>' : null;
+							echo is_array($artist['musicians'][3]) ? '<a class="li" href="#staff">'.lang('Staff', 'スタッフ', ['container' => 'div']).'</a>' : null;
+							echo is_array($artist['history']) ?      '<a class="li" href="#history">'.lang('History', '活動', ['container' => 'div']).'</a>' : null;
+							echo is_array($artist['schedule']) ?     '<a class="li" href="#schedule">'.lang('Lives', 'ライブ', ['container' => 'div']).'</a>' : null;
+							echo                                     '<a class="li" href="#comments">'.lang('Comment', 'コメント', ['container' => 'div']).'</a>';
 						?>
 					</ul>
 				</div>
 				
 				<div class="artist__content" style="flex-grow: 1;">
-					
 					<div class="col c4-AAAB artist__top">
 						<div class="artist__left">
 							<div class="text text--outlined artist__details--first">
-								<?php
-									if($default_image) {
-										?>
-											<a class="artist__main-image-link" href="<?php echo $default_image; ?>">
-												<img class="artist__main-image" alt="<?php echo $artist["quick_name"]; ?>" src="<?php echo $default_image; ?>" />
-											</a>
-										<?php
-									}
-								?>
-								
-								<div class="data__container">
-									<div class="data__item">
-										<div>
-											<h5>
-												<?php echo lang('Type', 'タイプ', ['secondary_class' => 'any--hidden']); ?>
-											</h5>
-											<?php echo ["unknown", "band", "session", "alter-ego", "solo", "special project"][$artist["type"]]; ?>
-										</div>
-									</div>
-									<div class="data__item">
-										<div>
-											<h5>
-												<?php echo lang('Status', '活動状況', ['secondary_class' => 'any--hidden']); ?>
-											</h5>
-											<?php echo ["unknown", "active", "disbanded", "paused", "semi-active"][$artist["active"]]; ?>
-										</div>
-									</div>
-									<?php
-										if(!empty($artist["date_occurred"]) || !empty($artist["date_ended"])) {
-											?>
-												<div class="data__item">
-													<div>
-														<h5>
-															<?php echo lang('Active', '活動期間', ['secondary_class' => 'any--hidden']); ?>
-														</h5>
-														<?php echo str_replace("0000", "", substr($artist["date_occurred"], 0, 4)."~".substr($artist["date_ended"], 0, 4)); ?>
-													</div>
-												</div>
-											<?php
-										}
-									?>
-									<div class="data__item">
-										<h5>
-											<?php echo lang('Area', '地域', ['secondary_class' => 'any--hidden']); ?>
-										</h5>
-										<?php
-											if(is_array($artist['areas']) && !empty($artist['areas'])) {
-												foreach($artist['areas'] as $area) {
-													echo lang($area['romaji'], $area['name'], ['secondary_class' => 'any--hidden']);
-												}
-											}
-											else {
-												echo lang('Japan', '日本', ['secondary_class' => 'any--hidden']);
-											}
-										?>
-									</div>
-									<div class="data__item <?php echo $artist['pronunciation'] ? null : 'any--hidden'; ?>">
-										<h5>
-											<?php echo lang('Pronunciation', '発音', ['secondary_class' => 'any--hidden']); ?>
-										</h5>
-										<span>
-											<?php echo $artist['pronunciation']; ?>
-											<button class="symbol--standalone symbol__caret-right" data-pronunciation="<?php echo html_entity_decode($artist['pronunciation'], ENT_NOQUOTES, "UTF-8"); ?>" type="button"></button>
-										</span>
-									</div>
-								</div>
-								
-								<div class="any--weaken artist__description"><?php echo $markdown_parser->parse_markdown($artist["description"], true); ?></div>
+								<?php include('partial-stats.php'); ?>
 							</div>
 							
 							<?php
@@ -146,129 +82,7 @@
 								
 								// Lineup
 								if(is_array($artist["musicians"]) && !empty($artist["musicians"])) {
-									foreach($artist["musicians"] as $musicians_type => $musicians) {
-										?>
-											<span id="<?php echo $musicians_type === 1 ? 'lineup' : ($musicians_type === 2 ? 'former' : 'staff'); ?>"></span>
-											<?php
-												if($musicians_type > 1) {
-													?>
-														<h2>
-															<?php
-																echo lang(
-																	($musicians_type === 1 ? 'Lineup' : ($musicians_type === 2 ? 'Former members' : 'Staff')),
-																	($musicians_type === 1 ? 'メンバー' : ($musicians_type === 2 ? '元メンバー' : 'スタッフ')),
-																	['container' => 'div', 'secondary_class' => 'any--weaken']
-																);
-															?>
-														</h2>
-													<?php
-												}
-											?>
-											
-											<div class="text <?php echo $musicians_type !== 1 ? "text--outlined" : null; ?>">
-												<?php
-													foreach($musicians as $musician) {
-														?>
-															<div class="ul">
-																<h4>
-																	<a class="a--inherit" href="/search/musicians/?position=<?php echo $musician["position"]; ?>#result"><?php echo $musician["position_name"]; ?></a>
-																</h4>
-																<h3>
-																	<a class="a--inherit" href="/musicians/<?php echo $musician["id"]."/".$musician["friendly"]; ?>/"><?php echo $musician["quick_name"]; ?></a>
-																	<span class="any--weaken-color"><?php echo $musician["romaji"] ? " (".$musician["name"].")" : null; ?></span>
-																</h3>
-																<div class="any--flex member__history">
-																	<div class="lineup__container">
-																		<?php
-																			foreach($musician['history'] as $history_period => $history_chunk) {
-																				?>
-																					<ul class="ul--inline lineup__period any--weaken-color symbol__next <?php echo $history_class; ?> ">
-																						<?php
-																							foreach($history_chunk as $band) {
-																								?>
-																									<li class="lineup__artist-container">
-																										<?php
-																											if(!empty($band["url"])) {
-																												?>
-																													<a class="artist artist--no-symbol" href="<?php echo $band["url"]; ?>">
-																														<?php echo $band["quick_name"]; ?>
-																													</a>
-																												<?php
-																											}
-																											
-																											echo empty($band["url"]) ? $band["quick_name"] : null;
-																											echo $band["romaji"] ? " (".$band["name"].")" : null;
-																											
-																											if(!empty($band["notes"]) && is_array($band["notes"])) {
-																												foreach($band["notes"] as $note) {
-																													?>
-																														<span class="any__note">
-																															<?php
-																																echo $note;
-																															?>
-																														</span>
-																													<?php
-																												}
-																											}
-																										?>
-																									</li>
-																								<?php
-																							}
-																						?>
-																					</ul>
-																				<?php
-																			}
-																		?>
-																	</div>
-																	<?php
-																		if(is_array($musician['sessions']) && !empty($musician['sessions'])) {
-																			?>
-																				<div class="lineup__sessions any--weaken-color">
-																					<h5>
-																						<?php echo lang('Sessions', 'セッション', ['secondary_class' => 'any--hidden']); ?>
-																					</h5>
-																					<?php
-																						foreach($musician['sessions'] as $band) {
-																							?>
-																								<span class="lineup__session">
-																									<?php
-																										if(!empty($band["url"])) {
-																											?>
-																												<a class="artist artist--no-symbol a--inherit" href="<?php echo $band["url"]; ?>"><?php echo $band["quick_name"]; ?></a>
-																											<?php
-																										}
-																										
-																										echo empty($band["url"]) ? $band["quick_name"] : null;
-																										echo $band["romaji"] ? " (".$band["name"].")" : null;
-																										
-																										if(!empty($band["notes"]) && is_array($band["notes"])) {
-																											foreach($band["notes"] as $note) {
-																												?>
-																													<span class="any__note">
-																														<?php
-																															echo $note;
-																														?>
-																													</span>
-																												<?php
-																											}
-																										}
-																									?>
-																								</span>
-																							<?php
-																						}
-																					?>
-																				</div>
-																			<?php
-																		}
-																	?>
-																</div>
-															</div>
-														<?php
-													}
-												?>
-											</div>
-										<?php
-									}
+									include('partial-lineup.php');
 								}
 								
 								// History
@@ -420,73 +234,7 @@
 						
 						<div class="artist__right">
 							<div class="text text--outlined artist__details--second">
-								<?php
-									if($default_image) {
-										?>
-											<a class="artist__main-image-link" href="<?php echo str_replace(".large.", ".", $default_image); ?>">
-												<img class="artist__main-image" alt="<?php echo $artist["quick_name"]; ?>" src="<?php echo $default_image; ?>" />
-											</a>
-										<?php
-									}
-								?>
-								<div class="data__container">
-									<div class="data__item">
-										<div>
-											<h5>
-												<?php echo lang('Type', 'タイプ', ['secondary_class' => 'any--hidden']); ?>
-											</h5>
-											<?php echo ["unknown", "band", "session", "alter-ego", "solo", "special project"][$artist["type"]]; ?>
-										</div>
-									</div>
-									<div class="data__item">
-										<div>
-											<h5>
-												<?php echo lang('Status', '活動状況', ['secondary_class' => 'any--hidden']); ?>
-											</h5>
-											<?php echo ["unknown", "active", "disbanded", "paused", "semi-active"][$artist["active"]]; ?>
-										</div>
-									</div>
-									<?php
-										if(!empty($artist["date_occurred"]) || !empty($artist["date_ended"])) {
-											?>
-												<div class="data__item">
-													<div>
-														<h5>
-															<?php echo lang('Active', '活動期間', ['secondary_class' => 'any--hidden']); ?>
-														</h5>
-														<?php echo str_replace("0000", "", substr($artist["date_occurred"], 0, 4)."~".substr($artist["date_ended"], 0, 4)); ?>
-													</div>
-												</div>
-											<?php
-										}
-									?>
-									<div class="data__item">
-										<h5>
-											<?php echo lang('Area', '地域', ['secondary_class' => 'any--hidden']); ?>
-										</h5>
-										<?php
-											if(is_array($artist['areas']) && !empty($artist['areas'])) {
-												foreach($artist['areas'] as $area) {
-													echo lang($area['romaji'], $area['name'], ['secondary_class' => 'any--hidden']);
-												}
-											}
-											else {
-												echo lang('Japan', '日本', ['secondary_class' => 'any--hidden']);
-											}
-										?>
-									</div>
-									<div class="data__item <?php echo $artist['pronunciation'] ? null : 'any--hidden'; ?>">
-										<h5>
-											<?php echo lang('Pronunciation', '発音', ['secondary_class' => 'any--hidden']); ?>
-										</h5>
-										<span>
-											<?php echo $artist['pronunciation']; ?>
-											<button class="symbol--standalone symbol__caret-right" data-pronunciation="<?php echo html_entity_decode($artist['pronunciation'], ENT_NOQUOTES, "UTF-8"); ?>" type="button"></button>
-										</span>
-									</div>
-								</div>
-								
-								<div class="any--weaken artist__description"><?php echo $markdown_parser->parse_markdown($artist["description"], true); ?></div>
+								<?php include('partial-stats.php'); ?>
 							</div>
 							
 							<?php
@@ -692,95 +440,45 @@
 				</div>
 			</div>
 			
-							<style>.obscure__input:checked + .obscure__container.a { max-height: 8rem; overflow:hidden; }</style>
-							<style>
-								:target {
-									content: "";
-									display: block;
-									margin-top: -4rem;
-									padding-top: 4rem;
-									position: relative;
-								}
-								/*h2:target::after {
-									background: var(--attention--faint);
-									background-clip: content-box;
-									bottom: 1rem;
-									content: "";
-									display: inline-block;
-									left: 0;
-									padding-top: 4rem;
-									position: absolute;
-									top: 0;
-									width: 3px;
-								}*/
-								tbody:not(:last-of-type) tr:last-of-type td {
-									padding-bottom: 1.5rem;
-								}
-								td h3 {
-									padding-bottom: 0;
-								}
-								.h--nav {
-									align-items: center;
-									display: flex;
-									flex-wrap: wrap;
-									/*justify-content: space-between;*/
-									padding-right: 0;
-								}
-								.h--nav::before {
-									align-self: bottom;
-								}
-								.h--nav :last-child {
-									margin-left: auto;
-								}
-							</style>
+			<style>.obscure__input:checked + .obscure__container.a { max-height: 8rem; overflow:hidden; }</style>
 			<style>
-				.artist__nav {
-					/*background: linear-gradient(to top, transparent, var(--background--faint) 1rem);*/
-					margin-top: -1rem;
-					padding: 1rem 0;
-					position: -webkit-sticky;
-					position: sticky;
-					top: 3rem;
-					z-index: 2;
+				:target {
+					content: "";
+					display: block;
+					margin-top: -4rem;
+					padding-top: 4rem;
+					position: relative;
 				}
-				@media(max-width:799.9px) {
-					.artist__nav {
-						background-image: linear-gradient(var(--background--faint), var(--background--faint));
-						background-position: 0 -1rem;
-						background-repeat: no-repeat;
-						padding: 1rem;
-						padding: 0.5rem 1rem 1rem 1rem;
-						text-align: center;
-					}
-					.artist__nav::after {
-						bottom: 0;
-						box-shadow: inset 0 1.5rem 1rem -1rem var(--background--faint);
-						content: "";
-						display: block;
-						height: 1rem;
-						left: 0;
-						position: absolute;
-						right: 0;
-					}
-					.artist__nav ul {
-						display: flex;
-						flex-wrap: wrap;
-						justify-content: space-between;
-					}
-					.artist__nav li {
-						border: none;
-						margin: 0;
-						padding: 0;
-					}
-					.artist__nav [href*='former'], .artist__nav [href*='staff'], .artist__nav [href*='schedule'] {
-						display: none;
-					}
+				/*h2:target::after {
+					background: var(--attention--faint);
+					background-clip: content-box;
+					bottom: 1rem;
+					content: "";
+					display: inline-block;
+					left: 0;
+					padding-top: 4rem;
+					position: absolute;
+					top: 0;
+					width: 3px;
+				}*/
+				tbody:not(:last-of-type) tr:last-of-type td {
+					padding-bottom: 1.5rem;
 				}
-				@media(min-width:800px) {
-					.artist__nav.artist__nav {
-						width: auto;
-						margin-right: 3rem;
-					}
+				td h3 {
+					padding-bottom: 0;
+				}
+				.h--nav {
+					align-items: center;
+					display: flex;
+					flex-wrap: wrap;
+					/*justify-content: space-between;*/
+					padding-right: 0;
+				}
+				.h--nav::before {
+					align-self: bottom;
+				}
+				.h--nav :last-child {
+					margin-left: auto;
 				}
 			</style>
 		<?php

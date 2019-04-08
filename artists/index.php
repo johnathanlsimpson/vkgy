@@ -83,29 +83,6 @@
 		// Get musicians' band history
 		$artist["musicians"] = sort_musicians($artist["musicians"]);
 		
-		// Parse musicians' band histories and separate sessions
-		$num_musician_types = count($artist['musicians']);
-		for($a=1; $a<=$num_musician_types; $a++) {
-			
-			$num_musicians = count($artist['musicians'][$a]);
-			for($b=0; $b<$num_musicians; $b++) {
-				
-				$num_history_periods = count($artist['musicians'][$a][$b]['history']);
-				for($c=0; $c<$num_history_periods; $c++) {
-					
-					$num_bands = count($artist['musicians'][$a][$b]['history'][$c]);
-					for($d=0; $d<$num_bands; $d++) {
-						
-						if($artist['musicians'][$a][$b]['history'][$c][$d]['is_session']) {
-							
-							$artist['musicians'][$a][$b]['sessions'][] = $artist['musicians'][$a][$b]['history'][$c][$d];
-							unset($artist['musicians'][$a][$b]['history'][$c][$d]);
-						}
-					}
-				}
-			}
-		}
-		
 		$sql_view = "INSERT INTO artists_views (artist_id, date_occurred, view_count) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE view_count = view_count + 1";
 		$stmt_view = $pdo->prepare($sql_view);
 		$stmt_view->execute([$artist["id"], date("Y-m-d")]);
