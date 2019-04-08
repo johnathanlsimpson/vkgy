@@ -39,10 +39,7 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 		if(!empty($update_values["name"])) {
 			$sql_artist = "UPDATE artists SET ".implode("=?, ", $update_keys)."=? WHERE id=? LIMIT 1";
 			$sql_artist_values = array_values($update_values);
-			//$sql_artist_values[] = date("Y-m-d H:i:s")." (".$_SESSION["userID"].")\n";
 			$sql_artist_values[] = sanitize($_POST["id"]);
-			
-			//echo $_SESSION['username'] === 'inartistic' ? print_r($sql_artist, true).print_r($sql_artist_values, true) : null;
 			
 			$stmt = $pdo->prepare($sql_artist);
 			
@@ -122,6 +119,9 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 							"dates_active"
 						];
 						
+						$musician['as_name'] = trim($musician['as_name']);
+						$musician['as_romaji'] = trim($musician['as_romaji']);
+						
 						$artist_musician_values = [];
 						foreach($artist_musician_keys as $key) {
 							$artist_musician_values[] = $musician[$key] ? sanitize($musician[$key]) : null;
@@ -171,16 +171,21 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 									"history"
 								];
 								
+								$musician["history"] = $markdown_parser->validate_markdown($musician["history"]);
+								$musician['name'] = trim($musician['name']);
+								$musician['romaji'] = trim($musician['romaji']);
+								
 								$musician_values = [];
 								foreach($musician_keys as $key) {
-									if($key === "history") {
-										$musician["history"] = $markdown_parser->validate_markdown($musician["history"]);
+									/*if($key === "history") {
 									}
+									if($key === 'name') {
+									}*/
+									//if($key)
 									$musician_values[] = sanitize($musician[$key]) ?: null;
 								}
 								
 								$sql_musician = "UPDATE musicians SET ".implode("=?, ", $musician_keys)."=? WHERE id=? LIMIT 1";
-								//$musician_values[] = date("Y-m-d H:i:s")." (".$_SESSION["userID"].")\n";
 								$musician_values[] = sanitize($musician["id"]);
 								$stmt = $pdo->prepare($sql_musician);
 								
@@ -213,9 +218,6 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 											}
 										}
 									}
-									
-									// Remove any duplicate artist-musician links
-									
 									
 									$output["status"] = "success";
 								}
