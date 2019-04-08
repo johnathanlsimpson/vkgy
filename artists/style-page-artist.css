@@ -272,7 +272,8 @@ session:nth-of-type(1n + 12)::before { content: "♓\00FE0E "; }
 
 .artist__main-image-link {
 	display: inline-block;
-	margin: -1rem -1rem 1rem -1rem;
+	margin: -1rem 0 1rem -1rem;
+	width: calc(100% + 2rem);
 }
 .artist__main-image {
 	vertical-align: middle;
@@ -295,6 +296,9 @@ session:nth-of-type(1n + 12)::before { content: "♓\00FE0E "; }
 	background-size: cover;
 	display: block;
 	height: 100%;
+}
+.images__link:hover {
+	opacity: 0.75;
 }
 #obscure-images:checked + .obscure__container {
 	max-height: 11rem;
