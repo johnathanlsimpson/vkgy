@@ -50,7 +50,6 @@
 								$rslt_musicians[$i]["id"], 
 								($rslt_musicians[$i]["usual_position"] ?: 6), 
 								1, 
-								//$timestamp,
 								$artist_id."-".$rslt_musicians[$i]["id"]
 							];
 							
@@ -97,9 +96,17 @@
 						}
 					}
 					else {
-						$sql_add = "INSERT INTO artists (name, romaji, friendly) VALUES (?, ?, ?)";
+						$kana_name = html_entity_decode($name, ENT_QUOTES, 'UTF-8');
+						if(preg_match('/'.'^[ぁ-んァ-ン]+$'.'/', $kana_name)) {
+							$pronunciation = $name;
+						}
+						else {
+							$pronunciation = null;
+						}
+						
+						$sql_add = "INSERT INTO artists (name, romaji, friendly, pronunciation) VALUES (?, ?, ?, ?)";
 						$stmt_add = $pdo->prepare($sql_add);
-						if($stmt_add->execute([$name, $romaji, $friendly])) {
+						if($stmt_add->execute([ $name, $romaji, $friendly, $pronunciation ])) {
 							$artist_id = $pdo->lastInsertId();
 							$linked_musicians = auto_link_musicians($pdo, $artist_id, $name, $romaji);
 							
