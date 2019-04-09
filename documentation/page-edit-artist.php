@@ -1,129 +1,107 @@
 <div class="col c1 documentation__wrapper">
 	<div>
 		<h2>
-			Editing basic information
+			Artist names
 		</h2>
-		<input class="any--hidden obscure__input" id="obscure-basic" type="checkbox" checked />
-		<div class="obscure__container obscure--alt obscure--height any--margin">
-			<h3>
-				Name
-			</h3>
-			<div class="text text--outlined">
-				<ul class="ul--bulleted">
-					<li>
-						Keep names true to the logotype when possible (include äccents), within reason.
-						Use official names and official romaji when specified (official name is 大日本鬼端児組 悪童会に占拠され ゴシップ but official romaji is Gossip).
-					</li>
-					<li>
-						If a band has changed their name, use the latest name.
-					</li>
-					<li>
-						“Friendly name” is a URL-friendly version of the band's name; usually romanized version with symbols replaced by hyphens.
-						These are automatically generated when adding a new artist, but can be modified when it makes sense (e.g. “e-m-grief” was changed to “em-grief” for readability).
-					</li>
-					<li>
-						Friendly names must be unique; if two artists share the same name (<a class="artist" href="/artists/arcadia/">ArcAdiA</a> and <a class="artist" href="/artists/arcadia-hiroshima/">ARcaDia</a>), one must have a different friendly name.
-						You can add the year that the band formed, or the band's hometown, or the vocalist's name, etc. (e.g. check the URL of <a class="artist" href="/artists/arcadia-hiroshima/">ARcaDia</a>).
-					</li>
-				</ul>
-			</div>
-			
-			<h3>
-				Description
-			</h3>
-			<div class="text text--outlined">
-				<ul class="ul--bulleted">
-					<li>
-						Description should briefly identify band in a meaningful way; it's not really meant for a full biography. For example: “Last band of vocalist XYZ. Lasted only months before disbanding due to XYZ.”
-					</li>
-				</ul>
-			</div>
-			
-			<h3>
-				Label history
-			</h3>
-			<div class="text text--outlined">
-				<ul class="ul--bulleted">
-					<li>
-						Enter the ID of the band's record label, enclosed in parentheses. The ID can be found on the label's edit page; <a class="symbol__company" href="/labels/matina/edit/">Matina</a>'s is 51, so you would type <span class="any__note">(51)</span>.
-					</li>
-					<li>
-						Each line represents a new period in time. So if a band transferred from Matina to <a class="symbol__company" href="/labels/key-party/edit/">KEY PARTY</a>, the label history would be <span class="any__note" style="vertical-align: middle;">(51)<br />(292)</span>.
-					</li>
-					<li>
-						A blank line indicates that the band is completely independent. If the band is managing themselves, but have given their self-management a title (e.g. <a class="artist" href="/artists/d/">D</a> was self-managed by <a class="symbol__company" href="/labels/god-child-records/">GOD CHILD RECORDS</a>), add it as a record label.
-					</li>
-					<li>
-						If a band is on a sublabel, indicate it like: <span class="any__note">(51) &gt; (112)</span>.
-					</li>
-					<li>
-						Comments can be added; e.g. if the band is produced by a label but not signed to it: <span class="any__note">(51) (produced)</span>.
-					</li>
-				</ul>
-			</div>
-			
-			<label class="input__button obscure__button" for="obscure-basic">Show section</label>
-		</div>
+		<ul class="ul--bulleted text text--outlined">
+			<li>The <span class="any__note">name</span> field is for the official name, and the <span class="any__note">romaji</span> field is for the romanization of the official name.<br /><br />i.e. 大日本鬼端児組 悪童会に占拠され ゴシップ → Dainippon Onitanjigumi Akudoukai ni Senkyosare GOSSIP</li>
+			<li>Unlike Wikipedia et al., the official name must include any and all symbols/typesets that the band uses in their logo, if possible. If not possible, the closest substitute should be used.<br /><br />i.e. The Gazette → the GazettE, and cali<strong style="display:inline-block;margin-left:2px;transform:rotate(90deg);">≠</strong>gari → cali<strong>≠</strong>gari</li>
+			<li>When romanizing the name, romanize only katakana/hiragana/kanji; all symbols should stay intact, if possible. If a band has an <em>official</em> romanization, use that instead.<br /><br />i.e. サリィ。 → SALLY。, and 愛狂います。 → Aikuruimasu。 → aicle。</li>
+			<li>The <span class="any__note">friendly</span> field, which is only accessible when editing an artist, is for a url-friendly names (A-z, 0-9, hyphens). The “common name” may be used there.<br /><br />i.e. 大日本鬼端児組 悪童会に占拠され ゴシップ → Dainippon Onitanjigumi Akudoukai ni Senkyosare GOSSIP → gossip</li>
+		</ul>
+		
+		<h2>
+			Bands with the same name
+		</h2>
+		<ul class="ul--bulleted text text--outlined">
+			<li>Bands with the same name can be differentiated by their <span class="any__note">friendly</span> name, which is accessed by editing the artist's page. The friendly name can be appeneded with the year they formed, city in which they were active, significant member, etc.<br /><br />i.e. <span class="any__note">name</span> AMETHYST → <span class="any__note">friendly</span> amethyst-1998 <span class="any__note">friendly</span> amethyst-kumamoto <span class="any__note">friendly</span> amethyst-duo</li>
+			<li>If the system doesn't allow you to add the artist, you can temporarily put a differentiation in the artist name, then edit the name and friendly name after the artist is added.<br /><br />i.e. [add as] <span class="any__note">name</span> SALLY-2016 [then edit into] <span class="any__note">name</span> SALLY <span class="any__note">friendly</span> sally-2016</li>
+		</ul>
+		
+		<h2>
+			Other details
+		</h2>
+		<ul class="ul--bulleted text text--outlined">
+			<li>The description should <em>very</em> briefly identify the band, e.g. “Last band of KISAKI, a trouble-prone goth-rock trio.”</li>
+			<li>The “official links” section is for URL of the band's official website, URLs of their Twitter accounts, etc. Put each URL on a new line.</li>
+		</ul>
+		
+		<h2>
+			Label history
+		</h2>
+		<ul class="ul--bulleted text text--outlined">
+			<li>
+				Enter the ID of the band's record label, enclosed in parentheses. The ID can be found on the label's page; e.g. <a class="symbol__company" href="/labels/matina/edit/">Matina</a>'s is 51, so you would type <span class="any__note">(51)</span>.
+			</li>
+			<li>
+				Each line represents a new period in time. So if a band transferred from Matina to <a class="symbol__company" href="/labels/key-party/edit/">KEY PARTY</a>, the label history would be <span class="any__note" style="vertical-align: middle;">(51)<br />(292)</span>.
+			</li>
+			<li>
+				A blank line indicates that the band is completely independent. If the band is managing themselves, but have given their self-management a title (e.g. <a class="artist" href="/artists/d/">D</a> was self-managed by <a class="symbol__company" href="/labels/god-child-records/">GOD CHILD RECORDS</a>), add it as a record label.
+			</li>
+			<li>
+				If a band is on a sublabel, indicate it like: <span class="any__note">(51) &gt; (112)</span>.
+			</li>
+			<li>
+				Comments can be added; e.g. if the band is produced by a label but not signed to it: <span class="any__note">(51) (produced)</span>.
+			</li>
+		</ul>
 		
 		<h2>
 			Editing biography
 		</h2>
-		<input class="any--hidden obscure__input" id="obscure-doc-bio" type="checkbox" checked />
-		<div class="text text--outlined obscure__container obscure--alt obscure--height">
-			<ul class="ul--bulleted">
-				<li>
-					The biography section is a timeline of important events, such as formation, member changes, important lives, and so on. It is completely text-based, and has a number of features. <span class="symbol__error">Releases are added automatically.</span>
-				</li>
-				<li>
-					Each biography entry starts with a date, formatted like yyyy-mm-dd, followed by a space, and then the event: <span class="any__note">1999-06-18 Dali forms.</span>.
-				</li>
-				<li>
-					Entries are separated with one blank line. (The system assumes that a line break <em>not</em> followed by a date is part of the same entry.)<br />
-					<span class="any__note" style="vertical-align: baseline;">1999-06-18 Bassist JUN joins.<br /><br />1999-07-01 Bassist JUN secedes.</span> is two entries; <span class="any__note" style="vertical-align: baseline;">1999-06-18 Bassist JUN joins.<br /><br />Later that day, he is run over by a car.</span> is one entry.
-				</li>
-				<li>
-					<a href="/"><?php echo $vkgy ? "vk.gy" : "weloveucp.com"; ?></a>'s flavor of markdown can be used:<br />
-					<span class="any__note">1997-01-01 /dali/ holds twoman vs /la sadies/. *The* **best** [record label](/labels/matina/).</span>
-					is interprated as
-					<span class="any__note">1997-01-01 <a class="artist" href="/artists/dali/">Dali</a> holds twoman vs <a class="artist" href="/artists/la-sadies/">La:Sadie's</a>. <em>The</em> <strong>best</strong> <a href="/labels/matina/">record label</a>.</span>
-				</li>
-				<li>
-					Per <a href="/"><?php echo $vkgy ? "vk.gy" : "weloveucp.com"; ?></a>'s flavor of markdown, you can linke to an artist while showing a different name by following the artist markdown with <span class="any__note">[display name here]</span>:
-					<span class="any__note">1997-01-01 /Dali/[SUGAR FORKFUL (シュガーフォークフル)] changes their name to /Dali/.</span>
-					is interprated as
-					<span class="any__note">1997-01-01 <a class="artist" href="/artists/dali/">SUGAR FORKFUL</a> changes their name to <a class="artist" href="/artists/dali/">Dali</a>.</span>
-				</li>
-				<li>
-					Each entry should be tagged with a type. <span class="symbol__error">The system attempts to do this automatically; you can see in the preview box how the system is tagging the entry.</span>
-				</li>
-				<li>
-					To manually tag an entry: at the end of the line, type a space, then hyphen, then follow with a word (or words separated by commas) from the following list:<br />
-					<span class="any__tag">activity</span> <span class="any__tag">cancellation</span> <span class="any__tag">disbandment</span> <span class="any__tag">formation</span> <span class="any__tag">label</span> <span class="any__tag">lineup</span> <span class="any__tag">live</span> <span class="any__tag">media</span> <span class="any__tag">member</span> <span class="any__tag">name</span> <span class="any__tag">other</span> <span class="any__tag">release</span> <span class="any__tag">schedule</span> <span class="any__tag">setlist</span> <span class="any__tag">trouble</span><br />
-					For example: <span class="any__note">1999-06-18 Bassist JUN joins. -member</span> or <span class="any__note">1999-06-18 Bassist JUN joins after oneman. -live,member</span>
-				</li>
-				<li>
-					The <span class="any__tag">lineup</span>, <span class="any__tag">schedule</span>, and <span class="any__tag">setlist</span> tags display in a smaller text than other entries.
-				</li>
-				<li>
-					The <span class="any__tag">disbandment</span> tag displays in a bright red, and should be used like so:<br />
-					<span class="any__note">1999-06-18 Dali disbands -disbandment</span> or <span class="any__note">1999-06-18 Dali indefinitely pauses activity -disbandment</span>.<br />
-					Try to use the verbiage that the band uses, e.g. “CODOMO A shuts down”.
-				</li>
-				<li>
-					If an entry is within the same year or month as the previous entry, you only need to type a partial date:<br />
-					<span class="any__note" style="vertical-align: baseline;">1999-07-01 Dali forms.<br /><br />02 First live is held.<br /><br />08-07 Bassist secedes.</span>
-					is interprated as
-					<span class="any__note" style="vertical-align: baseline;">1999-07-01 Dali forms.<br /><br />1997-07-02 First live is held.<br /><br />1997-08-07 Bassist secedes.</span>
-				</li>
-				<li>
-					If you type a livehouse's romanized name and move on to the next entry, the system will automatically fill in the rest of the livehouse name (japanese name, city, proper formatting) and tag it with <span class="any__tag">label</span>. <span class="symbol__error">So far, this only works for about 20 livehouses; this list is expanding.</span><br />
-					<span class="any__note" style="vertical-align: baseline;">1999-07-01 area<br /><br />16 rockmaykan</span>
-					is interprated as
-					<span class="any__note" style="vertical-align: baseline;">1999-07-01 Takadanobaba (高田馬場) AREA -schedule<br /><br />1997-07-16 Meguro (目黒) ROCKMAYKAN (鹿鳴館) -schedule</span>
-				</li>
-			</ul>
-			<label class="input__button obscure__button" for="obscure-doc-bio">Show section</label>
-		</div>
+		<ul class="ul--bulleted text text--outlined">
+			<li>
+				This section is to record important events. It's text-based, which means there's a learning curve, but it has several features to increase effeciency. It also automagically sets certain artist details.
+			</li>
+			<li>
+				Each entry in the biography should start with a date, a space, and then whatever happened (present-tense, active voice preferred).<br /><span class="any__note">1999-06-18 Dali forms.</span>.
+			</li>
+			<li>
+				Separate entries with a blank line, followed by the date of the new entry. Multi-line entries are also allowed.<br />
+				<span class="any__note" style="vertical-align: baseline;">1999-06-18 Bassist JUN joins.<br /><br />1999-07-01 Bassist JUN secedes.</span> or <span class="any__note" style="vertical-align: baseline;">1999-06-18 Bassist JUN joins.<br /><br />Later that day, he gets sick.</span>
+			</li>
+			<li>
+				vkgy Markdown, including /artist/ notation, can be used (see <a href="">the documentation</a>).<br />
+				<span class="any__note">/dali/ forms</span> → <a class="artist" href="/artists/dali/">Dali</a> forms<br />
+				<span class="any__note">*Their* **name** is /dali/[DARI].</span> → <em>Their</em> <strong>name</strong> is <a class="artist" href="/artists/dali/">DARI</a>.<br />
+				<span class="any__note">Their [Twitter](https://twitter.com/) is takeover.</span> → Their <a href="https://twitter.com/">Twitter</a> is takeover.
+			</li>
+			<li>
+				Each bio entry gets automatically tagged with a “type” at the end of the line. These consist of a space, followed by a hyphen, then the type. Mulitple types are separated by commas.<br />
+				<span class="any__note">1998-12-15 /Dali/ forms. -formation<br /><br />1999-01-01 Guitarist BOBBY joins after the band's live. -member,live</span><br /><br />
+				
+				You can manually override these by specifying one (or more) of the following tags:<br />
+				<?php
+					if(!$access_artist) {
+						$access_artist = new $access_artist($pdo);
+					}
+					foreach($access_artist->artist_bio_types as $type) {
+						echo '<span class="any__note">-'.$type.'</span> ';
+					}
+				?>
+			</li>
+			<li>
+				The <span class="any__tag">lineup</span>, <span class="any__tag">schedule</span>, and <span class="any__tag">setlist</span> tags display in a smaller text than other entries.
+			</li>
+			<li>
+				The <span class="any__tag">disbandment</span> tag displays in a bright red, and should be used like so:<br />
+				<span class="any__note">1999-06-18 Dali disbands -disbandment</span> or <span class="any__note">1999-06-18 Dali indefinitely pauses activity -disbandment</span>.<br />
+				Try to use the verbiage that the band uses, e.g. “CODOMO A shuts down”.
+			</li>
+			<li>
+				If an entry is within the same year or month as the previous entry, you only need to type a partial date:<br />
+				<span class="any__note" style="vertical-align: baseline;">1999-07-01 Dali forms.<br /><br />02 First live is held.<br /><br />08-07 Bassist secedes.</span>
+				is interprated as
+				<span class="any__note" style="vertical-align: baseline;">1999-07-01 Dali forms.<br /><br />1997-07-02 First live is held.<br /><br />1997-08-07 Bassist secedes.</span>
+			</li>
+			<li>
+				If you type a livehouse's romanized name and move on to the next entry, the system will automatically fill in the rest of the livehouse name (japanese name, city, proper formatting) and tag it with <span class="any__tag">label</span>. <span class="symbol__error">So far, this only works for about 20 livehouses; this list is expanding.</span><br />
+				<span class="any__note" style="vertical-align: baseline;">1999-07-01 area<br /><br />16 rockmaykan</span>
+				is interprated as
+				<span class="any__note" style="vertical-align: baseline;">1999-07-01 Takadanobaba (高田馬場) AREA -schedule<br /><br />1997-07-16 Meguro (目黒) ROCKMAYKAN (鹿鳴館) -schedule</span>
+			</li>
+		</ul>
 		
 		<h2>
 			Live schedule
