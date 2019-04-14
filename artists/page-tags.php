@@ -7,7 +7,7 @@
 		if(is_array($rslt_curr_tags) && !empty($rslt_curr_tags)) {
 			foreach($rslt_curr_tags as $tag) {
 				echo '<a class="symbol__tag" style="display: inline-block;" href="/search/artists/?tags[]='.$tag["friendly"].'">'.
-					($tag["romaji"] ?: $tag["name"]).
+					lang(($tag["romaji"] ?: $tag["name"]), $tag['name'], ['secondary_class' => 'any--hidden']).
 					($tag["num_times_tagged"] > 0 ? ' <span class="any__note">×'.$tag["num_times_tagged"].'</span>' : null).
 					'</a> &nbsp; ';
 			}
@@ -19,7 +19,7 @@
 			if(is_array($rslt_tags) && !empty($rslt_tags)) {
 				foreach($rslt_tags as $tag) {
 					$is_selected = in_array($tag["id"], $rslt_user_tags);
-					echo '<label data-id="'.$artist["id"].'" data-tag_id="'.$tag["id"].'" class="artist__tag any__tag symbol__tag '.($is_selected ? "any__tag--selected" : null).'" style="display: inline-block;">'.($tag["romaji"] ?: $tag["name"]).'</label> ';
+					echo '<label data-id="'.$artist["id"].'" data-tag_id="'.$tag["id"].'" class="artist__tag any__tag symbol__tag '.($is_selected ? "any__tag--selected" : null).'" style="display: inline-block;">'.lang(($tag["romaji"] ?: $tag["name"]), $tag['name'], ['secondary_class' => 'any--hidden']).'</label> ';
 				}
 			}
 		}
@@ -34,7 +34,7 @@
 			if(is_array($rslt_tags) && !empty($rslt_tags)) {
 				foreach($rslt_tags as $tag) {
 					if($tag["is_admin_tag"] && in_array($tag["id"], $rslt_curr_tag_ids)) {
-						echo '<label data-action="delete" data-id="'.$artist["id"].'" data-tag_id="'.$tag["id"].'" class="artist__tag symbol__tag any__tag any__tag--selected" style="display: inline-block;">'.($tag["romaji"] ?: $tag["name"]).'</label> ';
+						echo '<label data-action="delete" data-id="'.$artist["id"].'" data-tag_id="'.$tag["id"].'" class="artist__tag symbol__tag any__tag any__tag--selected" style="display: inline-block;">'.lang(($tag["romaji"] ?: $tag["name"]), $tag['name'], ['secondary_class' => 'any--hidden']).'</label> ';
 					}
 				}
 			}
