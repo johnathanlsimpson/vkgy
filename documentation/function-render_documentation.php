@@ -53,8 +53,15 @@ function render_documentation($page) {
 		// Cleanup the document a bit
 		$chunk = str_replace('<span class="any__note">→</span>', '<span class="symbol__next symbol--standalone"></span>', $chunk);
 		$chunk = str_replace(["</p>\n<p>", '<p>', '</p>'], ["<br /><br />\n", '', ''], $chunk);
-		$chunk = str_replace('</h2>', '</summary><div class="text text--outlined documentation__container">', $chunk).'</div>';
-		$chunk = '<details class="documentation__details">'.str_replace('<h2>', '<summary class="h2 documentation__summary">', $chunk).'</details>';
+		
+		// Add links
+		preg_match('/'.'>(.+?)<\/h2>'.'/', $chunk, $chunk_title);
+		$chunk = str_replace('<h2>', '<h2 id="'.friendly($chunk_title[1]).'">', $chunk);
+		
+		// Add layout tags
+		$chunk = str_replace(['<h2', '</h2>'], ['<summary class="h2 documentation__summary"', '</summary>'], $chunk);
+		$chunk = str_replace('</summary>', '</summary><div class="text text--outlined documentation__container">', $chunk).'</div>';
+		$chunk = '<details class="documentation__details">'.$chunk.'</details>';
 		
 		$chunks[$chunk_key] = $chunk;
 	}
