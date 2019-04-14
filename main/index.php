@@ -259,7 +259,7 @@
 					<a class="artist" data-name="<?php echo $image["artist_name"]; ?>" href="/artists/<?php echo $image["artist_friendly"]; ?>/"><?php echo $image["artist_quick_name"]; ?></a>
 				</p>
 				<p class="any--weaken">
-					<a class="symbol__vip" href="https://patreon.com/vkgy/" target="_blank">VIP members</a> can access high-res, unwatermarked version. <a href="/images/&type=flyer">View past flyers?</a>
+					<a class="symbol__vip" href="https://www.patreon.com/vkgy/" target="_blank">VIP members</a> can access high-res, unwatermarked version. <a href="/images/&type=flyer">View past flyers?</a>
 				</p>
 			</div>
 		</div>
@@ -335,7 +335,7 @@
 						else {
 							?>
 								<span class="symbol__vip">VIP members can view exclusive updates in this area.</span>
-								<a class="symbol__next" href="https://patreon.com/vkgy/" target="_blank" style="margin-left: auto; white-space: nowrap;">Support vkgy</a>
+								<a class="symbol__next" href="https://www.patreon.com/vkgy/" target="_blank" style="margin-left: auto; white-space: nowrap;">Support vkgy</a>
 							<?php
 						}
 					?>
@@ -350,7 +350,7 @@
 					'<a class="support__link" href="https://discord.gg/jw8jzXn" target="_blank"><img alt="vkgy at Discord" class="support__image lazy" data-src="/main/ad-discord.png" /></a>',
 					'<a class="support__link" href="http://witchthrone.com/" target="_blank"><img alt="Witchthrone" class="support__image lazy" data-src="/main/ad-witchthrone-wide.gif" /></a>',
 					'<a class="support__link" href="http://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/" target="_blank"><img alt="Buy vk merch at CDJapan" class="support__image lazy" data-src="/main/ad-cdjapan-wide.jpg" /></a>',
-					'<a class="support__link" href="https://patreon.com/vkgy" target="_blank"><img alt="Support vkgy at Patreon" class="support__image lazy" data-src="/main/ad-patreon.png" /></a>',
+					'<a class="support__link" href="https://www.patreon.com/vkgy" target="_blank"><img alt="Support vkgy at Patreon" class="support__image lazy" data-src="/main/ad-patreon.png" /></a>',
 				];
 				
 				shuffle($ads);
@@ -609,7 +609,7 @@
 						}
 					}
 				?>
-				<li><a class=" symbol__next a--inherit" href="https://patreon.com/vkgy/" target="_blank">Become VIP</a></li>
+				<li><a class=" symbol__next a--inherit" href="https://www.patreon.com/vkgy/" target="_blank">Become VIP</a></li>
 			</ul>
 		</div>
 	</div>
@@ -630,7 +630,7 @@
 			</ul>
 			
 			<p>
-				<a class="a--padded a--outlined any--weaken-color" href="https://patreon.com/vkgy/" target="_blank" style="text-indent: 0;">Support vkgy at Patreon</a>
+				<a class="a--padded a--outlined any--weaken-color" href="https://www.patreon.com/vkgy/" target="_blank" style="text-indent: 0;">Support vkgy at Patreon</a>
 			</p>
 		</div>
 	</div>

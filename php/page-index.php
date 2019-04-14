@@ -260,7 +260,7 @@
 					<div>
 						SINCE 2004
 					</div>
-					<a class="a--padded a--outlined cta__link a--patreon" href="https://patreon.com/vkgy/" target="_blank"><img src="/style/logo-patreon.png" style="height: 1rem;" /> <?php echo lang('Support vkgy', 'パトレオン', ['secondary_class' => 'any--hidden']); ?></a>
+					<a class="a--padded a--outlined cta__link a--patreon" href="https://www.patreon.com/vkgy/" target="_blank"><img src="/style/logo-patreon.png" style="height: 1rem;" /> <?php echo lang('Support vkgy', 'パトレオン', ['secondary_class' => 'any--hidden']); ?></a>
 				</div>
 				
 				<div class="any--weaken footer__right">
