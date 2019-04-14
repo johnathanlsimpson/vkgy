@@ -5,6 +5,10 @@
 </div>
 
 <?php
+	include('../comments/partial-pagination.php');
+	
 	include('../comments/partial-comments.php');
 	render_default_comment_section('none', 0, $comments, $markdown_parser);
+	
+	include('../comments/partial-pagination.php');
 ?>
