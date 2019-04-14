@@ -9,7 +9,8 @@
 	
 	subnav([
 		($_SESSION["loggedIn"] ? "Edit account" : "Register") => "/accounts/",
-		"User list" => "/users/"
+		"User list" => "/users/",
+		'Documentation' => '/documentation/',
 	]);
 	
 	if($_SESSION["loggedIn"]) {
