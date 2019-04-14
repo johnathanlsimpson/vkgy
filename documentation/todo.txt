@@ -1,2 +1,0 @@
-account recovery
-protect php files

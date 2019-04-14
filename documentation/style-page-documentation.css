@@ -1,0 +1,43 @@
+.documentation__details + h1 {
+	margin-top: 3rem;
+}
+.documentation__details:last-of-type {
+	margin-bottom: 2rem;
+}
+.documentation__summary:hover {
+	cursor: pointer;
+}
+.documentation__summary:focus {
+	outline: none;
+}
+.documentation__container .any__note,
+.documentation__container .symbol__next,
+.documentation__example,
+.documentation__raw {
+	vertical-align: middle;
+}
+.documentation__container .symbol__next {
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
+}
+.documentation__example,
+.documentation__raw {
+	display: inline-block;
+}
+.documentation__example ul, .documentation__example ol {
+	margin-bottom: 0;
+	margin-top: 0;
+}
+.documentation__example li {
+	padding-bottom: 0;
+	padding-top: 0;
+}
+.documentation__example hr {
+	margin-bottom: 0.5rem;
+	margin-top: 0.5rem;
+}
+.documentation--external {
+	background: var(--background--alt);
+	margin-bottom: -3rem;
+	padding-top: 3rem;
+}
