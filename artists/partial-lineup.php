@@ -97,8 +97,7 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 												<?php
 													$num_sessions = count($musicians[$a]['sessions']);
 													for($e=0; $e<$num_sessions; $e++) {
-														?><session data-is-session="<?php echo $musicians[$a]['sessions'][$e]['session_id']; ?>">
-																<?php
+														?><session data-is-session="<?php echo $musicians[$a]['sessions'][$e]['session_id']; ?>"><?php
 																	if(!empty($musicians[$a]['sessions'][$e]["url"])) {
 																		?><a class="artist artist--no-symbol a--inherit" href="<?php echo $musicians[$a]['sessions'][$e]["url"]; ?>"><?php echo lang($musicians[$a]['sessions'][$e]["quick_name"], $musicians[$a]['sessions'][$e]['name'], ['secondary_class' => 'any--hidden']); ?></a><?php
 																	}
@@ -115,8 +114,7 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 																				</span><?php
 																		}
 																	}
-																?>
-															</session><?php
+																?></session><?php
 														
 														echo $e < $num_sessions - 1 ? ' , ' : null;
 													}
