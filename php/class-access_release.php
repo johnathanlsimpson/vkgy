@@ -510,7 +510,7 @@
 				
 				// Check if tracklist needed, get tracklist, append to release
 				if($args["get"] === "basics" || $args["get"] === "all") {
-					$sql_tracklist = "SELECT release_id, name, romaji, disc_num, disc_name, disc_romaji, section_num, section_name, section_romaji, track_num, artist_id, artist_display_name, artist_display_romaji FROM releases_tracklists WHERE release_id IN (".str_repeat("?,", count($args["release_id"]) - 1)."?".") ORDER BY release_id ASC, id ASC, disc_num ASC, section_num ASC, track_num ASC";
+					$sql_tracklist = "SELECT release_id, name, romaji, disc_num, disc_name, disc_romaji, section_num, section_name, section_romaji, track_num, artist_id, artist_display_name, artist_display_romaji FROM releases_tracklists WHERE release_id IN (".str_repeat("?,", count((is_array($args["release_id"]) ? $args["release_id"] : [$args["release_id"]])) - 1)."?".") ORDER BY release_id ASC, id ASC, disc_num ASC, section_num ASC, track_num ASC";
 					$stmt_tracklist = $this->pdo->prepare($sql_tracklist);
 					$stmt_tracklist->execute(is_array($args["release_id"]) ? $args["release_id"] : [$args["release_id"]]);
 					$rslt_tracklist = $stmt_tracklist->fetchAll();
