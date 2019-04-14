@@ -221,18 +221,6 @@
 			
 			$artist['edit_history'] = array_values($artist['edit_history']);
 		}
-		/*if(!empty($artist["edit_history"]) && !is_array($artist["edit_history"])) {
-			$artist["edit_history"] = array_filter(explode("\n", $artist["edit_history"]));
-			
-			if(is_array($artist["edit_history"]) && !empty($artist["edit_history"])) {
-				for($i = 0; $i < count($artist["edit_history"]); $i++) {
-					$artist["edit_history"][$i] = [
-						"date_occurred" => substr($artist["edit_history"][$i], 0, 19),
-						"username" => $access_user->access_user(["id" => substr(substr($artist["edit_history"][$i], 21), 0, -1), "get" => "name"])["username"]
-					];
-				}
-			}
-		}*/
 		
 		// Get comments
 		$access_comment = new access_comment($pdo);
