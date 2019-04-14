@@ -69,8 +69,7 @@
 			</form>
 		<?php
 		
-		echo '<div class="col c1"><h1>Documentation</h1></div>';
-		
-		include("../documentation/page-add-artists.php");
+		$documentation_page = 'add-artists';
+		include('../documentation/index.php');
 	}
 ?>

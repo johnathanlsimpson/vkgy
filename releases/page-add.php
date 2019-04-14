@@ -143,7 +143,7 @@
 	</div>
 </div>
 
-<div class="col c1 any--signed-in-only">
+<div class="col c1 any--signed-in-only any--margin">
 	<div class="any--hidden">
 		<span data-contains="songs"              hidden>[]</span>
 		<span data-contains="artists"            hidden><?php echo json_encode($artist_list); ?></span>
@@ -868,3 +868,7 @@
 		</div>
 	</form>
 </div>
+
+<?php
+$documentation_page = 'releases';
+include('../documentation/index.php');

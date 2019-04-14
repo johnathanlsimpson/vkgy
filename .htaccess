@@ -89,6 +89,8 @@ RewriteRule  ^blog/add/?$              /?blog/&action=update
 RewriteRule  ^blog/([\w-]+)/?$         /?blog/&entry=$1
 RewriteRule  ^blog/([\w-]+)/edit/?$    /?blog/&action=update&entry=$1
 
+RewriteRule  ^documentation/([A-z\-]+)/?$  /?documentation/&documentation_page=$1
+
 RewriteRule  ^feed.*$  database [R=301,L]
 
 RewriteRule  ^i/?$  / [R=301,L]

@@ -70,15 +70,9 @@
 					</div>
 				</form>
 			</div>
-			
-			<div class="col c1">
-				<div>
-					<h1>
-						Documentation
-					</h1>
-				</div>
-				<?php include("../documentation/page-add-musicians.php"); ?>
-			</div>
 		<?php
+		
+		$documentation_page = 'musicians';
+		include('../documentation/index.php');
 	}
 ?>

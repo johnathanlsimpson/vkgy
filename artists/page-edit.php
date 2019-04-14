@@ -570,46 +570,38 @@
 								?>
 							</div>
 						</div>
-								
-								<div class="text text--docked">
-									<div class="input__row" data-role="submit-container">
-										<div class="input__group any--flex-grow">
-											<button class="any--flex-grow" data-role="submit" type="submit">
-												Submit edits
-											</button>
-										</div>
-										<div class="input__group">
-											<a class="artist a--inherit a--padded any--weaken-size" data-get="artist_url" data-get-into="href" href="/artists/<?php echo $artist["friendly"]; ?>/">
-												<span data-get="artist_quick_name"><?php echo $artist["quick_name"]; ?></span>
-											</a>
-										</div>
-										<?php
-											if($_SESSION["admin"]) {
-												?>
-													<div class="input__group">
-														<label class="input__checkbox-label symbol__trash symbol--standalone" name="delete"></label>
-													</div>
-												<?php
-											}
-										?>
-										<span data-role="status"></span>
-									</div>
-									
-									<div class="edit__result text text--outlined text--notice any--hidden" data-role="result"></div>
+						
+						<div class="text text--docked">
+							<div class="input__row" data-role="submit-container">
+								<div class="input__group any--flex-grow">
+									<button class="any--flex-grow" data-role="submit" type="submit">
+										Submit edits
+									</button>
 								</div>
-					</form>
-					
-					<div class="col c1 documentation__wrapper">
-						<div>
-							<h1>
-								Documentation
-							</h1>
+								<div class="input__group">
+									<a class="artist a--inherit a--padded any--weaken-size" data-get="artist_url" data-get-into="href" href="/artists/<?php echo $artist["friendly"]; ?>/">
+										<span data-get="artist_quick_name"><?php echo $artist["quick_name"]; ?></span>
+									</a>
+								</div>
+								<?php
+									if($_SESSION["admin"]) {
+										?>
+											<div class="input__group">
+												<label class="input__checkbox-label symbol__trash symbol--standalone" name="delete"></label>
+											</div>
+										<?php
+									}
+								?>
+								<span data-role="status"></span>
+							</div>
+							
+							<div class="edit__result text text--outlined text--notice any--hidden" data-role="result"></div>
 						</div>
-					</div>
+					</form>
 				<?php
 				
-				include("../documentation/page-edit-artist.php");
-				include("../documentation/page-add-musicians.php");
+				$documentation_page = ['edit-artist', 'musicians'];
+				include('../documentation/index.php');
 			}
 			else {
 				?>

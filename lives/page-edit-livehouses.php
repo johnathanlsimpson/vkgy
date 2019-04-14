@@ -192,6 +192,7 @@
 			</form>
 		<?php
 		
-		include("../documentation/page-edit-livehouses.php");
+		$documentation_page = 'livehouses';
+		include('../documentation/index.php');
 	}
 ?>
