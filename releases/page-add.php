@@ -683,6 +683,7 @@
 											
 											<div class="input__row">
 												<div class="input__group">
+													<label class="input__label">Credit</label>
 													<input class="input__checkbox" name="image_is_exclusive" type="checkbox" value="1" <?php $n++; echo $input[$n]; ?> />
 													<label class="input__checkbox-label symbol__unchecked">Scanned by you?</label>
 												</div>

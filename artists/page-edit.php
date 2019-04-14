@@ -334,11 +334,12 @@
 																
 																<div class="input__row">
 																	<div class="input__group">
+																		<label class="input__label">Credit</label>
 																		<input class="input__checkbox" name="image_is_exclusive" type="checkbox" value="1" <?php $n++; echo $input[$n]; ?> />
 																		<label class="input__checkbox-label symbol__unchecked">Scanned by you?</label>
 																	</div>
 																	<div class="input__group any--flex-grow">
-																		<label class="input__label">Other cedit</label>
+																		<label class="input__label">Other credit</label>
 																		<input class="any--flex-grow" name="image_credit" placeholder="http://theirwebsite.com" value="<?php $n++; echo $input[$n]; ?>" />
 																	</div>
 																</div>
