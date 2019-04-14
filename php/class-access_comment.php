@@ -22,7 +22,7 @@
 			}
 			$this->access_user = new access_user($pdo);
 			
-			$this->comment_types = ["blog", "release", "vip", "artist"];
+			$this->comment_types = ['blog', 'release', 'vip', 'artist', 'none'];
 		}
 		
 		
