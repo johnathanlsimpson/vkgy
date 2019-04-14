@@ -88,11 +88,15 @@
 .lineup__sessions session {
 	border: 1px solid transparent;
 	border-radius: 2px;
-	display: inline-block;
-	padding: 0 2px;
+	padding: 0 0.25rem;
+}
+.lineup__sessions .any__note {
+	padding: 2px;
+	vertical-align: text-bottom;
 }
 .lineup__sessions session a {
-	border: 0 transparent solid;
+	border-color: transparent !important;
+	border-style: solid;
 	border-width: 4px 0;
 }
 
@@ -110,18 +114,6 @@
 	padding: 0.25rem;
 	vertical-align: text-top;
 }
-/*session:nth-of-type(1n + 1)::before  { content: "♈\00FE0E "; }
-session:nth-of-type(1n + 2)::before  { content: "♉\00FE0E "; }
-session:nth-of-type(1n + 3)::before  { content: "♊\00FE0E "; }
-session:nth-of-type(1n + 4)::before  { content: "♋\00FE0E "; }
-session:nth-of-type(1n + 5)::before  { content: "♌\00FE0E "; }
-session:nth-of-type(1n + 6)::before  { content: "♍\00FE0E "; }
-session:nth-of-type(1n + 7)::before  { content: "♎\00FE0E "; }
-session:nth-of-type(1n + 8)::before  { content: "♏\00FE0E "; }
-session:nth-of-type(1n + 9)::before  { content: "♐\00FE0E "; }
-session:nth-of-type(1n + 10)::before { content: "♑\00FE0E "; }
-session:nth-of-type(1n + 11)::before { content: "♒\00FE0E "; }
-session:nth-of-type(1n + 12)::before { content: "♓\00FE0E "; }*/
 .lineup__compact {
 	float: right;
 	margin: 0 0 0.25rem 0.25rem;

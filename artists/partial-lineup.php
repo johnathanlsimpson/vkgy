@@ -101,9 +101,7 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 															<session data-is-session="<?php echo $musicians[$a]['sessions'][$e]['session_id']; ?>">
 																<?php
 																	if(!empty($musicians[$a]['sessions'][$e]["url"])) {
-																		?>
-																			<a class="artist artist--no-symbol a--inherit" href="<?php echo $musicians[$a]['sessions'][$e]["url"]; ?>"><?php echo lang($musicians[$a]['sessions'][$e]["quick_name"], $musicians[$a]['sessions'][$e]['name'], ['secondary_class' => 'any--hidden']); ?></a>
-																		<?php
+																		?><a class="artist artist--no-symbol a--inherit" href="<?php echo $musicians[$a]['sessions'][$e]["url"]; ?>"><?php echo lang($musicians[$a]['sessions'][$e]["quick_name"], $musicians[$a]['sessions'][$e]['name'], ['secondary_class' => 'any--hidden']); ?></a><?php
 																	}
 																	
 																	echo empty($musicians[$a]['sessions'][$e]["url"]) ? $musicians[$a]['sessions'][$e]["quick_name"] : null;
@@ -111,13 +109,11 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 																	
 																	if(!empty($musicians[$a]['sessions'][$e]["notes"]) && is_array($musicians[$a]['sessions'][$e]["notes"])) {
 																		foreach($musicians[$a]['sessions'][$e]["notes"] as $note) {
-																			?>
-																				<span class="any__note">
+																			?><span class="any__note">
 																					<?php
 																						echo $note;
 																					?>
-																				</span>
-																			<?php
+																				</span><?php
 																		}
 																	}
 																?>
