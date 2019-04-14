@@ -594,6 +594,9 @@
 		pointer-events: auto;
 		z-index: 203;
 	}
+	.head__user-link {
+		display: none;
+	}
 	.head__avatar {
 		border-radius: 50%;
 		height: 2rem;
@@ -617,12 +620,13 @@
 		.head__nav:last-of-type {
 			display: none;
 		}
-		.head__search, .head__symbol {
+		.head__search, .head__symbol, .head__user-link {
+			display: initial;
 			display: initial;
 		}
-		#language-ja:checked ~ .head .any--ja {
+		/*#language-ja:checked ~ .head .any--ja {
 			font-size: inherit;
-		}
+		}*/
 	}
 
 

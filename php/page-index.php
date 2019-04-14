@@ -102,7 +102,7 @@
 				<span class="any--weaken-color head__symbol symbol--standalone symbol__search"></span>
 				
 				<div class="head__right">
-					<a class="head__item head__nav a--inherit head__vip" href="/vip/"><?php echo lang('VIP', 'ビップ', ['secondary_container' => 'div', 'secondary_class' => 'any--weaken']); ?></a>
+					<a class="head__item head__nav a--inherit head__vip" href="/vip/">VIP</a>
 					<a class="head__item head__user-link" href="<?php echo $user_link; ?>">
 						<img alt="<?php echo $_SESSION['username']; ?>" class="head__avatar" src="<?php echo $avatar_url; ?>" />
 					</a>
