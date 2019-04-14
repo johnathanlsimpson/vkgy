@@ -65,6 +65,12 @@
 				$sql_values[] = sanitize($args["id"]);
 				$sql_values[] = array_flip($this->comment_types)[$args["type"]];
 			}
+			if(is_array($args['thread_ids']) && !empty($args['thread_ids'])) {
+				$sql_where[] = 'comments.thread_id=?'.str_repeat(' OR comments.thread_id=?', count($args['thread_ids']) - 1);
+				foreach($args['thread_ids'] as $thread_id) {
+					$sql_values[] = $thread_id;
+				}
+			}
 			if(is_numeric($args['is_approved'])) {
 				$sql_where[] = 'comments.is_approved=?';
 				$sql_values[] = $args['is_approved'];
@@ -84,6 +90,9 @@
 			
 			// LIMIT
 			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : $sql_limit ?: null;
+			if($sql_limit) {
+				$sql_where[] = 'comments.thread_id IS NULL';
+			}
 			
 			if($sql_select && $sql_from) {
 				
@@ -95,11 +104,29 @@
 				$comments = $stmt_comment->fetchAll();
 				$num_comments = count($comments);
 				
+				if($sql_limit) {
+					for($i=0; $i<$num_comments; $i++) {
+						$thread_ids[$comments[$i]['id']] = '';
+					}
+					
+					$thread_ids = array_keys($thread_ids);
+					
+					$access_replies = new access_comment($this->pdo);
+					
+					$reply_comments = $access_replies->access_comment([ 'thread_ids' => $thread_ids, 'get' => 'all' ]);
+					
+					$reply_comments = is_array($reply_comments) ? $reply_comments : [];
+					
+					$comments = array_merge($comments, $reply_comments);
+				}
+				
+				$num_comments = count($comments);
+				
 				if($args["get"] === "all" || $args["get"] === "list") {
 					if(is_array($comments)) {
 						for($i=0; $i<$num_comments; $i++) {
 							$comments[$i]["user"] = $this->access_user->access_user(["id" => (is_numeric($comments[$i]["user_id"]) ? $comments[$i]['user_id'] : 0), "get" => "name"]);
-							$comments[$i]["item_type"] = $this->comment_types[$comments[$i]["item_type"]];
+							$comments[$i]["item_type"] = is_numeric($comments[$i]["item_type"]) ? $this->comment_types[$comments[$i]["item_type"]] : $comments[$i]["item_type"];
 						}
 					}
 				}
@@ -138,17 +165,21 @@
 						}
 						
 						// Loop through comments and restructure into threads
-						for($i=0; $i<$num_comments; $i++) {
-							$comments[$i]["thread_id"] = $comments[$i]["thread_id"] ?: $comments[$i]["id"];
-							
-							if(!is_array($tmp_comments[$comments[$i]["thread_id"]])) {
-								$tmp_comments[$comments[$i]["thread_id"]] = [];
+						if(!$args['thread_ids']) {
+							for($i=0; $i<$num_comments; $i++) {
+								$comments[$i]["thread_id"] = $comments[$i]["thread_id"] ?: $comments[$i]["id"];
+								
+								if(!is_array($tmp_comments[$comments[$i]["thread_id"]])) {
+									$tmp_comments[$comments[$i]["thread_id"]] = [];
+								}
+								array_unshift($tmp_comments[$comments[$i]["thread_id"]], $comments[$i]);
 							}
-							array_unshift($tmp_comments[$comments[$i]["thread_id"]], $comments[$i]);
 						}
 					}
 					
-					$comments = $tmp_comments;
+					if(!$args['thread_ids']) {
+						$comments = $tmp_comments;
+					}
 				}
 			}
 				
