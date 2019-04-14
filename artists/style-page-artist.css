@@ -87,8 +87,14 @@
 }
 .lineup__sessions session {
 	border: 1px solid transparent;
+	border: 3px solid transparent;
+	border: none;
 	border-radius: 2px;
+	-webkit-box-decoration-break: clone;
+	box-decoration-break: clone;
+	margin-left: -2px;
 	padding: 0 0.25rem;
+	padding: 1px 2px;
 }
 .lineup__sessions .any__note {
 	padding: 2px;
@@ -102,7 +108,8 @@
 
 .lineup__sessions .lineup__session--hovered,
 .lineup__sessions .lineup__session--clicked {
-	border-color: var(--attention--faint);
+	/*border-color: var(--attention--faint);*/
+	box-shadow: 0 0 0 1px var(--attention--faint);
 }
 .lineup__container session::before {
 	background: var(--background--bold);
