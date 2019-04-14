@@ -1,8 +1,9 @@
 <?php
 	$body_class = $_SESSION["loggedIn"] ? "body--signed-in" : "body--signed-out";
 	$page_description = $page_description ? $page_description." | vkgy (ブイケージ)" : "vkgy is a visual kei library maintained by overseas fans. vkgy（ブイケージ）はビジュアル系のファンサイトとライブラリです。関連するアーティストのメンバープロフィールや活動やリリース情報などがあります。";
-	$page_title = $pageTitle ? $pageTitle." | vkgy (ブイケージ)" : "vkgy (ブイケージ) | visual kei library (ビジュアル系のファンサイトとライブラリ)";
-	$page_image = $page_image ?: "https://vk.gy/support/patreon-back.png";
+	$page_title = $page_title ?: $pageTitle;
+	$page_title = $page_title ? $page_title.' | vkgy (ブイケージ)' : 'vkgy (ブイケージ) | visual kei library (V系ライブラリ)';
+	$page_image = $page_image ?: 'https://vk.gy/support/patreon-back.png';
 	$background_image = $background_image ?: ($page_image ?: null);
 	
 	style([
