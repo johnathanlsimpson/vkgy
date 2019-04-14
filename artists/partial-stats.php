@@ -50,9 +50,11 @@
 		</h5>
 		<?php
 			if(is_array($artist['areas']) && !empty($artist['areas'])) {
+				$artist['areas'] = array_values(array_reverse($artist['areas']));
+				
 				foreach($artist['areas'] as $key => $area) {
+					echo $key > 0 ? '<span class="symbol__previous"></span>' : null;
 					echo lang($area['romaji'], $area['name'], ['secondary_class' => 'any--hidden']);
-					echo $key < count($artist['areas']) - 1 ? '<span class="symbol__previous"></span>' : null;
 				}
 			}
 			else {
