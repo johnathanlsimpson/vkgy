@@ -34,7 +34,9 @@
 
 ## Archaic Japanese
 
-* For obscure Japanese, the extended kana recommended by Hepburn are typically preferred. ''ヴ,, → ''VU,,, ''ル゜,, → ''LU,,.
+* For obscure Japanese, the extended kana recommended by Hepburn are typically preferred.
+
+ ''ヴ,, → ''VU,,, ''ル゜,, → ''LU,,.
 
 * For archaic Japanese, it's recommended that the phrase be romanized how it would be *pronounced*. For example, てふてふ is actually an archaic way to write *chouchou* (and this is the recommended romanization), despite that those characters would be read tefutefu now.
 

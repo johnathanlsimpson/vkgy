@@ -24,7 +24,7 @@
 
 * [vkgy](https://vk.gy/) is designed to make it easy and quick to add information, while avoiding duplicates and weird formatting. The downside is that there's sometimes a learning curve.
 
- One of the first things you have to get used to is Markdown—a system for formatting text and linking artists. See **[Markdown]()** for the full guide, but here's a quick primer on linking artists:
+ One of the first things you have to get used to is Markdown—a system for formatting text and linking artists. See **[Markdown](/documentation/markdown/)** for the full guide, but here's a quick primer on linking artists:
 
  In comments etc., you can make special artist links by enclosing their name between ''/slashes/,,. You can use romaji or Japanese, and can ommit symbols. The system will attempt to find that artist in the database and turn it into a working link in the final text:
 

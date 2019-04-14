@@ -2,7 +2,7 @@
 
 * Use the musician's real name (or most common name) and most common position.
 
-* Each musician must belong to at least one artist that's already in the database. See: **Band history**.
+* Each musician must belong to at least one artist that's already in the database. See: **[Band history](/documentation/musicians/#band-history)**.
 
 
 
@@ -28,7 +28,7 @@
 
  A new line (or era) is made when the musician leaves one band and joins another, or when he changes names or position within the band.
 
-* Using vkgy's special ''/slash/,, notation (see **Markdown**), you can link the musician to the bands within his band history.
+* Using vkgy's special ''/slash/,, notation (see **[Markdown](/documentation/markdown/)**), you can link the musician to the bands within his band history.
 
  For bands that *aren't* in the database yet, you can leave them as plain text (romanized name first, followed by the Japanese).
 

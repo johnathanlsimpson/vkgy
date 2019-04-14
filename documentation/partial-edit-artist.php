@@ -12,9 +12,9 @@
 
 * ''exclusive,, is for artists whose profiles feature information that can't be found on other websites. Only use this tag if you did research and discovered new information.
 
-* ''foreign,, is for any artists that are outside of Japan. See **[Adding artists]()** for criteria for foreign artists.
+* ''foreign,, is for any artists that are outside of Japan. See **[Adding artists](/documentation/add-artists/)** for criteria for foreign artists.
 
-* ''non-visual,, should be used for any non-visual bands. See **[Adding artists]()** for criteria for non-vk artists.
+* ''non-visual,, should be used for any non-visual bands. See **[Adding artists](/documentation/add-artists/)** for criteria for non-vk artists.
 
 * ''needs review,, can be used any time you're unsure about some of the information, or think there may be a mistake (please leave a comment explaning, if necessary).
 
@@ -40,7 +40,7 @@
 
 * The artist biography is completely text-based. There's a learning curve, but it's been optimized for non-Japanese speakers, has several features to increase efficiency, and automagically sets certain artist details.
 
-* Each entry in the biography needs a date and some content (present-tense, active voice, full sentences, use **[Markdown]()** to link artists or format text).
+* Each entry in the biography needs a date and some content (present-tense, active voice, full sentences, use **[Markdown](/documentation/markdown/)** to link artists or format text).
 
  ''1999-06-18 /Dali/ forms.,,
 
@@ -50,7 +50,7 @@
 
 * Each entry gets a ''-tag,, at the end. These are generated automatically—check the preview section while typing—and you'll see them in the text next time you go to edit the artist.
 
- You can also manually set the tags for each entry (see **[Biography tags]()**) by typing, at the end of the line, a hyphen followed by comma-separated tag(s).
+ You can also manually set the tags for each entry (see **[Biography tags](/documentation/edit-artist/#biography-tags)**) by typing, at the end of the line, a hyphen followed by comma-separated tag(s).
 
  {1999-06-18 /Dali/ forms. -formation\n\n1999-06-17 Guitarist JUN joins, but sprains his ankle. -member,trouble}
 
@@ -86,7 +86,7 @@
 
 * ''-trouble,, Bad events such as death, injury, arrest, etc.
 
-* ''-live,, Generic information about live events. Unlike ''-schedule,, (see **[Editing live schedule]()**), these entries are *not* added to the band's live history section.
+* ''-live,, Generic information about live events. Unlike ''-schedule,, (see **[Editing live schedule](/documentation/edit-artist/#editing-live-schedule)**), these entries are *not* added to the band's live history section.
 
  ''2018-06-06 Twoman vs /Gackt/ is held. -live,,
 
@@ -134,7 +134,7 @@
 
  Note that every release must be added to the database, even if information about it is unknown or it was cancelled. Theoretically, there should never be a released mention in the artist's biography that isn't in the database.
 
-* ''-schedule,, or ''-s,, A special tag that allows you to edit the band's live schedule directly from the biography. See **[Editing live schedule]()**.
+* ''-schedule,, or ''-s,, A special tag that allows you to edit the band's live schedule directly from the biography. See **[Editing live schedule](/documentation/edit-artist/#editing-live-schedule)**.
 
 
 

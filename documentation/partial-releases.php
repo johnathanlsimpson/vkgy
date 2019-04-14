@@ -77,7 +77,7 @@
 
  ''1. Song A\n2. Song B\n3. Song C,,
 
-* ''clear tracklist,, is mainly useful when duplicating releases (see **[Advanced editing]()**).
+* ''clear tracklist,, is mainly useful when duplicating releases (see **[Advanced editing](/documentation/releases/#advanced-editing)**).
 
 
 
@@ -91,7 +91,7 @@
 
 * ''friendly url,, is a url-friendly name for the release. It's automatically generated, but you can edit it if you'd like. Letters, numbers, and hyphens are allowed.
 
-* ''notes,, is for any random notes you have about the release. You can separate them with a horizontal line, and **[Markdown]()** can be used.
+* ''notes,, is for any random notes you have about the release. You can separate them with a horizontal line, and **[Markdown](/documentation/markdown/)** can be used.
 
  ''note 1\n\n---\n\n*another* note,, ''→,, [[<ul class="ul--compact" style="margin:0;"><li>note 1</li><li><em>another</em> note</li></ul>]]
 

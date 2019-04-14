@@ -32,10 +32,14 @@
 	padding-bottom: 0;
 	padding-top: 0;
 }
-.documentation__example hr {
+.documentation__example hr, .documentation__raw hr {
 	margin-bottom: 0.5rem;
 	margin-top: 0.5rem;
 }
+.documentation__raw ul, .documentation__raw ol {
+	margin-bottom: 0;
+	margin-top: 0;
+} 
 .documentation--external {
 	background: var(--background--alt);
 	margin-bottom: -3rem;

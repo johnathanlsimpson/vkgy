@@ -10,7 +10,7 @@
 
 * The ''friendly,, name is automatically generated, but may be manually edited. It can contain only letters, numbers, and hyphens, and must be unique for each livehouse.
 
-* Nicknames, when typed into the artist's bio (**[Editing artists]()**), will automatically resolve to the full livehouse name. Because of this, no two livehouses can have the same nickname.
+* Nicknames, when typed into the artist's bio (**[Editing artists](/documentation/edit-artist/)**), will automatically resolve to the full livehouse name. Because of this, no two livehouses can have the same nickname.
 
  Several nicknames are generated for each livehouse automatically, but you can manually add them in the ''nicknames,, field (comma separated). Add only common nicknames or very common misspellings.
 
@@ -36,7 +36,7 @@
 
 ## Merging duplicate livehouses
 
-* Livehouses should *only* be merged if the same livehouse was accidentally added twice. This is **not** for livehouses that changed their name (see **[Livehouse names]()**).
+* Livehouses should *only* be merged if the same livehouse was accidentally added twice. This is **not** for livehouses that changed their name (see **[Livehouse names](/documentation/livehouses/#livehouse-names)**).
 
 * Use the ''merge data from,, field to merge data **from** the selected livehouse **into** the livehouse you're currently editing.
 

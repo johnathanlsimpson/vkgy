@@ -21,7 +21,7 @@ In all cases, please use artist tags and descriptions appropriately. [Ask us](ht
 
  ''❌,, The Gazette, Cali Gari ''✔,, the GazettE, cali≠gari, CμЯЁ-βLAST
 
-* When romanizing, keep all symbols, letters, and numbers intact when possible (see **[Romaji]()**). If an official romanization exists, use that instead.
+* When romanizing, keep all symbols, letters, and numbers intact when possible (see **[Romanization](/documentation/romanization/)**). If an official romanization exists, use that instead.
 
  ''name,, サリィ。 ''romaji,, SALLY。 / ''name,, 愛狂います。 ''official romaji,, aicle。
 

@@ -1,9 +1,3 @@
-<?php
-	breadcrumbs([
-		'Documentation' => '/documentation/',
-	]);
-?>
-
 <div class="col c1">
 	<div>
 		<h1>

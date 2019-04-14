@@ -6,13 +6,7 @@
 
 * Lists are easy, and you can easily separate sections with lines, if you want:
 
- {* List
-* List
-
----
-
-1. Another
-1. List}
+ ''* List\n* List\n\n---\n\n1. Another\n1. List,, ''→,, [[<ul class="ul--compact"><li>List</li><li>List</li></ul><hr /><ol class="ul--compact"><li>Another</li><li>List</li></ol>]]
 
 
 
@@ -38,7 +32,9 @@
 
 * You can embed images, and give them a title if you'd like.
 
- {![You can also leave the brackets blank, if you want.](https://vk.gy/images/4614-omikuji-group-shot.jpg)}
+ ''![You can also leave the brackets blank, if you want.](https://vk.gy/images/4614-omikuji-group-shot.jpg),,
+
+ ![You can also leave the brackets blank, if you want.](https://vk.gy/images/4614-omikuji-group-shot.jpg)
 
 * Easily embed release information from vkgy, or tweets, or YouTube videos, just by pasting the link:
 
