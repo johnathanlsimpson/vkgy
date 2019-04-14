@@ -200,30 +200,28 @@ document.addEventListener("paste", function(event) {
 		var pasteText = event.clipboardData.getData('text/plain');
 		pasteText = pasteText.split("\n");
 		pasteText = pasteText.filter(function(x) { return x.replace(/\s+/, ''); });
-
+		
 		var numPastedLines = pasteText.length;
-
+		
 		if(numPastedLines > 1) {
 			event.preventDefault();
-
+			
 			var currElem = event.target;
-
+			
 			for(var i=0; i<numPastedLines; i++) {
 				currElem.value = currElem.value + cleanSongTitle(pasteText[i]);
-
+				
 				if(i + 1 < numPastedLines) {
 					var isParent = false;
-
+					
 					while(!isParent) {
 						currElem = currElem.parentElement;
-
+						
 						if(currElem.classList.contains("track--show-song")) {
 							var addTrackButton = currElem.querySelector(".track__song-controls:last-of-type .track__song-control");
 							addTrackButton.click();
-
 							currElem = currElem.nextElementSibling;
 							currElem = currElem.querySelector("input[name^=\"tracklist\[name\]\"]");
-
 							isParent = true;
 						}
 					}
@@ -256,4 +254,20 @@ clearButton.addEventListener('click', function() {
 	window.setTimeout(function() {
 		clearButton.classList.remove('symbol__success');
 	}, 1000);
+});
+
+// Clear friendly on name update
+var friendlyElem = document.querySelector('[name="friendly"]');
+var nameElems = [
+	document.querySelector('[name="name"]'),
+	document.querySelector('[name="romaji"]'),
+	document.querySelector('[name="press_name"]'),
+	document.querySelector('[name="press_romaji"]'),
+	document.querySelector('[name="type_name"]'),
+	document.querySelector('[name="type_romaji"]')
+];
+nameElems.forEach(function(elem) {
+	elem.addEventListener('change', function() {
+		friendlyElem.value = '';
+	});
 });
