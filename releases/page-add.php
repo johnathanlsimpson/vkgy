@@ -145,9 +145,9 @@
 
 <div class="col c1 any--signed-in-only any--margin">
 	<div class="any--hidden">
-		<span data-contains="songs"              hidden>[]</span>
-		<span data-contains="artists"            hidden><?php echo json_encode($artist_list); ?></span>
-		<span data-contains="companies"          hidden><?php echo json_encode($label_list); ?></span>
+		<template data-contains="songs"              hidden>[]</template>
+		<template data-contains="artists"            hidden><?php echo json_encode($artist_list); ?></template>
+		<template data-contains="companies"          hidden><?php echo json_encode($label_list); ?></template>
 	</div>
 
 	<form action="" enctype="multipart/form-data" method="post" name="add">

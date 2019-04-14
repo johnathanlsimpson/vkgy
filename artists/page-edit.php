@@ -19,11 +19,18 @@
 		"/artists/style-page-edit.css"
 	]);
 	
-	$artist_list = $access_artist->access_artist(["get" => "name"]);
-	if(is_array($artist_list) && !empty($artist_list)) {
-		foreach($artist_list as $key => $tmp_artist) {
-			$artist_list[$tmp_artist["id"]] = [$tmp_artist["id"], $tmp_artist["friendly"], $tmp_artist["quick_name"].($tmp_artist["romaji"] ? " (".$tmp_artist["name"].")" : null)];
-		}
+	$artist_list = $access_artist->access_artist(['get' => 'name']);
+	$num_artist_list = count($artist_list);
+	for($i=0; $i<$num_artist_list; $i++) {
+		$third_line  = $artist_list[$i]['quick_name'].($artist_list[$i]['romaji'] ? ' ('.$artist_list[$i]['name'].')' : null);
+		$third_line .= friendly($artist_list[$i]['quick_name']) != $artist_list[$i]['friendly'] ? ' ('.$artist_list[$i]['friendly'].')' : null;
+		$third_line  = str_replace(["&#92;", "&#34;"], ["\\", "\""], $third_line);
+		
+		$artist_list[$i] = [
+			$artist_list[$i]['id'],
+			'',
+			$third_line
+		];
 	}
 	
 	$access_release = new access_release($pdo);
@@ -49,9 +56,9 @@
 			if(!empty($artist)) {
 				?>
 					<form action="" class="col c1 any--margin" enctype="multipart/form-data" id="form__edit" method="post" name="form__edit">
-						<span data-contains="artists" hidden><?php echo json_encode(is_array($artist_list) ? array_values($artist_list) : []); ?></span>
-						<span data-contains="musicians" hidden><?php echo json_encode(is_array($musician_list) ? array_values($musician_list) : []); ?></span>
-						<span data-contains="releases" hidden><?php echo json_encode(is_array($release_list) ? array_values($release_list) : []); ?></span>
+						<template data-contains="artists" hidden><?php echo json_encode(is_array($artist_list) ? array_values($artist_list) : []); ?></template>
+						<template data-contains="musicians" hidden><?php echo json_encode(is_array($musician_list) ? array_values($musician_list) : []); ?></template>
+						<template data-contains="releases" hidden><?php echo json_encode(is_array($release_list) ? array_values($release_list) : []); ?></template>
 						
 						<input id="form__changes" name="changes" type="hidden" />
 						
