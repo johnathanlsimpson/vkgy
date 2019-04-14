@@ -174,14 +174,10 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 								$musician["history"] = $markdown_parser->validate_markdown($musician["history"]);
 								$musician['name'] = trim($musician['name']);
 								$musician['romaji'] = trim($musician['romaji']);
+								$musician['friendly'] = !$musician['friendly'] || $musician['friendly'] === '-' ? friendly($musician['romaji'] ?: $musician['name']) : $musician['friendly'];
 								
 								$musician_values = [];
 								foreach($musician_keys as $key) {
-									/*if($key === "history") {
-									}
-									if($key === 'name') {
-									}*/
-									//if($key)
 									$musician_values[] = sanitize($musician[$key]) ?: null;
 								}
 								
