@@ -71,7 +71,7 @@
 										</h1>
 										
 										<input class="input__checkbox" id="artist_exclusive" name="is_exclusive" type="checkbox" value="1" <?php echo $artist["is_exclusive"] ? "checked" : null; ?> />
-										<label class="input__checkbox-label symbol__unchecked" for="artist_exclusive">Exclusive info?</label>
+										<label class="input__checkbox-label symbol__unchecked" for="artist_exclusive" hidden>Exclusive info?</label>
 									</div>
 									<div>
 										<?php
