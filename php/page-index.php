@@ -254,6 +254,9 @@
 					<li>
 						<a href="/search/">search</a>
 					</li>
+					<li>
+						<a href="/documentation/">documentation</a>
+					</li>
 				</ul>
 				
 				<div class="any--weaken footer__center">
@@ -290,6 +293,12 @@
 								RSS
 							</h5>
 							<a href="/rss/">vk.gy/rss/</a>
+						</li>
+						<li>
+							<h5>
+								Patreon
+							</h5>
+							<a href="https://www.patreon.com/vkgy/" target="_blank">vkgy</a>
 						</li>
 					</ul>
 				</div>
