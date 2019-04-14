@@ -1,5 +1,5 @@
 <?php
-	include('../documentation/function-parse_documentation.php');
+	include('../documentation/function-render_documentation.php');
 	
 	if(!$markdown_parser) {
 		$markdown_parser = new parse_markdown($pdo);
@@ -18,12 +18,32 @@
 			}
 		}
 	}
+	
+	// Set title and breadcrumbs
+	if($_GET['documentation_page']) {
+		$documentation_page = $_GET['documentation_page'];
+		$documentation_page = strtoupper(substr($documentation_page, 0, 1)).substr($documentation_page, 1);
+		$documentation_page = str_replace('-', ' ', $documentation_page);
+		
+		breadcrumbs([
+			'Documentation' => '/documentation/',
+			$documentation_page => '/documentation/'.$_GET['documentation_page'].'/'
+		]);
+		
+		$page_title = 'Documentation: '.$documentation_page;
+	}
 
 	// Pass content to page template, or else show index
 	if($documentation_contents && is_array($documentation_contents) && !empty($documentation_contents)) {
 		include('../documentation/page-documentation.php');
 	}
 	else {
+		breadcrumbs([
+			'Documentation' => '/documentation/',
+		]);
+		
+		$page_title = 'Documentation';
+		
 		include('../documentation/page-index.php');
 	}
 ?>
