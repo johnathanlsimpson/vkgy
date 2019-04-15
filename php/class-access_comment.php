@@ -79,6 +79,9 @@
 				$sql_where[] = 'comments.is_deleted=?';
 				$sql_values[] = $args['is_deleted'];
 			}
+			if($args['limit_threads']) {
+				$sql_where[] = 'comments.thread_id IS NULL';
+			}
 			
 			// GROUP
 			if($args["get"] === "count") {
@@ -90,9 +93,6 @@
 			
 			// LIMIT
 			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : $sql_limit ?: null;
-			if($sql_limit) {
-				$sql_where[] = 'comments.thread_id IS NULL';
-			}
 			
 			if($sql_select && $sql_from) {
 				
@@ -104,7 +104,7 @@
 				$comments = $stmt_comment->fetchAll();
 				$num_comments = count($comments);
 				
-				if($sql_limit) {
+				if($args['limit_threads']) {
 					for($i=0; $i<$num_comments; $i++) {
 						$thread_ids[$comments[$i]['id']] = '';
 					}
