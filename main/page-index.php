@@ -184,7 +184,7 @@
 				<?php
 					for($i=0; $i<count($comments); $i++) {
 						$comment_class = null;
-						$comments[$i]['user']['avatar_url'] = '/usericons/avatar-'.(file_exists('../usericons/avatar-'.$_comments[$i]['user'].'.png') ? $_comments[$i]['user'] : 'anonymous').'.png?'.date('YmdH');
+						$comments[$i]['user']['avatar_url'] = '/usericons/avatar-'.(file_exists('../usericons/avatar-'.$comments[$i]['user']['username'].'.png') ? $comments[$i]['user']['username'] : 'anonymous').'.png?'.date('YmdH');
 						
 						if(!$comments[$i]['is_approved']) {
 							$comment_class .= ($_SESSION['admin'] ? 'comment--unapproved' : 'any--hidden');
