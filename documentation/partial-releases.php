@@ -2,6 +2,10 @@
 
 * The ''name,, and ''romaji,, are for the official, base title; press and type fields can be accessed with the ''press/type,, button.
 
+ If the release doesn't have an exact name, try to use whatever is written on the release itself, i.e. ''2019.08.06 コメントCD,,.
+
+ In the event that the name is unknown, or hasn't been anounced, use a brief descriptor in parentheses: ''(unknown demotape),, ''(comment CD),, ''(single TBA),,.
+
 * ''press,, is for additional *pressings*, which typically occur on separate dates. The “most official” press name should be used: usually however the band refers to the press in promotional material, i.e. “追加プレス” or “2ndプレス.”
 
 * ''type,, is for when multiple types of a release were made available at the same time. Again, this should use the “most official” name, i.e. “TYPE-A” or “通常盤” or “RED VER.”
@@ -82,6 +86,14 @@
 
 
 ## Advanced editing
+
+* If a release was cancelled, it should still be entered into the database: just add '' (cancelled),, at the end of the title.
+
+* If a release was postponed, put the last date in the ''date,, field, but mention the original date and reason for delay in the ''notes,,.
+
+* If a release was sold on multiple days (e.g. three lives in a row), use the first for ''date,, and list the others in ''notes,,.
+
+ Note different presses/types must be entered as separate releases. Even if the band doesn't specify that they're multiple types, if there's *any* difference, it should be separate entries.
 
 * You can add as many images as you'd like, just be sure to select ''default cover image,, for whichver one is the cover. For the others, you can add descriptions as necessary.
 

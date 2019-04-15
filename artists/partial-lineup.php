@@ -92,7 +92,7 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 										?>
 											<div class="lineup__sessions any--weaken-color">
 												<h5>
-													<?php echo lang('Sessions', 'セッション', ['secondary_class' => 'any--hidden']); ?>
+													&#8251;<?php echo lang('Sessions', 'セッション', ['secondary_class' => 'any--hidden']); ?>
 												</h5>
 												<?php
 													$num_sessions = count($musicians[$a]['sessions']);
@@ -107,7 +107,8 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 																	
 																	if(!empty($musicians[$a]['sessions'][$e]["notes"]) && is_array($musicians[$a]['sessions'][$e]["notes"])) {
 																		foreach($musicians[$a]['sessions'][$e]["notes"] as $note) {
-																			?><span class="any__note">
+																			?>
+																				<span class="any__note">
 																					<?php
 																						echo $note;
 																					?>

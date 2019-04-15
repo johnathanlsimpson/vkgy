@@ -203,14 +203,48 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 									}
 									
 									// Add any new artist-musician links
-									preg_match_all("/"."\((\d+)\)"."/", $musician["history"], $matches);
-									if(is_array($matches) && !empty($matches)) {
-										foreach($matches[1] as $match) {
-											if(!in_array($match, $extant_links)) {
-												$sql_add_link = "INSERT INTO artists_musicians (artist_id, musician_id, position, unique_id) VALUES (?, ?, ?, ?)";
-												$values_add_link = [$match, sanitize($musician["id"]), sanitize($musician["usual_position"]), $match."-".sanitize($musician["id"])];
+									preg_match_all('/'.'\((\d+)\)(?:\/.+?\/)?(?:\[.+?\])?((?: \((?!\d+).+?\))*)'.'/', $musician['history'], $bands_in_database);
+									
+									if(is_array($bands_in_database) && !empty($bands_in_database)) {
+										$bands_in_database['full_matches'] = $bands_in_database[0];
+										$bands_in_database['ids'] = $bands_in_database[1];
+										$bands_in_database['notes'] = $bands_in_database[2];
+										
+										unset($bands_in_database[0], $bands_in_database[1], $bands_in_database[2]);
+										
+										foreach($bands_in_database['ids'] as $band_in_db_key => $band_in_db_id) {
+											if(!in_array($band_in_db_id, $extant_links)) {
+												
+												// Check if roadie
+												if(strpos($bands_in_database['notes'][$band_in_db_key], 'roadie') !== false) {
+													$position_name = 'roadie';
+													$position = 6;
+												}
+												
+												// Check if on different position
+												if(preg_match('/'.'\(on (vocals|guitar|bass|drums|keys)\)'.'/', $bands_in_database['notes'][$band_in_db_key], $position_match)) {
+													$position = array_search($position_match[1], ['other', 'vocals', 'guitar', 'bass', 'drums', 'keys']);
+												}
+												
+												$position = is_numeric($position) ? $position : $musician['usual_position'];
+												
+												// Check if support
+												if(strpos($bands_in_database['notes'][$band_in_db_key], 'support') !== false) {
+													$position_name = 'support '.['other', 'vocals', 'guitar', 'bass', 'drums', 'keys'][$position];
+												}
+												
+												// Check if pseudonym
+												if(preg_match('/'.'\(as ([A-z0-9&#;]+)(?: \(([A-z0-9&#;]+))?\)'.'/', $bands_in_database['notes'][$band_in_db_key], $as_name_match)) {
+													$as_name = $as_name_match[2] ?: $as_name_match[1];
+													$as_romaji = $as_name_match[2] ? $as_name_match[1] : null;
+												}
+												
+												$sql_add_link = "INSERT INTO artists_musicians (artist_id, musician_id, position, position_name, as_name, as_romaji, unique_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+												$values_add_link = [ $band_in_db_id, sanitize($musician['id']), $position, $position_name, $as_name, $as_romaji, $band_in_db_id.'-'.sanitize($musician['id']) ];
 												$stmt_add_link = $pdo->prepare($sql_add_link);
 												$stmt_add_link->execute($values_add_link);
+												
+												unset($position, $position_name, $as_name, $as_romaji);
 											}
 										}
 									}
@@ -246,6 +280,7 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 		$markdown_parser = new parse_markdown($pdo);
 		$bio = $markdown_parser->validate_markdown($_POST["bio"]);
 		$history = $access_artist->validate_bio($artist_id, $bio);
+		$history = is_array($history) ? $history : [ $history ];
 		$num_history = count($history);
 		
 		// Pull additions to bio, send through auto poster

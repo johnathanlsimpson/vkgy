@@ -86,9 +86,12 @@
 	line-height: 1.5;
 }
 .lineup__sessions session {
-	border: 1px solid transparent;
+	border: none;
 	border-radius: 2px;
-	padding: 0 0.25rem;
+	-webkit-box-decoration-break: clone;
+	box-decoration-break: clone;
+	margin-left: -2px;
+	padding: 1px 2px;
 }
 .lineup__sessions .any__note {
 	padding: 2px;
@@ -102,7 +105,7 @@
 
 .lineup__sessions .lineup__session--hovered,
 .lineup__sessions .lineup__session--clicked {
-	border-color: var(--attention--faint);
+	box-shadow: 0 0 0 1px var(--attention--faint);
 }
 .lineup__container session::before {
 	background: var(--background--bold);
@@ -285,11 +288,11 @@
 .lineup__sessions {
 	flex-grow: 1;
 	flex-basis: 150px;
-	width: 100%;
+	min-width: 100%;
 }
 @media(min-width: 800px) {
 	.lineup__sessions {
-		width: auto;
+		min-width: auto;
 	}
 }
 .lineup__session + .lineup__session::before {
