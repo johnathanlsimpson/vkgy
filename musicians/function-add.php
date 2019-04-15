@@ -11,7 +11,6 @@
 				$romaji = sanitize($_POST["romaji"][$key]) ?: null;
 				$friendly = friendly($romaji ?: $name);
 				$position = sanitize($_POST["position"][$key]) ?: 6;
-				//$edit_history = date("Y-m-d H:i:s")." (".$_SESSION["userID"].")";
 				
 				if($name) {
 					$history = $_POST["history"][$key];
@@ -39,20 +38,57 @@
 							
 							if(is_array($history_lines)) {
 								foreach($history_lines as $line) {
-									preg_match_all("/"."\((\d+)\)"."/", $line, $matches, PREG_PATTERN_ORDER);
 									
-									if(is_array($matches) && !empty($matches[1])) {
-										foreach($matches[1] as $artist_id) {
-											$sql_link = "INSERT INTO artists_musicians (artist_id, musician_id, position, to_end, unique_id) VALUES (?, ?, ?, ?, ?)";
+									preg_match_all('/'.'\((\d+)\)(?:\/.+?\/)?(?:\[.+?\])?((?: \((?!\d+).+?\))*)'.'/', $line, $bands_in_database);
+									
+									if(is_array($bands_in_database) && !empty($bands_in_database)) {
+										
+										$bands_in_database['full_matches'] = $bands_in_database[0];
+										$bands_in_database['ids'] = $bands_in_database[1];
+										$bands_in_database['notes'] = $bands_in_database[2];
+										
+										unset($bands_in_database[0], $bands_in_database[1], $bands_in_database[2]);
+										
+										foreach($bands_in_database['ids'] as $band_in_db_key => $band_in_db_id) {
+											
+											if(strpos($bands_in_database['notes'][$band_in_db_key], '(roadie)') !== false) {
+												$position_name = 'roadie';
+												$link_position = 6;
+											}
+											
+											// Check if on different position
+											if(preg_match('/'.'\(on (vocals|guitar|bass|drums|keys)\)'.'/', $bands_in_database['notes'][$band_in_db_key], $position_match)) {
+												$link_position = array_search($position_match[1], ['other', 'vocals', 'guitar', 'bass', 'drums', 'keys']);
+											}
+											
+											$link_position = is_numeric($link_position) ? $link_position : $position;
+											
+											// Check if support
+											if(strpos($bands_in_database['notes'][$band_in_db_key], 'support') !== false) {
+												$position_name = 'support '.['other', 'vocals', 'guitar', 'bass', 'drums', 'keys'][$link_position];
+											}
+											
+											// Check if pseudonym
+											if(preg_match('/'.'\(as ([A-z0-9&#;]+)(?: \(([A-z0-9&#;]+))?\)'.'/', $bands_in_database['notes'][$band_in_db_key], $as_name_match)) {
+												$as_name = $as_name_match[2] ?: $as_name_match[1];
+												$as_romaji = $as_name_match[2] ? $as_name_match[1] : null;
+											}
+											
+											$sql_link = "INSERT INTO artists_musicians (artist_id, musician_id, position, position_name, as_name, as_romaji, to_end, unique_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 											$stmt_link = $pdo->prepare($sql_link);
 											
-											if($stmt_link->execute([$artist_id, $musician_id, $position, 1, $artist_id."-".$musician_id])) {
+											if($stmt_link->execute([ $band_in_db_id, $musician_id, $link_position, $position_name, $as_name, $as_romaji, 1, $band_in_db_id."-".$musician_id ])) {
 												$output["status"] = "success";
+												$linked_artists[] = $band_in_db_id;
 											}
 											else {
 												$output["status"] = "error";
-												$output["result"][] = ($romaji ?: $name)." could not be linked to artist #".$artist_id.".";
+												if(!in_array($band_in_db_id, $linked_artists)) {
+													$output["result"][] = ($romaji ?: $name)." could not be linked to artist #".$band_in_db_id.".";
+												}
 											}
+											
+											unset($link_position, $position_name, $as_name, $as_romaji);
 										}
 									}
 								}
