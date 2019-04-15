@@ -81,12 +81,7 @@
 	width: 50px;
 }
 .comment__no-avatar {
-	border: none;
-}
-.comment__no-avatar .head__base {
-	fill: transparent;
-	stroke: var(--text--faint);
-	stroke-width: 3pt;
+	border-color: var(--background);
 }
 .comment__content {
 	overflow: hidden;
@@ -98,13 +93,16 @@
 	padding-left: 1ch;
 	white-space: nowrap;
 }
-.comment__user {
-	margin-right: auto;
+.comment__next::before {
+	display: none;
 }
 .comment__comment {
 	flex-grow: 1;
 	max-width: 100%;
 	overflow: hidden;
+}
+.comment__user {
+	margin-right: 1ch;
 }
 @media(max-width: 799.99px) {
 	.main__left {
@@ -118,6 +116,15 @@
 	}
 }
 @media(min-width: 800px) {
+	.comment__next::before {
+		display: inline-block;
+	}
+	.comment__next::after {
+		content: " more";
+	}
+	.comment__user {
+		margin-right: auto;
+	}
 	.main__right {
 		align-self: stretch;
 		max-height: 100%;

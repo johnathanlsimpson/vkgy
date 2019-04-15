@@ -22,7 +22,7 @@
 			}
 			$this->access_user = new access_user($pdo);
 			
-			$this->comment_types = ["blog", "release", "vip", "artist"];
+			$this->comment_types = ['blog', 'release', 'vip', 'artist', 'none'];
 		}
 		
 		
@@ -65,6 +65,12 @@
 				$sql_values[] = sanitize($args["id"]);
 				$sql_values[] = array_flip($this->comment_types)[$args["type"]];
 			}
+			if(is_array($args['thread_ids']) && !empty($args['thread_ids'])) {
+				$sql_where[] = 'comments.thread_id=?'.str_repeat(' OR comments.thread_id=?', count($args['thread_ids']) - 1);
+				foreach($args['thread_ids'] as $thread_id) {
+					$sql_values[] = $thread_id;
+				}
+			}
 			if(is_numeric($args['is_approved'])) {
 				$sql_where[] = 'comments.is_approved=?';
 				$sql_values[] = $args['is_approved'];
@@ -84,6 +90,9 @@
 			
 			// LIMIT
 			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : $sql_limit ?: null;
+			if($sql_limit) {
+				$sql_where[] = 'comments.thread_id IS NULL';
+			}
 			
 			if($sql_select && $sql_from) {
 				
@@ -93,28 +102,84 @@
 				
 				$stmt_comment->execute($sql_values);
 				$comments = $stmt_comment->fetchAll();
+				$num_comments = count($comments);
+				
+				if($sql_limit) {
+					for($i=0; $i<$num_comments; $i++) {
+						$thread_ids[$comments[$i]['id']] = '';
+					}
+					
+					$thread_ids = array_keys($thread_ids);
+					
+					$access_replies = new access_comment($this->pdo);
+					
+					$reply_comments = $access_replies->access_comment([ 'thread_ids' => $thread_ids, 'get' => 'all' ]);
+					
+					$reply_comments = is_array($reply_comments) ? $reply_comments : [];
+					
+					$comments = array_merge($comments, $reply_comments);
+				}
+				
+				$num_comments = count($comments);
 				
 				if($args["get"] === "all" || $args["get"] === "list") {
 					if(is_array($comments)) {
-						foreach($comments as $key => $comment) {
-							$comments[$key]["user"] = $this->access_user->access_user(["id" => (is_numeric($comment["user_id"]) ? $comment['user_id'] : 0), "get" => "name"]);
-							$comments[$key]["item_type"] = $this->comment_types[$comment["item_type"]];
+						for($i=0; $i<$num_comments; $i++) {
+							$comments[$i]["user"] = $this->access_user->access_user(["id" => (is_numeric($comments[$i]["user_id"]) ? $comments[$i]['user_id'] : 0), "get" => "name"]);
+							$comments[$i]["item_type"] = is_numeric($comments[$i]["item_type"]) ? $this->comment_types[$comments[$i]["item_type"]] : $comments[$i]["item_type"];
 						}
 					}
 				}
 				if($args["get"] === "all") {
 					if(is_array($comments)) {
-						foreach($comments as $key => $comment) {
-							$comment["thread_id"] = $comment["thread_id"] ?: $comment["id"];
+						
+						// Loop through comments and set up SQL to get link to page that comment was made on
+						for($i=0; $i<$num_comments; $i++) {
+							$comments[$i]['item_url'] = '/comments/';
 							
-							if(!is_array($tmp_comments[$comment["thread_id"]])) {
-								$tmp_comments[$comment["thread_id"]] = [];
+							if($comments[$i]['item_type'] != 'none') {
+								if($comments[$i]['item_type'] === 'release') {
+									$tmp_sql_comment_links[$i] = 'SELECT releases.id, CONCAT_WS("/", "", "releases", artists.friendly, releases.id, releases.friendly, "") AS url FROM releases LEFT JOIN artists ON artists.id=releases.artist_id WHERE releases.id=?';
+								}
+								else {
+									$tmp_sql_comment_links[$i] = 'SELECT id, CONCAT_WS("/", "", "'.$comments[$i]['item_type'].($comments[$i]['item_type'] === 'artist' ? 's' : null).'", friendly, "") AS url FROM '.$comments[$i]['item_type'].($comments[$i]['item_type'] === 'artist' ? 's' : null).' WHERE id=?';
+								}
+								
+								$values_comment_links[$i] = $comments[$i]['item_id'];
 							}
-							array_unshift($tmp_comments[$comment["thread_id"]], $comment);
+						}
+						
+						// Loop through SQL generated in last step and get URLs to pages that comments were left on
+						if(is_array($tmp_sql_comment_links)) {
+							$sql_comment_links = 'SELECT * FROM (('.implode(') UNION (', $tmp_sql_comment_links).')) a';
+							
+							$stmt_comment_links = $this->pdo->prepare($sql_comment_links);
+							$stmt_comment_links->execute( array_values($values_comment_links) );
+							
+							foreach($stmt_comment_links->fetchAll() as $rslt_comment_link) {
+								$key = $rslt_comment_link['id'];
+								$key = array_search($key, $values_comment_links);
+								
+								$comments[$key]['item_url'] = $rslt_comment_link['url'];
+							}
+						}
+						
+						// Loop through comments and restructure into threads
+						if(!$args['thread_ids']) {
+							for($i=0; $i<$num_comments; $i++) {
+								$comments[$i]["thread_id"] = $comments[$i]["thread_id"] ?: $comments[$i]["id"];
+								
+								if(!is_array($tmp_comments[$comments[$i]["thread_id"]])) {
+									$tmp_comments[$comments[$i]["thread_id"]] = [];
+								}
+								array_unshift($tmp_comments[$comments[$i]["thread_id"]], $comments[$i]);
+							}
 						}
 					}
 					
-					$comments = $tmp_comments;
+					if(!$args['thread_ids']) {
+						$comments = $tmp_comments;
+					}
 				}
 			}
 				

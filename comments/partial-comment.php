@@ -54,7 +54,10 @@
 					<div class="comment__content" data-markdown="{markdown}">{content}</div>
 					
 					<!-- Bottom, reply link -->
-					<a class="a--padded a--outlined comment__reply symbol__arrow-right-circled" rel="nofollow">Reply <span class="any--weaken-size any--jp"><?php echo sanitize('(リプライ)'); ?></span></a>
+					<a class="a--padded a--outlined comment__reply symbol__arrow-right-circled" rel="nofollow"><?php echo lang('Reply', 'リプライ', ['secondary_class' => 'any--hidden']); ?></a>
+					
+					<!-- Bottom, view link -->
+					<a class="a--padded comment__view" href="{item_url}" rel="nofollow">View page</a>
 					
 				</div>
 			</div>

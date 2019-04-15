@@ -20,7 +20,7 @@
 
  The [database](https://vk.gy/database/) page also allows you to quickly see all items that have been edited recently.
 
- There are also [images](https://vk.gy/images/), [livehouses](https://vk.gy/livehouses/), [users](https://vk.gy/users/), [documentation](https://vk.gy/documentation/), and [VIP](https://vk.gy/vip/) sections.
+ There are also [comments](https://vk.gy/comments/), [documentation](https://vk.gy/documentation/), [images](https://vk.gy/images/), [livehouses](https://vk.gy/livehouses/), [users](https://vk.gy/users/), and [VIP](https://vk.gy/vip/) sections.
 
 * [vkgy](https://vk.gy/) is designed to make it easy and quick to add information, while avoiding duplicates and weird formatting. The downside is that there's sometimes a learning curve.
 

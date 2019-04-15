@@ -59,10 +59,13 @@
 	border-bottom: none;
 	padding-bottom: 0;
 }
-.comment__reply {
+.comment__reply, .comment__view, .comment__view {
 	display: none;
 }
-.comment__container:last-of-type .comment__content + .comment__reply {
+.comment__view[href="/comments/"], .comment__view[href=""] {
+	display: none !important;
+}
+.comment__container:last-of-type .comment__content + .comment__reply, .comment__container:last-of-type .comment__content + .comment__reply + .comment__view {
 	display: inline-block;
 	margin-top: 1rem;
 }

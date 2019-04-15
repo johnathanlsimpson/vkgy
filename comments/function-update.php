@@ -8,13 +8,15 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 	if(is_numeric($_POST['item_id']) && in_array($_POST['item_type'], $access_comment->comment_types)) {
 		
 		// Check that specified entry exists
-		$item_table = $_POST['item_type'].($_POST['item_type'] === 'artist' || $_POST['item_type'] === 'release' ? 's' : null);
-		$sql_check = 'SELECT 1 FROM '.$item_table.' WHERE id=? LIMIT 1';
-		$stmt_check = $pdo->prepare($sql_check);
-		$stmt_check->execute([ $_POST['item_id'] ]);
-		$item_exists = $stmt_check->fetchColumn();
+		if($_POST['item_type'] != 'none') {
+			$item_table = $_POST['item_type'].($_POST['item_type'] === 'artist' || $_POST['item_type'] === 'release' ? 's' : null);
+			$sql_check = 'SELECT 1 FROM '.$item_table.' WHERE id=? LIMIT 1';
+			$stmt_check = $pdo->prepare($sql_check);
+			$stmt_check->execute([ $_POST['item_id'] ]);
+			$item_exists = $stmt_check->fetchColumn();
+		}
 		
-		if($item_exists) {
+		if($item_exists || $_POST['item_type'] === 'none') {
 			
 			// Set variables
 			$item_id      = sanitize($_POST['item_id']);
