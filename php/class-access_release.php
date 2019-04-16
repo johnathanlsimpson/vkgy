@@ -156,6 +156,7 @@
 		// Build and return 'release(s)' object(s)
 		// ======================================================
 		function access_release($args = []) {
+			
 			// [PRE-SELECT] Artist name
 			if(!empty($args["artist_display_name"])) {
 				$artist_id = $this->access_artist->access_artist(["name" => $args["artist_display_name"], "get" => "id"]);
@@ -211,7 +212,6 @@
 				$rslt_pre = $stmt_pre->fetchAll();
 				
 				if(is_array($rslt_pre) && !empty($rslt_pre)) {
-					//$args["release_id"] = is_array($args["release_id"]) ? $args["release_id"] : [];
 					$tmp_release_ids = [];
 					
 					for($i = 0; $i < count($rslt_pre); $i++) {
@@ -302,8 +302,7 @@
 						"releases.upc",
 						"releases.medium",
 					];
-					
-					if($args['edit_history']) {
+					if($args['edit_ids']) {
 						$sql_select[] = 'users.username';
 						$sql_select[] = 'edits_releases.date_occurred AS date_edited';
 					}
@@ -322,7 +321,7 @@
 						"releases.romaji",
 						"releases.friendly",
 						"releases.medium",
-						"IF(images.id IS NOT NULL, CONCAT('/images/', images.id, '-', COALESCE(images.friendly, ''), '.', images.extension), '') AS cover"
+						//"IF(images.id IS NOT NULL, CONCAT('/images/', images.id, '-', COALESCE(images.friendly, ''), '.', images.extension), '') AS cover"
 					];
 				}
 				elseif($args['get'] === 'id') {
@@ -341,7 +340,7 @@
 				$sql_from[] = "releases_collections";
 				$sql_from[] = "LEFT JOIN releases ON releases.id=releases_collections.release_id";
 			}
-			elseif($args['edit_history']) {
+			elseif(is_array($args['edit_ids'])) {
 				$sql_from[] = 'edits_releases';
 				$sql_from[] = 'LEFT JOIN releases ON releases.id=edits_releases.release_id';
 				$sql_from[] = 'LEFT JOIN users ON users.id=edits_releases.user_id';
@@ -383,14 +382,10 @@
 				$sql_where[] = "releases_collections.user_id=?";
 				$sql_values[] = $args["user_id"];
 			}
-			
-			if($args['edit_history']) {
-				$sql_where[] = 'edits_releases.date_occurred>?';
-				$sql_where[] = 'edits_releases.date_occurred<?';
-				$sql_values[] = date("Y-m-d", strtotime("-1 month", strtotime($args["edit_history"])));
-				$sql_values[] = date("Y-m-d", strtotime("+1 month", strtotime($args["edit_history"])));
+			if(is_array($args['edit_ids'])) {
+				$sql_where[] = substr(str_repeat('edits_releases.id=? OR ', count($args['edit_ids'])), 0, -4);
+				$sql_values = array_merge($sql_values, $args['edit_ids']);
 			}
-			
 			if(is_array($args["release_id"]) && !empty($args["release_id"])) {
 				$sql_where[] = "releases.id=".implode(" OR releases.id=", array_fill(0, count($args["release_id"]), "?"));
 				$sql_values = is_array($sql_values) ? array_merge($sql_values, $args["release_id"]) : $args["release_id"];
@@ -460,6 +455,12 @@
 			}
 			
 			
+			// GROUP
+			if($args['get'] === 'basics' || $args['get'] === 'all') {
+				$sql_group[] = 'releases.id';
+			}
+			
+			
 			// ORDER
 			if($args["order"]) {
 				$sql_order[] = $args["order"];
@@ -484,29 +485,31 @@
 					$sql_releases .= "LEFT JOIN images ON images.release_id=CONCAT('(', releases.id, ')') AND images.is_release='1' AND images.is_default='1' ";
 					array_unshift($sql_values, ($_SESSION["userID"] ?: ip2long($_SERVER["REMOTE_ADDR"])));
 				}
-				if($args['get'] === 'calendar') {
-					$sql_releases .= "LEFT JOIN images ON images.release_id=CONCAT('(', releases.id, ')') AND images.is_release='1' AND images.is_default='1' ";
-				}
 				
 				$sql_releases .= is_array($sql_where) && !empty($sql_where) ? "WHERE (".implode(") AND (", $sql_where).") ".$sql_force.' ' : null;
-				$sql_releases .= "GROUP BY releases.id ORDER BY ".implode(", ", $sql_order);
+				$sql_releases .= ($sql_group ? 'GROUP BY '.implode(', ', $sql_group) : null).' ORDER BY '.implode(', ', $sql_order);
 				$sql_releases .= " ".$sql_limit;
 				
-				//echo $_SESSION['username'] === 'inartistic' ? print_r($sql_releases, true).'<pre>'.print_r($sql_values, true).'</pre>' : null;	
-				
+				// Run query
 				$stmt_releases = $this->pdo->prepare($sql_releases);
 				$stmt_releases->execute($sql_values);
 				$rslt_releases = $stmt_releases->fetchAll();
-				$num_rslt_releases = count($rslt_releases);
+				$num_rslt_releases = is_array($rslt_releases) ? count($rslt_releases) : 0;
+				
+				$artist_ids = [];
 				
 				for($i = 0; $i < $num_rslt_releases; $i++) {
 					$id = $rslt_releases[$i]["id"];
+					$artist_id = $rslt_releases[$i]['artist_id'];
 					
 					$releases[$id] = $rslt_releases[$i];
 					$release_ids[] = $id;
+					$artist_ids[$artist_id] = $artist_id;
 					
 					unset($rslt_releases[$i]);
 				}
+				
+				$artist_ids = array_values($artist_ids);
 				
 				// Check if tracklist needed, get tracklist, append to release
 				if($args["get"] === "basics" || $args["get"] === "all") {
@@ -530,8 +533,14 @@
 					}
 				}
 				
-				// Get additional data as needed
+				// Get additional data
 				if(is_array($releases) && !empty($releases)) {
+					
+					// Get artist info
+					if(is_array($artist_ids)) {
+						$release_artists = $this->access_artist->access_artist([ 'get' => 'name', 'id' => $artist_ids, 'associative' => true ]);
+					}
+					
 					for($i = 0; $i < $num_rslt_releases; $i++) {
 						$release_id = $release_ids[$i];
 						
@@ -539,10 +548,9 @@
 							$releases[$release_id]['username'] = $usernames[$release_id];
 						}
 						
+						// Add artist info to releases
 						if(in_array($args["get"], ["all", "basics", "list", 'calendar'])) {
-							if(is_numeric($releases[$release_id]["artist_id"])) {
-								$releases[$release_id]["artist"] = $this->access_artist->access_artist(["get" => "name", "id" => $releases[$release_id]["artist_id"] ]);
-							}
+							$releases[$release_id]['artist'] = $release_artists[$releases[$release_id]['artist_id']];
 						}
 						
 						if(in_array($args["get"], ["all", "basics"])) {

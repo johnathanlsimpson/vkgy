@@ -493,6 +493,19 @@
 		// Core function
 		// ======================================================
 		function access_artist($args = []) {
+			
+			
+			
+			
+			//$time_start = microtime(true); 
+			
+			//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----1<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
+		//	$time_start = microtime(true); 
+			
+			
+			
+			
+			
 			// SELECT
 			$sql_select = [];
 			switch($args["get"]) {
@@ -619,24 +632,68 @@
 			$sql_order = $sql_order ?: ["friendly ASC"];
 			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : $sql_limit ?: null;
 			
+			
+			
+			//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----2<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
+			//$time_start = microtime(true); 
+			
+			
+			
+			
 			// QUERY
 			if(is_numeric($args["id"]) && $args["get"] !== "all" && is_array($this->indexed_artists) && !empty($this->indexed_artists[$args["id"]])) {
 				return $this->indexed_artists[$args["id"]];
 			}
 			else {
 				if(!empty($sql_select)) {
+					
+					
+					
+					//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----3<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
+					//$time_start = microtime(true); 
+					
+					
+					
 					$sql_artist = "SELECT ".implode(", ", $sql_select)." FROM artists ".(!empty($sql_where) ? "WHERE (".implode(") AND (", $sql_where).")" : null)." ORDER BY ".implode(", ", $sql_order)." ".$sql_limit;
 					
 					//echo $_SESSION['username'] === 'inartistic' ? print_r($sql_artist, true).print_r($sql_values, true) : null;
 					
 					$stmt = $this->pdo->prepare($sql_artist);
 					
+					
+					
+					
+					
+					//	echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----4<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
+					//$time_start = microtime(true); 
+					
+					
 					if($stmt) {
 					//if($_SESSION['username'] === 'inartistic' && $stmt) {
 						$stmt->execute($sql_values);
 						
-						$artists = $stmt->fetchAll();
-						$num_artists = count($artists);
+						
+							//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----5<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
+					//$time_start = microtime(true); 
+						
+						
+						if($_SESSION['username'] === 'inartistic') {
+							//foreach($stmt->fetchAll() as $x) {
+								//$artists[] = $x;
+							//}
+						}
+						else {
+						}
+							$artists = $stmt->fetchAll();
+							$num_artists = count($artists);
+						
+						
+						
+						
+							//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----6<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
+					//$time_start = microtime(true); 
+						
+						
 						
 						if(is_array($artists)) {
 							// If getting all artist info or basics, grab musician data, then compile into lineup string
@@ -704,6 +761,13 @@
 							if(!empty($args["friendly"]) || is_numeric($args["id"])) {
 								$artists = reset($artists);
 							}
+							
+							
+								//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----7<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
+					//$time_start = microtime(true); 
+							
+							
+							
 							
 							return $artists;
 						}
