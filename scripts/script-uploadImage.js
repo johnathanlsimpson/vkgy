@@ -1,3 +1,4 @@
+// Loop through image <input>s and attach updateImageData
 var imageElemNames = [
 	'id',
 	'item_type',
@@ -20,6 +21,7 @@ imageElemNames.forEach(function(imageElemName) {
 	});
 });
 
+// Update image data
 function updateImageData(changedElem) {
 	var parentIsFound = false;
 	var currentElem = changedElem;
@@ -42,63 +44,39 @@ function updateImageData(changedElem) {
 	});
 }
 
+// Core image upload
+var imageUploadElem = document.querySelector('[name=images]');
+var imageTemplate = document.querySelector('#image-template');
+var imagesElem = document.querySelector('.image__results');
 
-// Update image data
-/*function updateImageData(parentElem) {
-	var statusElem = $(parentElem).find(".image__status");
-	var dataElems = $(parentElem).find("[name^=image_]");
-	var formData = {};
+imageUploadElem.addEventListener('change', function() {
+	var newImageElem = document.importNode(imageTemplate.content, true);
 	
-	for(var i = 0; i < $(dataElems).length; i++) {
-		var dataElem = $(dataElems).eq(i);
-		var key = $(dataElem).attr("name").replace("image_", "");
-		var value = $(dataElem).val();
+	for(var i=0; i<imageUploadElem.files.length; i++) {
+		var thisImage = imageUploadElem.files[i];
 		
-		if(key === "is_default" || key === "is_exclusive") {
-			if($(dataElem).is(":checked")) {
-				formData[key] = value;
-			}
-		}
-		else {
-			formData[key] = value;
+		if(!!thisImage.type.match(/image.*/)) {
+			initializeInlineSubmit($(newImageElem), '/php/function-upload_image.php', {
+				'preparedFormData' : { 'image' : thisImage },
+				'callbackOnSuccess' : function(returnedData) { console.log('success...?'); console.log(returnedData); }
+			});
 		}
 	}
 	
-	initializeInlineSubmit($(parentElem), "/php/function-update_image.php", {
-		"statusContainer" : $(statusElem),
-		"preparedFormData" : formData
-	});
 	
-	//console.log("trying to update");
-}*/
-
-
-
-// Trigger updateImageData() whenever image data input is changed
-/*$(document).on("change", "[name^=image_]", function(event) {
-	var parentElem = $(this).parents(".image__template");
 	
-	updateImageData($(parentElem));
 	
-	//console.log("jquery update image data");
-});*/
+	
+	imagesElem.prepend(newImageElem);
+	//console.log(imageUploadElem, imageTemplate, imagesElem, newImageElem);
+});
 
 
-
-// Set id/for attributes on checkbox/label pairs
-/*function updateIdFor() {
-	var checkboxes = $(".image__template .input__checkbox");
-	for(var i = 0; i < checkboxes.length; i++) {
-		$(".image__template .input__checkbox").eq(i).attr("id", "checkbox" + i)
-		.next(".input__checkbox-label").attr("for", "checkbox" + i);
-	}
-}
-updateIdFor();*/
-
+		//let newCommentateTemplate = document.importNode(this.commentateTemplate.content, true);
 
 
 // Core image upload
-$("[name=images]").on("change", function(event) {
+/*$("[name=images]").on("change", function(event) {
 	var inputElem = $(this);
 	var resultContainer = $(".image__results");
 	var resultTemplate = $(".image__template:first-of-type");
@@ -118,7 +96,7 @@ $("[name=images]").on("change", function(event) {
 		
 		$(resultElem).removeClass("any--hidden").addClass("any--fade-in");
 		
-		if(!!thisFile.type.match(/image.*/)) {
+		if(!!thisFile.type.match(/image./)) {
 			initializeInlineSubmit($(resultElem), "/php/function-upload_image.php", {
 				"statusContainer" : $(statusElem),
 				"preparedFormData" : { "image" : thisFile },
@@ -127,7 +105,7 @@ $("[name=images]").on("change", function(event) {
 			});
 		}
 	}
-});
+});*/
 
 
 

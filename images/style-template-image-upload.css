@@ -6,6 +6,8 @@
 	background-size: contain;
 	margin-right: 0.5rem;
 	margin-top: 1rem;
+	padding-top: calc(100px);
+	text-align: center;
 	width: 100px;
 }
 .image__result {

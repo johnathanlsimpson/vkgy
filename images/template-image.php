@@ -7,7 +7,7 @@
 			<form class="image__template any--flex li">
 				<!-- Thumbnail -->
 				<div class="image__image" data-get="image_style" data-get-into="style" style="background-image:url({background_url});">
-					<span class="image__status"></span>
+					<span class="image__status" data-role="status"></span>
 				</div>
 				
 				<!-- Data -->
@@ -65,7 +65,7 @@
 				</div>
 				
 				<!-- Result -->
-				<div class="image__result text text--notice" data-get="result">{result}</div>
+				<div class="image__result text text--notice" data-role="result">{result}</div>
 			</form>
 		<?php
 		
