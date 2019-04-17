@@ -17,3 +17,9 @@
 .image__result:empty {
 	display: none;
 }
+[data-scanned-by-user]::after {
+	content: 'vkgy user?';
+}
+[data-scanned-by-user="1"]::after {
+	content: 'you?';
+}

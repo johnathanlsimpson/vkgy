@@ -56,7 +56,7 @@ imageUploadElem.addEventListener('change', function() {
 		var thisImage = imageUploadElem.files[i];
 		
 		if(!!thisImage.type.match(/image.*/)) {
-			initializeInlineSubmit($(newImageElem), '/php/function-upload_image.php', {
+			initializeInlineSubmit($(newImageElem), '/images/function-upload_image.php', {
 				'preparedFormData' : { 'image' : thisImage },
 				'callbackOnSuccess' : function(returnedData) { console.log('success...?'); console.log(returnedData); }
 			});

@@ -26,7 +26,7 @@
 						</div>
 						<div class="input__group">
 							<input class="input__checkbox" name="is_default" type="checkbox" value="1" {is_default} />
-							<label class="input__checkbox-label symbol__unchecked">Default {item_type} image?</label>
+							<label class="input__checkbox-label symbol__unchecked" data-get="default_button_text">Default {item_type} image?</label>
 						</div>
 						<div class="input__group">
 							<label class="input__checkbox-label symbol__trash symbol--standalone image__delete"></label>
@@ -37,15 +37,15 @@
 					<div class="input__row">
 						<div class="input__group any--flex-grow">
 							<label class="input__label">Artists</label>
-							<select class="input" data-populate-on-click="true" data-multiple="true" data-source="artists" name="artist_id[]" multiple>{artist_ids}</select>
+							<select class="input" data-populate-on-click="true" data-multiple="true" data-source="artists" name="artist_id[]" multiple><option data-get="artist_id" data-get-into="value"></option>{artist_ids}</select>
 						</div>
 						<div class="input__group any--flex-grow">
 							<label class="input__label">Musicians</label>
-							<select class="input" data-populate-on-click="true" data-multiple="true" data-source="musicians" name="musician_id[]" multiple>{musician_ids}</select>
+							<select class="input" data-populate-on-click="true" data-multiple="true" data-source="musicians" name="musician_id[]" multiple><option data-get="musician_id" data-get-into="value"></option>{musician_ids}</select>
 						</div>
 						<div class="input__group any--flex-grow">
 							<label class="input__label">Releases</label>
-							<select class="input" data-populate-on-click="true" data-multiple="true" data-source="releases" name="release_id[]" multiple>{release_ids}</select>
+							<select class="input" data-populate-on-click="true" data-multiple="true" data-source="releases" name="release_id[]" multiple><option data-get="release_id" data-get-into="value"></option>{release_ids}</select>
 						</div>
 					</div>
 					
@@ -54,7 +54,7 @@
 						<div class="input__group">
 							<label class="input__label">Credit</label>
 							<input class="input__checkbox" name="is_exclusive" type="checkbox" value="1" {is_exclusive} />
-							<label class="input__checkbox-label symbol__unchecked" data-scanned-by-user="{scanned_by}">Scanned by</label>
+							<label class="input__checkbox-label symbol__unchecked" data-get="scanned_by_text" data-get-into="data-scanned-by-user" data-scanned-by-user="{scanned_by}">Scanned by</label>
 						</div>
 						<div class="input__group any--flex-grow">
 							<label class="input__label">Other credit</label>
