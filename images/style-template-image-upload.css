@@ -1,0 +1,17 @@
+.image__template {
+	flex-wrap: wrap;
+}
+.image__image {
+	background-repeat: no-repeat;
+	background-size: contain;
+	margin-right: 0.5rem;
+	margin-top: 1rem;
+	width: 100px;
+}
+.image__result {
+	margin-bottom: 0;
+	width: 100%;
+}
+.image__result:empty {
+	display: none;
+}

@@ -21,7 +21,7 @@ if(is_numeric($_POST['id'])) {
 	$links        = [ 'artists' => $_POST['artist_id'], 'labels' => $_POST['label_id'], 'musicians' => $_POST['musician_id'], 'releases' => $_POST['release_id'] ];
 	
 	// Run query
-	$sql_update = 'UPDATE SET description=?, friendly=?, credit=?, is_exclusive=?, is_queued=? WHERE id=? LIMIT 1';
+	$sql_update = 'UPDATE images SET description=?, friendly=?, credit=?, is_exclusive=?, is_queued=? WHERE id=? LIMIT 1';
 	$stmt_update = $pdo->prepare($sql_update);
 	
 	if($stmt_update->execute([ $description, $friendly, $credit, $is_exclusive, $is_queued, $id ])) {
@@ -92,6 +92,9 @@ if(is_numeric($_POST['id'])) {
 		if($is_queued) {
 			update_development($pdo, ['type' => 'flyer']);
 		}
+	}
+	else {
+		$output['result'] = 'Couldn\'t update.';
 	}
 }
 

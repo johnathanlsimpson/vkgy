@@ -1,5 +1,50 @@
+var imageElemNames = [
+	'id',
+	'item_type',
+	'item_id',
+	'description',
+	'is_default',
+	'artist_ids',
+	'musician_ids',
+	'release_ids',
+	'is_exclusive',
+	'credit'
+];
+imageElemNames.forEach(function(imageElemName) {
+	var imageElems = document.querySelectorAll('[name^="' + imageElemName + '"]');
+	
+	imageElems.forEach(function(imageElem) {
+		imageElem.addEventListener('change', function() {
+			updateImageData(imageElem);
+		});
+	});
+});
+
+function updateImageData(changedElem) {
+	var parentIsFound = false;
+	var currentElem = changedElem;
+	var parentElem;
+	
+	while(!parentIsFound) {
+		currentElem = currentElem.parentNode;
+		
+		if(currentElem.classList.contains('image__template')) {
+			parentElem = currentElem;
+			
+			parentIsFound = true;
+		}
+	}
+	
+	var statusElem = parentElem.querySelector('.image__status');
+	
+	initializeInlineSubmit($(currentElem), '/images/function-update_image.php', {
+		'statusContainer' : $(statusElem),
+	});
+}
+
+
 // Update image data
-function updateImageData(parentElem) {
+/*function updateImageData(parentElem) {
 	var statusElem = $(parentElem).find(".image__status");
 	var dataElems = $(parentElem).find("[name^=image_]");
 	var formData = {};
@@ -25,30 +70,30 @@ function updateImageData(parentElem) {
 	});
 	
 	//console.log("trying to update");
-}
+}*/
 
 
 
 // Trigger updateImageData() whenever image data input is changed
-$(document).on("change", "[name^=image_]", function(event) {
+/*$(document).on("change", "[name^=image_]", function(event) {
 	var parentElem = $(this).parents(".image__template");
 	
 	updateImageData($(parentElem));
 	
 	//console.log("jquery update image data");
-});
+});*/
 
 
 
 // Set id/for attributes on checkbox/label pairs
-function updateIdFor() {
+/*function updateIdFor() {
 	var checkboxes = $(".image__template .input__checkbox");
 	for(var i = 0; i < checkboxes.length; i++) {
 		$(".image__template .input__checkbox").eq(i).attr("id", "checkbox" + i)
 		.next(".input__checkbox-label").attr("for", "checkbox" + i);
 	}
 }
-updateIdFor();
+updateIdFor();*/
 
 
 
