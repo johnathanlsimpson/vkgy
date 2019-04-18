@@ -26,9 +26,28 @@
 		// ======================================================
 		function get_artist_images($artist_id) {
 			if(is_numeric($artist_id)) {
-				$sql_images = "SELECT *, CONCAT('/images/', id, '-', COALESCE(friendly, ''), '.', extension) AS url FROM images WHERE artist_id LIKE CONCAT('%(', ?, ')%') AND is_release IS NULL ORDER BY date_added DESC";
+				$sql_images = '
+					SELECT
+						images.*,
+						CONCAT("/images/", images.id, "-", COALESCE(images.friendly, "image"), ".", images.extension) AS url,
+						GROUP_CONCAT(DISTINCT images_artists.artist_id) AS artist_ids,
+						GROUP_CONCAT(DISTINCT images_musicians.musician_id) AS musician_ids,
+						GROUP_CONCAT(DISTINCT images_releases.release_id) AS release_ids
+						
+					FROM (
+						SELECT image_id FROM images_artists WHERE artist_id=? ORDER BY id DESC
+					) a
+					INNER JOIN images ON images.id=a.image_id
+					
+					LEFT JOIN images_artists ON images_artists.image_id=images.id
+					LEFT JOIN images_musicians ON images_musicians.image_id=images.id
+					LEFT JOIN images_releases ON images_releases.image_id=images.id
+					
+					GROUP BY images.id
+					ORDER BY images.id DESC
+				';
 				$stmt_images = $this->pdo->prepare($sql_images);
-				$stmt_images->execute([$artist_id]);
+				$stmt_images->execute([ $artist_id ]);
 				
 				return($stmt_images->fetchAll());
 			}

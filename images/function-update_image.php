@@ -14,9 +14,9 @@ if(is_numeric($_POST['id'])) {
 	$friendly     = friendly($description) ?: null;
 	$credit       = sanitize($_POST['credit']) ?: null;
 	
-	$is_exclusive = $_POST['is_exclusive'] ? true : false;
-	$is_default   = $_POST['is_default'] ? true : false;
-	$is_queued    = $_POST['is_queued'] ? true : false;
+	$is_exclusive = $_POST['is_exclusive'] ? 1 : 0;
+	$is_default   = $_POST['is_default'] ? 1 : 0;
+	$is_queued    = $_POST['is_queued'] ? 1 : 0;
 	
 	$links        = [ 'artists' => $_POST['artist_id'], 'labels' => $_POST['label_id'], 'musicians' => $_POST['musician_id'], 'releases' => $_POST['release_id'] ];
 	
@@ -96,6 +96,9 @@ if(is_numeric($_POST['id'])) {
 	else {
 		$output['result'] = 'Couldn\'t update.';
 	}
+}
+else {
+	$output['result'] = 'Non-numeric ID.'.print_r($_POST, true);
 }
 
 $output['status'] = $output['status'] ?: 'error';

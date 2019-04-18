@@ -279,6 +279,8 @@
 								</h2>
 								<?php
 									include('../images/partial-upload.php');
+									render_image_upload('artist', $artist['id'], $artist['quick_name'], $artist['quick_name'].' group photo', $artist['images']);
+									//echo '<pre>'.print_r($artist['images'], true).'</pre>';
 									//render_default_comment_section('artist', $artist['id'], $artist['comments'], $markdown_parser);
 								?>
 							</div>

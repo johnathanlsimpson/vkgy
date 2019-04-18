@@ -4,7 +4,7 @@
 		ob_start();
 		
 		?>
-			<option value="{value}" selected></option>
+			<option value="{value}" selected>{name}</option>
 		<?php
 		
 		$option_template = ob_get_clean();
