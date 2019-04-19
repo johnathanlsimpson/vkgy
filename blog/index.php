@@ -130,6 +130,12 @@
 			if(!empty($_GET["entry"])) {
 				$entry = $access_blog->access_blog(["friendly" => sanitize($_GET["entry"]), "get" => "all"]);
 				
+				for($i=0; $i<count($entry['images']); $i++) {
+					if($entry['images'][$i]['id'] === $entry['image_id']) {
+						$entry['default_image'] = $entry['images'][$i];
+					}
+				}
+				
 				if(is_array($entry) && !empty($entry)) {
 					$pageTitle = "Edit entry: ".$entry["title"];
 					

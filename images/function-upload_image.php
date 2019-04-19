@@ -11,18 +11,15 @@
 			$tmp_name            = $image['tmp_name'];
 			$error               = $image['error'];
 			$user_id             = $_SESSION['userID'] ?: 0;
-			$is_queued           = $image['queued'] ? 1 : 0;
-			$is_exclusive        = $is_queued ? 1 : 0;
 			$needs_compression   = isset($image['needs_compression']) ? $image['needs_compression'] : true;
 			$item_type           = sanitize($_POST['item_type']);
 			$item_id             = sanitize($_POST['item_id']);
 			$default_description = sanitize($_POST['default_description']);
-			$friendly            = friendly($default_description);
 			
 			if($error === 0 && preg_match('/'.'image.+'.'/', $type)) {
-				$sql_init = 'INSERT INTO images (extension, user_id, is_queued, is_exclusive, description, friendly) VALUES (?, ?, ?, ?, ?, ?)';
+				$sql_init = 'INSERT INTO images (extension, user_id) VALUES (?, ?)';
 				$stmt_init = $pdo->prepare($sql_init);
-				$stmt_init->execute([ 'jpg', $user_id, $is_queued, $is_exclusive, $default_description, $friendly ]);
+				$stmt_init->execute([ 'jpg', $user_id ]);
 				
 				$id = $pdo->lastInsertId();
 				$new_name = '../images/tmp/'.$id.'-'.$name;
@@ -70,46 +67,53 @@
 										update_development($pdo, [ 'type' => 'flyer', 'user_id' => $_SESSION['userID'] ]);
 									}
 									
+									// Set data for update_image function
+									$_POST[$item_type.'_id'] = $item_id;
+									$_POST['id'] = $id;
+									$suppress_output = true;
+									include_once('../images/function-update_image.php');
+									
 									$output['status'] = 'success';
 									$output['id'] = $id;
 									$output['image_style'] = 'background-image: url(/images/'.$id.'.thumbnail.jpg);';
 									$output['image_markdown'] = '![](/images/'.$file_name.')';
-									$output['scanned_by_text'] = 'you';
 									$output['is_exclusive_for'] = 'is-exclusive-'.$id;
 									$output['is_default_for'] = 'is-default-'.$id;
 									$output['item_type'] = $item_type;
 									$output['item_id'] = $item_id;
 									$output[$item_type.'_id'] = $item_id;
 									$output['description'] = $default_description;
+									$output['image_status'] = 'new';
 								}
 								else {
-									$output['result'] = 'Couldn\'t rename file.';
+									$output['result'][] = 'Couldn\'t rename file.';
 								}
 							}
 							else {
-								$output['result'] = 'Couldn\'t update database.';
+								$output['result'][] = 'Couldn\'t update database.';
 							}
 						}
 						else {
-							$output['result'] = 'Extension not allowed.';
+							$output['result'][] = 'Extension not allowed.';
 						}
 					}
 					else {
-						$output['result'] = 'Couldn\'t upload file.';
+						$output['result'][] = 'Couldn\'t upload file.';
 					}
 				}
 				else {
-					$output['result'] = 'Couldn\'t get ID.';
+					$output['result'][] = 'Couldn\'t get ID.';
 				}
 			}
 			else {
-				$output['result'] = 'The image couldn\'t be uploaded. '.$error.'*'.$type;
+				$output['result'][] = 'The image couldn\'t be uploaded. '.$error.'*'.$type;
 			}
 		}
 		else {
-			$output['result'] = 'Image data empty.';
+			$output['result'][] = 'Image data empty.';
 		}
 		
+		$output['result'] = is_array($output['result']) ? implode('<br />', $output['result']) : null;
 		$output['status'] = $output['status'] ?: 'error';
 		
 		echo $queued ? null : json_encode($output);

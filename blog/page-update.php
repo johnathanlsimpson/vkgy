@@ -1,26 +1,17 @@
 <?php
 	if($_SESSION["loggedIn"]) {
 		script([
-			"/scripts/external/script-autosize.js",
-			"/scripts/external/script-selectize.js",
-			"/scripts/script-initDelete.js",
-			"/scripts/script-initSelectize.js",
-			"/scripts/script-uploadImage.js",
-			"/blog/script-page-update.js",
+			'/scripts/external/script-autosize.js',
+			'/scripts/script-initDelete.js',
+			'/blog/script-page-update.js',
 		]);
 		
 		style([
-			"/style/external/style-selectize.css",
-			"/style/style-selectize.css",
 			"/blog/style-page-update.css"
 		]);
 		
-		$access_artist = new access_artist($pdo);
-		
-		$artist_list = $access_artist->access_artist(["get" => "name"]);
-		foreach($artist_list as $key => $tmp_artist) {
-			$artist_list[$tmp_artist["id"]] = [$tmp_artist["id"], $tmp_artist["friendly"], $tmp_artist["quick_name"].($tmp_artist["romaji"] ? " (".$tmp_artist["name"].")" : null)];
-		}
+		include_once('../php/function-render_json_list.php');
+		render_json_list('artist');
 		
 		?>
 			<div class="col c1">
@@ -52,7 +43,6 @@
 			
 			<form action="/blog/function-update.php" class="col c3-AAB" enctype="multipart/form-data" method="post" name="form__update">
 				<div>
-					<span data-contains="artists" hidden><?php echo json_encode(array_values($artist_list)); ?></span>
 					<input data-get="id" data-get-into="value" name="id"  value="<?php echo $entry["id"]; ?>" type="hidden" />
 					<input data-get="friendly" data-get-into="value" name="friendly" type="hidden" value="<?php echo $entry["friendly"]; ?>" />
 					
@@ -78,112 +68,20 @@
 					<h3>
 						Upload image
 					</h3>
-					<div class="text text--outlined">
-						<div class="input__row">
-							<div class="input__group any--flex-grow">
-								<input class="any--flex-grow" name="images" type="file" multiple />
-							</div>
-						</div>
-						<ul class="image__results">
-							<?php
-								function image_template($input = []) {
-									$n = -1;
-									?>
-										<li class="image__template <?php $n++; echo $input[$n]; ?>">
-											<div class="any--flex">
-												<div class="image__image" data-get="image_style" data-get-into="style" style="<?php $n++; echo $input[$n]; ?>">
-													<span class="image__status"></span>
-												</div>
-												<div class="any--flex-grow image__data">
-													<input data-get="image_id" data-get-into="value" name="image_id" value="<?php $n++; echo $input[$n]; ?>" hidden />
-													
-													<div class="input__row">
-														<div class="input__group any--flex-grow">
-															<label class="input__label">Image code</label>
-															<span class="image__result symbol__copy" data-get="image_markdown"><?php $n++; echo $input[$n]; ?></span>
-														</div>
-														<div class="input__group">
-															<input class="input__checkbox" data-get="image_id" data-get-into="value" name="image_is_entry_default" type="radio" value="<?php $n++; echo $input[$n]; ?>" <?php $n++; echo $input[$n]; ?> />
-															<label class="input__checkbox-label symbol__unchecked">Main entry image?</label>
-														</div>
-														<div class="input__group">
-															<label class="input__checkbox-label symbol__trash symbol--standalone image__delete" data-get="image_id" data-get-into="data-id" data-id="<?php $n++; echo $input[$n]; ?>"></label>
-														</div>
-													</div>
-													
-													<div class="input__row">
-														<div class="input__group any--flex-grow">
-															<label class="input__label">Description</label>
-															<input class="any--flex-grow" name="image_description" value="<?php $n++; echo $input[$n]; ?>" />
-														</div>
-													</div>
-													
-													<div class="input__row">
-														<div class="input__group any--flex-grow">
-															<label class="input__label">Artists</label>
-															<select class="input" data-populate-on-click="true" data-multiple="true" data-source="artists" name="image_artist_id" multiple>
-																<?php $n++; echo $input[$n]; ?>
-															</select>
-														</div>
-													</div>
-													
-													<div class="input__row">
-														<div class="input__group any--flex-grow">
-															<label class="input__label">Credit</label>
-															<input class="any--flex-grow" name="image_credit" placeholder="[somebody](https://website.com/)" value="<?php $n++; echo $input[$n]; ?>" />
-														</div>
-														<div class="input__group">
-															<input class="input__checkbox" name="image_is_exclusive" type="checkbox" value="1" <?php $n++; echo $input[$n]; ?> />
-															<label class="input__checkbox-label symbol__unchecked">vkgy exclusive?</label>
-														</div>
-													</div>
-												</div>
-											</div>
-										</li>
-									<?php
-								}
-
-								image_template([
-									"any--hidden",
-									"",
-									"",
-									"",
-									"",
-									"checked",
-									"",
-									"",
-									"",
-									"",
-									"",
-									"",
-									"",
-									"",
-									""
-								]);
-								
-								if(!empty($entry["image"]) && image_exists($entry["image"], $pdo)) {
-									$image_artist = "";
-									foreach(array_filter(array_unique(explode("(", str_replace(")", "", $entry["image_artist_id"])))) as $tmp_image_artist) {
-										$image_artist .= '<option data-name="'.$artist_list[$tmp_image_artist][2].'" value="'.$tmp_image_artist.'" selected>'.$artist_list[$tmp_image_artist][2].'</option>';
-									}
-									
-									image_template([
-										"",
-										"background-image: url(".$entry["image"].")",
-										$entry["image_id"],
-										"![".$entry["image_description"]."](http://weloveucp.com".$entry["image"].")",
-										$entry["image_id"],
-										"checked",
-										$entry["image_id"],
-										$entry["image_description"],
-										$image_artist,
-										$entry["image_credit"],
-										$entry["image_is_exclusive"] ? "checked" : ""
-									]);
-								}
-							?>
-							</ul>
-					</div>
+					<?php
+						include('../images/function-render_image_section.php');
+						render_image_section($entry['images'], [
+							'item_type' => 'blog',
+							'item_id' => $entry['id'],
+							'item_name' => 'blog entry',
+							'default_description' => '',
+							'default_id' => $entry['image_id'],
+							'hide_blog' => '1',
+							'hide_labels' => '1',
+							'hide_musicians' => '1',
+							'hide_releases' => '1',
+						]);
+					?>
 					
 					<h3>
 						Tags
@@ -202,7 +100,6 @@
 										}
 									}
 									
-									//$tag["checked"] = is_array($entry["tags"]) && in_array($tag["id"], array_keys($entry["tags"])) ? "checked" : null;
 									?>
 										<input class="input__checkbox" id="<?php echo "tag".$tag_key; ?>" name="tags[]" value="<?php echo $tag["id"]; ?>" type="checkbox" <?php echo $tag["checked"] ? 'checked' : null; ?> />
 										<label class="symbol__tag any__tag" for="<?php echo "tag".$tag_key; ?>"><?php echo $tag["tag"]; ?></label>
@@ -238,7 +135,7 @@
 						<span class="update__preview-status"></span>
 					</h3>
 					<div class="text text--outlined">
-						<div class="update__image-container"><img alt="" class="update__image" src="<?php echo $entry["image"]; ?>" /></div>
+						<div class="update__image any--weaken" style="<?php echo $entry['default_image'] ? 'background-image:url(/images/'.$entry['default_image']['id'].'.medium.jpg);' : null; ?>"></div>
 						<div class="update__preview"></div>
 					</div>
 				</div>

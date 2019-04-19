@@ -12,6 +12,7 @@
 	include_once("../php/class-access_artist.php");
 	include_once("../php/class-access_blog.php");
 	include_once("../php/class-access_comment.php");
+	include_once('../php/class-access_image.php');
 	include_once("../php/class-access_label.php");
 	include_once("../php/class-access_live.php");
 	include_once("../php/class-access_musician.php");

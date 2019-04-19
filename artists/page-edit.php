@@ -18,46 +18,16 @@
 		"/artists/style-page-edit.css"
 	]);
 	
-	$artist_list = $access_artist->access_artist(['get' => 'name']);
-	$num_artist_list = count($artist_list);
-	for($i=0; $i<$num_artist_list; $i++) {
-		$third_line  = $artist_list[$i]['quick_name'].($artist_list[$i]['romaji'] ? ' ('.$artist_list[$i]['name'].')' : null);
-		$third_line .= friendly($artist_list[$i]['quick_name']) != $artist_list[$i]['friendly'] ? ' ('.$artist_list[$i]['friendly'].')' : null;
-		$third_line  = str_replace(["&#92;", "&#34;"], ["\\", "\""], $third_line);
-		
-		$artist_list[$i] = [
-			$artist_list[$i]['id'],
-			'',
-			$third_line
-		];
-	}
-	
-	$access_release = new access_release($pdo);
-	$release_list = $access_release->access_release(["artist_id" => $artist["id"], "get" => "name"]);
-	$release_list = array_values((is_array($release_list) ? $release_list : []));
-	if(is_array($release_list)) {
-		foreach($release_list as $key => $tmp_release) {
-			$release_list[$tmp_release["id"]] = [$tmp_release["id"], $tmp_release["friendly"], $tmp_release["quick_name"]];
-		}
-	}
-	
-	if(is_array($artist["musicians"])) {
-		foreach($artist["musicians"] as $tmp_musician) {
-			$musician_list[$tmp_musician["id"]] = [
-				$tmp_musician["id"],
-				friendly($tmp_musician["as_romaji"] ?: $tmp_musician["as_name"] ?: $tmp_musician["romaji"] ?: $tmp_musician["name"]),
-				($tmp_musician["as_romaji"] ?: $tmp_musician["as_name"] ?: $tmp_musician["romaji"] ?: $tmp_musician["name"]).($tmp_musician["as_romaji"] ? " (".$tmp_musician["as_name"].")" : (!$tmp_musician["as_name"] && $tmp_musician["romaji"] ? " (".$tmp_musician["name"].")" : null))
-			];
-		}
-	}
-	
 	if($_SESSION["admin"] > 0) { 
 			if(!empty($artist)) {
 				?>
 					<form action="" class="col c1 any--margin" enctype="multipart/form-data" id="form__edit" method="post" name="form__edit">
-						<template data-contains="artists" hidden><?php echo json_encode(is_array($artist_list) ? array_values($artist_list) : []); ?></template>
-						<template data-contains="musicians" hidden><?php echo json_encode(is_array($musician_list) ? array_values($musician_list) : []); ?></template>
-						<template data-contains="releases" hidden><?php echo json_encode(is_array($release_list) ? array_values($release_list) : []); ?></template>
+						<?php
+							include_once('../php/function-render_json_list.php');
+							render_json_list('artist');
+							render_json_list('musician', $artist['musicians']);
+							render_json_list('release', $artist['id'], 'artist_id');
+						?>
 						
 						<input id="form__changes" name="changes" type="hidden" />
 						
@@ -278,10 +248,17 @@
 									Edit image gallery
 								</h2>
 								<?php
-									include('../images/partial-upload.php');
-									render_image_upload('artist', $artist['id'], $artist['quick_name'], $artist['quick_name'].' group photo', $artist['images']);
-									//echo '<pre>'.print_r($artist['images'], true).'</pre>';
-									//render_default_comment_section('artist', $artist['id'], $artist['comments'], $markdown_parser);
+									include('../images/function-render_image_section.php');
+									render_image_section($artist['images'], [
+										'item_type' => 'artist',
+										'item_id' => $artist['id'],
+										'item_name' => $artist['quick_name'],
+										'default_description' => $artist['quick_name'].' group photo',
+										'default_id' => $artist['image_id'],
+										'hide_blog' => true,
+										'hide_labels' => true,
+										'hide_markdown' => true,
+									]);
 								?>
 							</div>
 						</div>

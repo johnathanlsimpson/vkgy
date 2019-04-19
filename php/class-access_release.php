@@ -321,7 +321,7 @@
 						"releases.romaji",
 						"releases.friendly",
 						"releases.medium",
-						//"IF(images.id IS NOT NULL, CONCAT('/images/', images.id, '-', COALESCE(images.friendly, ''), '.', images.extension), '') AS cover"
+						"IF(images.id IS NOT NULL, CONCAT('/images/', images.id, '-', COALESCE(images.friendly, ''), '.', images.extension), '') AS cover"
 					];
 				}
 				elseif($args['get'] === 'id') {
@@ -482,7 +482,7 @@
 				if($args["get"] === "basics" || $args["get"] === "all") {
 					$sql_releases .= "LEFT JOIN releases_ratings ON releases_ratings.release_id = releases.id ";
 					$sql_releases .= "LEFT JOIN releases_ratings AS user_rating ON user_rating.release_id=releases.id AND user_rating.".($_SESSION["loggedIn"] ? "user_id" : "ip_address")."=? ";
-					$sql_releases .= "LEFT JOIN images ON images.release_id=CONCAT('(', releases.id, ')') AND images.is_release='1' AND images.is_default='1' ";
+					$sql_releases .= "LEFT JOIN images ON images.id=releases.image_id ";
 					array_unshift($sql_values, ($_SESSION["userID"] ?: ip2long($_SERVER["REMOTE_ADDR"])));
 				}
 				
@@ -568,9 +568,9 @@
 						if($args["get"] === "all" && is_numeric($args["release_id"])) {
 							$releases[$release_id]["prev_next"] = $this->get_prev_next($release_id, $releases[$release_id]["artist"]["friendly"]);
 							
-							$sql_images = "SELECT id, CONCAT('/images/', id, IF(friendly, '-', ''), '.', extension) AS url, description, is_exclusive, is_default, credit FROM images WHERE is_release=? AND release_id LIKE CONCAT('%(', ?, ')%')";
+							$sql_images = "SELECT images.id, CONCAT('/images/', images.id, IF(images.friendly, '-', ''), '.', images.extension) AS url, images.description, images.is_exclusive, IF(images.id = ?, '1', '0') AS is_default, images.credit FROM images_releases LEFT JOIN images ON images.id=images_releases.image_id WHERE images_releases.release_id=?";
 							$stmt_images = $this->pdo->prepare($sql_images);
-							$stmt_images->execute(['1', $release_id]);
+							$stmt_images->execute([ $releases[$release_id]['image_id'], $release_id ]);
 							$releases[$release_id]["images"] = $stmt_images->fetchAll();
 						}
 						

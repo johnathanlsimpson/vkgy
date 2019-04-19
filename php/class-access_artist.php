@@ -16,6 +16,7 @@
 			
 			$this->pdo = $pdo;
 			
+			$this->access_image = new access_image($pdo);
 			$this->markdown_parser = new parse_markdown($pdo);
 		}
 		
@@ -24,7 +25,7 @@
 		// ======================================================
 		// Get images
 		// ======================================================
-		function get_artist_images($artist_id) {
+		/*function get_artist_images($artist_id) {
 			if(is_numeric($artist_id)) {
 				$sql_images = '
 					SELECT
@@ -51,7 +52,7 @@
 				
 				return($stmt_images->fetchAll());
 			}
-		}
+		}*/
 		
 		
 		
@@ -745,7 +746,7 @@
 									$artists[$i]["prev_artist"] = $this->access_artist(["friendly" => $artists[$i]["friendly"], "get" => "prev"]);
 									$artists[$i]["next_artist"] = $this->access_artist(["friendly" => $artists[$i]["friendly"], "get" => "next"]);
 									$artists[$i]["history"] = $this->get_history($artists[$i]["id"]);
-									$artists[$i]["images"] = $this->get_artist_images($artists[$i]["id"]);
+									$artists[$i]['images'] = $this->access_image->access_image([ 'artist_id' => $artists[$i]['id'], 'get' => 'all' ]);
 									
 									$sql_areas = 'SELECT areas.* FROM areas_artists LEFT JOIN areas ON areas.id=areas_artists.area_id WHERE areas_artists.artist_id=? ORDER BY areas.friendly ASC';
 									$stmt_areas = $this->pdo->prepare($sql_areas);

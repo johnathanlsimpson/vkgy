@@ -27,34 +27,6 @@
 		"/releases/style-page-add.css"
 	]);
 	
-	$access_artist = new access_artist($pdo);
-	
-	$artist_list = $access_artist->access_artist(["get" => "list"]);
-	
-	for($i = 0; $i < count($artist_list); $i++) {
-		$artist_list[$i] = [
-			$artist_list[$i]["id"],
-			"",
-			str_replace(["&#92;", "&#34;"], ["\\", "\""], $artist_list[$i]["quick_name"].($artist_list[$i]["romaji"] ? " (".$artist_list[$i]["name"].")" : "")).($artist_list[$i]["friendly"] != friendly($artist_list[$i]["quick_name"]) ? " (".$artist_list[$i]["friendly"].")" : null)
-		];
-	}
-	
-	array_unshift($artist_list, [0, "", "(omnibus / various artists)"]);
-
-	include_once("../php/class-access_label.php");
-	$access_label = new access_label($pdo);
-	$tmp_label_list = $access_label->access_label([
-		"get" => "list"
-	]);
-	foreach($tmp_label_list as $key => $label) {
-		$label_list[] = [
-			$label["id"],
-			"",
-			$label["quick_name"].($label["romaji"] ? " (".$label["name"].")" : "")
-		];
-		unset($tmp_label_list[$key]);
-	}
-
 	if(is_numeric($_GET["release"])) {
 		include_once("../php/class-access_release.php");
 		$access_release = new access_release($pdo);
@@ -144,11 +116,12 @@
 </div>
 
 <div class="col c1 any--signed-in-only any--margin">
-	<div class="any--hidden">
-		<template data-contains="songs"              hidden>[]</template>
-		<template data-contains="artists"            hidden><?php echo json_encode($artist_list); ?></template>
-		<template data-contains="companies"          hidden><?php echo json_encode($label_list); ?></template>
-	</div>
+	<?php
+		include_once('../php/function-render_json_list.php');
+		render_json_list('artist');
+		render_json_list('label');
+		render_json_list('song', []);
+	?>
 
 	<form action="" enctype="multipart/form-data" method="post" name="add">
 		<input data-get="id" data-get-into="value" name="id" type="hidden" value="<?php echo $release["id"]; ?>" />
@@ -449,8 +422,7 @@
 										echo $company_type;
 									?>
 								</div>
-								<select class="input" data-populate-on-click="true" data-source="companies" name="<?php echo $company_type; ?>_id[]" multiple data-multiple="true">
-									
+								<select class="input" data-populate-on-click="true" data-source="labels" name="<?php echo $company_type; ?>_id[]" multiple data-multiple="true">
 									<?php
 										if(is_array($release[$company_type])) {
 											foreach($release[$company_type] as $company) {
@@ -630,122 +602,22 @@
 			?>
 		</div>
 
-		<div class="any--flex any--flex-space-between">
+		<div>
 			<h3>
 				Images
 			</h3>
-		</div>
-		<div class="edit__images edit__hidden">
-			<div class="text">
-				<div class="input__row">
-					<div class="input__group any--flex-grow">
-						<input class="any--flex-grow" name="images" type="file" multiple />
-					</div>
-				</div>
-				<div class="input__row">
-					<div class="input__group any--flex-grow">
-						<span class="any--weaken">Note: images marked &ldquo;vk.gy exclusive&rdquo; will be watermarked with &ldquo;vk.gy&rdquo; and your username, when viewed at high res. If the image was scanned by someone else, you can credit them in the &ldquo;credit&rdquo; section.</span>
-					</div>
-				</div>
-				
-				<ul class="image__results">
-					<?php
-						function image_template($input = []) {
-							$n = -1;
-							?>
-								<li class="image__template <?php $n++; echo $input[$n]; ?>">
-									<span class="image__result"></span>
-									<div class="any--flex">
-										<div class="image__image" data-get="image_style" data-get-into="style" style="<?php $n++; echo $input[$n]; ?>">
-											<span class="image__status"></span>
-										</div>
-										<div class="any--flex-grow image__data">
-											<input name="image_is_release" value="1" hidden />
-											<input data-get="artist_id" data-get-into="value" name="image_artist_id" value="<?php $n++; echo $input[$n]; ?>" hidden />
-											<input data-get="id" data-get-into="value" name="image_release_id" value="<?php $n++; echo $input[$n]; ?>" hidden />
-											<input data-get="image_id" data-get-into="value" name="image_id" value="<?php $n++; echo $input[$n]; ?>" hidden />
-											
-											<div class="input__row">
-												<div class="input__group any--flex-grow">
-													<label class="input__label">Description</label>
-													<input class="any--flex-grow" name="image_description" placeholder="description" value="<?php $n++; echo $input[$n]; ?>" />
-												</div>
-												<div class="input__group">
-													<input class="input__checkbox" name="image_is_default" type="checkbox" value="1" <?php $n++; echo $input[$n]; ?> />
-													<label class="input__checkbox-label symbol__unchecked">Default cover image?</label>
-												</div>
-												<?php if($_SESSION['admin']) { ?>
-												<div class="input__group">
-													<label class="input__checkbox-label symbol__trash symbol--standalone image__delete" data-get="image_id" data-get-into="data-id" data-id="<?php $n++; echo $input[$n]; ?>"></label>
-												</div>
-												<?php } ?>
-											</div>
-											
-											<div class="input__row">
-												<div class="input__group">
-													<label class="input__label">Credit</label>
-													<input class="input__checkbox" name="image_is_exclusive" type="checkbox" value="1" <?php $n++; echo $input[$n]; ?> />
-													<label class="input__checkbox-label symbol__unchecked">Scanned by you?</label>
-												</div>
-												<div class="input__group any--flex-grow">
-													<label class="input__label">Other credit</label>
-													<input class="any--flex-grow" name="image_credit" placeholder="http://theirwebsite.com" value="<?php $n++; echo $input[$n]; ?>" />
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="image__result"></div>
-								</li>
-							<?php
-						}
-
-						image_template([
-							"any--hidden",
-							"",
-							$release["artist"]["id"],
-							$release["id"],
-							"",
-							"",
-							"checked",
-							"",
-							"",
-							""
-						]);
-
-						if(is_array($release["images"]) && !empty($release["images"])) {
-							foreach($release["images"] as $image) {
-								$image_artist = "";
-								foreach(array_filter(array_unique(explode("(", str_replace(")", "", $image["artist_id"])))) as $tmp_image_artist) {
-									$image_artist .= '<option data-name="'.$artist_list[$tmp_image_artist][2].'" value="'.$tmp_image_artist.'" selected>'.$artist_list[$tmp_image_artist][2].'</option>';
-								}
-
-								$image_musician = "";
-								foreach(array_filter(array_unique(explode("(", str_replace(")", "", $image["musician_id"])))) as $tmp_image_musician) {
-									$image_musician .= '<option data-name="'.$musician_list[$tmp_image_musician][2].'" value="'.$tmp_image_musician.'" selected>'.$musician_list[$tmp_image_musician][2].'</option>';
-								}
-
-								$image_release = "";
-								foreach(array_filter(array_unique(explode("(", str_replace(")", "", $image["release_id"])))) as $tmp_image_release) {
-									$image_release .= '<option data-name="'.$release_list[$tmp_image_release][2].'" value="'.$tmp_image_release.'" selected>'.$release_list[$tmp_image_release][2].'</option>';
-								}
-
-								image_template([
-									"",
-									"background-image: url(".str_replace(".", ".small.", $image["url"]).")",
-									$release["artist"]["id"],
-									$release["id"],
-									$image["id"],
-									$image["description"],
-									$image["is_default"] ? "checked" : null,
-									$image["id"],
-									$image["credit"],
-									$image["is_exclusive"] ? "checked" : null
-								]);
-							}
-						}
-					?>
-				</ul>
-			</div>
+			<?php
+				include('../images/function-render_image_section.php');
+				render_image_section($release['images'], [
+					'item_type' => 'release',
+					'item_id' => $release['id'],
+					'item_name' => $release['quick_name'],
+					'description' => 'cover',
+					'id' => $release['image_id'],
+					'hide_selects' => true,
+					'hide_markdown' => true,
+				]);
+			?>
 		</div>
 		
 		<h3>

@@ -50,24 +50,28 @@ function updateImageData(changedElem) {
 	
 	var inputElems = parentElem.querySelectorAll('[name]');
 	inputElems.forEach(function(inputElem) {
-		if(preparedFormData.hasOwnProperty(inputElem.name)) {
-			console.log(preparedFormData[inputElem.name]);
+		if(inputElem.nodeName === 'SELECT') {
+			preparedFormData[inputElem.name] = Array.prototype.map.call(inputElem.selectedOptions, function(x){ return x.value });
+		}
+		else if(inputElem.type === 'checkbox') {
+			preparedFormData[inputElem.name] = inputElem.checked ? 1 : 0;
 		}
 		else {
-			console.log('no');
+			preparedFormData[inputElem.name] = inputElem.value;
 		}
-		
-		/// selectedoptions
-		
-		preparedFormData[inputElem.name] = inputElem.value;
 	});
-	
-	console.log(preparedFormData);
 	
 	initializeInlineSubmit($(parentElem), '/images/function-update_image.php', {
 		'statusContainer' : $(statusElem),
-		'preparedFormData' : $(parentElem).serialize(),
+		'preparedFormData' : preparedFormData,
 	});
+	
+	var event = new Event('image-updated');
+	event.details = {
+		'parentElem': parentElem,
+		'targetElem': changedElem,
+	};
+	document.dispatchEvent(event);
 }
 
 // Core image upload
@@ -76,15 +80,16 @@ var imageTemplate = document.querySelector('#image-template');
 var imagesElem = document.querySelector('.image__results');
 
 imageUploadElem.addEventListener('change', function() {
-	var itemType = imageUploadElem.parentNode.querySelector('[name=default_item_type]').value;
-	var itemId = imageUploadElem.parentNode.querySelector('[name=default_item_id]').value;
-	var itemName = imageUploadElem.parentNode.querySelector('[name=default_item_name]').value;
-	var defaultDescription = imageUploadElem.parentNode.querySelector('[name=default_description]').value;
+	var itemType = imageUploadElem.parentNode.querySelector('[name=item_type]').value;
+	var itemId = imageUploadElem.parentNode.querySelector('[name=item_id]').value;
+	var itemName = imageUploadElem.parentNode.querySelector('[name=item_name]').value;
+	var defaultDescription = imageUploadElem.parentNode.querySelector('[name=description]').value;
 	
 	for(var i=0; i<imageUploadElem.files.length; i++) {
 		var thisImage = imageUploadElem.files[i];
 		
 		if(!!thisImage.type.match(/image.*/)) {
+			
 			var newImageElem = document.importNode(imageTemplate.content, true);
 			var itemIdElem = newImageElem.querySelector('[name^=' + itemType + '_id]');
 			var newOptionElem = document.createElement('option');
@@ -102,6 +107,8 @@ imageUploadElem.addEventListener('change', function() {
 			imagesElem.prepend(newImageElem);
 			lookForSelectize();
 			initImageEditElems();
+			
+			document.dispatchEvent(new Event('image-added'));
 		}
 	}
 });

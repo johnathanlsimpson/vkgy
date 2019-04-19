@@ -10,7 +10,7 @@ if(is_numeric($_POST['id'])) {
 	$item_type    = in_array($_POST['item_type'], $allowed_item_types) ? $_POST['item_type'] : 'other';
 	$item_id      = is_numeric($_POST['item_id']) ? $_POST['item_id'] : 0;
 	
-	$description  = sanitize($_POST['description']) ?: null;
+	$description  = sanitize($_POST['description']) ?: (sanitize($_POST['default_description']) ?: null);
 	$friendly     = friendly($description) ?: null;
 	$credit       = sanitize($_POST['credit']) ?: null;
 	
@@ -18,7 +18,7 @@ if(is_numeric($_POST['id'])) {
 	$is_default   = $_POST['is_default'] ? 1 : 0;
 	$is_queued    = $_POST['is_queued'] ? 1 : 0;
 	
-	$links        = [ 'artists' => $_POST['artist_id'], 'labels' => $_POST['label_id'], 'musicians' => $_POST['musician_id'], 'releases' => $_POST['release_id'] ];
+	$links        = [ 'artists' => $_POST['artist_id'], 'blog' => $_POST['blog_id'], 'labels' => $_POST['label_id'], 'musicians' => $_POST['musician_id'], 'releases' => $_POST['release_id'] ];
 	
 	// Run query
 	$sql_update = 'UPDATE images SET description=?, friendly=?, credit=?, is_exclusive=?, is_queued=? WHERE id=? LIMIT 1';
@@ -29,7 +29,7 @@ if(is_numeric($_POST['id'])) {
 		
 		// Link to artists/releases/etc
 		foreach($links as $link_table => $link_array) {
-			$link_column = substr($link_table, 0, -1).'_id';
+			$link_column = ($link_table === 'blog' ? $link_table : substr($link_table, 0, -1)).'_id';
 			
 			// Get current links
 			$sql_current_links = 'SELECT id, '.$link_column.' FROM images_'.$link_table.' WHERE image_id=?';
@@ -40,8 +40,11 @@ if(is_numeric($_POST['id'])) {
 			}
 			$rslt_current_links = is_array($rslt_current_links) ? $rslt_current_links : [];
 			
-			// Make IDs array if not already
-			if(!is_array($link_array) && strlen($link_array)) {
+			// JS might send as array, or comma separated string, or array with one string as child; standardize
+			if(is_array($link_array)) {
+				$link_array = explode(',', implode(',', $link_array));
+			}
+			elseif(!is_array($link_array) && strlen($link_array)) {
 				$link_array = explode(',', $link_array);
 			}
 			
@@ -56,9 +59,13 @@ if(is_numeric($_POST['id'])) {
 						unset($link_array[$link_array_key]);
 					}
 					else {
-						$sql_add_link = 'INSERT INTO images_'.$link_table.' (image_id, '.$link_column.') VALUES (?, ?)';
+						$sql_add_link = 'INSERT INTO images_'.$link_table.' (image_id, '.$link_column.') VALUES (?, ?)'; 
 						$stmt_add_link = $pdo->prepare($sql_add_link);
-						$stmt_add_link->execute([ $id, $link_array_value ]);
+						if($stmt_add_link->execute([ $id, $link_array_value ])) {
+						}
+						else {
+							$output['result'][] = 'Couldn\'t add image-'.$link_table.' link.';
+						}
 					}
 				}
 			}
@@ -68,7 +75,11 @@ if(is_numeric($_POST['id'])) {
 				foreach($rslt_current_links as $current_link_id => $current_link_artist_id) {
 					$sql_delete_link = 'DELETE FROM images_'.$link_table.' WHERE id=? LIMIT 1';
 					$stmt_delete_link = $pdo->prepare($sql_delete_link);
-					$stmt_delete_link->execute([ $current_link_id ]);
+					if($stmt_delete_link->execute([ $current_link_id ])) {
+					}
+					else {
+						$output['result'][] = 'Couldn\'t delete image-'.$link_table.' link.';
+					}
 				}
 			}
 			
@@ -94,13 +105,16 @@ if(is_numeric($_POST['id'])) {
 		}
 	}
 	else {
-		$output['result'] = 'Couldn\'t update.';
+		$output['result'][] = 'Couldn\'t update.';
 	}
 }
 else {
-	$output['result'] = 'Non-numeric ID.'.print_r($_POST, true);
+	$output['result'][] = 'Non-numeric ID.';
 }
 
-$output['status'] = $output['status'] ?: 'error';
-
-echo json_encode($output);
+if(!$suppress_output) {
+	$output['result'] = is_array($output['result']) ? implode('<br />', $output['result']) : null;
+	$output['status'] = $output['status'] ?: 'error';
+	
+	echo json_encode($output);
+}
