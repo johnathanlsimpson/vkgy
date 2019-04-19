@@ -60,7 +60,7 @@ function render_image_section($images, $args = []) {
 				'description' => $image['description'],
 				'credit' => $image['credit'],
 				'is_exclusive' => $image['is_exclusive'] ? 'checked' : null,
-				'is_default' => $image['id'] === $args['default_id'] ? 'checked' : null,
+				'is_default' => $image['id'] === $args['id'] ? 'checked' : null,
 				'artist_ids' => render_options(($image['artist_ids'] ?: $default['artist']), $artist_list),
 				'blog_id' => render_options(($image['blog_id'] ?: $default['blog']), $blog_list),
 				'musician_ids' => render_options(($image['label_ids'] ?: $default['label']), $label_list),

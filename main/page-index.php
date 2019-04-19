@@ -40,7 +40,7 @@
 					</a>
 				</p>
 				<p>
-					<a class="artist" data-name="<?php echo $image["artist_name"]; ?>" href="/artists/<?php echo $image["artist_friendly"]; ?>/"><?php echo $image["artist_quick_name"]; ?></a>
+					<a class="artist" data-name="<?php echo $image['artists'][0]["name"]; ?>" href="/artists/<?php echo $image['artists'][0]["friendly"]; ?>/"><?php echo $image['artists'][0]["quick_name"]; ?></a>
 				</p>
 				<p class="any--weaken">
 					<a class="symbol__vip" href="https://www.patreon.com/vkgy/" target="_blank">VIP members</a> can access high-res, unwatermarked version. <a href="/images/&type=flyer">View past flyers?</a>

@@ -2,8 +2,17 @@
 	include_once("../php/class-parse_markdown.php");
 	$markdown_parser = new parse_markdown($pdo);
 
+
 	if(!empty($release)) {
 		include_once("../releases/head.php");
+		
+		if(strlen($release['image_id'])) {
+			$release['cover'] = $release['images'][$release['image_id']];
+			
+			unset($release['images'][$release['image_id']]);
+			
+			$release['images'] = array_values($release['images']);
+		}
 		
 		background("/artists/".$release["artist"]["friendly"]."/main.large.jpg");
 		
@@ -75,12 +84,12 @@
 			<div class="col c3-AAB">
 				<div>
 					<div>
-						<div class="text any--flex release__head" data-coverurl="<?php echo $release["cover"] ? "https://vk.gy".$release["cover"] : null; ?>">
+						<div class="text any--flex release__head" data-coverurl="<?php echo $release["cover"] ? "https://vk.gy".$release["cover"]['url'] : null; ?>">
 							<?php
 								if($release["cover"]) {
 									?>
-										<a class="release__image-link <?php echo $release["cover_is_exclusive"] ? "release__image--exclusive" : null; ?>" href="<?php echo $release["cover"]; ?>" target="_blank">
-											<img alt="<?php echo $release["artist"]["quick_name"]." - ".$release["quick_name"]; ?>" class="release__image" src="<?php echo preg_replace("/"."\.(\w+)$"."/", ".medium.$1", $release["cover"]); ?>" />
+										<a class="release__image-link <?php echo $release['cover']['is_exclusive'] ? "release__image--exclusive" : null; ?>" href="<?php echo $release["cover"]['url']; ?>" target="_blank">
+											<img alt="<?php echo $release["artist"]["quick_name"]." - ".$release["quick_name"]; ?>" class="release__image" src="<?php echo preg_replace("/"."\.(\w+)$"."/", ".medium.$1", $release["cover"]['url']); ?>" />
 										</a>
 									<?php
 								}
@@ -750,7 +759,7 @@
 					</div>
 					
 					<?php
-						if(is_array($release["images"]) && count($release["images"]) > 1) {
+						if(is_array($release["images"]) && !empty($release['images'])) {
 							?>
 								<h3>
 									Other images
@@ -758,13 +767,11 @@
 								<div class="text text--outlined release__images">
 									<?php
 										foreach($release["images"] as $image) {
-											if(!$image["is_default"]) {
 												?>
 													<a href="/images/<?php echo $image["id"].($image["friendly"] ? "-".$image["friendly"] : null).".".$image["extension"]; ?>" target="_blank">
 														<img alt="<?php echo $image["description"]; ?>" class="release__thumbnail" src="/images/<?php echo $image["id"].($image["friendly"] ? "-".$image["friendly"] : null).".thumbnail.".$image["extension"]; ?>" />
 													</a>
 												<?php
-											}
 										}
 									?>
 								</div>

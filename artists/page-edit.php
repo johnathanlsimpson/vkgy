@@ -20,6 +20,7 @@
 	
 	if($_SESSION["admin"] > 0) { 
 			if(!empty($artist)) {
+				$artist['images'] = array_values($artist['images']);
 				?>
 					<form action="" class="col c1 any--margin" enctype="multipart/form-data" id="form__edit" method="post" name="form__edit">
 						<?php
@@ -253,8 +254,8 @@
 										'item_type' => 'artist',
 										'item_id' => $artist['id'],
 										'item_name' => $artist['quick_name'],
-										'default_description' => $artist['quick_name'].' group photo',
-										'default_id' => $artist['image_id'],
+										'description' => $artist['quick_name'].' group photo',
+										'id' => $artist['image_id'],
 										'hide_blog' => true,
 										'hide_labels' => true,
 										'hide_markdown' => true,

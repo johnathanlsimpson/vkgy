@@ -13,7 +13,7 @@ function initImageEditElems() {
 		'credit'
 	];
 	imageElemNames.forEach(function(imageElemName) {
-		var imageElems = document.querySelectorAll('[name^="' + imageElemName + '"]');
+		var imageElems = document.querySelectorAll('[name^="image_' + imageElemName + '"]');
 		
 		imageElems.forEach(function(imageElem) {
 			imageElem.addEventListener('change', function() {
@@ -46,6 +46,7 @@ function getParent(childElem, parentClass) {
 function updateImageData(changedElem) {
 	var parentElem = getParent(changedElem, 'image__template');
 	var statusElem = parentElem.querySelector('.image__status');
+	var resultElem = parentElem.querySelector('.image__result');
 	var preparedFormData = {};
 	
 	var inputElems = parentElem.querySelectorAll('[name]');
@@ -80,10 +81,10 @@ var imageTemplate = document.querySelector('#image-template');
 var imagesElem = document.querySelector('.image__results');
 
 imageUploadElem.addEventListener('change', function() {
-	var itemType = imageUploadElem.parentNode.querySelector('[name=item_type]').value;
-	var itemId = imageUploadElem.parentNode.querySelector('[name=item_id]').value;
-	var itemName = imageUploadElem.parentNode.querySelector('[name=item_name]').value;
-	var defaultDescription = imageUploadElem.parentNode.querySelector('[name=description]').value;
+	var itemType = imageUploadElem.parentNode.querySelector('[name=image_item_type]').value;
+	var itemId = imageUploadElem.parentNode.querySelector('[name=image_item_id]').value;
+	var itemName = imageUploadElem.parentNode.querySelector('[name=image_item_name]').value;
+	var defaultDescription = imageUploadElem.parentNode.querySelector('[name=image_description]').value;
 	
 	for(var i=0; i<imageUploadElem.files.length; i++) {
 		var thisImage = imageUploadElem.files[i];
@@ -91,7 +92,7 @@ imageUploadElem.addEventListener('change', function() {
 		if(!!thisImage.type.match(/image.*/)) {
 			
 			var newImageElem = document.importNode(imageTemplate.content, true);
-			var itemIdElem = newImageElem.querySelector('[name^=' + itemType + '_id]');
+			var itemIdElem = newImageElem.querySelector('[name^=image_' + itemType + '_id]');
 			var newOptionElem = document.createElement('option');
 			
 			newOptionElem.value = itemId;
@@ -117,7 +118,7 @@ imageUploadElem.addEventListener('change', function() {
 var deleteElems = document.querySelectorAll('.image__delete');
 deleteElems.forEach(function(deleteElem) {
 	var parentElem = getParent(deleteElem, 'image__template');
-	var imageId = parentElem.querySelector('[name=id]').value;
+	var imageId = parentElem.querySelector('[name=image_id]').value;
 	
 	initDelete($(deleteElem), '/images/function-delete_image.php', { 'id' : imageId }, function(deleteButton) {
 		parentElem.classList.add('any--fade-out');

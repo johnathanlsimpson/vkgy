@@ -23,6 +23,9 @@ subnav([
 	"Database" => "/database/",
 ]);
 
+$access_image = $access_image ?: new access_image($pdo);
+
+
 //if($_SESSION["username"] === "inartistic") { include_once("../main/function-choose_aod.php"); }
 
 /* Check VIP */
@@ -164,12 +167,8 @@ $addl_aod = $access_artist->access_artist(["id" => $rslt_aod["id"], "get" => "na
 $addl_aod = is_array($addl_aod) ? $addl_aod : [];
 $artist_of_day = array_merge($rslt_aod, $addl_aod);
 
-/* Image of day */
-$sql_fod = "(SELECT images.id, images.extension, CONCAT('/images/', images.id, '-', COALESCE(images.friendly, ''), '.', images.extension) AS url, artists.name AS artist_name, artists.friendly AS artist_friendly, COALESCE(artists.romaji, artists.name) AS artist_quick_name, images.date_added FROM queued_fod LEFT JOIN images ON images.id=queued_fod.image_id LEFT JOIN artists ON artists.id=SUBSTRING(TRIM(')' FROM images.artist_id),2) WHERE queued_fod.id='1' LIMIT 1)";
-$stmt_fod = $pdo->prepare($sql_fod);
-$stmt_fod->execute();
-$image = $stmt_fod->fetch();
-
+/* Flyer of day */
+$image = $access_image->access_image([ 'flyer_of_day' => true, 'get' => 'all' ])[0];
 if(is_array($image) && !empty($image)) {
 	$image["size"] = getimagesize("../images/image_files/".$image["id"].".".$image["extension"]);
 	$image["is_wide"] = is_array($image["size"]) && !empty($image["size"]) && $image["size"][0] > $image["size"][1];

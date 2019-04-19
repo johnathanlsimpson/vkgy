@@ -591,6 +591,10 @@
 				$sql_where[] = "artists.id=".implode(" OR artists.id=", array_fill(0, count($args["id"]), "?"));
 				$sql_values = is_array($sql_values) ? array_merge($sql_values, array_values($args["id"])) : array_values($args["id"]);
 			}
+			if(is_array($args["ids"]) && !empty($args["ids"])) {
+				$sql_where[] = "artists.id=".implode(" OR artists.id=", array_fill(0, count($args["ids"]), "?"));
+				$sql_values = is_array($sql_values) ? array_merge($sql_values, array_values($args["ids"])) : array_values($args["ids"]);
+			}
 			if($args["letter"]) {
 				$args["letter"] = sanitize($args["letter"]);
 				$args["letter"] = (strlen($args["letter"]) === 1 ? $args["letter"] : "-");
@@ -746,7 +750,7 @@
 									$artists[$i]["prev_artist"] = $this->access_artist(["friendly" => $artists[$i]["friendly"], "get" => "prev"]);
 									$artists[$i]["next_artist"] = $this->access_artist(["friendly" => $artists[$i]["friendly"], "get" => "next"]);
 									$artists[$i]["history"] = $this->get_history($artists[$i]["id"]);
-									$artists[$i]['images'] = $this->access_image->access_image([ 'artist_id' => $artists[$i]['id'], 'get' => 'all' ]);
+									$artists[$i]['images'] = $this->access_image->access_image([ 'artist_id' => $artists[$i]['id'], 'get' => 'most', 'associative' => true ]);
 									
 									$sql_areas = 'SELECT areas.* FROM areas_artists LEFT JOIN areas ON areas.id=areas_artists.area_id WHERE areas_artists.artist_id=? ORDER BY areas.friendly ASC';
 									$stmt_areas = $this->pdo->prepare($sql_areas);

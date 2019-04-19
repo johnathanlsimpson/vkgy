@@ -109,6 +109,9 @@
 					"CONCAT('/images/', images.id, '-', IF(images.friendly, images.friendly, ''), '.', images.extension) AS image"
 				);
 			}
+			if($args['get'] === 'name') {
+				array_push($sql_select, 'blog.title', 'blog.friendly', 'blog.id');
+			}
 			
 			
 			// FROM
@@ -123,6 +126,10 @@
 			if(is_numeric($args["id"])) {
 				$sql_where[] = "blog.id = ?";
 				$sql_values[] = $args["id"];
+			}
+			if(is_array($args['ids'])) {
+				$sql_where[] = substr(str_repeat('blog.id=? OR ', count($args['ids'])), 0, -4);
+				$sql_values = array_merge((is_array($sql_values) ? $sql_values : []), $args['ids']);
 			}
 			if(!empty($args["start_date"])) {
 				$sql_where[] = "blog.date_occurred <= ?";
@@ -183,6 +190,9 @@
 			
 			// Execute query
 			$sql_blog = "SELECT ".implode(", ", $sql_select)." FROM ".implode(" ", $sql_from)." ".($sql_where ? "WHERE (".implode(") AND (", $sql_where).")" : null)." ORDER BY blog.date_occurred DESC ".$sql_limit;
+			
+			//echo $sql_blog;
+			//print_r($sql_values);
 			$stmt = $this->pdo->prepare($sql_blog);
 			$stmt->execute($sql_values);
 			$rows = $stmt->fetchAll();
@@ -234,14 +244,25 @@
 				}
 			}
 			
-			// Return result
-			$rows = is_array($rows) ? $rows : [];
+			$num_blogs = count($rows);
 			
-			if($args["friendly"] || is_numeric($args["id"])) {
-				$rows = reset($rows);
+			for($i=0; $i<$num_blogs; $i++) {
+				if($args['associative']) {
+					$blogs[$rows[$i]['id']] = $rows[$i];
+				}
+				else {
+					$blogs[] = $rows[$i];
+				}
 			}
 			
-			return $rows;
+			// Return result
+			$blogs = is_array($blogs) ? $blogs : [];
+			
+			if($args["friendly"] || is_numeric($args["id"])) {
+				$blogs = reset($blogs);
+			}
+			
+			return $blogs;
 			
 		}
 	}

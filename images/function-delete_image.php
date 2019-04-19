@@ -1,39 +1,48 @@
 <?php
-	include_once("../php/include.php");
-	
-	$image_id = $_POST["id"];
-	
-	if(is_numeric($image_id) && $_SESSION["admin"]) {
-		$sql_get = "SELECT extension FROM images WHERE id=? LIMIT 1";
-		$stmt_get = $pdo->prepare($sql_get);
-		$stmt_get->execute([$image_id]);
+include_once("../php/include.php");
+
+foreach($_POST as $key => $value) {
+	if(strpos($key, 'image_') === 0) {
+		$new_key = substr($key, 6);
 		
-		$extension = $stmt_get->fetchColumn();
-		if(!empty($extension)) {
-			$sql_delete = "DELETE FROM images WHERE id=? LIMIT 1";
-			$stmt_delete = $pdo->prepare($sql_delete);
-			
-			if($stmt_delete->execute([$image_id])) {
-				if(file_exists("../images/image_files/".$image_id.".".$extension) && unlink("../images/image_files/".$image_id.".".$extension)) {
-					$output["status"] = "success";
-				}
-				else {
-					$output["result"] = "Couldn't be deleted.";
-				}
+		$_POST[$new_key] = $value;
+		
+		unset($_POST[$key]);
+	}
+}
+
+$image_id = $_POST["id"];
+
+if(is_numeric($image_id) && $_SESSION["admin"]) {
+	$sql_get = "SELECT extension FROM images WHERE id=? LIMIT 1";
+	$stmt_get = $pdo->prepare($sql_get);
+	$stmt_get->execute([$image_id]);
+
+	$extension = $stmt_get->fetchColumn();
+	if(!empty($extension)) {
+		$sql_delete = "DELETE FROM images WHERE id=? LIMIT 1";
+		$stmt_delete = $pdo->prepare($sql_delete);
+
+		if($stmt_delete->execute([$image_id])) {
+			if(file_exists("../images/image_files/".$image_id.".".$extension) && unlink("../images/image_files/".$image_id.".".$extension)) {
+				$output["status"] = "success";
 			}
 			else {
-				$output["result"] = "Couldn't be deleted from database.";
+				$output["result"] = "Couldn't be deleted.";
 			}
 		}
 		else {
-			$output["result"] = "Not found in database.";
+			$output["result"] = "Couldn't be deleted from database.";
 		}
 	}
 	else {
-		$output["result"] = 'Only editors can delete images. Please comment and ask an editor to help.';
+		$output["result"] = "Not found in database.";
 	}
-	
-	$output["status"] = $output["status"] ?: "error";
-	
-	echo json_encode($output);
-?>
+}
+else {
+	$output["result"] = 'Only editors can delete images. Please comment and ask an editor to help.';
+}
+
+$output["status"] = $output["status"] ?: "error";
+
+echo json_encode($output);

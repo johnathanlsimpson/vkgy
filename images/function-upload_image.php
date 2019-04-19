@@ -5,6 +5,16 @@
 	include_once('../php/function-post_deploy.php');
 	
 	function upload_image($image, $pdo) {
+		foreach($_POST as $key => $value) {
+			if(strpos($key, 'image_') === 0) {
+				$new_key = substr($key, 6);
+				
+				$_POST[$new_key] = $value;
+				
+				unset($_POST[$key]);
+			}
+		}
+		
 		if(is_array($image) && !empty($image)) {
 			$name                = sanitize(strtolower($image['name']));
 			$type                = $image['type'];

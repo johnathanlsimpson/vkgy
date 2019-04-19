@@ -1,5 +1,5 @@
-<a class="artist__main-image-link <?php echo $default_image ? '' : 'any--hidden'; ?>" href="<?php echo str_replace(".large.", ".", $default_image); ?>">
-	<img class="artist__main-image" alt="<?php echo $artist["quick_name"]; ?>" src="<?php echo $default_image; ?>" />
+<a class="artist__main-image-link <?php echo $artist['image'] ? '' : 'any--hidden'; ?>" href="<?php echo $artist['image']['url']; ?>">
+	<img class="artist__main-image" alt="<?php echo $artist["quick_name"]; ?>" src="<?php echo str_replace('.', '.large.', $artist['image']['url']); ?>" />
 </a>
 
 <div class="data__container">

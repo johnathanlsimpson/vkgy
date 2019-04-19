@@ -78,14 +78,10 @@
 				$sql_where[] = "id=?";
 				$sql_values = [sanitize($args["id"])];
 			}
-			/*if(preg_match("/"."\d{4}-\d{2}-\d{2}"."/", $args["edit_history"])) {
-				if($args["edit_history"] < date("Y-m-d")) {
-					$sql_where[] = "edit_history<?";
-					$sql_values[] = $args["edit_history"];
-				}
-				
-				$sql_order[] = "edit_history DESC";
-			}*/
+			if(is_array($args['ids'])) {
+				$sql_where[] = substr(str_repeat('labels.id=? OR ', count($args['ids'])), 0, -4);
+				$sql_values = array_merge((is_array($sql_values) ? $sql_values : []), $args['ids']);
+			}
 			
 			// ORDER
 			$sql_order = is_array($sql_order) ? $sql_order : ["friendly ASC"];
@@ -131,7 +127,12 @@
 						}
 					}
 					
-					$labels[] = $row;
+					if($args['associative']) {
+						$labels[$row['id']] = $row;
+					}
+					else {
+						$labels[] = $row;
+					}
 				}
 				
 				if(is_array($labels)) {

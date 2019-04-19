@@ -1,6 +1,7 @@
 <?php
 	include_once("../database/head.php");
 
+
 	script([
 		"/scripts/external/script-autosize.js",
 		"/scripts/external/script-selectize.js",
@@ -103,6 +104,8 @@
 			"Add release" => "/releases/add/"
 		]);
 	}
+	
+	$release['images'] = array_values($release['images']);
 
 	$pageTitle = !empty($release["quick_name"]) ? "Edit: ".$release["quick_name"]." - ".$release["artist"]["quick_name"] : "Add release";
 ?>

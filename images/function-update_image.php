@@ -2,6 +2,16 @@
 include_once('../php/include.php');
 include_once('../php/function-post_deploy.php');
 
+foreach($_POST as $key => $value) {
+	if(strpos($key, 'image_') === 0) {
+		$new_key = substr($key, 6);
+		
+		$_POST[$new_key] = $value;
+		
+		unset($_POST[$key]);
+	}
+}
+
 if(is_numeric($_POST['id'])) {
 	$allowed_item_types = ['artist', 'blog', 'label', 'musician', 'release', 'other'];
 	

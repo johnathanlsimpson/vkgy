@@ -241,8 +241,8 @@
 						"releases.*",
 						"CONCAT_WS(' ', COALESCE(releases.romaji, releases.name), COALESCE(releases.press_romaji, releases.press_name), COALESCE(releases.type_romaji, releases.type_name)) AS quick_name",
 						"AVG(releases_ratings.rating) AS rating",
-						"IF(images.id IS NOT NULL AND images.is_exclusive = '1', '1', '') AS cover_is_exclusive",
-						"IF(images.id IS NOT NULL, CONCAT('/images/', images.id, '-', COALESCE(images.friendly, ''), '.', images.extension), '') AS cover"
+						//"IF(images.id IS NOT NULL AND images.is_exclusive = '1', '1', '') AS cover_is_exclusive",
+						//"IF(images.id IS NOT NULL, CONCAT('/images/', images.id, '-', COALESCE(images.friendly, ''), '.', images.extension), '') AS cover"
 					];
 				}
 				if($args["get"] === "basics") {
@@ -264,8 +264,9 @@
 						"releases.artist_display_name",
 						"releases.artist_display_romaji",
 						"AVG(releases_ratings.rating) AS rating",
-						"IF(images.id IS NOT NULL AND images.is_exclusive = '1', '1', '') AS cover_is_exclusive",
-						"IF(images.id IS NOT NULL, CONCAT('/images/', images.id, '-', COALESCE(images.friendly, ''), '.', images.extension), '') AS cover"
+						'releases.image_id',
+						//"IF(images.id IS NOT NULL AND images.is_exclusive = '1', '1', '') AS cover_is_exclusive",
+						//"IF(images.id IS NOT NULL, CONCAT('/images/', images.id, '-', COALESCE(images.friendly, ''), '.', images.extension), '') AS cover"
 					];
 				}
 				if(($args["get"] === "all" || $args["get"] === "basics") && $_SESSION["loggedIn"]) {
@@ -321,7 +322,8 @@
 						"releases.romaji",
 						"releases.friendly",
 						"releases.medium",
-						"IF(images.id IS NOT NULL, CONCAT('/images/', images.id, '-', COALESCE(images.friendly, ''), '.', images.extension), '') AS cover"
+						'releases.image_id',
+						//"IF(images.id IS NOT NULL, CONCAT('/images/', images.id, '-', COALESCE(images.friendly, ''), '.', images.extension), '') AS cover"
 					];
 				}
 				elseif($args['get'] === 'id') {
@@ -536,6 +538,18 @@
 				// Get additional data
 				if(is_array($releases) && !empty($releases)) {
 					
+					// Get *just* cover image
+					if($args['get'] === 'basics' || $args['get'] === 'calendar') {
+						$this->access_image = $this->access_image ?: new access_image($this->pdo);
+						
+						$images = $this->access_image->access_image([ 'release_id' => $release_ids, 'get' => 'name', 'default' => true, 'associative' => true ]);
+						
+						for($i=0; $i<$num_rslt_releases; $i++) {
+							$releases[$release_ids[$i]]['image'] = $images[$releases[$release_ids[$i]]['image_id']];
+							unset($images[$releases[$release_ids[$i]]['image_id']]);
+						}
+					}
+					
 					// Get artist info
 					if(is_array($artist_ids)) {
 						$release_artists = $this->access_artist->access_artist([ 'get' => 'name', 'id' => $artist_ids, 'associative' => true ]);
@@ -565,13 +579,16 @@
 							unset($releases[$release_id]["artist_display_name"], $releases[$release_id]["artist_display_romaji"]);
 						}
 						
-						if($args["get"] === "all" && is_numeric($args["release_id"])) {
+						// Get prev/next
+						if($args['get'] === 'all' && is_numeric($args['release_id'])) {
 							$releases[$release_id]["prev_next"] = $this->get_prev_next($release_id, $releases[$release_id]["artist"]["friendly"]);
+						}
+						
+						// Get images
+						if($args['get'] === 'all' && is_numeric($args['release_id'])) {
+							$this->access_image = $this->access_image ?: new access_image($this->pdo);
 							
-							$sql_images = "SELECT images.id, CONCAT('/images/', images.id, IF(images.friendly, '-', ''), '.', images.extension) AS url, images.description, images.is_exclusive, IF(images.id = ?, '1', '0') AS is_default, images.credit FROM images_releases LEFT JOIN images ON images.id=images_releases.image_id WHERE images_releases.release_id=?";
-							$stmt_images = $this->pdo->prepare($sql_images);
-							$stmt_images->execute([ $releases[$release_id]['image_id'], $release_id ]);
-							$releases[$release_id]["images"] = $stmt_images->fetchAll();
+							$releases[$release_id]['images'] = $this->access_image->access_image([ 'release_id' => $release_id, 'get' => 'most', 'associative' => true ]);
 						}
 						
 						if($args["get"] === "all") {

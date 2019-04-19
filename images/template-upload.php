@@ -12,10 +12,10 @@
 				<!-- Upload area -->
 				<div class="input__row">
 					<div class="input__group any--flex-grow">
-						<input class="any--hidden" name="item_type" value="{item_type}" hidden disabled />
-						<input class="any--hidden" name="item_id" value="{item_id}" hidden disabled />
-						<input class="any--hidden" name="item_name" value="{item_name}" hidden disabled />
-						<input class="any--hidden" name="description" value="{description}" hidden disabled />
+						<input class="any--hidden" name="image_item_type" value="{item_type}" hidden disabled />
+						<input class="any--hidden" name="image_item_id" value="{item_id}" hidden disabled />
+						<input class="any--hidden" name="image_item_name" value="{item_name}" hidden disabled />
+						<input class="any--hidden" name="image_description" value="{description}" hidden disabled />
 						<input class="any--flex-grow" name="images" type="file" multiple />
 					</div>
 				</div>

@@ -465,9 +465,10 @@
 			$sql_group = [];
 			$sql_order = [];
 			$sql_limit;
+			$sql_values = [];
 			
 			// Select
-			if($args['get'] === 'all') {
+			if($args['get'] === 'all' || $args['get'] === 'most') {
 				$sql_select[] = 'images.*';
 				$sql_select[] = 'CONCAT("/images/", images.id, "-", COALESCE(images.friendly, "image"), ".", images.extension) AS url';
 				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_artists.artist_id) AS artist_ids';
@@ -476,8 +477,60 @@
 				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_musicians.musician_id) AS musician_ids';
 				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_releases.release_id) AS release_ids';
 			}
+			if($args['get'] === 'name') {
+				$sql_select[] = 'images.id';
+				$sql_select[] = 'images.extension';
+				$sql_select[] = 'images.friendly';
+				$sql_select[] = 'CONCAT("/images/", images.id, "-", COALESCE(images.friendly, "image"), ".", images.extension) AS url';
+			}
 			
 			// From
+			if($args['flyer_of_day']) {
+				$sql_from = 'queued_fod';
+			}
+			foreach(['artist_id' => 'artists', 'blog_id' => 'blog', 'label_id' => 'labels', 'musician_id' => 'musicians', 'release_id' => 'releases'] as $id_type => $id_table) {
+				if(is_array($args[$id_type]) || strlen($args[$id_type])) {
+					$args[$id_type] = is_array($args[$id_type]) ? $args[$id_type] : [ $args[$id_type] ];
+					
+					if($args['default']) {
+						$sql_from = '(SELECT image_id FROM '.$id_table.' WHERE ('.substr(str_repeat('id=? OR ', count($args[$id_type])), 0, -4).')) inner_join';
+					}
+					else {
+						$sql_from = '(SELECT image_id FROM images_'.$id_table.' WHERE ('.substr(str_repeat($id_type.'=? OR ', count($args[$id_type])), 0, -4).') ORDER BY id DESC) inner_join';
+					}
+					
+					$sql_values = array_merge($sql_values, $args[$id_type]);
+				}
+			}
+			
+			
+			/*if($args['default']) {
+				if(strlen($args['artist_id']) || is_array($args['_id'])) {
+					
+					$sql_from = '(SELECT image_id FROM artists WHERE id=? LIMIT 1) inner_join';
+					$sql_values[] = $args['artist_id'];
+				}
+				if(strlen($args['blog_id']) || is_array($args['_id'])) {
+					
+					$sql_from = '(SELECT image_id FROM blog WHERE id=? LIMIT 1) inner_join';
+					$sql_values[] = $args['blog_id'];
+				}
+				if(strlen($args['label_id']) || is_array($args['_id'])) {
+					
+					$sql_from = '(SELECT image_id FROM labels WHERE id=? LIMIT 1) inner_join';
+					$sql_values[] = $args['musician_id'];
+				}
+				if(strlen($args['musician_id']) || is_array($args['_id'])) {
+					
+					$sql_from = '(SELECT image_id FROM musicians WHERE id=? LIMIT 1) inner_join';
+					$sql_values[] = $args['label_id'];
+				}
+				if(strlen($args['release_id']) || is_array($args['_id'])) {
+					
+					$sql_from = '(SELECT image_id FROM releases WHERE id=? LIMIT 1) inner_join';
+					$sql_values[] = $args['release_id'];
+				}
+			}
 			if(is_numeric($args['artist_id'])) {
 				$sql_from = '(SELECT image_id FROM images_artists WHERE artist_id=? ORDER BY id DESC) inner_join';
 				$sql_values[] = $args['artist_id'];
@@ -497,13 +550,16 @@
 			if(is_numeric($args['release_id'])) {
 				$sql_from = '(SELECT image_id FROM images_releases WHERE release_id=? ORDER BY id DESC) inner_join';
 				$sql_values[] = $args['release_id'];
-			}
+			}*/
 			
 			// Join
+			if($args['flyer_of_day']) {
+				$sql_join[] = 'LEFT JOIN images ON images.id=queued_fod.image_id';
+			}
 			if(substr($sql_from, -10) === 'inner_join') {
 				$sql_join[] = 'INNER JOIN images ON images.id=inner_join.image_id';
 			}
-			if($args['get'] === 'all') {
+			if($args['get'] === 'all' || $args['get'] === 'most') {
 				$sql_join[] = 'LEFT JOIN images_artists ON images_artists.image_id=images.id';
 				$sql_join[] = 'LEFT JOIN images_blog ON images_blog.image_id=images.id';
 				$sql_join[] = 'LEFT JOIN images_labels ON images_labels.image_id=images.id';
@@ -511,13 +567,15 @@
 				$sql_join[] = 'LEFT JOIN images_releases ON images_releases.image_id=images.id';
 			}
 			
+			// Where
+			
 			// Group
-			if($args['get'] === 'all') {
+			if($args['get'] === 'all' || $args['get'] === 'most') {
 				$sql_group[] = 'images.id';
 			}
 			
 			// Order
-			if($args['get'] === 'all') {
+			if($args['get'] === 'all' || $args['get'] === 'most') {
 				$sql_order[] = 'images.id DESC';
 			}
 			
@@ -534,8 +592,60 @@
 			
 			// Run query
 			if(substr_count($sql_images, '?') === count($sql_values)) {
+				//echo $sql_images.print_r($sql_values, true);
+				
 				if($stmt_images->execute( $sql_values )) {
-					return $stmt_images->fetchAll();
+					$images = $stmt_images->fetchAll();
+					$num_images = count($images);
+					
+					// Get artists etc
+					if($args['get'] === 'all') {
+						foreach(['artists', 'blog', 'labels', 'musicians', 'releases'] as $link_table) {
+							$singular_link_table = $link_table === 'blog' ? $link_table : substr($link_table, 0, -1);
+							$link_column = $singular_link_table.'_id'.($link_table != 'blog' ? 's' : null);
+							
+							for($i=0; $i<$num_images; $i++) {
+								$links[$link_column] .= ','.$images[$i][$link_column];
+							}
+							
+							$links[$link_column] = explode(',', $links[$link_column]);
+							$links[$link_column] = array_unique($links[$link_column]);
+							$links[$link_column] = array_filter($links[$link_column], 'is_numeric');
+							$links[$link_column] = array_values($links[$link_column]);
+							
+							$this->access_artist = $this->access_artist ?: new access_artist($this->pdo);
+							$this->access_blog = $this->access_blog ?: new access_blog($this->pdo);
+							$this->access_label = $this->access_label ?: new access_label($this->pdo);
+							$this->access_musician = $this->access_musician ?: new access_musician($this->pdo);
+							$this->access_release = $this->access_release ?: new access_release($this->pdo);
+							
+							if(is_array($links[$link_column]) && !empty($links[$link_column])) {
+								$links[$link_table] = $this->{'access_' . $singular_link_table}->{'access_' . $singular_link_table}([ 'ids' => $links[$link_column], 'get' => 'name', 'associative' => true ]);
+							}
+							
+							for($i=0; $i<$num_images; $i++) {
+								$image_links = $images[$i][$link_column];
+								$image_links = explode(',', $image_links);
+								
+								foreach($image_links as $image_link_key => $image_link) {
+									$image_links[$image_link_key] = $links[$link_table][$image_link];
+								}
+								
+								$images[$i][$link_table] = $image_links;
+							}
+						}
+					}
+					
+					// Switch to associative
+					if($args['associative']) {
+						for($i=0; $i<$num_images; $i++) {
+							$tmp_images[$images[$i]['id']] = $images[$i];
+						}
+						
+						$images = $tmp_images;
+					}
+					
+					return $images;
 				}
 				else {
 					// Query failure
