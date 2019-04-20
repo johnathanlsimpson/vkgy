@@ -93,6 +93,7 @@
 			
 			// LIMIT
 			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : $sql_limit ?: null;
+
 			
 			if($sql_select && $sql_from) {
 				
@@ -105,6 +106,7 @@
 				$num_comments = count($comments);
 				
 				if($args['limit_threads']) {
+
 					for($i=0; $i<$num_comments; $i++) {
 						$thread_ids[$comments[$i]['id']] = '';
 					}

@@ -24,8 +24,6 @@ subnav([
 ]);
 
 $access_image = $access_image ?: new access_image($pdo);
-
-
 //if($_SESSION["username"] === "inartistic") { include_once("../main/function-choose_aod.php"); }
 
 /* Check VIP */
