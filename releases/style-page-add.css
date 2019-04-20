@@ -1,135 +1,135 @@
-.track:not(.track--show-disc)         .track__disc,
-.track:not(.track--show-section)      .track__section,
-.track:not(.track--show-song)         .track__song-container,
-.track:not(.track--show-controls)     .track__tracklist-controls,
-.track:not(.track--show-artist)       .track__artist,
-.track:not(.track--show-display-name) .track__display-name {
-	display: none;
-}
-.track, .track .input__row, .track .input__group {
-	box-sizing: content-box;
-	margin: 0;
-	padding: 0;
-}
-.track {
-	padding-left: 2rem;
-	padding-right: 2rem;
-}
-.track .input__row {
-	margin-left: -0.5rem;
-	margin-top: -0.5rem;
-}
-.track .input__group {
-	margin-top: 0.5rem;
-}
-.track + .track::before {
-	content: "";
-	display: block;
-	height: 1rem;
-	opacity: 0.75;
-	width: 100%;
-}
-.track--show-disc + .track--show-song::before,
-.track--show-disc + .track--show-section::before,
-.track--show-section + .track--show-song::before,
-.track--show-song + .track--show-controls::before,
-.track--show-controls + .track--show-section::before {
-	background-clip: content-box;
-	background-image: radial-gradient(circle at center center, var(--background--bold) 1px, transparent 0);
-	background-position: left center;
-	background-repeat: repeat-x;
-	background-size: 3px 3px;
-	height: 2rem;
-}
-.track--show-controls + .track--show-disc::before {
-	background-clip: border-box;
-	background-image: radial-gradient(circle at center center, var(--text) 1px, transparent 0);
-	background-position: left center;
-	background-repeat: repeat-x;
-	background-size: 3px 3px;
-	height: 6rem;
-	margin-left: -2rem;
-	width: calc(2rem + 100% + 2rem);
-}
-.track::first-of-type {
-	counter-reset: disc_count;
-}
-.track--show-disc {
-	counter-increment: disc_count;
-}
-.track__disc-label::after {
-	content: "#" counter(disc_count);
-}
-.track__num::before {
-	box-sizing: border-box;
-	color: var(--text--faint);
-	content: attr(data-count) ".";
-	display: inline-block;
-	height: 2rem;
-	left: -2rem;
-	padding-right: 0.5rem;
-	position: absolute;
-	text-align: right;
-	top: -2rem;
-	width: 2rem;
-}
-.track__artist {
-	max-width: 25vw;
-	min-width: 150px;
-	width: 25vw;
-}
-.track__ghost {
-	opacity: 0.5;
-}
-.track__ghost .track__num {
-	visibility: hidden;
-}
-.add__stealth, .add__edit {
-	margin-left: 0.5rem;
-}
-.add__edit-container {
-	margin-top: 1rem;
-	text-align: center;
-}
-.add__result {
-	margin-bottom: 0;
-	margin-top: 1rem;
-}
-.add__result:empty {
-	display: none;
-}
-.add__cover-link {
-	justify-content: space-around;
-	display: block;
-	height: 3rem;
-}
-.add__cover {
-	height: 100%;
-}
-.add__cover[src=""] {
-	display: none;
-}
-.image__template:nth-of-type(2) {
-	margin-top: 1rem;
-}
-.image__image {
-	align-items: center;
-	background-clip: content-box;
-	background-position: top center;
-	background-repeat: no-repeat;
-	background-size: contain;
-	display: flex;
-	justify-content: space-around;
-	min-width: 100px;
-	padding-right: 0.5rem;
-	text-align: center;
-	width: 100px;
-}
-.image__image img {
-	align-self: flex-start;
-	max-height: 100px;
-	max-width: 100px;
-}
-.image__data {
-	oveflow-x: hidden;
-}
+.track:not(.track--show-disc)         .track__disc,
+.track:not(.track--show-section)      .track__section,
+.track:not(.track--show-song)         .track__song-container,
+.track:not(.track--show-controls)     .track__tracklist-controls,
+.track:not(.track--show-artist)       .track__artist,
+.track:not(.track--show-display-name) .track__display-name {
+	display: none;
+}
+.track, .track .input__row, .track .input__group {
+	box-sizing: content-box;
+	margin: 0;
+	padding: 0;
+}
+.track {
+	padding-left: 2rem;
+	padding-right: 2rem;
+}
+.track .input__row {
+	margin-left: -0.5rem;
+	margin-top: -0.5rem;
+}
+.track .input__group {
+	margin-top: 0.5rem;
+}
+.track + .track::before {
+	content: "";
+	display: block;
+	height: 1rem;
+	opacity: 0.75;
+	width: 100%;
+}
+.track--show-disc + .track--show-song::before,
+.track--show-disc + .track--show-section::before,
+.track--show-section + .track--show-song::before,
+.track--show-song + .track--show-controls::before,
+.track--show-controls + .track--show-section::before {
+	background-clip: content-box;
+	background-image: radial-gradient(circle at center center, var(--background--bold) 1px, transparent 0);
+	background-position: left center;
+	background-repeat: repeat-x;
+	background-size: 3px 3px;
+	height: 2rem;
+}
+.track--show-controls + .track--show-disc::before {
+	background-clip: border-box;
+	background-image: radial-gradient(circle at center center, var(--text) 1px, transparent 0);
+	background-position: left center;
+	background-repeat: repeat-x;
+	background-size: 3px 3px;
+	height: 6rem;
+	margin-left: -2rem;
+	width: calc(2rem + 100% + 2rem);
+}
+.track::first-of-type {
+	counter-reset: disc_count;
+}
+.track--show-disc {
+	counter-increment: disc_count;
+}
+.track__disc-label::after {
+	content: "#" counter(disc_count);
+}
+.track__num::before {
+	box-sizing: border-box;
+	color: var(--text--faint);
+	content: attr(data-count) ".";
+	display: inline-block;
+	height: 2rem;
+	left: -2rem;
+	padding-right: 0.5rem;
+	position: absolute;
+	text-align: right;
+	top: -2rem;
+	width: 2rem;
+}
+.track__artist {
+	max-width: 25vw;
+	min-width: 150px;
+	width: 25vw;
+}
+.track__ghost {
+	opacity: 0.5;
+}
+.track__ghost .track__num {
+	visibility: hidden;
+}
+.add__stealth, .add__edit {
+	margin-left: 0.5rem;
+}
+.add__edit-container {
+	margin-top: 1rem;
+	text-align: center;
+}
+.add__result {
+	margin-bottom: 0;
+	margin-top: 1rem;
+}
+.add__result:empty {
+	display: none;
+}
+.add__cover-link {
+	justify-content: space-around;
+	display: block;
+	height: 3rem;
+}
+.add__cover {
+	height: 100%;
+}
+.add__cover[src=""] {
+	display: none;
+}
+/*.image__template:nth-of-type(2) {
+	margin-top: 1rem;
+}
+.image__image {
+	align-items: center;
+	background-clip: content-box;
+	background-position: top center;
+	background-repeat: no-repeat;
+	background-size: contain;
+	display: flex;
+	justify-content: space-around;
+	min-width: 100px;
+	padding-right: 0.5rem;
+	text-align: center;
+	width: 100px;
+}
+.image__image img {
+	align-self: flex-start;
+	max-height: 100px;
+	max-width: 100px;
+}
+.image__data {
+	oveflow-x: hidden;
+}*/

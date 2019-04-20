@@ -261,10 +261,10 @@
 												</div>
 												<div class="any--weaken release__data">
 													<?php
-														if($release["cover"]) {
+														if($release["image"]) {
 															?>
-																<a class="release__image-link" href="<?php echo $release["cover"]; ?>" target="_blank">
-																	<img alt="<?php echo $release["artist"]["quick_name"]." - ".$release["quick_name"]; ?>" class="release__image" data-src="<?php echo preg_replace("/"."\.(\w+)$"."/", ".thumbnail.$1", $release["cover"]); ?>" />
+																<a class="release__image-link" href="<?php echo $release["image"]; ?>" target="_blank">
+																	<img alt="<?php echo $release["artist"]["quick_name"]." - ".$release["quick_name"]; ?>" class="release__image" data-src="<?php echo preg_replace("/"."\.(\w+)$"."/", ".thumbnail.$1", $release["image"]['url']); ?>" />
 																</a>
 															<?php
 														}
