@@ -1,0 +1,46 @@
+.image__template {
+	flex-wrap: wrap;
+}
+.image__image {
+	background-repeat: no-repeat;
+	background-size: contain;
+	margin-right: 0.5rem;
+	margin-top: 1rem;
+	padding-top: 1rem;
+	text-align: center;
+	width: 100px;
+}
+.image__data {
+	max-width: calc(100% - 100px - 1rem);
+}
+.image__result {
+	margin-bottom: 0;
+	width: 100%;
+}
+.image__result:empty {
+	display: none;
+}
+.image__results:not(:empty) {
+	border-top: 1px solid var(--background--bold);
+	margin-top: 1rem;
+	padding-top: 1rem;
+}
+[name="is_exclusive"] + label::after {
+	content: "vkgy user?";
+}
+[data-image-status="new"] [name="is_exclusive"] + label::after {
+	content: "you?";
+}
+[data-hide-selects="1"] .image__selects,
+[data-hide-markdown="1"] .image__markdown,
+[data-hide-artists="1"] .image__artists,
+[data-hide-blog="1"] .image__blog,
+[data-hide-labels="1"] .image__labels,
+[data-hide-musicians="1"] .image__musicians,
+[data-hide-releases="1"] .image__releases {
+	flex: none;
+	height: 0;
+	margin-bottom: -0.5rem;
+	overflow: hidden;
+	width: 0;
+}

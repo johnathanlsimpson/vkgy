@@ -360,7 +360,7 @@
 		function get_artist_image_id($artist_friendly) {
 			// If artist ID provided, look for main artist image 
 			if(strlen($artist_friendly)) {
-				$sql_artist = "SELECT images.id AS image_id FROM artists LEFT JOIN images ON images.artist_id=CONCAT('(', artists.id, ')') AND images.is_default=? AND images.is_release IS NULL WHERE artists.friendly=? LIMIT 1";
+				$sql_artist = "SELECT images.id AS image_id FROM artists LEFT JOIN images ON images.id=artists.image_id WHERE artists.friendly=? LIMIT 1";
 				$stmt_artist = $this->pdo->prepare($sql_artist);
 				$stmt_artist->execute([ 1, sanitize($artist_friendly) ]);
 				$rslt_artist = $stmt_artist->fetchColumn();
@@ -449,6 +449,183 @@
 			}
 			else {
 				$this->render_image($image_url);
+			}
+		}
+		
+		// ======================================================
+		// Core function
+		// ======================================================
+		function access_image($args = []) {
+			
+			// Setup
+			$sql_select = [];
+			$sql_from;
+			$sql_join = [];
+			$sql_where = [];
+			$sql_group = [];
+			$sql_order = [];
+			$sql_limit;
+			$sql_values = [];
+			
+			// Select
+			if($args['get'] === 'all' || $args['get'] === 'most') {
+				$sql_select[] = 'images.*';
+				$sql_select[] = 'CONCAT("/images/", images.id, "-", COALESCE(images.friendly, "image"), ".", images.extension) AS url';
+				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_artists.artist_id) AS artist_ids';
+				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_blog.blog_id) AS blog_id';
+				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_labels.label_id) AS label_ids';
+				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_musicians.musician_id) AS musician_ids';
+				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_releases.release_id) AS release_ids';
+				$sql_select[] = 'users.username';
+			}
+			if($args['get'] === 'name') {
+				$sql_select[] = 'images.id';
+				$sql_select[] = 'images.extension';
+				$sql_select[] = 'images.friendly';
+				$sql_select[] = 'CONCAT("/images/", images.id, "-", COALESCE(images.friendly, "image"), ".", images.extension) AS url';
+			}
+			
+			// From
+			if($args['flyer_of_day']) {
+				$sql_from = 'queued_fod';
+			}
+			foreach(['artist_id' => 'artists', 'blog_id' => 'blog', 'label_id' => 'labels', 'musician_id' => 'musicians', 'release_id' => 'releases'] as $id_type => $id_table) {
+				if(is_array($args[$id_type]) || strlen($args[$id_type])) {
+					$args[$id_type] = is_array($args[$id_type]) ? $args[$id_type] : [ $args[$id_type] ];
+					
+					if($args['default']) {
+						$sql_from = '(SELECT image_id FROM '.$id_table.' WHERE ('.substr(str_repeat('id=? OR ', count($args[$id_type])), 0, -4).')) inner_join';
+					}
+					else {
+						$sql_from = '(SELECT image_id FROM images_'.$id_table.' WHERE ('.substr(str_repeat($id_type.'=? OR ', count($args[$id_type])), 0, -4).') ORDER BY id DESC) inner_join';
+					}
+					
+					$sql_values = array_merge($sql_values, $args[$id_type]);
+				}
+			}
+			if($args['type'] === 'artist') {
+				$sql_from = '(SELECT image_id FROM images_artists'.($args['order'] ? ' ORDER BY '.str_replace('images.', 'images_artists.', $args['order']) : null).($args['limit'] ? ' LIMIT '.$args['limit'] : null).') inner_join';
+			}
+			if($args['type'] === 'release') {
+				$sql_from = '(SELECT image_id FROM images_releases'.($args['order'] ? ' ORDER BY '.str_replace('images.', 'images_releases.', $args['order']) : null).($args['limit'] ? ' LIMIT '.$args['limit'] : null).') inner_join';
+			}
+			if(!$sql_from) {
+				$sql_from = 'images';
+			}
+			
+			// Join
+			if($args['flyer_of_day']) {
+				$sql_join[] = 'LEFT JOIN images ON images.id=queued_fod.image_id';
+			}
+			if(substr($sql_from, -10) === 'inner_join') {
+				$sql_join[] = 'INNER JOIN images ON images.id=inner_join.image_id';
+			}
+			if($args['get'] === 'all' || $args['get'] === 'most') {
+				$sql_join[] = 'LEFT JOIN images_artists ON images_artists.image_id=images.id';
+				$sql_join[] = 'LEFT JOIN images_blog ON images_blog.image_id=images.id';
+				$sql_join[] = 'LEFT JOIN images_labels ON images_labels.image_id=images.id';
+				$sql_join[] = 'LEFT JOIN images_musicians ON images_musicians.image_id=images.id';
+				$sql_join[] = 'LEFT JOIN images_releases ON images_releases.image_id=images.id';
+				$sql_join[] = 'LEFT JOIN users ON users.id=images.user_id';
+			}
+			
+			// Where
+			if($args['type'] === 'flyer') {
+				$sql_where[] = 'images.description LIKE "%flyer%"';
+			}
+			if($args['type'] === 'vip') {
+				$sql_where[] = 'images.is_exclusive=?';
+				$sql_values[] = 1;
+			}
+			
+			// Group
+			if($args['get'] === 'all' || $args['get'] === 'most') {
+				$sql_group[] = 'images.id';
+			}
+			
+			// Order
+			if($args['order']) {
+				$sql_order[] = $args['order'];
+			}
+			elseif($args['get'] === 'all' || $args['get'] === 'most') {
+				$sql_order[] = 'images.id DESC';
+			}
+			
+			// Limit
+			$sql_limit = $args['limit'] ?: null;
+			
+			// Prepare query
+			$sql_images =
+				'SELECT '.implode(', ', $sql_select).' '.
+				'FROM '.$sql_from.' '.
+				(implode(' ', $sql_join)).' '.
+				(!empty($sql_where) ? 'WHERE ('.implode(') AND (', $sql_where).')' : null).' '.
+				(!empty($sql_group) ? 'GROUP BY '.implode(', ', $sql_group) : null).' '.
+				(!empty($sql_order) ? 'ORDER BY '.implode(', ', $sql_order) : null).' '.
+				($sql_limit ? 'LIMIT '.$sql_limit : null);
+			$stmt_images = $this->pdo->prepare($sql_images);
+			
+			// Run query
+			if(substr_count($sql_images, '?') === count($sql_values)) {
+				if($stmt_images->execute( $sql_values )) {
+					$images = $stmt_images->fetchAll();
+					$num_images = count($images);
+					
+					// Get artists etc
+					if($args['get'] === 'all') {
+						foreach(['artists', 'blog', 'labels', 'musicians', 'releases'] as $link_table) {
+							$singular_link_table = $link_table === 'blog' ? $link_table : substr($link_table, 0, -1);
+							$link_column = $singular_link_table.'_id'.($link_table != 'blog' ? 's' : null);
+							
+							for($i=0; $i<$num_images; $i++) {
+								$links[$link_column] .= ','.$images[$i][$link_column];
+							}
+							
+							$links[$link_column] = explode(',', $links[$link_column]);
+							$links[$link_column] = array_unique($links[$link_column]);
+							$links[$link_column] = array_filter($links[$link_column], 'is_numeric');
+							$links[$link_column] = array_values($links[$link_column]);
+							
+							$this->access_artist = $this->access_artist ?: new access_artist($this->pdo);
+							$this->access_blog = $this->access_blog ?: new access_blog($this->pdo);
+							$this->access_label = $this->access_label ?: new access_label($this->pdo);
+							$this->access_musician = $this->access_musician ?: new access_musician($this->pdo);
+							$this->access_release = $this->access_release ?: new access_release($this->pdo);
+							
+							if(is_array($links[$link_column]) && !empty($links[$link_column])) {
+								$links[$link_table] = $this->{'access_' . $singular_link_table}->{'access_' . $singular_link_table}([ 'ids' => $links[$link_column], 'get' => 'name', 'associative' => true ]);
+							}
+							
+							for($i=0; $i<$num_images; $i++) {
+								$image_links = $images[$i][$link_column];
+								$image_links = explode(',', $image_links);
+								
+								foreach($image_links as $image_link_key => $image_link) {
+									$image_links[$image_link_key] = $links[$link_table][$image_link];
+								}
+								
+								$images[$i][$link_table] = $image_links;
+							}
+						}
+					}
+					
+					// Switch to associative
+					if($args['associative']) {
+						for($i=0; $i<$num_images; $i++) {
+							$tmp_images[$images[$i]['id']] = $images[$i];
+						}
+						
+						$images = $tmp_images;
+					}
+					
+					return $images;
+				}
+				else {
+					// Query failure
+				}
+			}
+			else {
+				// Mis-match in number of values
 			}
 		}
 	}

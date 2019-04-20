@@ -53,6 +53,7 @@
 			"Edit" => "/artists/".$artist["friendly"]."/edit/"
 		]);
 		
+		// Remove uneditable lines from history
 		if(is_array($artist["history"])) {
 			foreach($artist["history"] as $history_key => $history_line) {
 				if(in_array("is_uneditable", $history_line["type"])) {

@@ -9,18 +9,17 @@
 	$stmt_user->execute([$username]);
 	$rslt_user = $stmt_user->fetch();
 	
-	
-	$sql_aod = "SELECT artists.friendly, COALESCE(artists.romaji, artists.name) AS quick_name FROM artists_of_day LEFT JOIN artists ON artists.id=artists_of_day.artist_id ORDER BY artists_of_day.date_occurred DESC LIMIT 1";
+	$sql_aod = "SELECT artists.friendly, COALESCE(artists.romaji, artists.name) AS quick_name FROM queued_aod LEFT JOIN artists ON artists.id=queued_aod.artist_id ORDER BY queued_aod.date_occurred DESC LIMIT 1";
 	$stmt_aod = $pdo->prepare($sql_aod);
 	$stmt_aod->execute();
 	$artist_of_day = $stmt_aod->fetch();
-
-	$sql_fod = "SELECT COALESCE(artists.romaji, artists.name) AS quick_name FROM images_of_day LEFT JOIN images ON images.id=images_of_day.image_id LEFT JOIN artists ON images.artist_id=CONCAT('(', artists.id, ')') WHERE images_of_day.id='1'";
+	
+	$sql_fod = 'SELECT COALESCE(artists.romaji, artists.name) AS quick_name FROM queued_fod LEFT JOIN images_artists ON images_artists.image_id=queued_fod.image_id LEFT JOIN artists ON artists.id=images_artists.artist_id WHERE queued_fod.id=? LIMIT 1';
 	$stmt_image_of_day = $pdo->prepare($sql_fod);
-	$stmt_image_of_day->execute();
+	$stmt_image_of_day->execute([ 1 ]);
 	$rslt_image_of_day = $stmt_image_of_day->fetchColumn();
 	
-	$sql_artist = "SELECT COALESCE(romaji, name) AS quick_name FROM artists ORDER BY edit_history DESC LIMIT 1";
+	$sql_artist = "SELECT COALESCE(artists.romaji, artists.name) AS quick_name FROM edits_artists LEFT JOIN artists ON artists.id=edits_artists.artist_id ORDER BY edits_artists.id DESC LIMIT 1";
 	$stmt_artist = $pdo->prepare($sql_artist);
 	$stmt_artist->execute();
 	$rslt_artist = $stmt_artist->fetchColumn();
@@ -43,7 +42,6 @@
 	imagefill($image,0,0,$color["bg"]);
 
 	$png = imagecreatefromjpeg('../style/cage.jpg');
-	//$bg_image_scaled = imagescale($png, (84), (130));
 	imagecopymerge($image, $png, (600 - 84 - 10), 10, 0, 0, (84), (130), 100);
 	
 	
@@ -62,13 +60,6 @@
 		"margin" => 5,
 		"x" => 48
 	];
-	
-	/*$lines[] = [
-		"text" => "LATEST NEWS",
-		"color" => "light",
-		"size" => 8,
-		"margin" => 5
-	];*/
 	
 	$lines[] = [
 		"text" => html_entity_decode($rslt_entries, ENT_QUOTES, "UTF-8"),
@@ -193,47 +184,6 @@
 		
 		$lines[$line_key] = $line;
 	}
-	
-	/*if(is_array($rslt_user) && !empty($rslt_user) && $rslt_user["is_vip"]) {
-		$x = imageftbbox($lines["username"]["size"], 0, $font, $lines["username"]["text"]);
-		$x = abs($x[0]) + abs($x[2]);
-		$x = $x_margin + $x + 5;
-		
-		$vip_margin = 3;
-		$vip_text = "VIP";
-		$vip_dimensions = imageftbbox($lines["username"]["size"], 0, $font, $vip_text);
-		$vip_width = abs($vip_dimensions[0]) + abs($vip_dimensions[2]);
-		
-		imagerectangle($image, $x, $lines["username"]["y"] - $lines["username"]["offset"], $x + $vip_margin + $vip_width + $vip_margin - 1, $lines["username"]["y"] - $lines["username"]["offset"] + $lines["username"]["height"], $color["less_attention"]);
-		
-		imagefttext($image, $lines["username"]["size"], 0, $x + $vip_margin, $lines["username"]["y"], $color["less_attention"], $font, $vip_text);
-	}*/
-	
-	/*imagefttext($image, 12, 0, 10, 30, $color["less_attention"], $font, "vk.gy visual kei database");
-	imagefttext($image, 8, 0, 10, 40, $color["light"], $font, "2018-04-04 BY INARTISTIC");
-	imagefttext($image, 12, 0, 10, 60, $color["text"], $font, "llll-Ligro- vocalist gone, album cancelled, will disband");
-	
-	imagefttext($image, 8, 0, 10, 85, $color["light"], $font, "ARTIST OF THE DAY");
-	imagefttext($image, 12, 0, 10, 100, $color["text"], $font, $artist_of_day);
-	
-	imagefttext($image, 8, 0, 300, 85, $color["light"], $font, "FLYER OF THE DAY");
-	imagefttext($image, 12, 0, 300, 100, $color["text"], $font, $rslt_image_of_day);*/
-	
-	//$text_height = imageftbbox(16, 0, $font, $text)[2];
-	
-	//imagefttext($image, $font_size, 0, 20, 20, $color["text"], $font, $text);
-	
-	/*foreach($text as $t) {
-		if($t["align"] === "right") {
-			$temp_x = $image_width - $x - imageftbbox($t["size"], 0, $font, $t["line"])[2] - (49 + 5);
-		}
-		
-		imagefttext($image, $t["size"], 0, $temp_x ?: $x, $y + $t["offset"], $t["color"] ? $color[$t["color"]] : $color["text"], $font, $t["line"]);
-		
-		$y = $y + $t["height"];
-		
-		unset($temp_x);
-	}*/
 
 	
 	header("Content-Type: image/jpeg");

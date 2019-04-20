@@ -16,6 +16,7 @@
 			
 			$this->pdo = $pdo;
 			
+			$this->access_image = new access_image($pdo);
 			$this->markdown_parser = new parse_markdown($pdo);
 		}
 		
@@ -24,15 +25,34 @@
 		// ======================================================
 		// Get images
 		// ======================================================
-		function get_artist_images($artist_id) {
+		/*function get_artist_images($artist_id) {
 			if(is_numeric($artist_id)) {
-				$sql_images = "SELECT *, CONCAT('/images/', id, '-', COALESCE(friendly, ''), '.', extension) AS url FROM images WHERE artist_id LIKE CONCAT('%(', ?, ')%') AND is_release IS NULL ORDER BY date_added DESC";
+				$sql_images = '
+					SELECT
+						images.*,
+						CONCAT("/images/", images.id, "-", COALESCE(images.friendly, "image"), ".", images.extension) AS url,
+						GROUP_CONCAT(DISTINCT images_artists.artist_id) AS artist_ids,
+						GROUP_CONCAT(DISTINCT images_musicians.musician_id) AS musician_ids,
+						GROUP_CONCAT(DISTINCT images_releases.release_id) AS release_ids
+						
+					FROM (
+						SELECT image_id FROM images_artists WHERE artist_id=? ORDER BY id DESC
+					) a
+					INNER JOIN images ON images.id=a.image_id
+					
+					LEFT JOIN images_artists ON images_artists.image_id=images.id
+					LEFT JOIN images_musicians ON images_musicians.image_id=images.id
+					LEFT JOIN images_releases ON images_releases.image_id=images.id
+					
+					GROUP BY images.id
+					ORDER BY images.id DESC
+				';
 				$stmt_images = $this->pdo->prepare($sql_images);
-				$stmt_images->execute([$artist_id]);
+				$stmt_images->execute([ $artist_id ]);
 				
 				return($stmt_images->fetchAll());
 			}
-		}
+		}*/
 		
 		
 		
@@ -493,6 +513,19 @@
 		// Core function
 		// ======================================================
 		function access_artist($args = []) {
+			
+			
+			
+			
+			//$time_start = microtime(true); 
+			
+			//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----1<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
+		//	$time_start = microtime(true); 
+			
+			
+			
+			
+			
 			// SELECT
 			$sql_select = [];
 			switch($args["get"]) {
@@ -558,6 +591,10 @@
 				$sql_where[] = "artists.id=".implode(" OR artists.id=", array_fill(0, count($args["id"]), "?"));
 				$sql_values = is_array($sql_values) ? array_merge($sql_values, array_values($args["id"])) : array_values($args["id"]);
 			}
+			if(is_array($args["ids"]) && !empty($args["ids"])) {
+				$sql_where[] = "artists.id=".implode(" OR artists.id=", array_fill(0, count($args["ids"]), "?"));
+				$sql_values = is_array($sql_values) ? array_merge($sql_values, array_values($args["ids"])) : array_values($args["ids"]);
+			}
 			if($args["letter"]) {
 				$args["letter"] = sanitize($args["letter"]);
 				$args["letter"] = (strlen($args["letter"]) === 1 ? $args["letter"] : "-");
@@ -619,24 +656,68 @@
 			$sql_order = $sql_order ?: ["friendly ASC"];
 			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : $sql_limit ?: null;
 			
+			
+			
+			//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----2<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
+			//$time_start = microtime(true); 
+			
+			
+			
+			
 			// QUERY
 			if(is_numeric($args["id"]) && $args["get"] !== "all" && is_array($this->indexed_artists) && !empty($this->indexed_artists[$args["id"]])) {
 				return $this->indexed_artists[$args["id"]];
 			}
 			else {
 				if(!empty($sql_select)) {
+					
+					
+					
+					//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----3<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
+					//$time_start = microtime(true); 
+					
+					
+					
 					$sql_artist = "SELECT ".implode(", ", $sql_select)." FROM artists ".(!empty($sql_where) ? "WHERE (".implode(") AND (", $sql_where).")" : null)." ORDER BY ".implode(", ", $sql_order)." ".$sql_limit;
 					
 					//echo $_SESSION['username'] === 'inartistic' ? print_r($sql_artist, true).print_r($sql_values, true) : null;
 					
 					$stmt = $this->pdo->prepare($sql_artist);
 					
+					
+					
+					
+					
+					//	echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----4<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
+					//$time_start = microtime(true); 
+					
+					
 					if($stmt) {
 					//if($_SESSION['username'] === 'inartistic' && $stmt) {
 						$stmt->execute($sql_values);
 						
-						$artists = $stmt->fetchAll();
-						$num_artists = count($artists);
+						
+							//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----5<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
+					//$time_start = microtime(true); 
+						
+						
+						if($_SESSION['username'] === 'inartistic') {
+							//foreach($stmt->fetchAll() as $x) {
+								//$artists[] = $x;
+							//}
+						}
+						else {
+						}
+							$artists = $stmt->fetchAll();
+							$num_artists = count($artists);
+						
+						
+						
+						
+							//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----6<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
+					//$time_start = microtime(true); 
+						
+						
 						
 						if(is_array($artists)) {
 							// If getting all artist info or basics, grab musician data, then compile into lineup string
@@ -669,7 +750,7 @@
 									$artists[$i]["prev_artist"] = $this->access_artist(["friendly" => $artists[$i]["friendly"], "get" => "prev"]);
 									$artists[$i]["next_artist"] = $this->access_artist(["friendly" => $artists[$i]["friendly"], "get" => "next"]);
 									$artists[$i]["history"] = $this->get_history($artists[$i]["id"]);
-									$artists[$i]["images"] = $this->get_artist_images($artists[$i]["id"]);
+									$artists[$i]['images'] = $this->access_image->access_image([ 'artist_id' => $artists[$i]['id'], 'get' => 'most', 'associative' => true ]);
 									
 									$sql_areas = 'SELECT areas.* FROM areas_artists LEFT JOIN areas ON areas.id=areas_artists.area_id WHERE areas_artists.artist_id=? ORDER BY areas.friendly ASC';
 									$stmt_areas = $this->pdo->prepare($sql_areas);
@@ -704,6 +785,13 @@
 							if(!empty($args["friendly"]) || is_numeric($args["id"])) {
 								$artists = reset($artists);
 							}
+							
+							
+								//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----7<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
+					//$time_start = microtime(true); 
+							
+							
+							
 							
 							return $artists;
 						}

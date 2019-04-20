@@ -110,11 +110,17 @@ $(":input").inputmask();
 initializeInlineSubmit($("[name=add]"), "/releases/function-add.php",{
 	submitOnEvent : "submit",
 	showEditLink : true,
-	callbackOnSuccess : function() {
-		var parentElems = $(".image__template:not(.any--hidden)");
+	callbackOnSuccess : function(formElement, returnedData) {
+		/*var parentElems = $(".image__template:not(.any--hidden)");
 		$.each(parentElems, function() {
 			updateImageData($(this));
-		});
+		});*/
+		
+		var e = new Event('item-id-updated');
+		e.details = {
+			'id' : returnedData.id
+		};
+		document.dispatchEvent(e);
 	}
 });
 
@@ -152,9 +158,9 @@ function changePageState(state) {
 		$("[data-role=submit-container]").removeClass(hideClass);
 		$("[data-role=result-container]").addClass(hideClass);
 		$("[data-role=edit-container]").addClass(hideClass);
-		$(".image__template:not(:first-of-type)").remove();
+		//$(".image__template:not(:first-of-type)").remove();
 		$("[name=friendly]").attr("value", "");
-		$("[name=image_release_id]").attr("value", "");
+		//$("[name=image_release_id]").attr("value", "");
 		$("[name=id]").attr("value", "");
 		history.pushState(null, null, "/releases/add/");
 	}

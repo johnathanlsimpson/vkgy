@@ -9,6 +9,15 @@
 			'/artists/script-page-artist.js',
 		]);
 		
+		
+		if(strlen($artist['image_id'])) {
+			$artist['image'] = $artist['images'][$artist['image_id']];
+			
+			unset($artist['images'][$artist['image_id']]);
+			
+			$artist['images'] = array_values($artist['images']);
+		}
+		
 		?>
 			<div class="col c3 artist__other">
 				<?php
@@ -240,9 +249,6 @@
 							<?php
 								// Images
 								if(is_array($artist["images"]) && !empty($artist["images"])) {
-									if(count($artist["images"]) === 1 && image_exists($default_image, $pdo)) {
-									}
-									else {
 										?>
 											<div>
 												<h3>
@@ -267,7 +273,6 @@
 												</div>
 											</div>
 										<?php
-									}
 								}
 								
 								// Label history

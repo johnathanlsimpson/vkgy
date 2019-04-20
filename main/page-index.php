@@ -40,7 +40,7 @@
 					</a>
 				</p>
 				<p>
-					<a class="artist" data-name="<?php echo $image["artist_name"]; ?>" href="/artists/<?php echo $image["artist_friendly"]; ?>/"><?php echo $image["artist_quick_name"]; ?></a>
+					<a class="artist" data-name="<?php echo $image['artists'][0]["name"]; ?>" href="/artists/<?php echo $image['artists'][0]["friendly"]; ?>/"><?php echo $image['artists'][0]["quick_name"]; ?></a>
 				</p>
 				<p class="any--weaken">
 					<a class="symbol__vip" href="https://www.patreon.com/vkgy/" target="_blank">VIP members</a> can access high-res, unwatermarked version. <a href="/images/&type=flyer">View past flyers?</a>
@@ -184,7 +184,7 @@
 				<?php
 					for($i=0; $i<count($comments); $i++) {
 						$comment_class = null;
-						$comments[$i]['user']['avatar_url'] = '/usericons/avatar-'.(file_exists('../usericons/avatar-'.$_comments[$i]['user'].'.png') ? $_comments[$i]['user'] : 'anonymous').'.png?'.date('YmdH');
+						$comments[$i]['user']['avatar_url'] = '/usericons/avatar-'.(file_exists('../usericons/avatar-'.$comments[$i]['user']['username'].'.png') ? $comments[$i]['user']['username'] : 'anonymous').'.png?'.date('YmdH');
 						
 						if(!$comments[$i]['is_approved']) {
 							$comment_class .= ($_SESSION['admin'] ? 'comment--unapproved' : 'any--hidden');

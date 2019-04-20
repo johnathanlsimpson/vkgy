@@ -251,6 +251,10 @@
 				$sql_where[] = "artists_musicians.artist_id=?";
 				$sql_values[] = $args["artist_id"];
 			}
+			if(is_array($args['ids'])) {
+				$sql_where[] = substr(str_repeat('musicians.id=? OR ', count($args['ids'])), 0, -4);
+				$sql_values = array_merge((is_array($sql_values) ? $sql_values : []), $args['ids']);
+			}
 			/*if(preg_match("/"."\d{4}-\d{2}-\d{2}"."/", $args["edit_history"])) {
 				if($args["edit_history"] < date("Y-m-d")) {
 					$sql_where[] = "musicians.edit_history<?";

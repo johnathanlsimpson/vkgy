@@ -16,7 +16,7 @@
 	$artist_of_day = $stmt_aod->fetch();
 	
 	// Flyer of day
-	$sql_fod = "SELECT COALESCE(artists.romaji, artists.name) AS quick_name FROM queued_fod LEFT JOIN images ON images.id=queued_fod.image_id LEFT JOIN artists ON images.artist_id=CONCAT('(', artists.id, ')') WHERE queued_fod.id='1'";
+	$sql_fod = "SELECT COALESCE(artists.romaji, artists.name) AS quick_name FROM queued_fod LEFT JOIN images ON images.id=queued_fod.image_id LEFT JOIN images_artists ON images_artists.image_id=images.id LEFT JOIN artists ON artists.id=images_artists.artist_id WHERE queued_fod.id='1'";
 	$stmt_image_of_day = $pdo->prepare($sql_fod);
 	$stmt_image_of_day->execute();
 	$rslt_image_of_day = $stmt_image_of_day->fetchColumn();

@@ -6,7 +6,6 @@
 		"/scripts/script-showElem.js",
 		"/scripts/script-initDelete.js",
 		"/scripts/script-initSelectize.js",
-		"/scripts/script-uploadImage.js",
 		
 		"/artists/script-previewBio.js",
 		"/artists/script-exclusive.js",
@@ -19,46 +18,17 @@
 		"/artists/style-page-edit.css"
 	]);
 	
-	$artist_list = $access_artist->access_artist(['get' => 'name']);
-	$num_artist_list = count($artist_list);
-	for($i=0; $i<$num_artist_list; $i++) {
-		$third_line  = $artist_list[$i]['quick_name'].($artist_list[$i]['romaji'] ? ' ('.$artist_list[$i]['name'].')' : null);
-		$third_line .= friendly($artist_list[$i]['quick_name']) != $artist_list[$i]['friendly'] ? ' ('.$artist_list[$i]['friendly'].')' : null;
-		$third_line  = str_replace(["&#92;", "&#34;"], ["\\", "\""], $third_line);
-		
-		$artist_list[$i] = [
-			$artist_list[$i]['id'],
-			'',
-			$third_line
-		];
-	}
-	
-	$access_release = new access_release($pdo);
-	$release_list = $access_release->access_release(["artist_id" => $artist["id"], "get" => "name"]);
-	$release_list = array_values((is_array($release_list) ? $release_list : []));
-	if(is_array($release_list)) {
-		foreach($release_list as $key => $tmp_release) {
-			$release_list[$tmp_release["id"]] = [$tmp_release["id"], $tmp_release["friendly"], $tmp_release["quick_name"]];
-		}
-	}
-	
-	if(is_array($artist["musicians"])) {
-		foreach($artist["musicians"] as $tmp_musician) {
-			$musician_list[$tmp_musician["id"]] = [
-				$tmp_musician["id"],
-				friendly($tmp_musician["as_romaji"] ?: $tmp_musician["as_name"] ?: $tmp_musician["romaji"] ?: $tmp_musician["name"]),
-				($tmp_musician["as_romaji"] ?: $tmp_musician["as_name"] ?: $tmp_musician["romaji"] ?: $tmp_musician["name"]).($tmp_musician["as_romaji"] ? " (".$tmp_musician["as_name"].")" : (!$tmp_musician["as_name"] && $tmp_musician["romaji"] ? " (".$tmp_musician["name"].")" : null))
-			];
-		}
-	}
-	
 	if($_SESSION["admin"] > 0) { 
 			if(!empty($artist)) {
+				$artist['images'] = array_values($artist['images']);
 				?>
 					<form action="" class="col c1 any--margin" enctype="multipart/form-data" id="form__edit" method="post" name="form__edit">
-						<template data-contains="artists" hidden><?php echo json_encode(is_array($artist_list) ? array_values($artist_list) : []); ?></template>
-						<template data-contains="musicians" hidden><?php echo json_encode(is_array($musician_list) ? array_values($musician_list) : []); ?></template>
-						<template data-contains="releases" hidden><?php echo json_encode(is_array($release_list) ? array_values($release_list) : []); ?></template>
+						<?php
+							include_once('../php/function-render_json_list.php');
+							render_json_list('artist');
+							render_json_list('musician', $artist['musicians']);
+							render_json_list('release', $artist['id'], 'artist_id');
+						?>
 						
 						<input id="form__changes" name="changes" type="hidden" />
 						
@@ -278,137 +248,19 @@
 								<h2>
 									Edit image gallery
 								</h2>
-								<input class="any--hidden obscure__input" id="obscure-images" type="checkbox" checked />
-								<div class="text obscure__container obscure--height">
-									<div class="input__row">
-										<div class="input__group any--flex-grow">
-											<input class="any--flex-grow" name="images" type="file" multiple />
-										</div>
-									</div>
-									<div class="input__row">
-										<div class="input__group any--flex-grow">
-											<span class="any--weaken">Note: images marked &ldquo;vk.gy exclusive&rdquo; will be watermarked with &ldquo;vk.gy&rdquo; and your username, when viewed at high res. If the image was scanned by someone else, you can credit them in the &ldquo;credit&rdquo; section.</span>
-										</div>
-									</div>
-									
-									<ul class="image__results">
-										<?php
-											function image_template($input = []) {
-												$n = -1;
-												?>
-													<li class="image__template <?php $n++; echo $input[$n]; ?>">
-														<div class="any--flex">
-															<div class="image__image" data-get="image_style" data-get-into="style" style="<?php $n++; echo $input[$n]; ?>">
-																<span class="image__status"></span>
-															</div>
-															<div class="any--flex-grow image__data">
-																<input data-get="image_id" data-get-into="value" name="image_id" value="<?php $n++; echo $input[$n]; ?>" hidden />
-																
-																<div class="input__row">
-																	<div class="input__group any--flex-grow">
-																		<label class="input__label">Description</label>
-																		<input class="any--flex-grow" name="image_description" value="<?php $n++; echo $input[$n]; ?>" />
-																	</div>
-																	<div class="input__group">
-																		<input class="input__checkbox" name="image_is_default" type="checkbox" value="1" <?php $n++; echo $input[$n]; ?> />
-																		<label class="input__checkbox-label symbol__unchecked">Default artist image?</label>
-																	</div>
-																	<div class="input__group">
-																		<label class="input__checkbox-label symbol__trash symbol--standalone image__delete" data-get="image_id" data-get-into="data-id" data-id="<?php $n++; echo $input[$n]; ?>"></label>
-																	</div>
-																</div>
-																
-																<div class="input__row">
-																	<div class="input__group any--flex-grow">
-																		<label class="input__label">Artists</label>
-																		<select class="input" data-populate-on-click="true" data-multiple="true" data-source="artists" name="image_artist_id" multiple>
-																			<?php $n++; echo $input[$n]; ?>
-																		</select>
-																	</div>
-																	<div class="input__group any--flex-grow">
-																		<label class="input__label">Musicians</label>
-																		<select class="input" data-populate-on-click="true" data-multiple="true" data-source="musicians" name="image_musician_id" multiple>
-																			<?php $n++; echo $input[$n]; ?>
-																		</select>
-																	</div>
-																	<div class="input__group any--flex-grow">
-																		<label class="input__label">Releases</label>
-																		<select class="input" data-populate-on-click="true" data-multiple="true" data-source="releases" name="image_release_id" multiple>
-																			<?php $n++; echo $input[$n]; ?>
-																		</select>
-																	</div>
-																</div>
-																
-																<div class="input__row">
-																	<div class="input__group">
-																		<label class="input__label">Credit</label>
-																		<input class="input__checkbox" name="image_is_exclusive" type="checkbox" value="1" <?php $n++; echo $input[$n]; ?> />
-																		<label class="input__checkbox-label symbol__unchecked">Scanned by you?</label>
-																	</div>
-																	<div class="input__group any--flex-grow">
-																		<label class="input__label">Other credit</label>
-																		<input class="any--flex-grow" name="image_credit" placeholder="http://theirwebsite.com" value="<?php $n++; echo $input[$n]; ?>" />
-																	</div>
-																</div>
-															</div>
-														</div>
-														<div class="image__result"></div>
-													</li>
-												<?php
-											}
-											
-											image_template([
-												"any--hidden",
-												"",
-												"",
-												$artist["quick_name"]." group shot",
-												"",
-												"",
-												'<option selected value="'.$artist["id"].'">'.$artist["quick_name"].'</option>',
-												"",
-												"",
-												"",
-												""
-											]);
-											
-											if(is_array($artist["images"]) && !empty($artist["images"])) {
-												foreach($artist["images"] as $image) {
-													
-													$image_artist = "";
-													foreach(array_filter(array_unique(explode("(", str_replace(")", "", $image["artist_id"])))) as $tmp_image_artist) {
-														$image_artist .= '<option data-name="'.$artist_list[$tmp_image_artist][2].'" value="'.$tmp_image_artist.'" selected>'.$artist_list[$tmp_image_artist][2].'</option>';
-													}
-													
-													$image_musician = "";
-													foreach(array_filter(array_unique(explode("(", str_replace(")", "", $image["musician_id"])))) as $tmp_image_musician) {
-														$image_musician .= '<option data-name="'.$musician_list[$tmp_image_musician][2].'" value="'.$tmp_image_musician.'" selected>'.$musician_list[$tmp_image_musician][2].'</option>';
-													}
-													
-													$image_release = "";
-													foreach(array_filter(array_unique(explode("(", str_replace(")", "", $image["release_id"])))) as $tmp_image_release) {
-														$image_release .= '<option data-name="'.$release_list[$tmp_image_release][2].'" value="'.$tmp_image_release.'" selected>'.$release_list[$tmp_image_release][2].'</option>';
-													}
-													
-													image_template([
-														"",
-														"background-image: url(".str_replace(".", ".small.", $image["url"]).")",
-														$image["id"],
-														$image["description"],
-														$image["is_default"] ? "checked" : null,
-														$image["id"], 
-														$image_artist,
-														$image_musician,
-														$image_release,
-														$image["credit"],
-														$image["is_exclusive"] ? "checked" : null
-													]);
-												}
-											}
-										?>
-									</ul>
-									
-									<label class="input__button obscure__button" for="obscure-images">Show section</label>
-								</div>
+								<?php
+									include('../images/function-render_image_section.php');
+									render_image_section($artist['images'], [
+										'item_type' => 'artist',
+										'item_id' => $artist['id'],
+										'item_name' => $artist['quick_name'],
+										'description' => $artist['quick_name'].' group photo',
+										'id' => $artist['image_id'],
+										'hide_blog' => true,
+										'hide_labels' => true,
+										'hide_markdown' => true,
+									]);
+								?>
 							</div>
 						</div>
 						
