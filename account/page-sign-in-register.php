@@ -6,15 +6,6 @@
 	style([
 		"/account/style-page-sign-in-register.css"
 	]);
-	
-	/*
-		$sql_artist_list = "SELECT artists.id, COALESCE(artists.romaji, artists.name) AS quick_name FROM images LEFT JOIN artists ON images.artist_id=CONCAT('(', artists.id, ')') WHERE is_default='1' ORDER BY artists.friendly ASC";
-		$stmt_artist_list = $pdo->prepare($sql_artist_list);
-		$stmt_artist_list->execute();
-		foreach($stmt_artist_list->fetchAll() as $artist) {
-			$artist_list[] = [$artist["id"], "", $artist["quick_name"]];
-		}
-	*/
 ?>
 
 <div class="col c1">
@@ -55,40 +46,6 @@
 		<h3>
 			Register
 		</h3>
-		<!--<form action="/accounts/function-register.php" class="text text--outlined" enctype="multipart/form-data" method="post" name="form__register">
-			<div class="input__row">
-				<div class="input__group any--flex-grow">
-					<input class="any--flex-grow" name="username" pattern="^[\w\-\.]{3,}$" placeholder="username" required />
-				</div>
-			</div>
-			<div class="input__row">
-				<div class="input__group any--flex-grow">
-					<input class="any--flex-grow" name="password" placeholder="password" type="password" required />
-				</div>
-			</div>
-			<div class="input__row">
-				<div class="input__group any--flex-grow">
-					<input class="any--flex-grow" name="email" placeholder="email" type="email" required />
-				</div>
-			</div>
-			<div class="input__row">
-				<div class="input__group any--flex-grow">
-					<button class="any--flex-grow" type="submit">
-						Register
-					</button>
-					<span data-role="status"></span>
-				</div>
-			</div>
-			<div class="text text--outlined text--notice" data-role="result"></div>
-			<ul class="register__notes ul--bulleted">
-				<li>
-					Usernames are limited to <span class="any__note">letters</span>, <span class="any__note">numbers</span>, and the following characters: <span class="any__note">-</span>, <span class="any__note">_</span>, or <span class="any__note">.</span>.
-				</li>
-				<li>
-					An email address is required (for password resets, etc.), but you are welcome to use a service like <a href="//mailinator.com" target="_blank">Mailinator</a>.
-				</li>
-			</ul>
-		</form>-->
 		<form action="/account/function-register.php" class="text register__container register__section" enctype="multipart/form-data" method="post" name="register__form" autocomplete="off">
 				<ul>
 					<input class="any--hidden" id="register__radio--bat" name="register_avatar" type="radio" value="bat" checked />

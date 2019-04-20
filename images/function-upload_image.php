@@ -84,7 +84,7 @@
 									include_once('../images/function-update_image.php');
 									
 									$output['status'] = 'success';
-									$output['id'] = $id;
+									$output['image_id'] = $id;
 									$output['image_style'] = 'background-image: url(/images/'.$id.'.thumbnail.jpg);';
 									$output['image_markdown'] = '![](/images/'.$file_name.')';
 									$output['is_exclusive_for'] = 'is-exclusive-'.$id;

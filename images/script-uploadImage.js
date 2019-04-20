@@ -95,6 +95,9 @@ imageUploadElem.addEventListener('change', function() {
 			var itemIdElem = newImageElem.querySelector('[name^=image_' + itemType + '_id]');
 			var newOptionElem = document.createElement('option');
 			
+			newImageElem.querySelector('[name=image_item_type]').value = itemType;
+			newImageElem.querySelector('[name=image_item_id]').value = itemId;
+			
 			newOptionElem.value = itemId;
 			newOptionElem.innerHTML = itemName;
 			newOptionElem.selected = true;
@@ -127,6 +130,22 @@ deleteElems.forEach(function(deleteElem) {
 			parentElem.remove();
 		}, 300);
 	});
+});
+
+// Handle item ID change
+document.addEventListener('item-id-updated', function(event) {
+	var imageItemIdElems = document.querySelectorAll('[name=image_item_id]');
+	
+	if(imageItemIdElems.length) {
+		imageItemIdElems.forEach(function(imageItemIdElem) {
+			imageItemIdElem.value = event.details.id;
+			imageItemIdElem.setAttribute('value', event.details.id);
+			
+			if(!imageItemIdElem.disabled) {
+				imageItemIdElem.dispatchEvent(new Event('change'));
+			}
+		});
+	}
 });
 
 // Init elements

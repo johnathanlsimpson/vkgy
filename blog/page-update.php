@@ -74,8 +74,8 @@
 							'item_type' => 'blog',
 							'item_id' => $entry['id'],
 							'item_name' => 'blog entry',
-							'default_description' => '',
-							'default_id' => $entry['image_id'],
+							'description' => '',
+							'id' => $entry['image_id'],
 							'hide_blog' => '1',
 							'hide_labels' => '1',
 							'hide_musicians' => '1',
@@ -135,7 +135,7 @@
 						<span class="update__preview-status"></span>
 					</h3>
 					<div class="text text--outlined">
-						<div class="update__image any--weaken" style="<?php echo $entry['default_image'] ? 'background-image:url(/images/'.$entry['default_image']['id'].'.medium.jpg);' : null; ?>"></div>
+						<div class="update__image any--weaken" style="<?php echo $entry['image'] ? 'background-image:url(/images/'.$entry['image']['id'].'.medium.jpg);' : null; ?>"></div>
 						<div class="update__preview"></div>
 					</div>
 				</div>

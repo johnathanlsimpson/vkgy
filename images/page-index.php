@@ -9,40 +9,25 @@
 	
 	$limit_num = 25;
 	$limit_images = (($search_page * $limit_num) - $limit_num).', '.$limit_num;
-	$where_images = [
-		'all' => null,
-		'flyer' => 'images.description LIKE \'%flyer%\'',
-		'artist' => 'images.release_id IS NULL',
-		'release' => 'images.release_id IS NOT NULL',
-		'vip' => 'images.is_exclusive=1',
-	];
-	$sql_images = "
-		SELECT
-			result.*,
-			users.username,
-			artists.name AS artist_name,
-			artists.romaji AS artist_romaji,
-			artists.friendly AS artist_friendly,
-			CONCAT_WS(' ', COALESCE(releases.romaji, releases.name, ''), COALESCE(releases.press_romaji, releases.press_name, ''), COALESCE(releases.type_romaji, releases.type_name, '')) AS release_romaji,
-			CONCAT_WS(' ', COALESCE(releases.name, ''), COALESCE(releases.press_name, ''), COALESCE(releases.type_name, '')) AS release_name,
-			releases.friendly AS release_friendly,
-			releases.id AS release_id
-		FROM
-		(
-			SELECT images.*
-			FROM images ".
-			($where_images[$search_type] ? 'WHERE '.$where_images[$search_type] : null).' '.
-			'ORDER BY images.date_added '.$search_order.' '.
-			'LIMIT '.$limit_images."
-		) result ".
-		'LEFT JOIN users ON users.id=result.user_id '.
-		"LEFT JOIN artists ON artists.id REGEXP CONCAT('^\(', result.artist_id, '\)$') ".
-		"LEFT JOIN releases ON releases.id REGEXP CONCAT('^\(', result.release_id, '\)$') ";
-	$stmt_images = $pdo->prepare($sql_images);
-	$stmt_images->execute();
-	$rslt_images = $stmt_images->fetchAll();
 	
-	$sql_num_images = 'SELECT COUNT(*) FROM images '.($where_images[$search_type] ? 'WHERE '.$where_images[$search_type] : null);
+	$access_image = $access_image ?: new access_image($pdo);
+	$rslt_images = $access_image->access_image([ 'type' => $search_type, 'get' => 'all', 'order' => 'images.id '.$search_order, 'limit' => $limit_images ]);
+	
+	if($search_type === 'all') {
+		$sql_num_images = 'SELECT COUNT(*) FROM images';
+	}
+	if($search_type === 'artist') {
+		$sql_num_images = 'SELECT COUNT(*) FROM images_artists';
+	}
+	if($search_type === 'flyer') {
+		$sql_num_images = 'SELECT COUNT(*) FROM images WHERE description LIKE "%flyer%"';
+	}
+	if($search_type === 'release') {
+		$sql_num_images = 'SELECT COUNT(*) FROM images_releases';
+	}
+	if($search_type === 'vip') {
+		$sql_num_images = 'SELECT COUNT(*) FROM images WHERE is_exclusive=1';
+	}
 	$stmt_num_images = $pdo->prepare($sql_num_images);
 	$stmt_num_images->execute();
 	$num_images = $stmt_num_images->fetchColumn();

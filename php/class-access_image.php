@@ -360,7 +360,7 @@
 		function get_artist_image_id($artist_friendly) {
 			// If artist ID provided, look for main artist image 
 			if(strlen($artist_friendly)) {
-				$sql_artist = "SELECT images.id AS image_id FROM artists LEFT JOIN images ON images.artist_id=CONCAT('(', artists.id, ')') AND images.is_default=? AND images.is_release IS NULL WHERE artists.friendly=? LIMIT 1";
+				$sql_artist = "SELECT images.id AS image_id FROM artists LEFT JOIN images ON images.id=artists.image_id WHERE artists.friendly=? LIMIT 1";
 				$stmt_artist = $this->pdo->prepare($sql_artist);
 				$stmt_artist->execute([ 1, sanitize($artist_friendly) ]);
 				$rslt_artist = $stmt_artist->fetchColumn();
@@ -476,6 +476,7 @@
 				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_labels.label_id) AS label_ids';
 				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_musicians.musician_id) AS musician_ids';
 				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_releases.release_id) AS release_ids';
+				$sql_select[] = 'users.username';
 			}
 			if($args['get'] === 'name') {
 				$sql_select[] = 'images.id';
@@ -502,55 +503,15 @@
 					$sql_values = array_merge($sql_values, $args[$id_type]);
 				}
 			}
-			
-			
-			/*if($args['default']) {
-				if(strlen($args['artist_id']) || is_array($args['_id'])) {
-					
-					$sql_from = '(SELECT image_id FROM artists WHERE id=? LIMIT 1) inner_join';
-					$sql_values[] = $args['artist_id'];
-				}
-				if(strlen($args['blog_id']) || is_array($args['_id'])) {
-					
-					$sql_from = '(SELECT image_id FROM blog WHERE id=? LIMIT 1) inner_join';
-					$sql_values[] = $args['blog_id'];
-				}
-				if(strlen($args['label_id']) || is_array($args['_id'])) {
-					
-					$sql_from = '(SELECT image_id FROM labels WHERE id=? LIMIT 1) inner_join';
-					$sql_values[] = $args['musician_id'];
-				}
-				if(strlen($args['musician_id']) || is_array($args['_id'])) {
-					
-					$sql_from = '(SELECT image_id FROM musicians WHERE id=? LIMIT 1) inner_join';
-					$sql_values[] = $args['label_id'];
-				}
-				if(strlen($args['release_id']) || is_array($args['_id'])) {
-					
-					$sql_from = '(SELECT image_id FROM releases WHERE id=? LIMIT 1) inner_join';
-					$sql_values[] = $args['release_id'];
-				}
+			if($args['type'] === 'artist') {
+				$sql_from = '(SELECT image_id FROM images_artists'.($args['order'] ? ' ORDER BY '.str_replace('images.', 'images_artists.', $args['order']) : null).($args['limit'] ? ' LIMIT '.$args['limit'] : null).') inner_join';
 			}
-			if(is_numeric($args['artist_id'])) {
-				$sql_from = '(SELECT image_id FROM images_artists WHERE artist_id=? ORDER BY id DESC) inner_join';
-				$sql_values[] = $args['artist_id'];
+			if($args['type'] === 'release') {
+				$sql_from = '(SELECT image_id FROM images_releases'.($args['order'] ? ' ORDER BY '.str_replace('images.', 'images_releases.', $args['order']) : null).($args['limit'] ? ' LIMIT '.$args['limit'] : null).') inner_join';
 			}
-			if(is_numeric($args['blog_id'])) {
-				$sql_from = '(SELECT image_id FROM images_blog WHERE blog_id=? ORDER BY id DESC) inner_join';
-				$sql_values[] = $args['blog_id'];
+			if(!$sql_from) {
+				$sql_from = 'images';
 			}
-			if(is_numeric($args['label_id'])) {
-				$sql_from = '(SELECT image_id FROM images_labels WHERE label_id=? ORDER BY id DESC) inner_join';
-				$sql_values[] = $args['label_id'];
-			}
-			if(is_numeric($args['musician_id'])) {
-				$sql_from = '(SELECT image_id FROM images_musicians WHERE musician_id=? ORDER BY id DESC) inner_join';
-				$sql_values[] = $args['musician_id'];
-			}
-			if(is_numeric($args['release_id'])) {
-				$sql_from = '(SELECT image_id FROM images_releases WHERE release_id=? ORDER BY id DESC) inner_join';
-				$sql_values[] = $args['release_id'];
-			}*/
 			
 			// Join
 			if($args['flyer_of_day']) {
@@ -565,9 +526,17 @@
 				$sql_join[] = 'LEFT JOIN images_labels ON images_labels.image_id=images.id';
 				$sql_join[] = 'LEFT JOIN images_musicians ON images_musicians.image_id=images.id';
 				$sql_join[] = 'LEFT JOIN images_releases ON images_releases.image_id=images.id';
+				$sql_join[] = 'LEFT JOIN users ON users.id=images.user_id';
 			}
 			
 			// Where
+			if($args['type'] === 'flyer') {
+				$sql_where[] = 'images.description LIKE "%flyer%"';
+			}
+			if($args['type'] === 'vip') {
+				$sql_where[] = 'images.is_exclusive=?';
+				$sql_values[] = 1;
+			}
 			
 			// Group
 			if($args['get'] === 'all' || $args['get'] === 'most') {
@@ -575,9 +544,15 @@
 			}
 			
 			// Order
-			if($args['get'] === 'all' || $args['get'] === 'most') {
+			if($args['order']) {
+				$sql_order[] = $args['order'];
+			}
+			elseif($args['get'] === 'all' || $args['get'] === 'most') {
 				$sql_order[] = 'images.id DESC';
 			}
+			
+			// Limit
+			$sql_limit = $args['limit'] ?: null;
 			
 			// Prepare query
 			$sql_images =
@@ -592,8 +567,6 @@
 			
 			// Run query
 			if(substr_count($sql_images, '?') === count($sql_values)) {
-				//echo $sql_images.print_r($sql_values, true);
-				
 				if($stmt_images->execute( $sql_values )) {
 					$images = $stmt_images->fetchAll();
 					$num_images = count($images);

@@ -276,8 +276,8 @@
 					</aside>
 					
 					<div class="entry__content entry__main-column">
-						<a class="entry__image-link lazy" data-src="<?php echo str_replace('.', '.thumbnail.', $entry['image']); ?>" href="<?php echo $entry['image']; ?>">
-							<img class="entry__image lazy" data-src="<?php echo str_replace('.', '.large.', $entry['image']); ?>" />
+						<a class="entry__image-link lazy" data-src="<?php echo str_replace('.', '.thumbnail.', $entry['image']['url']); ?>" href="<?php echo $entry['image']['url']; ?>">
+							<img class="entry__image lazy" data-src="<?php echo str_replace('.', '.large.', $entry['image']['url']); ?>" />
 						</a>
 						
 						<div class="text text--centered">

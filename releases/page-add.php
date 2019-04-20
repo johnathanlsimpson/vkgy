@@ -105,6 +105,7 @@
 		]);
 	}
 	
+	$release['images'] = is_array($release['images']) ? $release['images'] : [];
 	$release['images'] = array_values($release['images']);
 
 	$pageTitle = !empty($release["quick_name"]) ? "Edit: ".$release["quick_name"]." - ".$release["artist"]["quick_name"] : "Add release";

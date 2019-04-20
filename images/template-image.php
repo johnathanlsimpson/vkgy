@@ -14,9 +14,9 @@
 				<div class="image__data any--flex-grow">
 					
 					<!-- IDs -->
-					<input data-get="id" data-get-into="value" name="image_id" value="{id}" hidden />
-					<input data-get="item_type" data-get-into="value" name="image_item_type" value="{item_type}" hidden />
-					<input data-get="item_id" data-get-into="value" name="image_item_id" value="{item_id}" hidden />
+					<input data-get="image_id" data-get-into="value" name="image_id" value="{id}" hidden />
+					<input name="image_item_type" value="{item_type}" hidden />
+					<input name="image_item_id" value="{item_id}" hidden />
 					
 					<!-- Markdown code -->
 					<div class="input__row image__markdown">

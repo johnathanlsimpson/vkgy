@@ -29,7 +29,7 @@ autosize($(".autosize"));
 
 // Update preview image
 document.addEventListener('image-updated', function(event) {
-	if(event.details.targetElem.name === 'is_default') {
+	if(event.details.targetElem.name === 'image_is_default') {
 		var imagePreviewElem = document.querySelector('.update__image');
 		
 		if(event.details.targetElem.checked) {
@@ -48,7 +48,17 @@ document.addEventListener('image-updated', function(event) {
 
 
 // Submit
-initializeInlineSubmit($("[name=form__update]"), "/blog/function-update_entry.php", { "submitOnEvent" : "submit", "showEditLink" : true });
+initializeInlineSubmit($("[name=form__update]"), "/blog/function-update_entry.php", {
+	"submitOnEvent" : "submit",
+	"showEditLink" : true,
+	'callbackOnSuccess' : function(event, returnedData) { 
+		var e = new Event('item-id-updated');
+		e.details = {
+			'id' : returnedData.id
+		};
+		document.dispatchEvent(e);
+	},
+});
 
 
 

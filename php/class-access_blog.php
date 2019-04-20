@@ -77,25 +77,17 @@
 			// SELECT
 			$sql_select = [];
 			if($args["get"] === "all") {
-				array_push($sql_select,
-					"blog.*",
-					"CONCAT('/images/', images.id, '-', COALESCE(images.friendly, ''), '.', images.extension) AS image",
-					"images.description AS image_description",
-					"images.credit AS image_credit",
-					"images.is_exclusive AS image_is_exclusive",
-					"images.friendly AS image_friendly"
-				);
+				$sql_select[] = 'blog.*';
 			}
 			elseif($args["get"] === "list") {
 				array_push($sql_select,
-					"CONCAT('/images/', images.id, '-', COALESCE(images.friendly, ''), '.', images.extension) AS image",
 					"blog.date_occurred",
 					"blog.title",
 					"blog.friendly",
-					//"blog.edit_history",
 					"blog.user_id",
 					"blog.id",
-					"SUBSTRING_INDEX(blog.content, '\n', 1) AS content"
+					"SUBSTRING_INDEX(blog.content, '\n', 1) AS content",
+					'blog.image_id'
 				);
 			}
 			elseif($args["get"] === "basics") {
@@ -106,7 +98,7 @@
 					"blog.content",
 					"blog.user_id",
 					"blog.id",
-					"CONCAT('/images/', images.id, '-', IF(images.friendly, images.friendly, ''), '.', images.extension) AS image"
+					'blog.image_id'
 				);
 			}
 			if($args['get'] === 'name') {
@@ -118,7 +110,7 @@
 			$sql_from = ["blog"];
 			
 			if($args["get"] === "all" || $args["get"] === "basics" || $args["get"] === "list") {
-				$sql_from[] = "LEFT JOIN images_blog ON images_blog.blog_id=blog.id LEFT JOIN images ON images.id=images_blog.image_id";
+				//$sql_from[] = "LEFT JOIN images_blog ON images_blog.blog_id=blog.id LEFT JOIN images ON images.id=images_blog.image_id";
 			}
 			
 			
@@ -190,31 +182,49 @@
 			
 			// Execute query
 			$sql_blog = "SELECT ".implode(", ", $sql_select)." FROM ".implode(" ", $sql_from)." ".($sql_where ? "WHERE (".implode(") AND (", $sql_where).")" : null)." ORDER BY blog.date_occurred DESC ".$sql_limit;
+			$stmt_blog = $this->pdo->prepare($sql_blog);
+			$stmt_blog->execute($sql_values);
+			$blogs = $stmt_blog->fetchAll();
+			$num_blogs = count($blogs);
 			
-			//echo $sql_blog;
-			//print_r($sql_values);
-			$stmt = $this->pdo->prepare($sql_blog);
-			$stmt->execute($sql_values);
-			$rows = $stmt->fetchAll();
+			// Get list of returned IDs
+			for($i=0; $i<$num_blogs; $i++) {
+				$blog_ids[] = $blogs[$i]['id'];
+			}
 			
 			// Add'l data
 			if($args["get"] === "basics" || $args["get"] === "all" || $args["get"] === "list") {
-				if(is_array($rows)) {
-					foreach($rows as $row_key => $row) {
-						$rows[$row_key]["username"] = $this->access_user->access_user(["id" => $row["user_id"], "get" => "name"])["username"];
+				if(is_array($blogs)) {
+					foreach($blogs as $row_key => $row) {
+						$blogs[$row_key]["username"] = $this->access_user->access_user(["id" => $row["user_id"], "get" => "name"])["username"];
 					}
 				}
 			}
+			
+			// Get images
+			if($args['get'] === 'all') {
+				for($i=0; $i<$num_blogs; $i++) {
+					$blogs[$i]['images'] = $this->access_image->access_image([ 'blog_id' => $blog_ids, 'get' => 'most', 'associative' => true ]);
+				}
+			}
+			elseif($args['get'] === 'basics' || $args['get'] === 'list') {
+				$images = $this->access_image->access_image([ 'blog_id' => $blog_ids, 'get' => 'name', 'default' => true, 'associative' => true ]);
+				
+				for($i=0; $i<$num_blogs; $i++) {
+					$blogs[$i]['image'] = $images[$blogs[$i]['image_id']];
+				}
+			}
+			
 			if($args["get"] === "all") {
 				
-				if(is_array($rows)) {
-					foreach($rows as $row_key => $row) {
+				if(is_array($blogs)) {
+					foreach($blogs as $row_key => $row) {
 						
 						// Get tags
 						$sql_tags = 'SELECT tags.tag AS name, tags.friendly, tags.id FROM blog_tags LEFT JOIN tags ON tags.id=blog_tags.tag_id WHERE blog_tags.blog_id=?';
 						$stmt_tags = $this->pdo->prepare($sql_tags);
 						$stmt_tags->execute([ $row['id'] ]);
-						$rows[$row_key]['tags'] = $stmt_tags->fetchAll();
+						$blogs[$row_key]['tags'] = $stmt_tags->fetchAll();
 						
 						// Get artist tags
 						$sql_artists = 'SELECT blog_artists.artist_id FROM blog_artists WHERE blog_artists.blog_id=?';
@@ -228,31 +238,28 @@
 								$artist_tags[] = $artist['artist_id'];
 							}
 							
-							$rows[$row_key]['tags_artists'] = $this->access_artist->access_artist([ 'id' => $artist_tags, 'get' => 'name' ]);
+							$blogs[$row_key]['tags_artists'] = $this->access_artist->access_artist([ 'id' => $artist_tags, 'get' => 'name' ]);
 						}
-						
-						// Get images
-						$rows[$row_key]['images'] = $this->access_image->access_image([ 'blog_id' => $row['id'], 'get' => 'all' ]);
 						
 						$sql_prev_next = "(SELECT title, friendly, 'prev' AS type FROM blog WHERE date_occurred<? ORDER BY date_occurred DESC LIMIT 1) UNION (SELECT title, friendly, 'next' AS type FROM blog WHERE date_occurred>? ORDER BY date_occurred ASC LIMIT 1)";
 						$stmt_prev_next = $this->pdo->prepare($sql_prev_next);
 						$stmt_prev_next->execute([$row["date_occurred"], $row["date_occurred"]]);
-						$rows[$row_key]["prev_next"] = $stmt_prev_next->fetchAll();
+						$blogs[$row_key]["prev_next"] = $stmt_prev_next->fetchAll();
 						
-						$rows[$row_key]["comments"] = $this->access_comment->access_comment(["id" => $row["id"], 'user_id' => $_SESSION['userID'], "type" => "blog", "get" => "all"]);
+						$blogs[$row_key]["comments"] = $this->access_comment->access_comment(["id" => $row["id"], 'user_id' => $_SESSION['userID'], "type" => "blog", "get" => "all"]);
 					}
 				}
 			}
 			
-			$num_blogs = count($rows);
-			
-			for($i=0; $i<$num_blogs; $i++) {
-				if($args['associative']) {
-					$blogs[$rows[$i]['id']] = $rows[$i];
+			// Reformat into associative
+			if($args['associative']) {
+				for($i=0; $i<$num_blogs; $i++) {
+					$tmp_blogs[$blogs[$i]['id']] = $blogs[$i];
 				}
-				else {
-					$blogs[] = $rows[$i];
-				}
+				
+				$blogs = $tmp_blogs;
+				
+				unset($tmp_blogs);
 			}
 			
 			// Return result

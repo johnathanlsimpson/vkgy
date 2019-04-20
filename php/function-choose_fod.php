@@ -12,17 +12,19 @@
 	$stmt_flyer = $pdo->prepare($sql_flyer);
 	$stmt_flyer->execute();
 	$flyer = $stmt_flyer->fetch();
+	
+	$artist_id = explode(")", str_replace("(", "", $flyer["artist_id"]))[0];
 
 	if(is_array($flyer) && !empty($flyer)) {
 		
 		// Move flyer from queued_flyers database to images database
-		$sql_unqueue = "INSERT INTO images (extension, is_exclusive, user_id, artist_id, description, friendly) VALUES (?, ?, ?, ?, ?, ?)";
+		$sql_unqueue = "INSERT INTO images (extension, is_exclusive, user_id, description, friendly) VALUES (?, ?, ?, ?, ?, ?)";
 		$stmt_unqueue = $pdo->prepare($sql_unqueue);
 		$input_unqueue = [
 			$flyer["extension"],
 			"1",
 			$flyer["user_id"],
-			$flyer["artist_id"],
+			//$flyer["artist_id"],
 			($flyer["description"] ?: "flyer"),
 			($flyer["friendly"] ?: "flyer")
 		];
@@ -45,8 +47,12 @@
 					$stmt_fod = $pdo->prepare($sql_fod);
 					$stmt_fod->execute([ $new_image_id, 1 ]);
 					
+					// Creat link
+					$sql_link = 'INSERT INTO images_artists (image_id, artist_id) VALUES (?, ?)';
+					$stmt_link = $pdo->prepare($sql_link);
+					$stmt_link->execute([ $new_image_id, $artist_id ]);
+					
 					// Get artist info from flyer
-					$artist_id = explode(")", str_replace("(", "", $flyer["artist_id"]))[0];
 					if(is_numeric($artist_id)) {
 						$flyer['artist'] = $access_artist->access_artist(["id" => $artist_id, "get" => "name"]);
 					}

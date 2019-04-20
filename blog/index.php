@@ -29,6 +29,9 @@
 		$stmt_edit_history->execute([ $entry['id'] ]);
 		$entry['edit_history'] = $stmt_edit_history->fetchAll();
 		
+		
+		$entry['image'] = $entry['images'][$entry['image_id']];
+		
 		if(is_array($entry) && !empty($entry)) {
 			$pageTitle = $entry["title"];
 			
@@ -132,7 +135,7 @@
 				
 				for($i=0; $i<count($entry['images']); $i++) {
 					if($entry['images'][$i]['id'] === $entry['image_id']) {
-						$entry['default_image'] = $entry['images'][$i];
+						$entry['image'] = $entry['images'][$i];
 					}
 				}
 				

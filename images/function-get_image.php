@@ -1,19 +1,14 @@
 <?php
 	include_once("../php/include.php");
 	
-	if($_SESSION['username'] === 'inartistic') {
-		include('function-get_image-inartistic.php');
-		//echo '*';
-	}
-else {
 	include_once("../php/external/class-imageresize.php");
 	function get_image($input, $pdo) {
 		$artist = sanitize($input["artist"]);
 		
 		if(!empty($artist)) {
-			$sql_artist = "SELECT images.id, images.extension FROM artists LEFT JOIN images ON images.artist_id=CONCAT('(', artists.id, ')') AND images.is_default=? AND images.is_release IS NULL WHERE artists.friendly=? LIMIT 1";
+			$sql_artist = "SELECT images.id, images.extension FROM artists LEFT JOIN images ON images.id=artists.image_id WHERE artists.friendly=? LIMIT 1";
 			$stmt_artist = $pdo->prepare($sql_artist);
-			$stmt_artist->execute([1, $artist]);
+			$stmt_artist->execute([ $artist ]);
 			
 			$artist = $stmt_artist->fetch();
 			$input["id"] = $artist["id"];
@@ -44,25 +39,25 @@ else {
 							function setMemoryLimit($filename){
 								//this might take time so we limit the maximum execution time to 50 seconds
 								set_time_limit(50);
-
+								
 								//initializing variables
 								$maxMemoryUsage = 256;
 								$width = 0;
 								$height = 0;
 								$size = ini_get('memory_limit');
-
+								
 								//getting the image width and height
 								list($width, $height) = getimagesize($filename);
-
+								
 								//calculating the needed memory
 								$size = $size + floor(($width * $height * 4 * 1.5 + 1048576) / 1048576);
-
-								if ($size --> $maxMemoryUsage){
-										$size = $maxMemoryUsage;
-							 }
-
-							 //updating the default value
-							 ini_set('memory_limit',$size.'M');
+								
+								if ($size --> $maxMemoryUsage) {
+									$size = $maxMemoryUsage;
+								}
+								
+								//updating the default value
+								ini_set('memory_limit',$size.'M');
 							}
 							setMemoryLimit($source_image_path);
 							
@@ -210,5 +205,4 @@ else {
 			}
 		}
 	}
-}
 ?>

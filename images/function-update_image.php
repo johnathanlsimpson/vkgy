@@ -28,16 +28,39 @@ if(is_numeric($_POST['id'])) {
 	$is_default   = $_POST['is_default'] ? 1 : 0;
 	$is_queued    = $_POST['is_queued'] ? 1 : 0;
 	
-	$links        = [ 'artists' => $_POST['artist_id'], 'blog' => $_POST['blog_id'], 'labels' => $_POST['label_id'], 'musicians' => $_POST['musician_id'], 'releases' => $_POST['release_id'] ];
+	// Set links array
+	$links = [ 'artists' => $_POST['artist_id'], 'blog' => $_POST['blog_id'], 'labels' => $_POST['label_id'], 'musicians' => $_POST['musician_id'], 'releases' => $_POST['release_id'] ];
+	
+	// Standardize into array (might be string or 'array' of one string)
+	foreach($links as $link_table => $link_array) {
+		if(!is_array($link_array)) {
+			$links[$link_table] = explode(',', $link_array);
+		}
+		else {
+			$links[$link_table] = explode(',', implode(',', $link_array));
+		}
+	}
+	
+	// Set up default link
+	if($item_type != 'other') {
+		if($item_type === 'blog') {
+			$links[$item_type][] = $item_id;
+		}
+		else {
+			$tmp_key = $item_type.'s';
+			$links[$tmp_key][] = $item_id;
+		}
+	}
 	
 	// Run query
 	$sql_update = 'UPDATE images SET description=?, friendly=?, credit=?, is_exclusive=?, is_queued=? WHERE id=? LIMIT 1';
 	$stmt_update = $pdo->prepare($sql_update);
-	
 	if($stmt_update->execute([ $description, $friendly, $credit, $is_exclusive, $is_queued, $id ])) {
+		
+		// Status
 		$output['status'] = 'success';
 		
-		// Link to artists/releases/etc
+		// Link to artists etc.
 		foreach($links as $link_table => $link_array) {
 			$link_column = ($link_table === 'blog' ? $link_table : substr($link_table, 0, -1)).'_id';
 			
@@ -49,14 +72,6 @@ if(is_numeric($_POST['id'])) {
 				$rslt_current_links[$current_link['id']] = $current_link[$link_column];
 			}
 			$rslt_current_links = is_array($rslt_current_links) ? $rslt_current_links : [];
-			
-			// JS might send as array, or comma separated string, or array with one string as child; standardize
-			if(is_array($link_array)) {
-				$link_array = explode(',', implode(',', $link_array));
-			}
-			elseif(!is_array($link_array) && strlen($link_array)) {
-				$link_array = explode(',', $link_array);
-			}
 			
 			// Determine new links
 			if(is_array($link_array) && !empty($link_array)) {
