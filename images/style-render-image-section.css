@@ -25,10 +25,10 @@
 	margin-top: 1rem;
 	padding-top: 1rem;
 }
-[name="is_exclusive"] + label::after {
+[name="image_is_exclusive"] + label::after {
 	content: "vkgy user?";
 }
-[data-image-status="new"] [name="is_exclusive"] + label::after {
+[data-image-status="new"] [name="image_is_exclusive"] + label::after {
 	content: "you?";
 }
 [data-hide-selects="1"] .image__selects,

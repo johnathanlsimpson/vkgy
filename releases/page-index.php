@@ -38,63 +38,16 @@
 		<?php
 	}
 	
-	//$time_start = microtime(true); 
+	$sql_recently_edited = 'SELECT MAX(id) AS id FROM edits_releases GROUP BY release_id ORDER BY id DESC LIMIT 20';
+	$stmt_recently_edited = $pdo->prepare($sql_recently_edited);
+	$stmt_recently_edited->execute();
+	foreach($stmt_recently_edited->fetchAll() as $rslt_recently_edited) {
+		$recently_edited_ids[] = $rslt_recently_edited['id'];
+	}
 	
-	//if($_SESSION['username'] === 'inartistic') {
-		$sql_recently_edited = 'SELECT MAX(id) AS id FROM edits_releases GROUP BY release_id ORDER BY id DESC LIMIT 20';
-		$stmt_recently_edited = $pdo->prepare($sql_recently_edited);
-		$stmt_recently_edited->execute();
-		foreach($stmt_recently_edited->fetchAll() as $rslt_recently_edited) {
-			$recently_edited_ids[] = $rslt_recently_edited['id'];
-		}
-		
-		//print_r($recently_edited_ids);
-		
-		$edited_releases = $access_release->access_release([ 'edit_ids' => $recently_edited_ids, 'get' => 'list' ]);
-	
-		//echo'===='; print_r($edited_releases);
-		
-		/*SELECT
-				'release' AS type,
-				edits_releases.user_id,
-				CONCAT_WS('/', '', 'releases', artists.friendly, releases.id, releases.friendly, '') AS url,
-				CONCAT_WS(' ', COALESCE(releases.romaji, releases.name, ''), COALESCE(press_romaji, press_name, ''), COALESCE(type_romaji, type_name, '')) AS quick_name,
-				edits_releases.date_occurred AS date_edited,
-				COALESCE(artists.romaji, artists.name) AS artist_quick_name,
-				CONCAT_WS('/', '', 'artists', artists.friendly, '') AS artist_url
-			FROM edits_releases
-			INNER JOIN (
-				SELECT MAX(id) AS id FROM edits_releases GROUP BY release_id ORDER BY id DESC LIMIT 20
-			) max_edit_release_ids
-			ON edits_releases.id=max_edit_release_ids.id
-			LEFT JOIN releases ON releases.id=edits_releases.release_id
-			LEFT JOIN artists ON artists.id=releases.artist_id*/
-		
-		
-		/*$s = 'SELECT id FROM releases WHERE date_occurred>=? ORDER BY date_occurred ASC';
-		$t = $pdo->prepare($s);
-		$t->execute([ date('Y-m-d', strtotime('-1 month')) ]);
-		foreach($t->fetchAll() as $r) {
-			$x[] = $r['id'];
-		}
-		$y = $access_release->access_release(['ids' => $x, 'get' => 'calendar']);
-		
-		echo $_SESSION['username'] === 'inartistic' ? '* Get recent releases, new way'.((microtime(true) - $time_start)) : null;
-		$time_start = microtime(true); */
-	//}
-//else {
-	//$edited_releases = $access_release->access_release([ "edit_history" => true, "get" => "list", 'order' => 'edits_releases.id DESC', "limit" => "20" ]);
-	
-	
-	
-//}
-	//echo $_SESSION['username'] === 'inartistic' ? '* Get edited releases'.((microtime(true) - $time_start)) : null;
-	//$time_start = microtime(true); 
+	$edited_releases = $access_release->access_release([ 'edit_ids' => $recently_edited_ids, 'get' => 'list' ]);
 	
 	$recent_releases = $access_release->access_release([ 'get' => 'calendar', 'start_date' => date('Y-m-d', strtotime('-1 month')) ]);
-	
-	//echo $_SESSION['username'] === 'inartistic' ? '* Get recent releases'.((microtime(true) - $time_start)) : null;
-	//$time_start = microtime(true); 
 	
 	if(is_array($recent_releases) && !empty($recent_releases)) {
 		$recent_releases = array_reverse($recent_releases);
@@ -113,9 +66,6 @@
 		$release_ids_by_name = array_values($release_ids_by_name);
 		$release_ids_by_name = array_flip($release_ids_by_name);
 	}
-	
-	//echo $_SESSION['username'] === 'inartistic' ? '* Sort releases '.((microtime(true) - $time_start)) : null;
-	//$time_start = microtime(true); 
 ?>
 
 <?php
@@ -167,7 +117,7 @@
 								
 								foreach($day as $release) {
 									$artist_image = '/artists/'.$release['artist']['friendly'].'/main.small.jpg';
-									$cover_image = str_replace('.jpg', '.thumbnail.jpg', $release['cover']);
+									$cover_image = str_replace('.jpg', '.thumbnail.jpg', $release['image']['url']);
 									$artist_url = '/artists/'.$release['artist']['friendly'].'/';
 									$artist_name = $release['artist']['quick_name'].($release['artist']['romaji'] ? ' <span class="any--weaken">('.$release['artist']['name'].')</span>' : null);
 									$release_name = $release['quick_name'].($release['romaji'] ? ' <span class="any--weaken">('.$release['name'].')</span>' : null);
@@ -242,8 +192,6 @@
 			</div>
 		<?php
 	}
-	
-	//echo $_SESSION['username'] === 'inartistic' ? '* Display releases '.((microtime(true) - $time_start)) : null;
 ?>
 
 <style>
