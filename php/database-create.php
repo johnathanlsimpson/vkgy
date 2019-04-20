@@ -79,7 +79,8 @@ CREATE TABLE IF NOT EXISTS `artists` (
   `label_history` mediumtext COLLATE ".$pdo_config['db_collation'].",
   `official_links` mediumtext COLLATE ".$pdo_config['db_collation'].",
   `date_occurred` date DEFAULT NULL,
-  `date_ended` date DEFAULT NULL
+  `date_ended` date DEFAULT NULL,
+  `image_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
 CREATE TABLE IF NOT EXISTS `artists_bio` (
@@ -256,18 +257,49 @@ CREATE TABLE IF NOT EXISTS `feed` (
 
 CREATE TABLE IF NOT EXISTS `images` (
 	`id` int(11) NOT NULL,
-	`extension` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+	`extension` text COLLATE ".$pdo_config['db_collation']." NOT NULL,
 	`is_default` tinyint(1) DEFAULT NULL,
 	`is_exclusive` tinyint(1) DEFAULT NULL,
 	`is_release` tinyint(1) DEFAULT NULL,
+  `is_queued` tinyint(1) DEFAULT '0',
 	`date_added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`user_id` int(11) NOT NULL DEFAULT '0',
-	`artist_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-	`release_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-	`musician_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-	`description` text CHARACTER SET utf8 COLLATE utf8_unicode_ci,
-	`friendly` text CHARACTER SET utf8 COLLATE utf8_unicode_ci,
-	`credit` text CHARACTER SET utf8 COLLATE utf8_unicode_ci
+	`artist_id` varchar(50) COLLATE ".$pdo_config['db_collation']." DEFAULT NULL,
+	`release_id` varchar(50) COLLATE ".$pdo_config['db_collation']." DEFAULT NULL,
+	`musician_id` varchar(50) COLLATE ".$pdo_config['db_collation']." DEFAULT NULL,
+	`description` text COLLATE ".$pdo_config['db_collation'].",
+	`friendly` text COLLATE ".$pdo_config['db_collation'].",
+	`credit` text COLLATE ".$pdo_config['db_collation']."
+) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
+
+CREATE TABLE IF NOT EXISTS `images_artists` (
+  `id` int(11) NOT NULL,
+  `image_id` int(11) NOT NULL,
+  `artist_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
+
+CREATE TABLE IF NOT EXISTS `images_blog` (
+  `id` int(11) NOT NULL,
+  `image_id` int(11) NOT NULL,
+  `blog_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
+
+CREATE TABLE IF NOT EXISTS `images_labels` (
+  `id` int(11) NOT NULL,
+  `image_id` int(11) NOT NULL,
+  `label_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
+
+CREATE TABLE IF NOT EXISTS `images_musicians` (
+  `id` int(11) NOT NULL,
+  `image_id` int(11) NOT NULL,
+  `musician_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
+
+CREATE TABLE IF NOT EXISTS `images_releases` (
+  `id` int(11) NOT NULL,
+  `image_id` int(11) NOT NULL,
+  `release_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
 CREATE TABLE IF NOT EXISTS `labels` (
@@ -285,7 +317,8 @@ CREATE TABLE IF NOT EXISTS `labels` (
 	`date_added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`parent_label_id` int(11) DEFAULT NULL,
 	`description` text COLLATE ".$pdo_config['db_collation'].",
-	`official_links` text COLLATE ".$pdo_config['db_collation']."
+	`official_links` text COLLATE ".$pdo_config['db_collation'].",
+  `image_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
 CREATE TABLE IF NOT EXISTS `labels_bio` (
@@ -383,7 +416,8 @@ CREATE TABLE IF NOT EXISTS `musicians` (
 	`usual_position` int(11) NOT NULL DEFAULT '0' COMMENT '0: other / 1: vocal / 2: guitar / 3: bass / 4: drum',
 	`friendly` mediumtext COLLATE ".$pdo_config['db_collation'].",
 	`history` mediumtext COLLATE ".$pdo_config['db_collation'].",
-	`edit_history` text COLLATE ".$pdo_config['db_collation']."
+	`edit_history` text COLLATE ".$pdo_config['db_collation'].",
+  `image_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
 CREATE TABLE IF NOT EXISTS `queued_aod` (
@@ -470,7 +504,7 @@ CREATE TABLE IF NOT EXISTS `releases` (
 	`jan_code` mediumtext COLLATE ".$pdo_config['db_collation'].",
 	`artist_display_name` mediumtext COLLATE ".$pdo_config['db_collation'].",
 	`artist_display_romaji` mediumtext COLLATE ".$pdo_config['db_collation'].",
-	`cover` text COLLATE ".$pdo_config['db_collation']."
+  `image_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
 CREATE TABLE IF NOT EXISTS `releases_collections` (
@@ -966,6 +1000,16 @@ ALTER TABLE `feed`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `images`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `images_artists`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `images_blog`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `images_labels`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `images_musicians`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `images_releases`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `labels`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `labels_bio`
@@ -1084,6 +1128,26 @@ ALTER TABLE `edits_musicians`
 
 ALTER TABLE `edits_releases`
 	ADD CONSTRAINT `edits_releases_ibfk_1` FOREIGN KEY (`release_id`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `images_artists`
+  ADD CONSTRAINT `images_artists_ibfk_1` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `images_artists_ibfk_2` FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `images_blog`
+  ADD CONSTRAINT `images_blog_ibfk_1` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `images_blog_ibfk_2` FOREIGN KEY (`blog_id`) REFERENCES `blog` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `images_labels`
+  ADD CONSTRAINT `images_labels_ibfk_1` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `images_labels_ibfk_2` FOREIGN KEY (`label_id`) REFERENCES `labels` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `images_musicians`
+  ADD CONSTRAINT `images_musicians_ibfk_1` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `images_musicians_ibfk_2` FOREIGN KEY (`musician_id`) REFERENCES `musicians` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `images_releases`
+  ADD CONSTRAINT `images_releases_ibfk_1` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `images_releases_ibfk_2` FOREIGN KEY (`release_id`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `releases_collections`
 	ADD CONSTRAINT `releases_collections_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
