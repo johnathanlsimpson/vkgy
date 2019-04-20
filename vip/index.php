@@ -9,9 +9,7 @@
 	]);
 	
 	subnav([
-		//"Support vkgy" => "/support/",
 		"Become VIP" => "https://patreon.com/vkgy",
-		//"Buy us a coffee" => "https://ko-fi.com/vkgyofficial",
 		"Add VIP post" => "/vip/add/",
 		"VIP forum" => "/vip/",
 	]);
@@ -25,21 +23,6 @@
 		$stmt_check = $pdo->prepare($sql_check);
 		$stmt_check->execute([ $_SESSION["userID"] ]);
 		$is_vip = $stmt_check->fetchColumn();
-	}
-	
-	$dev_line = "";
-	$dev_file = fopen("../documentation/updates.txt", "r");
-	$dev_cursor = -1;
-	fseek($dev_file, $dev_cursor, SEEK_END);
-	$dev_char = fgetc($dev_file);
-	while($dev_char === "\n" || $dev_char === "\r") {
-		fseek($dev_file, --$dev_cursor, SEEK_END);
-		$dev_char = fgetc($dev_file);
-	}
-	while($dev_char !== false && $dev_char !== "\n" && $dev_char !== "\r") {
-		$dev_line = $dev_char.$dev_line;
-		fseek($dev_file, --$dev_cursor, SEEK_END);
-		$dev_char = fgetc($dev_file);
 	}
 	
 	$sql_members = "SELECT username FROM users WHERE is_vip=1";
