@@ -36,8 +36,6 @@
 		
 		$pageTitle = $release["quick_name"]." - ".$release["artist"]["quick_name"];
 		
-		//echo $_SESSION['username'] === 'inartistic' ? '<pre>'.print_r($release, true).'</pre>' : null;
-		
 		?>
 			<div class="col c1" itemscope itemtype="http://schema.org/MusicAlbum" data-url="<?php echo "https://vk.gy/".$release["artist"]["friendly"]."/".$release["id"]."/".$release["friendly"]."/"; ?>">
 				<span itemtype="byArtist" content="<?php echo $release["artist"]["quick_name"]; ?>" data-artist="<?php echo $release["artist"]["name"]; ?>" data-artistsort="<?php echo $release["artist"]["romaji"]; ?>"></span>
@@ -764,7 +762,7 @@
 						if(is_array($release["images"]) && !empty($release['images'])) {
 							?>
 								<h3>
-									Other images
+									Related images
 								</h3>
 								<div class="text text--outlined release__images">
 									<?php
