@@ -28,8 +28,7 @@
 		$stmt_edit_history = $pdo->prepare($sql_edit_history);
 		$stmt_edit_history->execute([ $entry['id'] ]);
 		$entry['edit_history'] = $stmt_edit_history->fetchAll();
-		
-		
+		$entry['images'] = is_array($entry['images']) ? $entry['images'] : [];
 		$entry['image'] = $entry['images'][$entry['image_id']];
 		
 		if(is_array($entry) && !empty($entry)) {
@@ -133,11 +132,8 @@
 			if(!empty($_GET["entry"])) {
 				$entry = $access_blog->access_blog(["friendly" => sanitize($_GET["entry"]), "get" => "all"]);
 				
-				for($i=0; $i<count($entry['images']); $i++) {
-					if($entry['images'][$i]['id'] === $entry['image_id']) {
-						$entry['image'] = $entry['images'][$i];
-					}
-				}
+				$entry['images'] = is_array($entry['images']) ? $entry['images'] : [];
+				$entry['image'] = $entry['images'][$entry['image_id']];
 				
 				if(is_array($entry) && !empty($entry)) {
 					$pageTitle = "Edit entry: ".$entry["title"];
