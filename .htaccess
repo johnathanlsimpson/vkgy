@@ -81,13 +81,13 @@ RewriteRule  ^artists/([-\w]+)\.jpg$                                            
 RewriteRule  ^artists/([-\w]+)/edit/?$                                           /?artists/&action=edit&artist=$1
 RewriteRule  ^artists/([-\w]+)/main(?:\.(thumbnail|small|medium|large))?\.jpg?$  /images/page-image.php?artist=$1&method=$2
 
-RewriteRule  ^blog/?$                  /?blog/&page=latest
-RewriteRule  ^blog/artist/([\w-]+)/?$  /?blog/&artist=$1
-RewriteRule  ^blog/tag/([\w-]+)/?$     /?blog/&tag=$1
-RewriteRule  ^blog/page/(\d+)/?$       /?blog/&page=$1
-RewriteRule  ^blog/add/?$              /?blog/&action=update
-RewriteRule  ^blog/([\w-]+)/?$         /?blog/&entry=$1
-RewriteRule  ^blog/([\w-]+)/edit/?$    /?blog/&action=update&entry=$1
+RewriteRule  ^blog/?$                                   /?blog/&page=latest
+RewriteRule  ^blog/artist/([\w-]+)/?(?:page/(\d+)/?)?$  /?blog/&artist=$1&page=$2
+RewriteRule  ^blog/tag/([\w-]+)/?(?:page/(\d+)/?)?$     /?blog/&tag=$1&page=$2
+RewriteRule  ^blog/page/(\d+)/?$                        /?blog/&page=$1
+RewriteRule  ^blog/add/?$                               /?blog/&action=update
+RewriteRule  ^blog/([\w-]+)/?$                          /?blog/&entry=$1
+RewriteRule  ^blog/([\w-]+)/edit/?$                     /?blog/&action=update&entry=$1
 
 RewriteRule  ^documentation/([A-z\-]+)/?$  /?documentation/&documentation_page=$1
 
