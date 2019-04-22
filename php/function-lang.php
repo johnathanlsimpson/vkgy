@@ -19,8 +19,8 @@ function lang($english_text, $japanese_text, $options = []) {
 	}
 	
 	// Clean text
-	$english_text = sanitize($english_text);
-	$japanese_text = sanitize($japanese_text);
+	$english_text = sanitize($english_text, "allowhtml");
+	$japanese_text = sanitize($japanese_text, "allowhtml");
 	
 	// Output html
 	$output  =
