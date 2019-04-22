@@ -6,7 +6,9 @@
 	if(!empty($release)) {
 		include_once("../releases/head.php");
 		
-		if(is_numeric($release['image_id'])) {
+		$release['images'] = is_array($release['images']) ? $release['images'] : [];
+		
+		if(!empty($release['images']) && is_numeric($release['image_id'])) {
 			$release['image'] = $release['images'][$release['image_id']];
 			
 			unset($release['images'][$release['image_id']]);
@@ -35,6 +37,8 @@
 		}
 		
 		$pageTitle = $release["quick_name"]." - ".$release["artist"]["quick_name"];
+		
+		//echo $_SESSION['username'] === 'inartistic' ? '<pre>'.print_r($release, true).'</pre>' : null;
 		
 		?>
 			<div class="col c1" itemscope itemtype="http://schema.org/MusicAlbum" data-url="<?php echo "https://vk.gy/".$release["artist"]["friendly"]."/".$release["id"]."/".$release["friendly"]."/"; ?>">
