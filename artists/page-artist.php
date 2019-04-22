@@ -10,7 +10,10 @@
 		]);
 		
 		
-		if(strlen($artist['image_id'])) {
+		$artist['images'] = is_array($artist['images']) ? $artist['images'] : [];
+		
+		if(!empty($artist['images']) && is_numeric($artist['image_id'])) {
+			
 			$artist['image'] = $artist['images'][$artist['image_id']];
 			
 			unset($artist['images'][$artist['image_id']]);
