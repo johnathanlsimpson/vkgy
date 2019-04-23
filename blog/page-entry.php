@@ -1,7 +1,16 @@
 <?php
 	if(is_array($entry) && !empty($entry)) {
 		
-		$page_image = "https://vk.gy".str_replace('.', '.large.', $entry["image"]);
+		$entry['images'] = is_array($entry['images']) ? $entry['images'] : [];
+		
+		if(!empty($entry['images']) && is_numeric($entry['image_id'])) {
+			$entry['image'] = $entry['images'][$entry['image_id']];
+			
+			$page_image = "https://vk.gy".str_replace('.', '.large.', $entry['image']['url']);
+			
+			$entry_has_image = true;
+		}
+		
 		
 		$sql_twitter = "SELECT twitter FROM users WHERE username=? LIMIT 1";
 		$stmt_twitter = $pdo->prepare($sql_twitter);
@@ -14,7 +23,7 @@
 		
 		$page_description = preg_replace("/"."<.*?>"."/", "", strtok($entry["content"], "\n"))." (Continued…)";
 		
-		$entry_has_image = strlen($entry['image']) && image_exists($entry['image'], $pdo) ? true : false;
+		//$entry_has_image = strlen($entry['image']) && image_exists($entry['image'], $pdo) ? true : false;
 		
 		// Related: entries with same tag
 		if(is_array($entry['tags']) && !empty($entry['tags'])) {

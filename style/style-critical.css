@@ -179,6 +179,11 @@
 			opacity: 0;
 		}
 	}
+	.any__obscure {
+		background-position: center 25%;
+		background-repeat: no-repeat;
+		background-size: cover;
+	}
 	.any__obscure::before {
 		background-image: linear-gradient(to bottom right, var(--background) 1px, transparent 0);
 		background-size: 3px 3px;
@@ -771,7 +776,7 @@
 	* ========================================================
 	*/
 	.text {
-		background: var(--background);
+		background-color: var(--background);
 		border: 1px solid var(--background);
 		border-radius: 3px;
 		line-height: 1.5;

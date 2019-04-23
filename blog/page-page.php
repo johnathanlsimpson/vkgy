@@ -1,93 +1,142 @@
-<?php
-	if(is_array($entries) && !empty($entries)) {
-		?>
-			<div class="col c1">
-				<div>
-					<?php
-						if(!empty($error)) {
-							?>
-								<div class="text text--outlined text--error">
-									<?php echo $error; ?>
-								</div>
-							<?php
-						}
-					?>
-					
-					<h1>
-						<?php
-							echo $_GET["page"] === "latest" ? "Latest news" : "News, page ".sanitize($_GET["page"]);
-						?>
-					</h1>
-				</div>
-			</div>
-			
-			<div class="col c4-AAAB">
-				<div>
-					<div class="any--flex any--flex-space-between any--margin">
-						<?php
-							if($prev_next["prev"]["page"]) {
-								?>
-									<a href="/blog/page/<?php echo $prev_next["prev"]["page"]; ?>/"><span class="symbol__previous"></span> Page <?php echo $prev_next["prev"]["page"]; ?></a>
-								<?php
-							}
-							if($prev_next["next"]["page"]) {
-								?>
-									<a class="any--align-right" href="/blog/page/<?php echo $prev_next["next"]["page"]; ?>/">Page <?php echo $prev_next["next"]["page"]; ?> <span class="symbol__next"></span></a>
-								<?php
-							}
-						?>
-					</div>
-					
-					<?php
-						foreach($entries as $entry) {
-							?>
-								<h2>
-									<a class="a--inherit" href="/blog/<?php echo $entry["friendly"]; ?>/"><?php echo $entry["title"]; ?></a>
-								</h2>
-								<div class="text">
-									<?php
-										echo $markdown_parser->parse_markdown($entry["content"]);
-									?>
-								</div>
-							<?php
-						}
-					?>
-					
-					<div class="any--flex any--flex-space-between">
-						<?php
-							if($prev_next["prev"]["page"]) {
-								?>
-									<a href="/blog/page/<?php echo $prev_next["prev"]["page"]; ?>/"><span class="symbol__previous"></span> Page <?php echo $prev_next["prev"]["page"]; ?></a>
-								<?php
-							}
-							if($prev_next["next"]["page"]) {
-								?>
-									<a class="any--align-right" href="/blog/page/<?php echo $prev_next["next"]["page"]; ?>/">Page <?php echo $prev_next["next"]["page"]; ?> <span class="symbol__next"></span></a>
-								<?php
-							}
-						?>
-					</div>
-				</div>
-				
-				<div>
-					<h3>
-						Tags
-					</h3>
-					<div class="text text--outlined">
-						<?php
-							$sql_tags = "SELECT friendly, tag FROM tags ORDER BY friendly ASC";
-							$stmt_tags = $pdo->prepare($sql_tags);
-							$stmt_tags->execute();
-							
-							foreach($stmt_tags->fetchAll() as $tag) {
-								?>
-									<a class="any__tag symbol__tag" href="/blog/tag/<?php echo $tag["friendly"]; ?>/"><?php echo $tag["tag"]; ?></a>
-								<?php
-							}
-						?>
-					</div>
-				</div>
-			</div>
+<div class="col c1">
+	<div>
 		<?php
-	}
-?>
+			if(!empty($error)) {
+				?>
+					<div class="text text--outlined text--error">
+						<?php echo $error; ?>
+					</div>
+				<?php
+			}
+		?>
+
+		<h1>
+			<?php echo lang('Visual kei news', 'V系ニュース', [ 'container' => 'div' ]); ?>
+		</h1>
+		
+		<?php
+			if($artist || $tag) {
+				$header_slug_en = $artist ? '<a class="artist" href="/artists/'.$artist['friendly'].'/">'.$artist['quick_name'].'</a>' : '<a class="symbol__tag" href="/blog/tag/'.$tag['friendly'].'/">'.$tag['tag'].'</a>';
+				$header_slug_jp = $artist ? '<a class="artist" href="/artists/'.$artist['friendly'].'/">'.$artist['name'].'</a>' : '<a class="symbol__tag" href="/blog/tag/'.$tag['friendly'].'/">'.$tag['tag'].'</a>';
+				
+				?>
+					<h2 class="any--margin">
+						<?php
+							echo lang(
+								'Showing news tagged <span class="any__note" style="display: inline-block; vertical-align: top;">'.$header_slug_en.'</span>',
+								$header_slug_jp.' のニュース',
+								[ 'container' => 'div' ]);
+						?>
+					</h2>
+				<?php
+			}
+		?>
+	</div>
+
+	<div class="col c3 any--margin">
+		<div>
+			<?php
+				$prev_link  = '/blog'.($_GET['artist'] ? '/artist/'.friendly($_GET['artist']) : null).($_GET['tag'] ? '/tag/'.friendly($_GET['tag']) : null);
+				$prev_link .= '/page/'.$prev_next['prev']['page'].'/';
+				
+				$prev_text_en  = 'Page '.($prev_next['prev']['page'] ?: '1');
+				$prev_text_jp  = ($prev_next['prev']['page'] ?: '1').' ページ目';
+				
+				echo $prev_next['prev']['page'] ? '<a href="'.$prev_link.'"><span class="symbol__previous"></span> '.lang($prev_text_en, $prev_text_jp, ['secondary_class' => 'any--hidden']).'</a>' : lang($prev_text_en, $prev_text_jp, ['secondary_class' => 'any--hidden']);
+			?>
+		</div>
+		<div style="text-align: center;">
+			<?php
+				if(is_numeric($_GET['page'])) {
+					$start = (sanitize($_GET['page']) * 10 - 10 + 1);
+					$stop = (sanitize($_GET['page']) * 10 - 10 + count($entries));
+				
+					echo lang('Entries '.$start.' to '.$stop, $start.'～'.$stop.'件', [ 'secondary_class' => 'any--hidden' ]);
+				}
+				else { 
+					echo lang('Latest', '最近', [ 'secondary_class' => 'any--hidden' ]);
+				}
+			?>
+		</div>
+		<div style="text-align: right;">
+			<?php
+				$next_link  = '/blog'.($_GET['artist'] ? '/artist/'.friendly($_GET['artist']) : null).($_GET['tag'] ? '/tag/'.friendly($_GET['tag']) : null);
+				$next_link .= '/page/'.$prev_next['next']['page'].'/';
+				
+				$next_text_en  = 'Page '.($prev_next['next']['page'] ?: $prev_next['latest_page_num']);
+				$next_text_jp  = ($prev_next['next']['page'] ?: $prev_next['latest_page_num']).' ページ目';
+				
+				echo $prev_next['next']['page'] ? '<a href="'.$next_link.'">'.lang($next_text_en, $next_text_jp, ['secondary_class' => 'any--hidden']).' <span class="symbol__next"></span></a>' : lang($next_text_en, $next_text_jp, ['secondary_class' => 'any--hidden']);
+			?>
+		</div>
+	</div>
+</div>
+
+<div class="col c4-AAAB">
+	<div>
+
+		<?php
+			for($i=0; $i<$num_entries; $i++) {
+				?>
+					<div class="entry__container text any__obscure any__obscure--fade lazy" data-src="<?php echo is_array($entries[$i]['image']) && !empty($entries[$i]['image']) ? str_replace('.', '.small.', $entries[$i]['image']['url']) : null; ?>">
+						<h2>
+							<div class="h5">
+								<?php echo $entries[$i]['date_occurred']; ?>
+								<a class="user" href="<?php echo '/users/'.$entries[$i]['username'].'/'; ?>"><?php echo $entries[$i]['username']; ?></a>
+							</div>
+							<a href="/blog/<?php echo $entries[$i]["friendly"]; ?>/"><?php echo $entries[$i]["title"]; ?></a>
+						</h2>
+						<?php
+							echo $markdown_parser->parse_markdown($entries[$i]["content"]);
+						?>
+						<a class="a--padded a--outlined entry__comment" style="margin-top:1rem;" href="<?php echo '/blog/'.$entries[$i]['friendly'].'/'; ?>"><?php echo lang('comment on this', 'コメントする', [ 'secondary_class' => 'any--hidden' ]); ?></a>
+					</div>
+				<?php
+			}
+		?>
+	</div>
+
+	<div>
+		<h3>
+			<?php echo lang('Popular', 'おすすめ', [ 'container' => 'div' ]); ?>
+		</h3>
+		<ul class="text text--outlined ul--compact">
+			<?php
+				$sql_rec = 'SELECT blog.title, blog.friendly, COUNT(*) AS num_comments FROM comments LEFT JOIN blog ON blog.id=comments.item_id WHERE comments.item_type=0 AND comments.date_occurred>"'.date('Y-m-d', strtotime('-2 months')).'" GROUP BY comments.item_id ORDER BY num_comments DESC LIMIT 10';
+				$stmt_rec = $pdo->prepare($sql_rec);
+				$stmt_rec->execute();
+				$rslt_rec = $stmt_rec->fetchAll();
+				$rslt_rec = is_array($rslt_rec) ? $rslt_rec : [];
+				shuffle($rslt_rec);
+
+				for($i=0; $i < count($rslt_rec) && $i < 5; $i++) {
+					?>
+						<li>
+							<a class="symbol__news" href="<?php echo '/blog/'.$rslt_rec[$i]['friendly'].'/'; ?>"><?php echo $rslt_rec[$i]['title']; ?></a>
+						</li>
+					<?php
+				}
+			?>
+		</ul>
+
+		<h3>
+			<?php echo lang('Browse by tag', 'タグ', [ 'container' => 'div' ]); ?>
+		</h3>
+		<ul class="ul--compact text text--outlined">
+			<?php
+				$sql_tags = "SELECT tags.friendly, tags.tag, COUNT(*) AS num_tagged FROM blog_tags LEFT JOIN tags ON tags.id=blog_tags.tag_id GROUP BY blog_tags.tag_id ORDER BY tags.friendly ASC";
+				$stmt_tags = $pdo->prepare($sql_tags);
+				$stmt_tags->execute();
+
+				foreach($stmt_tags->fetchAll() as $tag) {
+					?>
+						<li>
+							<span class="any__note" style="float:right;"><?php echo $tag['num_tagged']; ?></span>
+							<a class="symbol__tag" href="<?php echo '/blog/tag/'.$tag["friendly"]; ?>/"><?php echo $tag["tag"]; ?></a>
+						</li>
+					<?php
+				}
+			?>
+		</ul>
+	</div>
+</div>

@@ -28,8 +28,7 @@
 		$stmt_edit_history = $pdo->prepare($sql_edit_history);
 		$stmt_edit_history->execute([ $entry['id'] ]);
 		$entry['edit_history'] = $stmt_edit_history->fetchAll();
-		
-		
+		$entry['images'] = is_array($entry['images']) ? $entry['images'] : [];
 		$entry['image'] = $entry['images'][$entry['image_id']];
 		
 		if(is_array($entry) && !empty($entry)) {
@@ -45,9 +44,52 @@
 		}
 	}
 	
+	if(!$_GET['entry'] && !$_GET['action']) {
+		$prev_next = $access_blog->get_prev_next([
+			'artist' => $_GET['artist'],
+			'tag' => $_GET['tag'],
+			'page' => $_GET['page'] ?: 'latest',
+			'get' => 'list',
+		]);
+		
+		$entries = $access_blog->access_blog([
+			'artist' => $_GET['artist'],
+			'tag' => $_GET['tag'],
+			'page' => $_GET['page'] ?: 'latest',
+			'get' => 'list',
+		]);
+		$entries = is_array($entries) ? $entries : [];
+		$num_entries = count($entries);
+		
+		if($_GET['artist']) {
+			$artist = $access_artist->access_artist([ 'friendly' => friendly($_GET['artist']), 'get' => 'name' ]);
+		}
+		
+		if($_GET['tag']) {
+			$tag = $access_blog->access_tag([ 'friendly' => friendly($_GET['tag']) ]);
+		}
+		
+		if($_GET['page']) {
+			$pageTitle = "News, page ".$_GET["page"];
+
+			breadcrumbs([
+				"Page ".$_GET["page"] => "/blog/".$_GET["page"]."/"
+			]);
+		}
+		else {
+			$page_title = 'Latest news';
+
+			breadcrumbs([
+				"Latest news" => "/blog/"
+			]);
+		}
+			
+		include("../blog/page-page.php");
+	}
 	
 	
-	if($_GET["tag"] || $_GET["artist"]) {
+	
+	/*if($_GET["tag"] || $_GET["artist"]) {
 		
 		if($_GET["tag"]) {
 			$sql_tag = "SELECT id, tag FROM tags WHERE friendly=? LIMIT 1";
@@ -78,25 +120,19 @@
 			
 			include("../blog/page-tag.php");
 		}
-	}
+	}*/
 	
 	
 	
-	if($_GET["page"] === "latest" || is_numeric($_GET["page"])) {
-		$t = microtime();
-		//echo $_SESSION["username"] === "inartistic" ? "*".((microtime() - $t) * 1000)."<br />" : null;
-		$t = microtime();
+	/*if($_GET["page"] === "latest" || is_numeric($_GET["page"])) {
+		$entries = $access_blog->access_blog([ 'page' => $_GET['page'], 'get' => 'list' ]);
+		$entries = is_array($entries) ? $entries : [];
+		$num_entries = count($entries);
 		
-		$entries = $access_blog->access_blog(["page" => $_GET["page"], "get" => "basics"]);
-		
-		$t = microtime();
-		//echo $_SESSION["username"] === "inartistic" ? "*".((microtime() - $t) * 1000)."<br />" : null;
-		$t = microtime();
-
 		if(is_array($entries) && !empty($entries)) {
 			if($_GET["page"] === "latest") {
 				$pageTitle = "Latest news";
-
+				
 				breadcrumbs([
 					"Latest news" => "/blog/"
 				]);
@@ -105,21 +141,17 @@
 			}
 			else {
 				$pageTitle = "News, page ".$_GET["page"];
-
+				
 				breadcrumbs([
 					"Page ".$_GET["page"] => "/blog/".$_GET["page"]."/"
 				]);
 				
 				$prev_next = $access_blog->get_prev_next(["page" => $_GET["page"]]);
 			}
-
+			
 			include("../blog/page-page.php");
 		}
-		
-		$t = microtime();
-		//echo $_SESSION["username"] === "inartistic" ? "*".((microtime() - $t) * 1000)."<br />" : null;
-		$t = microtime();
-	}
+	}*/
 	
 	
 	if($_GET["action"] === "update") {
@@ -133,11 +165,8 @@
 			if(!empty($_GET["entry"])) {
 				$entry = $access_blog->access_blog(["friendly" => sanitize($_GET["entry"]), "get" => "all"]);
 				
-				for($i=0; $i<count($entry['images']); $i++) {
-					if($entry['images'][$i]['id'] === $entry['image_id']) {
-						$entry['image'] = $entry['images'][$i];
-					}
-				}
+				$entry['images'] = is_array($entry['images']) ? $entry['images'] : [];
+				$entry['image'] = $entry['images'][$entry['image_id']];
 				
 				if(is_array($entry) && !empty($entry)) {
 					$pageTitle = "Edit entry: ".$entry["title"];

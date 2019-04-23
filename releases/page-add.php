@@ -12,7 +12,7 @@
 		"/scripts/script-initDelete.js",
 		"/scripts/script-initSelectize.js",
 		"/scripts/script-showElem.js",
-		"/scripts/script-uploadImage.js",
+		//"/scripts/script-uploadImage.js",
 		"/scripts/script-initEasyAutocomplete.js",
 
 		"/releases/script-resetTrackNums.js",
@@ -204,7 +204,7 @@
 					<input class="input--secondary" name="romaji" placeholder="(romaji)" value="<?php echo $release["romaji"]; ?>" />
 				</div>
 				<div class="input__group">
-					<button class="symbol__down-caret <?php echo $release["press_name"] || $release["type_name"] ? "any--hidden" : ""; ?>" data-show="add__press-container">
+					<button class="symbol__down-caret <?php echo $release["press_name"] || $release["type_name"] ? "any--hidden" : ""; ?>" data-show="add__press-container" type="button">
 						Type/Press
 					</button>
 				</div>
@@ -251,7 +251,7 @@
 					</select>
 				</div>
 				<div class="input__group">
-					<button class="symbol__down-caret <?php echo $release["artist"]["display_name"] ? "any--hidden" : ""; ?>" data-show="add__display-name">
+					<button class="symbol__down-caret <?php echo $release["artist"]["display_name"] ? "any--hidden" : ""; ?>" data-show="add__display-name" type="button">
 						Display name
 					</button>
 				</div>
@@ -341,7 +341,7 @@
 					</select>
 				</div>
 				<div class="input__group">
-					<button class="<?php echo $release["format_name"] ? "any--hidden" : ""; ?>" data-show="add__custom-format">
+					<button class="<?php echo $release["format_name"] ? "any--hidden" : ""; ?>" data-show="add__custom-format" type="button">
 						Custom format
 					</button>
 				</div>
@@ -497,36 +497,36 @@
 								</div>
 
 								<div class="track__song-controls input__group">
-									<button class="track__song-control track__reorder" tabindex="-1">⇅</button>
+									<button class="track__song-control track__reorder" tabindex="-1" type="button">⇅</button>
 								</div>
 								<div class="track__song-controls input__group">
-									<button class="track__song-control" data-add="song" tabindex="-1">+</button>
+									<button class="track__song-control" data-add="song" tabindex="-1" type="button">+</button>
 								</div>
 							</div>
 
 							<div class="input__row track__tracklist-controls">
 								<div class="input__group">
-									<button class="track__control" data-add="disc">
+									<button class="track__control" data-add="disc" type="button">
 										Add disc
 									</button>
 								</div>
 								<div class="input__group">
-									<button class="track__control" data-add="section">
+									<button class="track__control" data-add="section" type="button">
 										Add section
 									</button>
 								</div>
 								<div class="input__group">
-									<button class="track__control" data-add="songs">
+									<button class="track__control" data-add="songs" type="button">
 										Add tracks
 									</button>
 								</div>
 								<div class="input__group">
-									<button class="track__control" data-show="track--show-artist">
+									<button class="track__control" data-show="track--show-artist" type="button">
 										Show artists
 									</button>
 								</div>
 								<div class="input__group">
-									<button class="track__control" data-show="track--show-artist track--show-display-name">
+									<button class="track__control" data-show="track--show-artist track--show-display-name" type="button">
 										Show artist display names
 									</button>
 								</div>
@@ -725,7 +725,7 @@
 		<div class="text text--docked">
 			<div class="any--flex input__row" data-role="submit-container">
 				<div class="input__group any--flex-grow">
-					<button class="any--flex-grow" data-role="submit" name="submit">
+					<button class="any--flex-grow" data-role="submit" name="submit" type="submit">
 						Submit
 					</button>
 				</div>

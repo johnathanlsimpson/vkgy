@@ -158,10 +158,21 @@ function changePageState(state) {
 		$("[data-role=submit-container]").removeClass(hideClass);
 		$("[data-role=result-container]").addClass(hideClass);
 		$("[data-role=edit-container]").addClass(hideClass);
-		//$(".image__template:not(:first-of-type)").remove();
 		$("[name=friendly]").attr("value", "");
-		//$("[name=image_release_id]").attr("value", "");
 		$("[name=id]").attr("value", "");
+		
+		
+		
+		document.querySelector('[name=image_item_id]').value = null;
+		document.querySelector('[name=image_item_name]').value = null;
+		var images = document.querySelectorAll('.image__results .image__template');
+		if(images && images.length) {
+			images.forEach(function(image) {
+				image.remove();
+			});
+		}
+		
+		
 		history.pushState(null, null, "/releases/add/");
 	}
 	else if(state === "edit") {

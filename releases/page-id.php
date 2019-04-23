@@ -6,8 +6,10 @@
 	if(!empty($release)) {
 		include_once("../releases/head.php");
 		
-		if(strlen($release['image_id'])) {
-			$release['cover'] = $release['images'][$release['image_id']];
+		$release['images'] = is_array($release['images']) ? $release['images'] : [];
+		
+		if(!empty($release['images']) && is_numeric($release['image_id'])) {
+			$release['image'] = $release['images'][$release['image_id']];
 			
 			unset($release['images'][$release['image_id']]);
 			
@@ -35,6 +37,8 @@
 		}
 		
 		$pageTitle = $release["quick_name"]." - ".$release["artist"]["quick_name"];
+		
+		//echo $_SESSION['username'] === 'inartistic' ? '<pre>'.print_r($release, true).'</pre>' : null;
 		
 		?>
 			<div class="col c1" itemscope itemtype="http://schema.org/MusicAlbum" data-url="<?php echo "https://vk.gy/".$release["artist"]["friendly"]."/".$release["id"]."/".$release["friendly"]."/"; ?>">
@@ -84,12 +88,12 @@
 			<div class="col c3-AAB">
 				<div>
 					<div>
-						<div class="text any--flex release__head" data-coverurl="<?php echo $release["cover"] ? "https://vk.gy".$release["cover"]['url'] : null; ?>">
+						<div class="text any--flex release__head" data-coverurl="<?php echo $release['image'] ? "https://vk.gy".$release['image']['url'] : null; ?>">
 							<?php
-								if($release["cover"]) {
+								if($release['image']) {
 									?>
-										<a class="release__image-link <?php echo $release['cover']['is_exclusive'] ? "release__image--exclusive" : null; ?>" href="<?php echo $release["cover"]['url']; ?>" target="_blank">
-											<img alt="<?php echo $release["artist"]["quick_name"]." - ".$release["quick_name"]; ?>" class="release__image" src="<?php echo preg_replace("/"."\.(\w+)$"."/", ".medium.$1", $release["cover"]['url']); ?>" />
+										<a class="release__image-link <?php echo $release['image']['is_exclusive'] ? "release__image--exclusive" : null; ?>" href="<?php echo $release['image']['url']; ?>" target="_blank">
+											<img alt="<?php echo $release["artist"]["quick_name"]." - ".$release["quick_name"]; ?>" class="release__image" src="<?php echo preg_replace("/"."\.(\w+)$"."/", ".medium.$1", $release['image']['url']); ?>" />
 										</a>
 									<?php
 								}
@@ -762,7 +766,7 @@
 						if(is_array($release["images"]) && !empty($release['images'])) {
 							?>
 								<h3>
-									Other images
+									Related images
 								</h3>
 								<div class="text text--outlined release__images">
 									<?php

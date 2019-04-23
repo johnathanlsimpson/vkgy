@@ -10,7 +10,10 @@
 		]);
 		
 		
-		if(strlen($artist['image_id'])) {
+		$artist['images'] = is_array($artist['images']) ? $artist['images'] : [];
+		
+		if(!empty($artist['images']) && is_numeric($artist['image_id'])) {
+			
 			$artist['image'] = $artist['images'][$artist['image_id']];
 			
 			unset($artist['images'][$artist['image_id']]);
@@ -122,6 +125,7 @@
 																		$history_event = $artist['history'][$i][$n][$m];
 																		$history_type = trim($history_event['type']);
 																		
+																		// For multiple-type releases, show base name for first link and type name for additional links
 																		if($history_type === 'release' && is_array($history_event["content"])) {
 																			
 																			// Save base name of release
@@ -148,16 +152,34 @@
 																						// ...and if that next release shares the same base name as the first release that day...
 																						if($release_name === ($artist["history"][$i][$n][$m + $x]["content"]["romaji"] ?: $artist["history"][$i][$n][$m + $x]["content"]["name"])) {
 																							
-																							// ...then remove the base name from that nth release, showing only "type", and transform to a link
-																							$artist["history"][$i][$n][$m + $x]["content"] = 
-																								'<a class="" href="'.$artist["history"][$i][$n][$m + $x]["content"]["url"].'">'.
-																								substr($artist["history"][$i][$n][$m + $x]["content"]["quick_name"], strlen($release_name)).
-																								'</a>';
+																							// ...if it has type name, we'll remove base title and put it at back; otherwise at front
+																							if(strlen($artist["history"][$i][$n][$m + $x]["content"]['press_name']) || strlen($artist["history"][$i][$n][$m + $x]["content"]['type_name'])) {
+																							
+																								// ...then remove the base name from that nth release, showing only "type", and transform to a link
+																								$artist["history"][$i][$n][$m + $x]["content"] = 
+																									'<a class="" href="'.$artist["history"][$i][$n][$m + $x]["content"]["url"].'">'.
+																									substr($artist["history"][$i][$n][$m + $x]["content"]["quick_name"], strlen($release_name)).
+																									'</a>';
 																								
-																							// ...and combine the nth release with the first one, removing the nth release from the flow of the biography
-																							$history_event["content"] .= 
-																								' <span class="any--weaken">/</span> '.
-																								$artist["history"][$i][$n][$m + $x]["content"];
+																								// ...and combine the nth release with the first one, removing the nth release from the flow of the biography
+																								$history_event["content"] .= 
+																									' <span class="any--weaken">/</span> '.
+																									$artist["history"][$i][$n][$m + $x]["content"];
+																							}
+																							else {
+																							
+																								// ...then remove the base name from that nth release, showing only "type", and transform to a link
+																								$artist["history"][$i][$n][$m + $x]["content"] = 
+																									
+																								
+																								$history_event["content"] =
+																									'<a class="symbol__release" href="'.$artist["history"][$i][$n][$m + $x]["content"]["url"].'">'.
+																									$artist["history"][$i][$n][$m + $x]["content"]["quick_name"].
+																									'</a>'.
+																									' <span class="any--weaken">/</span> '.
+																									str_replace('>'.$release_name.' ', '>', $history_event["content"]);
+																								
+																							}
 																							
 																							unset($artist["history"][$i][$n][$m + $x]);
 																						}
@@ -387,7 +409,7 @@
 								include("../artists/page-tags.php");
 								
 								// Popularity
-								include("../artists/page-ranking.php");
+								include("../artists/partial-ranking.php");
 							?>
 						</div>
 						

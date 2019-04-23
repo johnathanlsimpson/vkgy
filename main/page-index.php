@@ -75,7 +75,7 @@
 			</h2>
 			
 			<div class="text any--flex news__container">
-				<div class="news__main lazy any__obscure" data-src="<?php echo $news[0]["image"]; ?>">
+				<div class="news__main lazy any__obscure" data-src="<?php echo !empty($news[0]['image']) ? $news[0]['image']['url'] : null; ?>">
 					<h2>
 						<div class="h5 any--flex">
 							<?php echo $news[0]["date_occurred"]; ?>
@@ -93,7 +93,7 @@
 					<?php
 						for($i=1; $i<=5; $i++) {
 							?>
-								<li class="news__entry any__obscure lazy" data-src="<?php echo $news[$i]["image"]; ?>">
+								<li class="news__entry any__obscure lazy" data-src="<?php echo !empty($news[$i]['image']) ? $news[$i]['image']['url'] : null; ?>">
 									<h3>
 										<a href="/blog/<?php echo $news[$i]["friendly"]; ?>/"><?php echo $news[$i]["title"]; ?></a>
 									</h3>

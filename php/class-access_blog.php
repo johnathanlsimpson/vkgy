@@ -26,6 +26,40 @@
 		// ======================================================
 		// Get tags
 		// ======================================================
+		function access_tag($args = []) {
+			$values_tag = [];
+			
+			if(is_numeric($args['id'])) {
+				$where_tag = 'id=?';
+				$values_tag[] = $args['id'];
+			}
+			if(strlen($args['friendly'])) {
+				$where_tag = 'friendly=?';
+				$values_tag[] = friendly($args['friendly']);
+			}
+			
+			$sql_tag = 'SELECT * FROM tags'.($where_tag ? ' WHERE '.$where_tag : null);
+			$stmt_tag = $this->pdo->prepare($sql_tag);
+			$stmt_tag->execute($values_tag);
+			$rslt_tag = $stmt_tag->fetchAll();
+			$rslt_tag = is_array($rslt_tag) ? $rslt_tag : [];
+			$num_tags = count($rslt_tag);
+			
+			if($args['associative']) {
+				for($i=0; $i<$num_tags; $i++) {
+					$output[$rslt_tag[$i]['friendly']] = $rslt_tag[$i];
+				}
+			}
+			else {
+				$output = $rslt_tag;
+			}
+			
+			if(count($output) === 1) {
+				$output = reset($output);
+			}
+			
+			return $output;
+		}
 		function list_tags($flat = true) {
 			$sql_tags = "SELECT * FROM tags ORDER BY friendly ASC";
 			$stmt_tags = $this->pdo->prepare($sql_tags);
@@ -46,21 +80,33 @@
 		// Prev/next links
 		// ======================================================
 		function get_prev_next($args = []) {
-			$sql_count = "SELECT COUNT(1) AS total_count, CEIL(COUNT(1) / 10) AS latest_page_num, LEAST(FLOOR(COUNT(1) / 10), (CEIL(COUNT(1) / 10) - 1)) AS penultimate_page_num, TRUNCATE((((COUNT(1) / 10) - FLOOR(COUNT(1) / 10)) * 10), 0) AS remainder FROM blog";
-			$stmt_count = $this->pdo->prepare($sql_count);
-			$stmt_count->execute();
-			$counts = $stmt_count->fetch();
-
-			if($args["page"] === "latest") {
-				$output["prev"]["page"] = $counts["penultimate_page_num"];
-			}
+			$output = $this->access_blog([ 'artist' => $args['artist'], 'tag' => $args['tag'], 'get' => 'num_entries' ]);
 			
-			elseif(is_numeric($args["page"])) {
-				if($args["page"] > 1) {
-					$output["prev"]["page"] = $args["page"] - 1;
+			if($output['remainder'] < 5) {
+				if($args['page'] === 'latest' && $output['penultimate_page_num'] > 1) {
+					$output['prev']['page'] = $output['penultimate_page_num'] - 1;
 				}
-				if($args["page"] < $counts["latest_page_num"]) {
-					$output["next"]["page"] = $args["page"] + 1;
+				elseif(is_numeric($args['page'])) {
+					if($args["page"] > 1) {
+						$output["prev"]["page"] = $args["page"] - 1;
+					}
+					if($args["page"] < $output["latest_page_num"] - 1) {
+						$output["next"]["page"] = $args["page"] + 1;
+					}
+				}
+				$output["latest_page_num"] = $output["latest_page_num"] - 1;
+			}
+			else {
+				if($args['page'] === 'latest') {
+					$output['prev']['page'] = $output['penultimate_page_num'];
+				}
+				elseif(is_numeric($args['page'])) {
+					if($args["page"] > 1) {
+						$output["prev"]["page"] = $args["page"] - 1;
+					}
+					if($args["page"] < $output["latest_page_num"]) {
+						$output["next"]["page"] = $args["page"] + 1;
+					}
 				}
 			}
 			
@@ -104,10 +150,33 @@
 			if($args['get'] === 'name') {
 				array_push($sql_select, 'blog.title', 'blog.friendly', 'blog.id');
 			}
+			if($args['get'] === 'num_entries') {
+				$sql_select = [
+					'COUNT(1) AS num_entries',
+					'CEIL(COUNT(1) / 10) AS latest_page_num',
+					'LEAST(FLOOR(COUNT(1) / 10), (CEIL(COUNT(1) / 10) - 1)) AS penultimate_page_num',
+					'TRUNCATE((((COUNT(1) / 10) - FLOOR(COUNT(1) / 10)) * 10), 0) AS remainder'
+				];
+			}
 			
 			
 			// FROM
 			$sql_from = ["blog"];
+			
+			if(strlen($args['artist'])) {
+				$sql_from = [
+					'artists',
+					'LEFT JOIN blog_artists ON blog_artists.artist_id=artists.id',
+					'LEFT JOIN blog ON blog.id=blog_artists.blog_id',
+				];
+			}
+			if(strlen($args['tag'])) {
+				$sql_from = [
+					'tags',
+					'LEFT JOIN blog_tags ON blog_tags.tag_id=tags.id',
+					'LEFT JOIN blog ON blog.id=blog_tags.blog_id',
+				];
+			}
 			
 			if($args["get"] === "all" || $args["get"] === "basics" || $args["get"] === "list") {
 				//$sql_from[] = "LEFT JOIN images_blog ON images_blog.blog_id=blog.id LEFT JOIN images ON images.id=images_blog.image_id";
@@ -115,6 +184,14 @@
 			
 			
 			// WHERE
+			if(strlen($args['artist'])) {
+				$sql_where[] = 'artists.friendly=?';
+				$sql_values[] = friendly($args['artist']);
+			}
+			if(strlen($args['tag'])) {
+				$sql_where[] = 'tags.friendly=?';
+				$sql_values[] = friendly($args['tag']);
+			}
 			if(is_numeric($args["id"])) {
 				$sql_where[] = "blog.id = ?";
 				$sql_values[] = $args["id"];
@@ -130,12 +207,6 @@
 			if(!empty($args["end_date"])) {
 				$sql_where[] = "blog.date_occurred >= ?";
 				$sql_values[] = friendly(str_replace(["y", "m", "d"], $args["end_date"]));
-			}
-			if(!empty($args["tag"])) {
-				foreach(explode(" ", $args["tag"]) as $tag) {
-					$sql_where[] = "blog.tags LIKE CONCAT('%(', ?, ')%')";
-					$sql_values[] = sanitize($tag);
-				}
 			}
 			if(!empty($args["artist_id"])) {
 				foreach(explode(" ", $args["artist_id"]) as $tag) {
@@ -160,32 +231,85 @@
 				$sql_values[] = sanitize($args["friendly"]);
 			}
 			
+			// Group
+			if($args['get'] === 'num_entries') {
+				if($args['artist']) {
+					//$sql_group[] = 'blog_artists.artist_id';
+				}
+				elseif($args['tag']) {
+					//$sql_group[] = 'blog_tags.tag_id';
+				}
+			}
+			
 			
 			// LIMIT
 			if($args["page"] === "latest") {
-				$sql_limit = "LIMIT 10";
-			}
-			elseif(is_numeric($args["page"])) {
-				$sql_count = "SELECT CEIL(COUNT(1) / 10) AS latest_page_num, LEAST(FLOOR(COUNT(1) / 10), (CEIL(COUNT(1) / 10) - 1)) AS penultimate_page_num, TRUNCATE((((COUNT(1) / 10) - FLOOR(COUNT(1) / 10)) * 10), 0) AS remainder FROM blog";
-				$stmt = $this->pdo->prepare($sql_count);
-				$stmt->execute();
-				$count = $stmt->fetch();
+				$total_num_entries = $this->get_prev_next($args);
 				
-				if($args["page"] < $count["latest_page_num"]) {
-					$sql_limit = "LIMIT ".((($count["penultimate_page_num"] * 10) + $count["remainder"]) - ($args["page"] * 10)).", 10";
+				if($total_num_entries['remainder'] < 5) {
+					$sql_limit = 'LIMIT '.(10 + $total_num_entries['remainder']);
 				}
 				else {
-					$sql_limit = "LIMIT ".($count["remainder"] > 5 ? $count["remainder"] : 5);
+					$sql_limit = "LIMIT 10";
+				}
+			}
+			if(is_numeric($args['page'])) {
+				$total_num_entries = $this->get_prev_next($args);
+				//echo $_SESSION['username'] === 'inartistic' ? '***'.print_r($total_num_entries, true).'***' : null;
+				/*if($args['artist']) {
+					$sql_count = '
+						SELECT
+							CEIL(COUNT(1) / 10) AS latest_page_num,
+							LEAST(FLOOR(COUNT(1) / 10), (CEIL(COUNT(1) / 10) - 1)) AS penultimate_page_num,
+							TRUNCATE((((COUNT(1) / 10) - FLOOR(COUNT(1) / 10)) * 10), 0) AS remainder
+						FROM artists LEFT JOIN blog_artists ON blog_artists.artist_id=artists.id
+						WHERE artists.friendly=?';
+					$values_count[] = friendly($args['artist']);
+				}
+				elseif($args['tag']) {
+					$sql_count = '
+						SELECT
+							CEIL(COUNT(1) / 10) AS latest_page_num,
+							LEAST(FLOOR(COUNT(1) / 10), (CEIL(COUNT(1) / 10) - 1)) AS penultimate_page_num,
+							TRUNCATE((((COUNT(1) / 10) - FLOOR(COUNT(1) / 10)) * 10), 0) AS remainder
+						FROM tags LEFT JOIN blog_tags ON blog_tags.tag_id=tags.id
+						WHERE tags.friendly=?';
+					$values_count[] = friendly($args['tag']);
+				}
+				else {
+					$sql_count = '
+						SELECT
+							CEIL(COUNT(1) / 10) AS latest_page_num,
+							LEAST(FLOOR(COUNT(1) / 10), (CEIL(COUNT(1) / 10) - 1)) AS penultimate_page_num,
+							TRUNCATE((((COUNT(1) / 10) - FLOOR(COUNT(1) / 10)) * 10), 0) AS remainder
+						FROM blog';
+				}
+				$stmt = $this->pdo->prepare($sql_count);
+				$stmt->execute($values_count);
+				$count = $stmt->fetch();*/
+				if($args['page'] == $total_num_entries['latest_page_num'] - 1 && $total_num_entries['remainder'] < 5) {
+					$sql_limit = 'LIMIT '.(10 + $total_num_entries['remainder']);
+				}
+				elseif($args["page"] < $total_num_entries["latest_page_num"]) {
+					$sql_limit = "LIMIT ".((($total_num_entries["penultimate_page_num"] * 10) + $total_num_entries["remainder"]) - ($args["page"] * 10)).", 10";
+				}
+				else {
+					$sql_limit = "LIMIT ".($total_num_entries["remainder"] > 5 ? $total_num_entries["remainder"] : 5);
 				}
 			}
 			
 			
 			// Execute query
 			$sql_blog = "SELECT ".implode(", ", $sql_select)." FROM ".implode(" ", $sql_from)." ".($sql_where ? "WHERE (".implode(") AND (", $sql_where).")" : null)." ORDER BY blog.date_occurred DESC ".$sql_limit;
+			
+			//echo $_SESSION['username'] === 'inartistic' ? $sql_blog.'<br />' : null;
+			
 			$stmt_blog = $this->pdo->prepare($sql_blog);
 			$stmt_blog->execute($sql_values);
 			$blogs = $stmt_blog->fetchAll();
 			$num_blogs = count($blogs);
+			
+			//echo $_SESSION['username'] === 'inartistic' ? '<pre>'.print_r($blogs, true).'</pre>' : null;
 			
 			// Get list of returned IDs
 			for($i=0; $i<$num_blogs; $i++) {
@@ -265,7 +389,7 @@
 			// Return result
 			$blogs = is_array($blogs) ? $blogs : [];
 			
-			if($args["friendly"] || is_numeric($args["id"])) {
+			if($args["friendly"] || is_numeric($args["id"]) || $args['get'] === 'num_entries') {
 				$blogs = reset($blogs);
 			}
 			

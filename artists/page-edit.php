@@ -20,8 +20,7 @@
 	
 	if($_SESSION["admin"] > 0) { 
 			if(!empty($artist)) {
-				$artist['images'] = is_array($artist['images']) ? $artist['images'] : [];
-				$artist['images'] = array_values($artist['images']);
+				$artist['images'] = is_array($artist['images']) ? array_values($artist['images']) : [];
 				?>
 					<form action="" class="col c1 any--margin" enctype="multipart/form-data" id="form__edit" method="post" name="form__edit">
 						<?php

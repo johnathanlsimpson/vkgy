@@ -23,6 +23,27 @@ function initImageEditElems() {
 	});
 }
 
+// Init delete buttons
+function initImageDeleteButtons() {
+	var imageDeleteButtons = document.querySelectorAll('.image__delete');
+	var itemType = document.querySelector('[name=image_item_type]').value;
+	var itemId = document.querySelector('[name=image_item_id]').value;
+	
+	imageDeleteButtons.forEach(function(imageDeleteButton) {
+		
+		var parentElem = getParent(imageDeleteButton, 'image__template');
+		var imageId = parentElem.querySelector('[name=image_id]').value;
+		
+		initDelete($(imageDeleteButton), '/images/function-delete_image.php', { 'id' : imageId, 'item_type': itemType, 'item_id': itemId }, function(deleteButton) {
+			parentElem.classList.add('any--fade-out');
+			
+			setTimeout(function() {
+				parentElem.remove();
+			}, 300);
+		});
+	});
+}
+
 // Function get specified parent
 function getParent(childElem, parentClass) {
 	var currentElem = childElem;
@@ -79,7 +100,6 @@ function updateImageData(changedElem) {
 var imageUploadElem = document.querySelector('[name=images]');
 var imageTemplate = document.querySelector('#image-template');
 var imagesElem = document.querySelector('.image__results');
-
 imageUploadElem.addEventListener('change', function() {
 	var itemType = imageUploadElem.parentNode.querySelector('[name=image_item_type]').value;
 	var itemId = imageUploadElem.parentNode.querySelector('[name=image_item_id]').value;
@@ -106,30 +126,18 @@ imageUploadElem.addEventListener('change', function() {
 			
 			initializeInlineSubmit($(newImageElem), '/images/function-upload_image.php', {
 				'preparedFormData' : { 'image' : thisImage, 'item_type' : itemType, 'item_id' : itemId, 'default_description' : defaultDescription },
+				'callbackOnSuccess': function() {
+					
+					imagesElem.prepend(newImageElem);
+					lookForSelectize();
+					initImageEditElems();
+					initImageDeleteButtons();
+
+					document.dispatchEvent(new Event('image-added'));
+				}
 			});
-			
-			imagesElem.prepend(newImageElem);
-			lookForSelectize();
-			initImageEditElems();
-			
-			document.dispatchEvent(new Event('image-added'));
 		}
 	}
-});
-
-// Delete images
-var deleteElems = document.querySelectorAll('.image__delete');
-deleteElems.forEach(function(deleteElem) {
-	var parentElem = getParent(deleteElem, 'image__template');
-	var imageId = parentElem.querySelector('[name=image_id]').value;
-	
-	initDelete($(deleteElem), '/images/function-delete_image.php', { 'id' : imageId }, function(deleteButton) {
-		parentElem.classList.add('any--fade-out');
-		
-		setTimeout(function() {
-			parentElem.remove();
-		}, 300);
-	});
 });
 
 // Handle item ID change
@@ -151,3 +159,4 @@ document.addEventListener('item-id-updated', function(event) {
 // Init elements
 lookForSelectize();
 initImageEditElems();
+initImageDeleteButtons();

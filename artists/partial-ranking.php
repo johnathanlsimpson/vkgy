@@ -14,7 +14,13 @@
 	$stmt_num_releases->execute([ "available everywhere", $artist["id"] ]);
 	$rslt_num_releases = $stmt_num_releases->fetchColumn();
 	
-	$sql_lives = "SELECT lives.date_occurred, lives.livehouse_id, lives_livehouses.capacity FROM lives LEFT JOIN lives_livehouses ON lives_livehouses.id=lives.livehouse_id WHERE lives_livehouses.capacity IS NOT NULL AND lives.lineup LIKE CONCAT('%(', ?, ')%') ORDER BY lives.date_occurred ASC";
+	$sql_lives = '
+		SELECT lives.date_occurred, lives.livehouse_id, lives_livehouses.capacity 
+		FROM lives_artists 
+		LEFT JOIN lives ON lives.id=lives_artists.live_id 
+		LEFT JOIN lives_livehouses ON lives_livehouses.id=lives.livehouse_id
+		WHERE lives_artists.artist_id=? AND lives_livehouses.capacity IS NOT NULL
+		ORDER BY lives.date_occurred ASC';
 	$stmt_lives = $pdo->prepare($sql_lives);
 	$stmt_lives->execute([ $artist["id"] ]);
 	$rslt_lives = $stmt_lives->fetchAll();
