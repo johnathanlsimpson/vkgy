@@ -409,7 +409,7 @@
 								include("../artists/page-tags.php");
 								
 								// Popularity
-								include("../artists/page-ranking.php");
+								include("../artists/partial-ranking.php");
 							?>
 						</div>
 						
