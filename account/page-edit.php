@@ -14,7 +14,7 @@
 	
 	$access_artist = new access_artist($pdo);
 	
-	$sql_image_list = "SELECT artist_id FROM images WHERE is_default=?";
+	/*$sql_image_list = "SELECT artist_id FROM images WHERE is_default=?";
 	$stmt_image_list = $pdo->prepare($sql_image_list);
 	$stmt_image_list->execute([ "1" ]);
 	$rslt_image_list = $stmt_image_list->fetchAll();
@@ -27,7 +27,7 @@
 				$artist_list[$image["artist_id"]] = $image["artist_id"];
 			}
 		}
-	}
+	}*/
 	
 	if($_SESSION["loggedIn"] && is_numeric($_SESSION["userID"])) {
 		$sql_check = "SELECT 1 FROM users WHERE id=? AND is_vip=1 LIMIT 1";
