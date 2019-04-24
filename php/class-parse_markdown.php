@@ -125,8 +125,6 @@
 				$id           = $match[1];
 				$name         = $match[2];
 				$display_name = $match[3];
-				//$display_name = str_replace(["&#91;", "&#93;"], ["&#92;&#91;", "&#92;&#93;"], $display_name);
-				
 				
 				if(!is_numeric($id)) {
 					$id = $access_artist->access_artist(["name" => $name, "get" => "id"])[0]["id"];
@@ -412,6 +410,7 @@
 				foreach($reference_data as $reference_datum) {
 					$output = "";
 					
+					// Artist
 					if($reference_datum["type"] === "artist") {
 						if($reference_datum["not_found"]) {
 							$output = $reference_datum["name"];
@@ -420,9 +419,13 @@
 							$output = '<a class="artist" href="/artists/'.$reference_datum["friendly"].'/" data-name="'.$reference_datum["name"].'">'.$reference_datum["quick_name"].'</a>'.($reference_datum["romaji"] ? ' ('.$reference_datum["name"].')' : null);
 						}
 					}
+					
+					// User
 					elseif($reference_datum['type'] === 'user') {
 						$output = '<a class="user" href="/users/'.$reference_datum['username'].'/">'.$reference_datum['username'].'</a>';
 					}
+					
+					// Live
 					elseif($reference_datum["type"] === "live" && !$ignore_references) {
 						ob_start();
 						?>
@@ -467,6 +470,8 @@
 						<?php
 						$output = str_replace(["\n", "\t", "\r"], "", ob_get_clean());
 					}
+					
+					// Release
 					elseif($reference_datum["type"] === "release" && !$ignore_references) {
 						ob_start();
 						?>
@@ -537,14 +542,18 @@
 				$input_content = preg_replace_callback("/".$this->youtube_pattern."/", function($match) {
 					return '<div class="module module--youtube"><iframe src="https://www.youtube.com/embed/'.$match[1].'" frameborder="0" allowfullscreen></iframe></div>';
 				}, $input_content);
-
+				
 				$input_content = preg_replace_callback("/".$this->twitter_pattern."/", function($match) {
 					return '<div class="module module--twitter"><blockquote class="twitter-tweet" data-lang="en"><a href="https://twitter.com/'.$match[1].'/status/'.$match[2].'"></a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>';
 				}, $input_content);
-
+				
+				// Image
 				$input_content = preg_replace_callback("/".$this->image_pattern."/", function($match) {
-				return '<div class="module module--image any--weaken any--align-center"><a href="'.($match[3] ?: $match[2]).'"><img alt="'.$match[1].'" src="'.$match[2].'" /></a><div>'.$match[1].'</div></div>';
-			}, $input_content);
+					$image_src = $match[2];
+					$image_src = preg_replace('/'.'(^(?:https?:)?(?:\/\/)?(?:vk\.gy)?\/images\/\d+(?:-[A-z0-9-]*)?)(\.[A-z]+)$'.'/', '$1.medium$2', $image_src);
+					
+					return '<div class="module module--image any--weaken any--align-center"><a href="'.($match[3] ?: $match[2]).'"><img alt="'.$match[1].'" data-src="'.$image_src.'" /></a><div>'.$match[1].'</div></div>';
+				}, $input_content);
 			}
 			
 			return $input_content;

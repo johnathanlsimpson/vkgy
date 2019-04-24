@@ -9,7 +9,10 @@ function previewEntry() {
 		initializeInlineSubmit($("[name=form__update]"), "/blog/function-preview_entry.php", {
 			"preparedFormData" : formData,
 			"statusContainer" : $(".update__preview-status"),
-			"resultContainer" : $(".update__preview")
+			"resultContainer" : $(".update__preview"),
+			'callbackOnSuccess' : function() {
+				var lazyLoad = new LazyLoad();
+			}
 		});
 	}
 }
@@ -49,13 +52,32 @@ document.addEventListener('image-updated', function(event) {
 	}
 });
 
+// Init delete button
+function initDeleteButton() {
+	var deleteButton = document.querySelector('[name=delete]');
+	var newDeleteButton = deleteButton.cloneNode(true);
+	deleteButton.parentNode.replaceChild(newDeleteButton, deleteButton);
+	
+	deleteButton = document.querySelector('[name=delete]');
+	deleteButton.setAttribute('data-state', null);
+	
+	initDelete(
+		$(deleteButton),
+		'/blog/function-delete_entry.php',
+		{ 'id': deleteButton.getAttribute('data-id') },
+		function() { changeState('add'); }
+	);
+}
 
+initDeleteButton();
 
 // Submit
 initializeInlineSubmit($("[name=form__update]"), "/blog/function-update_entry.php", {
 	"submitOnEvent" : "submit",
 	"showEditLink" : true,
 	'callbackOnSuccess' : function(event, returnedData) {
+		initDeleteButton();
+		
 		var e = new Event('item-id-updated');
 		e.details = {
 			'id' : returnedData.id,
@@ -64,9 +86,6 @@ initializeInlineSubmit($("[name=form__update]"), "/blog/function-update_entry.ph
 		document.dispatchEvent(e);
 	},
 });
-
-
-
 
 // Change states
 function changeState(state) {
@@ -78,7 +97,7 @@ function changeState(state) {
 	}
 	
 	if(state === "edit") {
-		document.title = text[state] + ": " + $("[name=title]").val() + " | weloveucp.com";
+		document.title = text[state] + ": " + $("[name=title]").val() + " |  vk.gy (ブイケージ)";
 		history.pushState("", "", "/blog/" + $("[name=friendly]").val() + "/edit/");
 	}
 	else if(state === "add") {
@@ -99,16 +118,7 @@ function changeState(state) {
 			$(elems[i]).html("").val("").attr("selected", false).attr("checked", false).attr("src", "").attr("data-id", "");
 		}
 		
-		document.title = text[state] + " | weloveucp.com";
+		document.title = text[state] + " | vk.gy (ブイケージ)";
 		history.pushState("", "", "/blog/add/");
 	}
 }
-
-
-
-function initDeleteWrapper() {
-	$("[name=delete]").off("click");
-	initDelete($("[name=delete]"), "/blog/function-delete_entry.php", { "id" : $("[name=id]").val() }, function() { changeState("add"); });
-}
-
-initDeleteWrapper();

@@ -1,14 +1,15 @@
 <?php
 include_once('../php/include.php');
+include_once('../php/class-access_social_media.php');
 $access_social_media = $access_social_media ?: new access_social_media($pdo);
 $access_image = $access_image ?: new access_image($pdo);
 
 // Set to date to JST
 $current_date = new DateTime(null, new DateTimeZone('JST'));
-$current_date = $current_date->date;
+$current_date = $current_date->format('Y-m-d H:i');
 
 // Get queued entries with scheduled date
-$sql_queued = 'SELECT * FROM blog WHERE is_queued=? AND scheduled_date IS NOT NULL AND scheduled_date<=?';
+$sql_queued = 'SELECT * FROM blog WHERE is_queued=? AND date_scheduled IS NOT NULL AND date_scheduled<=?';
 $stmt_queued = $pdo->prepare($sql_queued);
 $stmt_queued->execute([ 1, $current_date ]);
 $rslt_queued = $stmt_queued->fetchAll();
@@ -23,17 +24,18 @@ if(is_array($rslt_queued) && !empty($rslt_queued)) {
 			
 			// Immediately post to socials
 			if(strlen($entry['title']) && strlen($entry['friendly'])) {
-				$social_post = $access_social_media->build_post(['title' => $title, 'url' => 'https://vk.gy/blog/'.$entry['friendly'].'/', 'id' => $entry['id'] ], 'blog_post');
+				$social_post = $access_social_media->build_post(['title' => $entry['title'], 'url' => 'https://vk.gy/blog/'.$entry['friendly'].'/', 'id' => $entry['id'] ], 'blog_post');
 				$access_social_media->post_to_social($social_post, 'both');
 			}
 			
 			// Update images
 			$images = $access_image->access_image([ 'blog_id' => $entry['id'], 'get' => 'name', 'show_queued' => true ]);
+			
 			if(is_array($images) && !empty($images)) {
 				foreach($images as $image) {
-					$sql_image = 'UPDATE images SET is_queued=?, date_occurred=? WHERE id=?';
-					$stmt_image = $pdo->prepare($sql_images);
-					$stmt_image->execute([ 0, $current_date, $entry['id'] ]);
+					$sql_image = 'UPDATE images SET is_queued=?, date_added=? WHERE id=?';
+					$stmt_image = $pdo->prepare($sql_image);
+					$stmt_image->execute([ 0, $current_date, $image['id'] ]);
 				}
 			}
 		}

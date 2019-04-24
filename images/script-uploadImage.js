@@ -101,6 +101,7 @@ function updateImageData(changedElem) {
 var imageUploadElem = document.querySelector('[name=images]');
 var imageTemplate = document.querySelector('#image-template');
 var imagesElem = document.querySelector('.image__results');
+
 imageUploadElem.addEventListener('change', function() {
 	var itemType = imageUploadElem.parentNode.querySelector('[name=image_item_type]').value;
 	var itemId = imageUploadElem.parentNode.querySelector('[name=image_item_id]').value;
@@ -129,15 +130,15 @@ imageUploadElem.addEventListener('change', function() {
 			initializeInlineSubmit($(newImageElem), '/images/function-upload_image.php', {
 				'preparedFormData' : { 'image' : thisImage, 'item_type' : itemType, 'item_id' : itemId, 'is_queued': isQueued, 'default_description' : defaultDescription },
 				'callbackOnSuccess': function() {
-					
-					imagesElem.prepend(newImageElem);
-					lookForSelectize();
-					initImageEditElems();
-					initImageDeleteButtons();
-					
-					document.dispatchEvent(new Event('image-added'));
 				}
 			});
+			
+			imagesElem.prepend(newImageElem);
+			lookForSelectize();
+			initImageEditElems();
+			initImageDeleteButtons();
+			
+			document.dispatchEvent(new Event('image-added'));
 		}
 	}
 });
@@ -146,14 +147,16 @@ imageUploadElem.addEventListener('change', function() {
 document.addEventListener('item-id-updated', function(event) {
 	var imageItemIdElems = document.querySelectorAll('[name=image_item_id]');
 	var imageIsQueuedElems = document.querySelectorAll('[name=image_is_queued]');
+	var isQueued;
 	
 	if(imageItemIdElems.length) {
 		imageItemIdElems.forEach(function(imageItemIdElem, i) {
 			imageItemIdElem.value = event.details.id;
 			imageItemIdElem.setAttribute('value', event.details.id);
 			
-			imageIsQueuedElems[i].value = event.details.is_queued;
-			imageIsQueuedElems[i].setAttribute('value', event.details.is_queued);
+			isQueued = event.details.is_queued == 1 ? 1 : 0;
+			imageIsQueuedElems[i].value = isQueued;
+			imageIsQueuedElems[i].setAttribute('value', isQueued);
 			
 			if(!imageItemIdElem.disabled) {
 				imageItemIdElem.dispatchEvent(new Event('change'));
