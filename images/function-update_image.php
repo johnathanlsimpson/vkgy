@@ -125,7 +125,7 @@ if(is_numeric($_POST['id'])) {
 			}
 		}
 		
-		if($is_queued) {
+		if($is_queued && $item_type === 'flyer') {
 			update_development($pdo, ['type' => 'flyer']);
 		}
 	}

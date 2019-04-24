@@ -10,6 +10,7 @@ function initImageEditElems() {
 		'musician_id',
 		'release_id',
 		'is_exclusive',
+		'is_queued',
 		'credit'
 	];
 	imageElemNames.forEach(function(imageElemName) {
@@ -104,6 +105,7 @@ imageUploadElem.addEventListener('change', function() {
 	var itemType = imageUploadElem.parentNode.querySelector('[name=image_item_type]').value;
 	var itemId = imageUploadElem.parentNode.querySelector('[name=image_item_id]').value;
 	var itemName = imageUploadElem.parentNode.querySelector('[name=image_item_name]').value;
+	var isQueued = imageUploadElem.parentNode.querySelector('[name=image_is_queued]').value;
 	var defaultDescription = imageUploadElem.parentNode.querySelector('[name=image_description]').value;
 	
 	for(var i=0; i<imageUploadElem.files.length; i++) {
@@ -125,14 +127,14 @@ imageUploadElem.addEventListener('change', function() {
 			itemIdElem.prepend(newOptionElem);
 			
 			initializeInlineSubmit($(newImageElem), '/images/function-upload_image.php', {
-				'preparedFormData' : { 'image' : thisImage, 'item_type' : itemType, 'item_id' : itemId, 'default_description' : defaultDescription },
+				'preparedFormData' : { 'image' : thisImage, 'item_type' : itemType, 'item_id' : itemId, 'is_queued': isQueued, 'default_description' : defaultDescription },
 				'callbackOnSuccess': function() {
 					
 					imagesElem.prepend(newImageElem);
 					lookForSelectize();
 					initImageEditElems();
 					initImageDeleteButtons();
-
+					
 					document.dispatchEvent(new Event('image-added'));
 				}
 			});
@@ -143,14 +145,21 @@ imageUploadElem.addEventListener('change', function() {
 // Handle item ID change
 document.addEventListener('item-id-updated', function(event) {
 	var imageItemIdElems = document.querySelectorAll('[name=image_item_id]');
+	var imageIsQueuedElems = document.querySelectorAll('[name=image_is_queued]');
 	
 	if(imageItemIdElems.length) {
-		imageItemIdElems.forEach(function(imageItemIdElem) {
+		imageItemIdElems.forEach(function(imageItemIdElem, i) {
 			imageItemIdElem.value = event.details.id;
 			imageItemIdElem.setAttribute('value', event.details.id);
 			
+			imageIsQueuedElems[i].value = event.details.is_queued;
+			imageIsQueuedElems[i].setAttribute('value', event.details.is_queued);
+			
 			if(!imageItemIdElem.disabled) {
 				imageItemIdElem.dispatchEvent(new Event('change'));
+			}
+			if(!imageIsQueuedElems[i].disabled) {
+				imageIsQueuedElems[i].dispatchEvent(new Event('change'));
 			}
 		});
 	}

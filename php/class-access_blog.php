@@ -178,10 +178,6 @@
 				];
 			}
 			
-			if($args["get"] === "all" || $args["get"] === "basics" || $args["get"] === "list") {
-				//$sql_from[] = "LEFT JOIN images_blog ON images_blog.blog_id=blog.id LEFT JOIN images ON images.id=images_blog.image_id";
-			}
-			
 			
 			// WHERE
 			if(strlen($args['artist'])) {
@@ -230,16 +226,16 @@
 				$sql_where[] = "blog.friendly=?";
 				$sql_values[] = sanitize($args["friendly"]);
 			}
+			if($args['queued']) {
+				$sql_where[] = 'blog.is_queued=?';
+				$sql_values[] = 1;
+			}
+			if(!$args['show_queued']) {
+				$sql_where[] = 'blog.is_queued=?';
+				$sql_values[] = 0;
+			}
 			
 			// Group
-			if($args['get'] === 'num_entries') {
-				if($args['artist']) {
-					//$sql_group[] = 'blog_artists.artist_id';
-				}
-				elseif($args['tag']) {
-					//$sql_group[] = 'blog_tags.tag_id';
-				}
-			}
 			
 			
 			// LIMIT
@@ -255,38 +251,7 @@
 			}
 			if(is_numeric($args['page'])) {
 				$total_num_entries = $this->get_prev_next($args);
-				//echo $_SESSION['username'] === 'inartistic' ? '***'.print_r($total_num_entries, true).'***' : null;
-				/*if($args['artist']) {
-					$sql_count = '
-						SELECT
-							CEIL(COUNT(1) / 10) AS latest_page_num,
-							LEAST(FLOOR(COUNT(1) / 10), (CEIL(COUNT(1) / 10) - 1)) AS penultimate_page_num,
-							TRUNCATE((((COUNT(1) / 10) - FLOOR(COUNT(1) / 10)) * 10), 0) AS remainder
-						FROM artists LEFT JOIN blog_artists ON blog_artists.artist_id=artists.id
-						WHERE artists.friendly=?';
-					$values_count[] = friendly($args['artist']);
-				}
-				elseif($args['tag']) {
-					$sql_count = '
-						SELECT
-							CEIL(COUNT(1) / 10) AS latest_page_num,
-							LEAST(FLOOR(COUNT(1) / 10), (CEIL(COUNT(1) / 10) - 1)) AS penultimate_page_num,
-							TRUNCATE((((COUNT(1) / 10) - FLOOR(COUNT(1) / 10)) * 10), 0) AS remainder
-						FROM tags LEFT JOIN blog_tags ON blog_tags.tag_id=tags.id
-						WHERE tags.friendly=?';
-					$values_count[] = friendly($args['tag']);
-				}
-				else {
-					$sql_count = '
-						SELECT
-							CEIL(COUNT(1) / 10) AS latest_page_num,
-							LEAST(FLOOR(COUNT(1) / 10), (CEIL(COUNT(1) / 10) - 1)) AS penultimate_page_num,
-							TRUNCATE((((COUNT(1) / 10) - FLOOR(COUNT(1) / 10)) * 10), 0) AS remainder
-						FROM blog';
-				}
-				$stmt = $this->pdo->prepare($sql_count);
-				$stmt->execute($values_count);
-				$count = $stmt->fetch();*/
+				
 				if($args['page'] == $total_num_entries['latest_page_num'] - 1 && $total_num_entries['remainder'] < 5) {
 					$sql_limit = 'LIMIT '.(10 + $total_num_entries['remainder']);
 				}
@@ -301,15 +266,10 @@
 			
 			// Execute query
 			$sql_blog = "SELECT ".implode(", ", $sql_select)." FROM ".implode(" ", $sql_from)." ".($sql_where ? "WHERE (".implode(") AND (", $sql_where).")" : null)." ORDER BY blog.date_occurred DESC ".$sql_limit;
-			
-			//echo $_SESSION['username'] === 'inartistic' ? $sql_blog.'<br />' : null;
-			
 			$stmt_blog = $this->pdo->prepare($sql_blog);
 			$stmt_blog->execute($sql_values);
 			$blogs = $stmt_blog->fetchAll();
 			$num_blogs = count($blogs);
-			
-			//echo $_SESSION['username'] === 'inartistic' ? '<pre>'.print_r($blogs, true).'</pre>' : null;
 			
 			// Get list of returned IDs
 			for($i=0; $i<$num_blogs; $i++) {
@@ -328,7 +288,7 @@
 			// Get images
 			if($args['get'] === 'all') {
 				for($i=0; $i<$num_blogs; $i++) {
-					$blogs[$i]['images'] = $this->access_image->access_image([ 'blog_id' => $blog_ids, 'get' => 'most', 'associative' => true ]);
+					$blogs[$i]['images'] = $this->access_image->access_image([ 'blog_id' => $blog_ids, 'get' => 'most', 'associative' => true, 'show_queued' => true ]);
 				}
 			}
 			elseif($args['get'] === 'basics' || $args['get'] === 'list') {
@@ -336,6 +296,16 @@
 				
 				for($i=0; $i<$num_blogs; $i++) {
 					$blogs[$i]['image'] = $images[$blogs[$i]['image_id']];
+				}
+			}
+			
+			// Get edit history
+			if($args['get'] === 'all') {
+				for($i=0; $i<$num_blogs; $i++) {
+					$sql_edit_history = 'SELECT edits_blog.date_occurred, users.username FROM edits_blog LEFT JOIN users ON users.id=edits_blog.user_id WHERE edits_blog.blog_id=? ORDER BY edits_blog.date_occurred DESC';
+					$stmt_edit_history = $this->pdo->prepare($sql_edit_history);
+					$stmt_edit_history->execute([ $blogs[$i]['id'] ]);
+					$blogs[$i]['edit_history'] = $stmt_edit_history->fetchAll();
 				}
 			}
 			

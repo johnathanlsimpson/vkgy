@@ -537,6 +537,10 @@
 				$sql_where[] = 'images.is_exclusive=?';
 				$sql_values[] = 1;
 			}
+			if(!$args['show_queued']) {
+				$sql_where[] = 'images.is_queued=?';
+				$sql_values[] = 0;
+			}
 			
 			// Group
 			if($args['get'] === 'all' || $args['get'] === 'most') {
