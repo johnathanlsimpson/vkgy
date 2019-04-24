@@ -2,6 +2,7 @@
 	if($_SESSION["loggedIn"]) {
 		script([
 			'/scripts/external/script-autosize.js',
+			'/scripts/external/script-inputmask.js',
 			'/scripts/script-initDelete.js',
 			'/blog/script-page-update.js',
 		]);
@@ -43,7 +44,7 @@
 			
 			<form action="/blog/function-update.php" class="col c3-AAB" enctype="multipart/form-data" method="post" name="form__update">
 				<div>
-					<input data-get="id" data-get-into="value" name="id"  value="<?php echo $entry["id"]; ?>" type="hidden" />
+					<input data-get="id" data-get-into="value" name="id" value="<?php echo $entry["id"]; ?>" type="hidden" />
 					<input data-get="friendly" data-get-into="value" name="friendly" type="hidden" value="<?php echo $entry["friendly"]; ?>" />
 					
 					<h2 class="update__header">
@@ -80,6 +81,7 @@
 							'hide_labels' => '1',
 							'hide_musicians' => '1',
 							'hide_releases' => '1',
+							'is_queued' => 1,
 						]);
 					?>
 					
@@ -109,12 +111,43 @@
 						?>
 					</div>
 					
+					<h3>
+						Scheduling <?php echo $entry['date_scheduled']; ?>
+					</h3>
+					<ul class="text text--outlined any--weaken-color">
+						<li class="input__row">
+							<span class="input__group">
+								<label class="input__label">Post date/time</label>
+								<input class="input" data-inputmask="'alias': 'yyyy-mm-dd'" placeholder="yyyy-mm-dd" maxlength="10" name="date_scheduled" size="12" value="<?php echo substr($entry['date_scheduled'], 0, 10); ?>" />
+								<input class="input--secondary" data-inputmask="'alias': 'hh:mm'" placeholder="hh:mm" maxlength="5" name="time_scheduled" size="7" value="<?php echo substr($entry['date_scheduled'], 11, 5); ?>" />
+								&nbsp;JST
+							</span>
+						</li>
+						
+						<li class="symbol__help">
+							Scheuled entries will be saved as drafts, until the date/time that they go live.
+						</li>
+						
+						<li class="symbol__help">
+							Date/time is in <strong>24 hour JST</strong>. Use <a href="https://savvytime.com/converter/jst" target="_blank">this converter</a> if you need help.
+						</li>
+						
+						<li class="symbol__error">
+							The entry will automatically go live at the specified date/time. Please be sure the entry is correct before then.
+						</li>
+					</ul>
+					
 					<div class="text text--docked">
 						<div class="input__row" data-role="submit-container">
 							<div class="input__group any--flex-grow">
 								<button class="any--flex-grow" name="submit" type="submit">
 									<?php echo $entry ? "Edit" : "Add"; ?> entry
 								</button>
+								
+								&nbsp;
+								<input class="input__checkbox" id="is_queued" name="is_queued" type="checkbox" value="1" />
+								<label class="input__checkbox-label symbol__unchecked" for="is_queued">Save as draft?</label>
+								
 								<span data-role="status"></span>
 							</div>
 							<div class="input__group">
@@ -126,6 +159,7 @@
 							<a class="a--padded a--outlined any--flex-grow any--align-center" data-get="url" data-get-into="href" href="">View entry</a>
 							<a class="a--padded" data-get="edit_url" data-get-into="href" data-role="edit">Edit</a>
 						</div>
+						
 						<div class="text text--outlined text--notice update__result" data-role="result"></div>
 					</div>
 				</div>

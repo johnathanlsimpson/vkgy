@@ -3,7 +3,7 @@
 		<?php
 			if(!empty($error)) {
 				?>
-					<div class="text text--outlined text--error">
+					<div class="text text--outlined text--error symbol__error">
 						<?php echo $error; ?>
 					</div>
 				<?php
@@ -97,6 +97,30 @@
 	</div>
 
 	<div>
+		<?php
+			if(is_array($queued_entries) && !empty($queued_entries)) {
+				?>
+					<h3>
+						<div class="h5">
+							Admin
+						</div>
+						<?php echo lang('Queued entries', '出す予定', ['container' => 'div']); ?>
+					</h3>
+					<ul class="text text--outlined ul--compact">
+						<?php
+							foreach($queued_entries as $entry) {
+								?>
+									<li>
+										<a href="<?php echo '/blog/'.$entry['friendly'].'/'; ?>"><?php echo $entry['title']; ?></a>
+									</li>
+								<?php
+							}
+						?>
+					</ul>
+				<?php
+			}
+		?>
+		
 		<h3>
 			<?php echo lang('Popular', 'おすすめ', [ 'container' => 'div' ]); ?>
 		</h3>
@@ -108,11 +132,11 @@
 				$rslt_rec = $stmt_rec->fetchAll();
 				$rslt_rec = is_array($rslt_rec) ? $rslt_rec : [];
 				shuffle($rslt_rec);
-
+				
 				for($i=0; $i < count($rslt_rec) && $i < 5; $i++) {
 					?>
 						<li>
-							<a class="symbol__news" href="<?php echo '/blog/'.$rslt_rec[$i]['friendly'].'/'; ?>"><?php echo $rslt_rec[$i]['title']; ?></a>
+							<a href="<?php echo '/blog/'.$rslt_rec[$i]['friendly'].'/'; ?>"><?php echo $rslt_rec[$i]['title']; ?></a>
 						</li>
 					<?php
 				}
