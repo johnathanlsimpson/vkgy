@@ -16,33 +16,50 @@
 		
 		?>
 			<div class="col c1">
-				<div>
-					<h1>
-						Blog
-					</h1>
-				</div>
-			</div>
-			<div class="col c1">
-				<div class="any--flex any--margin">
+				<h1>
+					Blog
 					<?php
-						if(is_array($entry["prev_next"])) {
-							foreach($entry["prev_next"] as $prev_next) {
-								?>
-									<div class="any--flex-grow any--no-wrap <?php echo $prev_next["type"] === "next" ? "any--align-right" : null; ?>">
-										<a class="" href="/blog/<?php echo $prev_next["friendly"]; ?>/edit/">
-											<?php echo $prev_next["type"] === "prev" ? '<span class="symbol__previous"></span>' : null; ?>
-											<?php echo $prev_next["title"]; ?>
-											<?php echo $prev_next["type"] === "next" ? '<span class="symbol__next"></span>' : null; ?>
-										</a>
-									</div>
-								<?php
-							}
+						if(strlen($entry['friendly'])) {
+							?>
+								<div class="any--weaken">
+									<a class="a--inherit" href="<?php echo '/blog/'.$entry['friendly'].'/'; ?>"><?php echo $entry['title']; ?></a>
+								</div>
+							<?php
 						}
 					?>
-				</div>
+				</h1>
+				
+				<?php
+					if($error) {
+						?>
+							<div class="text text--outlined text--error symbol__error">
+								<?php echo $error; ?>
+							</div>
+						<?php
+					}
+					if(is_array($entry["prev_next"]) && !empty($entry['prev_next'])) {
+						?>
+							<div class="any--flex any--margin">
+								<?php
+									foreach($entry["prev_next"] as $prev_next) {
+										?>
+											<div class="any--flex-grow any--no-wrap <?php echo $prev_next["type"] === "next" ? "any--align-right" : null; ?>">
+												<a class="" href="/blog/<?php echo $prev_next["friendly"]; ?>/edit/">
+													<?php echo $prev_next["type"] === "prev" ? '<span class="symbol__previous"></span>' : null; ?>
+													<?php echo $prev_next["title"]; ?>
+													<?php echo $prev_next["type"] === "next" ? '<span class="symbol__next"></span>' : null; ?>
+												</a>
+											</div>
+										<?php
+									}
+								?>
+							</div>
+						<?php
+					}
+				?>
 			</div>
 			
-			<form action="/blog/function-update.php" class="col c3-AAB" enctype="multipart/form-data" method="post" name="form__update">
+			<form action="/blog/function-update.php" class="col c3-AAB any--margin" enctype="multipart/form-data" method="post" name="form__update">
 				<div>
 					<input data-get="id" data-get-into="value" name="id" value="<?php echo $entry["id"]; ?>" type="hidden" />
 					<input data-get="friendly" data-get-into="value" name="friendly" type="hidden" value="<?php echo $entry["friendly"]; ?>" />
@@ -62,6 +79,13 @@
 							<div class="input__group any--flex-grow">
 								<label class="input__label">Entry content</label>
 								<textarea class="input__textarea any--flex-grow autosize" name="content" placeholder="blog entry here..."><?php echo $entry["content"]; ?></textarea>
+							</div>
+						</div>
+						
+						<div class="input__row">
+							<div class="input__group any--flex-grow">
+								<label class="input__label">URL-friendly title</label>
+								<input class="any--flex-grow" name="friendly" placeholder="friendly" value="<?php echo $entry["friendly"]; ?>" />
 							</div>
 						</div>
 					</div>
@@ -145,7 +169,7 @@
 								</button>
 								
 								&nbsp;
-								<input class="input__checkbox" id="is_queued" name="is_queued" type="checkbox" value="1" />
+								<input class="input__checkbox" id="is_queued" name="is_queued" type="checkbox" value="1" <?php echo $entry['is_queued'] ? 'checked' : null; ?> />
 								<label class="input__checkbox-label symbol__unchecked" for="is_queued">Save as draft?</label>
 								
 								<span data-role="status"></span>
@@ -175,5 +199,28 @@
 				</div>
 			</form>
 		<?php
+		
+		if(is_array($queued_entries) && !empty($queued_entries)) {
+			?>
+				<div class="col c1">
+					<div>
+						<h2>
+							<?php echo lang('Queued/scheduled entries', '出す予定', ['container' => 'div']); ?>
+						</h2>
+						<ul class="text ul--compact">
+							<?php
+								foreach($queued_entries as $entry) {
+									?>
+										<li>
+											<a href="<?php echo '/blog/'.$entry['friendly'].'/edit/'; ?>"><?php echo $entry['title']; ?></a>
+										</li>
+									<?php
+								}
+							?>
+						</ul>
+					</div>
+				</div>
+			<?php
+		}
 	}
 ?>

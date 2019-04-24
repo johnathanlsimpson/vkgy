@@ -27,11 +27,11 @@ $is_vip = $stmt_vip_check->fetchColumn();
 // View: entry
 if(!empty($_GET["entry"]) && !$_GET["action"]) {
 	$entry = $access_blog->access_blog([ 'friendly' => sanitize($_GET['entry']), 'get' => 'all', 'show_queued' => true ]);
-
+	
 	if(
 		!$entry['is_queued']
 		||
-		$_SESSION['userID'] === $current_entry['user_id']
+		$_SESSION['userID'] === $entry['user_id']
 		||
 		$is_vip
 	) {
@@ -63,17 +63,25 @@ if(!empty($_GET["entry"]) && !$_GET["action"]) {
 // View: update
 if($_GET["action"] === "update") {
 	
-	// Get entry
-	$entry = $access_blog->access_blog([ 'friendly' => sanitize($_GET['entry']), 'get' => 'all', 'show_queued' => true ]);
-	$entry['images'] = is_array($entry['images']) ? $entry['images'] : [];
-	$entry['image'] = $entry['images'][$entry['image_id']];
+	if(!empty($_GET['entry'])) {
+		// Get entry
+		$entry = $access_blog->access_blog([ 'friendly' => sanitize($_GET['entry']), 'get' => 'all', 'show_queued' => true ]);
+		
+		if(is_array($entry) && !empty($entry)) {
+			$entry['images'] = is_array($entry['images']) ? $entry['images'] : [];
+			$entry['image'] = $entry['images'][$entry['image_id']];
+		}
+		else {
+			$error = 'Sorry, that entry couldn\'t be found. Showing <em>add entry</em> instead.';
+		}
+	}
 	
 	// Check if allowed
 	if($_SESSION['loggedIn']) {
 		if(
 			empty($entry)
 			||
-			$_SESSION['userID'] === $current_entry['user_id']
+			$_SESSION['userID'] === $entry['user_id']
 			||
 			!$entry['is_queued'] && $_SESSION['admin']
 			||
@@ -95,6 +103,14 @@ if($_GET["action"] === "update") {
 	$stmt_tags = $pdo->prepare($sql_tags);
 	$stmt_tags->execute();
 	$tags = $stmt_tags->fetchAll();
+	
+	// Get queued entries
+	$queued_entries = $access_blog->access_blog([
+		'queued' => true,
+		'get' => 'list',
+		'show_queued' => true,
+	]);
+	$num_queued_entries = is_array($queued_entries) ? count($queued_entries) : 0;
 	
 	if($is_allowed) {
 		if(is_array($entry) && !empty($entry)) {

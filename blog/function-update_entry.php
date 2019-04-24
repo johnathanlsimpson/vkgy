@@ -6,7 +6,7 @@ $access_social_media = $access_social_media ?: new access_social_media($pdo);
 $markdown_parser = $markdown_parser ?: new parse_markdown($pdo);
 $date_occurred_pattern = '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$';
 $current_date = new DateTime(null, new DateTimeZone('JST'));
-$current_date = $current_date->date;
+$current_date = $current_date->format('Y-m-d H:i');
 
 // Set basic content
 $id = is_numeric($_POST['id']) ? $_POST['id'] : null;
@@ -71,7 +71,7 @@ if($_SESSION['loggedIn']) {
 if($is_edit && $friendly === $current_entry['friendly']) {
 	$friendly_is_allowed = true;
 }
-elseif(!$is_edit) {
+else {
 	$sql_check_friendly = 'SELECT 1 FROM blog WHERE friendly=? LIMIT 1';
 	$stmt_check_friendly = $pdo->prepare($sql_check_friendly);
 	$stmt_check_friendly->execute([ $friendly ]);

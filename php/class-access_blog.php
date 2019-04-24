@@ -309,6 +309,16 @@
 				}
 			}
 			
+			// Get previous/next entry
+			if($args['get'] === 'all') {
+				for($i=0; $i<$num_blogs; $i++) {
+					$sql_prev_next = "(SELECT title, friendly, 'prev' AS type FROM blog WHERE date_occurred<? AND is_queued=? ORDER BY date_occurred DESC LIMIT 1) UNION (SELECT title, friendly, 'next' AS type FROM blog WHERE date_occurred>? AND is_queued=? ORDER BY date_occurred ASC LIMIT 1)";
+					$stmt_prev_next = $this->pdo->prepare($sql_prev_next);
+					$stmt_prev_next->execute([ $row["date_occurred"], 0, $row["date_occurred"], 0 ]);
+					$blogs[$row_key]["prev_next"] = $stmt_prev_next->fetchAll();
+				}
+			}
+			
 			if($args["get"] === "all") {
 				
 				if(is_array($blogs)) {
@@ -335,10 +345,6 @@
 							$blogs[$row_key]['tags_artists'] = $this->access_artist->access_artist([ 'id' => $artist_tags, 'get' => 'name' ]);
 						}
 						
-						$sql_prev_next = "(SELECT title, friendly, 'prev' AS type FROM blog WHERE date_occurred<? ORDER BY date_occurred DESC LIMIT 1) UNION (SELECT title, friendly, 'next' AS type FROM blog WHERE date_occurred>? ORDER BY date_occurred ASC LIMIT 1)";
-						$stmt_prev_next = $this->pdo->prepare($sql_prev_next);
-						$stmt_prev_next->execute([$row["date_occurred"], $row["date_occurred"]]);
-						$blogs[$row_key]["prev_next"] = $stmt_prev_next->fetchAll();
 						
 						$blogs[$row_key]["comments"] = $this->access_comment->access_comment(["id" => $row["id"], 'user_id' => $_SESSION['userID'], "type" => "blog", "get" => "all"]);
 					}
