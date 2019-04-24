@@ -96,8 +96,8 @@
 					foreach($rslt_images as $image) {
 						?>
 							<li class="image__wrapper">
-								<a class="image__link" href="https://vk.gy/images/<?php echo $image['id'].($image['friendly'] ? '-'.$image['friendly'] : null).'.'.$image['extension']; ?>">
-									<img class="image__thumbnail lazy" data-src="https://vk.gy/images/<?php echo $image['id'].'.thumbnail.'.$image['extension']; ?>" />
+								<a class="image__link" href="/images/<?php echo $image['id'].($image['friendly'] ? '-'.$image['friendly'] : null).'.'.$image['extension']; ?>">
+									<img class="image__thumbnail lazy" data-src="/images/<?php echo $image['id'].'.thumbnail.'.$image['extension']; ?>" />
 								</a>
 								
 								<div class="data__container image__data">

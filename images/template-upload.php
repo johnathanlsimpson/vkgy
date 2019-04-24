@@ -15,6 +15,7 @@
 						<input class="any--hidden" name="image_item_type" value="{item_type}" hidden disabled />
 						<input class="any--hidden" name="image_item_id" value="{item_id}" hidden disabled />
 						<input class="any--hidden" name="image_item_name" value="{item_name}" hidden disabled />
+						<input class="any--hidden" name="image_is_queued" value="{is_queued}" hidden disabled />
 						<input class="any--hidden" name="image_description" value="{description}" hidden disabled />
 						<input class="any--flex-grow" name="images" type="file" multiple />
 					</div>

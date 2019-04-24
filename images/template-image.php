@@ -17,6 +17,7 @@
 					<input data-get="image_id" data-get-into="value" name="image_id" value="{id}" hidden />
 					<input name="image_item_type" value="{item_type}" hidden />
 					<input name="image_item_id" value="{item_id}" hidden />
+					<input name="image_is_queued" value="{is_queued}" hidden />
 					
 					<!-- Markdown code -->
 					<div class="input__row image__markdown">

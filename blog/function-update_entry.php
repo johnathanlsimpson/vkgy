@@ -1,220 +1,227 @@
 <?php
-	include_once("../php/include.php");
-	include_once('../php/class-access_social_media.php');
-	$access_social_media = new access_social_media($pdo);
-	$markdown_parser = new parse_markdown($pdo);
+// Setup
+include_once('../php/include.php');
+include_once('../php/class-access_social_media.php');
+$access_social_media = $access_social_media ?: new access_social_media($pdo);
+$markdown_parser = $markdown_parser ?: new parse_markdown($pdo);
+$date_occurred_pattern = '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$';
+$current_date = new DateTime(null, new DateTimeZone('JST'));
+$current_date = $current_date->date;
+
+// Set basic content
+$id = is_numeric($_POST['id']) ? $_POST['id'] : null;
+$title = sanitize($_POST['title']);
+$content = sanitize($markdown_parser->validate_markdown($_POST['content']));
+$friendly = friendly($_POST['friendly'] ?: $title);
+$references = $markdown_parser->get_reference_data($content);
+$is_edit = is_numeric($id);
+$is_queued = $_POST['is_queued'] ? 1 : 0;
+
+// If edit, get current info
+if($is_edit) {
+	$sql_curr_entry = 'SELECT * FROM blog WHERE id=? LIMIT 1';
+	$stmt_curr_entry = $pdo->prepare($sql_curr_entry);
+	$stmt_curr_entry->execute([ $id ]);
+	$current_entry = $stmt_curr_entry->fetch();
+}
+
+// Set up date
+$date_scheduled = $_POST['date_scheduled'].' '.($_POST['time_scheduled'] ?: '00:00');
+$date_scheduled = preg_match('/'.$date_occurred_pattern.'/', $date_scheduled) && $date_scheduled > $current_date ? $date_scheduled : null;
+
+// ...If scheduled for future
+if($date_scheduled) {
+	$date_occurred = null;
+	$is_queued = 1;
+}
+
+// ...If was scheduled for future but now posting immediately
+elseif($is_edit && !$date_scheduled && !$current_entry['date_occurred']) {
+	$date_occurred = $current_date;
+}
+
+// ...If was queued and now isn't
+elseif($is_edit && !$date_scheduled && !$is_queued && $current_entry['is_queued']) {
+	$date_occurred = $current_date;
+}
+
+// Check if allowed
+if($_SESSION['loggedIn']) {
+	$sql_vip_check = 'SELECT 1 FROM users WHERE id=? AND is_vip=? LIMIT 1';
+	$stmt_vip_check = $pdo->prepare($sql_vip_check);
+	$stmt_vip_check->execute([ $_SESSION['userID'], 1 ]);
+	$is_vip = $stmt_vip_check->fetchColumn();
+
+	if(
+		(!$is_edit)
+		||
+		($is_edit && $_SESSION['userID'] === $current_entry['user_id'])
+		||
+		($is_edit && !$is_queued && $_SESSION['admin'])
+		||
+		($is_edit && $is_queued && $_SESSION['admin'] && $is_vip)
+		||
+		($is_edit && in_array(277, $_POST['tags']))
+	) {
+		$is_allowed = true;
+	}
+}
+
+// Check if friendly allowed
+if($is_edit && $friendly === $current_entry['friendly']) {
+	$friendly_is_allowed = true;
+}
+elseif(!$is_edit) {
+	$sql_check_friendly = 'SELECT 1 FROM blog WHERE friendly=? LIMIT 1';
+	$stmt_check_friendly = $pdo->prepare($sql_check_friendly);
+	$stmt_check_friendly->execute([ $friendly ]);
+	$friendly_is_allowed = $stmt_check_friendly->fetchColumn() ? false : true;
+}
+
+// Cycle through tags in POST, get blog entry x tag pairings in DB, add/delete accordingly
+function update_tags($tag_table, $id_column, $entry_id, $tag_column, $new_tag_array, $pdo) {
 	
-	if($_SESSION["loggedIn"]) {
-		$content = sanitize($markdown_parser->validate_markdown($_POST["content"]));
-		$references = $markdown_parser->get_reference_data($content);
-		$title = sanitize($_POST["title"]) ?: null;
+	// Unset any non-numeric tags (array_filter would remove id's of 0)
+	if(is_array($new_tag_array) && !empty($new_tag_array)) {
+		foreach($new_tag_array as $key => $tag_id) {
+			if(!is_numeric($tag_id)) {
+				unset($new_tag_array[$key]);
+			}
+		}
+	}
+	
+	// Remove non-unique tag values
+	if(is_array($new_tag_array) && !empty($new_tag_array)) {
+		$new_tag_array = array_unique($new_tag_array);
+	}
+	
+	// Get current tags
+	$sql_current_tags = 'SELECT id, '.$tag_column.' FROM '.$tag_table.' WHERE '.$id_column.'=?';
+	$stmt_current_tags = $pdo->prepare($sql_current_tags);
+	$stmt_current_tags->execute([ $entry_id ]);
+	$rslt_current_tags = $stmt_current_tags->fetchAll();
+	
+	// Unset duplicate tags, set up delete for tags that are no longer wanted
+	if(is_array($rslt_current_tags) && !empty($rslt_current_tags)) {
+		foreach($rslt_current_tags as $tag) {
+			if(in_array($tag[$tag_column], $new_tag_array)) {
+				$ignore_key = array_search($tag[$tag_column], $new_tag_array);
+				unset($new_tag_array[$ignore_key]);
+			}
+			else {
+				$tags_to_delete[] = $tag[$tag_column];
+			}
+		}
+	}
+	
+	// Add new tags
+	if(is_array($new_tag_array) && !empty($new_tag_array)) {
+		$sql_values = [];
 		
-		if($content) {
-			if($title) {
-				$id = strlen($_POST["id"]) > 0 ? sanitize($_POST["id"]) : null;
-				$id = strlen($id) > 0 && is_numeric($id) ? $id : null;
-				$image_id = sanitize($_POST["image_is_entry_default"]);
-				$image_id = is_numeric($image_id) ? $image_id : null;
-				$friendly = $_POST["friendly"] ? friendly($_POST["friendly"]) : friendly($title);
-				//$tags = (is_array($_POST["tags"]) && !empty($_POST["tags"]) ? sanitize("(".implode(")(", $_POST["tags"]).")") : null);
-				$is_edit = strlen($id) > 0 ? true : false;
+		foreach($new_tag_array as $tag_id) {
+			$sql_values[] = $tag_id;
+			$sql_values[] = $entry_id;
+			$sql_values[] = $_SESSION['userID'];
+		}
+		
+		$sql_add = 'INSERT INTO '.$tag_table.' ('.$tag_column.', '.$id_column.', user_id) VALUES '.substr(str_repeat('(?, ?, ?), ', count($new_tag_array)), 0, -2);
+		$stmt_add = $pdo->prepare($sql_add);
+		$stmt_add->execute($sql_values);
+	}
+	
+	// Delete tags
+	if(is_array($tags_to_delete) && !empty($tags_to_delete)) {
+		$sql_delete = 'DELETE FROM '.$tag_table.' WHERE '.$id_column.'=? AND ('.substr(str_repeat($tag_column.'=? OR ', count($tags_to_delete)), 0, -4).')';
+		$stmt_delete = $pdo->prepare($sql_delete);
+		$stmt_delete->execute(array_merge([ $entry_id ], $tags_to_delete));
+	}
+}
+
+// Add/update post
+if(strlen($title) && strlen($friendly) && strlen($content)) {
+	if($is_allowed) {
+		if($friendly_is_allowed) {
+			
+			// Build query
+			$keys_blog = [ 'title', 'friendly', 'content', 'is_queued', 'date_scheduled' ];
+			$values_blog = [ $title, $friendly, $content, $is_queued, $date_scheduled ];
+			
+			if($date_occurred) {
+				$keys_blog[] = 'date_occurred';
+				$values_blog[] = $date_occurred;
+			}
+			
+			if($is_edit) {
+				$sql_blog = 'UPDATE blog SET '.implode('=?, ', $keys_blog).'=? WHERE id=? LIMIT 1';
+				$values_blog[] = $id;
+			}
+			else {
+				$keys_blog[] = 'user_id';
+				$values_blog[] = $_SESSION['userID'];
+				$sql_blog = 'INSERT INTO blog ('.implode(', ', $keys_blog).') VALUES ('.substr(str_repeat('?, ', count($values_blog)), 0, -2).')';
+			}
+			
+			$stmt_blog = $pdo->prepare($sql_blog);
+			if($stmt_blog->execute($values_blog)) {
+				if(!$is_edit) {
+					$id = $pdo->lastInsertId();
+				}
 				
-				/*if(is_array($references)) {
+				// Output
+				$output['status'] = 'success';
+				$output['url'] = '/blog/'.$friendly.'/';
+				$output['edit_url'] = '/blog/'.$friendly.'/edit/';
+				$output['id'] = $id;
+				$output['friendly'] = $friendly;
+				$output['is_queued'] = $is_queued;
+				
+				// Update tag links
+				update_tags('blog_tags', 'blog_id', $id, 'tag_id', $_POST['tags'], $pdo);
+				
+				// Get artists and update links
+				if(is_array($references) && !empty($references)) {
 					foreach($references as $reference) {
-						if($reference["type"] === "artist") {
-							$tags_artists .= "(".$reference["id"].")";
+						if($reference['type'] === 'artist' && is_numeric($reference['id'])) {
+							$artist_tags[] = $reference['id'];
 						}
-					}
-				}
-				$tags_artists = $tags_artists ?: null;*/
-				
-				$sql_friendly = "SELECT 1 FROM blog WHERE friendly=? LIMIT 1";
-				$stmt_friendly = $pdo->prepare($sql_friendly);
-				$stmt_friendly->execute([$friendly]);
-				if(!$is_edit && $stmt_friendly->fetchColumn()) {
-					$output["result"] = "An entry with that title/url already exists. Please modify the title.";
-				}
-				else {
-					if($is_edit) {
-						$sql_check = "SELECT user_id FROM blog WHERE id=? LIMIT 1";
-						$stmt_check = $pdo->prepare($sql_check);
-						$stmt_check->execute([$id]);
-						$user_id = $stmt_check->fetchColumn();
-						
-						if($user_id === $_SESSION["userID"] || $_SESSION["admin"] || strpos($tags, '(auto-generated)') !== false) {
-							$sql_entry = "UPDATE blog SET title=?, content=?, tags=?, tags_artists=?, image_id=? WHERE id=? LIMIT 1";
-							$sql_values = [$title, $content, $tags, $tags_artists, $image_id, $id];
-						}
-						else {
-							$output["result"] = "Sorry, you don't have permission to edit this entry.";
-						}
-					}
-					else {
-						$sql_entry = "INSERT INTO blog (title, content, friendly, tags, tags_artists, image_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-						$sql_values = [$title, $content, $friendly, $tags, $tags_artists, $image_id, $_SESSION["userID"]];
 					}
 				}
 				
-				if($sql_entry && $sql_values && is_array($sql_values)) {
-					$stmt_entry = $pdo->prepare($sql_entry);
-					if($stmt_entry->execute($sql_values)) {
-						$id = $is_edit ? $id : $pdo->lastInsertId();
-						
-						$output["status"] = "success";
-						$output["url"] = "/blog/".$friendly."/";
-						$output["edit_url"] = "/blog/".$friendly."/edit/";
-						$output["id"] = $id;
-						$output["friendly"] = $friendly;
-						
-						// Cycle through tags in POST, get blog entry x tag pairings in DB, add/delete accordingly
-						function update_tags($tag_table, $id_column, $entry_id, $tag_column, $new_tag_array, $pdo) {
-							
-							// Unset any non-numeric tags (array_filter would remove id's of 0)
-							if(is_array($new_tag_array) && !empty($new_tag_array)) {
-								foreach($new_tag_array as $key => $tag_id) {
-									if(!is_numeric($tag_id)) {
-										unset($new_tag_array[$key]);
-									}
-								}
-							}
-							
-							// Remove non-unique tag values
-							if(is_array($new_tag_array) && !empty($new_tag_array)) {
-								$new_tag_array = array_unique($new_tag_array);
-							}
-							
-							// Get current tags
-							$sql_current_tags = 'SELECT id, '.$tag_column.' FROM '.$tag_table.' WHERE '.$id_column.'=?';
-							$stmt_current_tags = $pdo->prepare($sql_current_tags);
-							$stmt_current_tags->execute([ $entry_id ]);
-							$rslt_current_tags = $stmt_current_tags->fetchAll();
-							
-							// Unset duplicate tags, set up delete for tags that are no longer wanted
-							if(is_array($rslt_current_tags) && !empty($rslt_current_tags)) {
-								foreach($rslt_current_tags as $tag) {
-									if(in_array($tag[$tag_column], $new_tag_array)) {
-										$ignore_key = array_search($tag[$tag_column], $new_tag_array);
-										unset($new_tag_array[$ignore_key]);
-									}
-									else {
-										$tags_to_delete[] = $tag[$tag_column];
-									}
-								}
-							}
-							
-							// Add new tags
-							if(is_array($new_tag_array) && !empty($new_tag_array)) {
-								$sql_values = [];
-								
-								foreach($new_tag_array as $tag_id) {
-									$sql_values[] = $tag_id;
-									$sql_values[] = $entry_id;
-									$sql_values[] = $_SESSION['userID'];
-								}
-								
-								$sql_add = 'INSERT INTO '.$tag_table.' ('.$tag_column.', '.$id_column.', user_id) VALUES '.substr(str_repeat('(?, ?, ?), ', count($new_tag_array)), 0, -2);
-								$stmt_add = $pdo->prepare($sql_add);
-								$stmt_add->execute($sql_values);
-								
-								//echo $sql_add;
-								//print_r($sql_values);
-							}
-							
-							// Delete tags
-							if(is_array($tags_to_delete) && !empty($tags_to_delete)) {
-								$sql_delete = 'DELETE FROM '.$tag_table.' WHERE '.$id_column.'=? AND ('.substr(str_repeat($tag_column.'=? OR ', count($tags_to_delete)), 0, -4).')';
-								$stmt_delete = $pdo->prepare($sql_delete);
-								$stmt_delete->execute(array_merge([ $entry_id ], $tags_to_delete));
-								//echo $sql_delete;
-								//print_r(array_merge([ $entry_id ], $tags_to_delete));
-							}
-						}
-						
-						/*if(is_array($_POST['tags']) && !empty($_POST['tags'])) {
-							foreach($_POST['tags'] as $key => $tag) {
-								if(!is_numeric($tag)) {
-									unset($_POST['tags'][$key]);
-								}
-							}
-							
-							$_POST['tags'] = array_unique($_POST['tags']);
-							
-							if(is_array($_POST['tags']) && !empty($_POST['tags'])) {
-								$sql_check_tags = 'SELECT id, tag_id FROM blog_tags WHERE blog_id=?';
-								$stmt_check_tags = $pdo->prepare($sql_check_tags);
-								$stmt_check_tags->execute([ $id ]);
-								$rslt_check_tags = $stmt_check_tags->fetchAll();
-								
-								if(is_array($rslt_check_tags) && !empty($rslt_check_tags)) {
-									foreach($rslt_check_tags as $tag) {
-										if(in_array($tag['tag_id'], $_POST['tags'])) {
-											$ignore_key = array_search($tag['tag_id'], $_POST['tags']);
-											unset($_POST['tags'][$ignore_key]);
-										}
-										else {
-											$tags_to_delete[] = $tag['id'];
-										}
-									}
-								}
-								
-								if(is_array($rslt_check_tags) && !empty($rslt_check_tags)) {
-									$sql_add_tags = 'INSERT INTO blog_tags (blog_id, tag_id, user_id) VALUES (?, ?, ?)'
-								}
-							}
-						}*/
-						
-						if($_SESSION['username'] === 'inartistic') {
-							update_tags('blog_tags', 'blog_id', $id, 'tag_id', $_POST['tags'], $pdo);
-							
-							// Get artist ID's
-							if(is_array($references) && !empty($references)) {
-								foreach($references as $reference) {
-									if($reference["type"] === "artist" && is_numeric($reference['id'])) {
-										$artist_tags[] = $reference["id"];
-									}
-								}
-							}
-							
-							if(is_array($artist_tags)) {
-								$artist_tags = array_unique($artist_tags);
-							}
-							
-							if(is_array($artist_tags) && !empty($artist_tags)) {
-								update_tags('blog_artists', 'blog_id', $id, 'artist_id', $artist_tags, $pdo);
-							}
-						}
-						//update_tags('blog_artists', 'blog_id', $id, 'artist_id', $artist_tags);
-						
-						$sql_edit_history = 'INSERT INTO edits_blog (blog_id, user_id, content) VALUES (?, ?, ?)';
-						$stmt_edit_history = $pdo->prepare($sql_edit_history);
-						$stmt_edit_history->execute([ $id, $_SESSION['userID'], ($is_edit ? null : 'Created.') ]);
-						
-						if(!$is_edit && !empty($title) && !empty($friendly)) {
-							$social_post = $access_social_media->build_post([ 'title' => $title, 'url' => 'https://vk.gy'.$output['url'], 'id' => $id ], 'blog_post');
-							$access_social_media->queue_post($social_post, 'both', date('Y-m-d H:i:s', strtotime('+15 minutes')));
-						}
-					}
-					else {
-						$output["result"] = "Sorry, there was an error ".($is_edit ? "editing" : "adding")." the entry.";
-					}
+				if(is_array($artist_tags)) {
+					$artist_tags = array_unique($artist_tags);
 				}
-				else {
-					$output["result"] = $output["result"] ?: "Sorry, something went wrong.";
+				
+				if(is_array($artist_tags) && !empty($artist_tags)) {
+					update_tags('blog_artists', 'blog_id', $id, 'artist_id', $artist_tags, $pdo);
+				}
+				
+				// Update edit history
+				$sql_edit_history = 'INSERT INTO edits_blog (blog_id, user_id, content) VALUES (?, ?, ?)';
+				$stmt_edit_history = $pdo->prepare($sql_edit_history);
+				$stmt_edit_history->execute([ $id, $_SESSION['userID'], ($is_edit ? null : 'Created.') ]);
+				
+				// Queue for socials
+				if(!$is_edit && !$is_queued && strlen($title) && strlen($friendly)) {
+					$social_post = $access_social_media->build_post([ 'title' => $title, 'url' => 'https://vk.gy'.$output['url'], 'id' => $id ], 'blog_post');
+					$access_social_media->queue_post($social_post, 'both', date('Y-m-d H:i:s', strtotime('+15 minutes')));
 				}
 			}
 			else {
-				$output["result"] = "Title may not be blank.";
+				$output['result'] = 'Sorry, the post couldn\'t be updated.';
 			}
 		}
 		else {
-			$output["result"] = "Entry may not be blank.";
+			$output['result'] = 'Please choose a different title or url-friendly name.';
 		}
 	}
 	else {
-		$output["result"] = "Please sign in to update the blog.";
+		$output['result'] = 'Sorry, you\'re not allowed to edit this post.';
 	}
-	
-	$output["status"] = $output["status"] ?: "error";
-	
-	echo json_encode($output);
-?>
+}
+else {
+	$output['result'] = 'Please enter a title and text.';
+}
+
+$output['status'] = $output['status'] ?: 'error';
+
+echo json_encode($output);

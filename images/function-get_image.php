@@ -28,6 +28,14 @@
 		
 		if(is_numeric($id) && !empty($ext) && in_array($ext, $allowed_extensions)) {
 			if(file_exists($source_image_path)) {
+				
+				// Get image info
+				$sql_image = "SELECT is_exclusive, is_queued, user_id FROM images WHERE id=? LIMIT 1";
+				$stmt_image = $pdo->prepare($sql_image);
+				$stmt_image->execute([$id]);
+				$rslt_image = $stmt_image->fetch();
+				$is_exclusive = $rslt_image["is_exclusive"];
+				
 				// If resized
 				if(!empty($method) && in_array($method, $allowed_methods)) {
 					if($ext === "gif") {
@@ -85,12 +93,6 @@
 					}
 				}
 				else {
-					$sql_image = "SELECT is_exclusive, user_id FROM images WHERE id=? LIMIT 1";
-					$stmt_image = $pdo->prepare($sql_image);
-					$stmt_image->execute([$id]);
-					$rslt_image = $stmt_image->fetch();
-					$is_exclusive = $rslt_image["is_exclusive"];
-					
 					// If exclusive
 					if($is_exclusive) {
 						// Allow full-size images in Mp3tag
@@ -183,7 +185,11 @@
 					}
 				}
 				
-				if($returned_image_path) {
+				if(
+					($returned_image_path && !$rslt_image['is_queued'])
+					||
+					($returned_image_path && $rslt_image['is_queued'] && !$input['is_hotlinked'])
+				) {
 					if($input["image_path_only"]) {
 						return $returned_image_path;
 					}

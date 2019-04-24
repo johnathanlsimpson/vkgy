@@ -22,7 +22,11 @@ $("[name=content]").on("input propertychange paste", function() {
 	typingTimer = setTimeout(previewEntry, 200);
 });
 
-
+// Init inputmask() on appropriate elements
+var inputMaskElems = document.querySelectorAll('[data-inputmask]');
+inputMaskElems.forEach(function(inputMaskElem) {
+	$(inputMaskElem).inputmask();
+});
 
 // Autosize
 autosize($(".autosize"));
@@ -51,10 +55,11 @@ document.addEventListener('image-updated', function(event) {
 initializeInlineSubmit($("[name=form__update]"), "/blog/function-update_entry.php", {
 	"submitOnEvent" : "submit",
 	"showEditLink" : true,
-	'callbackOnSuccess' : function(event, returnedData) { 
+	'callbackOnSuccess' : function(event, returnedData) {
 		var e = new Event('item-id-updated');
 		e.details = {
-			'id' : returnedData.id
+			'id' : returnedData.id,
+			'is_queued' : returnedData.is_queued,
 		};
 		document.dispatchEvent(e);
 	},

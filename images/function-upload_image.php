@@ -25,6 +25,7 @@
 			$item_type           = sanitize($_POST['item_type']);
 			$item_id             = sanitize($_POST['item_id']);
 			$default_description = sanitize($_POST['default_description']);
+			$is_queued           = $_POST['is_queued'] ? 1 : 0;
 			
 			if($error === 0 && preg_match('/'.'image.+'.'/', $type)) {
 				$sql_init = 'INSERT INTO images (extension, user_id) VALUES (?, ?)';
@@ -40,10 +41,10 @@
 						$file_name = $id.'.'.$extension;
 						
 						if(in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
-							$sql_update = 'UPDATE images SET extension=? WHERE id=? LIMIT 1';
+							$sql_update = 'UPDATE images SET extension=?, is_queued=? WHERE id=? LIMIT 1';
 							$stmt_update = $pdo->prepare($sql_update);
 							
-							if($stmt_update->execute([ $extension, $id ])) {
+							if($stmt_update->execute([ $extension, $is_queued, $id ])) {
 								
 								if(rename($new_name, '../images/tmp/'.$file_name)) {
 									
