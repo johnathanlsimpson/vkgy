@@ -81,14 +81,64 @@
 								<textarea class="input__textarea any--flex-grow autosize" name="content" placeholder="blog entry here..."><?php echo $entry["content"]; ?></textarea>
 							</div>
 						</div>
-						
-						<div class="input__row">
-							<div class="input__group any--flex-grow">
-								<label class="input__label">URL-friendly title</label>
-								<input class="any--flex-grow" name="friendly" placeholder="friendly" value="<?php echo $entry["friendly"]; ?>" />
-							</div>
-						</div>
 					</div>
+					
+					<h3>
+						Advanced
+					</h3>
+					<input class="any--hidden obscure__input" id="obscure-advanced" type="checkbox" checked />
+					<ul class="text obscure__container obscure--height">
+						<!-- Friendly -->
+						<li>
+							<div class="input__row">
+								<div class="input__group any--flex-grow">
+									<label class="input__label">URL-friendly title</label>
+									<input class="any--flex-grow" name="friendly" placeholder="friendly" value="<?php echo $entry["friendly"]; ?>" />
+								</div>
+							</div>
+						</li>
+						
+						<!-- Credit -->
+						<li>
+							<div class="input__row">
+								<div class="input__group any--flex-grow">
+									<label class="input__label">Sources</label>
+									<textarea class="input__textarea any--flex-grow autosize" name="sources" placeholder="http://example.com/&#10;@band_official"><?php echo $entry['sources']; ?></textarea>
+								</div>
+							</div>
+							
+							<div class="symbol__help any--weaken-color" style="margin-top: 1rem;">
+								This will appear at the bottom of the post. If a Twitter handle is included, when the post is automatically tweeted, that account will be included as an author (in addition to the Twitter handle of whoever wrote this post).
+							</div>
+						</li>
+						
+						<!-- Supplemental -->
+						<li>
+							<div class="input__row">
+								<div class="input__group any--flex-grow">
+									<label class="input__label">Supplemental info</label>
+									<textarea class="input__textarea any--flex-grow autosize" name="supplemental" placeholder="* Blog: http://example.com/&#10;* OHP: http://example.com/"><?php echo $entry['supplemental']; ?></textarea>
+								</div>
+							</div>
+							
+							<div class="symbol__help any--weaken-color" style="margin-top: 1rem;">
+								This will appear at the bottom of the post, and is hidden by default. It's for long sections of secondary information, such as live schedules, links, advertising, etc.
+							</div>
+						</li>
+						
+						<!-- Japanese text -->
+						<li>
+							<div class="input__row">
+								<div class="input__group any--flex-grow">
+									<label class="input__label">Japanese translation</label>
+									<textarea class="input__textarea any--flex-grow autosize" name="content_ja" placeholder="記事"><?php echo $entry['content_ja']; ?></textarea>
+								</div>
+							</div>
+						</li>
+						
+						<label class="input__button obscure__button" for="obscure-advanced">Show options</label>
+					</ul>
+					
 					
 					<h3>
 						Upload image

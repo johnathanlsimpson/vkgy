@@ -26,7 +26,7 @@ if($_SESSION["loggedIn"]) {
 		}
 	}
 	else {
-		$output["result"] = "-".$id."-".print_r($_POST)."Sorry, this entry cannot be deleted.";
+		$output["result"] = "Sorry, this entry cannot be deleted.";
 	}
 }
 else {

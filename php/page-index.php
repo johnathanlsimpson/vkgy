@@ -123,7 +123,7 @@
 				<div class="underhead__account">
 					<a class="a--inherit any--signed-out-only head__item symbol__help" href="/account/"><?php echo lang('account', 'アカウント', ['secondary_class' => 'any--hidden']); ?></a>&nbsp;
 					<a class="a--inherit any--signed-in-only head__item head__signout symbol__exit" href="/sign-out/&request=<?php echo $_SERVER["REQUEST_URI"]; ?>"><?php echo lang('sign out', 'サインアウトする', ['secondary_class' => 'any--hidden']); ?></a>
-					<a class="a--inherit any--signed-in-only head__item head__user user" href="/users/<?php echo $_SERVER["username"]; ?>/"><?php echo $_SESSION['username']; ?></a>
+					<a class="a--inherit any--signed-in-only head__item head__user user" href="/users/<?php echo $_SESSION["username"]; ?>/"><?php echo $_SESSION['username']; ?></a>
 				</div>
 				
 				<script>

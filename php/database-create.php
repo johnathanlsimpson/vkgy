@@ -151,7 +151,11 @@ CREATE TABLE IF NOT EXISTS `blog` (
 	`id` int(11) NOT NULL,
 	`title` mediumtext COLLATE ".$pdo_config['db_collation'].",
 	`content` longtext COLLATE ".$pdo_config['db_collation'].",
+  `content_ja` text COLLATE ".$pdo_config['db_collation'].",
+  `supplemental` text COLLATE ".$pdo_config['db_collation'].",
+  `sources` text COLLATE ".$pdo_config['db_collation'].",
 	`date_occurred` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_scheduled` timestamp NULL DEFAULT NULL,
 	`user_id` bigint(5) DEFAULT '0',
 	`image_id` int(11) DEFAULT NULL,
 	`image` mediumtext COLLATE ".$pdo_config['db_collation'].",
@@ -159,7 +163,8 @@ CREATE TABLE IF NOT EXISTS `blog` (
 	`tags` mediumtext COLLATE ".$pdo_config['db_collation'].",
 	`tags_artists` varchar(150) COLLATE ".$pdo_config['db_collation']." DEFAULT NULL,
 	`friendly` varchar(100) COLLATE ".$pdo_config['db_collation']." DEFAULT NULL,
-	`is_archived` tinyint(4) NOT NULL DEFAULT '0'
+	`is_archived` tinyint(1) NOT NULL DEFAULT '0',
+  `is_queued` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
 CREATE TABLE IF NOT EXISTS `blog_artists` (
