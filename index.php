@@ -40,6 +40,7 @@
 		"/scripts/external/script-tippy.js",
 		"/scripts/script-tooltips.js",
 		"/scripts/script-topButton.js",
+		'/scripts/script-showObscured.js',
 	]);
 	
 	ob_start();
