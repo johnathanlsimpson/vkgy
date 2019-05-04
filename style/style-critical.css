@@ -203,48 +203,6 @@
 	.any__obscure--faint::before {
 		background-color: rgba(var(--rgb__background--faint), 0.75);
 	}
-	.any__partial, .any__partial--horizontal {
-		overflow: hidden;
-	}
-	.any__partial::after, .any__partial--horizontal::after {
-		background-image: linear-gradient(to top, var(--background--faint) 1rem, transparent 50%);
-		bottom: 0;
-		content: "";
-		display: block;
-		left: -1px;
-		pointer-events: none;
-		position: absolute;
-		right: -1px;
-		top: 0;
-	}
-	.any__partial {
-		max-height: 10rem;
-	}
-	.any__partial--horizontal {
-		max-width: 100%;
-		white-space: nowrap;
-	}
-	.any__partial--horizontal::after {
-		background-image: linear-gradient(to left, var(--background--faint) 1rem, transparent 50%);
-	}
-	.any__partial-input:checked ~ .any__partial-label {
-		display: none;
-	}
-	.any__partial-input:checked ~ .any__partial,
-	.any__partial-input:checked ~ .any__partial--horizontal {
-		overflow: visible;
-	}
-	.any__partial-input:checked ~ .any__partial {
-		max-height: none;
-	}
-	.any__partial-input:checked ~ .any__partial--horizontal {
-		max-width: none;
-		white-space: normal;
-	}
-	.any__partial-input:checked ~ .any__partial::after,
-	.any__partial-input:checked ~ .any__partial--horizontal::after {
-		display: none;
-	}
 
 
 
