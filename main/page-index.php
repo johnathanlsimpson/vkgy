@@ -225,7 +225,9 @@
 			<h3>
 				<?php echo lang('Database updates', '最近の更新', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
 			</h3>
-			<div class="text text--outlined">
+			
+			<input class="obscure__input" id="obscure-updates" type="checkbox" checked />
+			<div class="text text--outlined obscure__container obscure--faint obscure--height">
 				<ul>
 					<?php
 						for($i=0; $i<$num_updates; $i++) {
@@ -259,6 +261,7 @@
 						}
 					?>
 				</ul>
+				<label class="input__button obscure__button" for="obscure-updates">Show more</label>
 			</div>
 		</div>
 	</div>
