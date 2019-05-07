@@ -5,11 +5,14 @@ if(obscureTriggerElems && obscureTriggerElems.length) {
 	obscureTriggerElems.forEach(function(obscureTriggerElem) {
 		obscureTriggerElem.addEventListener('click', function(event) {
 			
-			event.preventDefault();
+			
+			
+			//event.preventDefault();
 			
 			var obscureInput = obscureTriggerElem.previousElementSibling;
 			
-			obscureInput.checked = false;
+			setTimeout(function() {
+			obscureInput.checked = false; }, 100);
 			
 		});
 	});
