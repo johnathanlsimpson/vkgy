@@ -16,7 +16,7 @@
 		}
 		
 		if(is_array($image) && !empty($image)) {
-			$name                = sanitize(strtolower($image['name']));
+			$name                = str_replace('/', '', sanitize(strtolower($image['name'])));
 			$type                = $image['type'];
 			$tmp_name            = $image['tmp_name'];
 			$error               = $image['error'];
@@ -24,7 +24,6 @@
 			$needs_compression   = isset($image['needs_compression']) ? $image['needs_compression'] : true;
 			$item_type           = sanitize($_POST['item_type']);
 			$item_id             = sanitize($_POST['item_id']);
-			//$default_description = sanitize($_POST['default_description']);
 			$is_queued           = $_POST['is_queued'] ? 1 : 0;
 			
 			if($error === 0 && preg_match('/'.'image.+'.'/', $type)) {
@@ -93,7 +92,6 @@
 									$output['item_type'] = $item_type;
 									$output['item_id'] = $item_id;
 									$output[$item_type.'_id'] = $item_id;
-									//$output['description'] = $default_description;
 									$output['image_status'] = 'new';
 								}
 								else {
