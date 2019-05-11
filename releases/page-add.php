@@ -12,7 +12,6 @@
 		"/scripts/script-initDelete.js",
 		"/scripts/script-initSelectize.js",
 		"/scripts/script-showElem.js",
-		//"/scripts/script-uploadImage.js",
 		"/scripts/script-initEasyAutocomplete.js",
 
 		"/releases/script-resetTrackNums.js",
@@ -613,13 +612,14 @@
 			<?php
 				include('../images/function-render_image_section.php');
 				render_image_section($release['images'], [
-					'item_type' => 'release',
-					'item_id' => $release['id'],
-					'item_name' => $release['quick_name'],
-					'description' => 'cover',
-					'id' => $release['image_id'],
-					'hide_selects' => true,
+					'item_type'     => 'release',
+					'item_id'       => $release['id'],
+					'item_name'     => $release['quick_name'],
+					'description'   => $release['quick_name'].' cover',
+					'id'            => $release['image_id'],
+					'hide_selects'  => true,
 					'hide_markdown' => true,
+					'is_default'    => 'checked',
 				]);
 			?>
 		</div>
