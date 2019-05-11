@@ -106,8 +106,6 @@ imageUploadElem.addEventListener('change', function() {
 	var itemType = imageUploadElem.parentNode.querySelector('[name=image_item_type]').value;
 	var itemId = imageUploadElem.parentNode.querySelector('[name=image_item_id]').value;
 	var itemName = imageUploadElem.parentNode.querySelector('[name=image_item_name]').value;
-	var isQueued = imageUploadElem.parentNode.querySelector('[name=image_is_queued]').value;
-	var defaultDescription = imageUploadElem.parentNode.querySelector('[name=image_description]').value;
 	
 	for(var i=0; i<imageUploadElem.files.length; i++) {
 		var thisImage = imageUploadElem.files[i];
@@ -128,17 +126,31 @@ imageUploadElem.addEventListener('change', function() {
 			itemIdElem.prepend(newOptionElem);
 			
 			initializeInlineSubmit($(newImageElem), '/images/function-upload_image.php', {
-				'preparedFormData' : { 'image' : thisImage, 'item_type' : itemType, 'item_id' : itemId, 'is_queued': isQueued, 'default_description' : defaultDescription },
-				'callbackOnSuccess': function() {
+				'preparedFormData' : { 'image' : thisImage, 'item_type' : itemType, 'item_id' : itemId },
+				'callbackOnSuccess': function(event, returnedData) {
+					
+					// Get image that was just added
+					var thisImageElem = document.querySelector('[name="image_id"][value="' + returnedData.image_id + '"]');
+					thisImageElem = getParent(thisImageElem, 'image__template');
+					
+					// When image finished uploading, remove loading symbol
+					thisImageElem.querySelector('.image__status').classList.remove('loading');
+					thisImageElem.querySelector('.image__status').classList.add('symbol__' + returnedData.status);
+					
+					// Notify page of new image, and trigger new image to update data (to set defaults)
+					thisImageElem.querySelector('[name=image_id]').dispatchEvent(new Event('change'));
+					document.dispatchEvent(new Event('image-added'));
 				}
 			});
 			
+			// (Before ajax done,) append new image, add loading symbol
+			newImageElem.querySelector('.image__status').classList.add('loading');
 			imagesElem.prepend(newImageElem);
+			
+			// Init buttons in new image element
 			lookForSelectize();
 			initImageEditElems();
 			initImageDeleteButtons();
-			
-			document.dispatchEvent(new Event('image-added'));
 		}
 	}
 });

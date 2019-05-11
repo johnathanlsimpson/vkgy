@@ -44,29 +44,37 @@ function render_options($option_ids_string, $option_list) {
 function render_image_section($images, $args = []) {
 	global $image_template;
 	global $image_upload_template;
+	global $wrapped_image_template;
+	global $wrapped_image_upload_template;
+	global $wrapped_option_template;
 	global $artist_list;
 	global $blog_list;
 	global $musician_list;
 	global $release_list;
+	
+	// Render empty templates
+	echo render_component($wrapped_image_upload_template);
+	echo render_component($wrapped_image_template, $args);
+	echo render_component($wrapped_option_template);
 	
 	$default[$args['item_type']] = $args['item_id'];
 	
 	if(is_array($images) && !empty($images)) {
 		foreach($images as $image) {
 			$rendered_images[] = render_component($image_template, [
-				'id' => $image['id'],
-				'item_type' => $args['item_type'],
-				'item_id' => $args['item_id'],
-				'description' => $image['description'],
-				'credit' => $image['credit'],
-				'is_exclusive' => $image['is_exclusive'] ? 'checked' : null,
-				'is_default' => $image['id'] === $args['id'] ? 'checked' : null,
-				'artist_ids' => render_options(($image['artist_ids'] ?: $default['artist']), $artist_list),
-				'blog_id' => render_options(($image['blog_id'] ?: $default['blog']), $blog_list),
-				'musician_ids' => render_options(($image['label_ids'] ?: $default['label']), $label_list),
-				'musician_ids' => render_options(($image['musician_ids'] ?: $default['musician']), $musician_list),
-				'release_ids' => render_options(($image['release_ids'] ?: $default['release']), $release_list),
-				'scanned_by' => $image['user_id'] == $_SESSION['userID'] ? '1' : '0',
+				'id'             => $image['id'],
+				'item_type'      => $args['item_type'],
+				'item_id'        => $args['item_id'],
+				'description'    => $image['description'],
+				'credit'         => $image['credit'],
+				'is_exclusive'   => $image['is_exclusive'] ? 'checked' : null,
+				'is_default'     => $image['id'] === $args['id'] ? 'checked' : null,
+				'artist_ids'     => render_options(($image['artist_ids'] ?: $default['artist']), $artist_list),
+				'blog_id'        => render_options(($image['blog_id'] ?: $default['blog']), $blog_list),
+				'musician_ids'   => render_options(($image['label_ids'] ?: $default['label']), $label_list),
+				'musician_ids'   => render_options(($image['musician_ids'] ?: $default['musician']), $musician_list),
+				'release_ids'    => render_options(($image['release_ids'] ?: $default['release']), $release_list),
+				'scanned_by'     => $image['user_id'] == $_SESSION['userID'] ? '1' : '0',
 				'background_url' => '/images/'.$image['id'].'.thumbnail.'.$image['extension'],
 				'image_markdown' => '![](/images/'.$image['id'].'.'.$image['extension'].')',
 			]);
