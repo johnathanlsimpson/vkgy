@@ -1,7 +1,7 @@
 <?php
 
 // Populate a <template> element with data
-function render_component($component_template, $replacement_data) {
+function render_component($component_template, $replacement_data = []) {
 	if($component_template && is_array($replacement_data)) {
 		ob_start();
 		
