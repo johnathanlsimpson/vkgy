@@ -22,9 +22,20 @@ if(is_array($rslt_queued) && !empty($rslt_queued)) {
 		$stmt_update = $pdo->prepare($sql_update);
 		if($stmt_update->execute([ 0, $current_date, $entry['id'] ])) {
 			
+			// Format sources
+			if($entry['sources']) {
+				preg_match_all('/'.'^(@([A-z0-9-_]+))(?:\s|$)'.'/m', $entry['sources'], $twitter_matches);
+				
+				if(is_array($twitter_matches) && !empty($twitter_matches)) {
+					for($i=0; $i<count($twitter_matches[0]); $i++) {
+						$twitter_authors[] = $twitter_matches[1][$i];
+					}
+				}
+			}
+			
 			// Immediately post to socials
 			if(strlen($entry['title']) && strlen($entry['friendly'])) {
-				$social_post = $access_social_media->build_post(['title' => $entry['title'], 'url' => 'https://vk.gy/blog/'.$entry['friendly'].'/', 'id' => $entry['id'] ], 'blog_post');
+				$social_post = $access_social_media->build_post([ 'title' => $entry['title'], 'url' => 'https://vk.gy/blog/'.$entry['friendly'].'/', 'id' => $entry['id'], 'twitter_authors' => $twitter_authors ], 'blog_post');
 				$access_social_media->post_to_social($social_post, 'both');
 			}
 			

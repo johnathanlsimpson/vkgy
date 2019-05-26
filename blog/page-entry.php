@@ -11,7 +11,6 @@
 			$entry_has_image = true;
 		}
 		
-		
 		$sql_twitter = "SELECT twitter FROM users WHERE username=? LIMIT 1";
 		$stmt_twitter = $pdo->prepare($sql_twitter);
 		$stmt_twitter->execute([$entry["username"]]);
@@ -22,8 +21,6 @@
 		}
 		
 		$page_description = preg_replace("/"."<.*?>"."/", "", strtok($entry["content"], "\n"))." (Continued…)";
-		
-		//$entry_has_image = strlen($entry['image']) && image_exists($entry['image'], $pdo) ? true : false;
 		
 		// Related: entries with same tag
 		if(is_array($entry['tags']) && !empty($entry['tags'])) {
@@ -292,6 +289,31 @@
 						<div class="text text--centered">
 							<?php
 								echo $entry['content'];
+								
+								if($entry['sources']) {
+									preg_match_all('/'.'^(@([A-z0-9-_]+))(?:\s|$)'.'/m', $entry['sources'], $twitter_matches);
+									
+									if(is_array($twitter_matches) && !empty($twitter_matches)) {
+										for($i=0; $i<count($twitter_matches[0]); $i++) {
+											$entry['sources'] = str_replace($twitter_matches[1][$i], '['.$twitter_matches[1][$i].'](https://twitter.com/'.$twitter_matches[2][$i].'/)', $entry['sources']);
+										}
+									}
+									
+									$sources = $entry['sources'];
+									$sources = explode("\n", $sources);
+									$sources = array_filter($sources);
+									$sources = (count($sources) > 1 ? '* ' : null).implode("\n* ", $sources);
+									$sources = $markdown_parser->parse_markdown($sources);
+									
+									?>
+										<h5 style="margin-top: 3rem;">
+											Sources
+										</h5>
+										<div class="text text--outlined text--compact text--notice" style="margin-top: 1rem; margin-bottom: 0;">
+											<?php echo $sources; ?>
+										</div>
+									<?php
+								}
 							?>
 						</div>
 					</div>

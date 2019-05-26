@@ -12,10 +12,29 @@ $current_date = $current_date->format('Y-m-d H:i');
 $id = is_numeric($_POST['id']) ? $_POST['id'] : null;
 $title = sanitize($_POST['title']);
 $content = sanitize($markdown_parser->validate_markdown($_POST['content']));
+$content_ja = sanitize($markdown_parser->validate_markdown($_POST['content_ja'])) ?: null;
+$supplemental = sanitize($markdown_parser->validate_markdown($_POST['supplemental'])) ?: null;
+$sources = sanitize($_POST['sources']) ?: null;
 $friendly = friendly($_POST['friendly'] ?: $title);
 $references = $markdown_parser->get_reference_data($content);
 $is_edit = is_numeric($id);
 $is_queued = $_POST['is_queued'] ? 1 : 0;
+
+// Format sources
+if($sources) {
+	preg_match_all('/'.'^(@([A-z0-9-_]+))(?:\s|$)'.'/m', $sources, $twitter_matches);
+	
+	if(is_array($twitter_matches) && !empty($twitter_matches)) {
+		for($i=0; $i<count($twitter_matches[0]); $i++) {
+			$twitter_authors[] = $twitter_matches[1][$i];
+		}
+	}
+	
+	$sources = explode("\n", $sources);
+	$sources = array_filter($sources);
+	$sources = implode("\n", $sources);
+	$sources = sanitize($markdown_parser->validate_markdown($sources));
+}
 
 // If edit, get current info
 if($is_edit) {
@@ -143,8 +162,8 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 		if($friendly_is_allowed) {
 			
 			// Build query
-			$keys_blog = [ 'title', 'friendly', 'content', 'is_queued', 'date_scheduled' ];
-			$values_blog = [ $title, $friendly, $content, $is_queued, $date_scheduled ];
+			$keys_blog = [ 'title', 'friendly', 'content', 'content_ja', 'supplemental', 'sources', 'is_queued', 'date_scheduled' ];
+			$values_blog = [ $title, $friendly, $content, $content_ja, $supplemental, $sources, $is_queued, $date_scheduled ];
 			
 			if($date_occurred) {
 				$keys_blog[] = 'date_occurred';
@@ -202,7 +221,7 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 				
 				// Queue for socials
 				if(!$is_edit && !$is_queued && strlen($title) && strlen($friendly)) {
-					$social_post = $access_social_media->build_post([ 'title' => $title, 'url' => 'https://vk.gy'.$output['url'], 'id' => $id ], 'blog_post');
+					$social_post = $access_social_media->build_post([ 'title' => $title, 'url' => 'https://vk.gy'.$output['url'], 'id' => $id, 'twitter_authors' => $twitter_authors ], 'blog_post');
 					$access_social_media->queue_post($social_post, 'both', date('Y-m-d H:i:s', strtotime('+15 minutes')));
 				}
 			}
