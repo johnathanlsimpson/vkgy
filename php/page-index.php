@@ -74,8 +74,61 @@
 			$avatar_url = file_exists('..'.$avatar_url) ? $avatar_url : '/usericons/avatar-anonymous.png';
 		?>
 		
-		<div class="col c1 head head">
-			<div class="head__container">
+		<div class="head__top col c1" style="background: radial-gradient(circle, var(--accent) 1px, transparent 0); background-size: 3px 3px; background-position: bottom; background:var(--background--bold);">
+			<div style="display:flex; padding-left: 4rem; background: transparent; height: 3rem; padding: 0;margin-bottom: -1rem; z-index: 2000; padding-left:calc(38px + 0.75rem); pointer-events: none;">
+				
+				
+				<a style="width: calc(38px + 0.5rem); left: 0; height: 3rem; pointer-events: auto; background: var(--accent); background-position: center 0.25rem; background-repeat:no-repeat; background-image:url(/style/vkgy1.png); display: inline-block; height: 5.5rem;position: absolute; z-index:200;
+									
+									
+									
+									
+									
+									background: transparent;
+									background-image:
+										url('/style/vkgy4.gif'),
+										linear-gradient(to top, transparent 0.5rem, var(--accent) 0, var(--accent)),
+										linear-gradient(to top right, transparent 45%, var(--accent) 50%),
+										linear-gradient(to top left, transparent 45%, var(--accent) 50%);
+									background-position:
+										center 0.25rem,
+										left top,
+										left bottom,
+										right bottom;
+									background-repeat:
+										no-repeat;
+									background-size:
+										auto,
+										100% 100%,
+										50% 0.5rem,
+										50% 0.5rem;
+									
+									
+									
+									
+									
+									
+									
+									">X
+				
+				
+				</a>
+				
+				<span style="pointer-events: auto;">
+				<label class="input__checkbox-label" style="display:inline-block;">EN</label>
+				<label class="input__checkbox-label" style="display:inline-block;">日本語</label></span>
+				
+				
+				<span style="margin-left:auto; display:inline-block; height:2rem; line-height:2rem; pointer-events:auto;" class="any--weaken-size">
+					<a class="symbol__help" href="">REGISTER</a>
+					<a class="symbol__user" href="">SIGN IN</a>
+				</span>
+			</div>
+		</div>
+		
+		<div class="col c1 head head" style="position: sticky; top: 0;">
+			
+			<div class="head__container" style="padding-left: 1.5rem;">
 				<div class="head__links any--flex">
 					<a href="https://vk.gy/" class="head__item">
 						<svg x="0px" y="0px" width="0" height="0" viewBox="0 0 105 164" class="head__cage" fill="none" stroke="var(--accent)" stroke-width="5">
@@ -112,9 +165,9 @@
 		</div>
 		
 		<form action="/search/" class="any--hidden" enctype="multipart/form-data" id="form__search" method="get" name="form__search"><button type="submit"></button></form>
-		<div class="head__spacer">&nbsp;</div>
+		<!--<div class="head__spacer">&nbsp;</div>-->
 		
-		<div class="underhead__wrapper col c1 any--margin any--weaken-color">
+		<!--<div class="underhead__wrapper col c1 any--margin any--weaken-color">
 			<div class="underhead__container any--flex">
 				
 				<label class="input__checkbox-label symbol__unchecked" for="language-en">EN</label>&nbsp;
@@ -158,7 +211,7 @@
 					</div>
 				</form>
 			</div>
-		</div>
+		</div>-->
 		
 		<?php
 			if($background_image) {
@@ -169,10 +222,10 @@
 			
 			if(!empty($breadcrumbs) || !empty($subnavs)) {
 				?>
-					<div class="col c1 subhead__container">
+					<div class="col c1 subhead__container" style="margin-top:0;">
 						<div class="subhead__inner">
 							<?php
-								if(!empty($breadcrumbs)) {
+								/*if(!empty($breadcrumbs)) {
 									?>
 										<ol class="breadcrumb__container any--weaken" itemscope itemtype="http://schema.org/BreadcrumbList">
 											<?php
@@ -193,10 +246,10 @@
 											?>
 										</ol>
 									<?php
-								}
+								}*/
 								if(!empty($subnavs) && is_array($subnavs)) {
 									?>
-										<div class="subnav__inner">
+										<div class="subnav__inner" style="margin-top:1rem; border-width: 0 0 1px 0; border-radius: 3px; border:none; background:linear-gradient(to top, rgba(0,0,0,0.1), transparent 50%);">
 											<div class="any--weaken subnav">
 												<?php
 													foreach($subnavs as $subnav_chunk) {
@@ -205,10 +258,13 @@
 																$class = ($subnav["signed_in_only"] ? "any--signed-in-only" : null)." ".($key === 0 ? "subnav__section" : null);
 																$class .= $_SERVER['REQUEST_URI'] === $subnav['url'] ? 'subnav--active' : null;
 																?>
-																	<a class="a--inherit a--padded <?php echo $class; ?>" href="<?php echo $subnav["url"]; ?>">
+																	<a style="<?php echo $key===0 ? '' : null; ?>" class="a--inherit a--padded <?php echo $class; ?>" href="<?php echo $subnav["url"]; ?>">
 																		<?php
 																			echo $subnav["text"];
 																		?>
+																		
+																	</a>
+												<a href="">	<span style="font-size:0.75em;border:1px solid; padding:0 2px; border-radius:3px;">ADD</span>
 																	</a>
 																<?php
 															}

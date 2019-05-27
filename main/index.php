@@ -167,7 +167,7 @@ $artist_of_day = array_merge($rslt_aod, $addl_aod);
 
 /* Flyer of day */
 $image = $access_image->access_image([ 'flyer_of_day' => true, 'get' => 'all' ])[0];
-if(is_array($image) && !empty($image)) {
+if(is_array($image) && !empty($image) && file_exists("../images/image_files/".$image["id"].".".$image["extension"])) {
 	$image["size"] = getimagesize("../images/image_files/".$image["id"].".".$image["extension"]);
 	$image["is_wide"] = is_array($image["size"]) && !empty($image["size"]) && $image["size"][0] > $image["size"][1];
 }
