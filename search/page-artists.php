@@ -20,6 +20,9 @@
 	$search = array_filter($search, function($value) { return is_array($value) || strlen($value); });
 	
 	$search['active'] = (string)$search['active'];
+	if(!strlen($search['active'])) {
+		unset($search['active']);
+	}
 	
 	if(is_array($search) && !empty($search)) {
 		$artist_query["get"] = "name";
@@ -93,6 +96,33 @@
 						
 						<input class="input__checkbox" id="active-4" name="active" type="radio" value="4" <?php echo $search['active'] === '4' ? "checked" : null; ?> />
 						<label class="symbol__unchecked input__checkbox-label" for="active-4">semi-active</label>
+					</div>
+				</div>
+				
+				<hr />
+				
+				<h3>
+					Activity area
+				</h3>
+				<div class="input__row">
+					<div class="input__group any--flex-grow">
+						<select class="input" name="area" placeholder="area of activity">
+							<option></option>
+							<option value="overseas">overseas (&#28023;&#22806;)</option>
+							<option value="japan">Japan (&#26085;&#26412;)</option>
+							<?php
+								$sql_areas = 'SELECT name, romaji, friendly FROM areas ORDER BY friendly';
+								$stmt_areas = $pdo->prepare($sql_areas);
+								$stmt_areas->execute();
+								$rslt_areas = $stmt_areas->fetchAll();
+								
+								foreach($rslt_areas as $area) {
+									?>
+										<option value="<?php echo $area['friendly']; ?>"><?php echo $area['romaji'].' ('.$area['name'].')'; ?></option>
+									<?php
+								}
+							?>
+						</select>
 					</div>
 				</div>
 				
