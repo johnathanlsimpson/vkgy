@@ -629,7 +629,7 @@
 								$sql_child_area = 'SELECT id FROM areas WHERE ';
 								
 								foreach($tmp_area_ids as $key => $id) {
-									$sql_child_area .= 'parent_id=? OR ';
+									$sql_child_area .= '(parent_id=? AND id!=parent_id) OR ';
 								}
 								
 								$sql_child_area = substr($sql_child_area, 0, -4);
