@@ -71,8 +71,15 @@
 							</div>
 							
 							<?php
+								foreach($rslt_curr_tags as $curr_tag) {
+									if($curr_tag['friendly'] === 'exclusive') {
+										$artist_is_exclusive = true;
+										break;
+									}
+								}
+								
 								// Exclusive banner
-								if($artist["is_exclusive"]) {
+								if($artist_is_exclusive) {
 									?>
 										<div class="text text--outlined any__obscure any__obscure--faint" style="background-image: url(/support/patreon-back.png); background-size: cover;">
 											<div class="h5 symbol__star--full">vkgy exclusive</div>
