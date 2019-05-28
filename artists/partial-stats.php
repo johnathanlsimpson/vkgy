@@ -9,14 +9,14 @@
 				<?php echo lang('Type', 'タイプ', ['secondary_class' => 'any--hidden']); ?>
 			</h5>
 			<?php
-				echo [
+				echo '<a href="/search/artists/&type='.$artist['type'].'">'.[
 					lang('unknown', '不明', ['secondary_class' => 'any--hidden']),
 					lang('band', 'バンド', ['secondary_class' => 'any--hidden']),
 					lang('session', 'セッション', ['secondary_class' => 'any--hidden']),
 					lang('alter-ego', '別名義バンド', ['secondary_class' => 'any--hidden']),
 					lang('solo', 'ソロ', ['secondary_class' => 'any--hidden']),
 					lang('special', '限定', ['secondary_class' => 'any--hidden']),
-				][$artist["type"]];
+				][$artist["type"]].'</a>';
 			?>
 		</div>
 	</div>
@@ -26,13 +26,13 @@
 				<?php echo lang('Status', '活動状況', ['secondary_class' => 'any--hidden']); ?>
 			</h5>
 			<?php
-				echo [
+				echo '<a href="/search/artists/&active='.$artist['active'].'">'.[
 					lang('unknown', '不明', ['secondary_class' => 'any--hidden']),
 					lang('active', '現在活動', ['secondary_class' => 'any--hidden']),
 					lang('disbanded', '解散', ['secondary_class' => 'any--hidden']),
 					lang('paused', '休止', ['secondary_class' => 'any--hidden']),
 					lang('semi-active', '時々活動', ['secondary_class' => 'any--hidden'])
-				][$artist['active']];
+				][$artist['active']].'</a>';
 			?>
 		</div>
 	</div>
@@ -54,7 +54,7 @@
 				
 				foreach($artist['areas'] as $key => $area) {
 					echo $key > 0 ? '<span class="symbol__previous"></span>' : null;
-					echo lang($area['romaji'], $area['name'], ['secondary_class' => 'any--hidden']);
+					echo '<a href="/search/artists/&area='.$area['friendly'].'">'.lang($area['romaji'], $area['name'], ['secondary_class' => 'any--hidden']).'</a>';
 				}
 			}
 			else {
@@ -67,7 +67,12 @@
 					}
 				}
 				
-				echo $artist_is_foreign ? lang('Overseas', '海外', ['secondary_class' => 'any--hidden']) : lang('Japan', '日本', ['secondary_class' => 'any--hidden']);
+				if($artist_is_foreign) {
+					echo '<a href="/search/artists/&area=overseas">'.lang('overseas', '海外', ['secondary_class' => 'any--hidden']).'</a>';
+				}
+				else {
+					echo '<a href="/search/artists/&area=japan">'.lang('Japan', '日本', ['secondary_class' => 'any--hidden']).'</a>';
+				}
 			}
 		?>
 	</div>
