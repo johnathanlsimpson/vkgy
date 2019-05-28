@@ -598,6 +598,10 @@
 				$sql_where[] = "label_history LIKE CONCAT('%(', ?, ')%')";
 				$sql_values[] = $args["label_id"];
 			}
+			if(is_numeric($args['type'])) {
+				$sql_where[] = 'type=?';
+				$sql_values[] = $args['type'];
+			}
 			if(is_numeric($args["affiliation"])) {
 				$sql_where[] = "artists.affiliation <= ?";
 				$sql_values[] = $args["affiliation"];
