@@ -84,7 +84,7 @@
 										<div class="text text--outlined any__obscure any__obscure--faint" style="background-image: url(/support/patreon-back.png); background-size: cover;">
 											<div class="h5 symbol__star--full">vkgy exclusive</div>
 											<div>
-												This artist profile features exclusive information discovered by vkgy contributors!
+												This artist profile features exclusive information discovered by vkgy contributors! <a class="symbol__next" href="/search/artists/?tags[]=exclusive#result">View others</a>
 											</div>
 										</div>
 									<?php
