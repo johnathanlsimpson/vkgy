@@ -19,6 +19,8 @@
 	
 	$search = array_filter($search, function($value) { return is_array($value) || strlen($value); });
 	
+	$search['active'] = (string)$search['active'];
+	
 	if(is_array($search) && !empty($search)) {
 		$artist_query["get"] = "name";
 		$artist_query["limit"] = 100;
@@ -67,36 +69,32 @@
 					Both Japanese and romanized titles are ok.
 				</div>
 				
-				<?php
-						?>
-							<hr />
-							
-							<h3>
-								Activity status
-							</h3>
-							<div class="input__row">
-								<div class="input__group">
-									<input class="input__checkbox" id="active-none" name="active" type="radio" value="" <?php echo !is_numeric($search['active']) ? "checked" : null; ?> />
-									<label class="symbol__unchecked input__checkbox-label" for="active-none">any status</label>
-									
-									<input class="input__checkbox" id="active-0" name="active" type="radio" value="0" <?php echo $search['active'] == 0 ? "checked" : null; ?> />
-									<label class="symbol__unchecked input__checkbox-label" for="active-0">unknown</label>
-									
-									<input class="input__checkbox" id="active-1" name="active" type="radio" value="1" <?php echo $search['active'] == 1 ? "checked" : null; ?> />
-									<label class="symbol__unchecked input__checkbox-label" for="active-1">active</label>
-									
-									<input class="input__checkbox" id="active-2" name="active" type="radio" value="2" <?php echo $search['active'] == 2 ? "checked" : null; ?> />
-									<label class="symbol__unchecked input__checkbox-label" for="active-2">disbanded</label>
-									
-									<input class="input__checkbox" id="active-3" name="active" type="radio" value="3" <?php echo $search['active'] == 3 ? "checked" : null; ?> />
-									<label class="symbol__unchecked input__checkbox-label" for="active-3">paused</label>
-									
-									<input class="input__checkbox" id="active-4" name="active" type="radio" value="4" <?php echo $search['active'] == 4 ? "checked" : null; ?> />
-									<label class="symbol__unchecked input__checkbox-label" for="active-4">semi-active</label>
-								</div>
-							</div>
-						<?php
-				?>
+				<hr />
+				
+				<h3>
+					Activity status
+				</h3>
+				<div class="input__row">
+					<div class="input__group">
+						<input class="input__checkbox" id="active-none" name="active" type="radio" value="" <?php echo !is_numeric($search['active']) ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__checkbox-label" for="active-none">any status</label>
+						
+						<input class="input__checkbox" id="active-0" name="active" type="radio" value="0" <?php echo $search['active'] === '0' ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__checkbox-label" for="active-0">unknown</label>
+						
+						<input class="input__checkbox" id="active-1" name="active" type="radio" value="1" <?php echo $search['active'] === '1' ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__checkbox-label" for="active-1">active</label>
+						
+						<input class="input__checkbox" id="active-2" name="active" type="radio" value="2" <?php echo $search['active'] === '2' ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__checkbox-label" for="active-2">disbanded</label>
+						
+						<input class="input__checkbox" id="active-3" name="active" type="radio" value="3" <?php echo $search['active'] === '3' ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__checkbox-label" for="active-3">paused</label>
+						
+						<input class="input__checkbox" id="active-4" name="active" type="radio" value="4" <?php echo $search['active'] === '4' ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__checkbox-label" for="active-4">semi-active</label>
+					</div>
+				</div>
 				
 				<hr />
 				
@@ -129,11 +127,11 @@
 					Tags
 				</h3>
 				<div class="input__row">
-						<div class="input__group">
-							<label class="input__label">
-								Search artists by tag
-							</label>
-						</div>
+					<div class="input__group">
+						<label class="input__label">
+							Search artists by tag
+						</label>
+						
 						<?php
 							$sql_tags = "SELECT * FROM tags_artists ORDER BY friendly ASC";
 							$stmt_tags = $pdo->prepare($sql_tags);
@@ -143,16 +141,16 @@
 							if(is_array($rslt_tags) && !empty($rslt_tags)) {
 								foreach($rslt_tags as $i => $tag) {
 									?>
-										<div class="input__group">
-											<input class="input__checkbox" id="tags[<?php echo $i+1; ?>]" name="tags[]" type="checkbox" value="<?php echo $tag["friendly"]; ?>" <?php echo (is_array($search["tags"]) && in_array($tag["friendly"], $search["tags"]) ? "checked" : null); ?> />
-											<label class="symbol__unchecked input__checkbox-label" for="tags[<?php echo $i+1; ?>]"><?php echo $tag["romaji"] ?: $tag["name"]; ?></label>
-										</div>
+										<input class="input__checkbox" id="tags[<?php echo $i+1; ?>]" name="tags[]" type="checkbox" value="<?php echo $tag["friendly"]; ?>" <?php echo (is_array($search["tags"]) && in_array($tag["friendly"], $search["tags"]) ? "checked" : null); ?> />
+										<label class="symbol__unchecked input__checkbox-label" for="tags[<?php echo $i+1; ?>]"><?php echo $tag["romaji"] ?: $tag["name"]; ?></label>
 									<?php
 								}
 							}
 						?>
 					</div>
 				</div>
+				
+				<hr />
 				
 				<div class="input__row">
 					<div class="input__group any--flex-grow">
