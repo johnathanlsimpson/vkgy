@@ -58,7 +58,16 @@
 				}
 			}
 			else {
-				echo lang('Japan', '日本', ['secondary_class' => 'any--hidden']);
+				if(is_array($rslt_curr_tags) && !empty($rslt_curr_tags)) {
+					foreach($rslt_curr_tags as $curr_tag) {
+						if($curr_tag['friendly'] === 'foreign') {
+							$artist_is_foreign = true;
+							break;
+						}
+					}
+				}
+				
+				echo $artist_is_foreign ? lang('Overseas', '海外', ['secondary_class' => 'any--hidden']) : lang('Japan', '日本', ['secondary_class' => 'any--hidden']);
 			}
 		?>
 	</div>
