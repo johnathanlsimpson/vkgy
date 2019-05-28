@@ -23,40 +23,6 @@
 		
 		
 		// ======================================================
-		// Get images
-		// ======================================================
-		/*function get_artist_images($artist_id) {
-			if(is_numeric($artist_id)) {
-				$sql_images = '
-					SELECT
-						images.*,
-						CONCAT("/images/", images.id, "-", COALESCE(images.friendly, "image"), ".", images.extension) AS url,
-						GROUP_CONCAT(DISTINCT images_artists.artist_id) AS artist_ids,
-						GROUP_CONCAT(DISTINCT images_musicians.musician_id) AS musician_ids,
-						GROUP_CONCAT(DISTINCT images_releases.release_id) AS release_ids
-						
-					FROM (
-						SELECT image_id FROM images_artists WHERE artist_id=? ORDER BY id DESC
-					) a
-					INNER JOIN images ON images.id=a.image_id
-					
-					LEFT JOIN images_artists ON images_artists.image_id=images.id
-					LEFT JOIN images_musicians ON images_musicians.image_id=images.id
-					LEFT JOIN images_releases ON images_releases.image_id=images.id
-					
-					GROUP BY images.id
-					ORDER BY images.id DESC
-				';
-				$stmt_images = $this->pdo->prepare($sql_images);
-				$stmt_images->execute([ $artist_id ]);
-				
-				return($stmt_images->fetchAll());
-			}
-		}*/
-		
-		
-		
-		// ======================================================
 		// Artist card template
 		// ======================================================
 		function artist_card($artist, $show_title = false) {
@@ -514,18 +480,6 @@
 		// ======================================================
 		function access_artist($args = []) {
 			
-			
-			
-			
-			//$time_start = microtime(true); 
-			
-			//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----1<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
-		//	$time_start = microtime(true); 
-			
-			
-			
-			
-			
 			// SELECT
 			$sql_select = [];
 			switch($args["get"]) {
@@ -644,25 +598,87 @@
 				$sql_where[] = "label_history LIKE CONCAT('%(', ?, ')%')";
 				$sql_values[] = $args["label_id"];
 			}
+			if(is_numeric($args['type'])) {
+				$sql_where[] = 'type=?';
+				$sql_values[] = $args['type'];
+			}
 			if(is_numeric($args["affiliation"])) {
 				$sql_where[] = "artists.affiliation <= ?";
 				$sql_values[] = $args["affiliation"];
 			}
+			if(strlen($args['area'])) {
+				if($args['area'] === 'overseas') {
+					$sql_where[] = 'artists_tags.tag_id=?';
+					$sql_values[] = 18;
+					$sql_from = 'artists_tags';
+					$sql_join[] = 'LEFT JOIN artists ON artists.id=artists_tags.artist_id';
+				}
+				else {
+					$sql_parent_area = 'SELECT id FROM areas WHERE friendly=? LIMIT 1';
+					$stmt_parent_area = $this->pdo->prepare($sql_parent_area);
+					$stmt_parent_area->execute([ $args['area'] ]);
+					$rslt_parent_area = $stmt_parent_area->fetchColumn();
+					
+					if(is_numeric($rslt_parent_area)) {
+						$area_ids[] = $rslt_parent_area;
+						$tmp_area_ids[] = $rslt_parent_area;
+						
+						// Given a set of area IDs, find all child areas
+						// then store their IDs into a temporary array
+						// + add them onto a permanent array, and keep
+						// looping down until all children areas are found.
+						// Later we'll take those IDs and get related artists.
+						while(!$all_area_children_found) {
+							if(is_array($tmp_area_ids)) {
+								$sql_child_area = 'SELECT id FROM areas WHERE ';
+								
+								foreach($tmp_area_ids as $key => $id) {
+									$sql_child_area .= '(parent_id=? AND id!=parent_id) OR ';
+								}
+								
+								$sql_child_area = substr($sql_child_area, 0, -4);
+								$stmt_child_area = $this->pdo->prepare($sql_child_area);
+								$stmt_child_area->execute($tmp_area_ids);
+								$rslt_child_area = $stmt_child_area->fetchAll();
+								
+								$tmp_area_ids = [];
+								
+								if(is_array($rslt_child_area) && !empty($rslt_child_area)) {
+									foreach($rslt_child_area as $child_area) {
+										$area_ids[] = $child_area['id'];
+										$tmp_area_ids[] = $child_area['id'];
+									}
+								}
+								else {
+									$all_area_children_found = true;
+								}
+							}
+							else {
+								$all_area_children_found = true;
+							}
+						}
+						
+						// Take resulting area IDs and apply to artist query
+						if(is_array($area_ids) && !empty($area_ids)) {
+							$sql_from = 'areas_artists';
+							$sql_join[] = 'LEFT JOIN artists ON artists.id=areas_artists.artist_id';
+							$sql_where[] = substr(str_repeat('(areas_artists.area_id=?) OR ', count($area_ids)), 0, -4);
+							foreach($area_ids as $area_id) {
+								$sql_values[] = $area_id;
+							}
+						}
+					}
+				}
+			}
 			
 			// DEFAULTS
 			$sql_select = $sql_select ?: [];
+			$sql_from = $sql_from ?: 'artists';
+			$sql_join = is_array($sql_join) ? implode(' ', $sql_join) : null;
 			$sql_where = $sql_where ?: [];
 			$sql_values = $sql_values ?: [];
 			$sql_order = $sql_order ?: ["friendly ASC"];
 			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : $sql_limit ?: null;
-			
-			
-			
-			//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----2<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
-			//$time_start = microtime(true); 
-			
-			
-			
 			
 			// QUERY
 			if(is_numeric($args["id"]) && $args["get"] !== "all" && is_array($this->indexed_artists) && !empty($this->indexed_artists[$args["id"]])) {
@@ -671,53 +687,13 @@
 			else {
 				if(!empty($sql_select)) {
 					
-					
-					
-					//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----3<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
-					//$time_start = microtime(true); 
-					
-					
-					
-					$sql_artist = "SELECT ".implode(", ", $sql_select)." FROM artists ".(!empty($sql_where) ? "WHERE (".implode(") AND (", $sql_where).")" : null)." ORDER BY ".implode(", ", $sql_order)." ".$sql_limit;
-					
-					//echo $_SESSION['username'] === 'inartistic' ? print_r($sql_artist, true).print_r($sql_values, true) : null;
-					
+					$sql_artist = "SELECT ".implode(", ", $sql_select)." FROM ".$sql_from.' '.$sql_join.' '.(!empty($sql_where) ? "WHERE (".implode(") AND (", $sql_where).")" : null)." ORDER BY ".implode(", ", $sql_order)." ".$sql_limit;
 					$stmt = $this->pdo->prepare($sql_artist);
 					
-					
-					
-					
-					
-					//	echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----4<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
-					//$time_start = microtime(true); 
-					
-					
 					if($stmt) {
-					//if($_SESSION['username'] === 'inartistic' && $stmt) {
 						$stmt->execute($sql_values);
-						
-						
-							//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----5<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
-					//$time_start = microtime(true); 
-						
-						
-						if($_SESSION['username'] === 'inartistic') {
-							//foreach($stmt->fetchAll() as $x) {
-								//$artists[] = $x;
-							//}
-						}
-						else {
-						}
-							$artists = $stmt->fetchAll();
-							$num_artists = count($artists);
-						
-						
-						
-						
-							//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----6<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
-					//$time_start = microtime(true); 
-						
-						
+						$artists = $stmt->fetchAll();
+						$num_artists = count($artists);
 						
 						if(is_array($artists)) {
 							// If getting all artist info or basics, grab musician data, then compile into lineup string
@@ -786,71 +762,9 @@
 								$artists = reset($artists);
 							}
 							
-							
-								//echo $_SESSION['username'] === 'inartistic' ? '<br /><br />----7<br />'.((microtime(true) - $time_start)).'<br />----<br />' : null;
-					//$time_start = microtime(true); 
-							
-							
-							
-							
 							return $artists;
 						}
-					//}
 					}
-					/*elseif($stmt) {
-						$stmt->execute($sql_values);
-						foreach($stmt->fetchAll() as $row) {
-							$artists[] = $row;
-						}
-						
-						if(is_array($artists)) {
-							if($args["get"] === "all" || $args["get"] === "basics") {
-								$access_musician = new access_musician($this->pdo);
-								
-								foreach($artists as $key => $artist) {
-									$artists[$key]["musicians"] = $access_musician->access_musician(["artist_id" => $artist["id"], "get" => "all"]);
-									
-									if(is_array($artists[$key]["musicians"]) && !empty($artists[$key]["musicians"])) {
-										foreach($artists[$key]["musicians"] as $musician) {
-											if($musician["to_end"] && $musician['position'] != 7 && $musician["position_name"] !== "roadie") {
-												$artists[$key]["lineup"][] = ($musician["position"] ? ["O", "V", "G", "B", "D", "K", "O", "S"][$musician["position"]] : (substr($musician["position_romaji"], 0, 1) ?: substr($musician["position_name"], 0, 1) ?: "O")).". ".($musician["as_quick_name"] ?: $musician["quick_name"]);
-											}
-										}
-										
-										$artists[$key]["lineup"] = is_array($artists[$key]["lineup"]) && !empty($artists[$key]["lineup"]) ? implode(" / ", $artists[$key]["lineup"]) : null;
-									}
-								}
-							}
-							
-							if($args["get"] === "all") {
-								foreach($artists as $key => $artist) {
-									$artists[$key]["labels"] = $this->format_label_history($artist["label_history"]);
-									$artists[$key]["prev_artist"] = $this->access_artist(["friendly" => $artist["friendly"], "get" => "prev"]);
-									$artists[$key]["next_artist"] = $this->access_artist(["friendly" => $artist["friendly"], "get" => "next"]);
-									$artists[$key]["history"] = $this->get_history($artist["id"]);
-									$artists[$key]["images"] = $this->get_artist_images($artist["id"]);
-								}
-							}
-							
-							if($args["get"] === "artist_list") {
-								for($i = 0; $i < count($artists); $i++) {
-									if(friendly($artists[$i]["quick_name"]) != $artists[$i]["friendly"]) {
-										$artists[$i]["needs_hint"] = true;
-									}
-								}
-							}
-							
-							if(!empty($args["friendly"]) || is_numeric($args["id"])) {
-								$artists = reset($artists);
-							}
-							
-							if(is_numeric($args["id"]) && $args["get"] !== "all" && $args["get"] !== "id") {
-								$this->indexed_artists[$args["id"]] = $artists;
-							}
-							
-							return $artists;
-						}
-					}*/
 				}
 			}
 		}
