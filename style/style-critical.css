@@ -585,7 +585,7 @@
 		}
 	}
 	.secondary-nav__ja {
-		font-size: 0.8rem;
+		font-size: 0.8rem !important;
 		padding-left: 0;
 		padding-right: 0;
 	}
@@ -679,7 +679,7 @@
 			vertical-align: baseline;
 		}
 	}
-	.secondary-nav__link span {
+	.secondary-nav__link {
 		color: var(--text);
 	}
 	
@@ -834,9 +834,23 @@
 		grid-row: 1;
 	}
 	.primary-nav__avatar {
+		background: var(--background--faint);
 		border-radius: 50%;
 		height: 2rem;
+		overflow: hidden;
 		width: 2rem;
+	}
+	.primary-nav__avatar:hover {
+		opacity: 0.75;
+	}
+	.primary-nav__avatar object {
+		height: 100%;
+		width: 100%;
+	}
+	.primary-nav__avatar object::before {
+		font-size: 1.25rem;
+		top: 50%;
+		transform: translateY(50%);
 	}
 	
 	
