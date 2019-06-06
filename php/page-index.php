@@ -148,16 +148,20 @@
 				
 				<?php
 					if(is_array($subnavs) && !empty($subnavs)) {
-						foreach($subnavs as $subnav_chunk) {
-							foreach($subnav_chunk as $subnav) {
-								if(!$subnav['signed_in_only'] || ($subnav['signed_in_only'] && $_SESSION['loggedIn'])) {
-									$subnav['class'] = ($_SERVER['REQUEST_URI'] === $subnav['url'] ? 'quaternary-nav--active' : null);
-									?>
-										<a class="quaternary-nav__link  a--inherit a--padded <?php echo $subnav['class']; ?>" href="<?php echo $subnav['url']; ?>"><?php echo $subnav['text']; ?></a>
-									<?php
+						?>
+							<div class="quaternary-nav__container"><?php
+								foreach($subnavs as $subnav_chunk) {
+									foreach($subnav_chunk as $subnav) {
+										if(!$subnav['signed_in_only'] || ($subnav['signed_in_only'] && $_SESSION['loggedIn'])) {
+											$subnav['class'] = ($_SERVER['REQUEST_URI'] === $subnav['url'] ? 'quaternary-nav--active' : null);
+											?>
+												<a class="quaternary-nav__link  a--inherit a--padded <?php echo $subnav['class']; ?>" href="<?php echo $subnav['url']; ?>"><?php echo $subnav['text']; ?></a>
+											<?php
+										}
+									}
 								}
-							}
-						}
+							?></div>
+						<?php
 					}
 				?>
 			</div>
