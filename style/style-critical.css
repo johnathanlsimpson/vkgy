@@ -10,12 +10,11 @@
 	--negative-gutter: -2vw;
 	--page-max-width: 1800px;
 	--page-margin: calc( ( 100vw - var(--page-max-width) ) / 2 );
+	
+	--light--primary:   0, 0%, 100%;
+	--light--secondary: 0, 0%, 80%;
+	--border-radius:    3px;
 }
-			:root {
-				--light--primary:   0, 0%, 100%;
-				--light--secondary: 0, 0%, 80%;
-				--border-radius:    3px;
-			}
 .col {
 	align-items: flex-start;
 	border: 0 solid transparent;
@@ -530,13 +529,16 @@
 	.secondary-nav__home {
 		background-color: var(--accent);
 		background-image:
-			url('/style/vkgy_cage.gif'),
-			url('/style/vkgy_text.gif');
+			url('/style/vkgy_cage_hd.gif'),
+			url('/style/vkgy_text_hd.gif');
 		background-position:
 			0 1px,
 			0 bottom;
 		background-repeat:
 			no-repeat;
+		background-size:
+			calc( 184px / 2 ) calc( 128px / 2 ),
+			calc( 368px / 2 ) calc( 30px / 2 );
 		color: var(--accent);
 		display: inline-block;
 		height: 5rem;
