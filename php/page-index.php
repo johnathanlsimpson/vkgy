@@ -142,8 +142,7 @@
 		<div class="header__wrapper  col c1">
 			<div class="header__container  lazy any--flex" data-src="<?php echo $background_image; ?>">
 				<h1 class="header__header">
-					<?php $page_header = '<a class="a--inherit" href="">'.lang('Visual kei artist list', 'アーティストの一覧', ['container' => 'div']).'</a>';
-					echo $page_header ?: 'vk.gy'; ?>
+					<?php echo $page_header ?: null; ?>
 				</h1>
 				
 				<?php
