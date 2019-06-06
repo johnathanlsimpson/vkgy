@@ -74,217 +74,149 @@
 			$avatar_url = file_exists('..'.$avatar_url) ? $avatar_url : '/usericons/avatar-anonymous.png';
 		?>
 		
-		<div class="head__top col c1" style="background: radial-gradient(circle, var(--accent) 1px, transparent 0); background-size: 3px 3px; background-position: bottom; background:var(--background--bold);">
-			<div style="display:flex; padding-left: 4rem; background: transparent; height: 3rem; padding: 0;margin-bottom: -1rem; z-index: 2000; padding-left:calc(38px + 0.75rem); pointer-events: none;">
+		<nav class="col c1 secondary-nav__wrapper">
+			<div class="flex any--weaken-color">
+				<a class="secondary-nav__home" href="/"></a>
 				
+				<label class="secondary-nav__en input__checkbox-label symbol__unchecked" for="language-en">EN</label>
+				<label class="secondary-nav__ja input__checkbox-label symbol__unchecked" for="language-ja">日本語</label>
 				
-				<a style="width: calc(38px + 0.5rem); left: 0; height: 3rem; pointer-events: auto; background: var(--accent); background-position: center 0.25rem; background-repeat:no-repeat; background-image:url(/style/vkgy1.png); display: inline-block; height: 5.5rem;position: absolute; z-index:200;
-									
-									
-									
-									
-									
-									background: transparent;
-									background-image:
-										url('/style/vkgy4.gif'),
-										linear-gradient(to top, transparent 0.5rem, var(--accent) 0, var(--accent)),
-										linear-gradient(to top right, transparent 45%, var(--accent) 50%),
-										linear-gradient(to top left, transparent 45%, var(--accent) 50%);
-									background-position:
-										center 0.25rem,
-										left top,
-										left bottom,
-										right bottom;
-									background-repeat:
-										no-repeat;
-									background-size:
-										auto,
-										100% 100%,
-										50% 0.5rem,
-										50% 0.5rem;
-									
-									
-									
-									
-									
-									
-									
-									">X
+				<a class="secondary-nav__social secondary-nav__twitter  a--inherit symbol__twitter" href="https://twitter.com/vkgy_/" target="_blank"></a>
+				<a class="secondary-nav__social secondary-nav__facebook a--inherit symbol__facebook" href="https://facebook.com/vkgy.official/" target="_blank"></a>
+				<a class="secondary-nav__social secondary-nav__youtube  a--inherit symbol__youtube" href="https://youtube.com/c/vkgyofficial" target="_blank"></a>
+				<a class="secondary-nav__social secondary-nav__discord  a--inherit symbol__discord" href="https://discord.gg/jw8jzXn" target="_blank"></a>
+				<a class="secondary-nav__social secondary-nav__patreon  a--inherit symbol__patreon" href="https://patreon.com/vkgy/" target="_blank"></a>
 				
-				
-				</a>
-				
-				<span style="pointer-events: auto;">
-				<label class="input__checkbox-label" style="display:inline-block;">EN</label>
-				<label class="input__checkbox-label" style="display:inline-block;">日本語</label></span>
-				
-				
-				<span style="margin-left:auto; display:inline-block; height:2rem; line-height:2rem; pointer-events:auto;" class="any--weaken-size">
-					<a class="symbol__help" href="">REGISTER</a>
-					<a class="symbol__user" href="">SIGN IN</a>
-				</span>
+				<a class="head__link secondary-nav__link secondary-nav__sign-out a--inherit symbol__exit     any--signed-in-only"  href="/sign-out/"><?php echo lang('Sign out', 'サインアウト', ['secondary_class' => 'any--hidden']); ?></a>
+				<a class="head__link secondary-nav__link secondary-nav__register a--inherit symbol__register any--signed-out-only" href="/account/"><?php echo lang('Register', 'アカウントの作成', ['secondary_class' => 'any--hidden']); ?></a>
+				<a class="head__link secondary-nav__link secondary-nav__sign-in  a--inherit symbol__sign-in  any--signed-out-only" href="/account/"><?php echo lang('Sign in', 'サインイン', ['secondary_class' => 'any--hidden']); ?></a>
 			</div>
-		</div>
+		</nav>
 		
-		<div class="col c1 head head" style="position: sticky; top: 0;">
-			
-			<div class="head__container" style="padding-left: 1.5rem;">
-				<div class="head__links any--flex">
-					<a href="https://vk.gy/" class="head__item">
-						<svg x="0px" y="0px" width="0" height="0" viewBox="0 0 105 164" class="head__cage" fill="none" stroke="var(--accent)" stroke-width="5">
+		<nav class="col c1 primary-nav__wrapper">
+			<div class="primary-nav__container any--flex">
+				<div class="primary-nav__links any--flex">
+					<a href="/" class="primary-nav__home">
+						<svg x="0px" y="0px" width="0" height="0" viewBox="0 0 105 164" class="primary-nav__cage" fill="none" stroke="var(--accent)" stroke-width="5">
 							<path d="M52.5,161.5c-27.6,0-50-8.3-50-16v-88c0-24.4,17.6-44.7,40.8-49c1.5-3.5,5.1-6,9.2-6c4.1,0,7.6,2.5,9.2,6 c23.3,4.3,40.9,24.6,40.9,49v88C102.5,153.2,80.1,161.5,52.5,161.5z" /><path d="M42.5,107.7c0,4.6,0,8.8,0,12.2 M52.5,7.5c-5.5,0-10,13.9-10,41" /><path d="M22.5,101.5c0,16.1,0,56.1,0,56.1 M52.5,7.5c-16.6,0-30,20.9-30,48" /><path d="M62.5,107.9c0,16.3,0,30.5,0,37.7 M52.5,7.5c5.5,0,10,13.9,10,41" /><path d="M82.5,136.5L82.5,136.5 M82.5,100.6c0,8.9,0,17.9,0,26.2 M52.5,7.5c16.6,0,30,20.9,30,48" /><path d="M52.5,108.1c-22.4,0-41.6-12.3-50-30c8.4-17.7,27.6-30,50-30c22.4,0,41.6,12.3,50,30C94.1,95.7,74.8,108.1,52.5,108.1z" /><path d="M82.5,57.5 c0,16.7-13.3,30.3-30,30.3s-30-13.5-30-30.3" />
 						</svg>
 					</a>
+					
 					<?php
 						$links = [
-							["news",   "ニュース", "/blog/",     "symbol__news"],
-							["bands",  "バンド",   "/artists/",  "symbol__artist"],
-							["music",  "リリース", "/releases/", "symbol__release"],
-							["more",   "もっと",   "/database/", "symbol__database"],
-							["search", "サーチ",   "/search/",   "symbol__search"],
+							["news",   "ニュース", "/blog/"],
+							["bands",  "バンド",   "/artists/"],
+							["music",  "リリース", "/releases/"],
+							["more",   "もっと",   "/database/"],
+							["search", "サーチ",   "/search/"],
 						];
 						foreach($links as $link) {
 							?>
-								<a class="head__item head__nav a--inherit" href="<?php echo $link[2]; ?>"><?php echo lang($link[0], $link[1], ['secondary_container' => 'div', 'secondary_class' => 'any--weaken']); ?></a>
+								<a class="head__link primary-nav__link a--inherit" href="<?php echo $link[2]; ?>"><?php echo lang($link[0], $link[1], ['secondary_container' => 'div', 'secondary_class' => 'any--weaken']); ?></a>
 							<?php
 						}
 					?>
 				</div>
 				
-				<input class="head__search" form="form__search" name="q" placeholder="search" size="6" />
-				<span class="any--weaken-color head__symbol symbol--standalone symbol__search"></span>
+				<input class="primary-nav__search" form="form__search" name="q" placeholder="search" size="6" />
+				<span class="primary-nav__search-symbol any--weaken-color symbol--standalone symbol__search"></span>
 				
-				<div class="head__right">
-					<a class="head__item head__nav a--inherit head__vip" href="/vip/">VIP</a>
-					<a class="head__item head__user-link" href="<?php echo $user_link; ?>">
-						<img alt="<?php echo $_SESSION['username']; ?>" class="head__avatar" src="<?php echo $avatar_url; ?>" />
+				<div class="primary-nav__right any--flex any--weaken-color">
+					<a class="head__link primary-nav__add a--inherit" href="/blog/add/"><span class="symbol__news symbol--standalone"></span></a>
+					<a class="head__link primary-nav__add a--inherit" href="/artists/add/"><span class="symbol__artist symbol--standalone"></span></a>
+					<a class="head__link primary-nav__add a--inherit" href="/releases/add/"><span class="symbol__release symbol--standalone"></span></a>
+					<a class="head__link primary-nav__add a--inherit" href="/musicians/add/"><span class="symbol__musician symbol--standalone"></span></a>
+					<a class="head__link primary-nav__add a--inherit" href="/labels/add/"><span class="symbol__company symbol--standalone"></span></a>
+					
+					<a class="head__link primary-nav__user-link" href="<?php echo $user_link; ?>">
+						<img alt="<?php echo $_SESSION['username']; ?>" class="primary-nav__avatar" src="<?php echo $avatar_url; ?>" />
 					</a>
-					<button class="head__button" form="form__search" name="submit" type="submit"><?php echo lang('search', 'サーチ', ['primary_container' => 'span', 'secondary_container' => 'span', 'secondary_class' => 'any--hidden']); ?></button>
 				</div>
+				
+				<button class="primary-nav__search-button" form="form__search" name="submit" type="submit"><?php echo lang('search', 'サーチ', ['primary_container' => 'span', 'secondary_container' => 'span', 'secondary_class' => 'any--hidden']); ?></button>
+			</div>
+		</nav>
+		
+		<form action="/search/" class="any--hidden" enctype="multipart/form-data" id="form__search" method="get" name="form__search"><button type="submit"></button></form>
+		
+		<div class="header__wrapper  col c1">
+			<div class="header__container  lazy any--flex" data-src="<?php echo $background_image; ?>">
+				<h1 class="header__header">
+					<?php $page_header = '<a class="a--inherit" href="">'.lang('Visual kei artist list', 'アーティストの一覧', ['container' => 'div']).'</a>';
+					echo $page_header ?: 'vk.gy'; ?>
+				</h1>
+				
+				<?php
+					if(is_array($subnavs) && !empty($subnavs)) {
+						foreach($subnavs as $subnav_chunk) {
+							foreach($subnav_chunk as $subnav) {
+								if(!$subnav['signed_in_only'] || ($subnav['signed_in_only'] && $_SESSION['loggedIn'])) {
+									$subnav['class'] = ($_SERVER['REQUEST_URI'] === $subnav['url'] ? 'quaternary-nav--active' : null);
+									?>
+										<a class="quaternary-nav__link  a--inherit a--padded <?php echo $subnav['class']; ?>" href="<?php echo $subnav['url']; ?>"><?php echo $subnav['text']; ?></a>
+									<?php
+								}
+							}
+						}
+					}
+				?>
 			</div>
 		</div>
 		
-		<form action="/search/" class="any--hidden" enctype="multipart/form-data" id="form__search" method="get" name="form__search"><button type="submit"></button></form>
-		<!--<div class="head__spacer">&nbsp;</div>-->
-		
-		<!--<div class="underhead__wrapper col c1 any--margin any--weaken-color">
-			<div class="underhead__container any--flex">
-				
-				<label class="input__checkbox-label symbol__unchecked" for="language-en">EN</label>&nbsp;
-				<label class="input__checkbox-label symbol__unchecked" for="language-ja"><?php echo sanitize('日本語'); ?></label>&nbsp;<span style="color: var(--accent);">&beta;</span>
-				
-				<div class="underhead__account">
-					<a class="a--inherit any--signed-out-only head__item symbol__help" href="/account/"><?php echo lang('account', 'アカウント', ['secondary_class' => 'any--hidden']); ?></a>&nbsp;
-					<a class="a--inherit any--signed-in-only head__item head__signout symbol__exit" href="/sign-out/&request=<?php echo $_SERVER["REQUEST_URI"]; ?>"><?php echo lang('sign out', 'サインアウトする', ['secondary_class' => 'any--hidden']); ?></a>
-					<a class="a--inherit any--signed-in-only head__item head__user user" href="/users/<?php echo $_SESSION["username"]; ?>/"><?php echo $_SESSION['username']; ?></a>
-				</div>
-				
-				<script>
-					let enButton = document.querySelector('[for="language-en"]');
-					let jaButton = document.querySelector('[for="language-ja"]');
-					
-					function setLang(event) {
-						let url = '/php/function-set_lang.php';
-						let lang = 'en';
-						let connection = new XMLHttpRequest();
-						
-						if(event.target.htmlFor === 'language-ja') {
-							lang = 'ja';
+		<div class="tertiary-nav__wrapper  col">
+			<div class="tertiary-nav__container  any--flex"><?php
+				if(is_array($section_nav) && !empty($section_nav)) {
+					foreach($section_nav as $nav) {
+						if(!$nav['signed_in_only'] || ($nav['signed_in_only'] && $_SESSION['loggedIn'])) {
+							$nav['class'] = ($_SERVER['REQUEST_URI'] === $nav['url'] ? 'tertiary-nav--active' : null);
+							?>
+								<a class="tertiary-nav__link  a--inherit a--padded <?php echo $nav['class']; ?>" href="<?php echo $nav['url']; ?>"><?php echo $nav['text']; ?></a>
+							<?php
 						}
-						
-						connection.open('POST', url);
-						connection.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-						connection.send("lang=" + lang);
 					}
-					
-					enButton.addEventListener('click', setLang);
-					jaButton.addEventListener('click', setLang);
-				</script>
-				
-				<form action="/account/function-sign_in.php" class="underhead__sign-in any--flex any--signed-out-only input__row sign-in__container sign-in--refresh" enctype="multipart/form-data" method="post" name="form__signin">
-					<div class="input__group">
-						<input name="username" placeholder="username (ユーザー名)" />
-						<input class="input--secondary" name="password" placeholder="password (パスワード)" type="password" />
-						<button name="submit" type="submit"><?php echo lang('Sign in', 'サインイン', ['secondary_class' => 'any--hidden']); ?></button>
-						<span class="signin__status" data-role="status" data-status=""></span>
-						<span class="signin__status-message" data-role="status-message"></span>
-					</div>
-				</form>
+				}
+			?></div>
+			<div class="quinary-nav__container  any--flex">
+				<?php
+					if(is_array($directional_nav) && !empty($directional_nav)) {
+						foreach($directional_nav as $nav) {
+							$nav['class'] = 'quinary-nav__'.$nav['position'];
+							$nav['symbol'] = $nav['symbol'] ?: ($nav['position'] === 'left' ? 'previous' : ($nav['position'] === 'right' ? 'next' : 'random'));
+							
+							if($nav['url']) {
+								?>
+									<a class="<?php echo $nav['class']; ?>" href="<?php echo $nav['url']; ?>">
+										<span class="symbol__<?php echo $nav['symbol']; ?>"></span>
+										<span class="quinary-nav__text"><?php echo $nav['text']; ?></span>
+									</a>
+								<?php
+							}
+							else {
+								?>
+									<span class="<?php echo $nav['class']; ?> any--weaken-color">
+										<span class="symbol__<?php echo $nav['symbol']; ?>"></span>
+										<span class="quinary-nav__text"><?php echo $nav['text']; ?></span>
+									</span>
+								<?php
+							}
+						}
+					}
+				?>
 			</div>
-		</div>-->
+		</div>
 		
 		<?php
-			if($background_image) {
-				?>
-					<div class="content__background any__obscure any__obscure--fade lazy" data-src="<?php echo $background_image; ?>"></div>
-				<?php
-			}
-			
 			if(!empty($breadcrumbs) || !empty($subnavs)) {
 				?>
-					<div class="col c1 subhead__container" style="margin-top:0;">
-						<div class="subhead__inner">
-							<?php
-								/*if(!empty($breadcrumbs)) {
-									?>
-										<ol class="breadcrumb__container any--weaken" itemscope itemtype="http://schema.org/BreadcrumbList">
-											<?php
-												foreach($breadcrumbs as $num => $breadcrumb) {
-													?>
-														<li class="breadcrumb__item symbol symbol__caret-right" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-															<a class="a--padded a--inherit" href="<?php echo $breadcrumb["url"]; ?>" itemprop="item">
-																<span itemprop="name">
-																	<?php
-																		echo $breadcrumb["text"];
-																	?>
-																</span>
-															</a>
-															<meta itemprop="position" content="<?php echo $num + 1; ?>" />
-														</li>
-													<?php
-												}
-											?>
-										</ol>
-									<?php
-								}*/
-								if(!empty($subnavs) && is_array($subnavs)) {
-									?>
-										<div class="subnav__inner" style="margin-top:1rem; border-width: 0 0 1px 0; border-radius: 3px; border:none; background:linear-gradient(to top, rgba(0,0,0,0.1), transparent 50%);">
-											<div class="any--weaken subnav">
-												<?php
-													foreach($subnavs as $subnav_chunk) {
-														if(is_array($subnav_chunk) && !empty($subnav_chunk)) {
-															foreach($subnav_chunk as $key => $subnav) {
-																$class = ($subnav["signed_in_only"] ? "any--signed-in-only" : null)." ".($key === 0 ? "subnav__section" : null);
-																$class .= $_SERVER['REQUEST_URI'] === $subnav['url'] ? 'subnav--active' : null;
-																?>
-																	<a style="<?php echo $key===0 ? '' : null; ?>" class="a--inherit a--padded <?php echo $class; ?>" href="<?php echo $subnav["url"]; ?>">
-																		<?php
-																			echo $subnav["text"];
-																		?>
-																		
-																	</a>
-												<a href="">	<span style="font-size:0.75em;border:1px solid; padding:0 2px; border-radius:3px;">ADD</span>
-																	</a>
-																<?php
-															}
-														}
-													}
-												?>
-											</div>
-										</div>
-									<?php
-								}
-							?>
+					<div class="col c1 subhead__container" style="margin-top:0; display: none;">
+						<div class="subhead__inner flex">
 						</div>
 					</div>
 				<?php
 			}
 		?>
 		
-		<div class="content__container">
-			<?php echo $page_contents; ?>
-		</div>
+		<?php echo $page_contents; ?>
 		
 		<div class="footer__container">
 			<div class="col c4-ABBC any--margin">
@@ -316,10 +248,36 @@
 				</ul>
 				
 				<div class="any--weaken footer__center">
+					<?php
+						if(!empty($breadcrumbs)) {
+							?>
+								<ol class="breadcrumb__container" itemscope itemtype="http://schema.org/BreadcrumbList">
+									<?php
+										foreach($breadcrumbs as $num => $breadcrumb) {
+											?>
+												<li class="breadcrumb__item symbol symbol__caret-right" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+													<a class="a--padded a--inherit" href="<?php echo $breadcrumb["url"]; ?>" itemprop="item">
+														<span itemprop="name">
+															<?php
+																echo $breadcrumb["text"];
+															?>
+														</span>
+													</a>
+													<meta itemprop="position" content="<?php echo $num + 1; ?>" />
+												</li>
+											<?php
+										}
+									?>
+								</ol>
+							<?php
+						}
+					?>
+					
 					<a href="https://vk.gy/">vkgy</a> &copy; John (<a class="user" href="/users/inartistic/">inartistic</a>)
 					<div>
 						SINCE 2004
 					</div>
+					
 					<a class="a--padded a--outlined cta__link a--patreon" href="https://www.patreon.com/vkgy/" target="_blank"><img src="/style/logo-patreon.png" style="height: 1rem;" /> <?php echo lang('Support vkgy', 'パトレオン', ['secondary_class' => 'any--hidden']); ?></a>
 				</div>
 				
@@ -415,5 +373,34 @@
 		<?php
 			include_once("../style/symbols.php");
 		?>
+		<script>
+			// Observe when 'hero' home link is visible, and increase padding in main nav
+			var heroHomeButton = document.querySelector('.secondary-nav__home');
+			var stickyNavContainer = document.querySelector('.primary-nav__container');
+			
+			var navObserver = new IntersectionObserver(function(entries) {
+				if(entries[0]['isIntersecting']) {
+					stickyNavContainer.classList.add('primary-nav__container--hidden');
+				}
+				else {
+					stickyNavContainer.classList.remove('primary-nav__container--hidden');
+				}
+			});
+			
+			navObserver.observe(heroHomeButton);
+			
+			// Activate search when clicking link on mobile
+			var searchLink = document.querySelector('.primary-nav__container [href="/search/"]');
+			var searchElem = document.querySelector('.primary-nav__search');
+			
+			searchLink.addEventListener('click', function(event) {
+				event.preventDefault();
+				stickyNavContainer.classList.add('primary-nav--searching');
+				searchElem.focus();
+			});
+			searchElem.addEventListener('blur', function() {
+				stickyNavContainer.classList.remove('primary-nav--searching');
+			});
+		</script>
 	</body>
 </html>
