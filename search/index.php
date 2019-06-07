@@ -1,10 +1,5 @@
 <?php
-
 $search_type = in_array($_GET['search_type'], ['releases', 'artists', 'musicians']) ? $_GET['search_type'] : 'all';
-
-if($search_type === 'all' && $_SERVER['REQUEST_URI'] != '/search/') {
-	$_SERVER['REQUEST_URI'] = '/search/';
-}
 
 subnav([
 	lang('All',       '全て',           [ 'primary_class' => 'symbol__search', 'secondary_class' => 'any--hidden symbol__search' ]) => '/search/',
@@ -53,6 +48,8 @@ if($search_type === 'all') {
 		parse_str($request, $search);
 		$search = array_filter($search);
 	}
+	
+	print_r($search);
 	
 	if(!empty($search['q'])) {
 		$q = sanitize($search['q']);
