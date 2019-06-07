@@ -18,10 +18,10 @@ breadcrumbs([
 	"Home" => "https://vk.gy/"
 ]);
 
-subnav([
+/*subnav([
 	"Add news" => "/blog/add/",
 	"Database" => "/database/",
-]);
+]);*/
 
 $access_image = $access_image ?: new access_image($pdo);
 //if($_SESSION["username"] === "inartistic") { include_once("../main/function-choose_aod.php"); }
@@ -35,9 +35,9 @@ if($_SESSION["loggedIn"] && is_numeric($_SESSION["userID"])) {
 }
 
 if($is_vip) {
-	subnav([
+	/*subnav([
 		"VIP" => "/vip/"
-	]);
+	]);*/
 }
 
 /* Get VIP news */
