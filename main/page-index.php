@@ -1,4 +1,8 @@
-<div class="col c4-AAAB any--margin">
+<?php
+	$page_header = lang('Welcome to vk.gy', 'vk.gyへようこそ', [ 'container' => 'div' ]);
+?>
+
+<!--<div class="col c4-AAAB any--margin">
 	<div class="any--weaken">
 		<?php
 			echo
@@ -16,7 +20,7 @@
 	<div class="cta__container">
 		<a class="a--padded a--outlined cta__link a--patreon" href="https://patreon.com/vkgy/" target="_blank"><img src="/style/logo-patreon.png" style="height: 1rem;" /> <?php echo lang('Support vkgy', 'パトレオン', ['secondary_class' => 'any--hidden']); ?></a>
 	</div>
-</div>
+</div>-->
 
 <div class="col c4-ABBC section__main">
 	<div class="main__left">

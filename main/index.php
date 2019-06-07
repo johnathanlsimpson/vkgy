@@ -18,10 +18,10 @@ breadcrumbs([
 	"Home" => "https://vk.gy/"
 ]);
 
-subnav([
+/*subnav([
 	"Add news" => "/blog/add/",
 	"Database" => "/database/",
-]);
+]);*/
 
 $access_image = $access_image ?: new access_image($pdo);
 //if($_SESSION["username"] === "inartistic") { include_once("../main/function-choose_aod.php"); }
@@ -35,9 +35,9 @@ if($_SESSION["loggedIn"] && is_numeric($_SESSION["userID"])) {
 }
 
 if($is_vip) {
-	subnav([
+	/*subnav([
 		"VIP" => "/vip/"
-	]);
+	]);*/
 }
 
 /* Get VIP news */
@@ -167,7 +167,7 @@ $artist_of_day = array_merge($rslt_aod, $addl_aod);
 
 /* Flyer of day */
 $image = $access_image->access_image([ 'flyer_of_day' => true, 'get' => 'all' ])[0];
-if(is_array($image) && !empty($image)) {
+if(is_array($image) && !empty($image) && file_exists("../images/image_files/".$image["id"].".".$image["extension"])) {
 	$image["size"] = getimagesize("../images/image_files/".$image["id"].".".$image["extension"]);
 	$image["is_wide"] = is_array($image["size"]) && !empty($image["size"]) && $image["size"][0] > $image["size"][1];
 }
