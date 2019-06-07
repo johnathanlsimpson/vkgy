@@ -1,5 +1,7 @@
 <?php
 	if(!empty($user) && is_array($user)) {
+	$page_header = lang('Member profile', 'プロフィール', ['container' => 'div']);
+		
 		include_once("../avatar/class-avatar.php");
 		include_once("../avatar/avatar-options.php");
 		include_once("../avatar/avatar-definitions.php");
@@ -35,13 +37,13 @@
 		if(is_array($collection)) {
 			$collection = array_values($collection);
 		}
-		$num_collected = count($collection);
+		$num_collected = is_array($collection) ? count($collection) : 0;
 		
 		// Collection/Wants: Count Artists
 		for($i=0; $i<$num_collected; $i++) {
 			$artist_ids[] = $collection[$i]["artist_id"];
 		}
-		$num_artists_collected = count($artist_ids);
+		$num_artists_collected = is_array($artist_ids) ? count($artist_ids) : 0;
 		for($i=0; $i<$num_wants; $i++) {
 			$artist_ids[] = $wants[$i]["artist_id"];
 		}
@@ -376,9 +378,32 @@
 			$next_users[$next_user[$i]['type']] = $next_user[$i]['username'];
 		}
 		
+		subnav([
+			[
+				'text' => $next_users['older'],
+				'url' => '/users/'.$next_users['older'].'/',
+				'position' => 'left',
+			],
+			[
+				'text' => $next_users['newer'],
+				'url' => '/users/'.$next_users['newer'].'/',
+				'position' => 'right',
+			],
+		], 'directional');
+		
+		if(strlen($next_users['rand1'])) {
+			subnav([
+				[
+					'text' => $next_users['rand1'],
+					'url' => '/users/'.$next_users['rand1'].'/',
+					'position' => 'center',
+				],
+			], 'directional');
+		}
+		
 		?>
 			<!-- Prev Next -->
-			<div class="col c3 any--margin any--weaken-color">
+			<!--<div class="col c3 any--margin any--weaken-color">
 				<div>
 					<h5>
 						&larr; A
@@ -407,7 +432,7 @@
 					</h5>
 					<?php echo $next_users['newer'] ? '<a class="user a--inherit" href="/user/'.$next_users['newer'].'/">'.$next_users['newer'].'</a>' : 'N/A'; ?>
 				</div>
-			</div>
+			</div>-->
 			
 			<!-- User header -->
 			<div class="col c1">

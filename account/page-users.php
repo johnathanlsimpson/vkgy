@@ -7,13 +7,12 @@
 	style([
 		"/account/style-page-users.css"
 	]);
+	
+	$page_header = lang('Member list', 'メンバー一覧', ['container' => 'div']);
 ?>
 
 <div class="col c1">
 	<div>
-		<h1>
-			User list
-		</h1>
 		
 		<?php
 			if($error) {

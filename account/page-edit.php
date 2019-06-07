@@ -13,6 +13,8 @@
 	]);
 	
 	$access_artist = new access_artist($pdo);
+
+$page_header = lang('Account', 'アカウント', ['container' => 'div']);
 	
 	/*$sql_image_list = "SELECT artist_id FROM images WHERE is_default=?";
 	$stmt_image_list = $pdo->prepare($sql_image_list);
