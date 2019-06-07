@@ -6,22 +6,16 @@
 	style([
 		"/account/style-page-sign-in-register.css"
 	]);
+	
+	$page_header = lang('Account', 'アカウント', ['container' => 'div']);
 ?>
-
-<div class="col c1">
-	<div>
-		<h1>
-			Account services
-		</h1>
-	</div>
-</div>
 
 <div class="col c2 any--signed-out-only">
 	<div>
 		<h2>
 			Sign in
 		</h2>
-		<form action="" class="text sign-in__container" enctype="multipart/form-data" method="post" name="form__sign-in">
+		<form action="" class="text sign-in__container <?php echo $_SERVER['HTTP_REFERER'] ? 'sign-in--back' : 'sign-in--refresh'; ?>" enctype="multipart/form-data" method="post" name="form__sign-in">
 			<div class="input__row">
 				<div class="input__group any--flex-grow">
 					<input class="any--flex-grow" name="username" pattern="^[\w- \.]{3,}$" placeholder="username" required />
