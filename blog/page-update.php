@@ -14,20 +14,21 @@
 		include_once('../php/function-render_json_list.php');
 		render_json_list('artist');
 		
+		$page_header = 'Edit blog entry';
+		
 		?>
 			<div class="col c1">
-				<h1>
-					Blog
 					<?php
 						if(strlen($entry['friendly'])) {
 							?>
+							<h1>
 								<div class="any--weaken">
 									<a class="a--inherit" href="<?php echo '/blog/'.$entry['friendly'].'/'; ?>"><?php echo $entry['title']; ?></a>
 								</div>
+							</h1>
 							<?php
 						}
 					?>
-				</h1>
 				
 				<?php
 					if($error) {
@@ -38,7 +39,16 @@
 						<?php
 					}
 					if(is_array($entry["prev_next"]) && !empty($entry['prev_next'])) {
-						?>
+						foreach($entry["prev_next"] as $prev_next) {
+							subnav([
+								[
+									'text' => $prev_next['title'],
+									'url' => '/blog/'.$prev_next['friendly'].'/edit/',
+									'position' => $prev_next['type'] === 'next' ? 'right' : 'left',
+								]
+							], 'directional');
+						}
+						/*?>
 							<div class="any--flex any--margin">
 								<?php
 									foreach($entry["prev_next"] as $prev_next) {
@@ -54,7 +64,7 @@
 									}
 								?>
 							</div>
-						<?php
+						<?php*/
 					}
 				?>
 			</div>
