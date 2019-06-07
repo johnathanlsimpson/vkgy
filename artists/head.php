@@ -1,6 +1,10 @@
 <?php
 
-$page_header = lang(($artist['romaji'] ?: $artist['name']), $artist['name'], [ 'container' => 'div' ]);
+$page_header = lang(
+	'<a class="artist symbol__artist a--inherit" href="/artists/'.$artist['friendly'].'/">'.($artist['romaji'] ?: $artist['name']).'</a>',
+	'<a class="artist symbol__artist a--inherit" href="/artists/'.$artist['friendly'].'/">'.$artist['name'].'</a>',
+	['container' => 'div']
+);
 
 subnav([
 	'Profile' => '/artists/'.$artist['friendly'].'/',
