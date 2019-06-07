@@ -190,11 +190,12 @@
 }
 .section__support {
 	align-items: stretch;
+	background-color: var(--background);
 	overflow: hidden;
 	padding-bottom: 3rem;
 	padding-top: 3rem;
 }
-.section__support::before {
+/*.section__support::before {
 	background-color: var(--background);
 	background-image: url(/main/pattern.png);
 	background-position: center;
@@ -208,7 +209,7 @@
 	transform: rotate(-5deg);
 	right: -50%;
 	z-index: -1;
-}
+}*/
 .support__list {
 	display: inline;
 	line-height: 2;
