@@ -13,6 +13,7 @@ function subnav($input_array, $nav_type = 'section', $signed_in_only = false) {
 						'url' => $value['url'],
 						'position' => $value['position'],
 						'signed_in_only' => $signed_in_only ? true : false,
+						'referrer' => $_SERVER['REQUEST_URI'],
 					];
 				}
 				else {
@@ -20,6 +21,7 @@ function subnav($input_array, $nav_type = 'section', $signed_in_only = false) {
 						'text' => $key,
 						'url' => $value,
 						'signed_in_only' => $signed_in_only ? true : false,
+						'referrer' => $_SERVER['REQUEST_URI'],
 					];
 				}
 			}

@@ -161,6 +161,7 @@
 		
 		<form action="/search/" class="any--hidden" enctype="multipart/form-data" id="form__search" method="get" name="form__search"><button type="submit"></button></form>
 		
+		<!-- HEADER -->
 		<div class="header__wrapper  col c1">
 			<div class="header__container  lazy any--flex" data-src="<?php echo $background_image; ?>">
 				<h1 class="header__header">
@@ -189,7 +190,7 @@
 				if(is_array($section_nav) && !empty($section_nav)) {
 					foreach($section_nav as $nav) {
 						if(!$nav['signed_in_only'] || ($nav['signed_in_only'] && $_SESSION['loggedIn'])) {
-							$nav['class'] = ($_SERVER['REQUEST_URI'] === $nav['url'] ? 'tertiary-nav--active' : null);
+							$nav['class'] = explode('&', $_SERVER['REQUEST_URI'])[0] === $nav['url'] ? 'tertiary-nav--active' : null;
 							?>
 								<a class="tertiary-nav__link  a--inherit a--padded <?php echo $nav['class']; ?>" href="<?php echo $nav['url']; ?>"><?php echo $nav['text']; ?></a>
 							<?php
@@ -204,7 +205,7 @@
 							$nav['class'] = 'quinary-nav__'.$nav['position'];
 							$nav['symbol'] = $nav['symbol'] ?: ($nav['position'] === 'left' ? 'previous' : ($nav['position'] === 'right' ? 'next' : 'random'));
 							
-							if($nav['url']) {
+							if(strlen($nav['url'])) {
 								?>
 									<a class="<?php echo $nav['class']; ?>" href="<?php echo $nav['url']; ?>">
 										<span class="symbol__<?php echo $nav['symbol']; ?>"></span>
@@ -215,7 +216,6 @@
 							else {
 								?>
 									<span class="<?php echo $nav['class']; ?> any--weaken-color">
-										<span class="symbol__<?php echo $nav['symbol']; ?>"></span>
 										<span class="quinary-nav__text"><?php echo $nav['text']; ?></span>
 									</span>
 								<?php
@@ -225,17 +225,6 @@
 				?>
 			</div>
 		</div>
-		
-		<?php
-			if(!empty($breadcrumbs) || !empty($subnavs)) {
-				?>
-					<div class="col c1 subhead__container" style="margin-top:0; display: none;">
-						<div class="subhead__inner flex">
-						</div>
-					</div>
-				<?php
-			}
-		?>
 		
 		<?php echo $page_contents; ?>
 		
