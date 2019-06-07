@@ -11,15 +11,11 @@
 		"/artists/script-page-letter.js",
 	]);
 	
-	/*$list_template = str_replace(["\t", "\r", "\n"], "", '
-		<li class="artist-list__item" data-recent="{8}" data-is_exclusive="{9}">
-			<div class="h5 artist-list__history">{1}</div>
-			<a class="artist artist-list__link artist artist--no-symbol" data-name="{2}" data-quickname="{3}" href="{4}">
-				<span class="artist-list__name">{5}</span> <span class="any__note artist-list__hint">{6}</span><br />
-				<span class="artist-list__jp any--jp any--weaken">{7}</span>
-			</a>
-		</li>
-	');*/
+	subnav([
+		lang('Artist list', 'アーティスト一覧', [ 'secondary_class' => 'any--hidden' ]) => '/artists/',
+		lang('Search', 'サーチ', [ 'secondary_class' => 'any--hidden' ]) => '/search/artists/',
+	]);
+	
 	$list_template = str_replace(["\t", "\r", "\n"], "", '
 		<li class="artist-list__item" data-recent="{8}" data-is_exclusive="{9}">
 			<div class="h5 artist-list__history">{1}</div>
@@ -30,14 +26,12 @@
 	');
 	
 	$str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ-";
+	
+	$page_header = lang('Visual kei artist list', 'ビジュアル系アーティストの一覧', [ 'container' => 'div' ]);
 ?>
 
 <div class="col c1">
-	<div>
-		<h1>
-			<?php echo lang('Visual kei artist list', 'ビジュアル系アーティストの一覧', ['container' => 'div', 'secondary_class' => 'any--weaken']); ?>
-		</h1>
-	</div>
+	
 	
 	<?php
 		if($error) {

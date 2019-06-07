@@ -1,5 +1,4 @@
 <?php	
-	include_once("../database/head.php");
 	include_once("../artists/function-sort_musicians.php");
 	include_once("../php/class-access_user.php");
 	
@@ -13,6 +12,12 @@
 	
 	$pageTitle = "Artist list | アーティスト一覧";
 	$page_description = "Visual kei artist list. Profiles, biographies, member histories. ビジュアル系アーティスト一覧。プロフィール、活動、リリース情報、など。";
+	
+	$page_header = lang('Artists', 'アーティスト', [ 'container' => 'div' ]);
+	
+	subnav([
+		'Add artist' => '/artists/add/',
+	], 'interact', true);
 	
 	// Choose page
 	if(!empty($_GET["artist"])) {
@@ -80,22 +85,12 @@
 			"Edit artist" => "/artists/".$artist["friendly"]."/edit/"
 		], true);
 		
-		
 		// Get musicians' band history
 		$artist["musicians"] = sort_musicians($artist["musicians"]);
 		
 		$sql_view = "INSERT INTO artists_views (artist_id, date_occurred, view_count) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE view_count = view_count + 1";
 		$stmt_view = $pdo->prepare($sql_view);
 		$stmt_view->execute([$artist["id"], date("Y-m-d")]);
-		
-		// Set/unset default image
-		$default_image = "/artists/".$artist["friendly"]."/main.large.jpg";
-		if(image_exists($default_image, $pdo)) {
-			background($default_image);
-		}
-		else {
-			unset($default_image);
-		}
 		
 		// Parse history
 		if(is_array($artist["history"])) {
