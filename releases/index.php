@@ -2,8 +2,15 @@
 	$access_release = new access_release($pdo);
 	$access_artist = new access_artist($pdo);
 	
-	include("../database/head.php");
-	include("../releases/head.php");
+	breadcrumbs([
+		'Releases' => '/releases/',
+	]);
+	
+	subnav([
+		'Add release' => '/releases/add/',
+	], 'interact', true);
+	
+	$page_header = lang('Releases', 'リリース', ['container' => 'div']);
 	
 	if(is_numeric($_GET["id"])) {
 		$release = $access_release->access_release(["release_id" => $_GET["id"], "get" => "all"]);

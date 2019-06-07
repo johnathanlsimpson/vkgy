@@ -14,6 +14,7 @@
 		$pageTitle  = $artist["quick_name"]." discography";
 		$pageTitle .= " | ".$artist["name"]."ディスコグラフィ";
 		
+		include('../artists/head.php');
 		
 		if($error) {
 			?>
@@ -30,11 +31,6 @@
 		
 		?>
 			<div class="col c1">
-				<div>
-					<?php
-						$access_artist->artist_card(["quick_name" => $artist["quick_name"], "name" => $artist["name"], "romaji" => $artist["romaji"], "friendly" => $artist["friendly"]], true);
-					?>
-				</div>
 				
 				<div>
 					<div class="any--flex release__control-container any--margin">

@@ -1,5 +1,9 @@
 <?php
 	$page_header = lang('Welcome to vk.gy', 'vk.gyへようこそ', [ 'container' => 'div' ]);
+	
+	subnav([
+		'Patreon' => 'https://patreon.com/vkgy/',
+	], 'interact');
 ?>
 
 <!--<div class="col c4-AAAB any--margin">

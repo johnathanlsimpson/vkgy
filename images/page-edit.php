@@ -37,13 +37,12 @@
 		$artist_keys[$artist_list[$i][0]] = $i + 1;
 	}
 	array_unshift($artist_list, [0, "", "(omnibus / various artists)"]);
+	
+	$page_header = 'Edit queued images';
 ?>
 
 <div class="col c1">
 	<div>
-		<h2>
-			Edit queued images
-		</h2>
 		
 		<div class="text text--outlined text--notice">
 			Showing <span class="any__note"><?php echo count($images); ?></span> of <span class="any__note"><?php echo number_format($rslt_count); ?></span> queued images.

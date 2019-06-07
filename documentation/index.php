@@ -1,5 +1,10 @@
 <?php
 	include('../documentation/function-render_documentation.php');
+
+	if(strpos($_SERVER['REQUEST_URI'], '/documentation/') === 0) {
+		include('../account/head.php');
+		$page_header = lang('Documentation', 'ガイド', ['container' => 'div']);
+	}
 	
 	if(!$markdown_parser) {
 		$markdown_parser = new parse_markdown($pdo);

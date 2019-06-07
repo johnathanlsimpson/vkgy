@@ -1,7 +1,23 @@
 <?php
-	include_once("../database/head.php");
-
-
+	breadcrumbs([
+		'Releases' => '/releases/',
+	]);
+	
+	subnav([
+		'Add release' => '/releases/add/',
+	], 'interact', true);
+	
+	subnav([
+		lang('Release calendar', '新譜一覧', ['secondary_class' => 'any--hidden']) => '/releases/',
+		lang('Search', 'サーチ', ['secondary_class' => 'any--hidden']) => '/search/releases/',
+	]);
+	
+	$page_header = lang('Add release', 'リリースを追加する', ['container' => 'div']);
+	
+	subnav([
+		lang('Add release', 'リリースを追加する', ['secondary_class' => 'any--hidden']) => '/releases/add/',
+	]);
+	
 	script([
 		"/scripts/external/script-autosize.js",
 		"/scripts/external/script-selectize.js",

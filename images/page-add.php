@@ -30,13 +30,11 @@
 			}
 		}
 		
+		$page_header = 'Add images to queue';
+		
 		?>
 			<div class="col c1">
 				<div>
-					<h2>
-						Add images to queue
-					</h2>
-					
 					<div class="text text--outlined text--notice">
 						<?php echo $output; ?>
 					</div>

@@ -32,14 +32,26 @@
 	$stmt_num_images->execute();
 	$num_images = $stmt_num_images->fetchColumn();
 	$num_pages = ceil($num_images / $limit_num);
+	
+	subnav([
+		[
+			'text' => $search_page > 1 ? 'Page '.($search_page - 1) : 'Page 1',
+			'url' => $search_page > 1 ? '/images/&type='.$search_type.'&order='.$search_order.'&page='.($search_page - 1) : null,
+			'position' => 'left',
+		],
+		[
+			'text' => 'Results '.(($search_page - 1) * $limit_num + 1).' to '.(($search_page - 1) * $limit_num + $limit_num),
+			'position' => 'center',
+		],
+		[
+			'text' => $search_page < $num_pages ? 'Page '.($search_page + 1) : 'Page '.$search_page,
+			'url' => $search_page < $num_pages ? '/images/&type='.$search_type.'&order='.$search_order.'&page='.($search_page + 1) : null,
+			'position' => 'right',
+		],
+	], 'directional');
 ?>
 
 <div class="col c1">
-	<div>
-		<h2>
-			<?php echo lang('Images list', '画像一覧', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
-		</h2>
-	</div>
 	
 	<div class="col c2 images__controls">
 		<div>
@@ -52,40 +64,6 @@
 			<a href="/images/&type=artist&order=<?php echo strtolower($search_order); ?>" class="input__checkbox-label <?php echo $_GET['type'] === 'artist' ? 'symbol__checked input__checkbox-label--selected' : 'symbol__unchecked'; ?>">Artist</a>
 			<a href="/images/&type=release&order=<?php echo strtolower($search_order); ?>" class="input__checkbox-label <?php echo $_GET['type'] === 'release' ? 'symbol__checked input__checkbox-label--selected' : 'symbol__unchecked'; ?>">Release</a>
 			<a href="/images/&type=vip&order=<?php echo strtolower($search_order); ?>" class="input__checkbox-label <?php echo $_GET['type'] === 'vip' ? 'symbol__checked input__checkbox-label--selected' : 'symbol__unchecked'; ?>">VIP</a>
-		</div>
-	</div>
-	
-	<div class="col c3 any--weaken-color images__controls">
-		<div>
-			<?php
-				if($search_page > 1) {
-					?>
-						<a class="symbol__previous" href="<?php echo '/images/&type='.$search_type.'&order='.$search_order.'&page='.($search_page - 1); ?>">Page <?php echo ($search_page - 1); ?></a>
-						&nbsp;
-						<a class="symbol__oldest" href="<?php echo '/images/&type='.$search_type.'&order='.$search_order.'&page=1'; ?>">1</a>
-					<?php
-				}
-				else {
-					echo 'Page 1';
-				}
-			?>
-		</div>
-		<div>
-			Results <?php echo (($search_page - 1) * $limit_num + 1).' to '.(($search_page - 1) * $limit_num + $limit_num); ?>
-		</div>
-		<div>
-			<?php
-				if($search_page < $num_pages) {
-					?>
-						<a href="<?php echo '/images/&type='.$search_type.'&order='.$search_order.'&page='.$num_pages; ?>"><?php echo $num_pages; ?> <span class="symbol__newest"></span></a>
-						&nbsp;
-						<a href="<?php echo '/images/&type='.$search_type.'&order='.$search_order.'&page='.($search_page + 1); ?>">Page <?php echo ($search_page + 1); ?> <span class="symbol__next"></span></a>
-					<?php
-				}
-				else {
-					echo 'Page '.$search_page;
-				}
-			?>
 		</div>
 	</div>
 	

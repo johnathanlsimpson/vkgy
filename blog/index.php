@@ -8,13 +8,10 @@ $markdown_parser = new parse_markdown($pdo);
 
 $page_header = lang('Visual kei news', 'V系ニュース', ['container' => 'div']);
 
+include('../blog/head.php');
+
 breadcrumbs([
 	"News" => "/blog/"
-]);
-
-subnav([
-	'Latest' => '/blog/',
-	'Entries by tag' => '/blog/tags/',
 ]);
 
 subnav([

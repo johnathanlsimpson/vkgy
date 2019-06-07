@@ -381,12 +381,12 @@
 		subnav([
 			[
 				'text' => $next_users['older'],
-				'url' => '/users/'.$next_users['older'].'/',
+				'url' => $next_users['older'] ? '/users/'.$next_users['older'].'/' : null,
 				'position' => 'left',
 			],
 			[
 				'text' => $next_users['newer'],
-				'url' => '/users/'.$next_users['newer'].'/',
+				'url' => $next_users['newer'] ? '/users/'.$next_users['newer'].'/' : null,
 				'position' => 'right',
 			],
 		], 'directional');

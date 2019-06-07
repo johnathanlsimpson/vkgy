@@ -12,16 +12,16 @@
 		"/musicians/style-page-add.css"
 	]);
 	
+	$page_header = lang('Add musician', 'ミュージシャンを追加する', ['container' => 'div']);
+	
+	subnav([
+		lang('Add musician', 'ミュージシャン追加', ['secondary_class' => 'any--hidden']) => '/musicians/add/',
+	]);
+	
 	if($_SESSION["admin"]) {
 		?>
 			<div class="col c1 any--margin">
 				<form action="/musicians/function-add.php" enctype="multipart/form-data" method="post" name="form__add">
-					<h1>
-						Musicians
-					</h1>
-					<h2>
-						Add musicians
-					</h2>
 					<?php
 						for($i = 0; $i < 7; $i++) {
 							?>
