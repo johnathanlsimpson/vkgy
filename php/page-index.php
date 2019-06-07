@@ -170,14 +170,12 @@
 				<!-- INTERACT NAV -->
 				<div class="quaternary-nav__container any--weaken-size"><?php
 					if(is_array($interact_nav) && !empty($interact_nav)) {
-						foreach($interact_nav as $subnav_chunk) {
-							foreach($subnav_chunk as $subnav) {
-								if(!$subnav['signed_in_only'] || ($subnav['signed_in_only'] && $_SESSION['loggedIn'])) {
-									$subnav['class'] = ($_SERVER['REQUEST_URI'] === $subnav['url'] ? 'quaternary-nav--active' : null);
-									?>
-										<a class="quaternary-nav__link  a--inherit a--padded <?php echo $subnav['class']; ?>" href="<?php echo $subnav['url']; ?>"><?php echo $subnav['text']; ?></a>
-									<?php
-								}
+						foreach($interact_nav as $nav) {
+							if(!$nav['signed_in_only'] || ($nav['signed_in_only'] && $_SESSION['loggedIn'])) {
+								$nav['class'] = ($_SERVER['REQUEST_URI'] === $nav['url'] ? 'quaternary-nav--active' : null);
+								?>
+									<a class="quaternary-nav__link  a--inherit a--padded <?php echo $nav['class']; ?>" href="<?php echo $nav['url']; ?>"><?php echo $nav['text']; ?></a>
+								<?php
 							}
 						}
 					}
@@ -189,14 +187,12 @@
 		<div class="tertiary-nav__wrapper  col">
 			<div class="tertiary-nav__container  any--flex"><?php
 				if(is_array($section_nav) && !empty($section_nav)) {
-					foreach($section_nav as $nav_chunk) {
-						foreach($nav_chunk as $nav) {
-							if(!$nav['signed_in_only'] || ($nav['signed_in_only'] && $_SESSION['loggedIn'])) {
-								$nav['class'] = ($_SERVER['REQUEST_URI'] === $nav['url'] ? 'tertiary-nav--active' : null);
-								?>
-									<a class="tertiary-nav__link  a--inherit a--padded <?php echo $nav['class']; ?>" href="<?php echo $nav['url']; ?>"><?php echo $nav['text']; ?></a>
-								<?php
-							}
+					foreach($section_nav as $nav) {
+						if(!$nav['signed_in_only'] || ($nav['signed_in_only'] && $_SESSION['loggedIn'])) {
+							$nav['class'] = ($_SERVER['REQUEST_URI'] === $nav['url'] ? 'tertiary-nav--active' : null);
+							?>
+								<a class="tertiary-nav__link  a--inherit a--padded <?php echo $nav['class']; ?>" href="<?php echo $nav['url']; ?>"><?php echo $nav['text']; ?></a>
+							<?php
 						}
 					}
 				}
