@@ -113,10 +113,10 @@ RewriteRule  ^labels/add/?$             /?labels/&action=add
 RewriteRule  ^labels/([\w\-]+)/?$       /?labels/&label=$1
 RewriteRule  ^labels/([\w\-]+)/edit/?$  /?labels/&action=edit&label=$1
 
-RewriteRule  ^lives/edit/areas/?$                          /?lives/&action=edit&method=areas
+RewriteRule  ^lives/areas/edit/?$                          /?lives/&action=edit&method=areas
 RewriteRule  ^lives/livehouses/edit(?:/page/(\d+))?/?$     /?lives/&action=edit&method=livehouses&page=$1
 RewriteRule  ^lives/livehouses/(\d+)/edit/?$               /?lives/&action=edit&method=livehouses&id=$1
-RewriteRule  ^lives/add/livehouses/?$                      /?lives/&action=add&method=livehouses
+RewriteRule  ^lives/livehouses/add/?$                      /?lives/&action=add&method=livehouses
 RewriteRule  ^lives/livehouses/?$                          /?lives/&page=livehouses
 
 RewriteRule  ^musicians/add/?$           /?musicians/&action=add
