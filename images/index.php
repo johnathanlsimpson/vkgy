@@ -3,23 +3,20 @@
 		"Images" => "/images/"
 	]);
 	
+	subnav([
+		'Images' => '/images/',
+	]);
+	
 	if($_SESSION["admin"] > 1) {
 		subnav([
 			"Upload queue" => "/images/add/",
 			"Edit queue" => "/images/edit/"
-		]);
+		], 'interact', true);
 	}
 	
 	$pageTitle = "Images";
+	$page_header = lang('Image list', '画像一覧', ['container' => 'div']);
 ?>
-
-<div class="col c1">
-	<div>
-		<h1>
-			Images
-		</h1>
-	</div>
-</div>
 
 <?php
 	if($_SESSION["admin"] > 1 && !empty($_GET["action"])) {

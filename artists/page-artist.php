@@ -1,5 +1,7 @@
 <?php
 	if(is_array($artist) && !empty($artist)) {
+		include('../artists/head.php');
+		
 		style([
 			"../artists/style-page-artist.css"
 		]);
@@ -21,34 +23,28 @@
 			$artist['images'] = array_values($artist['images']);
 		}
 		
-		?>
-			<div class="col c3 artist__other">
-				<?php
-					foreach($rslt_next as $prevnext_key => $rslt) {
-						$type = $rslt['type'];
-						$name = lang(($rslt['romaji'] ?: $rslt['name']), $rslt['name'], ['secondary_class' => 'any--hidden']);
-						$symbol = $type === 'rand' ? 'random' : ($type === 'previous' ? $type : null);
-						
-						echo $prevnext_key === 0 && $type != 'previous' ? '<div>&nbsp;</div>' : null;
-						
-						?>
-							<div class="artist__<?php echo $type; ?>">
-								<a class="<?php echo $symbol ? 'symbol__'.$symbol : null; ?>" href="/artists/<?php echo $rslt["friendly"]; ?>/"><?php echo $name; echo $type === 'next' ? '<span class="symbol__next"></span>' : null; ?></a>
-							</div>
-						<?php
-						
-						echo $prevnext_key === 1 && $type === 'rand' && !$rslt_next[2] ? '<div>&nbsp;</div>' : null;
-					}
-				?>
-			</div>
-			<div class="col c1">
-				<div>
-					<?php
-						$access_artist->artist_card(array_merge($artist, ["musicians" => $artist["musicians"][1]]), true);
-					?>
-				</div>
-			</div>
+		foreach($rslt_next as $rslt) {
+			subnav([
+				[
+					'text' => lang(($rslt['romaji'] ?: $rslt['name']), $rslt['name'], ['secondary_class' => 'any--hidden']),
+					'url' => '/artists/'.$rslt["friendly"].'/',
+					'position' => ($rslt['type'] === 'rand' ? 'center' : ($rslt['type'] === 'previous' ? 'left' : 'right')),
+				],
+			], 'directional');
 			
+			if(count($rslt_next) === 2) {
+				if($rslt['type'] != 'rand') {
+					subnav([
+						[
+							'text' => lang( ($artist['romaji'] ?: $artist['name']), $artist['name'], [ 'secondary_class' => 'any--hidden' ] ),
+							'position' => $rslt['type'] === 'previous' ? 'right' : 'left',
+						],
+					], 'directional');
+				}
+			}
+		}
+		
+		?>
 			<div class="col c4-ABBB">
 				<div class="artist__nav">
 					<ul class="ul--compact">

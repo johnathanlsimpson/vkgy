@@ -3,11 +3,23 @@
 		"Lives" => "/lives/"
 	]);
 	
+	$page_header = lang('Lives', 'ライブ', ['container' => 'div']);
+	
+	subnav([
+		lang('Lives', 'ライブ', ['secondary_class' => 'any--hidden']) => '/lives/',
+		lang('Livehouses', 'ライブハウス', ['secondary_class' => 'any--hidden']) => '/lives/livehouses/',
+	]);
+	
+	if($_SESSION['admin'] > 1) {
+		subnav([
+			'Edit areas' => '/lives/areas/edit/',
+		], 'interact', true);
+	}
+	
 	subnav([
 		"Edit livehouses" => "/lives/livehouses/edit/",
-		"Add livehouses" => "/lives/add/livehouses/",
-		//"Edit areas" => "/lives/edit/areas/",
-	]);
+		"Add livehouses" => "/lives/livehouses/add/",
+	], 'interact', true);
 	
 	script([
 		"/scripts/external/script-selectize.js",
@@ -153,14 +165,6 @@
 		$num_livehouses = count($rslt_livehouses);
 	}
 ?>
-
-<div class="col c1">
-	<div>
-		<h1>
-			Lives
-		</h1>
-	</div>
-</div>
 
 <?php
 	if($add_livehouses || $edit_livehouses) {

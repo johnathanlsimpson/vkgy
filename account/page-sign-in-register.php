@@ -7,7 +7,7 @@
 		"/account/style-page-sign-in-register.css"
 	]);
 	
-	$page_header = lang('Account', 'アカウント', ['container' => 'div']);
+	$page_header = lang('Register', '登録', ['container' => 'div']);
 ?>
 
 <div class="col c2 any--signed-out-only">

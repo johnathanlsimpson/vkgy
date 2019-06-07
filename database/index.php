@@ -66,7 +66,16 @@ $stmt_recent = $pdo->prepare($sql_recent);
 $stmt_recent->execute();
 $database = $stmt_recent->fetchAll();
 
-include_once("../database/head.php");
-include("../database/page-index.php");
+$page_title = 'Database';
+$page_header = 'Database';
 
-$pageTitle = 'Database';
+subnav([
+	'Artists' => '/artists/',
+	'Musicians' => '/musicians/',
+	'Labels' => '/labels/',
+	'Releases' => '/releases/',
+	'Lives' => '/lives/',
+	'Images' => '/images/',
+]);
+
+include("../database/page-index.php");

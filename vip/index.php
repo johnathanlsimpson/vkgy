@@ -10,13 +10,17 @@
 	
 	subnav([
 		"Become VIP" => "https://patreon.com/vkgy",
-		"Add VIP post" => "/vip/add/",
 		"VIP forum" => "/vip/",
 	]);
 	
-	background("../support/patreon-back.png");
+	subnav([
+		"Add VIP post" => "/vip/add/",
+	], 'interact', true);
 	
 	$pageTitle = "VIP section";
+	$page_header = 'VIP section';
+	
+	background("../support/patreon-back.png");
 	
 	if($_SESSION["loggedIn"] && is_numeric($_SESSION["userID"])) {
 		$sql_check = "SELECT 1 FROM users WHERE id=? AND is_vip=1 LIMIT 1";

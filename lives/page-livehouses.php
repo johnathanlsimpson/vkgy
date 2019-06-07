@@ -1,19 +1,9 @@
 <?php
 	style('../lives/style-page-livehouses.css');
+	
+	$page_header = lang('Livehouse list', 'ライブハウス一覧', ['container' => 'div']);
 ?>
 
-<div class="col c1">
-	<div>
-		<h2>
-			<div class="any--en">
-				Livehouse list
-			</div>
-			<div class="any--jp any--weaken">
-				<?php echo sanitize('ライブハウス一覧'); ?>
-			</div>
-		</h2>
-	</div>
-</div>
 
 <?php
 	if(is_array($rslt_livehouses) && !empty($rslt_livehouses)) {

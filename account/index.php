@@ -1,44 +1,11 @@
 <?php
-	$access_user = new access_user($pdo);
-	$access_artist = new access_artist($pdo);
-	$access_release = new access_release($pdo);
-	
-	breadcrumbs([
-		"Account services" => "/account/"
-	]);
-	
-	/*subnav([
-		($_SESSION["loggedIn"] ? "Edit account" : "Register") => "/accounts/",
-		"User list" => "/users/",
-		'Documentation' => '/documentation/',
-	]);*/
-	
-	/*if($_SESSION["loggedIn"]) {
-		subnav(["My account" => "/users/".$_SESSION["username"]."/"]);
-	}*/
-	
-	if($_SESSION['loggedIn']) {
-		$section_nav[] = [
-			'text' => $_SESSION['username'],
-			'url' => '/users/'.$_SESSION['username'].'/',
-		];
-	}
-	else {
-		$section_nav[] = [
-			'text' => lang('Register/Sign in', '登録・サインイン', ['secondary_class' => 'any--hidden']),
-			'url' => '/account/'
-		];
-	}
-	
-	$section_nav[] = [
-		'text' => lang('Member list', 'メンバー一覧', ['secondary_class' => 'any--hidden']),
-		'url' => '/users/',
-	];
-	$section_nav[] = [
-		'text' => lang('Documentation', 'ガイド', ['secondary_class' => 'any--hidden']),
-		'url' => '/documentation/',
-	];
-	
+
+$access_user = new access_user($pdo);
+$access_artist = new access_artist($pdo);
+$access_release = new access_release($pdo);
+
+include('../account/head.php');
+
 	// Switch controller
 	if(!$template && $_GET["page"] === "users") {
 		$template = "users";

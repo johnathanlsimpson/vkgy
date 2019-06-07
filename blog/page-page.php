@@ -9,10 +9,7 @@
 				<?php
 			}
 		?>
-
-		<h1>
-			<?php echo lang('Visual kei news', 'V系ニュース', [ 'container' => 'div' ]); ?>
-		</h1>
+		
 		
 		<?php
 			if($artist || $tag) {
@@ -33,7 +30,7 @@
 		?>
 	</div>
 
-	<div class="col c3 any--margin">
+	<!--<div class="col c3 any--margin">
 		<div>
 			<?php
 				$prev_link  = '/blog'.($_GET['artist'] ? '/artist/'.friendly($_GET['artist']) : null).($_GET['tag'] ? '/tag/'.friendly($_GET['tag']) : null);
@@ -41,8 +38,16 @@
 				
 				$prev_text_en  = 'Page '.($prev_next['prev']['page'] ?: '1');
 				$prev_text_jp  = ($prev_next['prev']['page'] ?: '1').' ページ目';
+			
+				subnav([
+					[
+						'text' => lang($prev_text_en, $prev_text_jp, ['secondary_class' => 'any--hidden']),
+						'url' => $prev_next['prev']['page'] ? $prev_link : null,
+						'position' => 'left',
+					]
+				], 'directional');
 				
-				echo $prev_next['prev']['page'] ? '<a href="'.$prev_link.'"><span class="symbol__previous"></span> '.lang($prev_text_en, $prev_text_jp, ['secondary_class' => 'any--hidden']).'</a>' : lang($prev_text_en, $prev_text_jp, ['secondary_class' => 'any--hidden']);
+				//echo $prev_next['prev']['page'] ? '<a href="'.$prev_link.'"><span class="symbol__previous"></span> '.lang($prev_text_en, $prev_text_jp, ['secondary_class' => 'any--hidden']).'</a>' : lang($prev_text_en, $prev_text_jp, ['secondary_class' => 'any--hidden']);
 			?>
 		</div>
 		<div style="text-align: center;">
@@ -51,10 +56,26 @@
 					$start = (sanitize($_GET['page']) * 10 - 10 + 1);
 					$stop = (sanitize($_GET['page']) * 10 - 10 + count($entries));
 				
-					echo lang('Entries '.$start.' to '.$stop, $start.'～'.$stop.'件', [ 'secondary_class' => 'any--hidden' ]);
+					//echo lang('Entries '.$start.' to '.$stop, $start.'～'.$stop.'件', [ 'secondary_class' => 'any--hidden' ]);
+					
+					
+			
+					subnav([
+						[
+							'text' => lang('Entries '.$start.' to '.$stop, $start.'～'.$stop.'件', [ 'secondary_class' => 'any--hidden' ]),
+							'position' => 'center',
+						]
+					], 'directional');
+
 				}
 				else { 
-					echo lang('Latest', '最近', [ 'secondary_class' => 'any--hidden' ]);
+					//echo lang('Latest', '最近', [ 'secondary_class' => 'any--hidden' ]);
+					subnav([
+						[
+							'text' => lang('Latest', '最近', [ 'secondary_class' => 'any--hidden' ]),
+							'position' => 'center',
+						]
+					], 'directional');
 				}
 			?>
 		</div>
@@ -66,10 +87,18 @@
 				$next_text_en  = 'Page '.($prev_next['next']['page'] ?: $prev_next['latest_page_num']);
 				$next_text_jp  = ($prev_next['next']['page'] ?: $prev_next['latest_page_num']).' ページ目';
 				
-				echo $prev_next['next']['page'] ? '<a href="'.$next_link.'">'.lang($next_text_en, $next_text_jp, ['secondary_class' => 'any--hidden']).' <span class="symbol__next"></span></a>' : lang($next_text_en, $next_text_jp, ['secondary_class' => 'any--hidden']);
+				subnav([
+					[
+						'text' => lang($next_text_en, $next_text_jp, ['secondary_class' => 'any--hidden']),
+						'url' => $prev_next['next']['page'] ? $next_link : null,
+						'position' => 'right',
+					]
+				], 'directional');
+				
+				//echo $prev_next['next']['page'] ? '<a href="'.$next_link.'">'.lang($next_text_en, $next_text_jp, ['secondary_class' => 'any--hidden']).' <span class="symbol__next"></span></a>' : lang($next_text_en, $next_text_jp, ['secondary_class' => 'any--hidden']);
 			?>
 		</div>
-	</div>
+	</div>-->
 </div>
 
 <div class="col c4-AAAB">

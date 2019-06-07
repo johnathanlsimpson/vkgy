@@ -15,15 +15,14 @@
 		"/style/external/style-selectize.css",
 		"/releases/style-page-index.css"
 	]);
+	
+	subnav([
+		lang('Release calendar', '新譜一覧', ['secondary_class' => 'any--hidden']) => '/releases/',
+		lang('Search', 'サーチ', ['secondary_class' => 'any--hidden']) => '/search/releases/',
+	]);
+	
+	$page_header = lang('VK release information', 'V系リリース情報', ['container' => 'div']);
 ?>
-
-<div class="col c1">
-	<div>
-		<h1>
-			<?php echo lang('Visual kei releases', 'ビジュアル系リリース情報', ['container' => 'div']); ?>
-		</h1>
-	</div>
-</div>
 
 <?php
 	if($error) {
@@ -254,7 +253,7 @@
 		max-width: 100px;
 	}
 	[data-src]:not(.loaded) {
-		opacity: 0;
+		/*opacity: 0;*/
 	}
 	
 	/* Show controls as active when checked */

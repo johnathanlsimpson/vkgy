@@ -6,17 +6,17 @@ $access_artist = new access_artist($pdo);
 $access_blog = new access_blog($pdo);
 $markdown_parser = new parse_markdown($pdo);
 
+$page_header = lang('Visual kei news', 'V系ニュース', ['container' => 'div']);
+
+include('../blog/head.php');
+
 breadcrumbs([
 	"News" => "/blog/"
 ]);
 
 subnav([
-	"Tags" => "/blog/tags/"
-]);
-
-subnav([
 	"Add entry" => "/blog/add/"
-], true);
+], 'interact', true);
 
 // Check VIP status
 $sql_vip_check = 'SELECT 1 FROM users WHERE id=? AND is_vip=? LIMIT 1';
@@ -47,7 +47,7 @@ if(!empty($_GET["entry"]) && !$_GET["action"]) {
 		
 		breadcrumbs([$entry["title"] => "/blog/".$entry["friendly"]."/"]);
 		
-		subnav(["Edit entry" => "/blog/".$entry["friendly"]."/edit/"]);
+		subnav(["Edit entry" => "/blog/".$entry["friendly"]."/edit/"], 'interact', true);
 		
 		update_views("blog", $entry["id"], $pdo);
 		

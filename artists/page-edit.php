@@ -18,6 +18,12 @@
 		"/artists/style-page-edit.css"
 	]);
 	
+	include('../artists/head.php');
+	
+	subnav([
+		'Edit artist' => '/artists/'.$artist['friendly'].'/edit/',
+	]);
+	
 	if($_SESSION["admin"] > 0) { 
 			if(!empty($artist)) {
 				$artist['images'] = is_array($artist['images']) ? array_values($artist['images']) : [];
@@ -33,41 +39,6 @@
 						<input id="form__changes" name="changes" type="hidden" />
 						
 						<div class="col c1">
-							<div>
-								<div class="any--flex any--flex-space-between">
-									<div class="any--flex any--flex-space-between any--flex-grow">
-										<h1>
-											Edit <a class="artist a--inherit" data-get="artist_url" data-get-into="href" href="/artists/<?php echo $artist["friendly"]; ?>/"><span data-get="artist_quick_name"><?php echo $artist["quick_name"]; ?></span></a>
-										</h1>
-										
-										<input class="input__checkbox" id="artist_exclusive" name="is_exclusive" type="checkbox" value="1" <?php echo $artist["is_exclusive"] ? "checked" : null; ?> />
-										<label class="input__checkbox-label symbol__unchecked" for="artist_exclusive" hidden>Exclusive info?</label>
-									</div>
-									<div>
-										<?php
-											if(!empty($artist["prev_artist"])) {
-												?>
-													<a class="" href="/artists/<?php echo $artist["prev_artist"]["friendly"]; ?>/edit/">
-														<span class="symbol__previous"></span>
-														<?php echo $artist["prev_artist"]["quick_name"]; ?>
-													</a>
-												<?php
-											}
-											
-											if(!empty($artist["next_artist"])) {
-												?>
-													&nbsp;
-													<a class="" href="/artists/<?php echo $artist["next_artist"]["friendly"]; ?>/edit/">
-														<?php echo $artist["next_artist"]["quick_name"]; ?>
-														<span class="symbol__next"></span>
-													</a>
-												<?php
-											}
-										?>
-									</div>
-								</div>
-							</div>
-							
 							<div>
 								<h2>Edit basic information</h2>
 								<div class="text">

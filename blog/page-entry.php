@@ -116,14 +116,21 @@
 					<div class="entry__side">
 						<?php
 							if($entry['prev_next'][0]['type'] === 'prev') {
-								?>
+								subnav([
+									[
+										'text' => $entry['prev_next'][0]['title'],
+										'url' => '/blog/'.$entry['prev_next'][0]['friendly'].'/',
+										'position' => 'left',
+									]
+								], 'directional');
+								/*?>
 									<h5>
 										Older
 									</h5>
 									<a href="/blog/<?php echo $entry["prev_next"][0]["friendly"]; ?>/" style="display: block;">
 										<?php echo $entry["prev_next"][0]["title"]; ?>
 									</a>
-								<?php
+								<?php*/
 							}
 						?>
 					</div>
@@ -140,14 +147,21 @@
 					<div class="entry__side">
 						<?php
 							if(isset($entry['prev_next'][1])) {
-								?>
+								subnav([
+									[
+										'text' => $entry['prev_next'][1]['title'],
+										'url' => '/blog/'.$entry['prev_next'][1]['friendly'].'/',
+										'position' => 'right',
+									]
+								], 'directional');
+								/*?>
 								<h5>
 									Newer
 								</h5>
 								<a href="/blog/<?php echo $entry["prev_next"][1]["friendly"]; ?>/" style="display: block;">
 									<?php echo $entry["prev_next"][1]["title"]; ?>
 								</a>
-								<?php
+								<?php*/
 							}
 						?>
 					</div>

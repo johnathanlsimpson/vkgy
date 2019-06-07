@@ -1,48 +1,35 @@
 <?php
+	$page_header = ($edit_livehouses ? 'Edit' : 'Add').' livehouses';
+	
+	subnav([
+		($edit_livehouses ? 'Edit' : 'Add').' livehouses' => '/lives/livehouses/'.($edit_livehouses ? 'edit' : 'add').'/',
+	]);
+	
+	if($edit_livehouses) {
+		subnav([
+			[
+				'text' => $page_num > 1 ? 'Page '.($page_num - 1) : 'Page 1',
+				'url' => $page_num > 1 ? '/lives/livehouses/edit/page/'.($page_num - 1).'/' : null,
+				'position' => 'left',
+			],
+			[
+				'text' => 'Page '.$page_num,
+				'position' => 'center',
+			],
+			[
+				'text' => $page_num < $max_page ? 'Page '.($page_num + 1) : 'Page '.$max_page,
+				'url' => $page_num < $max_page ? '/lives/livehouses/edit/page/'.($page_num + 1).'/' : null,
+				'position' => 'right',
+			],
+		], 'directional');
+	}
+	
 	if($_SESSION["admin"]) {
 		?>
 			<form action="/lives/function-edit-livehouses.php" class="col c1 any--margin" enctype="multipart/form-data" method="post" name="form__update">
 				<span data-contains="areas" hidden><?php echo json_encode($area_list); ?></span>
 				<span data-contains="companies" hidden><?php echo json_encode($company_list); ?></span>
 				<span data-contains="livehouses" hidden><?php echo json_encode($livehouse_list); ?></span>
-				
-				<div>
-					<h2>
-						<?php echo $edit_livehouses ? 'Edit' : 'Add'; ?> livehouses
-					</h2>
-				</div>
-				
-				<?php
-					if($edit_livehouses) {
-						?>
-							<div class="col c3 any--margin">
-								<div>
-									<?php
-										if($page_num > 1) {
-											?>
-												<a class="symbol__previous" href="/lives/livehouses/edit/page/<?php echo $page_num - 1; ?>/">Page <?php echo $page_num - 1; ?></a>
-												<a class="a--padded symbol__oldest" href="/lives/livehouses/edit/page/1/"></a>
-											<?php
-										}
-									?>
-								</div>
-								<div style="text-align: center;">
-									Page <?php echo $page_num; ?>
-								</div>
-								<div style="text-align: right;">
-									<?php
-										if($page_num < $max_page) {
-											?>
-												<a class="a--padded" href="/lives/livehouses/edit/page/<?php echo $max_page; ?>/"><span class="symbol__newest"></span></a>
-												<a href="/lives/livehouses/edit/page/<?php echo $page_num + 1; ?>/">Page <?php echo $page_num + 1; ?><span class="symbol__next"></span></a>
-											<?php
-										}
-									?>
-								</div>
-							</div>
-						<?php
-					}
-				?>
 				
 				<div>
 					<?php
@@ -152,32 +139,6 @@
 							<?php
 						}
 					?>
-				</div>
-				
-				<div class="col c3 any--margin">
-					<div>
-						<?php
-							if($page_num > 1) {
-								?>
-									<a class="symbol__previous" href="/lives/livehouses/edit/page/<?php echo $page_num - 1; ?>/">Page <?php echo $page_num - 1; ?></a>
-									<a class="a--padded symbol__oldest" href="/lives/livehouses/edit/page/1/"></a>
-								<?php
-							}
-						?>
-					</div>
-					<div style="text-align: center;">
-						Page <?php echo $page_num; ?>
-					</div>
-					<div style="text-align: right;">
-						<?php
-							if($page_num < $max_page) {
-								?>
-									<a class="a--padded" href="/lives/livehouses/edit/page/<?php echo $max_page; ?>/"><span class="symbol__newest"></span></a>
-									<a href="/lives/livehouses/edit/page/<?php echo $page_num + 1; ?>/">Page <?php echo $page_num + 1; ?><span class="symbol__next"></span></a>
-								<?php
-							}
-						?>
-					</div>
 				</div>
 				
 				<div class="text text--docked">

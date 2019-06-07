@@ -4,9 +4,7 @@ $markdown_parser = $markdown_parser ?: new parse_markdown($pdo);
 
 $page_title = 'Comments';
 
-breadcrumbs([
-	'Comments' => '/comments/',
-]);
+include('../blog/head.php');
 
 $page = is_numeric($_GET['page']) ? $_GET['page'] : 1;
 $limit = 15;

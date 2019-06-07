@@ -1,12 +1,15 @@
+<?php
+$page_header = 'Edit areas';
+subnav([
+	'Edit areas' => '/lives/areas/edit/',
+]);
+?>
+
 <div class="col c1">
 	<div>
-		<h2>
-			Update areas
-		</h2>
 		<div class="text">
 			<span data-contains="areas" hidden><?php echo json_encode($rslt_areas); ?></span>
 			<?php
-			//print_r($rslt_areas);
 				for($i=0; $i<$num_areas; $i++) {
 					?>
 						<div class="input__row li">

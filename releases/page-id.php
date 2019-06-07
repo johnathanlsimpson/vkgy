@@ -38,52 +38,29 @@
 		
 		$pageTitle = $release["quick_name"]." - ".$release["artist"]["quick_name"];
 		
-		//echo $_SESSION['username'] === 'inartistic' ? '<pre>'.print_r($release, true).'</pre>' : null;
+		$artist = $release['artist'];
+		include('../artists/head.php');
+		
+		subnav([
+			'Edit release' => '/releases/'.$release['artist']['friendly'].'/'.$release['id'].'/'.$release['friendly'].'/edit/',
+		], 'interact', true);
+		
+		if(is_array($release["prev_next"]) && !empty($release["prev_next"])) {
+			foreach($release["prev_next"] as $link) {
+				subnav([
+					[
+						'text' => $link['quick_name'],
+						'url' => $link['url'],
+						'position' => $link['type'] === 'next' ? 'right' : 'left',
+					],
+				], 'directional');
+			}
+		}
 		
 		?>
 			<div class="col c1" itemscope itemtype="http://schema.org/MusicAlbum" data-url="<?php echo "https://vk.gy/".$release["artist"]["friendly"]."/".$release["id"]."/".$release["friendly"]."/"; ?>">
 				<span itemtype="byArtist" content="<?php echo $release["artist"]["quick_name"]; ?>" data-artist="<?php echo $release["artist"]["name"]; ?>" data-artistsort="<?php echo $release["artist"]["romaji"]; ?>"></span>
-				<div>
-					<?php
-						$access_artist->artist_card(["quick_name" => $release["artist"]["quick_name"], "friendly" => $release["artist"]["friendly"]], true);
-					?>
-				</div>
-				<?php
-					if(is_array($release["prev_next"]) && !empty($release["prev_next"])) {
-						?>
-							<div class="any--flex">
-								<div class="release__prev-next">
-									<?php
-										foreach($release["prev_next"] as $link) {
-											if($link["type"] === "prev") {
-												?>
-													<a href="<?php echo $link["url"]; ?>">
-														<span class="symbol__previous"></span>
-														<?php echo $link["quick_name"]; ?>
-													</a>
-												<?php
-											}
-										}
-									?>
-								</div>
-								<div class="release__prev-next">
-									<?php
-										foreach($release["prev_next"] as $link) {
-											if($link["type"] === "next") {
-												?>
-													<a href="<?php echo $link["url"]; ?>">
-														<?php echo $link["quick_name"]; ?>
-														<span class="symbol__next"></span>
-													</a>
-												<?php
-											}
-										}
-									?>
-								</div>
-							</div>
-						<?php
-					}
-				?>
+				
 			</div>
 			<div class="col c3-AAB">
 				<div>
