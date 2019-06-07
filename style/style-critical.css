@@ -1048,11 +1048,16 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
+	.quinary-nav__left {
+		order: 1;
+	}
 	.quinary-nav__center {
 		justify-content: center;
+		order: 2;
 	}
 	.quinary-nav__right {
 		justify-content: flex-end;
+		order: 3;
 	}
 	.quinary-nav__right [class^="symbol"] {
 		order: 2;
