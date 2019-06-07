@@ -16,6 +16,9 @@ $(".sign-in__container").on("submit", function(event) {
 				if(formElement.hasClass('sign-in--refresh')) {
 					location.reload();
 				}
+				else if(formElement.hasClass('sign-in--back')) {
+					window.history.back();
+				}
 				else {
 					$("body").removeClass(removeClass).addClass(addClass);
 				}
