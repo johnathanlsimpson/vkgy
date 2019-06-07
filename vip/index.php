@@ -14,7 +14,7 @@
 	]);
 	
 	subnav([
-		"Add VIP post" => "/vip/add/",
+		"Add entry" => "/vip/add/",
 	], 'interact', true);
 	
 	$pageTitle = "VIP section";
@@ -121,8 +121,8 @@
 		]);
 		
 		subnav([
-			"Edit VIP entry" => "/vip/".$entry["friendly"]."/edit/"
-		]);
+			"Edit entry" => "/vip/".$entry["friendly"]."/edit/"
+		], 'interact', true);
 		
 		$pageTitle = $entry["title"];
 		
