@@ -122,13 +122,13 @@
 				<span class="primary-nav__search-symbol any--weaken-color symbol--standalone symbol__search"></span>
 				
 				<div class="primary-nav__right any--flex any--weaken-color">
-					<a class="head__link primary-nav__add a--inherit any--signed-in-only" href="/blog/add/"><span class="symbol__news symbol--standalone"></span></a>
-					<a class="head__link primary-nav__add a--inherit any--signed-in-only" href="/artists/add/"><span class="symbol__artist symbol--standalone"></span></a>
-					<a class="head__link primary-nav__add a--inherit any--signed-in-only" href="/releases/add/"><span class="symbol__release symbol--standalone"></span></a>
-					<a class="head__link primary-nav__add a--inherit any--signed-in-only" href="/musicians/add/"><span class="symbol__musician symbol--standalone"></span></a>
-					<a class="head__link primary-nav__add a--inherit any--signed-in-only" href="/labels/add/"><span class="symbol__company symbol--standalone"></span></a>
+					<a class="head__link primary-nav__add a--inherit any--signed-in-only" href="/blog/add/" title="Add Blog Post"><span class="symbol__news symbol--standalone"></span></a>
+					<a class="head__link primary-nav__add a--inherit any--signed-in-only" title="Add Artist" href="/artists/add/"><span class="symbol__artist symbol--standalone"></span></a>
+					<a class="head__link primary-nav__add a--inherit any--signed-in-only" title="Add Release" href="/releases/add/"><span class="symbol__release symbol--standalone"></span></a>
+					<a class="head__link primary-nav__add a--inherit any--signed-in-only" title="Add Musician" href="/musicians/add/"><span class="symbol__musician symbol--standalone"></span></a>
+					<a class="head__link primary-nav__add a--inherit any--signed-in-only" title="Add Label" href="/labels/add/"><span class="symbol__company symbol--standalone"></span></a>
 					
-					<a class="head__link primary-nav__avatar" href="<?php echo $user_link; ?>">
+					<a class="head__link primary-nav__avatar" title="View Your Profile" href="<?php echo $user_link; ?>">
 						<object alt="<?php echo $_SESSION['username']; ?>" class="symbol__user symbol--standalone" data="<?php echo $avatar_url; ?>" type="image/png"></object>
 					</a>
 				</div>
