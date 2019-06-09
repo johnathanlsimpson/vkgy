@@ -2,14 +2,14 @@
 	include("../php/include.php");
 	
 	if($_SESSION["loggedIn"]) {
-		$artist_id = is_numeric($_POST["id"]) ? $_POST["id"] : null;
+		$musician_id = is_numeric($_POST["id"]) ? $_POST["id"] : null;
 		$user_id = $_SESSION["userID"];
 		$tag_id = is_numeric($_POST["tag_id"]) ? $_POST["tag_id"] : null;
 		
-		if(is_numeric($artist_id)) {
+		if(is_numeric($musician_id)) {
 			
 			// Check if user has permission to add/remove
-			$sql_is_admin_tag = 'SELECT is_admin_tag FROM tags_artists WHERE id=? LIMIT 1';
+			$sql_is_admin_tag = 'SELECT is_admin_tag FROM tags_musicians WHERE id=? LIMIT 1';
 			$stmt_is_admin_tag = $pdo->prepare($sql_is_admin_tag);
 			$stmt_is_admin_tag->execute([ $tag_id ]);
 			$rslt_is_admin_tag = $stmt_is_admin_tag->fetchColumn();
@@ -18,33 +18,33 @@
 			
 			if($user_is_allowed) {
 				
-				if($_POST["action"] === "delete" && $_SESSION["is_admin"] > 0 && is_numeric($artist_id) && is_numeric($tag_id)) {
+				if($_POST["action"] === "delete" && $_SESSION["is_admin"] > 0 && is_numeric($musician_id) && is_numeric($tag_id)) {
 					
 					// Perform delete
-					$sql_delete = "DELETE FROM artists_tags WHERE artist_id=? AND tag_id=?";
+					$sql_delete = "DELETE FROM musicians_tags WHERE musician_id=? AND tag_id=?";
 					$stmt_delete = $pdo->prepare($sql_delete);
 					
-					if($stmt_delete->execute([ $artist_id, $tag_id ])) {
+					if($stmt_delete->execute([ $musician_id, $tag_id ])) {
 						$output["status"] = "success";
 						$output["result"] = "Admin tag has been removed.";
 					}
 				}
 				else {
 					
-					$sql_check = "SELECT id FROM artists_tags WHERE user_id=? AND artist_id=? AND tag_id=? LIMIT 1";
+					$sql_check = "SELECT id FROM musicians_tags WHERE user_id=? AND musician_id=? AND tag_id=? LIMIT 1";
 					$stmt_check = $pdo->prepare($sql_check);
-					$stmt_check->execute([$user_id, $artist_id, $tag_id]);
+					$stmt_check->execute([$user_id, $musician_id, $tag_id]);
 					
 					$record_id = $stmt_check->fetchColumn();
 					$is_tagged = is_numeric($record_id);
 					
 					if($is_tagged) {
-						$sql_update = "DELETE FROM artists_tags WHERE id=? LIMIT 1";
+						$sql_update = "DELETE FROM musicians_tags WHERE id=? LIMIT 1";
 						$sql_values = [$record_id];
 					}
 					else {
-						$sql_update = "INSERT INTO artists_tags (user_id, artist_id, tag_id) VALUES (?, ?, ?)";
-						$sql_values = [$user_id, $artist_id, $tag_id];
+						$sql_update = "INSERT INTO musicians_tags (user_id, musician_id, tag_id) VALUES (?, ?, ?)";
+						$sql_values = [$user_id, $musician_id, $tag_id];
 						$output["is_checked"] = "1";
 					}
 					
@@ -53,7 +53,7 @@
 						$output["status"] = "success";
 					}
 					else {
-						$output["result"] = "Sorry, the artist tags couldn't be updated.";
+						$output["result"] = "Sorry, the musician tags couldn't be updated.";
 					}
 				}
 				
@@ -67,7 +67,7 @@
 		}
 	}
 	else {
-		$output["result"] = "Please sign in to tag artists.";
+		$output["result"] = "Please sign in to tag musicians.";
 	}
 	
 	$output["status"] = $output["status"] ?: "error";
