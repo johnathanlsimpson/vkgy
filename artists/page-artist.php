@@ -493,48 +493,6 @@
 					?>
 				</div>
 			</div>
-
-			<style>.obscure__input:checked + .obscure__container.a { max-height: 8rem; overflow:hidden; }</style>
-			<style>
-				:target {
-					content: "";
-					display: block;
-					margin-top: -4rem;
-					padding-top: 4rem;
-					position: relative;
-				}
-				/*h2:target::after {
-					background: hsl(var(--attention--secondary));
-					background-clip: content-box;
-					bottom: 1rem;
-					content: "";
-					display: inline-block;
-					left: 0;
-					padding-top: 4rem;
-					position: absolute;
-					top: 0;
-					width: 3px;
-				}*/
-				tbody:not(:last-of-type) tr:last-of-type td {
-					padding-bottom: 1.5rem;
-				}
-				td h3 {
-					padding-bottom: 0;
-				}
-				.h--nav {
-					align-items: center;
-					display: flex;
-					flex-wrap: wrap;
-					/*justify-content: space-between;*/
-					padding-right: 0;
-				}
-				.h--nav::before {
-					align-self: bottom;
-				}
-				.h--nav :last-child {
-					margin-left: auto;
-				}
-			</style>
 		<?php
 	}
 ?>

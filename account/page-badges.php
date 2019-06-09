@@ -31,17 +31,3 @@
 		<?php
 	}
 ?>
-
-<style>
-	.user__badges .badge__description {
-		display: none;
-	}
-	.user__badges {
-		display: flex;
-		flex-wrap: wrap;
-		margin-bottom: 2rem;
-	}
-	.user__badges .badge__container {
-		margin-bottom: 1rem;
-	}
-</style>

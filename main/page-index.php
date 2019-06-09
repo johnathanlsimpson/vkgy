@@ -152,36 +152,6 @@
 				}
 			?>
 		</div>
-		<style>
-			.support__container::after {
-				background: linear-gradient(to right, transparent 728px, hsl(var(--background--secondary)));
-				content: "";
-				display: block;
-				height: 100%;
-				left: 0;
-				pointer-events: none;
-				position: absolute;
-				top: 0;
-				width: 100%;
-				z-index: 2;
-			}
-			.support__link:first-of-type {
-			}
-			.support__link {
-				display: inline-block;
-			}
-			.support__image {
-				object-fit: contain;
-				height: 90px;
-				width: 728px;
-				max-width: 100%;
-				max-height: 100%;
-			}
-			.comment--unapproved .comment__notice {
-				color: hsl(var(--accent));
-				display: initial !important;
-			}
-		</style>
 
 		<h3>
 			<?php echo lang('Recent discussions', '最近のコメント', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
