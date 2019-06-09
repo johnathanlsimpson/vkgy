@@ -137,28 +137,6 @@
 			</div>
 		</nav>
 		
-		<script>
-			let enButton = document.querySelector('[for="language-en"]');
-			let jaButton = document.querySelector('[for="language-ja"]');
-			
-			function setLang(event) {
-				let url = '/php/function-set_lang.php';
-				let lang = 'en';
-				let connection = new XMLHttpRequest();
-				
-				if(event.target.htmlFor === 'language-ja') {
-					lang = 'ja';
-				}
-				
-				connection.open('POST', url);
-				connection.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				connection.send("lang=" + lang);
-			}
-			
-			enButton.addEventListener('click', setLang);
-			jaButton.addEventListener('click', setLang);
-		</script>
-		
 		<form action="/search/" class="any--hidden" enctype="multipart/form-data" id="form__search" method="get" name="form__search"><button type="submit"></button></form>
 		
 		<!-- HEADER -->
@@ -383,34 +361,5 @@
 		<?php
 			include_once("../style/symbols.php");
 		?>
-		<script>
-			// Observe when 'hero' home link is visible, and increase padding in main nav
-			var heroHomeButton = document.querySelector('.secondary-nav__home');
-			var stickyNavContainer = document.querySelector('.primary-nav__container');
-			
-			var navObserver = new IntersectionObserver(function(entries) {
-				if(entries[0]['isIntersecting']) {
-					stickyNavContainer.classList.add('primary-nav__container--hidden');
-				}
-				else {
-					stickyNavContainer.classList.remove('primary-nav__container--hidden');
-				}
-			});
-			
-			navObserver.observe(heroHomeButton);
-			
-			// Activate search when clicking link on mobile
-			var searchLink = document.querySelector('.primary-nav__container [href="/search/"]');
-			var searchElem = document.querySelector('.primary-nav__search');
-			
-			searchLink.addEventListener('click', function(event) {
-				event.preventDefault();
-				stickyNavContainer.classList.add('primary-nav--searching');
-				searchElem.focus();
-			});
-			searchElem.addEventListener('blur', function() {
-				stickyNavContainer.classList.remove('primary-nav--searching');
-			});
-		</script>
 	</body>
 </html>

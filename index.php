@@ -34,13 +34,15 @@
 		"/scripts/external/script-jquery-3.2.1.js",
 		"/scripts/external/script-lazyload.js",
 		"/scripts/script-inlineSubmit.js",
-		"/scripts/script-signIn.js",
 		"/scripts/script-initLazyLoad.js",
 		"/scripts/external/script-popper.js",
 		"/scripts/external/script-tippy.js",
 		"/scripts/script-tooltips.js",
 		"/scripts/script-topButton.js",
 		'/scripts/script-showObscured.js',
+		'/scripts/script-watchNav.js',
+		'/scripts/script-showSearch.js',
+		'/scripts/script-switchLang.js',
 	]);
 	
 	ob_start();
