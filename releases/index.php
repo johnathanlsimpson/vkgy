@@ -15,6 +15,32 @@
 	if(is_numeric($_GET["id"])) {
 		$release = $access_release->access_release(["release_id" => $_GET["id"], "get" => "all"]);
 		
+		// Tags
+		$sql_tags = "SELECT * FROM tags_releases ORDER BY friendly ASC";
+		$stmt_tags = $pdo->prepare($sql_tags);
+		$stmt_tags->execute();
+		$rslt_tags = $stmt_tags->fetchAll();
+		
+		$sql_curr_tags = "SELECT tags_releases.*, COUNT(releases_tags.id) AS num_times_tagged FROM releases_tags LEFT JOIN tags_releases ON tags_releases.id=releases_tags.tag_id WHERE releases_tags.release_id=? GROUP BY releases_tags.tag_id";
+		$stmt_curr_tags = $pdo->prepare($sql_curr_tags);
+		$stmt_curr_tags->execute([ $release["id"] ]);
+		$rslt_curr_tags = $stmt_curr_tags->fetchAll();
+		
+		if(is_array($rslt_curr_tags) && !empty($rslt_curr_tags)) {
+			foreach($rslt_curr_tags as $tag) {
+				$needs_admin_tags = $needs_admin_tags ?: ($tag["is_admin_tag"] ?: false);
+				$rslt_curr_tag_ids[] = $tag["id"];
+				
+				if($tag['friendly'] === 'exclusive') {
+					$release_is_exclusive = true;
+				}
+				
+				if($tag['friendly'] === 'removed') {
+					$release_is_removed = true;
+				}
+			}
+		}
+		
 		if(is_array($release) && !empty($release)) {
 			$page_description = $release["artist"]["quick_name"]." 「".$release["quick_name"]."」 release information, reviews, etc. ".$release["artist"]["name"]." 「".$release["name"]." ".$release["press_name"]." ".$release["type_name"]."」のリリース情報、レビュー、など。 | vk.gy (ブイケージ)";
 			

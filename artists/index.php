@@ -72,6 +72,7 @@
 	
 	// Show page: Profile
 	elseif($show_artist_page) {
+		
 		$pageTitle = $artist["quick_name"]." profile | ".$artist["name"]."&#12503;&#12525;&#12501;&#12451;&#12540;&#12523;";
 		$page_description = $artist["quick_name"]." profile, biography, members' history. 「".$artist["name"]."」のプロフィール、活動、リリース情報、など。".($artist["lineup"] ? " (".$artist["lineup"].")" : null);
 		$page_image = "https://vk.gy/artists/".$artist["friendly"]."/main.large.jpg";
@@ -249,6 +250,14 @@
 			foreach($rslt_curr_tags as $tag) {
 				$needs_admin_tags = $needs_admin_tags ?: ($tag["is_admin_tag"] ?: false);
 				$rslt_curr_tag_ids[] = $tag["id"];
+				
+				if($tag['friendly'] === 'exclusive') {
+					$artist_is_exclusive = true;
+				}
+				
+				if($tag['friendly'] === 'removed') {
+					$artist_is_removed = true;
+				}
 			}
 		}
 		
