@@ -4,6 +4,10 @@
 	subnav([
 		'Patreon' => 'https://patreon.com/vkgy/',
 	], 'interact');
+	
+	script([
+		'/scripts/script-signIn.js',
+	]);
 ?>
 
 <!--<div class="col c4-AAAB any--margin">

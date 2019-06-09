@@ -1,5 +1,6 @@
 <?php
 	script([
+		'/scripts/script-signIn.js',
 		'/comments/script-update.js',
 	]);
 	
