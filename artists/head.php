@@ -1,10 +1,20 @@
 <?php
 
-$page_header = lang(
-	'<a class="artist symbol__artist a--inherit" href="/artists/'.$artist['friendly'].'/">'.($artist['romaji'] ?: $artist['name']).'</a>',
-	'<a class="artist symbol__artist a--inherit" href="/artists/'.$artist['friendly'].'/">'.$artist['name'].'</a>',
-	['container' => 'div']
+$artist_header_link = '<a class="artist symbol__artist a--inherit" href="/artists/'.$artist['friendly'].'/">{name}</a><div class="any--weaken">{secondary}</div>';
+
+$artist_header_en = str_replace(
+	['{name}', '{secondary}'],
+	[($artist['romaji'] ?: $artist['name']), ($artist['romaji'] ? $artist['name'] : null)],
+	$artist_header_link
 );
+
+$artist_header_jp = str_replace(
+	['{name}', '{secondary}'],
+	[$artist['name'], ($artist['pronunciation'] && $artist['pronunciation'] != $artist['name'] ? $artist['pronunciation'] : null)],
+	$artist_header_link
+);
+
+$page_header = lang($artist_header_en, $artist_header_jp, [ 'secondary_class' => 'any--hidden' ]);
 
 subnav([
 	'Profile' => '/artists/'.$artist['friendly'].'/',
