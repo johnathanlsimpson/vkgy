@@ -221,7 +221,7 @@
 	align-items: center;
 }
 .support__why::before {
-	background: linear-gradient(transparent, hsl(var(--background)) 1.5rem);
+	background: linear-gradient(hsla(var(--background), 0), hsla(var(--background), 1) 1.5rem);
 	content: "";
 	display: block;
 	left: -3rem;
@@ -232,7 +232,7 @@
 }
 @media(min-width: 800px) {
 	.support__why::before {
-		background: linear-gradient(to right, transparent, hsl(var(--background)) 1.5rem);
+		background: linear-gradient(to right, hsla(var(--background), 0), hsla(var(--background), 1) 1.5rem);
 	}
 }
 .support__text {
