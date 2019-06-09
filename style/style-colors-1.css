@@ -1,26 +1,26 @@
 /**
 	* ========================================================
-	* COLORS: DARK
+	* COLORS (HSL): DARK
 	* ========================================================
 **/
 :root {
-	--accent:              hsla(344, 37%, 50%, 1);
+	--accent:              344, 37%, 50%;
 	
-	--attention--faint:    hsla(154, 32%, 50%, 1);
-	--attention:           hsla(154, 32%, 45%, 1);
+	--attention--faint:    154, 32%, 50%;
+	--attention:           154, 32%, 45%;
 	
-	--interactive--faint:  hsla(227, 12%, 55%, 1);
-	--interactive:         hsla(227, 12%, 45%, 1);
+	--interactive--faint:  227, 12%, 55%;
+	--interactive:         227, 12%, 45%;
 	
-	--text:                hsla(0, 5%, 70%, 1);
-	--text--faint:         hsla(0, 0%, 40%, 1);
+	--text:                0, 5%, 70%;
+	--text--faint:         0, 0%, 40%;
 	
-	--background--faint:   hsla(240, 9%, 7%, 1);
-	--background:          hsla(240, 9%, 13%, 1);
-	--background--bold:    hsla(240, 9%, 23%, 1);
-	--background--alt:     hsla(196, 27%, 10%, 1);
+	--background--faint:   240, 9%, 7%;
+	--background:          240, 9%, 13%;
+	--background--bold:    240, 9%, 23%;
+	--background--alt:     196, 27%, 10%;
 	
-	--rgb__background:        30, 30, 36;
+	/*--rgb__background:        30, 30, 36;
 	--rgb__background--faint: 16, 16, 19;
-	--rgb__background--bold:  65, 65, 78;
+	--rgb__background--bold:  65, 65, 78;*/
 }
