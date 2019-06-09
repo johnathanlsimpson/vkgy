@@ -142,25 +142,15 @@
 			
 			
 			
-			// After successful sign in, set session and cookie w/ user info
+			// Take info gathered from DB during sign in, apply to $_SESSION, and then set current IP address in DB
 			public function set_login_data($user_data) {
 				$sql_set_ip = 'UPDATE users SET ip_address=? WHERE id=? LIMIT 1';
 				$stmt_set_ip = $this->pdo->prepare($sql_set_ip);
 				$stmt_set_ip->execute([ ip2long($_SERVER['REMOTE_ADDR']), $user_data['userID'] ]);
 				
-				$user_data["loggedIn"] = 1;
-				$fields = [
-					"userID",
-					"username",
-					"admin",
-					"icon",
-					"loggedIn",
-					'site-theme',
-					'site_lang',
-				];
-				foreach($fields as $field) {
-					$_SESSION[$field] = $user_data[$field];
-				}
+				$_SESSION = is_array($_SESSION) ? $_SESSION : [];
+				$_SESSION = array_merge($_SESSION, $user_data);
+				
 				$this->hashSet($user_data["userID"]);
 			}
 			
@@ -170,11 +160,26 @@
 			public function sign_in($input) {
 				$username_pattern = "^[\w\-\.\ ]{3,}$";
 				if(preg_match("/".$username_pattern."/", $input["username"])) {
-					$sql_user = "SELECT id, username, rank, icon, password_old, password, site_theme, site_lang FROM users WHERE username=? LIMIT 1";
+					$sql_user = "SELECT id, username, rank, is_vip, icon, password_old, password, site_theme, site_lang FROM users WHERE username=? LIMIT 1";
 					$stmt = $this->pdo->prepare($sql_user);
 					$stmt->execute(array($input["username"]));
 					$row = $stmt->fetch();
+					
 					if($row) {
+						$session_data = [
+							'userID' => $row['id'],
+							'site-theme' => $row['site_theme'],
+							'admin' => $row['rank'],
+							'loggedIn' => 1,
+							
+							'user_id' => $row['id'],
+							'username' => $row['username'],
+							'site_theme' => $row['site_theme'],
+							'site_lang' => $row['site_lang'],
+							'is_admin' => $row['rank'],
+							'is_vip' => $row['is_vip'],
+							'is_signed_in' => 1,
+						];
 						
 						// If using old password
 						if(strlen($row["password_old"]) > 0 && empty($row["password"])) {
@@ -187,16 +192,7 @@
 									password_hash($input["password"], PASSWORD_DEFAULT),
 									$row["id"]
 								])) {
-									$this->set_login_data(
-										array(
-											"userID" => $row["id"],
-											"username" => $row["username"],
-											"admin" => $row["rank"],
-											"icon" => $row["icon"],
-											'site-theme' => $row['site_theme'],
-											'site_lang' => $row['site_lang'],
-										)
-									);
+									$this->set_login_data($session_data);
 									$this->status = 7;
 								}
 								else {
@@ -209,16 +205,7 @@
 						
 						elseif(strlen($row["password"]) > 0) {
 							if(password_verify($input["password"], $row["password"])) {
-								$this->set_login_data(
-									array(
-										"userID" => $row["id"],
-										"username" => $row["username"],
-										"admin" => $row["rank"],
-										"icon" => $row["icon"],
-										'site-theme' => $row['site_theme'],
-										'site_lang' => $row['site_lang'],
-									)
-								);
+								$this->set_login_data($session_data);
 								$this->status = 7;
 							}
 							else {
@@ -242,7 +229,7 @@
 			
 			// Sign out: destroy session and cookie
 			public function sign_out() {
-				foreach(["userID", "username", "admin", "icon", "hash", "loggedIn", 'site-theme', 'site_lang', "remember_me"] as $key) {
+				foreach(["userID", 'user_id', "username", "admin", 'is_admin', "icon", "hash", "loggedIn", 'is_signed_in', 'is_vip', 'site-theme', 'site_theme', 'site_lang', "remember_me"] as $key) {
 					unset($_SESSION[$key]);
 					setcookie($key, "", time() - 60 * 60 * 24 * 40, "/", $this->domain, true, true);
 				}
