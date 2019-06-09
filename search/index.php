@@ -49,8 +49,6 @@ if($search_type === 'all') {
 		$search = array_filter($search);
 	}
 	
-	print_r($search);
-	
 	if(!empty($search['q'])) {
 		$q = sanitize($search['q']);
 		

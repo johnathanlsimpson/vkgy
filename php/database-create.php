@@ -425,6 +425,14 @@ CREATE TABLE IF NOT EXISTS `musicians` (
   `image_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
+CREATE TABLE IF NOT EXISTS `musicians_tags` (
+	`id` int(11) NOT NULL,
+	`musician_id` int(11) NOT NULL,
+	`tag_id` int(11) NOT NULL,
+	`user_id` int(11) NOT NULL,
+	`date_occurred` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
+
 CREATE TABLE IF NOT EXISTS `queued_aod` (
 	`id` int(11) NOT NULL,
 	`artist_id` int(11) NOT NULL,
@@ -591,6 +599,14 @@ CREATE TABLE IF NOT EXISTS `tags` (
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
 CREATE TABLE IF NOT EXISTS `tags_artists` (
+	`id` int(11) NOT NULL,
+	`name` tinytext COLLATE ".$pdo_config['db_collation']." NOT NULL,
+	`romaji` tinytext COLLATE ".$pdo_config['db_collation'].",
+	`friendly` varchar(100) COLLATE ".$pdo_config['db_collation']." NOT NULL,
+	`is_admin_tag` int(11) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
+
+CREATE TABLE IF NOT EXISTS `tags_musicians` (
 	`id` int(11) NOT NULL,
 	`name` tinytext COLLATE ".$pdo_config['db_collation']." NOT NULL,
 	`romaji` tinytext COLLATE ".$pdo_config['db_collation'].",
@@ -858,6 +874,11 @@ ALTER TABLE `messages`
 ALTER TABLE `musicians`
 	ADD PRIMARY KEY (`id`);
 
+ALTER TABLE `musicians_tags`
+	ADD PRIMARY KEY (`id`),
+	ADD KEY `musician_id` (`musician_id`),
+	ADD KEY `tag_id` (`tag_id`);
+
 ALTER TABLE `queued_aod`
 	ADD PRIMARY KEY (`id`),
 	ADD KEY `artist_id` (`artist_id`);
@@ -909,6 +930,10 @@ ALTER TABLE `tags`
 	ADD UNIQUE KEY `friendly` (`friendly`);
 
 ALTER TABLE `tags_artists`
+	ADD PRIMARY KEY (`id`),
+	ADD UNIQUE KEY `friendly` (`friendly`);
+
+ALTER TABLE `tags_musicians`
 	ADD PRIMARY KEY (`id`),
 	ADD UNIQUE KEY `friendly` (`friendly`);
 
@@ -1033,6 +1058,8 @@ ALTER TABLE `messages`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `musicians`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `musicians_tags`
+	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `queued_aod`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `queued_flyers`
@@ -1060,6 +1087,8 @@ ALTER TABLE `releases_wants`
 ALTER TABLE `tags`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `tags_artists`
+	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `tags_musicians`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `tags_releases`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
@@ -1103,6 +1132,10 @@ ALTER TABLE `artists_bio`
 ALTER TABLE `artists_musicians`
 	ADD CONSTRAINT `artists_musicians_ibfk_1` FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`) ON DELETE CASCADE,
 	ADD CONSTRAINT `artists_musicians_ibfk_2` FOREIGN KEY (`musician_id`) REFERENCES `musicians` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `artists_tags`
+  ADD CONSTRAINT `artists_tags_ibfk_1` FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `artists_tags_ibfk_2` FOREIGN KEY (`tag_id`) REFERENCES `tags_artists` (`id`);
 
 ALTER TABLE `artists_views`
 	ADD CONSTRAINT `artists_views_ibfk_1` FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -1154,6 +1187,10 @@ ALTER TABLE `images_releases`
   ADD CONSTRAINT `images_releases_ibfk_1` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `images_releases_ibfk_2` FOREIGN KEY (`release_id`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE `musicians_tags`
+  ADD CONSTRAINT `musicians_tags_ibfk_1` FOREIGN KEY (`musician_id`) REFERENCES `musicians` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `musicians_tags_ibfk_2` FOREIGN KEY (`tag_id`) REFERENCES `tags_musicians` (`id`);
+	
 ALTER TABLE `releases_collections`
 	ADD CONSTRAINT `releases_collections_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
 	ADD CONSTRAINT `releases_collections_ibfk_2` FOREIGN KEY (`release_id`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -1164,6 +1201,10 @@ ALTER TABLE `releases_likes`
 
 ALTER TABLE `releases_ratings`
 	ADD CONSTRAINT `releases_ratings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `releases_tags`
+  ADD CONSTRAINT `releases_tags_ibfk_1` FOREIGN KEY (`release_id`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `releases_tags_ibfk_2` FOREIGN KEY (`tag_id`) REFERENCES `tags_releases` (`id`);
 
 ALTER TABLE `releases_tracklists`
 	ADD CONSTRAINT `releases_tracklists_ibfk_1` FOREIGN KEY (`release_id`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
