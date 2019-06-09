@@ -1,34 +1,34 @@
-.tippy-popper[x-placement^=bottom] .tippy-arrow {
-  border-bottom-color: var(--interactive--faint);
-}
-.tippy-popper[x-placement^=top] .tippy-arrow {
-  border-top-color: var(--interactive--faint);
-}
-.tippy-tooltip {
-  background-position: top center;
-  background-size: cover;
-  margin: 0;
-}
-.tippy-tooltip .any--jp {
-  font-size: 0.7em;
-}
-.tippy-tooltip .h1 {
-  margin: 0;
-  padding: 0;
-  text-align: center;
-}
-.tippy-tooltip .name {
-  margin-bottom: 0.5rem;
-}
-.tippy-tooltip .profile {
-}
-.tippy-tooltip a span {
-  display: inline-block;
-  vertical-align: top;
-}
-.tippy-tooltip .any--flex {
-	align-content: space-around;
-}
-.tippy-tooltip .any--flex a + a {
-	margin-left: 0.25rem;
+.tippy-popper[x-placement^=bottom] .tippy-arrow {
+  border-bottom-color: hsl(var(--interactive--secondary));
+}
+.tippy-popper[x-placement^=top] .tippy-arrow {
+  border-top-color: hsl(var(--interactive--secondary));
+}
+.tippy-tooltip {
+  background-position: top center;
+  background-size: cover;
+  margin: 0;
+}
+.tippy-tooltip .any--jp {
+  font-size: 0.7em;
+}
+.tippy-tooltip .h1 {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+.tippy-tooltip .name {
+  margin-bottom: 0.5rem;
+}
+.tippy-tooltip .profile {
+}
+.tippy-tooltip a span {
+  display: inline-block;
+  vertical-align: top;
+}
+.tippy-tooltip .any--flex {
+	align-content: space-around;
+}
+.tippy-tooltip .any--flex a + a {
+	margin-left: 0.25rem;
 }

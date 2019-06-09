@@ -37,6 +37,6 @@
 .image__vip span {
 	border: 1px solid;
 	border-radius: 3px;
-	color: var(--accent);
+	color: hsl(var(--accent));
 	padding: 0 2px;
 }

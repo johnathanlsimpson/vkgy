@@ -1,6 +1,6 @@
 .artist-list__container {
 	column-gap: 2rem;
-	column-rule: 1px dotted var(--background--bold);
+	column-rule: 1px dotted hsl(var(--background--bold));
 	column-width: 200px;
 }
 .artist-list__container:not(:empty)::before { display: none; }

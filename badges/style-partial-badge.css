@@ -1,10 +1,10 @@
 /* Outer container */
 .badge__container {
-	background-color: var(--background--faint);
+	background-color: hsl(var(--background--secondary));
 	background-image:
-		linear-gradient(var(--background--faint), var(--background--faint)),
-		linear-gradient(45deg, rgba(var(--rgb__background--faint), 1) 25%, rgba(var(--rgb__background--faint), 0) 0),
-		linear-gradient(-45deg, rgba(var(--rgb__background--faint), 1) 25%, rgba(var(--rgb__background--faint), 0) 0);
+		linear-gradient(hsl(var(--background--secondary)), hsl(var(--background--secondary))),
+		linear-gradient(45deg, hsla(var(background--faint), 1) 25%, hsla(var(background--faint), 0) 0),
+		linear-gradient(-45deg, hsla(var(background--faint), 1) 25%, hsla(var(background--faint), 0) 0);
 	background-position:
 		0 18px,
 		center top,
@@ -33,15 +33,15 @@
 	line-height: 1;
 	position: absolute;
 	text-shadow:
-		-1px 0 0 var(--background--faint),
-		1px 0 0 var(--background--faint),
-		0 -1px 0 var(--background--faint),
-		0 1px 0 var(--background--faint);
+		-1px 0 0 hsl(var(--background--secondary)),
+		1px 0 0 hsl(var(--background--secondary)),
+		0 -1px 0 hsl(var(--background--secondary)),
+		0 1px 0 hsl(var(--background--secondary));
 	z-index: 1;
 }
 .badge__container::after {
 	bottom: 2px;
-	color: var(--attention--faint);
+	color: hsl(var(--attention--secondary));
 	left: 0;
 	letter-spacing: normal;
 	text-align: center;
@@ -57,7 +57,7 @@
 
 /* Lines */
 .badge__deco-a, .badge__deco-b, .badge__deco-a::before, .badge__deco-a::after, .badge__deco-b::before, .badge__deco-b::after {
-	border: 2px solid var(--attention--faint);
+	border: 2px solid hsl(var(--attention--secondary));
 	box-sizing: border-box;
 	display: block;
 	margin: -2px;
@@ -74,7 +74,7 @@
 }
 .badge__deco-a {
 	background-color: inherit;
-	background-image: linear-gradient(rgba(var(--rgb__background--faint), 0), rgba(var(--rgb__background--faint), 1));
+	background-image: linear-gradient(hsla(var(background--faint), 0), hsla(var(background--faint), 1));
 }
 .badge__deco-b {
 	border-color: transparent;

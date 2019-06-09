@@ -4,23 +4,19 @@
 	* ========================================================
 **/
 :root {
-	--accent:              344, 37%, 50%;
-	
-	--attention--faint:    154, 32%, 50%;
-	--attention:           154, 32%, 45%;
-	
-	--interactive--faint:  227, 12%, 55%;
-	--interactive:         227, 12%, 45%;
-	
-	--text:                0, 5%, 70%;
-	--text--faint:         0, 0%, 40%;
-	
-	--background--faint:   240, 9%, 7%;
-	--background:          240, 9%, 13%;
-	--background--bold:    240, 9%, 23%;
-	--background--alt:     196, 27%, 10%;
-	
-	/*--rgb__background:        30, 30, 36;
-	--rgb__background--faint: 16, 16, 19;
-	--rgb__background--bold:  65, 65, 78;*/
+	--accent:                 344, 37%,  50%;
+
+	--attention--secondary:   154, 32%,  50%;
+	--attention:              154, 32%,  45%;
+
+	--interactive--secondary: 227, 12%,  55%;
+	--interactive:            227, 12%,  45%;
+
+	--text:                   0,   5%,   70%;
+	--text--faint:            0,   0%,   40%;
+
+	--background--secondary:  240, 9%,   7%;
+	--background:             240, 9%,   13%;
+	--background--bold:       240, 9%,   23%;
+	--background--alt:        196, 27%,  10%;
 }

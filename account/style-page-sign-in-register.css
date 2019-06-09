@@ -8,20 +8,6 @@
 .register__notes {
 	margin-top: 3rem;
 }
-
-
-
-
-
-/*.register__wrapper.register__wrapper {
-	margin-left: -3rem;
-	padding-right: 3rem;
-}
-@media(min-width: 800px) {
-	.register__wrapper.register__wrapper {
-		padding-right: 0;
-	}
-}*/
 .register__status {
 	margin-left: 1rem;
 }
@@ -39,18 +25,11 @@
 	display: none;
 }
 .register__show:checked + .register__show-label {
-	color: var(--text);
+	color: hsl(var(--text));
 }
 .register__show:checked + .register__show-label::before {
 	clip-path: url(#symbol__checked);
 }
-/*.register__container {
-	flex-basis: 400px;
-}
-.register__section {
-	flex-grow: 1;
-	margin-left: 3rem;
-}*/
 .register__face {
 	background: url('/main/avback.gif');
 	background-position: center;
@@ -76,7 +55,7 @@
 }
 #register__radio--bat:checked ~ .register__avatar-container .register__bat,
 #register__radio--gecko:checked ~ .register__avatar-container .register__gecko {
-	color: var(--text);
+	color: hsl(var(--text));
 }
 #register__radio--bat:checked ~ .register__avatar-container .register__bat::before,
 #register__radio--gecko:checked ~ .register__avatar-container .register__gecko::before {

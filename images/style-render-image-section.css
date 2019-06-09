@@ -21,7 +21,7 @@
 	display: none;
 }
 .image__results:not(:empty) {
-	border-top: 1px solid var(--background--bold);
+	border-top: 1px solid hsl(var(--background--bold));
 	margin-top: 1rem;
 	padding-top: 1rem;
 }

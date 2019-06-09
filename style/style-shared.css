@@ -25,7 +25,7 @@
 	width: 800px;
 }
 .text--docked {
-	box-shadow: 0 0 2rem 1rem var(--background--faint);
+	box-shadow: 0 0 2rem 1rem hsl(var(--background--secondary));
 	bottom: 0;
 	left: 0;
 	margin: 0;
@@ -40,7 +40,7 @@
 	line-height: 1.75;
 }
 .hr, hr {
-	background: var(--background--bold);
+	background: hsl(var(--background--bold));
 	border: none;
 	height: 1px;
 	margin: 2rem 0;
@@ -61,8 +61,8 @@
 * ========================================================
 */
 .blockquote, blockquote {
-	background: var(--background);
-	border-left: 1px solid var(--background--bold);
+	background: hsl(var(--background));
+	border-left: 1px solid hsl(var(--background--bold));
 	padding: 1rem;
 }
 * + .blockquote, * + blockquote {
@@ -72,14 +72,14 @@
 	display: none;
 }
 .obscure__container::after {
-	box-shadow: inset 0 -5.5rem 2rem -4rem var(--background);
+	box-shadow: inset 0 -5.5rem 2rem -4rem hsl(var(--background));
 	display: none;
 }
 .obscure--faint::after {
-	box-shadow: inset 0 -5.5rem 2rem -4rem var(--background--faint);
+	box-shadow: inset 0 -5.5rem 2rem -4rem hsl(var(--background--secondary));
 }
 .obscure--alt::after {
-	box-shadow: inset 0 -5.5rem 2rem -4rem var(--background--alt);
+	box-shadow: inset 0 -5.5rem 2rem -4rem hsl(var(--background--alt));
 }
 .obscure__container::after {
 	bottom: 0;
@@ -111,7 +111,7 @@ opacity: 1;
 }
 .obscure__button {
 	bottom: 1rem;
-	box-shadow: 0 0 0.5rem 0.5rem var(--background);
+	box-shadow: 0 0 0.5rem 0.5rem hsl(var(--background));
 	cursor: pointer;
 	display: none;
 	left: 50%;
@@ -121,10 +121,10 @@ opacity: 1;
 	z-index: 1;
 }
 .obscure--faint .obscure__button {
-	box-shadow: 0 0 1rem 1rem var(--background--faint);
+	box-shadow: 0 0 1rem 1rem hsl(var(--background--secondary));
 }
 .obscure--alt .obscure__button {
-	box-shadow: 0 0 1rem 1rem var(--background--alt);
+	box-shadow: 0 0 1rem 1rem hsl(var(--background--alt));
 }
 
 .data__container {
@@ -134,7 +134,7 @@ opacity: 1;
 	margin: -0.5rem;
 }
 .data__item {
-	border-left: 1px dotted var(--background--bold);
+	border-left: 1px dotted hsl(var(--background--bold));
 	border-top: none;
 	display: inline-block;
 	margin: 0.5rem;
@@ -151,7 +151,7 @@ opacity: 1;
 * ========================================================
 */
 .footer__container {
-	background: linear-gradient(var(--background), transparent);
+	background: linear-gradient(hsl(var(--background)), transparent);
 	padding-top: 3rem;
 	text-align: center;
 }
@@ -182,18 +182,18 @@ opacity: 1;
 	}
 }
 .footer__message {
-	color: var(--background);
+	color: hsl(var(--background));
 	filter: blur(3px);
 	font-size: 1.25rem;
 	letter-spacing: 1px;
 	transition: 1s color linear, 1s filter linear;
 }
 .footer__message:hover {
-	color: var(--accent);
+	color: hsl(var(--accent));
 	filter: blur(0);
 }
 .footer__top {
-	background: var(--background);
+	background: hsl(var(--background));
 	bottom: 1rem;
 	display: none;
 	opacity: 0;
@@ -261,7 +261,7 @@ opacity: 1;
 	margin-top: 3rem;
 }
 .comment__template + .comment__template:not([data-thread-id]), .comment__template + .comment__template[data-thread-id=""] {
-	border-top: 1px dotted var(--text--faint);
+	border-top: 1px dotted hsl(var(--text--faint));
 }
 
 
@@ -278,7 +278,7 @@ opacity: 1;
 	margin-top: 2rem;
 }
 .module ul, .module ol {
-	color: var(--text--faint);
+	color: hsl(var(--text--faint));
 }
 .text .module {
 	margin-left: -1rem;
@@ -289,7 +289,7 @@ opacity: 1;
 	margin-right: -0.5rem;
 }
 .module {
-	background-image: linear-gradient(to bottom right,var(--background--faint) 1px,transparent 0);
+	background-image: linear-gradient(to bottom right,hsl(var(--background--secondary)) 1px,transparent 0);
 	background-size: 3px 3px;
 	padding: 1rem;
 }
@@ -389,14 +389,14 @@ td:not(:last-of-type), .td:not(:last-of-type) {
 	padding-right: 1rem;
 }
 tr:not(:first-of-type) td, .tr:not(:first-of-type) .td {
-	border-top: 1px dotted var(--background--bold);
+	border-top: 1px dotted hsl(var(--background--bold));
 	padding-top: 0.5rem;
 }
 tr:not(:last-of-type) td, .tr:not(:last-of-type) .td {
 	padding-bottom: 0.5rem;
 }
 table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
-	border-top: 1px dotted var(--text--faint);
+	border-top: 1px dotted hsl(var(--text--faint));
 	margin-top: 1.5rem;
 	padding-top: 1.5rem;
 }
@@ -415,7 +415,7 @@ table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
 	text-indent: 0;
 }
 .ol + .ol, .ul + .ul, ol + ol, ul + ul {
-	border-top: 1px dotted var(--text--faint);
+	border-top: 1px dotted hsl(var(--text--faint));
 	margin-top: 1rem;
 	padding-top: 1rem;
 }
@@ -429,7 +429,7 @@ table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
 	counter-increment: defaultcounter;
 }
 .ol .li::before, ol li::before {
-	color: var(--text--faint);
+	color: hsl(var(--text--faint));
 	content: counter(defaultcounter);
 	display: inline-block;
 	padding-right: 0.5rem;
@@ -438,7 +438,7 @@ table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
 	padding-left: 1rem;
 }
 .ul--bulleted > .li::before, .ul--bulleted > li::before {
-	background: radial-gradient(circle, var(--text--faint) 3px, transparent 0);
+	background: radial-gradient(circle, hsl(var(--text--faint)) 3px, transparent 0);
 	color: transparent;
 	content: "-";
 	display: inline-block;
@@ -447,7 +447,7 @@ table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
 	width: 6px;
 }
 .ul--bulleted .ul--bulleted .li::before, .ul--bulleted .ul--bulleted li::before {
-	background: radial-gradient(circle, var(--background--bold) 3px, transparent 0);
+	background: radial-gradient(circle, hsl(var(--background--bold)) 3px, transparent 0);
 }
 .ul--compact .li, .ul--compact li, .li--compact {
 	padding: 0.5rem 0;
@@ -462,7 +462,7 @@ table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
 	padding-bottom: 0;
 }
 .li + .li, li + li {
-	border-top: 1px dotted var(--background--bold);
+	border-top: 1px dotted hsl(var(--background--bold));
 }
 .li + *:not(.li), li + *:not(li) {
 	margin-top: 1rem;
@@ -483,7 +483,7 @@ table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
 	margin-left: -0.5rem;
 }
 .ul--bordered li {
-	border-left: 1px dotted var(--background--bold);
+	border-left: 1px dotted hsl(var(--background--bold));
 	padding-left: 0.5rem;
 }
 .ol--inline .li, .ol--inline li, .ul--inline .li, .ul--inline li {
@@ -562,9 +562,9 @@ table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
 	margin-top: 1rem;
 }
 .input, .input--secondary, .input__button, .input__checkbox-label, .input__select, .input__textarea, button, input, select, textarea {
-	background: var(--background--bold);
+	background: hsl(var(--background--bold));
 	background-image:
-		linear-gradient(to right, var(--interactive--faint) 50%, transparent 0),
+		linear-gradient(to right, hsl(var(--interactive--secondary)) 50%, transparent 0),
 		linear-gradient(rgba(255,255,255, 0.05), rgba(255,255,255, 0.05)),
 		linear-gradient(rgba(255,255,255, 0.1),  rgba(255,255,255, 0.1));
 	background-position: bottom right;
@@ -576,7 +576,7 @@ table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
 	border: none;
 	border-radius: 3px;
 	box-sizing: content-box;
-	color: var(--text);
+	color: hsl(var(--text));
 	font-family: inherit;
 	font-size: 1rem;
 	height: 1rem;
@@ -628,17 +628,17 @@ table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
 	box-shadow: inset 2rem 0 2rem -2rem rgba(0,0,0, 0.25);
 }
 .input--secondary:not(:focus):not(:active), .input--secondary::placeholder, .input--secondary::-webkit-input-placeholder {
-	color: var(--text--faint);
+	color: hsl(var(--text--faint));
 }
 .input__button, button {
 	background-image:
 		linear-gradient(rgba(255,255,255,0.05),  rgba(255,255,255,0.05)),
 		linear-gradient(rgba(255,255,255,0.1),   rgba(255,255,255,0.1)),
 		linear-gradient(rgba(0,0,0, 0.25),       transparent),
-		linear-gradient(to right, var(--interactive--faint) 50%, transparent 0);
+		linear-gradient(to right, hsl(var(--interactive--secondary)) 50%, transparent 0);
 	background-position: top, top, top, bottom right;
 	background-size: 100% 2px, 0, 0, 0;
-	color: var(--text);
+	color: hsl(var(--text));
 	cursor: pointer;
 	font-family: monospace, "brackets", メイリオ, Meiryo, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "ＭＳ Ｐゴシック", "MS PGothic", serif;
 	font-weight: normal;
@@ -670,7 +670,7 @@ table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
 }
 .input__checkbox-label {
 	background-image: none;
-	color: var(--text--faint);
+	color: hsl(var(--text--faint));
 	cursor: pointer;
 	font-family: monospace, "brackets", メイリオ, Meiryo, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "ＭＳ Ｐゴシック", "MS PGothic", serif;
 	margin-bottom: 0.25rem;
@@ -679,7 +679,7 @@ table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
 	user-select: none;
 }
 .input__checkbox-label--selected, .input__checkbox:checked + .input__checkbox-label {
-	color: var(--text);
+	color: hsl(var(--text));
 }
 .input__checkbox-label--selected::before, .input__checkbox:checked + .input__checkbox-label::before, .input__checkbox:checked + .any__tag::before {
 	opacity: 1;
@@ -716,16 +716,16 @@ select[multiple][multiple][multiple] option {
 	margin-right: 0.5rem;
 }
 select[multiple][multiple][multiple] option + option::before {
-	background: var(--background--bold);
-	color: var(--text);
+	background: hsl(var(--background--bold));
+	color: hsl(var(--text));
 	content: ",";
 	display: inline-block;
 	margin-left: -0.5rem;
 	width: 0.5rem;
 }
 select[multiple][multiple][multiple] option::after {
-	background: var(--background--bold);
-	color: var(--text);
+	background: hsl(var(--background--bold));
+	color: hsl(var(--text));
 	content: attr(data-name);
 	left: 0;
 	position: absolute;

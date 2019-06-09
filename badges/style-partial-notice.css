@@ -11,7 +11,7 @@
 .badge__label, .badge__label::before, .badge__label::after {
 	border-radius: 50%;
 	bottom: 0;
-	color: var(--background--faint);
+	color: hsl(var(--background--secondary));
 	left: 0;
 	opacity: 0;
 	position: absolute;
@@ -23,7 +23,7 @@
 	z-index: 2;
 }
 .badge__label::before {
-	background: var(--background--bold);
+	background: hsl(var(--background--bold));
 	content: "?";
 	display: block;
 	font-size: 100px;
@@ -31,8 +31,8 @@
 	margin: -5px;
 }
 .badge__label::after {
-	border: 3px solid var(--interactive--faint);
-	color: var(--interactive--faint);
+	border: 3px solid hsl(var(--interactive--secondary));
+	color: hsl(var(--interactive--secondary));
 	content: "Click to reveal badge";
 	cursor: pointer;
 	display: none;
@@ -41,8 +41,8 @@
 	z-index: 3;
 }
 .badge__label:hover::after {
-	border-color: var(--interactive);
-	color: var(--interactive);
+	border-color: hsl(var(--interactive));
+	color: hsl(var(--interactive));
 }
 
 /* New badge: unopened */
@@ -71,8 +71,8 @@
 	width: 0;
 }
 .badge__input:checked + .badge__container[data-level] {
-	background-color: var(--background--faint);
-	color: var(--background--faint);
+	background-color: hsl(var(--background--secondary));
+	color: hsl(var(--background--secondary));
 }
 
 /* New badge: when opening */

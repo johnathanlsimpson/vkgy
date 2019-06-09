@@ -39,9 +39,9 @@
 .documentation__raw ul, .documentation__raw ol {
 	margin-bottom: 0;
 	margin-top: 0;
-} 
+}
 .documentation--external {
-	background: var(--background--alt);
+	background: hsl(var(--background--alt));
 	margin-bottom: -3rem;
 	padding-top: 3rem;
 }

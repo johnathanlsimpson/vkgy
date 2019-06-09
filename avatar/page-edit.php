@@ -1,11 +1,11 @@
 <?php
 	include_once("../avatar/class-avatar.php");
 	include_once("../avatar/avatar-definitions.php");
-	
+
 	style([
 		"/avatar/style-page-edit.css",
 	]);
-	
+
 	script([
 		"/avatar/script-page-edit.js",
 	]);
@@ -22,20 +22,20 @@
 						$name = "{$layer_name}__{$part_name}";
 						$value = $shape_name;
 						$checked = (isset($current_avatar[$layer_name][$part_name]["shapes"][$shape_name]) ? "checked" : (!$current_avatar[$layer_name][$part_name]["shapes"] && $shape_name === array_keys($part_attributes["shapes"])[0] ? "checked" : null));
-						
+
 						?>
 							<input class="input__checkbox any--hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" type="radio" value="<?php echo $value; ?>" <?php echo $checked; ?> />
 						<?php
 					}
 				}
-				
+
 				if($part_attributes["color_is_selectable"]) {
 					foreach($part_attributes["colors"] as $color_name => $color_value) {
 						$id = "{$layer_name}__{$part_name}--{$color_name}";
 						$name = "{$layer_name}__{$part_name}-color";
 						$value = $color_name;
 						$checked = (isset($current_avatar[$layer_name][$part_name]["colors"][$color_name]) ? "checked" : (!$current_avatar[$layer_name][$part_name]["colors"] && $color_name === array_keys($part_attributes["colors"])[0] ? "checked" : null));
-						
+
 						?>
 							<input class="input__checkbox any--hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" type="radio" value="<?php echo $value; ?>" <?php echo $checked; ?> />
 						<?php
@@ -44,13 +44,13 @@
 			}
 		}
 	?>
-	
+
 	<div class="avatar__column any--margin">
 		<h2>
 			Edit avatar
 		</h2>
 		<div class="text avatar__container">
-			
+
 			<svg version="1.1" id="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="600px" height="600px" viewBox="0 0 600 600" enable-background="new 0 0 600 600" xml:space="preserve">
 				<?php
 					$avatar = new avatar($avatar_layers);
@@ -67,7 +67,7 @@
 		</div>
 		<div class="text text--outlined text--notice avatar__result any--hidden" data-role="result"></div>
 	</div>
-	
+
 	<div class="controls__column avatar__controls">
 		<?php
 			/* Form controls */
@@ -153,11 +153,11 @@
 							echo '#'.$layer_name.'__'.$part_name.'--'.$shape_name.':checked ~ .avatar__column .'.$layer_name.' [class*='.$layer_name.'__'.$part_name.']:not(.'.$layer_name.'__'.$part_name.'--'.$shape_name.') {';
 								echo 'display:none;';
 							echo '} '."\n";
-							
+
 							echo '#'.$layer_name.'__'.$part_name.'--'.$shape_name.':checked ~ .avatar__controls [for='.$layer_name.'__'.$part_name.'--'.$shape_name.'] {';
-								echo 'color:var(--text);';
+								echo 'color:hsl(var(--text));';
 							echo '} '."\n";
-							
+
 							echo '#'.$layer_name.'__'.$part_name.'--'.$shape_name.':checked ~ .avatar__controls [for='.$layer_name.'__'.$part_name.'--'.$shape_name.']::before {';
 								echo 'clip-path:url(#symbol__checked);';
 								echo 'opacity:1;';
@@ -169,11 +169,11 @@
 							echo '#'.$layer_name.'__'.$part_name.'--'.$shape_name.':checked ~ .avatar__column .'.$layer_name.' [class*='.$layer_name.'__'.$part_name.']:not(.'.$layer_name.'__'.$part_name.'--'.$shape_name.') {';
 								echo 'display:none;';
 							echo '} '."\n";
-							
+
 							echo '#'.$layer_name.'__'.$part_name.'--'.$shape_name.':checked ~ .avatar__controls [for='.$layer_name.'__'.$part_name.'--'.$shape_name.'] {';
-								echo 'color:var(--text);';
+								echo 'color:hsl(var(--text));';
 							echo '} '."\n";
-							
+
 							echo '#'.$layer_name.'__'.$part_name.'--'.$shape_name.':checked ~ .avatar__controls [for='.$layer_name.'__'.$part_name.'--'.$shape_name.']::before {';
 								echo 'clip-path:url(#symbol__checked);';
 								echo 'opacity:1;';
@@ -181,20 +181,20 @@
 						}
 					}
 				}
-				
+
 				if($part_attributes["color_is_selectable"]) {
 					foreach($part_attributes["colors"] as $color_name => $color) {
 						$color_value = is_array($color) ? $color["color"] : $color;
-						
+
 						echo '#'.$layer_name.'__'.$part_name.'--'.$color_name.':checked ~ .avatar__column .'.$layer_name.' .'.$layer_name.'__'.$part_name.' {';
 							echo 'fill: '.$color_value.'; ';
 							echo 'stroke: '.$color_value.';';
 						echo '} '."\n";
-						
+
 						echo '#'.$layer_name.'__'.$part_name.'--'.$color_name.':checked ~ .avatar__controls [for='.$layer_name.'__'.$part_name.'--'.$color_name.'] {';
-							echo 'color:var(--text);';
+							echo 'color:hsl(var(--text));';
 						echo '} '."\n";
-						
+
 						echo '#'.$layer_name.'__'.$part_name.'--'.$color_name.':checked ~ .avatar__controls [for='.$layer_name.'__'.$part_name.'--'.$color_name.']::before {';
 							echo 'clip-path:url(#symbol__checked);';
 							echo 'opacity:1;';
@@ -204,7 +204,7 @@
 				elseif($part_attributes['extends_color']) {
 					foreach($parts[$part_attributes['extends_color']]["colors"] as $color_name => $color) {
 						$color_value = is_array($color) ? $color["color"] : $color;
-						
+
 						echo '#'.$layer_name.'__'.$part_attributes['extends_color'].'--'.$color_name.':checked ~ .avatar__column .'.$layer_name.' .'.$layer_name.'__'.$part_name.' {';
 							echo 'fill: '.$color_value.'; ';
 							echo 'stroke: '.$color_value.';';
@@ -218,28 +218,28 @@
 
 <script>
 	var randButton = document.getElementsByClassName('avatar__random')[0];
-	
+
 	randButton.addEventListener('click', randomizeAvatar);
-	
+
 	function randomizeAvatar() {
 		var radioElems = document.querySelectorAll('[name=form__avatar] .input__checkbox');
 		var elemName;
 		var prevName;
-		
+
 		for(var i=0; i<radioElems.length; i++) {
 			elemName = radioElems[i].getAttribute('name');
-			
+
 			if(prevName != elemName) {
 				selectedElems = document.querySelectorAll('[name=' + elemName + ']');
 				randNum = Math.floor(Math.random() * Math.floor(selectedElems.length));
-				
+
 				for(var n=0; n<selectedElems.length; n++) {
 					selectedElems[n].checked = false;
 				}
-				
+
 				selectedElems[randNum].checked = true;
 			}
-			
+
 			prevName = elemName;
 		}
 	}
