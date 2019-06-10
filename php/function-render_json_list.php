@@ -7,7 +7,7 @@ $access_label = $access_label ?: new access_label($pdo);
 $access_musician = $access_musician ?: new access_musician($pdo);
 $access_release = $access_release ?: new access_release($pdo);
 
-function render_json_list($input_type, $input = null, $input_id_type = null) {
+function render_json_list($input_type, $input = null, $input_id_type = null, $include_friendly = null) {
 	global $pdo;
 	global $access_artist, $access_label, $access_musician, $access_release;
 	global $artist_list, $label_list, $musician_list, $release_list;
@@ -33,7 +33,7 @@ function render_json_list($input_type, $input = null, $input_id_type = null) {
 		
 		// Artist
 		if($input_type === 'artist') {
-			$input_chunk[] = '';
+			$input_chunk[] = $include_friendly ? $input[$i]['friendly'] : '';
 			$input_chunk[] =
 				str_replace(['&#92;', '&#34;'], ['\\', '"'], 
 					($input[$i]['quick_name'].($input[$i]['romaji'] ? ' ('.$input[$i]['name'].')' : null)).
@@ -43,7 +43,7 @@ function render_json_list($input_type, $input = null, $input_id_type = null) {
 		
 		// Label
 		elseif($input_type === 'label') {
-			$input_chunk[] = '';
+			$input_chunk[] = $include_friendly ? $input[$i]['friendly'] : '';
 			$input_chunk[] = $input[$i]['quick_name'].($input[$i]['romaji'] ? ' ('.$input[$i]['name'].')' : null);
 		}
 		
