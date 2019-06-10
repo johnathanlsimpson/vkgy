@@ -1,6 +1,6 @@
 // Setup options for tribute.js
 function tributeSetup(tributeType) {
-	var optionList, selectLinkTemplate, selectTextTemplate, trigger;
+	var optionList, selectLinkTemplate, selectTextTemplate, trigger, valuesx;
 	var optionListIsParsed;
 	
 	// Depending on collection type, use different source and return different string
@@ -54,21 +54,37 @@ function tributeSetup(tributeType) {
 		trigger: trigger,
 		
 		values: function(text, returnToTribute) {
-			if(optionList && optionList != 'undefined' && optionListIsParsed !== true) {
-				optionList = JSON.parse(optionList.innerHTML);
-			}
-			
-			if(!optionList || optionList === 'undefined') {
-				optionList = [];
-			}
-			
-			optionListIsParsed = true;
-			
-			returnToTribute(optionList);
-		},
+			remoteSearch(text, returnToTribute, tributeType);
+		}
 	}
 	
 	return tributeOptions;
+}
+
+// Send typed text to PHP search function
+function remoteSearch(text, returnToTribute, tributeType) {
+	var URL = '/php/function-tribute_search.php';
+	
+	xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function () {
+		if(xhr.readyState === 4) {
+			if(xhr.status === 200) {
+				if(xhr.responseText.length && xhr.responseText != 'null') {
+					var data = JSON.parse(xhr.responseText);
+					returnToTribute(data);
+				}
+				else {
+					returnToTribute([]);
+				}
+			}
+			else if(xhr.status === 403) {
+				returnToTribute([]);
+			}
+		}
+	};
+	
+	xhr.open("GET", URL + '?q=' + text + '&type=' + tributeType, true);
+	xhr.send();
 }
 
 // Init tribute.js object and add default collections
