@@ -274,6 +274,9 @@ class CommentHandler {
 		// Append new comment/commentate container to parent and focus
 		threadContainer.appendChild(newCommentTemplate);
 		threadContainer.querySelector('.comment__container:last-of-type .commentate__content').focus();
+		
+		// Re-initialized Tribute.js
+		initTribute();
 	}
 	
 	

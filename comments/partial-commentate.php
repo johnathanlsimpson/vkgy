@@ -18,7 +18,7 @@
 				<div class="input__row commentate__comment">
 					<div class="input__group any--flex-grow">
 						<label class="input__label">Comment</label>
-						<textarea class="commentate__content input__textarea any--flex-grow" name="content" placeholder="your comment...&#10;<?php echo sanitize('あなたのコメント...'); ?>">{content}</textarea>
+						<textarea class="commentate__content input__textarea any--flex-grow any--tributable" name="content" placeholder="your comment...&#10;<?php echo sanitize('あなたのコメント...'); ?>">{content}</textarea>
 					</div>
 				</div>
 				

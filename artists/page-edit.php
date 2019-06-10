@@ -1,11 +1,15 @@
 <?php
+	include('../artists/head.php');
+	
 	script([
 		"/scripts/external/script-autosize.js",
 		"/scripts/external/script-selectize.js",
+		'/scripts/external/script-tribute.js',
 		
 		"/scripts/script-showElem.js",
 		"/scripts/script-initDelete.js",
 		"/scripts/script-initSelectize.js",
+		'/scripts/script-initTribute.js',
 		
 		"/artists/script-previewBio.js",
 		"/artists/script-exclusive.js",
@@ -13,12 +17,11 @@
 	]);
 	
 	style([
+		'/style/external/style-tribute.css',
 		"/style/external/style-selectize.css",
 		"/style/style-selectize.css",
 		"/artists/style-page-edit.css"
 	]);
-	
-	include('../artists/head.php');
 	
 	subnav([
 		'Edit artist' => '/artists/'.$artist['friendly'].'/edit/',
@@ -31,8 +34,9 @@
 					<form action="" class="col c1 any--margin" enctype="multipart/form-data" id="form__edit" method="post" name="form__edit">
 						<?php
 							include_once('../php/function-render_json_list.php');
-							render_json_list('artist');
-							render_json_list('musician', $artist['musicians']);
+							render_json_list('artist', null, null, true);
+							render_json_list('label', null, null, true);
+							render_json_list('musician', $artist['musicians'], null, true);
 							render_json_list('release', $artist['id'], 'artist_id');
 						?>
 						
@@ -124,7 +128,7 @@
 													<label class="input__label">
 														Label history
 													</label>
-													<textarea class="autoresize any--flex-grow input__textarea" name="label_history" placeholder="(1)&#10;(1), (2)&#10;(3) (management only)"><?php echo $artist["label_history"]; ?></textarea>
+													<textarea class="autoresize any--flex-grow input__textarea any--tributable" name="label_history" placeholder="(1)&#10;(1), (2)&#10;(3) (management only)"><?php echo $artist["label_history"]; ?></textarea>
 												</div>
 											</div>
 										</li>
@@ -179,7 +183,7 @@
 								<div class="text">
 									<div class="input__row">
 										<div class="input__group any--flex-grow">
-											<textarea class="autoresize input__textarea any--flex-grow edit__history" name="bio"><?php
+											<textarea class="autoresize input__textarea any--flex-grow any--tributable edit__history" name="bio"><?php
 												if(is_array($artist["history"])) {
 													$n = 0;
 													foreach($artist["history"] as $history_line) {
@@ -381,7 +385,7 @@
 																<div class="input__row">
 																	<div class="input__group any--flex-grow">
 																		<label class="input__label">Band history</label>
-																		<textarea class="autoresize input__textarea any--flex-grow" name="musicians[<?php echo $m; ?>][history]" placeholder="(1)[Nega]&#10;(1) (support)"><?php echo $musician["raw_history"]; ?></textarea>
+																		<textarea class="autoresize input__textarea any--flex-grow any--tributable" name="musicians[<?php echo $m; ?>][history]" placeholder="(1)[Nega]&#10;(1) (support)"><?php echo $musician["raw_history"]; ?></textarea>
 																	</div>
 																</div>
 															</li>

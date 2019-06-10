@@ -1,15 +1,22 @@
 <?php
 	script([
+		'/scripts/external/script-tribute.js',
+		'/scripts/script-initTribute.js',
 		'/scripts/script-signIn.js',
 		'/comments/script-update.js',
 	]);
 	
 	style([
+		'/style/external/style-tribute.css',
 		'/comments/style-partial-comments.css',
 	]);
 	
 	include_once('../php/class-parse_markdown.php');
 	$markdown_parser = new parse_markdown($pdo);
+	
+	include_once('../php/function-render_json_list.php');
+	render_json_list('artist', null, null, true);
+	render_json_list('label', null, null, true);
 	
 	function render_comment_component($component_template, $replacement_data) {
 		if($component_template && is_array($replacement_data)) {
