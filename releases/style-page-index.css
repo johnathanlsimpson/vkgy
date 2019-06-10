@@ -6,7 +6,7 @@
 	margin-top: 1rem;
 }
 select[name][name][name] + .selectize-control .item + .item::before {
-	color: hsl(var(--text--faint));
+	color: hsl(var(--text--secondary));
 	content: ", ";
 }
 .input.input.input.input.selectize-control * {

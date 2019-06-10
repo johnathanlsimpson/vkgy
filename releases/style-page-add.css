@@ -62,7 +62,7 @@
 }
 .track__num::before {
 	box-sizing: border-box;
-	color: hsl(var(--text--faint));
+	color: hsl(var(--text--secondary));
 	content: attr(data-count) ".";
 	display: inline-block;
 	height: 2rem;

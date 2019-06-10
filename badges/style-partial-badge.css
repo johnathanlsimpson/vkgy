@@ -3,8 +3,8 @@
 	background-color: hsl(var(--background--secondary));
 	background-image:
 		linear-gradient(hsl(var(--background--secondary)), hsl(var(--background--secondary))),
-		linear-gradient(45deg, hsla(var(background--faint), 1) 25%, hsla(var(background--faint), 0) 0),
-		linear-gradient(-45deg, hsla(var(background--faint), 1) 25%, hsla(var(background--faint), 0) 0);
+		linear-gradient(45deg, hsla(var(background--secondary), 1) 25%, hsla(var(background--secondary), 0) 0),
+		linear-gradient(-45deg, hsla(var(background--secondary), 1) 25%, hsla(var(background--secondary), 0) 0);
 	background-position:
 		0 18px,
 		center top,
@@ -74,7 +74,7 @@
 }
 .badge__deco-a {
 	background-color: inherit;
-	background-image: linear-gradient(hsla(var(background--faint), 0), hsla(var(background--faint), 1));
+	background-image: linear-gradient(hsla(var(background--secondary), 0), hsla(var(background--secondary), 1));
 }
 .badge__deco-b {
 	border-color: transparent;

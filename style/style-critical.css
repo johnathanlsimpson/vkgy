@@ -125,7 +125,7 @@
 		vertical-align: text-top;
 	}
 	.any__tag, .tag {
-		color: hsl(var(--text--faint));
+		color: hsl(var(--text--secondary));
 		cursor: pointer;
 		user-select: none;
 	}
@@ -210,12 +210,12 @@
 	}
 	.any__obscure--fade::before {
 		background-image:
-			linear-gradient(to bottom, hsla(var(background--faint), 0.75), hsl(var(--background--secondary))),
+			linear-gradient(to bottom, hsla(var(background--secondary), 0.75), hsl(var(--background--secondary))),
 			linear-gradient(to bottom right, hsla(var(--background), 1) 1px, hsla(var(--background), 0));
 		background-size: 100% 100%, 3px 3px;
 	}
-	.any__obscure--faint::before {
-		background-color: hsla(var(background--faint), 0.75);
+	.any__obscure--secondary::before {
+		background-color: hsla(var(background--secondary), 0.75);
 	}
 
 
@@ -303,7 +303,7 @@
 		font-size: 0.9em;
 	}
 	.any--weaken, .any--weaken-color {
-		color: hsl(var(--text--faint));
+		color: hsl(var(--text--secondary));
 	}
 	.any--weaken, .any--weaken-size {
 		font-size: 0.8em;
@@ -444,7 +444,7 @@
 		font-weight: normal;
 	}
 	.h5, h5, .input__label {
-		color: hsl(var(--text--faint));
+		color: hsl(var(--text--secondary));
 		font-family: var(--font--secondary);
 		font-size: 0.8rem;
 		letter-spacing: 1px;
