@@ -141,8 +141,8 @@
 <div class="col c1 any--signed-in-only any--margin">
 	<?php
 		include_once('../php/function-render_json_list.php');
-		render_json_list('artist', null, null, true);
-		render_json_list('label', null, null, true);
+		render_json_list('artist');
+		render_json_list('label');
 		render_json_list('song', []);
 	?>
 

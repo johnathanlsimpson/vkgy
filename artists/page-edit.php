@@ -34,9 +34,8 @@
 					<form action="" class="col c1 any--margin" enctype="multipart/form-data" id="form__edit" method="post" name="form__edit">
 						<?php
 							include_once('../php/function-render_json_list.php');
-							render_json_list('artist', null, null, true);
-							render_json_list('label', null, null, true);
-							render_json_list('musician', $artist['musicians'], null, true);
+							render_json_list('artist');
+							render_json_list('musician', $artist['musicians']);
 							render_json_list('release', $artist['id'], 'artist_id');
 						?>
 						

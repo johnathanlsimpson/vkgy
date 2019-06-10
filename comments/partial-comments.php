@@ -14,10 +14,6 @@
 	include_once('../php/class-parse_markdown.php');
 	$markdown_parser = new parse_markdown($pdo);
 	
-	include_once('../php/function-render_json_list.php');
-	render_json_list('artist', null, null, true);
-	render_json_list('label', null, null, true);
-	
 	function render_comment_component($component_template, $replacement_data) {
 		if($component_template && is_array($replacement_data)) {
 			ob_start();

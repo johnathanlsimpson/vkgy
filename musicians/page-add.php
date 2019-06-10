@@ -1,7 +1,4 @@
 <?php
-	include_once('../php/function-render_json_list.php');
-	render_json_list('artist', null, null, true);
-	
 	script([
 		"/scripts/external/script-autosize.js",
 		"/scripts/external/script-selectize.js",

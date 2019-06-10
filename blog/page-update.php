@@ -15,8 +15,7 @@
 		]);
 		
 		include_once('../php/function-render_json_list.php');
-		render_json_list('artist', null, null, true);
-		render_json_list('label', null, null, true);
+		render_json_list('artist');
 		
 		$page_header = 'Edit blog entry';
 		
