@@ -181,7 +181,7 @@
 	filter: saturate(0);
 }
 .collection__header {
-	border-top-color: hsl(var(--text--faint));
+	border-top-color: hsl(var(--text--secondary));
 }
 .collection__item {
 	clear: both;

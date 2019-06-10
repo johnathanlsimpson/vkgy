@@ -155,7 +155,7 @@
 		flex-direction: column;
 	}
 	.release__data {
-		border-bottom: 1px dotted hsl(var(--text--faint));
+		border-bottom: 1px dotted hsl(var(--text--secondary));
 		display: flex;
 		justify-content: space-between;
 		margin: 0;
