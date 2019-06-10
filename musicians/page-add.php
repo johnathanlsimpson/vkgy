@@ -2,12 +2,15 @@
 	script([
 		"/scripts/external/script-autosize.js",
 		"/scripts/external/script-selectize.js",
+		'/scripts/external/script-tribute.js',
+		'/scripts/script-initTribute.js',
 		"/scripts/script-initSelectize.js",
 		"/musicians/script-page-add.js"
 	]);
 	
 	style([
 		"/style/external/style-selectize.css",
+		'/style/external/style-tribute.css',
 		"/style/style-selectize.css",
 		"/musicians/style-page-add.css"
 	]);
@@ -49,7 +52,7 @@
 									<div class="input__row">
 										<div class="input__group any--flex-grow">
 											<label class="input__label">Band history</label>
-											<textarea class="autosize input__textarea any--flex-grow" name="history[]" placeholder="band history"></textarea>
+											<textarea class="autosize input__textarea any--flex-grow any--tributable" name="history[]" placeholder="band history"></textarea>
 										</div>
 									</div>
 								</div>

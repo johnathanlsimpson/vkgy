@@ -1,9 +1,13 @@
 <?php
 	script([
+		'/scripts/external/script-tribute.js',
+		'/scripts/script-initTribute.js',
+		'/scripts/script-signIn.js',
 		'/comments/script-update.js',
 	]);
 	
 	style([
+		'/style/external/style-tribute.css',
 		'/comments/style-partial-comments.css',
 	]);
 	

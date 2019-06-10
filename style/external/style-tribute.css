@@ -1,0 +1,35 @@
+.tribute-container {
+	background: hsl(var(--background--bold));
+	border: 2px solid hsl(var(--interactive--secondary));
+  display: block;
+  height: auto;
+	left: 0;
+  max-height: 300px;
+  max-width: 500px;
+  overflow: auto;
+	padding: 0.25rem;
+	position: absolute;
+	top: 0;
+  z-index: 999999;
+}
+.tribute-container ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.tribute-container li {
+	border: 2px solid transparent;
+	border-radius: var(--border-radius);
+	cursor: pointer;
+	padding: 0.25rem;
+}
+.tribute-container li.highlight {
+	border-color: hsl(var(--background--secondary));
+}
+.tribute-container li.no-match {
+	cursor: default;
+}
+.tribute-container li span, .tribute-container .menu-highlighted {
+	background: hsl(var(--background));
+	color: hsl(var(--attention--secondary));
+}

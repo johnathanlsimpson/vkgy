@@ -1,0 +1,22 @@
+/**
+	* ========================================================
+	* COLORS (HSL): DEFAULT
+	* ========================================================
+**/
+:root {
+	--accent:                 340, 73%,  25%;
+
+	--attention--secondary:   146, 65%,  25%;
+	--attention:              147, 50%,  47%;
+
+	--interactive--secondary: 211, 100%, 22%;
+	--interactive:            207, 24%,  56%;
+
+	--text:                   0,   5%,   25%;
+	--text--faint:            0,   0%,   50%;
+
+	--background--secondary:  20,  0%,   90%;
+	--background:             18,  0%,   82%;
+	--background--bold:       18,  0%,   74%;
+	--background--alt:        146, 10%,  85%;
+}

@@ -1,44 +1,44 @@
 <?php
 	if(!empty($user) && is_array($user)) {
 	$page_header = lang('Member profile', 'プロフィール', ['container' => 'div']);
-		
+
 		include_once("../avatar/class-avatar.php");
 		include_once("../avatar/avatar-options.php");
 		include_once("../avatar/avatar-definitions.php");
-		
+
 		$access_artist = new access_artist($pdo);
-		
+
 		script([
 			"/scripts/external/script-clusterize.js",
 			"/account/script-page-user.js",
 		]);
-		
+
 		style([
 			"/account/style-page-user.css"
 		]);
-		
+
 		// Wants: Get IDs
 		$sql_wants = 'SELECT release_id FROM releases_wants WHERE user_id=?';
 		$stmt_wants = $pdo->prepare($sql_wants);
 		$stmt_wants->execute([ $user['id'] ]);
 		$rslt_wants = $stmt_wants->fetchAll();
 		$num_wants = count($rslt_wants);
-		
+
 		for($i=0; $i<$num_wants; $i++) {
 			$wants_ids[] = $rslt_wants[$i]['release_id'];
 		}
-		
+
 		// Wants: Get
 		$wants = $access_release->access_release([ 'ids' => $wants_ids, 'get' => 'quick_name' ]);
 		$wants = array_values($wants);
-		
+
 		// Collection: Get
 		$collection = $access_release->access_release([ 'user_id' => $user['id'], 'get' => 'quick_name' ]);
 		if(is_array($collection)) {
 			$collection = array_values($collection);
 		}
 		$num_collected = is_array($collection) ? count($collection) : 0;
-		
+
 		// Collection/Wants: Count Artists
 		for($i=0; $i<$num_collected; $i++) {
 			$artist_ids[] = $collection[$i]["artist_id"];
@@ -51,11 +51,11 @@
 			$artist_ids = array_unique($artist_ids);
 			$artist_ids = array_filter($artist_ids, 'is_numeric');
 			$artist_ids = array_values($artist_ids);
-			
+
 			// Collection: Get Artists
 			$artists = $access_artist->access_artist([ 'id' => $artist_ids, 'get' => 'name', 'associative' => true ]);
 		}
-		
+
 		// Collection/Wants: Sort
 		if(is_array($collection) && !empty($collection)) {
 			usort($collection, function($a, $b) use($artists) {
@@ -67,7 +67,7 @@
 				return $artists[$a['artist_id']]['friendly'].$a["friendly"] <=> $artists[$b['artist_id']]['friendly'].$b["friendly"];
 			});
 		}
-		
+
 		// Check VIP
 		if($_SESSION["loggedIn"] && is_numeric($_SESSION["userID"])) {
 			$sql_check = "SELECT 1 FROM users WHERE id=? AND is_vip=1 LIMIT 1";
@@ -75,7 +75,7 @@
 			$stmt_check->execute([ $_SESSION["userID"] ]);
 			$is_vip = $stmt_check->fetchColumn();
 		}
-		
+
 		// Avatar
 		$sql_avatar = "SELECT content FROM users_avatars WHERE user_id=? LIMIT 1";
 		$stmt_avatar = $pdo->prepare($sql_avatar);
@@ -83,12 +83,12 @@
 		$rslt_avatar = $stmt_avatar->fetchColumn();
 		$avatar_class = $rslt_avatar ? null : 'user--no-avatar';
 		$rslt_avatar = $rslt_avatar ?: '{"head__base":"default","head__base-color":"i"}';
-		
+
 		$avatar = new avatar($avatar_layers, $rslt_avatar, ["is_vip" => true]);
 		$user["avatar"] = $avatar->get_avatar_paths();
-		
+
 		unset($avatar);
-		
+
 		// Stats: Setup
 		$stats = [
 			'fan_since' => ['emoji' => '🕒'],
@@ -107,25 +107,25 @@
 			'tagged' => ['emoji' => '🔖'],
 		];
 		$current_year = date('Y');
-		
+
 		// Stat: Fan since
 		$stats['fan_since']['value'] = $user['fan_since'] ?: 0;
-		
+
 		// Stat: Member since
 		$stats['member_for']['value'] = ($current_year - substr($user['date_added'], 0, 4));
-		
+
 		// Stat: Comments
 		$sql_num_comments = 'SELECT COUNT(1) FROM comments WHERE user_id=?';
 		$stmt_num_comments = $pdo->prepare($sql_num_comments);
 		$stmt_num_comments->execute([ $user['id'] ]);
 		$stats['comments']['value'] = $stmt_num_comments->fetchColumn();
-		
+
 		// Stat: Posts
 		$sql_num_posts = 'SELECT COUNT(1) FROM blog WHERE user_id=?';
 		$stmt_num_posts = $pdo->prepare($sql_num_posts);
 		$stmt_num_posts->execute([ $user['id'] ]);
 		$stats['posts']['value'] = $stmt_num_posts->fetchColumn();
-		
+
 		// Stat: Artists
 		$sql_artists = '
 			SELECT COUNT(1) AS num_added
@@ -136,7 +136,7 @@
 		$stmt_artists = $pdo->prepare($sql_artists);
 		$stmt_artists->execute([ $user['id'] ]);
 		$stats['artists']['value'] = $stmt_artists->fetchColumn();
-		
+
 		// Stat: Musicians
 		$sql_musicians = '
 			SELECT COUNT(1) AS num_added
@@ -149,7 +149,7 @@
 		$stmt_musicians = $pdo->prepare($sql_musicians);
 		$stmt_musicians->execute([ $user['id'] ]);
 		$stats['musicians']['value'] = $stmt_musicians->fetchColumn();
-		
+
 		// Stat: Releases added
 		$sql_releases = '
 			SELECT COUNT(1) AS num_added
@@ -162,7 +162,7 @@
 		$stmt_releases = $pdo->prepare($sql_releases);
 		$stmt_releases->execute([ $user['id'] ]);
 		$stats['releases']['value'] = $stmt_releases->fetchColumn();
-		
+
 		// Stat: Edits
 		$sql_db_edits = '
 		SELECT COUNT(1) AS num_edits FROM
@@ -177,13 +177,13 @@
 		$stmt_db_edits = $pdo->prepare($sql_db_edits);
 		$stmt_db_edits->execute([ $user['id'], $user['id'], $user['id'] ]);
 		$stats['edits']['value'] = $stmt_db_edits->fetchColumn();
-		
+
 		// Stat: Collection
 		$sql_num_collection = 'SELECT COUNT(1) FROM releases_collections WHERE user_id=?';
 		$stmt_num_collection = $pdo->prepare($sql_num_collection);
 		$stmt_num_collection->execute([ $user['id'] ]);
 		$stats['collection']['value'] = $stmt_num_collection->fetchColumn();
-		
+
 		// Stat: Oldest Release
 		$sql_oldest = 'SELECT releases.date_occurred FROM releases_collections LEFT JOIN releases ON releases.id=releases_collections.release_id WHERE releases_collections.user_id=? AND releases.date_occurred IS NOT NULL AND releases.date_occurred > "0000-00-00" ORDER BY releases.date_occurred ASC LIMIT 1';
 		$stmt_oldest = $pdo->prepare($sql_oldest);
@@ -193,7 +193,7 @@
 		if(is_numeric($rslt_oldest)) {
 			$stats['oldest']['value'] = $current_year - $rslt_oldest;
 		}
-		
+
 		// Stat: Newest Release
 		$sql_newest = 'SELECT releases.date_occurred FROM releases_collections LEFT JOIN releases ON releases.id=releases_collections.release_id WHERE releases_collections.user_id=? AND releases.date_occurred IS NOT NULL AND releases.date_occurred > "0000-00-00" ORDER BY releases.date_occurred DESC LIMIT 1';
 		$stmt_newest = $pdo->prepare($sql_newest);
@@ -203,27 +203,27 @@
 		if(is_numeric($rslt_newest)) {
 			$stats['newest']['value'] = $rslt_newest - $current_year;
 		}
-		
+
 		// Stat: Collection value
 		$sql_collection_price = 'SELECT releases.price FROM releases_collections LEFT JOIN releases ON releases.id=releases_collections.release_id WHERE releases_collections.user_id=?';
 		$stmt_collection_price = $pdo->prepare($sql_collection_price);
 		$stmt_collection_price->execute([ $user['id'] ]);
 		$rslt_collection_price = $stmt_collection_price->fetchAll();
 		$num_collection_price = count($rslt_collection_price);
-		
+
 		$stats['worth']['value'] = 0;
 		for($i=0; $i<$num_collection_price; $i++) {
 			$tmp_price = preg_replace('/'.'(&#[A-z0-9]+?;)'.'/', '', $rslt_collection_price[$i]['price']);
 			$tmp_price = preg_replace('/'.'[^0-9]'.'/', '', $tmp_price);
 			$stats['worth']['value'] = $stats['worth']['value'] + (is_numeric($tmp_price) ? $tmp_price : 0);
 		}
-		
+
 		// Stat: Ratings
 		$sql_ratings = 'SELECT COUNT(1) FROM releases_ratings WHERE user_id=?';
 		$stmt_ratings = $pdo->prepare($sql_ratings);
 		$stmt_ratings->execute([ $user['id'] ]);
 		$stats['ratings']['value'] = $stmt_ratings->fetchColumn();
-		
+
 		// Stat: Tags
 		$sql_tags = '
 		SELECT COUNT(1) AS num_tags FROM
@@ -236,7 +236,7 @@
 		$stmt_tags = $pdo->prepare($sql_tags);
 		$stmt_tags->execute([ $user['id'], $user['id'] ]);
 		$stats['tagged']['value'] = $stmt_tags->fetchColumn();
-		
+
 		// Stats: determine level
 		$levels = [
 			'default' => [
@@ -312,20 +312,20 @@
 				0
 			],
 		];
-		
+
 		// Stats: Remove
 		if($stats['collection']['value'] == 0) {
 			unset($stats['oldest'], $stats['newest'], $stats['worth']);
 		}
-		
+
 		// Stats: Overall level
 		foreach($stats as $key => $stat) {
 			$tmp_key = $levels[$key] ? $key : 'default';
-			
+
 			foreach($levels[$tmp_key] as $level => $min) {
 				if(is_numeric($stat['value']) && $stat['value'] >= $min) {
 					$stats[$key]['level'] = $level + 1;
-					
+
 					if($level + 1 === 10) {
 						$level_num++;
 					}
@@ -335,11 +335,11 @@
 		if($level_num < 1) {
 			$level_num = ($stats['comments']['value'] || $stats['collection']['value']) ? 1 : 0;
 		}
-		
+
 		// Stats: format
 		foreach($stats as $key => $stat) {
 			$stats[$key]['value'] = $key != 'fan_since' && $key != 'oldest' ? number_format($stat['value']) : $stat['value'];
-			
+
 			if($key === 'member_for') {
 				$stats[$key]['value'] .= ' years';
 			}
@@ -352,10 +352,10 @@
 			elseif($key === 'newest') {
 				$stats[$key]['value'] = $stat['value'] + $current_year;
 			}
-			
+
 			$stats[$key]['title'] = $stats[$key]['title'] ?: str_replace('_', ' ', $key);
 		}
-		
+
 		// User links
 		$sql_next = "
 			(SELECT username, 'older' AS type FROM users WHERE id < ? ORDER BY id DESC LIMIT 1)
@@ -373,11 +373,11 @@
 		$stmt_next = $pdo->prepare($sql_next);
 		$stmt_next->execute([ $user['id'], $user['username'], $user['id'], $user['username'] ]);
 		$next_user = $stmt_next->fetchAll();
-		
+
 		for($i=0; $i<count($next_user); $i++) {
 			$next_users[$next_user[$i]['type']] = $next_user[$i]['username'];
 		}
-		
+
 		subnav([
 			[
 				'text' => $next_users['older'],
@@ -390,7 +390,7 @@
 				'position' => 'right',
 			],
 		], 'directional');
-		
+
 		if(strlen($next_users['rand1'])) {
 			subnav([
 				[
@@ -400,54 +400,24 @@
 				],
 			], 'directional');
 		}
-		
+
 		?>
-			<!-- Prev Next -->
-			<!--<div class="col c3 any--margin any--weaken-color">
-				<div>
-					<h5>
-						&larr; A
-					</h5>
-					<?php echo $next_users['prev'] ? '<a class="user" href="/user/'.$next_users['prev'].'/">'.$next_users['prev'].'</a>' : 'N/A'; ?>
-					
-					<h5>
-						Older
-					</h5>
-					<?php echo $next_users['older'] ? '<a class="a--inherit user" href="/user/'.$next_users['older'].'/">'.$next_users['older'].'</a>' : 'N/A'; ?>
-				</div>
-				<div style="text-align: center;">
-					<h5>
-						Random
-					</h5>
-					<?php echo $next_users['rand1'] ? '<a class="user" href="/user/'.$next_users['rand1'].'/">'.$next_users['rand1'].'</a>' : 'N/A'; ?>
-				</div>
-				<div style="text-align: right;">
-					<h5>
-						Z &rarr;
-					</h5>
-					<?php echo $next_users['next'] ? '<a class="user" href="/user/'.$next_users['next'].'/">'.$next_users['next'].'</a>' : 'N/A'; ?>
-					
-					<h5>
-						Newer
-					</h5>
-					<?php echo $next_users['newer'] ? '<a class="user a--inherit" href="/user/'.$next_users['newer'].'/">'.$next_users['newer'].'</a>' : 'N/A'; ?>
-				</div>
-			</div>-->
-			
+
+
 			<!-- User header -->
 			<div class="col c1">
 				<div>
 					<div class="text user__card any--flex" style="min-height: 100px; box-sizing: content-box;">
-						
+
 						<svg class="user__avatar <?php echo $avatar_class; ?>" version="1.1" id="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="0px" height="0px" viewBox="0 0 600 600" enable-background="new 0 0 600 600" xml:space="preserve">
 							<?php echo $user["avatar"]; ?>
 						</svg>
-						
+
 						<div>
 							<h1 class="user__username">
 								<a class="a--inherit user" href="/user/<?php echo $user["username"]; ?>/"><?php echo $user["username"]; ?></a>
 							</h1>
-							
+
 							<?php
 								if($user["is_admin"] > 1) {
 									?>
@@ -465,7 +435,7 @@
 									<?php
 								}
 							?>
-							
+
 							<?php
 								if($user['motto'] || $user['birthday'] || $user['gender'] || $user['website'] || $user['twitter'] || $user['tumblr'] || $user['facebook'] || $user['lastfm']) {
 									?>
@@ -514,7 +484,7 @@
 											?>
 										</ul>
 									<?php
-									
+
 									if($user['motto']) {
 										?>
 											<div class="user__motto"><?php echo $user['motto']; ?></div>
@@ -528,7 +498,7 @@
 						</div>
 					</div>
 				</div>
-				
+
 				<!-- Stats -->
 				<div class="any--margin stats__wrapper">
 					<h2 class="stats__title">
@@ -539,11 +509,11 @@
 							<?php echo sanitize('ランク'); ?> <sup class="any--weaken">&beta;</sup>
 						</div>
 					</h2>
-					
+
 					<div class="stat__level h5 level__container" data-level="<?php echo $level_num; ?>">
 						<span class="level__deco"></span>
 					</div>
-					
+
 					<div class="stat__container">
 						<ul class="data__container">
 							<?php
@@ -555,11 +525,11 @@
 												<div class="h5 level__container" data-level="<?php echo $stat['level']; ?>" data-emoji="<?php echo $stat['emoji']; ?>">
 													<span class="level__deco"></span>
 												</div>
-												
+
 												<h5>
 													<?php echo $stat['title']; ?>
 												</h5>
-												
+
 												<?php echo $stat['value']; ?>
 											</li>
 										<?php
@@ -570,10 +540,10 @@
 					</div>
 				</div>
 			</div>
-			
+
 			<!-- Badges -->
 			<?php if($_SESSION['username'] === 'inartistic') { include('page-badges.php'); } ?>
-			
+
 			<!-- Edit -->
 			<?php
 				if($_SESSION["username"] === $user["username"]) {
@@ -585,15 +555,15 @@
 									Edit your account
 								</h1>
 							</div>
-							
+
 							<?php include("page-edit.php"); ?>
-							
+
 							<label class="input__button obscure__button" for="obscure-edit">Show options</label>
 						</div>
 					<?php
 				}
 			?>
-			
+
 			<!-- Collection -->
 			<div class="col <?php echo $num_wants ? 'c3-AAB' : 'c1'; ?>">
 				<div>
@@ -606,17 +576,17 @@
 								<?php echo sanitize('コレクション'); ?>
 							</div>
 						</h2>
-						
+
 						<div class="collection__controls">
 							<label class="collection__control input__checkbox-label input__checkbox-label--selected" data-filter="" for="filter-all">all</label>
 							<label class="collection__control input__checkbox-label" data-filter="" for="filter-for-sale">for sale</label>
 						</div>
 					</div>
-					
+
 					<div class="collection__wrapper text" id="collection-wrapper">
 						<input class="any--hidden" id="filter-all" name="filter-for-sale" type="radio" value="0" />
 						<input class="any--hidden" id="filter-for-sale" name="filter-for-sale" type="radio" value="1" />
-						
+
 						<ul class="any--weaken-color collection__container" id="collection-container">
 							<?php
 								if(is_array($collection) && !empty($collection)) {
@@ -624,11 +594,11 @@
 										$curr_artist = $collection[$i]['artist_id'];
 										$curr_letter = substr($artists[$collection[$i]['artist_id']]['friendly'], 0, 1);
 										$curr_letter = is_numeric($curr_letter) ? '#' : $curr_letter;
-										
+
 										$item_class = $collection[$i]['is_for_sale'] ? 'collection--for-sale' : null;
-										
+
 										if($curr_letter != $prev_letter) {
-											//ob_start();
+											
 											?>
 												<li class="collection__header">
 													<h4>
@@ -636,20 +606,19 @@
 													</h4>
 												</li>
 											<?php
-											//$collection_lines[] = ob_get_clean();
+											
 										}
-										
+
 										if($curr_artist != $prev_artist) {
-											//ob_start();
+											
 											?>
 												<li class="collection__artist">
 													<a class="artist" href="<?php echo '/artists/'.$artists[$collection[$i]['artist_id']]['friendly'].'/'; ?>"><?php echo $artists[$collection[$i]['artist_id']]['quick_name']; ?></a>
 												</li>
 											<?php
-											//$collection_lines[] = ob_get_clean();
+											
 										}
 										
-										//ob_start();
 										?>
 											<li class="collection__item <?php echo $item_class; ?>">
 												<?php
@@ -659,9 +628,9 @@
 														<?php
 													}
 												?>
-												
+
 												<a class="a--inherit" href="<?php echo '/releases/'.$artists[$collection[$i]['artist_id']]['friendly'].'/'.$collection[$i]['id'].'/'.$collection[$i]['friendly'].'/'; ?>"><?php echo $collection[$i]['quick_name']; ?></a>
-												
+
 												<?php
 													if($_SESSION["username"] != $user["username"] && $collection[$i]["is_for_sale"]) {
 														?>
@@ -671,17 +640,11 @@
 												?>
 											</li>
 										<?php
-										//$collection_lines[] = ob_get_clean();
 										
 										$prev_artist = $curr_artist;
 										$prev_letter = $curr_letter;
 									}
 									
-									/*?>
-										<script>
-											var clusterData = [<?php echo json_encode($collection_lines); ?>];
-										</script>
-									<?php*/
 								}
 								else {
 									?>
@@ -690,20 +653,6 @@
 								}
 							?>
 						</ul>
-						
-						<style>
-							.collection__header {
-								border-top-color: var(--text--faint);
-							}
-							.collection__item {
-								clear: both;
-								padding: 0.5rem 0 0.5rem 1rem;
-							}
-							.collection__sell {
-								float: right;
-								margin: 0 0.5rem 0 auto;
-							}
-						</style>
 					</div>
 				</div>
 				<div class="collection__wants <?php echo !$num_wants ? 'any--hidden' : null; ?>">
@@ -731,7 +680,7 @@
 					</div>
 				</div>
 			</div>
-			
+
 			<!-- Prev Next -->
 			<div class="col c3 any--margin any--weaken-color">
 				<div>
@@ -739,7 +688,7 @@
 						&larr; A
 					</h5>
 					<?php echo $next_users['prev'] ? '<a class="user" href="/user/'.$next_users['prev'].'/">'.$next_users['prev'].'</a>' : 'N/A'; ?>
-					
+
 					<h5>
 						Older
 					</h5>
@@ -756,7 +705,7 @@
 						Z &rarr;
 					</h5>
 					<?php echo $next_users['next'] ? '<a class="user" href="/user/'.$next_users['next'].'/">'.$next_users['next'].'</a>' : 'N/A'; ?>
-					
+
 					<h5>
 						Newer
 					</h5>

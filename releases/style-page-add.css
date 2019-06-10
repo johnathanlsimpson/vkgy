@@ -35,7 +35,7 @@
 .track--show-song + .track--show-controls::before,
 .track--show-controls + .track--show-section::before {
 	background-clip: content-box;
-	background-image: radial-gradient(circle at center center, var(--background--bold) 1px, transparent 0);
+	background-image: radial-gradient(circle at center center, hsl(var(--background--bold)) 1px, transparent 0);
 	background-position: left center;
 	background-repeat: repeat-x;
 	background-size: 3px 3px;
@@ -43,7 +43,7 @@
 }
 .track--show-controls + .track--show-disc::before {
 	background-clip: border-box;
-	background-image: radial-gradient(circle at center center, var(--text) 1px, transparent 0);
+	background-image: radial-gradient(circle at center center, hsl(var(--text)) 1px, transparent 0);
 	background-position: left center;
 	background-repeat: repeat-x;
 	background-size: 3px 3px;
@@ -62,7 +62,7 @@
 }
 .track__num::before {
 	box-sizing: border-box;
-	color: var(--text--faint);
+	color: hsl(var(--text--faint));
 	content: attr(data-count) ".";
 	display: inline-block;
 	height: 2rem;

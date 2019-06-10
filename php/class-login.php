@@ -120,13 +120,29 @@
 						list($user_id, $remote_addr, $token, $mac) = explode(":", $_COOKIE["remember_me"]);
 						
 						if(is_numeric($user_id)) {
-							$sql_user = "SELECT id AS userID, username, rank AS admin, icon FROM users WHERE id=? LIMIT 1";
+							$sql_user = "SELECT id, username, rank, is_vip, site_theme, site_lang FROM users WHERE id=? LIMIT 1";
 							$stmt_user = $this->pdo->prepare($sql_user);
 							$stmt_user->execute([$user_id]);
-							$user = $stmt_user->fetch();
+							$row = $stmt_user->fetch();
 							
-							if(is_array($user) && !empty($user)) {
-								$this->set_login_data($user);
+							if(is_array($row) && !empty($row)) {
+								
+								$session_data = [
+									'userID' => $row['id'],
+									'site-theme' => $row['site_theme'],
+									'admin' => $row['rank'],
+									'loggedIn' => 1,
+									
+									'user_id' => $row['id'],
+									'username' => $row['username'],
+									'site_theme' => $row['site_theme'],
+									'site_lang' => $row['site_lang'],
+									'is_admin' => $row['rank'],
+									'is_vip' => $row['is_vip'],
+									'is_signed_in' => 1,
+								];
+
+								$this->set_login_data($session_data);
 							}
 						}
 						

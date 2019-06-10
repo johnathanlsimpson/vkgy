@@ -24,9 +24,11 @@
 		"/scripts/external/script-sortable.js",
 		"/scripts/external/script-inputmask.js",
 		"/scripts/external/script-easyautocomplete.js",
+		'/scripts/external/script-tribute.js',
 
 		"/scripts/script-initDelete.js",
 		"/scripts/script-initSelectize.js",
+		'/scripts/script-initTribute.js',
 		"/scripts/script-showElem.js",
 		"/scripts/script-initEasyAutocomplete.js",
 
@@ -38,6 +40,8 @@
 	style([
 		"/style/external/style-selectize.css",
 		"/style/external/style-easyautocomplete.css",
+		'/style/external/style-tribute.css',
+		
 		"/style/style-selectize.css",
 		"/style/style-easyautocomplete.css",
 		"/releases/style-page-add.css"
@@ -658,7 +662,7 @@
 					<span class="input__label">
 						Notes
 					</span>
-					<textarea class="input input__textarea autosize" name="notes" placeholder="notes"><?php echo implode("\n---\n", (is_array($release["notes"]) ? $release["notes"] : [])); ?></textarea>
+					<textarea class="input input__textarea any--tributable autosize" name="notes" placeholder="notes"><?php echo implode("\n---\n", (is_array($release["notes"]) ? $release["notes"] : [])); ?></textarea>
 				</div>
 			</div>
 
@@ -667,7 +671,7 @@
 					<span class="input__label">
 						Booklet credits
 					</span>
-					<textarea class="input input__textarea autosize" name="credits" placeholder="booklet credits"><?php
+					<textarea class="input input__textarea any--tributable autosize" name="credits" placeholder="booklet credits"><?php
 						if(is_array($release["credits"]) && !empty($release["credits"])) {
 							foreach($release["credits"] as $key => $credit) {
 								echo $credit["title"].($credit["title"] && $credit["credit"] ? " - " : null).$credit["credit"];

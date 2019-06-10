@@ -68,7 +68,7 @@
 						}
 						
 						// Search for IDs within the string chunk, then cycle through each ID and find artists that are also on that label
-						preg_match_all('/'.'\((\d+)\)'.'/', $label_text, $possible_labels, PREG_PATTERN_ORDER);
+						preg_match_all('/'.'\{(\d+)\}'.'/', $label_text, $possible_labels, PREG_PATTERN_ORDER);
 						
 						if(is_array($possible_labels[1]) && !empty($possible_labels[1])) {
 							$possible_labels = array_unique($possible_labels[1]);
@@ -130,8 +130,8 @@
 								if(is_array($companies)) {
 									foreach($companies as $company_key => $company) {
 										
-										$label_pattern = "((?:^|\s)\((\d+)\)(?:\[([^\(]+?)(?: \((.+?)\))?\])?)(?:.*)?";
-										$label_not_in_db_pattern = "(?:^)((?:(?! \().)+)(?: \((?!as )([^\(\)]*(?=&)[^\(\)]+(?=;)[^\(\)]+)\))?";
+										$label_pattern = "((?:^|\s)\{(\d+)\}(?:\[([^\(]+?)(?: \((.+?)\))?\])?)(?:.*)?";
+										$label_not_in_db_pattern = "(?:^)((?:(?! \{).)+)(?: \((?!as )([^\(\)]*(?=&)[^\(\)]+(?=;)[^\(\)]+)\))?";
 										$note_pattern = " \((.+?)(?=(?:(?<!\?)\) \(|\)$))\)";
 										
 										if(preg_match_all("/".$label_pattern."/", $company, $matches, PREG_SET_ORDER)) {

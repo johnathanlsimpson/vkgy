@@ -1,28 +1,28 @@
 <?php
 	if(is_array($artist) && !empty($artist)) {
 		include('../artists/head.php');
-		
+
 		style([
 			"../artists/style-page-artist.css"
 		]);
-		
+
 		script([
 			'/scripts/script-pronounce.js',
 			'/artists/script-page-artist.js',
 		]);
-		
-		
+
+
 		$artist['images'] = is_array($artist['images']) ? $artist['images'] : [];
-		
+
 		if(!empty($artist['images']) && is_numeric($artist['image_id'])) {
-			
+
 			$artist['image'] = $artist['images'][$artist['image_id']];
-			
+
 			unset($artist['images'][$artist['image_id']]);
-			
+
 			$artist['images'] = array_values($artist['images']);
 		}
-		
+
 		foreach($rslt_next as $rslt) {
 			subnav([
 				[
@@ -31,7 +31,7 @@
 					'position' => ($rslt['type'] === 'rand' ? 'center' : ($rslt['type'] === 'previous' ? 'left' : 'right')),
 				],
 			], 'directional');
-			
+
 			if(count($rslt_next) === 2) {
 				if($rslt['type'] != 'rand') {
 					subnav([
@@ -43,7 +43,7 @@
 				}
 			}
 		}
-		
+
 		?>
 			<div class="col c4-ABBB">
 				<div class="artist__nav">
@@ -58,7 +58,7 @@
 						?>
 					</ul>
 				</div>
-				
+
 				<div class="artist__content" style="flex-grow: 1;">
 					<?php
 						// Hide article if removed, unless VIP user
@@ -74,7 +74,7 @@
 									</div>
 								<?php
 							}
-							
+
 							?>
 								<div class="col c4-AAAB artist__top">
 									<div class="artist__left">
@@ -169,20 +169,20 @@
 																										if(strlen($artist["history"][$i][$n][$m + $x]["content"]['press_name']) || strlen($artist["history"][$i][$n][$m + $x]["content"]['type_name'])) {
 
 																											// ...then remove the base name from that nth release, showing only "type", and transform to a link
-																											$artist["history"][$i][$n][$m + $x]["content"] = 
+																											$artist["history"][$i][$n][$m + $x]["content"] =
 																												'<a class="" href="'.$artist["history"][$i][$n][$m + $x]["content"]["url"].'">'.
 																												substr($artist["history"][$i][$n][$m + $x]["content"]["quick_name"], strlen($release_name)).
 																												'</a>';
 
 																											// ...and combine the nth release with the first one, removing the nth release from the flow of the biography
-																											$history_event["content"] .= 
+																											$history_event["content"] .=
 																												' <span class="any--weaken">/</span> '.
 																												$artist["history"][$i][$n][$m + $x]["content"];
 																										}
 																										else {
 
 																											// ...then remove the base name from that nth release, showing only "type", and transform to a link
-																											$artist["history"][$i][$n][$m + $x]["content"] = 
+																											$artist["history"][$i][$n][$m + $x]["content"] =
 
 
 																											$history_event["content"] =
@@ -312,7 +312,7 @@
 
 											// Label history
 											if(is_array($artist["labels"]) && !empty($artist["labels"])) {
-												?>	
+												?>
 													<h3>
 														<?php echo lang('Label history', '所属レーベル', ['container' => 'div', 'secondary_class' => 'any--weaken']); ?>
 													</h3>
@@ -493,48 +493,6 @@
 					?>
 				</div>
 			</div>
-			
-			<style>.obscure__input:checked + .obscure__container.a { max-height: 8rem; overflow:hidden; }</style>
-			<style>
-				:target {
-					content: "";
-					display: block;
-					margin-top: -4rem;
-					padding-top: 4rem;
-					position: relative;
-				}
-				/*h2:target::after {
-					background: var(--attention--faint);
-					background-clip: content-box;
-					bottom: 1rem;
-					content: "";
-					display: inline-block;
-					left: 0;
-					padding-top: 4rem;
-					position: absolute;
-					top: 0;
-					width: 3px;
-				}*/
-				tbody:not(:last-of-type) tr:last-of-type td {
-					padding-bottom: 1.5rem;
-				}
-				td h3 {
-					padding-bottom: 0;
-				}
-				.h--nav {
-					align-items: center;
-					display: flex;
-					flex-wrap: wrap;
-					/*justify-content: space-between;*/
-					padding-right: 0;
-				}
-				.h--nav::before {
-					align-self: bottom;
-				}
-				.h--nav :last-child {
-					margin-left: auto;
-				}
-			</style>
 		<?php
 	}
 ?>

@@ -1,5 +1,6 @@
 <?php
 	script([
+		"/scripts/script-signIn.js",
 		"/account/script-page-sign-in-register.js"
 	]);
 	

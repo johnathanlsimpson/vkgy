@@ -12,6 +12,7 @@
 		// ======================================================
 		private $live_pattern = "(?:(?:https?\:)?\/\/(?:[A-z]+\.)?)?weloveucp\.com\/lives\/(\d+)\/?";
 		private $artist_pattern = "(?<=[^\w\/]|^)(?:\((\d+)\))?\/(?! )([^\/\n]+)(?! )\/(?:\[([^\[\]\/\n]+)\])?(?=\W|$)";
+		private $label_pattern = "(?<=[^\w\/\=]|^)(?:\{(\d+)\})?\=(?! )([^\=\/\n]+)(?! )\=(?:\[([^\[\]\/\=\n]+)\])?(?=\W|$)";
 		private $release_pattern = "(?:(?:https?\:)?\/\/(?:[A-z]+\.)?)?(?:weloveucp\.com|vk\.gy)\/releases\/[\w-]+\/(\d+)\/?[\w-]*\/?";
 		private $youtube_pattern = "(?:<iframe[^>]+)?(?<=\s|\"|^)(?:https?:\/\/)?(?:[A-z]+\.)?youtu\.?be.*?[\/|=]([\w-]{11})(?=\s|$|\")(?:\".+<\/iframe>)?";
 		private $twitter_pattern = "(?<!\()(?:<blockquote class=\"twitter.+)?(?:(?:https?:\/\/(?:\w+\.)?)?twitter\.com\/(\w+)\/status\/(\d{10,20}))(?:[^\s]+)?(?:.+twitter\.com.+\/script>)?(?!\))";
@@ -100,6 +101,7 @@
 			if(is_array($input_content_lines)) {
 				foreach($input_content_lines as $line_key => $line) {
 					$line = $this->validate_artist_markdown($line);
+					$line = $this->validate_label_markdown($line);
 					$line = $this->validate_social_markdown($line);
 					
 					$input_content_lines[$line_key] = $line;
@@ -144,6 +146,37 @@
 		}
 		
 		// ======================================================
+		// Validate label ref markdown before insertion in DB
+		// ======================================================
+		function validate_label_markdown($input_content) {
+			$access_label = new access_label($this->pdo);
+			
+			$output_content = preg_replace_callback("/".$this->label_pattern."/", function($match) use($access_label) {
+				$full_match   = $match[0];
+				$id           = $match[1];
+				$name         = $match[2];
+				$display_name = $match[3];
+				
+				
+				
+				if(!is_numeric($id)) {
+					$id = $access_label->access_label(["name" => $name, "get" => "id"])[0]["id"];
+				}
+				
+				if(!is_numeric($id)) {
+					$output_label_markdown = "=".$name."=";
+				}
+				else {
+					$output_artist_markdown = '{'.$id.'}='.$name.'='.($display_name ? '['.$display_name.']' : null);
+				}
+				
+				return $output_artist_markdown;
+			}, $input_content);
+			
+			return $output_content;
+		}
+		
+		// ======================================================
 		// Validate social media markdown
 		// ======================================================
 		function validate_social_markdown($input_content) {
@@ -169,6 +202,7 @@
 		function get_reference_data($input_content) {
 			$access_live = new access_live($this->pdo);
 			$access_artist = new access_artist($this->pdo);
+			$access_label = new access_label($this->pdo);
 			$access_release = new access_release($this->pdo);
 			$access_user = new access_user($this->pdo);
 			
@@ -235,6 +269,67 @@
 			}
 			unset($matches);
 			
+			// Label markdown >> data object
+			// -----------------------------------------------------
+			preg_match_all("/".$this->label_pattern."/", $input_content, $matches, PREG_OFFSET_CAPTURE);
+			if(is_array($matches)) {
+				$full_matches  = $matches[0];
+				$ids           = $matches[1];
+				$names         = $matches[2];
+				$display_names = $matches[3];
+				
+				if(is_array($full_matches)) {
+					foreach($full_matches as $key => $match) {
+						$full_match   = $match[0];
+						$offset       = $match[1];
+						$length       = strlen($match[0]);
+						$id           = $ids[$key][0];
+						$name         = $names[$key][0];
+						$display_name = $display_names[$key][0];
+						$display_name = str_replace(["&#92;&#91;", "&#92;&#93;"], ["&#91;", "&#93;"], $display_name);
+						
+						if(is_numeric($id)) {
+							$label = $access_label->access_label(["id" => $id, "get" => "name"]);
+						}
+						else {
+							$label = $access_label->access_label(["name" => $name, "get" => "name"]);
+						}
+						
+						if(is_array($label)) {
+							if(preg_match("/"."(.+?) \((.+?)\)"."/", $display_name, $match)) {
+								$name = $match[2] ?: $match[1];
+								$romaji = $match[2] ? $match[1] : null;
+							}
+							elseif($display_name) {
+								$name = $display_name;
+								$romaji = null;
+							}
+							else {
+								$name = $label["name"];
+								$romaji = $label["romaji"];
+							}
+							
+							$output["name"] = $name;
+							$output["romaji"] = $romaji;
+							$output["quick_name"] = $romaji ?: $name;
+							$output["friendly"] = $label["friendly"];
+							$output["id"] = $id;
+						}
+						else {
+							$output["name"] = $name;
+							$output["not_found"] = true;
+						}
+						
+						$output["offset"] = $offset;
+						$output["length"] = $length;
+						$output["type"] = "label";
+						
+						$references[] = $output;
+					}
+				}
+			}
+			unset($matches);
+			
 			// Release markdown >> data object
 			// -----------------------------------------------------
 			preg_match_all("/".$this->release_pattern."/", $input_content, $matches, PREG_OFFSET_CAPTURE);
@@ -249,17 +344,10 @@
 						$length     = strlen($match[0]);
 						$id         = $ids[$key][0];
 						
-						//$release = $access_release->access_release(["release_id" => $id, "get" => "basics", "tracklist" => "flat"]);
 						$release = $access_release->access_release(["release_id" => $id, "get" => "basics"]);
 						
 						if(is_array($release)) {
 							$output = $release;
-							
-							/*if(is_array($release["tracklist"])) {
-								foreach($release["tracklist"] as $key => $track) {
-									$release["tracklist"][$key] = $track["romaji"] ?: $track["name"];
-								}
-							}*/
 							
 							$output["tracklist"] = is_array($release["tracklist"]) ? $release["tracklist"] : [];
 							$output["inline"] = substr($input_content, ($offset - 2), 2) === "](" ? true : false;
@@ -364,13 +452,10 @@
 		function parse_markdown($input_content, $ignore_references = false) {
 			$markdown_parser = new Parsedown();
 			
-			$input_content = $this->alter_image_urls($input_content);
 			$input_content = sanitize($input_content);
 			$input_content = str_replace(["&#47;", "&#92;/"], ["/", "&#47;"], $input_content);
 			
 			$reference_data = $this->get_reference_data($input_content);
-			
-			$input_content = $this->alter_image_urls($input_content);
 			
 			if(!$ignore_references) {
 				$input_content = $this->references_to_html($input_content, $reference_data);
@@ -391,11 +476,11 @@
 		// ======================================================
 		function alter_image_urls($input_content) {
 			
-			/*if(strstr($input_content, "![") !== false && strstr($input_content, ".gif") === false) {
+			if(strstr($input_content, "![") !== false && strstr($input_content, ".gif") === false) {
 				$image_markdown_pattern = "\!\[(.*)\]\((?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)\/(.*)\)";
 				$replacement_pattern = "![$1](//$2.rsz.io/$3?format=jpg&w=500&quality=80)";
 				$input_content = preg_replace("/".$image_markdown_pattern."/", $replacement_pattern, $input_content);
-			}*/
+			}
 			
 			return $input_content;
 		}
@@ -417,6 +502,16 @@
 						}
 						else {
 							$output = '<a class="artist" href="/artists/'.$reference_datum["friendly"].'/" data-name="'.$reference_datum["name"].'">'.$reference_datum["quick_name"].'</a>'.($reference_datum["romaji"] ? ' ('.$reference_datum["name"].')' : null);
+						}
+					}
+					
+					// Label
+					if($reference_datum["type"] === "label") {
+						if($reference_datum["not_found"]) {
+							$output = $reference_datum["name"];
+						}
+						else {
+							$output = '<a class="symbol__company" href="/labels/'.$reference_datum["friendly"].'/" data-name="'.$reference_datum["name"].'">'.$reference_datum["quick_name"].'</a>'.($reference_datum["romaji"] ? ' ('.$reference_datum["name"].')' : null);
 						}
 					}
 					

@@ -1,9 +1,13 @@
 <?php
 	$page_header = lang('Welcome to vk.gy', 'vk.gyへようこそ', [ 'container' => 'div' ]);
-	
+
 	subnav([
 		'Patreon' => 'https://patreon.com/vkgy/',
 	], 'interact');
+	
+	script([
+		'/scripts/script-signIn.js',
+	]);
 ?>
 
 <!--<div class="col c4-AAAB any--margin">
@@ -20,7 +24,7 @@
 			);
 		?>
 	</div>
-	
+
 	<div class="cta__container">
 		<a class="a--padded a--outlined cta__link a--patreon" href="https://patreon.com/vkgy/" target="_blank"><img src="/style/logo-patreon.png" style="height: 1rem;" /> <?php echo lang('Support vkgy', 'パトレオン', ['secondary_class' => 'any--hidden']); ?></a>
 	</div>
@@ -36,7 +40,7 @@
 				<?php $access_artist->artist_card($artist_of_day); ?>
 			</div>
 		</div>
-		
+
 		<div class="main__iod">
 			<h3>
 				<?php echo lang('Flyer of the day', '今日のフライヤー', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
@@ -55,7 +59,7 @@
 				</p>
 			</div>
 		</div>
-		
+
 		<div class="main__ranking">
 			<h3>
 				<?php echo lang('Weekly artist ranking', '週間ランキング', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
@@ -75,13 +79,13 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<div class="main__middle">
 		<div class="main__news">
 			<h2>
 				<?php echo lang('Visual kei news', 'ビジュアル系ニュース', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
 			</h2>
-			
+
 			<div class="text any--flex news__container">
 				<div class="news__main lazy any__obscure" data-src="<?php echo !empty($news[0]['image']) ? $news[0]['image']['url'] : null; ?>">
 					<h2>
@@ -96,7 +100,7 @@
 					</div>
 					<a class="any--weaken-color a--padded a--outlined" href="/blog/<?php echo $news[0]["friendly"]; ?>/"><?php echo $news[0]["comment_text"]; ?></a>
 				</div>
-				
+
 				<ul class="news__additional">
 					<?php
 						for($i=1; $i<=5; $i++) {
@@ -110,7 +114,7 @@
 						}
 					?>
 				</ul>
-				
+
 				<div class="any__obscure news__entry news__vip any--flex">
 					<?php
 						if($is_vip) {
@@ -134,7 +138,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<div class="support__container any--margin">
 			<?php
 				$ads = [
@@ -144,45 +148,15 @@
 					'<a class="support__link" href="http://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/" target="_blank"><img alt="Buy vk merch at CDJapan" class="support__image lazy" data-src="/main/ad-cdjapan-wide.jpg" /></a>',
 					'<a class="support__link" href="https://www.patreon.com/vkgy" target="_blank"><img alt="Support vkgy at Patreon" class="support__image lazy" data-src="/main/ad-patreon.png" /></a>',
 				];
-				
+
 				shuffle($ads);
-				
+
 				foreach($ads as $ad) {
 					echo $ad.' ';
 				}
 			?>
 		</div>
-		<style>
-			.support__container::after {
-				background: linear-gradient(to right, transparent 728px, var(--background--faint));
-				content: "";
-				display: block;
-				height: 100%;
-				left: 0;
-				pointer-events: none;
-				position: absolute;
-				top: 0;
-				width: 100%;
-				z-index: 2;
-			}
-			.support__link:first-of-type {
-			}
-			.support__link {
-				display: inline-block;
-			}
-			.support__image {
-				object-fit: contain;
-				height: 90px;
-				width: 728px;
-				max-width: 100%;
-				max-height: 100%;
-			}
-			.comment--unapproved .comment__notice {
-				color: var(--accent);
-				display: initial !important;
-			}
-		</style>
-		
+
 		<h3>
 			<?php echo lang('Recent discussions', '最近のコメント', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
 		</h3>
@@ -193,29 +167,29 @@
 					for($i=0; $i<count($comments); $i++) {
 						$comment_class = null;
 						$comments[$i]['user']['avatar_url'] = '/usericons/avatar-'.(file_exists('../usericons/avatar-'.$comments[$i]['user']['username'].'.png') ? $comments[$i]['user']['username'] : 'anonymous').'.png?'.date('YmdH');
-						
+
 						if(!$comments[$i]['is_approved']) {
 							$comment_class .= ($_SESSION['admin'] ? 'comment--unapproved' : 'any--hidden');
 						}
-						
+
 						?>
 							<li class="obscure__item <?php echo $comment_class; ?>">
 								<div class="any--flex">
 									<a class="comment__avatar-container <?php echo $comments[$i]["user"]["avatar_class"]; ?>" href="/users/<?php echo $comments[$i]['user']['username']; ?>/">
 										<img alt="<?php echo $comments[$i]['user']['username']; ?>'s avatar" class="comment__avatar" src="https://vk.gy/<?php echo $comments[$i]['user']['avatar_url']; ?>" />
 									</a>
-									
+
 									<div class="comment__comment">
 										<h5 class="any--flex">
 											<a class="user a--inherit comment__user" href="/users/<?php echo $comments[$i]["user"]["username"]; ?>/"><?php echo $comments[$i]["user"]["username"]; ?></a>
 											<?php echo substr($comments[$i]["date_occurred"], 5); ?>
 										</h5>
-										
+
 										<div class="any--flex">
 											&ldquo;<span class="comment__content"><?php echo $comments[$i]["content"]; ?></span>&rdquo;
 											<a class="comment__next symbol__next" href="<?php echo $comments[$i]['url'] ? $comments[$i]['url'].'#comments' : '/comments/#comment-'.$comments[$i]['id']; ?>">Read</a>
 										</div>
-										
+
 										<span class="any--hidden symbol__error comment__notice">This comment is awaiting approval.</span>
 									</div>
 								</div>
@@ -227,13 +201,13 @@
 			<label class="input__button obscure__button" for="obscure-comments">Show more</label>
 		</div>
 	</div>
-	
+
 	<div class="main__right">
 		<div class="main__updates">
 			<h3>
 				<?php echo lang('Database updates', '最近の更新', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
 			</h3>
-			
+
 			<input class="obscure__input" id="obscure-updates" type="checkbox" checked />
 			<div class="text text--outlined obscure__container obscure--faint obscure--height">
 				<ul>
@@ -244,9 +218,9 @@
 									<h5>
 										<?php echo substr($updates[$i]["date_edited"], 0, 10); ?>
 									</h5>
-									
+
 									<a class="symbol__<?php echo $updates[$i]["type"]; ?> <?php echo $updates[$i]["type"]; ?>" href="<?php echo $updates[$i]["url"]; ?>"><?php echo $updates[$i]["quick_name"]; ?></a>
-									
+
 									<?php
 										if($updates[$i]["type"] === "release" && $updates[$i]["artist_quick_name"]) {
 											?>
@@ -255,7 +229,7 @@
 												</div>
 											<?php
 										}
-										
+
 										if($updates[$i]["type"] === "news" && $updates[$i]["artist_quick_name"]) {
 											?>
 												<div class="any--weaken">
@@ -277,18 +251,18 @@
 
 <div class="col c4-ABBC section__join any--signed-out-only">
 	<div></div>
-	
+
 	<div>
 		<h1 class="register__title">
 			<?php echo lang('Join vkgy', '新規登録', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
 		</h1>
-		
+
 		<div class="any--flex col c2 register__wrapper">
 			<form action="/account/function-register.php" class="text register__container register__section" enctype="multipart/form-data" method="post" name="register__form" autocomplete="off">
 				<ul>
 					<input class="any--hidden" id="register__radio--bat" name="register_avatar" type="radio" value="bat" checked />
 					<input class="any--hidden" id="register__radio--gecko" name="register_avatar" type="radio" value="gecko" />
-					
+
 					<li>
 						<div class="input__row">
 							<div class="input__group">
@@ -296,12 +270,12 @@
 							</div>
 							<input class="any--flex-grow" name="register_username" pattern="[A-z0-9-]+" placeholder="username (ユーザー名)" title="A-z, 0-9, -" />
 						</div>
-						
+
 						<div class="any--weaken register__note">
 							Usernames may contain: <strong>A-z</strong>, <strong>0-9</strong>, <strong>-</strong>. <span class="any--jp">（半角英字、数字、ハイフンを使用できます。）</span>
 						</div>
 					</li>
-					
+
 					<li>
 						<div class="input__row">
 							<div class="input__group any--flex-grow">
@@ -314,7 +288,7 @@
 							</div>
 						</div>
 					</li>
-					
+
 					<li class="register__avatar-container">
 						<div class="input__row">
 							<div class="input__group" style="align-self: center;">
@@ -326,12 +300,12 @@
 								<div class="register__face"></div>
 							</div>
 						</div>
-						
+
 						<div class="any--weaken register__note">
 							The avatar can be further customized after joining. <span class="any--jp">（登録後、アバターをさらにカスタマイズすることができます。）</span>
 						</div>
 					</li>
-					
+
 					<li>
 						<div class="input__row">
 							<div class="input__group any--flex-grow" data-role="submit-container">
@@ -341,10 +315,10 @@
 						</div>
 					</li>
 				</ul>
-				
+
 				<div class="text text--outlined text--notice register__result" data-role="result"></div>
 			</form>
-			
+
 			<div class="register__section">
 				<h3>
 					Why join?
@@ -359,7 +333,7 @@
 					<li>Exclusives for VIP supporters</li>
 				</ul>
 				</div>
-				
+
 				<h3>
 					Already a member?
 				</h3>
@@ -375,13 +349,13 @@
 							<span class="register__status" data-role="status"></span>
 						</div>
 					</div>
-					
+
 					<div class="text text--outlined text--notice register__result" data-role="result"></div>
 				</form>
 			</div>
 		</div>
 	</div>
-	
+
 	<div></div>
 </div>
 
@@ -390,7 +364,7 @@
 		<h1>
 			<?php echo lang('Patreon supporters', 'パトレオン', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
 		</h1>
-		
+
 		<div class="text text--notice any--weaken-color">
 			<ul class="ul--inline support__list">
 				<?php
@@ -407,11 +381,11 @@
 			</ul>
 		</div>
 	</div>
-	
+
 	<div class="support__why any--flex">
 		<div class="text text--outlined support__text">
 			VIP supporters receive:
-			
+
 			<ul class="ul--bulleted ul--inline support__list" style="margin-left: 2rem;">
 				<li>VIP badge</li>
 				<li>Early access</li>
@@ -422,7 +396,7 @@
 				<li>Avatar items</li>
 				<li>and more</li>
 			</ul>
-			
+
 			<p>
 				<a class="a--padded a--outlined any--weaken-color" href="https://www.patreon.com/vkgy/" target="_blank" style="text-indent: 0;">Support vkgy at Patreon</a>
 			</p>

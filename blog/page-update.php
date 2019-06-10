@@ -3,11 +3,14 @@
 		script([
 			'/scripts/external/script-autosize.js',
 			'/scripts/external/script-inputmask.js',
+			'/scripts/external/script-tribute.js',
 			'/scripts/script-initDelete.js',
+			'/scripts/script-initTribute.js',
 			'/blog/script-page-update.js',
 		]);
 		
 		style([
+			'/style/external/style-tribute.css',
 			"/blog/style-page-update.css"
 		]);
 		
@@ -48,23 +51,6 @@
 								]
 							], 'directional');
 						}
-						/*?>
-							<div class="any--flex any--margin">
-								<?php
-									foreach($entry["prev_next"] as $prev_next) {
-										?>
-											<div class="any--flex-grow any--no-wrap <?php echo $prev_next["type"] === "next" ? "any--align-right" : null; ?>">
-												<a class="" href="/blog/<?php echo $prev_next["friendly"]; ?>/edit/">
-													<?php echo $prev_next["type"] === "prev" ? '<span class="symbol__previous"></span>' : null; ?>
-													<?php echo $prev_next["title"]; ?>
-													<?php echo $prev_next["type"] === "next" ? '<span class="symbol__next"></span>' : null; ?>
-												</a>
-											</div>
-										<?php
-									}
-								?>
-							</div>
-						<?php*/
 					}
 				?>
 			</div>
@@ -88,7 +74,7 @@
 						<div class="input__row">
 							<div class="input__group any--flex-grow">
 								<label class="input__label">Entry content</label>
-								<textarea class="input__textarea any--flex-grow autosize" name="content" placeholder="blog entry here..."><?php echo $entry["content"]; ?></textarea>
+								<textarea class="input__textarea any--flex-grow any--tributable utosize" name="content" placeholder="blog entry here..."><?php echo $entry["content"]; ?></textarea>
 							</div>
 						</div>
 					</div>

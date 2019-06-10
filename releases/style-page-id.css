@@ -155,7 +155,7 @@
 		flex-direction: column;
 	}
 	.release__data {
-		border-bottom: 1px dotted var(--text--faint);
+		border-bottom: 1px dotted hsl(var(--text--faint));
 		display: flex;
 		justify-content: space-between;
 		margin: 0;
@@ -188,7 +188,7 @@
 	padding-top: 1rem;
 }*/
 .data__item {
-	border-left: 1px dotted var(--background--bold);
+	border-left: 1px dotted hsl(var(--background--bold));
 	margin-right: 0.5rem;
 }
 

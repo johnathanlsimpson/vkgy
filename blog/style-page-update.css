@@ -16,7 +16,7 @@
 	display: none;
 }
 .update__image {
-	background-color: var(--background);
+	background-color: hsl(var(--background));
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: contain;

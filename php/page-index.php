@@ -21,7 +21,7 @@
 		
 		<title><?php echo $page_title; ?></title>
 		
-		<link rel="stylesheet" id="stylesheet_theme" href="/style/style-colors<?php echo is_numeric($_SESSION['site-theme']) && $_SESSION['site-theme'] > 0 ? '-'.$_SESSION['site-theme'] : null; ?>.css" />
+		<link rel="stylesheet" id="stylesheet_theme" href="<?php echo '/style/style-colors-'.(is_numeric($_SESSION['site-theme']) ? $_SESSION['site-theme'] : 0).'.css'; ?>" />
 		<link rel="stylesheet" href="/style/style-critical.css<?php echo '?'.date('Ymd'); ?>" />
 		<?php
 			if(is_array($GLOBALS["styles"])) {
@@ -97,7 +97,7 @@
 			<div class="primary-nav__container any--flex">
 				<div class="primary-nav__links any--flex">
 					<a href="/" class="primary-nav__home">
-						<svg x="0px" y="0px" width="0" height="0" viewBox="0 0 105 164" class="primary-nav__cage" fill="none" stroke="var(--accent)" stroke-width="5">
+						<svg x="0px" y="0px" width="0" height="0" viewBox="0 0 105 164" class="primary-nav__cage" fill="none" stroke="hsl(var(--accent))" stroke-width="5">
 							<path d="M52.5,161.5c-27.6,0-50-8.3-50-16v-88c0-24.4,17.6-44.7,40.8-49c1.5-3.5,5.1-6,9.2-6c4.1,0,7.6,2.5,9.2,6 c23.3,4.3,40.9,24.6,40.9,49v88C102.5,153.2,80.1,161.5,52.5,161.5z" /><path d="M42.5,107.7c0,4.6,0,8.8,0,12.2 M52.5,7.5c-5.5,0-10,13.9-10,41" /><path d="M22.5,101.5c0,16.1,0,56.1,0,56.1 M52.5,7.5c-16.6,0-30,20.9-30,48" /><path d="M62.5,107.9c0,16.3,0,30.5,0,37.7 M52.5,7.5c5.5,0,10,13.9,10,41" /><path d="M82.5,136.5L82.5,136.5 M82.5,100.6c0,8.9,0,17.9,0,26.2 M52.5,7.5c16.6,0,30,20.9,30,48" /><path d="M52.5,108.1c-22.4,0-41.6-12.3-50-30c8.4-17.7,27.6-30,50-30c22.4,0,41.6,12.3,50,30C94.1,95.7,74.8,108.1,52.5,108.1z" /><path d="M82.5,57.5 c0,16.7-13.3,30.3-30,30.3s-30-13.5-30-30.3" />
 						</svg>
 					</a>
@@ -136,28 +136,6 @@
 				<button class="primary-nav__search-button" form="form__search" name="submit" type="submit"><?php echo lang('search', 'サーチ', ['primary_container' => 'span', 'secondary_container' => 'span', 'secondary_class' => 'any--hidden']); ?></button>
 			</div>
 		</nav>
-		
-		<script>
-			let enButton = document.querySelector('[for="language-en"]');
-			let jaButton = document.querySelector('[for="language-ja"]');
-			
-			function setLang(event) {
-				let url = '/php/function-set_lang.php';
-				let lang = 'en';
-				let connection = new XMLHttpRequest();
-				
-				if(event.target.htmlFor === 'language-ja') {
-					lang = 'ja';
-				}
-				
-				connection.open('POST', url);
-				connection.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				connection.send("lang=" + lang);
-			}
-			
-			enButton.addEventListener('click', setLang);
-			jaButton.addEventListener('click', setLang);
-		</script>
 		
 		<form action="/search/" class="any--hidden" enctype="multipart/form-data" id="form__search" method="get" name="form__search"><button type="submit"></button></form>
 		
@@ -383,34 +361,5 @@
 		<?php
 			include_once("../style/symbols.php");
 		?>
-		<script>
-			// Observe when 'hero' home link is visible, and increase padding in main nav
-			var heroHomeButton = document.querySelector('.secondary-nav__home');
-			var stickyNavContainer = document.querySelector('.primary-nav__container');
-			
-			var navObserver = new IntersectionObserver(function(entries) {
-				if(entries[0]['isIntersecting']) {
-					stickyNavContainer.classList.add('primary-nav__container--hidden');
-				}
-				else {
-					stickyNavContainer.classList.remove('primary-nav__container--hidden');
-				}
-			});
-			
-			navObserver.observe(heroHomeButton);
-			
-			// Activate search when clicking link on mobile
-			var searchLink = document.querySelector('.primary-nav__container [href="/search/"]');
-			var searchElem = document.querySelector('.primary-nav__search');
-			
-			searchLink.addEventListener('click', function(event) {
-				event.preventDefault();
-				stickyNavContainer.classList.add('primary-nav--searching');
-				searchElem.focus();
-			});
-			searchElem.addEventListener('blur', function() {
-				stickyNavContainer.classList.remove('primary-nav--searching');
-			});
-		</script>
 	</body>
 </html>
