@@ -214,7 +214,7 @@
 			linear-gradient(to bottom right, hsla(var(--background), 1) 1px, hsla(var(--background), 0));
 		background-size: 100% 100%, 3px 3px;
 	}
-	.any__obscure--secondary::before {
+	.any__obscure--faint::before {
 		background-color: hsla(var(background--secondary), 0.75);
 	}
 
