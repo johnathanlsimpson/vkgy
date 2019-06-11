@@ -10,7 +10,7 @@ function tributeSetup(tributeType) {
 			return '' + '<span contenteditable="false">' + '<a class="any__tribute symbol__artist" href="/artists/' + item.original[1] + '/" data-text="' + item.original[2].split(' (')[0] + '">' + '(' + item.original[0] + ')/' + item.original[2].split(' (')[0] + '/' + '</a>' + '</span>';
 		}
 		selectTextTemplate = function(item) {
-			return '(' + item.original[0] + ')/' + item.original[2].split(' (')[0] + '/';
+			return '(' + item.original[0] + ')/' + item.original[1] + '/';
 		}
 		trigger = '/';
 	}
@@ -20,7 +20,7 @@ function tributeSetup(tributeType) {
 			return '' + '<span contenteditable="false">' + '<a class="any__tribute symbol__company" href="/labels/' + item.original[1] + '/" data-text="' + item.original[2].split(' (')[0] + '">' + '{' + item.original[0] + '}=' + item.original[2].split(' (')[0] + '=' + '</a>' + '</span>';
 		}
 		selectTextTemplate = function(item) {
-			return '{' + item.original[0] + '}=' + item.original[2].split(' (')[0] + '=';
+			return '{' + item.original[0] + '}=' + item.original[1] + '=';
 		}
 		trigger = '=';
 	}
