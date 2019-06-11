@@ -219,10 +219,19 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 				$stmt_edit_history = $pdo->prepare($sql_edit_history);
 				$stmt_edit_history->execute([ $id, $_SESSION['userID'], ($is_edit ? null : 'Created.') ]);
 				
-				// Queue for socials
-				if(!$is_edit && !$is_queued && strlen($title) && strlen($friendly)) {
-					$social_post = $access_social_media->build_post([ 'title' => $title, 'url' => 'https://vk.gy'.$output['url'], 'id' => $id, 'twitter_authors' => $twitter_authors ], 'blog_post');
-					$access_social_media->queue_post($social_post, 'both', date('Y-m-d H:i:s', strtotime('+15 minutes')));
+				// Get queued, extant social media post, if exists
+				$extant_social_post = $access_social_media->get_post( $id, 'blog_post' );
+				
+				// Delete old social media post (if applicable) and generate new one, if post is live
+				if(!$extant_social_post || (is_array($extant_social_post) && is_numeric($extant_social_post['id']) && !$extant_social_post['is_completed'] )) {
+					if($extant_social_post) {
+						$access_social_media->delete_post( $extant_social_post['id'] );
+					}
+					
+					if(!$is_queued && strlen($title) && strlen($friendly)) {
+						$social_post = $access_social_media->build_post([ 'title' => $title, 'url' => 'https://vk.gy'.$output['url'], 'id' => $id, 'twitter_authors' => $twitter_authors ], 'blog_post');
+						$access_social_media->queue_post($social_post, 'both', date('Y-m-d H:i:s', strtotime('+30 minutes')));
+					}
 				}
 			}
 			else {
