@@ -36,14 +36,24 @@
 				$item_exists = true;
 			}
 			
+			// If blog entry, check if entry is live (don't tweet about a queued post)
+			if($queued_post['item_type'] === 'blog_post') {
+				$sql_check_if_queued = 'SELECT is_queued FROM blog WHERE id=? LIMIT 1';
+				$stmt_check_if_queued = $pdo->prepare($sql_check_if_queued);
+				$stmt_check_if_queued->execute([ $queued_post['item_id'] ]);
+				$item_is_queued = $stmt_check_if_queued->fetchColumn();
+			}
+			
 			// Post queued post to social media, remove from queue
 			if($is_recent && $item_exists) {
-				$rslt_queued_post = $access_social_media->post_to_social($queued_post, $queued_post['social_type']);
-				
-				if($rslt_queued_post['status'] === 'success') {
-					$sql_remove_post = 'UPDATE queued_social SET is_completed=? WHERE id=? LIMIT 1';
-					$stmt_remove_post = $pdo->prepare($sql_remove_post);
-					$stmt_remove_post->execute([ 1, $queued_post['id'] ]);
+				if(!$item_is_queued) {
+					$rslt_queued_post = $access_social_media->post_to_social($queued_post, $queued_post['social_type']);
+					
+					if($rslt_queued_post['status'] === 'success') {
+						$sql_remove_post = 'UPDATE queued_social SET is_completed=? WHERE id=? LIMIT 1';
+						$stmt_remove_post = $pdo->prepare($sql_remove_post);
+						$stmt_remove_post->execute([ 1, $queued_post['id'] ]);
+					}
 				}
 			}
 			else {
