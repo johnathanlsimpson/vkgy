@@ -2,10 +2,13 @@
 	if($is_vip) {
 		script([
 			"/scripts/external/script-autosize.js",
+			'/scripts/external/script-tribute.js',
+			'/scripts/script-initTribute.js',
 			"/vip/script-page-update.js"
 		]);
 		
 		style([
+			'/style/external/style-tribute.css',
 			"/vip/style-page-update.css"
 		]);
 		
@@ -37,7 +40,7 @@
 							<div class="input__row">
 								<div class="input__group any--flex-grow">
 									<label class="input__label">Entry</label>
-									<textarea class="autosize input__textarea any--flex-grow" name="content" placeholder="your entry here"><?php echo $entry["content"]; ?></textarea>
+									<textarea class="autosize input__textarea any--flex-grow any--tributable" name="content" placeholder="your entry here"><?php echo $entry["content"]; ?></textarea>
 								</div>
 							</div>
 
