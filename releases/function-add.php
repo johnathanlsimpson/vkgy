@@ -229,7 +229,7 @@
 									if($auto_post_url) {
 										$output["status"] = "success";
 										$output["result"] =
-											'A blog entry has been auto-generated, and will be shared to social media in 15 minutes. Any user may edit the entry; edits will be reflected in the social media posts.'.
+											'The blog has been updated with this information. Feel free to edit the post.'.
 											'<br /><br/ >'.
 											'<a class="a--outlined a--padded symbol__edit" href="'.$auto_post_url.'edit/">Edit blog entry</a>'.
 											'<a class="a--padded symbol__news" href="'.$auto_post_url.'">View blog entry</a>';
