@@ -52,13 +52,13 @@
 				'app_secret' => $fb_app_secret,
 				'default_graph_version' => 'v2.10',
 				'default_access_token' => $fb_default_access_token
-			]);
+			]); 
 			
 			// Set up Twitter	
-			$consumerKey = "HrlhS8HKJ5IMz0dJmiof4OBkF";
-			$consumerSecret = "t4v9YblyXaD715wTaLH01SzNAeiBKeyd7Vmyej8QeN1hZe5joR";
-			$accessToken = "168959357-jeB5X1aQpWNpbHvSOjP14Aiccl8pvshjGEA2SpBw";
-			$accessTokenSecret = "tSrG5qRD6mrEhMVSNviyDXTkxHpDbRqjTB9be5CKzEVWs";
+			$consumerKey = $twitter_consumer_key;
+			$consumerSecret = $twitter_consumer_secret;
+			$accessToken = $twitter_access_token;
+			$accessTokenSecret = $twitter_access_token_secret;
 			$this->twitter = new Twitter($consumerKey, $consumerSecret, $accessToken, $accessTokenSecret);
 		}
 		
