@@ -8,8 +8,7 @@ uploads/*
 
 # Ignore sensitive data
 php/database-variables.php
-php/external/function-init_facebook.php
-php/*social_media.php
+php/class-access_social_media-key.php
 php/class-login-key.php
 google*
 test*
