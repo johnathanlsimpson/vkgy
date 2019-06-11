@@ -126,14 +126,16 @@
 			if(is_array($content) && !empty($content) && is_numeric($content["artist_id"])) {
 				
 				// Attempt to get corresponding auto post
-				$sql_post = "SELECT id FROM blog WHERE tags_artists LIKE CONCAT('%(', ?, ')%') AND tags LIKE CONCAT('%(', ?, ')%') AND date_occurred LIKE CONCAT(?, '%') LIMIT 1";
-				$stmt_post = $this->pdo->prepare($sql_post);
-				$stmt_post->execute([ $content["artist_id"], $this->blog_tags["auto-generated"], '2018-11-21' ]);
-				$post_id = $stmt_post->fetchColumn();
+				$sql_extant_post = 'SELECT blog.id, blog_tags.tag_id FROM blog LEFT JOIN blog_tags ON (blog_tags.blog_id=blog.id AND blog_tags.tag_id=?) LEFT JOIN blog_artists ON blog_artists.blog_id=blog.id WHERE blog.date_occurred LIKE CONCAT(?, "%") AND blog_artists.artist_id=? GROUP BY blog.id';
+				$stmt_extant_post = $this->pdo->prepare($sql_extant_post);
+				$stmt_extant_post->execute([ $this->blog_tags['auto-generated'], date('Y-m-d'), $content['artist_id'] ]);
+				$rslt_extant_post = $stmt_extant_post->fetch();
 				
 				// Either create post or edit post
-				if(is_numeric($post_id)) {
-					$post = $this->edit_post($post_id, $content_type, $content, $is_future);
+				if(is_numeric($rslt_extant_post['id'])) {
+					if($rslt_extant_post['tag_id'] == $this->blog_tags['auto-generated']) {
+						$post = $this->edit_post($rslt_extant_post['id'], $content_type, $content, $is_future);
+					}
 				}
 				else {
 					$post = $this->create_post($content_type, $content, $is_future);
@@ -145,11 +147,60 @@
 					// Create social media post and queue
 					$post['artist'] = $this->access_artist->access_artist([ 'get' => 'name', 'id' => $content['artist_id'] ]);
 					$social_post = $this->access_social_media->build_post($post, 'blog_post');
-					$social_result = $this->access_social_media->queue_post($social_post, 'both', date('Y-m-d H:i:s', strtotime('+ 15 minutes')));
+					$social_result = $this->access_social_media->queue_post($social_post, 'both', date('Y-m-d H:i:s', strtotime('+ 30 minutes')));
 					
 					return ($post["url"] ?: false);
 				}
 			}
+		}
+		
+		
+		
+		// ======================================================
+		// Parse medium/format and return concise format
+		// ======================================================
+		private function parse_format($medium, $format) {
+			// Parse medium and format to see which format to use in title
+			$agg_format = $medium.$format;
+			
+			if(strpos($agg_format, '(omnibus)') !== false) {
+				$format = 'omnibus';
+			}
+			elseif(strpos($agg_format, '(CT)') !== false) {
+				$format = 'demotape';
+			}
+			elseif(strpos($agg_format, '(demo)') !== false && (strpos($agg_format, '(CD)') !== false || strpos($agg_format, '(CD-R)') !== false)) {
+				$format = 'demo CD';
+			}
+			elseif(strpos($agg_format, '(collection)') !== false && strpos($agg_format, '(full album)') !== false) {
+				$format = 'collection album';
+			}
+			elseif(strpos($agg_format, '(live recording)') !== false && strpos($agg_format, '(DVD)') !== false && strpos($agg_format, '(CD)') === false) {
+				$format = 'live DVD';
+			}
+			elseif(strpos($agg_format, '(collection)') !== false && strpos($agg_format, '(PV)') !== false && strpos($agg_format, '(DVD)') !== false && strpos($agg_format, '(live recording)') === false && strpos($agg_format, '(CD)') === false) {
+				$format = 'PV collection';
+			}
+			elseif(strpos($agg_format, '(maxi-single)') !== false) {
+				$format = 'maxi-single';
+			}
+			elseif(strpos($agg_format, '(single)') !== false) {
+				$format = 'single';
+			}
+			elseif(strpos($agg_format, '(full album)') !== false) {
+				$format = 'full album';
+			}
+			elseif(strpos($agg_format, '(mini-album)') !== false) {
+				$format = 'mini-album';
+			}
+			elseif(substr_count($medium, ')') < 3) {
+				$format = str_replace([')(', '(', ')'], ['+', '', ''], $medium);
+			}
+			else {
+				$format = 'release';
+			}
+			
+			return $format;
 		}
 		
 		
@@ -172,20 +223,34 @@
 					if(is_array($artist) && !empty($artist)) {
 						
 						// Get artist photo
-						$sql_image = "SELECT id FROM images WHERE artist_id=? AND is_default=? AND is_release IS NULL ORDER BY id DESC LIMIT 1";
-						$stmt_image = $this->pdo->prepare($sql_image);
-						$stmt_image->execute([ '('.$artist_id.')', 1 ]);
-						$image_id = $stmt_image->fetchColumn();
-						$image_id = is_numeric($image_id) ? $image_id : null;
+						$sql_image_id = 'SELECT image_id FROM artists WHERE id=? LIMIT 1';
+						$stmt_image_id = $this->pdo->prepare($sql_image_id);
+						$stmt_image_id->execute([ $artist_id ]);
+						$rlst_image_id = $stmt_image_id->fetchColumn();
+						$image_id = is_numeric($rslt_image_id) ? $rslt_image_id : null;
 						
 						// Go through each potential post type, and write the post
 						if($content_type === "release") {
-							$title = $artist["quick_name"].' new '.(str_replace([')(', '(', ')'], [' ', '', ''], $content["format"]) ?: 'release').' &ldquo;'.($content["romaji"] ?: $content["name"]).'&rdquo;';
-							$post = [
-								'('.$artist["id"].')/'.$artist["friendly"].'/ '.($is_future ? 'will' : 'has').' put out a new '.(str_replace([')(', '(', ')'], [' ', '', ''], $content["format"]) ?: 'release').'.',
-								'*'.($content["romaji"] ?: $content["name"]).'* '.($content["romaji"] ? ' (*'.$content["name"].'*) ' : null).($is_future ? 'will be' : 'was').' released '.($content["type_name"] ? 'in multiple types' : null).' on '.date('F jS', strtotime($content["date_occurred"])).'.',
-								'https://vk.gy/releases/'.$artist["friendly"].'/'.$content["id"].'/'.$content["friendly"].'/'
-							];
+							$format = $this->parse_format($content['medium'], $content['format']);
+							
+							if($artist['friendly'] === 'omnibus') {
+								$title = 'New omnibus: &ldquo;'.($content["romaji"] ?: $content["name"]).'&rdquo;';
+								
+								$post = [
+									'A new omnibus '.($is_future ? 'will be' : 'has been').' released.',
+								];
+							}
+							else {
+								$title = $artist["quick_name"].' new '.$format.': &ldquo;'.($content["romaji"] ?: $content["name"]).'&rdquo;';
+								
+								$post = [
+									'('.$artist["id"].')/'.$artist["friendly"].'/ '.($is_future ? 'will' : 'has').' '.($format != 'release' ? 'release'.($is_future ? null : 'd') : 'put out').' a new '.$format.'.',
+								];
+							}
+							
+							$post[] = '*'.($content["romaji"] ?: $content["name"]).'* '.($content["romaji"] ? ' (*'.$content["name"].'*) ' : null).($is_future ? 'will be' : 'was').' released '.($content["type_name"] ? 'in multiple types' : null).' on '.date('F jS', strtotime($content["date_occurred"])).'.';
+							$post[] = 'https://vk.gy/releases/'.$artist["friendly"].'/'.$content["id"].'/'.$content["friendly"].'/';
+							
 							$tag = 'release';
 						}
 						elseif($content_type === "bio") {
@@ -227,16 +292,14 @@
 						// Prepare additional post info, format
 						if(strlen($title) && is_array($post) && !empty($post) && strlen($tag)) {
 							$friendly = friendly($title);
-							//$tags = '('.$this->blog_tags["auto-generated"].')'.'('.$this->blog_tags[$tag].')';
-							//$artist_tags = '('.$artist_id.')';
 							$post = sanitize(implode("\n\n", $post));
 							$user_id = is_numeric($_SESSION["userID"]) ? $_SESSION["userID"] : '0';
 							$edit_history = date('Y-m-d H:i:s').' ('.$user_id.')'."\n";
 							
 							// Create post
-							$sql_add = "INSERT INTO blog (title, friendly, content, image_id, tags, tags_artists, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+							$sql_add = "INSERT INTO blog (title, friendly, content, image_id, user_id) VALUES (?, ?, ?, ?, ?)";
 							$stmt_add = $this->pdo->prepare($sql_add);
-							if($stmt_add->execute([ $title, $friendly, $post, $image_id, $tags, $artist_tags, $user_id ])) {
+							if($stmt_add->execute([ $title, $friendly, $post, $image_id, $user_id ])) {
 								$blog_id = $this->pdo->lastInsertId();
 								
 								$sql_tags = 'INSERT INTO blog_tags (blog_id, tag_id, user_id) VALUES (?, ?, ?), (?, ?, ?)';
@@ -248,7 +311,7 @@
 								$stmt_artist_tags->execute([ $blog_id, $artist_id, $_SESSION['userID'] ]);
 								
 								// Return URL if successful
-								return ["title" => $title, "url" => 'https://vk.gy/blog/'.$friendly.'/', "id" => $blog_id];
+								return [ 'title' => $title, 'url' => 'https://vk.gy/blog/'.$friendly.'/', 'id' => $blog_id, 'entry_is_new' => true ];
 							}
 						}
 					}
@@ -332,7 +395,7 @@
 														
 														if(preg_match('/'.'^https\:\/\/vk\.gy\/releases\/[A-z0-9-]+'.'/', $line)) {
 															$post["content"][$line_key] =
-																'They '.($is_future ? 'will' : 'have').' also put out a a new '.(str_replace([')(', '(', ')'], [' ', '', ''], $content["format"]) ?: 'release').', '.
+																'They '.($is_future ? 'will' : 'have').' also put out a a new '.$this->parse_format($content['medium'], $content['format']).', '.
 																'*'.($content["romaji"] ?: $content["name"]).'*'.($content["romaji"] ? ' (*'.$content["name"].'*)' : null).', '.
 																($content["type_name"] ? 'in multiple types' : null).' on '.date('F jS', strtotime($content["date_occurred"])).'.'.
 																"\n\n".
@@ -405,14 +468,6 @@
 										$title = $title ?: $post["title"];
 										$new_content = sanitize(implode("\n\n", $new_content));
 										$user_id = $post["user_id"] === 0 && is_numeric($_SESSION["userID"]) ? $_SESSION["userID"] : $post["user_id"];
-										//$edit_history = date('Y-m-d H:i:s').' ('.$user_id.')'."\n";
-										
-										
-										/*$tags = '';
-										foreach($post["tags"] as $tag_friendly) {
-											$tags .= '('.$this->blog_tags[$tag_friendly].')';
-										}
-										$tags .= !in_array($tag, $post["tags"]) ? '('.$this->blog_tags[$tag].')' : null;*/
 										
 										// Edit post
 										$sql_edit = "UPDATE blog SET title=?, content=?, user_id=? WHERE id=? LIMIT 1";
@@ -425,16 +480,9 @@
 												$stmt_tag = $this->pdo->prepare($sql_tags);
 												$stmt_tag->execute([ $post['id'], $this->blog_tags[$tag], $_SESSION['userID'] ]);
 											}
-											/*foreach($post['tags'] as $tag_friendly_name) {
-												$values_tags[] = $post['id'];
-												$values_tags[] = $this->blog_tags[$tag_friendly_name];
-												$values_tags[] = $_SESSION['userID'];
-											}*/
-											
-											
 											
 											// Return URL if successful
-											return ["title" => $title, "url" => 'https://vk.gy/blog/'.$post["friendly"].'/', "id" => $post_id];
+											return [ 'title' => $title, 'url' => 'https://vk.gy/blog/'.$post['friendly'].'/', 'id' => $post_id, 'entry_is_new' => false ];
 										}
 									}
 								}

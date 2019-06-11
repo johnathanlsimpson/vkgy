@@ -52,7 +52,7 @@
 				'app_secret' => $fb_app_secret,
 				'default_graph_version' => 'v2.10',
 				'default_access_token' => $fb_default_access_token
-			]); 
+			]);
 			
 			// Set up Twitter	
 			$consumerKey = $twitter_consumer_key;
