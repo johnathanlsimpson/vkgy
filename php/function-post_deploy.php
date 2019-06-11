@@ -36,11 +36,18 @@
 					}
 				}
 				
-				$sql_log_commit = "INSERT INTO vip (title, friendly, content, user_id) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE content = CONCAT(REGEXP_REPLACE(content, '".$replace_regex."', ''), ?, ?)";
-				$stmt_log_commit = $pdo->prepare($sql_log_commit);
+				$sql_curr_post = 'SELECT * FROM vip WHERE friendly=? LIMIT 1';
+				$stmt_curr_post = $pdo->prepare($sql_curr_post);
+				$stmt_curr_post->execute([ $friendly ]);
+				$rslt_curr_post = $stmt_curr_post->fetch();
 				
-				if($stmt_log_commit->execute([ $title, $friendly, $header.$content, $user_id, "\n", $content ])) {
-					return true;
+				if(is_array($rslt_curr_post) && !empty($rslt_curr_post) && strpos($rslt_curr_post['content'], $content) === false) {
+					$sql_log_commit = "INSERT INTO vip (title, friendly, content, user_id) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE content = CONCAT(REGEXP_REPLACE(content, '".$replace_regex."', ''), ?, ?)";
+					$stmt_log_commit = $pdo->prepare($sql_log_commit);
+					
+					if($stmt_log_commit->execute([ $title, $friendly, $header.$content, $user_id, "\n", $content ])) {
+						return true;
+					}
 				}
 			}
 		}
@@ -60,7 +67,7 @@
 				foreach($commits as $commit) {
 					$content = trim($commit["message"]);
 					
-					if(strpos($content, 'Merge branch') === false) {
+					if(strpos($content, 'Merge') !== 0) {
 						if(strlen($commit['author']['email'])) {
 							$sql_user = "SELECT id FROM users WHERE email=? LIMIT 1";
 							$stmt_user = $pdo->prepare($sql_user);

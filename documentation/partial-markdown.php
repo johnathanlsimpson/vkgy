@@ -10,17 +10,27 @@
 
 
 
-## Special vkgy Markdown
+## Linking articles
 
 * [vkgy](https://vk.gy/) has its own special version of Markdown that has additional features.
 
- If you want to link a band, type its name in /slashes/, and the system will attempt to link the correct band. You can use Japanese or romaji, and you don't have to capitalize or include symbols—the system will pull those automatically.
+ To generate an artist link, type its name in ''/slashes/,,, and the system will do the rest. In most areas, as soon as you type the first ''/,,, the system will offer autocomplete suggestions.
+
+ You can use Japanese or romaji, and don't have to capitalize or include symbols—the system will pull those automatically.
+
+ Note that, when editing a page, artist links will appear like this: ''(123)/band name/,,. The ''(123),, is the numeric link to the artist; but the system will add that part automatically, as long as you've used ''/slashes/,,.
 
  {/la sadies/ and /sugar forkful/ sound nothing alike.}
 
 * You can even link an artist while displaying a different name, by following the /slashes/ with the [display name]:
 
  {/inspire/ used to be called /inspire/[Ruin's;lave].}
+
+* Linking to labels is the same as linking to artists, but you use ''=,, instead, ''=like this=,,. Again, in most places, as soon as you type ''=,,, the autocomplete will start working.
+
+ Also like artists, you can link to a label while displaying a different name, if you want.
+
+ ''=soleil matina= sometimes called itself =soleil matina=[MATINA].,, ''→,, [[<a class="symbol__company" href="/labels/soleil-matina/">Soleil Matina</a> sometimes called itself <a class="symbol__company" href="/labels/soleil-matina/">MATINA</a>.]]
 
 * You can reference other vkgy users with an @:
 

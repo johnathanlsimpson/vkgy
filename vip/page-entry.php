@@ -9,10 +9,7 @@
 		?>
 			<div class="col c1">
 				<div>
-					<h1>
-						VIP section
-					</h1>
-					
+					<div class="text--centered">
 					<h2 style="<?php echo $entry["friendly"] === "development" ? "display: inline-block;" : null; ?>">
 						<?php
 							if($entry["friendly"] !== "development") {
@@ -31,6 +28,7 @@
 							echo $entry["friendly"] === "development" ? "Latest development updates" : $entry["title"];
 						?>
 					</h2>
+					</div>
 					
 					<?php
 						if($entry["friendly"] === "development") {
@@ -43,7 +41,7 @@
 						}
 					?>
 					
-					<div class="text <?php echo $entry["friendly"] === "development" ? "any__partial text--outlined" : null; ?>">
+					<div class="text text--centered <?php echo $entry["friendly"] === "development" ? "any__partial text--outlined" : null; ?>">
 						<?php
 							if($entry["friendly"] === "development") {
 								$file = file("../documentation/updates.txt");

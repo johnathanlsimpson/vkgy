@@ -210,12 +210,12 @@
 	}
 	.any__obscure--fade::before {
 		background-image:
-			linear-gradient(to bottom, hsla(var(background--secondary), 0.75), hsl(var(--background--secondary))),
+			linear-gradient(to bottom, hsla(var(--background--secondary), 0.75), hsl(var(--background--secondary))),
 			linear-gradient(to bottom right, hsla(var(--background), 1) 1px, hsla(var(--background), 0));
 		background-size: 100% 100%, 3px 3px;
 	}
 	.any__obscure--faint::before {
-		background-color: hsla(var(background--secondary), 0.75);
+		background-color: hsla(var(--background--secondary), 0.75);
 	}
 
 
