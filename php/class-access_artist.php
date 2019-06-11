@@ -595,7 +595,7 @@
 				}
 			}
 			if(is_numeric($args["label_id"])) {
-				$sql_where[] = "label_history LIKE CONCAT('%(', ?, ')%')";
+				$sql_where[] = "label_history LIKE CONCAT('%{', ?, '}%')";
 				$sql_values[] = $args["label_id"];
 			}
 			if(is_numeric($args['type'])) {
