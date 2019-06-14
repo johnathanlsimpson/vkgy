@@ -97,26 +97,6 @@ foreach($comments as $key => $comment) {
 	unset($sql_comment);
 }
 
-/* Avatars */
-include_once("../avatar/class-avatar.php");
-include_once("../avatar/avatar-options.php");
-include_once("../avatar/avatar-definitions.php");
-
-for($i=0; $i<$num_comments; $i++) {
-	$sql_avatar = "SELECT content FROM users_avatars WHERE user_id=? LIMIT 1";
-	$stmt_avatar = $pdo->prepare($sql_avatar);
-	$stmt_avatar->execute([ $comments[$i]["user"]["id"] ]);
-	$rslt_avatar = $stmt_avatar->fetchColumn();
-
-	$comments[$i]["user"]["avatar_class"] = (!$rslt_avatar ? 'comment__no-avatar' : null);
-	$rslt_avatar = $rslt_avatar ?: '{"head__base":"default","head__base-color":"i"}';
-
-	$avatar = new avatar($avatar_layers, $rslt_avatar, ["is_vip" => true]);
-	$comments[$i]["user"]["avatar"] = $avatar->get_avatar_paths();
-
-	unset($avatar);
-}
-
 /* Updates */
 $sql_recent = "
 	SELECT recent.*, users.username
