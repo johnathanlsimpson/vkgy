@@ -1,7 +1,7 @@
 class CommentHandler {
 	constructor() {
 		// Get username from signed-in element at top of page. Doesn't actually go into DB or anything, just for visual of adding new comment.
-		const usernameElem = document.querySelector('.head__user');
+		const usernameElem = document.querySelector('#comment-current-user');
 		this.dummyUsername = usernameElem && usernameElem.innerHTML ? usernameElem.innerHTML : 'anonymous';
 		
 		// Set up blank templates
