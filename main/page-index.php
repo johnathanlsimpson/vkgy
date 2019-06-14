@@ -167,29 +167,29 @@
 					for($i=0; $i<count($comments); $i++) {
 						$comment_class = null;
 						$comments[$i]['user']['avatar_url'] = '/usericons/avatar-'.(file_exists('../usericons/avatar-'.$comments[$i]['user']['username'].'.png') ? $comments[$i]['user']['username'] : 'anonymous').'.png?'.date('YmdH');
-
+						
 						if(!$comments[$i]['is_approved']) {
 							$comment_class .= ($_SESSION['admin'] ? 'comment--unapproved' : 'any--hidden');
 						}
-
+						
 						?>
 							<li class="obscure__item <?php echo $comment_class; ?>">
 								<div class="any--flex">
 									<a class="comment__avatar-container <?php echo $comments[$i]["user"]["avatar_class"]; ?>" href="/users/<?php echo $comments[$i]['user']['username']; ?>/">
-										<img alt="<?php echo $comments[$i]['user']['username']; ?>'s avatar" class="comment__avatar" src="https://vk.gy/<?php echo $comments[$i]['user']['avatar_url']; ?>" />
+										<img alt="<?php echo $comments[$i]['user']['username']; ?>'s avatar" class="comment__avatar" src="<?php echo $comments[$i]['user']['avatar_url']; ?>" />
 									</a>
-
+									
 									<div class="comment__comment">
 										<h5 class="any--flex">
 											<a class="user a--inherit comment__user" href="/users/<?php echo $comments[$i]["user"]["username"]; ?>/"><?php echo $comments[$i]["user"]["username"]; ?></a>
 											<?php echo substr($comments[$i]["date_occurred"], 5); ?>
 										</h5>
-
+										
 										<div class="any--flex">
 											&ldquo;<span class="comment__content"><?php echo $comments[$i]["content"]; ?></span>&rdquo;
 											<a class="comment__next symbol__next" href="<?php echo $comments[$i]['url'] ? $comments[$i]['url'].'#comments' : '/comments/#comment-'.$comments[$i]['id']; ?>">Read</a>
 										</div>
-
+										
 										<span class="any--hidden symbol__error comment__notice">This comment is awaiting approval.</span>
 									</div>
 								</div>
