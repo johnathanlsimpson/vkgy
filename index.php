@@ -17,6 +17,7 @@
 		"style",
 		"background",
 		"breadcrumbs",
+		'page_header',
 		"subnav",
 		"image_exists",
 		"update_views"
