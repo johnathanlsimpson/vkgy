@@ -1,34 +1,14 @@
 <?php
-	$page_header = lang('Welcome to vk.gy', 'vk.gyへようこそ', [ 'container' => 'div' ]);
-
+	page_header('Welcome to vk.gy', 'vk.gyへようこそ');
+	
 	subnav([
-		'Patreon' => 'https://patreon.com/vkgy/',
+		lang('Patreon', 'パトレオン', ['secondary_class' => 'any--hidden']) => 'https://patreon.com/vkgy/',
 	], 'interact');
 	
 	script([
 		'/scripts/script-signIn.js',
 	]);
 ?>
-
-<!--<div class="col c4-AAAB any--margin">
-	<div class="any--weaken">
-		<?php
-			echo
-			lang(
-				'vkgy is a visual kei library maintained by overseas fans. It specializes in small bands, and hard-to-find information.',
-				'vkgy（ブイケージ）はビジュアル系のライブラリです。関連するアーティストのメンバープロフィールや活動やリリース情報などがあります。',
-				[
-					'primary_container' => 'p',
-					'secondary_container' => 'p',
-				]
-			);
-		?>
-	</div>
-
-	<div class="cta__container">
-		<a class="a--padded a--outlined cta__link a--patreon" href="https://patreon.com/vkgy/" target="_blank"><img src="/style/logo-patreon.png" style="height: 1rem;" /> <?php echo lang('Support vkgy', 'パトレオン', ['secondary_class' => 'any--hidden']); ?></a>
-	</div>
-</div>-->
 
 <div class="col c4-ABBC section__main">
 	<div class="main__left">
@@ -117,7 +97,7 @@
 
 				<div class="any__obscure news__entry news__vip any--flex">
 					<?php
-						if($is_vip) {
+						if($_SESSION['is_vip']) {
 							?>
 								<p>
 									<a class="symbol__vip" href="<?php echo '/vip/'.$rslt_vip["friendly"].'/'; ?>">[VIP] <?php echo $rslt_vip["title"]; ?></a>
@@ -130,8 +110,8 @@
 						}
 						else {
 							?>
-								<span class="symbol__vip">VIP members can view exclusive updates in this area.</span>
-								<a class="symbol__next" href="https://www.patreon.com/vkgy/" target="_blank" style="margin-left: auto; white-space: nowrap;">Support vkgy</a>
+								<span class="symbol__vip"><?php echo lang('This content is <a href="https://patreon.com/vkgy/" target="_blank">VIP</a>-limited.', 'このコンテンツは<a href="https://patreon.com/vkgy/" target="_blank">VIP</a>限定です。', ['secondary_class' => 'any--hidden']); ?></span>
+								<a class="symbol__next" href="https://www.patreon.com/vkgy/" target="_blank" style="margin-left: auto; white-space: nowrap;"><?php echo lang('Support vk.gy', 'パトレオン', ['secondary_class' => 'any--hidden']); ?></a>
 							<?php
 						}
 					?>
@@ -256,13 +236,13 @@
 		<h1 class="register__title">
 			<?php echo lang('Join vkgy', '新規登録', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
 		</h1>
-
+		
 		<div class="any--flex col c2 register__wrapper">
 			<form action="/account/function-register.php" class="text register__container register__section" enctype="multipart/form-data" method="post" name="register__form" autocomplete="off">
 				<ul>
 					<input class="any--hidden" id="register__radio--bat" name="register_avatar" type="radio" value="bat" checked />
 					<input class="any--hidden" id="register__radio--gecko" name="register_avatar" type="radio" value="gecko" />
-
+					
 					<li>
 						<div class="input__row">
 							<div class="input__group">
@@ -270,12 +250,12 @@
 							</div>
 							<input class="any--flex-grow" name="register_username" pattern="[A-z0-9-]+" placeholder="username (ユーザー名)" title="A-z, 0-9, -" />
 						</div>
-
+						
 						<div class="any--weaken register__note">
-							Usernames may contain: <strong>A-z</strong>, <strong>0-9</strong>, <strong>-</strong>. <span class="any--jp">（半角英字、数字、ハイフンを使用できます。）</span>
+							<?php echo lang('Usernames may contain: <strong>A-z</strong>, <strong>0-9</strong>, <strong>-</strong>. ', '（半角英字、数字、ハイフンを使用できます。）', ['secondary_class' => 'any--weaken-color']); ?>
 						</div>
 					</li>
-
+					
 					<li>
 						<div class="input__row">
 							<div class="input__group any--flex-grow">
@@ -288,85 +268,83 @@
 							</div>
 						</div>
 					</li>
-
+					
 					<li class="register__avatar-container">
 						<div class="input__row">
 							<div class="input__group" style="align-self: center;">
-								<label class="input__label">Avatar eyes</label>
-								<label class="input__checkbox-label symbol__unchecked register__bat" for="register__radio--bat">bat</label>
-								<label class="input__checkbox-label symbol__unchecked register__gecko" for="register__radio--gecko">gecko</label>
+								<label class="input__label"><?php echo lang('Avatar eyes', 'アバター', ['secondary_class' => 'any--hidden']); ?></label>
+								<label class="input__checkbox-label symbol__unchecked register__bat" for="register__radio--bat"><?php echo lang('bat', 'メークⅠ', ['secondary_class' => 'any--hidden']); ?></label>
+								<label class="input__checkbox-label symbol__unchecked register__gecko" for="register__radio--gecko"><?php echo lang('bat', 'メークⅡ', ['secondary_class' => 'any--hidden']); ?></label>
 							</div>
 							<div class="input__group">
 								<div class="register__face"></div>
 							</div>
 						</div>
-
+						
 						<div class="any--weaken register__note">
-							The avatar can be further customized after joining. <span class="any--jp">（登録後、アバターをさらにカスタマイズすることができます。）</span>
+							<?php echo lang('The avatar can be further customized after joining. ', '（登録後、アバターをさらにカスタマイズすることができます。）', ['secondary_class' => 'any--weaken-color']); ?>
 						</div>
 					</li>
-
+					
 					<li>
 						<div class="input__row">
 							<div class="input__group any--flex-grow" data-role="submit-container">
-								<button class="any--flex-grow" data-role="submit" name="register_submit" type="submit">Join vkgy (登録する)</button>
+								<button class="any--flex-grow" data-role="submit" name="register_submit" type="submit"><?php echo lang('Join vkgy', '登録する', ['secondary_class' => 'any--hidden']); ?></button>
 								<span class="register__status" data-role="status"></span>
 							</div>
 						</div>
 					</li>
 				</ul>
-
+				
 				<div class="text text--outlined text--notice register__result" data-role="result"></div>
 			</form>
-
+			
 			<div class="register__section">
 				<h3>
-					Why join?
+					<?php echo lang('Why join?', '登録について', ['container' => 'div']); ?>
 				</h3>
 				<div class="text text--outlined">
-				<ul class="ul--bulleted">
-					<li>Post, comment, review</li>
-					<li>Tag artists/releases</li>
-					<li>Customize your avatar</li>
-					<li>Show off your collection</li>
-					<li>Tag your music files</li>
-					<li>Exclusives for VIP supporters</li>
-				</ul>
+					<ul class="ul--bulleted">
+						<li><?php echo lang('Contribute information and news', '情報を追加する'); ?></li>
+						<li><?php echo lang('Comment, review, rate, and tag', 'コメント・評価・レビュー'); ?></li>
+						<li><?php echo lang('Customize your VK avatar', 'V系アバターを作る'); ?></li>
+						<li><?php echo lang('Track items you own and want to own', 'コレクション・ほしい物リスト'); ?></li>
+					</ul>
 				</div>
-
+				
 				<h3>
-					Already a member?
+					<?php echo lang('Already a member?', 'サインイン', ['container' => 'div']); ?>
 				</h3>
 				<form action="/account/function-sign_in.php" class="text text--outlined sign-in__container sign-in--refresh" enctype="multipart/form-data" method="post" name="form__main-signin">
 					<div class="input__row">
 						<div class="input__group">
-							<label class="input__label">Sign in</label>
-							<input class="any--flex-grow input" name="username" placeholder="username" autocomplete="username" />
-							<input class="any--flex-grow input--secondary symbol__locked" name="password" placeholder="password" autocomplete="current-password" type="password" />
+							<label class="input__label"><?php echo lang('Sign in', 'サインイン', ['secondary_class' => 'any--hidden']); ?></label>
+							<input class="any--flex-grow input" name="username" placeholder="username (ユーザー名)" autocomplete="username" />
+							<input class="any--flex-grow input--secondary symbol__locked" name="password" placeholder="password (パスワード)" autocomplete="current-password" type="password" />
 						</div>
 						<div class="input__group" data-role="submit-container">
-							<button class="any--flex-grow" data-role="submit">Sign in</button>
+							<button class="any--flex-grow" data-role="submit"><?php echo lang('Sign in', 'サインイン', ['secondary_class' => 'any--hidden']); ?></button>
 							<span class="register__status" data-role="status"></span>
 						</div>
 					</div>
-
+					
 					<div class="text text--outlined text--notice register__result" data-role="result"></div>
 				</form>
 			</div>
 		</div>
 	</div>
-
+	
 	<div></div>
 </div>
 
-<div class="col c2 any--margin section__support">
+<div class="col c2 any--margin" style="background:hsl(var(--background)); padding-top: 3rem;">
 	<div class="">
 		<h1>
-			<?php echo lang('Patreon supporters', 'パトレオン', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
+			<?php echo lang('Patreon supporters', 'サポーター', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
 		</h1>
 
 		<div class="text text--notice any--weaken-color">
-			<ul class="ul--inline support__list">
+			<ul class="ul--inline ">
 				<?php
 					if(is_array($rslt_vip_users) && !empty($rslt_vip_users)) {
 						$rslt_vip_users[] = ["username" => "redaudrey"];
@@ -382,8 +360,8 @@
 		</div>
 	</div>
 
-	<div class="support__why any--flex">
-		<div class="text text--outlined support__text">
+	<div class="any--flex">
+		<div class="text text--outlined">
 			VIP supporters receive:
 
 			<ul class="ul--bulleted ul--inline support__list" style="margin-left: 2rem;">
@@ -425,25 +403,25 @@
 		</div>
 	</div>
 	<div>
-		<h3>
-			Browse artist tags
+		<h3 class="symbol__tag">
+			<?php echo lang('Browse artist tags', 'アーティストタグ', ['container' => 'div']); ?>
 		</h3>
 		<div class="text text--outlined">
 			<?php
 				foreach($rslt_artist_tags as $tag) {
-					echo '<a class="symbol__tag" href="/search/artists/?tags[]='.$tag["friendly"].'#result">'.($tag["romaji"] ?: $tag["name"]).'</a> ('.$tag["num_tagged"].') &nbsp; ';
+					echo '<span class="main__tag"><a href="/search/artists/?tags[]='.$tag["friendly"].'#result">'.lang(($tag["romaji"] ?: $tag["name"]), $tag['name'], ['secondary_class' => 'any--hidden']).'</a> <span class="any--weaken">&#215;'.$tag["num_tagged"].'</span></span>';
 				}
 			?>
 		</div>
 	</div>
 	<div>
-		<h3>
-			Browse release tags
+		<h3 class="symbol__tag">
+			<?php echo lang('Browse release tags', 'リリースタグ', ['container' => 'div']); ?>
 		</h3>
 		<div class="text text--outlined">
 			<?php
 				foreach($rslt_release_tags as $tag) {
-					echo '<a class="symbol__tag" href="/search/releases/?tag='.$tag["friendly"].'#result">'.($tag["romaji"] ?: $tag["name"]).'</a> ('.$tag["num_tagged"].') &nbsp; ';
+					echo '<span class="main__tag"><a href="/search/releases/?tag='.$tag["friendly"].'#result">'.lang(($tag["romaji"] ?: $tag["name"]), $tag['name'], ['secondary_class' => 'any--hidden']).'</a> <span class="any--weaken">&#215;'.$tag["num_tagged"].'</span></span>';
 				}
 			?>
 		</div>
@@ -454,7 +432,7 @@
 		</h3>
 		<div class="text text--outlined">
 			<ul>
-				<li><a href="mailto:inartistic@gmail.com">Email founder</a></li>
+				<li><a href="mailto:johnathan.l.simpson@gmail.com">Email founder</a></li>
 				<li><a href="https://twitter.com/vkgy_" target="_blank">Message on Twitter</a></li>
 				<li><a href="https://facebook.com/vkgyofficial" target="_blank">Message on Facebook</a></li>
 			</ul>

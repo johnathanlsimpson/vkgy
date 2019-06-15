@@ -18,27 +18,7 @@ breadcrumbs([
 	"Home" => "https://vk.gy/"
 ]);
 
-/*subnav([
-	"Add news" => "/blog/add/",
-	"Database" => "/database/",
-]);*/
-
 $access_image = $access_image ?: new access_image($pdo);
-//if($_SESSION["username"] === "inartistic") { include_once("../main/function-choose_aod.php"); }
-
-/* Check VIP */
-if($_SESSION["loggedIn"] && is_numeric($_SESSION["userID"])) {
-	$sql_check = "SELECT 1 FROM users WHERE id=? AND is_vip=1 LIMIT 1";
-	$stmt_check = $pdo->prepare($sql_check);
-	$stmt_check->execute([ $_SESSION["userID"] ]);
-	$is_vip = $stmt_check->fetchColumn();
-}
-
-if($is_vip) {
-	/*subnav([
-		"VIP" => "/vip/"
-	]);*/
-}
 
 /* Get VIP news */
 if($is_vip) {
