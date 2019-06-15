@@ -14,23 +14,23 @@
 <div class="col c2 any--signed-out-only">
 	<div>
 		<h2>
-			Sign in
+			<?php echo lang('Sign in', 'サインイン', ['container' => 'div']); ?>
 		</h2>
 		<form action="" class="text sign-in__container <?php echo $_SERVER['HTTP_REFERER'] ? 'sign-in--back' : 'sign-in--refresh'; ?>" enctype="multipart/form-data" method="post" name="form__sign-in">
 			<div class="input__row">
 				<div class="input__group any--flex-grow">
-					<input class="any--flex-grow" name="username" pattern="^[\w- \.]{3,}$" placeholder="username" required />
+					<input class="any--flex-grow" name="username" pattern="^[\w- \.]{3,}$" placeholder="username (ユーザー名)" required />
 				</div>
 			</div>
 			<div class="input__row">
 				<div class="input__group any--flex-grow">
-					<input class="any--flex-grow" name="password" placeholder="password" type="password" required />
+					<input class="any--flex-grow" name="password" placeholder="password (パスワード)" type="password" required />
 				</div>
 			</div>
 			<div class="input__row">
 				<div class="input__group any--flex-grow">
 					<button class="any--flex-grow" type="submit">
-						Sign in
+						<?php echo lang('Sign in', 'サインイン', ['secondary_class' => 'any--hidden']); ?>
 					</button>
 					<span data-role="status"></span>
 				</div>
@@ -39,7 +39,7 @@
 		</form>
 		
 		<h3>
-			Register
+			<?php echo lang('Join vkgy', '新規登録', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
 		</h3>
 		<form action="/account/function-register.php" class="text register__container register__section" enctype="multipart/form-data" method="post" name="register__form" autocomplete="off">
 				<ul>
@@ -49,20 +49,20 @@
 					<li>
 						<div class="input__row">
 							<div class="input__group">
-								<label class="input__label">Username</label>
+								<label class="input__label"><?php echo lang('Username', 'ユーザー名', ['secondary_class' => 'any--hidden']); ?></label>
 							</div>
 							<input class="any--flex-grow" name="register_username" pattern="[A-z0-9-]+" placeholder="username (ユーザ名)" title="A-z, 0-9, -" />
 						</div>
 						
 						<div class="any--weaken register__note">
-							Usernames may contain: <strong>A-z</strong>, <strong>0-9</strong>, <strong>-</strong>. <span class="any--jp">（半角英字、数字、ハイフンを使用できます。）</span>
+							<?php echo lang('Usernames may contain: <strong>A-z</strong>, <strong>0-9</strong>, <strong>-</strong>. ', '（半角英字、数字、ハイフンを使用できます。）', ['secondary_class' => 'any--weaken-color']); ?>
 						</div>
 					</li>
 					
 					<li>
 						<div class="input__row">
 							<div class="input__group any--flex-grow">
-								<label class="input__label">Password</label>
+								<label class="input__label"><?php echo lang('Password', 'パスワード', ['secondary_class' => 'any--hidden']); ?></label>
 								<input class="any--flex-grow symbol__locked" name="register_password" placeholder="password (パスワード)" type="password" />
 							</div>
 							<div class="input__group">
@@ -75,9 +75,9 @@
 					<li class="register__avatar-container">
 						<div class="input__row">
 							<div class="input__group" style="align-self: center;">
-								<label class="input__label">Avatar eyes</label>
-								<label class="input__checkbox-label symbol__unchecked register__bat" for="register__radio--bat">bat</label>
-								<label class="input__checkbox-label symbol__unchecked register__gecko" for="register__radio--gecko">gecko</label>
+								<label class="input__label"><?php echo lang('Avatar eyes', 'アバター', ['secondary_class' => 'any--hidden']); ?></label>
+								<label class="input__checkbox-label symbol__unchecked register__bat" for="register__radio--bat"><?php echo lang('bat', 'メークⅠ', ['secondary_class' => 'any--hidden']); ?></label>
+								<label class="input__checkbox-label symbol__unchecked register__gecko" for="register__radio--gecko"><?php echo lang('bat', 'メークⅡ', ['secondary_class' => 'any--hidden']); ?></label>
 							</div>
 							<div class="input__group">
 								<div class="register__face"></div>
@@ -85,14 +85,14 @@
 						</div>
 						
 						<div class="any--weaken register__note">
-							The avatar can be further customized after joining. <span class="any--jp">（登録後、アバターをさらにカスタマイズすることができます。）</span>
+							<?php echo lang('The avatar can be further customized after joining. ', '（登録後、アバターをさらにカスタマイズすることができます。）', ['secondary_class' => 'any--weaken-color']); ?>
 						</div>
 					</li>
 					
 					<li>
 						<div class="input__row">
 							<div class="input__group any--flex-grow" data-role="submit-container">
-								<button class="any--flex-grow" data-role="submit" name="register_submit" type="submit">Join vkgy (登録する)</button>
+								<button class="any--flex-grow" data-role="submit" name="register_submit" type="submit"><?php echo lang('Join vkgy', '登録する', ['secondary_class' => 'any--hidden']); ?></button>
 								<span class="register__status" data-role="status"></span>
 							</div>
 						</div>
@@ -105,16 +105,14 @@
 	
 	<div>
 		<h3>
-			Why register?
+			<?php echo lang('Why join?', '登録について', ['container' => 'div']); ?>
 		</h3>
 		<div class="text text--outlined">
 			<ul class="ul--bulleted">
-				<li>Edit your custom profile.</li>
-				<li>Rate and collect releases, and add releases to your wishlist.</li>
-				<li>Post to the community blog.</li>
-				<li>Comment on blog posts and releases.</li>
-				<li>Edit artist and release information.</li>
-				<li>VIP users: access special section and view exclusive images in super high quality, without watermarks.</li>
+				<li><?php echo lang('Contribute information and news', '情報を追加する'); ?></li>
+				<li><?php echo lang('Comment, review, rate, and tag', 'コメント・評価・レビュー'); ?></li>
+				<li><?php echo lang('Customize your VK avatar', 'V系アバターを作る'); ?></li>
+				<li><?php echo lang('Track items you own and want to own', 'コレクション・ほしい物リスト'); ?></li>
 			</ul>
 		</div>
 	</div>
