@@ -21,14 +21,18 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 			<?php
 				$num_musicians = count($musicians);
 				for($a=0; $a<$num_musicians; $a++) {
+					$position_name = $musicians[$a]['position_name'];
+					$position_name = $position_name == 'roadie' ? lang('roadie', 'ローディー', [ 'secondary_class' => 'any--hidden;' ]) : $position_name;
+					$position_name = strpos($position_name, 'support') === 0 ? lang($position_name, str_replace('support ', 'サポート', $position_name), [ 'secondary_class' => 'any--hidden' ]) : $position_name;
+					
 					?>
 						<div class="ul">
 							<h4>
-								<a class="a--inherit" href="/search/musicians/?position=<?php echo $musicians[$a]["position"]; ?>#result"><?php echo $musicians[$a]["position_name"]; ?></a>
+								<a class="a--inherit" href="/search/musicians/?position=<?php echo $musicians[$a]["position"]; ?>#result"><?php echo $position_name; ?></a>
 							</h4>
 							<h3>
-								<a class="a--inherit" href="/musicians/<?php echo $musicians[$a]["id"]."/".$musicians[$a]["friendly"]; ?>/"><?php echo $musicians[$a]["quick_name"]; ?></a>
-								<span class="any--weaken-color"><?php echo $musicians[$a]["romaji"] ? " (".$musicians[$a]["name"].")" : null; ?></span>
+								<a class="a--inherit" href="<?php echo '/musicians/'.$musicians[$a]["id"].'/'.$musicians[$a]["friendly"]; ?>/"><?php echo lang(($musicians[$a]["romaji"] ?: $musicians[$a]['name']), $musicians[$a]['name'], ['secondary_class' => 'any--hidden']); ?></a>
+								<span class="any--weaken-color any--en"><?php echo $musicians[$a]['romaji'] ? '('.$musicians[$a]['name'].')' : null; ?></span>
 							</h3>
 							<div class="any--flex member__history">
 								<div class="lineup__container any--weaken-color">
@@ -66,8 +70,14 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 																
 																if(!empty($musicians[$a]['history'][$c][$d]["notes"]) && is_array($musicians[$a]['history'][$c][$d]["notes"])) {
 																	foreach($musicians[$a]['history'][$c][$d]["notes"] as $note) {
+																		$note = substr($note, 1, -1);
+																		$note = $note == 'support' ? lang('support', 'サポート', [ 'secondary_class' => 'any--hidden' ]) : $note;
+																		$note = $note == 'roadie' ? lang('roadie', 'ローディー', [ 'secondary_class' => 'any--hidden' ]) : $note;
+																		$note = $note == 'retired' ? lang('retired', '引退', [ 'secondary_class' => 'any--hidden' ]) : $note;
+																		$note = $note == 'deceased' ? lang('deceased', '死去', [ 'secondary_class' => 'any--hidden' ]) : $note;
+																		
 																		?>
-																			<span class="any__note"><?php echo $note; ?></span>
+																			<span class="any__note"><?php echo $note == '(support)' ? lang('support', 'サポート') : $note; ?></span>
 																		<?php
 																	}
 																}
