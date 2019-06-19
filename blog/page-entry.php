@@ -1,4 +1,8 @@
 <?php
+	style([
+		'/blog/style-page-entry.css',
+	]);
+	
 	if(is_array($entry) && !empty($entry)) {
 
 		$entry['images'] = is_array($entry['images']) ? $entry['images'] : [];
