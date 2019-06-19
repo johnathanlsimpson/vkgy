@@ -1,0 +1,36 @@
+.lives__container {
+	align-items: flex-start;
+	flex-wrap: wrap;
+	margin-bottom: 2rem;
+}
+.lives__date {
+	display: flex;
+}
+.lives__live {
+	display: inline-block;
+	margin: 0 1rem 1rem 0;
+	vertical-align: top;
+}
+.lives__artists {
+	margin-top: 0.5rem;
+}
+.lives__artist:not(:last-of-type)::after {
+	content: ", ";
+}
+.senary-nav__container {
+	display: flex;
+	justify-content: space-between;
+}
+.senary-nav__container > * > * {
+	display: inline-block;
+	margin: 0 0 0.5rem 0.5rem;
+	white-space: nowrap;
+}
+.senary-nav__right {
+	display: flex;
+	flex-wrap: wrap;
+}
+.senary-nav__left > * {
+	margin-left: 0;
+	margin-right: 0.5rem;
+}

@@ -17,6 +17,7 @@
 			$this->pdo = $pdo;
 			
 			$this->access_image = new access_image($pdo);
+			$this->access_live = new access_live($pdo);
 			$this->markdown_parser = new parse_markdown($pdo);
 		}
 		
@@ -441,6 +442,9 @@
 				}
 				
 				// Add live schedule to artist bio
+				/*$lives = $access_live->access_live([ 'artist_id' => $artist_id, 'get' => 'name' ]);
+				
+				
 				$sql_schedule = "
 					SELECT
 						CONCAT_WS(' ', COALESCE(areas.romaji, areas.name), COALESCE(lives_livehouses.romaji, lives_livehouses.name)) AS quick_name,
@@ -463,7 +467,7 @@
 							"type" => ["14"]
 						];
 					}
-				}
+				}*/
 			}
 			
 			usort($history, function($a, $b) {
@@ -727,6 +731,8 @@
 									$artists[$i]["next_artist"] = $this->access_artist(["friendly" => $artists[$i]["friendly"], "get" => "next"]);
 									$artists[$i]["history"] = $this->get_history($artists[$i]["id"]);
 									$artists[$i]['images'] = $this->access_image->access_image([ 'artist_id' => $artists[$i]['id'], 'get' => 'most', 'associative' => true ]);
+									$artists[$i]['lives'] = $this->access_live->access_live([ 'artist_id' => $artists[$i]['id'], 'get' => 'name', 'keys' => 'date', 'order' => 'lives.date_occurred ASC' ]);
+									$artists[$i]['num_lives'] = $this->access_live->access_live([ 'artist_id' => $artists[$i]['id'], 'get' => 'count', 'keys' => 'date', 'order' => 'lives.date_occurred ASC' ]);
 									
 									$sql_areas = 'SELECT areas.* FROM areas_artists LEFT JOIN areas ON areas.id=areas_artists.area_id WHERE areas_artists.artist_id=? ORDER BY areas.friendly ASC';
 									$stmt_areas = $this->pdo->prepare($sql_areas);

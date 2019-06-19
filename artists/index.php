@@ -22,6 +22,7 @@
 	// Choose page
 	if(!empty($_GET["artist"])) {
 		$artist = $access_artist->access_artist(["friendly" => friendly($_GET["artist"]), "get" => "all"]);
+		
 		if(is_array($artist) && !empty($artist)) {
 			if($_GET["action"] === "edit") {
 				if($_SESSION["admin"]) {
@@ -94,36 +95,54 @@
 		$stmt_view->execute([$artist["id"], date("Y-m-d")]);
 		
 		// Parse history
-		if(is_array($artist["history"])) {
-			foreach($artist["history"] as $history_line) {
-				if(!in_array("is_uneditable", $history_line["type"])) {
-					$history_line["content"] = $markdown_parser->parse_markdown($history_line["content"]);
-				}
+		if(is_array($artist['history']) && !empty($artist['history'])) {
+			for($i=0; $i<count($artist['history']); $i++) {
+				$history_line = $artist['history'][$i];
 				
-				if(!in_array(14, $history_line['type'])) {
-					$tmp_history[substr($history_line["date_occurred"], 0, 4)][$history_line["date_occurred"]][] = $history_line;
+				// Parse text
+				if(in_array('is_uneditable', $history_line['type'])) {
 				}
 				else {
-					$tmp_schedule[substr($history_line["date_occurred"], 0, 4)][$history_line["date_occurred"]][] = $history_line;
+					$history_line['content'] = $markdown_parser->parse_markdown($history_line['content']);
+				}
+				
+				// Check if live schedule has entry at the same date
+				list($y, $m, $d) = explode('-', $history_line['date_occurred']);
+				
+				if(!in_array(14, $history_line['type']) && is_array($artist['lives']) && !empty($artist['lives']) && is_array($artist['lives'][$y][$m][$d])) {
+					$schedule_line = $artist['lives'][$y][$m][$d][0];
 					
-					$num_lives++;
+					$schedule_content =
+						'<a class="a--inherit" href="/lives/&area_id='.$schedule_line['area_id'].'">'.
+						lang(($schedule_line['area_romaji'] ?: $schedule_line['area_name']), $schedule_line['area_name'], ['secondary_class' => 'any--hidden']).
+						'</a>'.
+						' '.
+						'<a class="a--inherit" href="/lives/&livehouse_id='.$schedule_line['livehouse_id'].'">'.
+						lang(($schedule_line['livehouse_romaji'] ?: $schedule_line['livehouse_name']), $schedule_line['livehouse_name'], ['secondary_class' => 'any--hidden']).
+						'</a>';
+					
+					array_splice($artist['history'], ($i + 1), 0, 'live');
+					
+					$artist['history'][$i + 1] = [
+						'date_occurred' => $schedule_line['date_occurred'],
+						'content' => $schedule_content,
+						'type' => [ 14, 'is_uneditable' ],
+					];
 				}
+				
+			}
+		}
+		
+		if(is_array($artist["history"])) {
+			$num_history = count($artist['history']);
+			
+			for($i=0; $i<$num_history; $i++) {
+				list($y, $m, $d) = explode('-', $artist['history'][$i]['date_occurred']);
+				
+				$tmp_history[$y][$artist['history'][$i]['date_occurred']][] = $artist['history'][$i];
 			}
 			
-			if(is_array($tmp_schedule) && !empty($tmp_schedule)) {
-				foreach($tmp_schedule as $tmp_schedule_year => $tmp_schedule_dates) {
-					foreach($tmp_schedule_dates as $tmp_schedule_date => $tmp_schedule_lives) {
-						if(is_array($tmp_history[$tmp_schedule_year][$tmp_schedule_date])) {
-							foreach($tmp_schedule_lives as $tmp_schedule_live) {
-								array_push($tmp_history[$tmp_schedule_year][$tmp_schedule_date], $tmp_schedule_live);
-							}
-						}
-					}
-				}
-			}
-			
-			$artist["history"] = $tmp_history;
-			$artist['schedule'] = $tmp_schedule;
+			$artist['history'] = $tmp_history;
 		}
 		
 		// Unname history keys

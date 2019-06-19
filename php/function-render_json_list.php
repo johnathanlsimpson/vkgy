@@ -36,14 +36,23 @@ function render_json_list($input_type, $input = null, $input_id_type = null, $in
 		for($i=0; $i<$num_input; $i++) {
 			$input_chunk[] = $input[$i]['id'];
 			
+			// Clean values
+			foreach($input[$i] as $key => $value) {
+				$input[$i][$key] = str_replace(['&#92;', '&#34;'], ['\\', '"'], $value);
+			}
+			
+			// Areas
+			if($input_type === 'area') {
+				$input_chunk[] = null;
+				$input_chunk[] = ($input[$i]['romaji'] ? $input[$i]['romaji'].' ('.$input[$i]['name'].')' : $input[$i]['name']);
+			}
+			
 			// Artist
-			if($input_type === 'artist') {
+			elseif($input_type === 'artist') {
 				$input_chunk[] = $include_friendly ? $input[$i]['friendly'] : '';
 				$input_chunk[] =
-					str_replace(['&#92;', '&#34;'], ['\\', '"'], 
-						($input[$i]['quick_name'].($input[$i]['romaji'] ? ' ('.$input[$i]['name'].')' : null)).
-						(friendly($input[$i]['quick_name']) != $input[$i]['friendly'] ? ' ('.$input[$i]['friendly'].')' : null)
-					);
+					($input[$i]['quick_name'].($input[$i]['romaji'] ? ' ('.$input[$i]['name'].')' : null)).
+					(friendly($input[$i]['quick_name']) != $input[$i]['friendly'] ? ' ('.$input[$i]['friendly'].')' : null);
 			}
 			
 			// Label
@@ -60,10 +69,22 @@ function render_json_list($input_type, $input = null, $input_id_type = null, $in
 					($input[$i]["as_romaji"] ? " (".$input[$i]["as_name"].")" : (!$input[$i]["as_name"] && $input[$i]["romaji"] ? " (".$input[$i]["name"].")" : null));
 			}
 			
+			// Livehouses
+			elseif($input_type === 'livehouse') {
+				$input_chunk[] = null;
+				$input_chunk[] = ($input[$i]['romaji'] ? $input[$i]['romaji'].' ('.$input[$i]['name'].')' : $input[$i]['name']);
+			}
+			
 			// Release
 			elseif($input_type === 'release') {
 				$input_chunk[] = $input[$i]['friendly'];
 				$input_chunk[] = $input[$i]['quick_name'];
+			}
+			
+			// Year
+			elseif($input_type === 'year') {
+				$input[$i]['id'] = $input[$i]['year'];
+				$input_chunk = [ $input[$i]['year'], null, $input[$i]['year'] ];
 			}
 			
 			// Output chunk
