@@ -9,6 +9,10 @@
 	max-width: 100%;
 	vertical-align: middle;
 }
+.main__tag {
+	display: inline-block;
+	margin-right: 1ch;
+}
 .main__updates {
 	overflow: hidden;
 }

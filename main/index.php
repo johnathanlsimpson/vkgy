@@ -18,27 +18,7 @@ breadcrumbs([
 	"Home" => "https://vk.gy/"
 ]);
 
-/*subnav([
-	"Add news" => "/blog/add/",
-	"Database" => "/database/",
-]);*/
-
 $access_image = $access_image ?: new access_image($pdo);
-//if($_SESSION["username"] === "inartistic") { include_once("../main/function-choose_aod.php"); }
-
-/* Check VIP */
-if($_SESSION["loggedIn"] && is_numeric($_SESSION["userID"])) {
-	$sql_check = "SELECT 1 FROM users WHERE id=? AND is_vip=1 LIMIT 1";
-	$stmt_check = $pdo->prepare($sql_check);
-	$stmt_check->execute([ $_SESSION["userID"] ]);
-	$is_vip = $stmt_check->fetchColumn();
-}
-
-if($is_vip) {
-	/*subnav([
-		"VIP" => "/vip/"
-	]);*/
-}
 
 /* Get VIP news */
 if($is_vip) {
@@ -95,26 +75,6 @@ foreach($comments as $key => $comment) {
 	$comments[$key]["content"] = ($comment["item_type"] === "vip" && !$is_vip ? '<span class="symbol__error"></span> Only VIP members can view this content.' : $content);
 
 	unset($sql_comment);
-}
-
-/* Avatars */
-include_once("../avatar/class-avatar.php");
-include_once("../avatar/avatar-options.php");
-include_once("../avatar/avatar-definitions.php");
-
-for($i=0; $i<$num_comments; $i++) {
-	$sql_avatar = "SELECT content FROM users_avatars WHERE user_id=? LIMIT 1";
-	$stmt_avatar = $pdo->prepare($sql_avatar);
-	$stmt_avatar->execute([ $comments[$i]["user"]["id"] ]);
-	$rslt_avatar = $stmt_avatar->fetchColumn();
-
-	$comments[$i]["user"]["avatar_class"] = (!$rslt_avatar ? 'comment__no-avatar' : null);
-	$rslt_avatar = $rslt_avatar ?: '{"head__base":"default","head__base-color":"i"}';
-
-	$avatar = new avatar($avatar_layers, $rslt_avatar, ["is_vip" => true]);
-	$comments[$i]["user"]["avatar"] = $avatar->get_avatar_paths();
-
-	unset($avatar);
 }
 
 /* Updates */

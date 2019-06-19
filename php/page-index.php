@@ -140,11 +140,15 @@
 		<form action="/search/" class="any--hidden" enctype="multipart/form-data" id="form__search" method="get" name="form__search"><button type="submit"></button></form>
 		
 		<!-- HEADER -->
-		<div class="header__wrapper  col c1">
-			<div class="header__container  lazy any--flex" data-src="<?php echo $background_image; ?>">
-				<h1 class="header__header">
-					<?php echo $page_header ?: null; ?>
-				</h1>
+		<div class="header__wrapper col c1">
+			<div class="header__container lazy any--flex" data-src="<?php echo $background_image; ?>">
+				<div class="header__header">
+					<h1>
+						<?php echo $GLOBALS['page_header'] ?: ($page_header ?: null); ?>
+					</h1>
+					
+					<?php echo $GLOBALS['page_header_supplement'] ?: null; ?>
+				</div>
 				
 				<!-- INTERACT NAV -->
 				<div class="quaternary-nav__container any--weaken-size"><?php

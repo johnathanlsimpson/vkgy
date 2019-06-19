@@ -41,6 +41,13 @@
 		include('../comments/partial-comment.php');
 		include('../comments/partial-commentate.php');
 		
+		// Echo current username, to be used when making new comment
+		if($_SESSION['is_signed_in']) {
+			?>
+				<template id="comment-current-user"><?php echo $_SESSION['username']; ?></span></template>
+			<?php
+		}
+		
 		?>
 			<div class="col c1">
 				<div>
@@ -62,6 +69,7 @@
 									'content' => null,
 									'button_text' => 'Add',
 									'name' => null,
+									'username' => '******',
 								])
 						]);
 					?>

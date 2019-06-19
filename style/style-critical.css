@@ -879,7 +879,7 @@
 	.header__container * {
 		color: inherit;
 	}
-	.header__container > * {
+	.header__container > *, .header__header > * {
 		margin-bottom: 1rem;
 	}
 	.header__container .any--weaken {
@@ -948,12 +948,7 @@
 	/* PAGE HEADER: TEXT */
 	.header__header {
 		margin-right: auto;
-		width: 100%;
-	}
-	@media(min-width: 800px) {
-		.header__header {
-			width: auto;
-		}
+		width: auto;
 	}
 
 
