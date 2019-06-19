@@ -130,6 +130,8 @@
 					];
 				}
 				
+				// Merge changes made back into history array
+				$artist['history'][$i] = $history_line;
 			}
 		}
 		
