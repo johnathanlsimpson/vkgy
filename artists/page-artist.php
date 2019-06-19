@@ -238,7 +238,7 @@
 											}
 
 											// Schedule
-											if(is_array($artist['schedule']) && !empty($artist['schedule'])) {
+											if(is_array($artist['lives']) && !empty($artist['lives'])) {
 												?>
 													<span id="schedule"></span>
 													<h2>
@@ -247,22 +247,33 @@
 													<input class="obscure__input" id="obscure-lives" type="checkbox" <?php echo $num_lives > 3 ? 'checked' : null; ?> />
 													<div class="text a obscure__container obscure--height">
 														<?php
-															foreach($artist['schedule'] as $year => $schedule_year) {
+															foreach($artist['lives'] as $year => $schedule_year) {
 																?>
 																	<ul class="obscure__item ul--compact">
 																		<?php
-																			foreach($schedule_year as $day => $lives) {
-																				?>
-																					<li class="any--weaken">
-																						<span class="h4"><?php echo $day; ?></span>
-																						&nbsp;
-																						<?php
-																							foreach($lives as $live) {
-																								echo str_replace(['<p>', '</p>'], '', $live['content']);
-																							}
-																						?>
-																					</li>
-																				<?php
+																			foreach($schedule_year as $month => $schedule_month) {
+																				foreach($schedule_month as $day => $schedule_day) {
+																					?>
+																						<li class="any--weaken">
+																							<span class="h4"><?php
+																								echo '<a class="a--inherit" href="/lives/&date_occurred='.$year.'">'.$year.'</a>';
+																								echo '-';
+																								echo '<a class="a--inherit" href="/lives/&date_occurred='.$year.'-'.$month.'">'.$month.'</a>';
+																								echo '-';
+																								echo '<a class="a--inherit" href="/lives/&date_occurred='.$year.'-'.$month.'-'.$day.'">'.$day.'</a>';
+																							?></span>
+																							&nbsp;
+																							<?php
+																								foreach($schedule_day as $live) {
+																									$area = '<a class="a--inherit" href="/lives/&area_id='.$live['area_id'].'">'.lang(($live['area_romaji'] ?: $live['area_name']), $live['area_name'], ['secondary_class' => 'any--hidden']).'</a>';
+																									$livehouse = '<a class="a--inherit" href="/lives/&livehouse_id='.$live['livehouse_id'].'">'.lang(($live['livehouse_romaji'] ?: $live['livehouse_name']), $live['livehouse_name'], ['secondary_class' => 'any--hidden']).'</a>';
+																									
+																									echo $area.' '.$livehouse;
+																								}
+																							?>
+																						</li>
+																					<?php
+																				}
 																			}
 																		?>
 																	</ul>
