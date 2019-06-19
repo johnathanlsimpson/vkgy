@@ -110,16 +110,21 @@
 				list($y, $m, $d) = explode('-', $history_line['date_occurred']);
 				
 				if(!in_array(14, $history_line['type']) && is_array($artist['lives']) && !empty($artist['lives']) && is_array($artist['lives'][$y][$m][$d])) {
-					$schedule_content = lang(
-						($artist['lives'][$y][$m][$d][0]['area_romaji'] ?: $artist['lives'][$y][$m][$d][0]['area_name']).' '.($artist['lives'][$y][$m][$d][0]['livehouse_romaji'] ?: $artist['lives'][$y][$m][$d][0]['livehouse_name']),
-						$artist['lives'][$y][$m][$d][0]['area_name'].' '.$artist['lives'][$y][$m][$d][0]['livehouse_name'],
-						[ 'secondary_class' => 'any--hidden' ]
-					);
+					$schedule_line = $artist['lives'][$y][$m][$d][0];
+					
+					$schedule_content =
+						'<a class="a--inherit" href="/lives/&area_id='.$schedule_line['area_id'].'">'.
+						lang(($schedule_line['area_romaji'] ?: $schedule_line['area_name']), $schedule_line['area_name'], ['secondary_class' => 'any--hidden']).
+						'</a>'.
+						' '.
+						'<a class="a--inherit" href="/lives/&livehouse_id='.$schedule_line['livehouse_id'].'">'.
+						lang(($schedule_line['livehouse_romaji'] ?: $schedule_line['livehouse_name']), $schedule_line['livehouse_name'], ['secondary_class' => 'any--hidden']).
+						'</a>';
 					
 					array_splice($artist['history'], ($i + 1), 0, 'live');
 					
 					$artist['history'][$i + 1] = [
-						'date_occurred' => $artist['lives'][$y][$m][$d][0]['date_occurred'],
+						'date_occurred' => $schedule_line['date_occurred'],
 						'content' => $schedule_content,
 						'type' => [ 14, 'is_uneditable' ],
 					];
