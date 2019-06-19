@@ -18,13 +18,12 @@
 	if(is_array($flyer) && !empty($flyer)) {
 		
 		// Move flyer from queued_flyers database to images database
-		$sql_unqueue = "INSERT INTO images (extension, is_exclusive, user_id, description, friendly) VALUES (?, ?, ?, ?, ?, ?)";
+		$sql_unqueue = "INSERT INTO images (extension, is_exclusive, user_id, description, friendly) VALUES (?, ?, ?, ?, ?)";
 		$stmt_unqueue = $pdo->prepare($sql_unqueue);
 		$input_unqueue = [
 			$flyer["extension"],
 			"1",
 			$flyer["user_id"],
-			//$flyer["artist_id"],
 			($flyer["description"] ?: "flyer"),
 			($flyer["friendly"] ?: "flyer")
 		];
