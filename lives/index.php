@@ -172,7 +172,7 @@
 	}
 	
 	elseif($edit_areas) {
-		include("../lives/page-edit-areas.php");
+		include("page-edit-areas.php");
 	}
 	
 	elseif($view_livehouses) {
@@ -180,14 +180,6 @@
 	}
 	
 	else {
-		?>
-			<div class="col c1">
-				<div>
-					<div class="text text--outlined text--notice symbol__error">
-						Sorry, there's nothing to see here yet!
-					</div>
-				</div>
-			</div>
-		<?php
+		include('page-lives.php');
 	}
 ?>
