@@ -13,23 +13,8 @@
 	]);
 	
 	$access_artist = new access_artist($pdo);
-
-$page_header = lang('Account', 'アカウント', ['container' => 'div']);
 	
-	/*$sql_image_list = "SELECT artist_id FROM images WHERE is_default=?";
-	$stmt_image_list = $pdo->prepare($sql_image_list);
-	$stmt_image_list->execute([ "1" ]);
-	$rslt_image_list = $stmt_image_list->fetchAll();
-	
-	if(is_array($rslt_image_list) && !empty($rslt_image_list)) {
-		foreach($rslt_image_list as $image) {
-			$image["artist_id"] = substr($image["artist_id"], 1, -1);
-			
-			if(is_numeric($image["artist_id"])) {
-				$artist_list[$image["artist_id"]] = $image["artist_id"];
-			}
-		}
-	}*/
+	$page_header = lang('Account', 'アカウント', ['container' => 'div']);
 	
 	if($_SESSION["loggedIn"] && is_numeric($_SESSION["userID"])) {
 		$sql_check = "SELECT 1 FROM users WHERE id=? AND is_vip=1 LIMIT 1";
@@ -37,13 +22,6 @@ $page_header = lang('Account', 'アカウント', ['container' => 'div']);
 		$stmt_check->execute([ $_SESSION["userID"] ]);
 		$is_vip = $stmt_check->fetchColumn();
 	}
-	
-	include_once("../avatar/class-avatar.php");
-	
-	$sql_avatar = "SELECT * FROM users_avatars WHERE user_id=? LIMIT 1";
-	$stmt_avatar = $pdo->prepare($sql_avatar);
-	$stmt_avatar->execute([ $user["id"] ]);
-	$rslt_avatar = $stmt_avatar->fetch();
 	
 	if(is_array($user) && !empty($user)) {
 		?>
@@ -200,14 +178,7 @@ $page_header = lang('Account', 'アカウント', ['container' => 'div']);
 					<div class="edit__result text text--outlined text--notice" data-role="result"></div>
 				</div>
 			</form>
-		<?php
-		
-		$avatar = new avatar(null, $rslt_avatar["content"], ["is_vip" => $is_vip]);
-		$current_avatar = $avatar->get_selected_options();
-		
-		include("../avatar/page-edit.php");
-		
-		?>
+			
 			<div class="col c1">
 				<div>
 					<h2>

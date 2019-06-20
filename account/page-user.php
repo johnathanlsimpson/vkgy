@@ -548,6 +548,22 @@
 			<?php
 				if($_SESSION["username"] === $user["username"]) {
 					?>
+						<div class="col c1 user__edit">
+							<?php
+								include_once("../avatar/class-avatar.php");
+								
+								$sql_avatar = "SELECT * FROM users_avatars WHERE user_id=? LIMIT 1";
+								$stmt_avatar = $pdo->prepare($sql_avatar);
+								$stmt_avatar->execute([ $user["id"] ]);
+								$rslt_avatar = $stmt_avatar->fetch();
+								
+								$avatar = new avatar(null, $rslt_avatar["content"], ["is_vip" => $is_vip]);
+								$current_avatar = $avatar->get_selected_options();
+								
+								include("../avatar/partial-edit.php");
+							?>
+						</div>
+						
 						<input class="obscure__input" id="obscure-edit" type="checkbox" checked />
 						<div class="col c1 user__edit obscure__container obscure--height obscure--alt" id="user__edit">
 							<div>
