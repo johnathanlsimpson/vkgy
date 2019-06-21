@@ -125,6 +125,9 @@
 	<filter id="avatar__filter--blur">
 		<feGaussianBlur in="SourceGraphic" stdDeviation="2" />
 	</filter>
+	<filter id="avatar__filter--strong-blur">
+		<feGaussianBlur in="SourceGraphic" stdDeviation="5" />
+	</filter>
 </svg>
 
 <?php

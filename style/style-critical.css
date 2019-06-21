@@ -985,11 +985,12 @@
 	/* 3° (PAGE) NAV: WRAPPER */
 	.tertiary-nav__container {
 		background: hsl(var(--background--secondary));
+		background-image: linear-gradient(178deg, hsla(var(--background--bold), 1), hsla(var(--background--bold), 0) 50%);
+		background-repeat: no-repeat;
+		background-size: 100% 70%;
 		flex: none;
+		flex-wrap: wrap;
 		width: auto;
-	}
-	.tertiary-nav__container:not(:empty) {
-		margin-right: var(--gutter);
 	}
 
 
@@ -1001,8 +1002,10 @@
 	}
 	.tertiary-nav--active,
 	.tertiary-nav--active:hover {
+		background: hsl(var(--background--secondary));
 		border-top-color: currentColor;
 	}
+	.tertiary-nav--active::after,
 	.tertiary-nav__link:hover::after {
 		border: 0.5rem solid transparent;
 		border-top-color: currentColor;
