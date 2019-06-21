@@ -992,9 +992,6 @@
 		flex-wrap: wrap;
 		width: auto;
 	}
-	.tertiary-nav__container:not(:empty) {
-		margin-right: var(--gutter);
-	}
 
 
 	/* 3° (PAGE) NAV: LINKS */
