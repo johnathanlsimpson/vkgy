@@ -53,7 +53,7 @@
 							echo is_array($artist['musicians'][2]) ? '<a class="li" href="#former">'.lang('Former', '元メンバー', ['container' => 'div']).'</a>' : null;
 							echo is_array($artist['musicians'][3]) ? '<a class="li" href="#staff">'.lang('Staff', 'スタッフ', ['container' => 'div']).'</a>' : null;
 							echo is_array($artist['history']) ?      '<a class="li" href="#history">'.lang('History', '活動', ['container' => 'div']).'</a>' : null;
-							echo is_array($artist['schedule']) ?     '<a class="li" href="#schedule">'.lang('Lives', 'ライブ', ['container' => 'div']).'</a>' : null;
+							echo is_array($artist['lives']) ?        '<a class="li" href="#schedule">'.lang('Lives', 'ライブ', ['container' => 'div']).'</a>' : null;
 							echo                                     '<a class="li" href="#comments">'.lang('Comment', 'コメント', ['container' => 'div']).'</a>';
 						?>
 					</ul>

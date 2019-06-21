@@ -98,12 +98,15 @@
 				<div class="any__obscure news__entry news__vip any--flex">
 					<?php
 						if($_SESSION['is_vip']) {
+							$sql_vip = 'SELECT vip.title, vip.friendly, vip_views.user_id AS is_viewed FROM vip LEFT JOIN vip_views ON (vip_views.post_id=vip.id AND vip_views.user_id=?) ORDER BY date_occurred DESC LIMIT 1';
+							$stmt_vip = $pdo->prepare($sql_vip);
+							$stmt_vip->execute([ $_SESSION['user_id'] ]);
+							$rslt_vip = $stmt_vip->fetch();
+							
 							?>
 								<p>
 									<a class="symbol__vip" href="<?php echo '/vip/'.$rslt_vip["friendly"].'/'; ?>">[VIP] <?php echo $rslt_vip["title"]; ?></a>
 									<?php echo !$rslt_vip["is_viewed"] ? '<span class="news__new any--weaken-size">NEW</span>' : null; ?>
-									<br />
-									<a class="symbol__vip" href="/vip/development/">[VIP] Suggestions</a>
 								</p>
 								<a class="a--padded a--outlined" href="/vip/" style="margin-left: auto;">VIP section</a>
 							<?php

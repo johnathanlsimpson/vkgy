@@ -59,6 +59,25 @@
 			"Edit" => "/artists/".$artist["friendly"]."/edit/"
 		]);
 		
+		$access_live = new access_live($pdo);
+		$artist['lives'] = $access_live->access_live([ 'artist_id' => $artist['id'], 'get' => 'name' ]);
+		
+		foreach($artist['lives'] as $live_key => $live) {
+			$artist['lives'][$live_key] = [
+				'date_occurred' => $live['date_occurred'],
+				'content' => ($live['area_romaji'] ?: $live['area_name']).' '.($live['livehouse_romaji'] ?: $live['livehouse_name']),
+				'type' => [ 14 ],
+			];
+		}
+		
+		if(is_array($artist['history']) && is_array($artist['lives'])) {
+			$artist['history'] = array_merge($artist['history'], $artist['lives']);
+		}
+		
+		usort($artist['history'], function($a, $b) {
+			return $a['date_occurred'] <=> $b['date_occurred'];
+		});
+		
 		// Remove uneditable lines from history
 		if(is_array($artist["history"])) {
 			foreach($artist["history"] as $history_key => $history_line) {
@@ -109,25 +128,36 @@
 				// Check if live schedule has entry at the same date
 				list($y, $m, $d) = explode('-', $history_line['date_occurred']);
 				
-				if(!in_array(14, $history_line['type']) && is_array($artist['lives']) && !empty($artist['lives']) && is_array($artist['lives'][$y][$m][$d])) {
-					$schedule_line = $artist['lives'][$y][$m][$d][0];
+				// If last entry for particular day, check if we have a corresponding live schedule entry
+				if(
+					(isset($artist['history'][$i + 1]) && $artist['history'][$i + 1]['date_occurred'] != $history_line['date_occurred'])
+					||
+					($i +1 === count($artist['history']))
+				) {
 					
-					$schedule_content =
-						'<a class="a--inherit" href="/lives/&area_id='.$schedule_line['area_id'].'">'.
-						lang(($schedule_line['area_romaji'] ?: $schedule_line['area_name']), $schedule_line['area_name'], ['secondary_class' => 'any--hidden']).
-						'</a>'.
-						' '.
-						'<a class="a--inherit" href="/lives/&livehouse_id='.$schedule_line['livehouse_id'].'">'.
-						lang(($schedule_line['livehouse_romaji'] ?: $schedule_line['livehouse_name']), $schedule_line['livehouse_name'], ['secondary_class' => 'any--hidden']).
-						'</a>';
-					
-					array_splice($artist['history'], ($i + 1), 0, 'live');
-					
-					$artist['history'][$i + 1] = [
-						'date_occurred' => $schedule_line['date_occurred'],
-						'content' => $schedule_content,
-						'type' => [ 14, 'is_uneditable' ],
-					];
+					// If entry ISN'T live schedule, go ahead with check
+					if(!in_array(14, $history_line['type'])) {
+						if(is_array($artist['lives']) && !empty($artist['lives']) && is_array($artist['lives'][$y][$m][$d])) {
+							$schedule_line = $artist['lives'][$y][$m][$d][0];
+							
+							$schedule_content =
+								'<a class="a--inherit" href="/lives/&area_id='.$schedule_line['area_id'].'">'.
+								lang(($schedule_line['area_romaji'] ?: $schedule_line['area_name']), $schedule_line['area_name'], ['secondary_class' => 'any--hidden']).
+								'</a>'.
+								' '.
+								'<a class="a--inherit" href="/lives/&livehouse_id='.$schedule_line['livehouse_id'].'">'.
+								lang(($schedule_line['livehouse_romaji'] ?: $schedule_line['livehouse_name']), $schedule_line['livehouse_name'], ['secondary_class' => 'any--hidden']).
+								'</a>';
+							
+							array_splice($artist['history'], ($i + 1), 0, 'live');
+							
+							$artist['history'][$i + 1] = [
+								'date_occurred' => $schedule_line['date_occurred'],
+								'content' => $schedule_content,
+								'type' => [ 14, 'is_uneditable' ],
+							];
+						}
+					}
 				}
 				
 				// Merge changes made back into history array
