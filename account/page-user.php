@@ -548,7 +548,7 @@
 			<?php
 				if($_SESSION["username"] === $user["username"]) {
 					?>
-						<div class="col c1 user__edit">
+						<div class="col c1 user__edit" >
 							<?php
 								include_once("../avatar/class-avatar.php");
 								
