@@ -127,7 +127,7 @@ class ImageResize
 			set_time_limit(30);
 			
 			//initializing variables
-			$maxMemoryUsage = 256;
+			$maxMemoryUsage = 300;
 			$width = 0;
 			$height = 0;
 			$size = ini_get('memory_limit');
