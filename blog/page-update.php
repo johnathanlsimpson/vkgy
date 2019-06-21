@@ -239,7 +239,7 @@
 						<span class="update__preview-status"></span>
 					</h3>
 					<div class="text text--outlined">
-						<div class="update__image any--weaken" style="<?php echo $entry['image'] ? 'background-image:url(/images/'.$entry['image']['id'].'.medium.jpg);' : null; ?>"></div>
+						<div class="update__image any--weaken" style="<?php echo $entry['image'] ? 'background-image:url(/images/'.$entry['image']['id'].'.large.jpg);' : null; ?>"></div>
 						<div class="update__preview"></div>
 					</div>
 				</div>
