@@ -593,6 +593,10 @@
 					$sql_where[] = "artists.friendly = ? OR artists.name=? OR artists.romaji=? OR (artists.name LIKE CONCAT('%', ?, '%') OR artists.romaji LIKE CONCAT('%', ?, '%'))";
 					array_push($sql_values, friendly($args["name"]), sanitize($args["name"]), sanitize($args["name"]), sanitize($args["name"]), sanitize($args["name"]));
 				}
+				elseif($args['exact_name']) {
+					$sql_where[] = "artists.name=? OR artists.romaji=?";
+					array_push($sql_values, sanitize($args["name"]), sanitize($args["name"]));
+				}
 				else {
 					$sql_where[] = "artists.friendly=? OR artists.name=? OR artists.romaji=?";
 					array_push($sql_values, friendly($args["name"]), sanitize($args["name"]), sanitize($args["name"]));
@@ -700,6 +704,7 @@
 						$num_artists = count($artists);
 						
 						if(is_array($artists)) {
+							
 							// If getting all artist info or basics, grab musician data, then compile into lineup string
 							if($args["get"] === "all" || $args["get"] === "basics") {
 								$access_musician = new access_musician($this->pdo);
