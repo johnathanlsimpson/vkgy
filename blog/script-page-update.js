@@ -42,7 +42,7 @@ document.addEventListener('image-updated', function(event) {
 		if(event.details.targetElem.checked) {
 			var newImageStyle = event.details.parentElem.querySelector('.image__image').style.backgroundImage;
 			
-			newImageStyle = newImageStyle.replace('.thumbnail.', '.medium.');
+			newImageStyle = newImageStyle.replace('.thumbnail.', '.large.');
 			
 			imagePreviewElem.style.backgroundImage = newImageStyle;
 		}

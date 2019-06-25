@@ -43,7 +43,7 @@
 			$this->patreon_url = 'https://patreon.com/vkgy/';
 			
 			// Get FB/Twitter keys
-			include_once('../php/class-access_social_media-key.php');
+			include('../php/class-access_social_media-key.php');
 			
 			// Set up Facebook
 			$this->fb_page_id = "407931532968189";
