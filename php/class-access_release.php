@@ -159,7 +159,13 @@
 			
 			// [PRE-SELECT] Artist name
 			if(!empty($args["artist_display_name"])) {
-				$artist_id = $this->access_artist->access_artist(["name" => $args["artist_display_name"], "get" => "id"]);
+				$artist_id = $this->access_artist->access_artist(["name" => $args["artist_display_name"], 'exact_name' => true, "get" => "id"]);
+				
+				if(is_numeric($artist_id) || (is_array($artist_id) && !empty($artist_id))) {
+				}
+				else {
+					$artist_id = $this->access_artist->access_artist(["name" => $args["artist_display_name"], "get" => "id"]);
+				}
 				
 				if(is_array($artist_id) && is_numeric($artist_id[0]["id"])) {
 					$args["artist_id"] = $artist_id[0]["id"];
@@ -394,10 +400,22 @@
 			}
 			
 			if(!empty($args["release_name"])) {
-				$f = friendly($args["release_name"]);
-				$f = $f !== "-" ? $f : sanitize($args["release_name"]);
+				$typeless_name = html_entity_decode($args['release_name']);
+				$typeless_name = strtolower($typeless_name);
+				$typeless_name = str_replace([' - single', ' - ep'], '', $typeless_name);
+				$typeless_name = preg_replace('/'.' [\(\[].*(press|type|限定|盤|edition).*[\)\]]$'.'/', '', $typeless_name);
+				$typeless_name = preg_replace('/'.' [^ ]*(限定|盤)[^ ]*$'.'/', '', $typeless_name);
+				$typeless_name = preg_replace('/'.' ([a-z] )?type( [a-z])?$'.'/', '', $typeless_name);
+				$typeless_name = preg_replace('/'.' [a-z0-9]( press|プレス)$'.'/', '', $typeless_name);
+				
+				$typeless_friendly = friendly($typeless_name);
+				$typeless_friendly = $typeless_friendly === '-' ? $typeless_name : $typeless_friendly;
+				
+				$typeless_name = sanitize($typeless_name);
+				$typeless_friendly = sanitize($typeless_friendly);
+				
 				$sql_where[] = "releases.name LIKE CONCAT('%', ?, '%') OR releases.romaji LIKE CONCAT('%', ?, '%') OR releases.friendly LIKE CONCAT('%', ?, '%')";
-				array_push($sql_values, sanitize($args["release_name"]), sanitize($args["release_name"]), $f);
+				array_push($sql_values, $typeless_name, $typeless_name, $typeless_friendly);
 			}
 			if(is_numeric($args["release_id"])) {
 				$sql_where[] = "releases.id=?";
