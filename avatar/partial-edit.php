@@ -81,9 +81,11 @@
 		<div class="avatar__nav tertiary-nav__container any--flex any--margin">
 			<?php
 				foreach($avatar_layers as $layer_name => $layer) {
+					if(is_array($layer) && !empty($layer)) {
 					?>
 						<label class="tertiary-nav__link <?php echo $layer_name === 'head' ? 'tertiary-nav--active' : null; ?> a--inherit a--padded" for="<?php echo 'avatar__show-'.$layer_name; ?>"><?php echo lang($layer_name, $layer['attributes']['ja'] ?: $layer_name, ['secondary_class' => 'any--hidden']); ?></label>
 					<?php
+					}
 				}
 			?>
 		</div>
@@ -91,6 +93,7 @@
 		<?php
 			/* Form controls */
 			foreach($avatar_layers as $layer_name => $layer_parts) {
+				if(is_array($layer_parts) && !empty($layer_parts)) {
 				if(!$layer_parts["attributes"]["is_hidden"]) {
 					?>
 						<input class="avatar__show any--hidden" form="fake-form" id="<?php echo 'avatar__show-'.$layer_name; ?>" name="avatar__show[]" type="radio" <?php echo $layer_name === 'head' ? 'checked' : null; ?> />
@@ -164,6 +167,7 @@
 							</ul>
 						</div>
 					<?php
+				}
 				}
 			}
 		?>
