@@ -3,7 +3,8 @@
 		$input = mb_convert_kana($input, "aKV", "UTF-8");
 		$input = str_replace(["˜", "∼", "～", "〜"], "~", $input);
 		$input = str_replace("…", "・・・", $input);
-		$input = str_replace('　', ' ', $input);
+		$input = str_replace(['　', "\t"], ' ', $input);
+		$input = trim($input, " \t\0\x0B");
 		
 		return $input;
 	}
