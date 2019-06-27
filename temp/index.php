@@ -483,10 +483,10 @@ class grassthread_scraper {
 				}
 				
 				// Set format based on num tracks
-				if(is_array($releases[$release_key]['tracklist'])) {
+				if(is_array($releases[$release_key]['tracklist']) && $releases[$release_key]['format'][0] != 'demo') {
 					$num_tracks = count($releases[$release_key]['tracklist']);
 					
-					if($num_tracks < 3 && $releases[$release_key]['format'][0] != 'demo') {
+					if($num_tracks < 3) {
 						$releases[$release_key]['format'][0] = 'single';
 					}
 					if($num_tracks === 3 || $num_tracks === 4) {
