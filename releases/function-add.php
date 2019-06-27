@@ -33,6 +33,7 @@
 					
 					
 					// Format certain fields
+					$release['romaji']        = match_japanese($release['name'], $release['romaji']);
 					$release["user_id"]       = $_SESSION["userID"];
 					$release["friendly"]      = friendly($release["friendly"] ?: ($release["romaji"] ?: $release["name"])." ".($release["press_romaji"] ?: $release["press_name"])." ".($release["type_romaji"] ?: $release["type_name"]));
 					$release["date_occurred"] = str_replace(["y", "m", "d"], "0", $release["date_occurred"]) ?: "0000-00-00";
@@ -122,6 +123,11 @@
 							
 							if(!empty($line["name"]) || $line["name"] === "0") {
 								$track_num++;
+								
+								// Clean values
+								$line['disc_romaji'] = match_japanese($line['disc_name'], $line['disc_romaji']);
+								$line['section_romaji'] = match_japanese($line['section_name'], $line['section_romaji']);
+								$line['romaji'] = match_japanese($line['name'], $line['romaji']);
 								
 								$tracklist[] = [
 									"track_num" => $track_num ?: null,
