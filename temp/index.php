@@ -443,6 +443,9 @@ class grassthread_scraper {
 					$releases[$release_key]['venue_limitation'] = 'lives only';
 					$releases[$release_key]['press_limitation_name'] = 'not for sale (非売品)';
 				}
+				if(strpos($note, '会場限定') !== false) {
+					$releases[$release_key]['venue_limitation'] = 'lives only';
+				}
 				if(($medium === 'dvd' || $medium === 'vhs') && strpos($note, 'ライブ') !== false) {
 					$releases[$release_key]['format'][0] = $format ?: 'live recording';
 				}
@@ -501,7 +504,7 @@ class grassthread_scraper {
 				}
 			
 				// Re-clean notes
-				if($note === '配布' || $note === '配付') {
+				if($note === '配布' || $note === '配付' || $note === '会場限定') {
 					$releases[$release_key]['notes'] = null;
 				}
 			}
