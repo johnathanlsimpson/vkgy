@@ -21,51 +21,6 @@
 		}
 		
 		// ======================================================
-		// Add livehouse from raw input
-		// ======================================================
-		/*function add_livehouse_from_raw_input($input) {
-			if(preg_match("/".$this->regex_livehouse_name."/", $input, $input_livehouse_name)) {
-				if(is_array($input_livehouse_name) && !empty($input_livehouse_name) && !empty($input_livehouse_name[3])) {
-					$sql_livehouse_name = "SELECT CONCAT(IF(lives_livehouses.area_romaji IS NOT NULL, CONCAT(lives_livehouses.area_romaji, ' (', lives_livehouses.area_name, ')'), lives_livehouses.area_name), ' ', IF(lives_livehouses.romaji, CONCAT(lives_livehouses.romaji, ' (', lives_livehouses.name, ')'), lives_livehouses.name)) AS name, id FROM lives_livehouses WHERE romaji=? OR name=? LIMIT 1";
-					$stmt_livehouse_name = $this->pdo->prepare($sql_livehouse_name);
-					$stmt_livehouse_name->execute([$input_livehouse_name[3], $input_livehouse_name[3]]);
-					$rslt_livehouse_name = $stmt_livehouse_name->fetch();
-					
-					if(!is_numeric($rslt_livehouse_name["id"])) {
-						if(!empty($input_livehouse_name[1]) && !empty($input_livehouse_name[2]) && !empty($input_livehouse_name[3])) {
-							$area_name = $input_livehouse_name[2];
-							$area_romaji = $input_livehouse_name[1];
-							$name = $input_livehouse_name[4] ?: $input_livehouse_name[3];
-							$romaji = $input_livehouse_name[4] ? $input_livehouse_name[3] : null;
-							$quick_name = $area_romaji." ".($romaji ?: $name);
-							
-							$sql_add_livehouse = "INSERT INTO lives_livehouses (area_romaji, area_name, name, romaji, friendly, user_id) VALUES (?, ?, ?, ?, ?, ?)";
-							$stmt_add_livehouse = $this->pdo->prepare($sql_add_livehouse);
-							
-							if($stmt_add_livehouse->execute([$area_romaji, $area_name, $name, $romaji, friendly($quick_name), $_SESSION["userID"]])) {
-								$livehouse["id"] = $this->pdo->lastInsertId();
-								$livehouse["id"] = is_numeric($livehouse["id"]) ? $livehouse["id"] : null;
-								$livehouse["name"] = $input_livehouse_name[0];
-								
-								$sql_add_livehouse_nickname = "INSERT INTO lives_livehouse_nicknames (livehouse_id, nickname) VALUES (?, ?)";
-								$stmt_add_livehouse_nickname = $this->pdo->prepare($sql_add_livehouse_nickname);
-								$stmt_add_livehouse_nickname->execute([$livehouse["id"], str_replace("-", " ", friendly($romaji ?: $name))]);
-							}
-							else {
-								$livehouse["id"] = null;
-							}
-						}
-						else {
-							$livehouse["id"] = null;
-						}
-					}
-				}
-			}
-			
-			return (is_array($livehouse) && !empty($livehouse) && is_numeric($livehouse["id"]) ? $livehouse : false);
-		}*/
-		
-		// ======================================================
 		// Get livehouse name
 		// ======================================================
 		function get_livehouse($input) {
