@@ -137,6 +137,25 @@
 
 																					$history_event = $artist['history'][$i][$n][$m];
 																					$history_type = trim($history_event['type']);
+																					
+																					// For formation, link area
+																					if($history_type === 'formation' || $history_type === 'activity') {
+																						if(is_array($artist['areas'])) {
+																							foreach($artist['areas'] as $active_area) {
+																								if($active_area['romaji']) {
+																									$history_event['content'] = str_replace(
+																										$active_area['romaji'].' ('.$active_area['name'].')',
+																										'<a href="/search/artists/&area='.$active_area['romaji'].'#result">'.lang(
+																											$active_area['romaji'].' ('.$active_area['name'].')',
+																											$active_area['name'],
+																											['secondary_class' => 'any--hidden']
+																										).'</a>',
+																										$history_event['content']
+																									);
+																								}
+																							}
+																						}
+																					}
 
 																					// For multiple-type releases, show base name for first link and type name for additional links
 																					if($history_type === 'release' && is_array($history_event["content"])) {
