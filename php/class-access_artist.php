@@ -402,7 +402,7 @@
 									}
 									else {
 										// If found a corresponding livehouse, make a note
-										$note = 'A livehouse is mentioned in this entry; remember, to quickly add to the live schedule, you just need the livehouse name (English ok) followed by <code>-s</code>.';
+										$note = 'Auto-created -schedule entry. It\'s usually easier to ommit mention of the livehouse and just create a -schedule entry (for quick entry, type romanized livehouse name and tag -s).';
 									}
 								}
 								
