@@ -278,8 +278,8 @@
 								"name"         => "\bchanges?\b.*\bnames?\b",
 								"activity"     => "(?:\bpauses?\b|\bactivit(?:y|ies)\b|\bfreezes?\b)",
 								"disbandment"  => "\bdisbands\b",
-								"lineup"       => "lineup| \/ [A-z]\.",
-								"member"       => "\bmember\b|\bjoins?\b|\bsecedes?\b|\bsupports?\b|\bvocalist\b|\bguitarist\b|\bbassist\b|\bdrummer\b",
+								"lineup"       => "lineup| [\/\,] [VoGuBaDrKy]{1,2}\.| G: | Gu: ",
+								"member"       => "\bmember\b|\bjoins?\b|\bsecedes?\b|\bbegins support\b|\bas support\b|\bon support\b|\bvocalist\b|\bguitarist\b|\bbassist\b|\bdrummer\b",
 								"release"      => "\breleases?\b",
 								"cancellation" => "\bcancel(?:s|led)?\b",
 								"media"        => "\bTV\b|\bradio\b|\bmagazine\b|\btheme\b|\bfanclub\b|\bfan\b",
@@ -338,14 +338,88 @@
 							}
 						}
 						
-						if(is_array($line_type) && (in_array(14, $line_type) || in_array(15, $line_type))) {
-							if(!is_object($this->live_parser)) {
-								$this->live_parser = new parse_live($this->pdo);
+						// Set up live parser
+						if(!is_object($this->live_parser)) {
+							$this->live_parser = new parse_live($this->pdo);
+						}
+						
+						$parsed_live = null;
+						$note = null;
+						
+						// Try to catch lines that should be tagged -schedule
+						if(
+							is_array($line_type)
+							&&
+							in_array(array_search('live', $this->artist_bio_types), $line_type)
+						) {
+							// Patern: blah blah at Shinuku (新宿) HOLIDAY (ホリデー).
+							$pattern_schedule_ref_in_live = 'at(?: ([\w-\. ]+?)(?:\(([\w-\. &#;]+)\))?){1,2}\.?$';
+							
+							// If -live entry potentially has livehouse mentioned at end, grab that
+							if(preg_match('/'.$pattern_schedule_ref_in_live.'/', $line, $schedule_match)) {
+								$num_schedule_match = count($schedule_match) - 1;
+								
+								// EN: area? + livehouse
+								if($num_schedule_match === 1) {
+									$possible_livehouses[] = $schedule_match[1];
+									$possible_livehouses[] = strstr($num_schedule_match[1], ' ');
+								}
+								// EN: area? + livehouse / JA: area? + livehouse
+								elseif($num_schedule_match === 2) {
+									$possible_livehouses[] = $schedule_match[1];
+									$possible_livehouses[] = strstr($num_schedule_match[1], ' ');
+									$possible_livehouses[] = $schedule_match[2];
+								}
+								// EN: area / JA: area / EN: livehouse
+								elseif($num_schedule_match === 3) {
+									$possible_livehouses[] = $schedule_match[3];
+								}
+								// EN: area / JA: area / EN: livehouse / JA: livehouse
+								elseif($num_schedule_match === 4) {
+									$possible_livehouses[] = $schedule_match[3];
+									$possible_livehouses[] = $schedule_match[4];
+								}
+								
+								// Try each possible livehouse name in livehouse parser until we get a match
+								// $parsed_live is used in returned data
+								if(is_array($possible_livehouses) && !empty($possible_livehouses)) {
+									foreach($possible_livehouses as $possible_livehouse) {
+										if(is_array($parsed_live)) {
+											break;
+										}
+										else {
+											$parsed_live = $this->live_parser->parse_raw_input($possible_livehouse, $date, $artist_id);
+										}
+									}
+								}
+								
+								if(is_array($parsed_live) && !empty($parsed_live)) {
+									// If whole entry is just 'live at xxx.', change to -schedule tag
+									if($line == 'Live held '.$schedule_match[0]) {
+										$line = $parsed_live['livehouse']['name'];
+										$line_type = [ array_search('schedule', $this->artist_bio_types) ];
+										$note = 'This was tagged -live, but it it looks like a -schedule entry. Add further information to retain the -live tag.';
+									}
+									else {
+										// If found a corresponding livehouse, make a note
+										$note = 'A livehouse is mentioned in this entry; remember, to quickly add to the live schedule, you just need the livehouse name (English ok) followed by <code>-s</code>.';
+									}
+								}
+								
+								unset($possible_livehouses);
 							}
+						}
+						
+						// Schedule
+						if(
+							is_array($line_type)
+							&&
+							(in_array(array_search('schedule', $this->artist_bio_types), $line_type) || in_array(array_search('s', $this->artist_bio_types), $line_type))
+						) {
 							
 							$parsed_live = $this->live_parser->parse_raw_input($line, $date, $artist_id);
 							
-							if($parsed_live && is_array($parsed_live) && !empty($parsed_live)) {
+							if(is_array($parsed_live) && !empty($parsed_live)) {
 								$line = $parsed_live["livehouse"]["name"];
 								
 								$type_key = array_search(15, $line_type);
@@ -354,7 +428,7 @@
 								}
 							}
 							else {
-								$note = '<div class="any--weaken symbol__error">Unable to add to schedule. Livehouse may be missing from the database, or line may be tagged improperly. Switching tag to -live.</div>';
+								$note = 'Unable to add to schedule. Livehouse may be missing from the database, or line may be tagged improperly. Switching tag to -live.';
 								
 								$type_key = array_search(14, $line_type);
 								if(is_numeric($type_key)) {
@@ -368,6 +442,40 @@
 								
 								$line_type[] = array_search('live', $this->artist_bio_types);
 							}
+						}
+						
+						// Disbandment
+						if(
+							is_array($line_type)
+							&&
+							in_array(array_search('disbandment', $this->artist_bio_types), $line_type)
+						) {
+							$tmp_line = preg_replace('/'.'(?:\(\d+\))?(?:\/[^\/]+\/)?(?:\[[^\[\]]+\])?'.'/', '', $line);
+							$tmp_line = strstr($tmp_line, ' ');
+							
+							if($tmp_line && strlen($tmp_line) > 30) {
+								$note = 'Disbandment statements are usually short (“XXX disbands”). If appropriate, consider using a different tag here and making a separate, shorter -disbandment entry.';
+							}
+						}
+						
+						// Activity & disbandment -> disbandment
+						if(
+							is_array($line_type)
+							&&
+							$line_type[0] === array_search('activity', $this->artist_bio_types)
+							&&
+							$line_type[1] === array_search('disbandment', $this->artist_bio_types)
+						) {
+							unset($line_type[0]);
+						}
+						
+						// Warn if many tags
+						if(
+							is_array($line_type)
+							&&
+							count($line_type) > 3
+						) {
+							$note = 'This entry has many auto tags; if appropriate, consider manually setting just one or two tags, or separating into multiple entries.';
 						}
 						
 						// Clean line
@@ -386,7 +494,7 @@
 							"user_id" => $_SESSION["userID"],
 							'area_id' => $area_id,
 							"parsed_live" => $parsed_live,
-							"note" => $note,
+							"note" => $note ? '<div class="any--weaken symbol__help">'.$note.'</div>' : null,
 							'pronunciation' => $pronunciation
 						];
 						
@@ -394,7 +502,7 @@
 					}
 				}
 			}
-				
+			
 			return $output;
 		}
 		
