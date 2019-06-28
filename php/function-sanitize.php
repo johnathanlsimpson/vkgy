@@ -6,6 +6,16 @@
 		$input = str_replace(['　', "\t"], ' ', $input);
 		$input = trim($input, " \t\0\x0B");
 		
+		if(substr_count($input, '"') === 2) {
+			$input = preg_replace('/'.'"'.'/', '“', $input, 1);
+			$input = preg_replace('/'.'"'.'/', '”', $input, 1);
+		}
+		
+		if(substr_count($input, '\'') === 2) {
+			$input = preg_replace('/'.'\''.'/', '‘', $input, 1);
+			$input = preg_replace('/'.'\''.'/', '’', $input, 1);
+		}
+		
 		return $input;
 	}
 	

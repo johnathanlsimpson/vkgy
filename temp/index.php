@@ -436,17 +436,25 @@ class grassthread_scraper {
 				// Parse note
 				if(preg_match_all('/'.'限定(\d+)'.'/', $note, $matches)) {
 					$releases[$release_key]['press_limitation_num'] = $matches[1][0];
+					$releases[$release_key]['press_limitation_name'] = 'complete limited (完全限定盤)';
 				}
-				if(strpos($note, '配付') !== false) {
+				if(strpos($note, '配付') !== false || strpos($note, '配布') !== false) {
 					$releases[$release_key]['price'] = '0 yen';
+					$releases[$release_key]['venue_limitation'] = 'lives only';
+					$releases[$release_key]['press_limitation_name'] = 'not for sale (非売品)';
+				}
+				if(strpos($note, '会場限定') !== false) {
 					$releases[$release_key]['venue_limitation'] = 'lives only';
 				}
 				if(($medium === 'dvd' || $medium === 'vhs') && strpos($note, 'ライブ') !== false) {
 					$releases[$release_key]['format'][0] = $format ?: 'live recording';
 				}
 				if(strpos($note, 'ベスト') !== false) {
-					$releases[$release_key]['format'][0] = $format ?: 'collection';
+					$releases[$release_key]['format'][1] = $format ?: 'collection';
 				}
+				
+				// Set venue
+				$releases[$release_key]['venue_limitation'] = $releases[$release_key]['venue_limitation'] ?: 'available everywhere';
 				
 				// Explode tracklist, in case tracklist uses breaks instead of separate rows
 				$tmp_tracklist = explode("\n", $tr[3]['content']);
@@ -458,17 +466,46 @@ class grassthread_scraper {
 					}
 				}
 				else {
-					$releases[$release_key]['tracklist'][] = [
-						'title' => trim(str_replace('　', ' ', $tr[3]['content'])) ?: '(contents unknown)',
-						'lyrics' => trim(str_replace('　', ' ', $tr[4]['content'])),
-						'composition' => trim(str_replace('　', ' ', $tr[5]['content'])),
-						'arrangement' => trim(str_replace('　', ' ', $tr[6]['content']))
-					];
+					// If tracklist was blank, try to guess if it's a one-track release w/ just title track
+					if($releases[$release_key]['price'] === '0 yen' || $releases[$release_key]['medium'][0] === 'CT') {
+						$releases[$release_key]['tracklist'][] = [
+							'title' => trim(str_replace('　', ' ', $tr[3]['content'])) ?: ($title ?: '(contents unknown)'),
+							'lyrics' => trim(str_replace('　', ' ', $tr[4]['content'])),
+							'composition' => trim(str_replace('　', ' ', $tr[5]['content'])),
+							'arrangement' => trim(str_replace('　', ' ', $tr[6]['content']))
+						];
+					}
+					else {
+						$releases[$release_key]['tracklist'][] = [
+							'title' => trim(str_replace('　', ' ', $tr[3]['content'])) ?: '(contents unknown)',
+							'lyrics' => trim(str_replace('　', ' ', $tr[4]['content'])),
+							'composition' => trim(str_replace('　', ' ', $tr[5]['content'])),
+							'arrangement' => trim(str_replace('　', ' ', $tr[6]['content']))
+						];
+					}
 				}
 				
-				// Check if mini-album
-				if($format === 'full-album' && count($releases[$release_key]['tracklist']) < 7) {
-					$releases[$release_key]['format'][0] = 'mini-album';
+				// Set format based on num tracks
+				if(is_array($releases[$release_key]['tracklist']) && $releases[$release_key]['format'][0] != 'demo') {
+					$num_tracks = count($releases[$release_key]['tracklist']);
+					
+					if($num_tracks < 3) {
+						$releases[$release_key]['format'][0] = 'single';
+					}
+					if($num_tracks === 3 || $num_tracks === 4) {
+						$releases[$release_key]['format'][0] = 'maxi-single';
+					}
+					if($num_tracks >= 5 && $num_tracks <= 7) {
+						$releases[$release_key]['format'][0] = 'mini-album';
+					}
+					if($num_tracks >= 8) {
+						$releases[$release_key]['format'][0] = 'full-album';
+					}
+				}
+			
+				// Re-clean notes
+				if($note === '配布' || $note === '配付' || $note === '会場限定') {
+					$releases[$release_key]['notes'] = null;
 				}
 			}
 			

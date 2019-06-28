@@ -22,7 +22,7 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 				$num_musicians = count($musicians);
 				for($a=0; $a<$num_musicians; $a++) {
 					$position_name = $musicians[$a]['position_name'];
-					$position_name = $position_name == 'roadie' ? lang('roadie', 'ローディー', [ 'secondary_class' => 'any--hidden;' ]) : $position_name;
+					$position_name = $position_name == 'roadie' ? lang('roadie', 'ローディー', [ 'secondary_class' => 'any--hidden' ]) : $position_name;
 					$position_name = strpos($position_name, 'support') === 0 ? lang($position_name, str_replace('support ', 'サポート', $position_name), [ 'secondary_class' => 'any--hidden' ]) : $position_name;
 					
 					?>

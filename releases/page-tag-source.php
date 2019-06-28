@@ -1,7 +1,7 @@
 <?php
 	include_once("../php/include.php");
 	$access_release = new access_release($pdo);
-	//$debug_on = true;
+	$debug_on = false;
 	
 	// Verify user agent
 	if(stripos($_SERVER["HTTP_USER_AGENT"], "mp3tag") !== false) {
@@ -56,80 +56,94 @@
 	}
 	
 	elseif($is_mp3tag || ($debug_on && $_SESSION["admin"] > 1)) {
-		// Format input: artist_album
-		if(strlen($_GET["artist_album"]) > 0) {
-			$input = strtolower(urldecode($_GET["artist"]));
-			$input = explode("|", $_GET["artist_album"]);
+		
+		// Clean input: artist_album
+		if(strlen($_GET['artist_album'])) {
+			$artist_album = sanitize(urldecode($_GET['artist_album']));
+			list($artist_name, $album_name) = explode('|', $artist_album);
+		}
+		
+		// Clean input: artist
+		if(strlen($artist_name)) {
+			$artist_name = sanitize(urldecode($artist_name));
+		}
+		elseif(strlen($_GET['artist'])) {
+			$artist_name = sanitize(urldecode($_GET['artist']));
+		}
+		else {
+			unset($artist_name);
+		}
+		
+		// Clean input: album
+		if(strlen($album_name)) {
+			$album_name = sanitize(urldecode($album_name));
+		}
+		elseif(strlen($_GET['album'])) {
+			$album_name = sanitize(urldecode($_GET['album']));
+		}
+		else {
+			unset($album_name);
+		}
+		
+		// Clean input: album ID
+		if(is_numeric($_GET['release_id'])) {
+			$release_id = sanitize($_GET['release_id']);
+		}
+		
+		// Get: artist x album
+		if(strlen($artist_name) && strlen($album_name)) {
+			$releases = $access_release->access_release([ 'artist_display_name' => $artist_name, 'release_name' => $album_name, 'get' => 'list' ]);
 			
-			if(is_array($input) && count($input) === 2) {
-				$_GET["artist"] = $input[0];
-				$_GET["album"] = $input[1];
-				
-				unset($input);
+			if(is_array($releases) && !empty($releases)) {
+				unset($artist_name, $album_name);
 			}
 			else {
-				$_GET["artist"] = $_GET["artist_album"];
+				unset($album_name);
 			}
 		}
 		
-		// Format input: release ID
-		if(!is_numeric($_GET["release_id"])) {
-			unset($_GET["release_id"]);
-		}
-		
-		// Get list: artist, artist_album
-		if(strlen($_GET["artist"]) > 0) {
-			$rslt_releases = $access_release->access_release([ "artist_display_name" => sanitize($_GET["artist"]), "get" => "list" ]);
+		// Get: album
+		if(strlen($album_name)) {
+			$releases = $access_release->access_release([ 'release_name' => $album_name, 'get' => 'list' ]);
 			
-			if(is_array($rslt_releases) && !empty($rslt_releases)) {
-				foreach($rslt_releases as $release) {
-					if(
-						empty($_GET["album"])
-						||
-						strpos(strtolower($release["friendly"]), sanitize($_GET["album"])) !== false
-						||
-						(strlen(friendly($_GET["album"])) > 1 && strpos($release["friendly"], friendly($_GET["album"])) !== false)
-						||
-						strpos(strtolower($release["name"]), sanitize($_GET["album"])) !== false
-						||
-						strpos(strtolower($release["romaji"]), sanitize($_GET["album"])) !== false
-					) {
-						echo
-							"|".
-							html_entity_decode($release["artist"]["quick_name"]).
-							"|".
-							"/releases/page-tag-source.php?release_id=".$release["id"]."&username=".$_GET["username"]."&hash=".$_GET["hash"].
-							"|".
-							html_entity_decode($release["quick_name"]).
-							"\n";
-					}
-				}
+			if(is_array($releases) && !empty($releases)) {
+				unset($artist_name, $album_name);
 			}
-			echo " "; // Trailing line break needed due to Mp3tag bug
 		}
 		
-		// Get list: album
-		elseif(strlen($_GET["album"]) > 0) {
-			$rslt_releases = $access_release->access_release([ "release_name" => $_GET["album"], "get" => "list" ]);
+		// Get: artist
+		if(strlen($artist_name)) {
+			$releases = $access_release->access_release([ 'artist_display_name' => $artist_name, 'get' => 'list' ]);
 			
-			if(is_array($rslt_releases) && !empty($rslt_releases)) {
-				foreach($rslt_releases as $release) {
-					echo
-						"|".
-						html_entity_decode($release["artist"]["quick_name"]).
-						"|".
-						"/releases/page-tag-source.php?release_id=".$release["id"].
-						"|".
-						html_entity_decode($release["quick_name"]).
-						"\n";
-				}
+			if(is_array($releases) && !empty($releases)) {
+				unset($artist_name, $album_name);
 			}
-			echo " "; // Trailing line break needed due to Mp3tag bug
 		}
 		
-		// Get details: album ID
-		elseif(is_numeric($_GET["release_id"])) {
-			$rslt_release = $access_release->access_release([ "release_id" => $_GET["release_id"], "get" => "basics", "tracklist" => "flat" ]);
+		// Return results
+		$output = [];
+		if(is_array($releases) && !empty($releases)) {
+			foreach($releases as $release) {
+				$output[] =
+					'|'.
+					($release['artist']['romaji'] ?: $release['artist']['name']).
+					($release['artist']['romaji'] ? ' ('.$release['artist']['name'].')' : null).
+					'|'.
+					'/releases/page-tag-source.php?release_id='.$release['id'].'&username='.$_GET['username'].'&hash='.$_GET['hash'].
+					'|'.
+					($release['quick_name']).
+					($release['romaji'] ? ' ('.$release['name'].')' : null).
+					($release['press_romaji'] ? ' ('.$release['press_name'].')' : null).
+					($release['type_romaji'] ? ' ('.$release['type_name'].')' : null).
+					"\n";
+			}
+		}
+		// Implode output, decoded entities, and preserve last line break with trailing space, to Mp3tag bug
+		echo html_entity_decode(implode('', $output).' ');
+		
+		// Get and return: album ID
+		if(is_numeric($release_id)) {
+			$rslt_release = $access_release->access_release([ "release_id" => $release_id, "get" => "basics", "tracklist" => "flat" ]);
 			
 			// If multi-artist
 			if($rslt_release["artist"]["id"] === 0) {
@@ -202,20 +216,30 @@
 			}
 			
 			// Cover
-			if($rslt_release["cover"]) {
-				$rslt_release["cover"] = "http://vk.gy".$rslt_release["cover"].($is_vip ? "?username=".$_GET["username"]."&hash=".$_GET["hash"] : null);
+			$access_image = new access_image($pdo);
+			$cover = $access_image->access_image([ 'release_id' => $release_id, 'default' => true, 'get' => 'name' ]);
+			
+			if(is_array($cover[0]) && !empty($cover[0])) {
+				$rslt_release['cover'] = 'http://vk.gy/images/'.$cover[0]['id'].'.'.$cover[0]['extension'].($is_vip ? '?username='.$_GET['username'].'&hash='.$_GET['hash'] : null);
 			}
 			
 			// Tracks
 			foreach($rslt_release["tracklist"] as $track) {
 				if(is_array($track["notes"]) && !empty($track["notes"])) {
 					foreach($track["notes"] as $note) {
-						$track["name"] = trim(substr_replace($track["name"], "", $note["name_offset"], $note["name_length"]));
-						$track["romaji"] = trim(substr_replace($track["romaji"], "", $note["romaji_offset"], $note["romaji_length"]));
+						if(
+							$note['name'] == 'bonus track' || $note['name'] == 'secret track' || strpos($note['name'], 'cover') !== false ||
+							$note['romaji'] == 'bonus track' || $note['romaji'] == 'secret track' || strpos($note['romaji'], 'cover') !== false
+						) {
+							$track["name"] = trim(substr_replace($track["name"], "", $note["name_offset"], $note["name_length"]));
+							$track["romaji"] = trim(substr_replace($track["romaji"], "", $note["romaji_offset"], $note["romaji_length"]));
+						}
 					}
 				}
 				
+				$track['name'] = strlen($track['name']) ? $track['name'] : ' ';
 				$track["romaji"] = $track["romaji"] ?: $track["name"];
+				$track['romaji'] = strlen($track['romaji']) ? $track['romaji'] : ' ';
 				
 				$rslt_release["tracks_name"][] = str_replace("|", "\\|", $track["name"]);
 				$rslt_release["tracks_romaji"][] = str_replace("|", "\\|", $track["romaji"]);
@@ -226,7 +250,7 @@
 			// Format output
 			$output_release = [
 				$rslt_release["artist"]["name"],
-				($rslt_release["artist"]["romaji"] ?: $rslt_release["artist"]["name"]).(substr($rslt_release["artist"]["romaji"], -1) === "|" ? "|" : null), // Trailing pipe is needed due to Mp3tag bug
+				($rslt_release["artist"]["romaji"] ?: $rslt_release["artist"]["name"]),
 				$rslt_release["name"],
 				$rslt_release["romaji"] ?: $rslt_release["name"],
 				$is_multi_artist ? "omnibus" : null,
@@ -236,7 +260,7 @@
 				"(".str_replace("-", ".", $rslt_release["date_occurred"]).")",
 				"ビジュアル系",
 				$rslt_release["tracks_name"],
-				$rslt_release["tracks_romaji"].(substr($rslt_release["tracks_romaji"], -1) === "|" ? "|" : null) // Trailing pipe is needed due to Mp3tag bug
+				$rslt_release["tracks_romaji"]
 			];
 			
 			// Send output

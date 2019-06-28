@@ -41,16 +41,25 @@
 				$stmt_curr_post->execute([ $friendly ]);
 				$rslt_curr_post = $stmt_curr_post->fetch();
 				
-				if(is_array($rslt_curr_post) && !empty($rslt_curr_post) && strpos($rslt_curr_post['content'], $content) === false) {
-					$sql_log_commit = "INSERT INTO vip (title, friendly, content, user_id) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE content = CONCAT(REGEXP_REPLACE(content, '".$replace_regex."', ''), ?, ?)";
-					$stmt_log_commit = $pdo->prepare($sql_log_commit);
-					
-					if($stmt_log_commit->execute([ $title, $friendly, $header.$content, $user_id, "\n", $content ])) {
-						return true;
-					}
+				$sql_log_commit = "INSERT INTO vip (title, friendly, content, user_id) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE content = CONCAT(REGEXP_REPLACE(content, '".$replace_regex."', ''), ?, ?)";
+				$stmt_log_commit = $pdo->prepare($sql_log_commit);
+				
+				if($stmt_log_commit->execute([ $title, $friendly, $header.$content, $user_id, "\n", $content ])) {
+					return true;
+				}
+				else {
+					file_put_contents('deploy/log.txt', "Couldn't update DB.\n", FILE_APPEND | LOCK_EX);
 				}
 			}
+			else {
+				file_put_contents('deploy/log.txt', "No contents:\n".print_r($contents, true)."\n", FILE_APPEND | LOCK_EX);
+			}
 		}
+		else {
+			file_put_contents('deploy/log.txt', "No PDO.\n", FILE_APPEND | LOCK_EX);
+		}
+		
+		file_put_contents('deploy/log.txt', "Args:\n".print_r($args, true), FILE_APPEND | LOCK_EX);
 	}
 
 	// Post deploy
