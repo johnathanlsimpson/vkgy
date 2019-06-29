@@ -17,26 +17,27 @@
 				<!-- Where you leave your comment -->
 				<div class="input__row commentate__comment">
 					<div class="input__group any--flex-grow">
-						<label class="input__label">Comment</label>
+						<label class="input__label"><?php echo lang('Comment', 'コメント', 'hidden'); ?></label>
 						<textarea class="commentate__content input__textarea any--flex-grow autosize any--tributable" name="content" placeholder="your comment...&#10;<?php echo sanitize('あなたのコメント...'); ?>">{content}</textarea>
 					</div>
 				</div>
 				
 				<!-- This section shows when you're not signed in -->
 				<div class="input__row commentate__anonymous">
-					<div class="text text--compact text--outlined text--notice symbol__error commentate__notice">Your comment was posted anonymously. Would you like to add a handle name, or sign in?
-						<div class="any--jp any--weaken-color"><?php echo sanitize('コメントは匿名で投稿されます。 サインインしますか、それともハンドル名を追加しますか?'); ?></div>
+					<div class="text text--compact text--outlined text--notice commentate__notice">
+						<span class="symbol__error" style="float: left;"></span>
+						<?php echo lang('Commented anonymously. Add a handle name? (To edit your VK avatar, sign in or <a href="/account/" target="_blank">register</a>.)', 'コメントは匿名で投稿されます。ハンドル名を追加しますか？ (V系アバターをカスタマイズように、サインイン・<a href="/account/" target="_blank">登録</a>する。)', 'div'); ?>
 					</div>
 					
 					<!-- Set your handlename -->
 					<div class="input__group commentate__name">
-						<label class="input__label">Handle name</label>
+						<label class="input__label"><?php echo lang('Handle name', 'ハンドル名', 'hidden'); ?></label>
 						<input class="any--flex-grow" name="name" placeholder="your name <?php echo sanitize('(ハンドル名)'); ?>" value="{name}" />
 					</div>
 					
 					<!-- Sign in -->
 					<div class="input__group commentate__sign-in">
-						<label class="input__label">Username</label>
+						<label class="input__label"><?php echo lang('Username', 'ユーザ名', 'hidden'); ?></label>
 						<input class="any--flex-grow" name="username" placeholder="username <?php echo sanitize('(ユーザ名)'); ?>" value="{name}" />
 						<input class="commentate__password any--flex-grow input--secondary" name="password" placeholder="password <?php echo sanitize('(パスワード)'); ?>" type="password" value="{name}" />
 					</div>
@@ -45,7 +46,7 @@
 				<!-- Submit area -->
 				<div class="input__row">
 					<div class="input__group any--flex any--flex-grow">
-						<button class="input__button any--flex-grow comment__submit" name="submit" type="submit">{button_text} comment <?php echo sanitize('(コメントする)'); ?></button>
+						<button class="input__button any--flex-grow comment__submit" name="submit" type="submit"><?php echo lang('comment', 'コメントする', 'hidden'); ?></button>
 						<span data-role="status"></span>
 					</div>
 				</div>
