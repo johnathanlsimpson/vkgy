@@ -210,6 +210,35 @@
 		
 		<?php echo $page_contents; ?>
 		
+		<div class="col c1 any--margin">
+			<div class="quinary-nav__container  any--flex">
+				<?php
+					if(is_array($directional_nav) && !empty($directional_nav)) {
+						foreach($directional_nav as $nav) {
+							$nav['class'] = 'quinary-nav__'.$nav['position'];
+							$nav['symbol'] = $nav['symbol'] ?: ($nav['position'] === 'left' ? 'previous' : ($nav['position'] === 'right' ? 'next' : 'random'));
+							
+							if(strlen($nav['url'])) {
+								?>
+									<a class="<?php echo $nav['class']; ?>" href="<?php echo $nav['url']; ?>">
+										<span class="symbol__<?php echo $nav['symbol']; ?>"></span>
+										<span class="quinary-nav__text"><?php echo $nav['text']; ?></span>
+									</a>
+								<?php
+							}
+							else {
+								?>
+									<span class="<?php echo $nav['class']; ?> any--weaken-color">
+										<span class="quinary-nav__text"><?php echo $nav['text']; ?></span>
+									</span>
+								<?php
+							}
+						}
+					}
+				?>
+			</div>
+		</div>
+		
 		<div class="footer__container">
 			<div class="col c4-ABBC any--margin">
 				<ul class="any--weaken footer__left">
