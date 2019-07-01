@@ -538,12 +538,7 @@
 					foreach($releases as $release) {
 						$history[] = [
 							"date_occurred" => $release["date_occurred"],
-							"content" => [
-								"url" => '/releases/'.$release["artist"]["friendly"].'/'.$release["id"].'/'.$release["friendly"].'/',
-								"name" => $release["name"],
-								"romaji" => $release["romaji"],
-								"quick_name" => $release["quick_name"]
-							],
+							"content" => array_merge($release, [ "url" => '/releases/'.$release["artist"]["friendly"].'/'.$release["id"].'/'.$release["friendly"].'/' ]),
 							"type" => ["3", "is_uneditable"]
 						];
 					}
