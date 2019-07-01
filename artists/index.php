@@ -113,142 +113,6 @@
 		$stmt_view = $pdo->prepare($sql_view);
 		$stmt_view->execute([$artist["id"], date("Y-m-d")]);
 		
-		// Parse history
-		if(is_array($artist['history']) && !empty($artist['history'])) {
-			for($i=0; $i<count($artist['history']); $i++) {
-				$history_line = $artist['history'][$i];
-				
-				// Parse text
-				if(in_array('is_uneditable', $history_line['type'])) {
-				}
-				else {
-					$history_line['content'] = $markdown_parser->parse_markdown($history_line['content']);
-				}
-				
-				// Check if live schedule has entry at the same date
-				list($y, $m, $d) = explode('-', $history_line['date_occurred']);
-				
-				// If last entry for particular day, check if we have a corresponding live schedule entry
-				if(
-					(isset($artist['history'][$i + 1]) && $artist['history'][$i + 1]['date_occurred'] != $history_line['date_occurred'])
-					||
-					($i +1 === count($artist['history']))
-				) {
-					
-					// If entry ISN'T live schedule, go ahead with check
-					if(!in_array(14, $history_line['type'])) {
-						if(is_array($artist['lives']) && !empty($artist['lives']) && is_array($artist['lives'][$y][$m][$d])) {
-							$schedule_line = $artist['lives'][$y][$m][$d][0];
-							
-							$schedule_content =
-								'<a class="a--inherit" href="/lives/&area_id='.$schedule_line['area_id'].'">'.
-								lang(($schedule_line['area_romaji'] ?: $schedule_line['area_name']), $schedule_line['area_name'], ['secondary_class' => 'any--hidden']).
-								'</a>'.
-								' '.
-								'<a class="a--inherit" href="/lives/&livehouse_id='.$schedule_line['livehouse_id'].'">'.
-								lang(($schedule_line['livehouse_romaji'] ?: $schedule_line['livehouse_name']), $schedule_line['livehouse_name'], ['secondary_class' => 'any--hidden']).
-								'</a>';
-							
-							array_splice($artist['history'], ($i + 1), 0, 'live');
-							
-							$artist['history'][$i + 1] = [
-								'date_occurred' => $schedule_line['date_occurred'],
-								'content' => $schedule_content,
-								'type' => [ 14, 'is_uneditable' ],
-							];
-						}
-					}
-				}
-				
-				// Merge changes made back into history array
-				$artist['history'][$i] = $history_line;
-			}
-		}
-		
-		if(is_array($artist["history"])) {
-			$num_history = count($artist['history']);
-			
-			for($i=0; $i<$num_history; $i++) {
-				list($y, $m, $d) = explode('-', $artist['history'][$i]['date_occurred']);
-				
-				$tmp_history[$y][$artist['history'][$i]['date_occurred']][] = $artist['history'][$i];
-			}
-			
-			$artist['history'] = $tmp_history;
-		}
-		
-		// Unname history keys
-		if(is_array($artist["history"]) && !empty($artist["history"])) {
-			$artist["history"] = array_values($artist["history"]);
-			for($i = 0; $i < count($artist["history"]); $i++) {
-				$artist["history"][$i] = array_values($artist["history"][$i]);
-			}
-		}
-		
-		// Get history types
-		for($i = 0; $i < count($artist["history"]); $i++) {
-			for($n = 0; $n < count($artist["history"][$i]); $n++) {
-				for($m = 0; $m < count($artist["history"][$i][$n]); $m++) {
-					$types = "";
-					
-					foreach($artist["history"][$i][$n][$m]["type"] as $type) {
-						$types .= " ".$access_artist->artist_bio_types[$type]." ";
-					}
-					
-					$artist["history"][$i][$n][$m]["type"] = $types;
-				}
-			}
-		}
-		
-		// Reorder history
-		for($i = 0; $i < count($artist["history"]); $i++) {
-			for($n = 0; $n < count($artist["history"][$i]); $n++) {
-				$keys_to_move = [];
-				
-				for($m = 0; $m < count($artist["history"][$i][$n]); $m++) {
-					if(strstr($artist["history"][$i][$n][$m]["type"], " member ") !== false) {
-						$keys_to_move[] = $m;
-					}
-				}
-				
-				for($m = 0; $m < count($artist["history"][$i][$n]); $m++) {
-					if(strstr($artist["history"][$i][$n][$m]["type"], " schedule ") !== false) {
-						$keys_to_move[] = $m;
-					}
-				}
-				
-				for($m = 0; $m < count($artist["history"][$i][$n]); $m++) {
-					if(strstr($artist["history"][$i][$n][$m]["type"], " release ") !== false) {
-						$keys_to_move[] = $m;
-					}
-				}
-				
-				for($m = 0; $m < count($artist["history"][$i][$n]); $m++) {
-					if(strstr($artist["history"][$i][$n][$m]["type"], " disbandment ") !== false) {
-						$keys_to_move[] = $m;
-						$artist["date_ended"] = $artist["history"][$i][$n][$m]["date_occurred"] > $artist["date_ended"] ? $artist["history"][$i][$n][$m]["date_occurred"] : $artist["date_ended"];
-					}
-					if(strstr($artist["history"][$i][$n][$m]["type"], " formation ") !== false) {
-						$artist["date_occurred"] = $artist["history"][$i][$n][$m]["date_occurred"] > $artist["date_occurred"] ? $artist["history"][$i][$n][$m]["date_occurred"] : $artist["date_occurred"];
-					}
-				}
-				
-				for($m = 0; $m < count($artist["history"][$i][$n]); $m++) {
-					if(strstr($artist["history"][$i][$n][$m]["type"], " lineup ") !== false) {
-						$keys_to_move[] = $m;
-					}
-				}
-				
-				if(!empty($keys_to_move)) {
-					foreach($keys_to_move as $key) {
-						$artist["history"][$i][$n][] = $artist["history"][$i][$n][$key];
-						unset($artist["history"][$i][$n][$key]);
-					}
-					$artist["history"][$i][$n] = array_values($artist["history"][$i][$n]);
-				}
-			}
-		}
-		
 		// Format edit history
 		$sql_edit_history = 'SELECT edits_artists.*, users.username FROM edits_artists LEFT JOIN users ON users.id=edits_artists.user_id WHERE edits_artists.artist_id=? ORDER BY date_occurred DESC';
 		$stmt_edit_history = $pdo->prepare($sql_edit_history);
@@ -324,6 +188,27 @@
 				}
 			}
 		}
+		
+		// Videos
+		$sql_videos = 'SELECT * FROM artists_videos WHERE artist_id=?';
+		$stmt_videos = $pdo->prepare($sql_videos);
+		$stmt_videos->execute([ $artist['id'] ]);
+		$artist['videos'] = $stmt_videos->fetchAll();
+		
+		// Links
+		include('function-format_artist_links.php');
+		$artist['official_links'] = format_artist_links($artist['official_links']);
+		
+		// History
+		include('function-sort_history.php');
+		$artist['history'] = parse_history_types($artist['history'], $access_artist);
+		$artist['history'] = insert_lives_into_history($artist['history'], $artist['lives']);
+		$artist['history'] = parse_history_markdown($artist['history'], $markdown_parser);
+		$artist['history'] = link_activity_area($artist['history'], $artist['areas']);
+		$artist['history'] = format_releases($artist['history']);
+		$artist['date_occurred'] = get_formation_dates($artist['history']);
+		$artist['history'] = inline_lists($artist['history']);
+		$artist['history'] = structure_by_date($artist['history']);
 		
 		include("../artists/page-artist.php");
 	}
