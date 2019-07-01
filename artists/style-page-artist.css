@@ -447,8 +447,12 @@ td h3 {
 	margin: 0 auto;
 	max-height: 180px;
 	max-width: 320px;
-	padding-top: 56%;
 	width: 100%;
+}
+.side__video-link::before {
+	content: "";
+	display: block;
+	padding-top: 56%;
 }
 .side__video-link::after {
 	background: #555;

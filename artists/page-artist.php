@@ -93,6 +93,7 @@ $artist_is_viewable = $artist_is_removed && $_SESSION['is_vip'] || !$artist_is_r
 			
 			<!-- Content: left -->
 			<div class="artist__left">
+				
 				<!-- Mobile: top stats -->
 				<div class="text text--outlined artist__details--first">
 					<?php include('partial-stats.php'); ?>
@@ -100,6 +101,10 @@ $artist_is_viewable = $artist_is_removed && $_SESSION['is_vip'] || !$artist_is_r
 				
 				<?php
 					if($artist_is_viewable) {
+						
+						// Videos
+						include('partial-videos.php');
+						
 						// Exclusive banner
 						if($artist_is_exclusive) {
 							?>

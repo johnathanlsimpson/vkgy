@@ -25,6 +25,39 @@ for(var i = 0; i < $(".artist__tag").length; i++) {
 	});
 }
 
+// Approve/deny videos
+var approveElems = document.querySelectorAll('.video__approve');
+for(var i=0; i<approveElems.length; i++) {
+	initializeInlineSubmit($(approveElems[i]), approveElems[i].getAttribute('href'), {
+		submitButton: $(approveElems[i]),
+		statusContainer: $(approveElems[i]),
+		submitOnEvent: 'click',
+		callbackOnSuccess: function(formElement, returnedData) {
+		}
+	});
+}
+
+// Delete videos
+var deleteElems = document.querySelectorAll('.video__delete');
+for(var i=0; i<deleteElems.length; i++) {
+	deleteElems[i].addEventListener('click', function(event) {
+		event.preventDefault();
+		
+		if(this.dataset.isClicked) {
+			initializeInlineSubmit($(this), this.getAttribute('href'), {
+				submitButton: $(this),
+				statusContainer: $(this),
+				callbackOnSuccess: function(formElement, returnedData) {
+				}
+			});
+		}
+		else {
+			this.dataset.isClicked = 1;
+			this.innerHTML += '?';
+		}
+	});
+}
+
 // Init artist name pronunciation button
 var pronunciationButton = document.querySelectorAll('[data-pronunciation]');
 pronunciationButton.forEach(function(item, index) {

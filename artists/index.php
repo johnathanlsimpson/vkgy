@@ -190,7 +190,7 @@
 		}
 		
 		// Videos
-		$sql_videos = 'SELECT * FROM artists_videos WHERE artist_id=?';
+		$sql_videos = 'SELECT artists_videos.*, users.username FROM artists_videos LEFT JOIN users ON users.id=artists_videos.user_id WHERE artists_videos.artist_id=?';
 		$stmt_videos = $pdo->prepare($sql_videos);
 		$stmt_videos->execute([ $artist['id'] ]);
 		$artist['videos'] = $stmt_videos->fetchAll();
