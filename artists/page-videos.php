@@ -7,6 +7,11 @@ script([
 	'/scripts/script-initDelete.js',
 	'/artists/script-page-videos.js',
 ]);
+
+style([
+	'/artists/style-page-videos.css',
+]);
+
 ?>
 
 <div class="col c4-AAAB artist__top">
