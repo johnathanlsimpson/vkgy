@@ -189,7 +189,15 @@
 .bio__item[data-item-type~="lineup"] h5::after {
 	content: "Lineup #" counter(lineup);
 }
-.bio__item[data-item-type~="lineup"] .bio__content {
+.bio__item[data-item-type~="setlist"] h5::after {
+	content: "Setlist";
+}
+.bio__item[data-item-type~="note"] h5::after {
+	content: "Note";
+}
+.bio__item[data-item-type~="lineup"] .bio__content,
+.bio__item[data-item-type~="note"] .bio__content,
+.bio__item[data-item-type~="setlist"] .bio__content {
 	border: 3px solid hsl(var(--background--bold));
 	border-radius: 3px;
 	padding: 0.5rem;
@@ -211,10 +219,6 @@
 }
 .bio__item:not([data-item-num="0"]) .h4 {
 	color: transparent;
-}
-.bio__item:not([data-item-type~="release"]):not([data-item-type~="lineup"]):not([data-item-type~="schedule"]):not([data-item-type~="setlist"]) .bio__content {
-	color: inherit;
-	font-size: inherit;
 }
 .bio__item p {
 	line-height: inherit;
