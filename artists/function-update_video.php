@@ -4,63 +4,99 @@ include_once('../php/include.php');
 
 $allowed_methods = ['approve', 'delete', 'report'];
 
+$id = $_GET['id'] ?: ($_POST['id'] ?: null);
+$method = $_GET['method'] ?: ($_POST['method'] ?: null);
+$artist_id = $_GET['artist_id'] ?: ($_POST['artist_id'] ?: null);
+$channel_id = $_GET['channel_id'] ?: ($_POST['channel_id'] ?: null);
+
 // Check that user is allowed
-if($_SESSION['is_admin'] && is_numeric($_GET['id'])) {
-	if(in_array($_GET['method'], $allowed_methods)) {
+if(is_numeric($id)) {
+	if(in_array($method, $allowed_methods)) {
 		
 		// Check that video exists
-		$sql_video = 'SELECT 1 FROM artists_videos WHERE id=? LIMIT 1';
+		$sql_video = 'SELECT 1 FROM videos WHERE id=? LIMIT 1';
 		$stmt_video = $pdo->prepare($sql_video);
-		$stmt_video->execute([ $_GET['id'] ]);
+		$stmt_video->execute([ $id ]);
 		$rslt_video = $stmt_video->fetchColumn();
 		
 		if($rslt_video) {
 			// Approve
-			if($_GET['method'] === 'approve') {
-				$sql_approve = 'UPDATE artists_videos SET is_flagged=? WHERE id=? LIMIT 1';
+			if($method === 'approve' && $_SESSION['is_admin']) {
+				$sql_approve = 'UPDATE videos SET is_flagged=? WHERE id=? LIMIT 1';
 				$stmt_approve = $pdo->prepare($sql_approve);
-				if($stmt_approve->execute([ 0, $_GET['id'] ])) {
+				if($stmt_approve->execute([ 0, $id ])) {
 					$output['status'] = 'success';
+					
+					// If artist ID and channel ID provided
+					if(is_numeric($artist_id) && strlen($channel_id)) {
+							
+						// If channel not whitelisted already, add to official artist links
+						$sql_check_artist = 'SELECT 1 FROM artists WHERE id=? AND official_links LIKE CONCAT("%", ?, "%") LIMIT 1';
+						$stmt_check_artist = $pdo->prepare($sql_check_artist);
+						$stmt_check_artist->execute([ $artist_id, 'youtube.com/channel/'.sanitize($channel_id) ]);
+						
+						if($stmt_check_artist->fetchColumn()) {
+							$output['result'] = 'Found artist with channel in official links.';
+						}
+						else {
+							$channel_url = 'https://youtube.com/channel/'.sanitize($channel_id).'/';
+							
+							// Add channel link to artist
+							$sql_update_artist = 'UPDATE artists SET official_links=IF(official_links IS NULL, ?, CONCAT_WS("\n", official_links, ?)) WHERE id=? LIMIT 1';
+							$stmt_update_artist = $pdo->prepare($sql_update_artist);
+							if($stmt_update_artist->execute([ $channel_url, $channel_url, $artist_id ])) {
+								$output['result'] = 'Added channel to whitelist.';
+							}
+							else {
+								$output['result'] = 'Couldn\'t add channel to artist\'s links.';
+							}
+							
+						}
+					}
+					else {
+						$output['result'] = 'No artist/channel provided.';
+					}
 				}
 				else {
-					$output['result'] = $sql_approve.'*';
+					$output['result'] = 'Video couldn\'t be approved.';
 				}
 			}
 			
 			// Delete
-			if($_GET['method'] === 'delete') {
-				$sql_delete = 'DELETE FROM artists_videos WHERE id=? LIMIT 1';
+			if($method === 'delete' && $_SESSION['is_admin']) {
+				$sql_delete = 'DELETE FROM videos WHERE id=? LIMIT 1';
 				$stmt_delete = $pdo->prepare($sql_delete);
-				if($stmt_delete->execute([ $_GET['id'] ])) {
+				if($stmt_delete->execute([ $id ])) {
 					$output['status']== 'success';
 				}
 				else {
-					$output['result'] = $sql_delete.'*';
+					$output['result'] = 'Video couldn\'t be deleted.';
 				}
 			}
 			
 			// Report
-			if($_GET['method'] === 'report') {
-				$sql_report = 'UPDATE artists_videos SET is_flagged=? WHERE id=? LIMIT 1';
+			if($method === 'report') {
+				$sql_report = 'UPDATE videos SET is_flagged=? WHERE id=? LIMIT 1';
 				$stmt_report = $pdo->prepare($sql_report);
-				if($stmt_report->execute([ 1, $_GET['id'] ])) {
+				if($stmt_report->execute([ 1, $id ])) {
 					$output['status'] = 'success';
+					$output['result'] = lang('Reported. Thank you.', '報告されました。 ありがとうございました。', 'hidden');
 				}
 				else {
-					$output['result'] = $sql_report.'*';
+					$output['result'] = 'Video couldn\'t be reported.';
 				}
 			}
 		}
 		else {
-			$output['result'] = 'No video';
+			$output['result'] = 'YT video not found.';
 		}
 	}
 	else {
-		$output['result'] = 'Method not allowed';
+		$output['result'] = 'Method not allowed.';
 	}
 }
 else {
-	$output['result'] = 'Person not allowed';
+	$output['result'] = 'No ID supplied.';
 }
 
 $output['status'] = $output['status'] ?: 'success';
