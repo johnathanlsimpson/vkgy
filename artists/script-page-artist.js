@@ -25,37 +25,96 @@ for(var i = 0; i < $(".artist__tag").length; i++) {
 	});
 }
 
-// Approve/deny videos
+// Init 'add video'
+var addVideoForm = document.querySelector('[name=form__add-video]');
+var urlElem = addVideoForm.querySelector('[name=url]');
+initializeInlineSubmit($(addVideoForm), '/artists/function-add_video.php', {
+	submitOnEvent: 'submit',
+	callbackOnSuccess: function(formElement, returnedData) {
+		urlElem.value = '';
+	}
+});
+
+// Approve videos
 var approveElems = document.querySelectorAll('.video__approve');
 for(var i=0; i<approveElems.length; i++) {
-	initializeInlineSubmit($(approveElems[i]), approveElems[i].getAttribute('href'), {
-		submitButton: $(approveElems[i]),
-		statusContainer: $(approveElems[i]),
-		submitOnEvent: 'click',
-		callbackOnSuccess: function(formElement, returnedData) {
-		}
+	
+	approveElems[i].addEventListener('click', function(event) {
+		event.preventDefault();
+		
+		initializeInlineSubmit($(this), this.getAttribute('href'), {
+			submitButton: $(this),
+			statusContainer: $(this),
+			callbackOnSuccess: function(formElement, returnedData) {
+				
+				console.log(returnedData);
+				
+				// Fade out 'flagged' notice
+				var statusElem = formElement[0].parentElement;
+				statusElem.classList.add('any--fade-out');
+				
+				setTimeout(function() {
+					statusElem.remove();
+				}, 200);
+				
+			}
+		});
 	});
 }
 
-// Delete videos
-var deleteElems = document.querySelectorAll('.video__delete');
-for(var i=0; i<deleteElems.length; i++) {
-	deleteElems[i].addEventListener('click', function(event) {
+// Report videos
+var reportElems = document.querySelectorAll('.video__report');
+for(var i=0; i<reportElems.length; i++) {
+	
+	reportElems[i].addEventListener('click', function(event) {
 		event.preventDefault();
 		
-		if(this.dataset.isClicked) {
-			initializeInlineSubmit($(this), this.getAttribute('href'), {
-				submitButton: $(this),
-				statusContainer: $(this),
-				callbackOnSuccess: function(formElement, returnedData) {
+		initializeInlineSubmit($(this), this.getAttribute('href'), {
+			submitButton: $(this),
+			statusContainer: $(this),
+			callbackOnSuccess: function(formElement, returnedData) {
+				
+				// Show 'awaiting approval' dialog
+				var noticeElem = formElement[0].parentElement.parentElement.parentElement.querySelector('.video__flag-notice');
+				if(noticeElem && noticeElem.classList) {
+					noticeElem.classList.add('any--fade-in');
+					noticeElem.classList.remove('any--hidden');
 				}
-			});
-		}
-		else {
-			this.dataset.isClicked = 1;
-			this.innerHTML += '?';
-		}
+			}
+			
+		});
 	});
+	
+}
+
+// Delete video
+var deleteElems = document.querySelectorAll('.video__delete');
+for(var i=0; i<deleteElems.length; i++) {
+	
+	initDelete(
+		$(deleteElems[i]),
+		'/artists/function-update_video.php',
+		{
+			method: 'delete',
+			id: deleteElems[i].dataset.id
+		},
+		function(formElement, returnedData) {
+			
+			// Get parent video element
+			var videoElem = formElement[0].parentElement.parentElement;
+			
+			if(!videoElem.classList.contains('artist__video')) {
+				videoElem = videoElem.parentElement;
+			}
+			
+			// Fade out video
+			videoElem.classList.add('any--fade-out');
+			setTimeout(function() {
+				videoElem.remove();
+			}, 200);
+			
+		}
+	);
 }
 
 // Init artist name pronunciation button
