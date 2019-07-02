@@ -230,6 +230,18 @@ $artist_is_viewable = $artist_is_removed && $_SESSION['is_vip'] || !$artist_is_r
 				
 				<?php
 					if($artist_is_viewable) {
+						
+						// Sidebar: videos (unless viewing all videos)
+						if($artist['video'] && $_GET['section'] != 'videos') {
+							?>
+								<div class="text side__video-container">
+									<a class="lazy side__video-link youtube__embed" data-id="<?= $artist['video'][0]['youtube_id']; ?>" data-src="<?= 'https://img.youtube.com/vi/'.$artist['video'][0]['youtube_id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$artist['video'][0]['youtube_id']; ?>" target="_blank"></a>
+									<a class="symbol__previous side__videos-link" href="<?= '/artists/'.$artist['friendly'].'/videos/'; ?>"><?= lang('More videos', 'その他', 'hidden'); ?></a>
+									<span class="symbol__error any--weaken side__video-notice"><?= lang('Please <a class="a--inherit" href="/artists/'.$artist['friendly'].'/videos/">report</a> unofficial videos.', '非公式の動画を<a class="a--inherit" href="/artists/'.$artist['friendly'].'/videos/">報告して</a>ください。', 'hidden'); ?></span>
+								</div>
+							<?
+						}
+						
 						// Sidebar: images
 						if($artist["images"]) {
 								?>
@@ -252,17 +264,6 @@ $artist_is_viewable = $artist_is_removed && $_SESSION['is_vip'] || !$artist_is_r
 										</div>
 									</div>
 								<?php
-						}
-						
-						// Sidebar: videos (unless viewing all videos)
-						if($artist['video'] && $_GET['section'] != 'videos') {
-							?>
-								<div class="text side__video-container">
-									<a class="lazy side__video-link youtube__embed" data-id="<?= $artist['video'][0]['youtube_id']; ?>" data-src="<?= 'http://img.youtube.com/vi/'.$artist['video'][0]['youtube_id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$artist['video'][0]['youtube_id']; ?>" target="_blank"></a>
-									<a class="symbol__previous side__videos-link" href="<?= '/artists/'.$artist['friendly'].'/videos/'; ?>"><?= lang('More videos', 'その他', 'hidden'); ?></a>
-									<span class="symbol__error any--weaken side__video-notice"><?= lang('Please <a class="a--inherit" href="/artists/'.$artist['friendly'].'/videos/">report</a> unofficial videos.', '非公式の動画を<a class="a--inherit" href="/artists/'.$artist['friendly'].'/videos/">報告して</a>ください。', 'hidden'); ?></span>
-								</div>
-							<?
 						}
 						
 						// Label history
