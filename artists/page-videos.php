@@ -140,39 +140,3 @@ script([
 <div class="col c1">
 	<?php include('partial-bottom.php'); ?>
 </div>
-
-<style>
-	.video__item {
-		flex-wrap: wrap;
-	}
-	.video__container {
-		margin-right: 1rem;
-		max-width: 320px;
-		width:100%;
-	}
-	.video__details {
-		flex: 1;
-		max-width: 100%;
-		min-width: 300px;
-	}
-	.video__data {
-		margin-top: 1rem;
-	}
-	.video__add-notice, .video__add-result {
-		margin: 1rem 0 0 0;
-	}
-	.video__add-result:empty {
-		display: none;
-	}
-	.video__flag-notice {
-		align-items: center;
-		margin: 0 0 1rem 0;
-		width: 100%;
-	}
-	.video__empty-notice {
-		margin: 0;
-	}
-	li + .video__empty-notice {
-		display: none;
-	}
-</style>
