@@ -701,6 +701,16 @@ CREATE TABLE IF NOT EXISTS `views` (
 	`date_occurred` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
+CREATE TABLE IF NOT EXISTS `videos` (
+  `id` int(11) NOT NULL,
+  `artist_id` int(11) NOT NULL,
+  `release_id` int(11) DEFAULT NULL,
+  `user_id` int(11) NOT NULL DEFAULT '0',
+  `date_added` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `youtube_id` text COLLATE ".$pdo_config['db_collation']." NOT NULL,
+  `is_flagged` tinyint(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
+
 CREATE TABLE IF NOT EXISTS `vip` (
 	`id` int(11) NOT NULL,
 	`title` mediumtext COLLATE ".$pdo_config['db_collation']." NOT NULL,
