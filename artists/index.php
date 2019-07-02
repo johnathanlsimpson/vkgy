@@ -209,10 +209,17 @@
 		$artist['history'] = insert_lives_into_history($artist['history'], $artist['lives']);
 		$artist['history'] = parse_history_markdown($artist['history'], $markdown_parser);
 		$artist['history'] = link_activity_area($artist['history'], $artist['areas']);
-		$artist['history'] = format_releases($artist['history']);
 		$artist['date_occurred'] = get_formation_dates($artist['history']);
 		$artist['history'] = inline_lists($artist['history']);
+		$artist['history'] = flag_questions($artist['history']);
 		$artist['history'] = structure_by_date($artist['history']);
+		foreach($artist['history'] as $y => $history_year) {
+			foreach($history_year as $m => $history_month) {
+				foreach($history_month as $d => $history_day) {
+					$artist['history'][$y][$m][$d] = format_releases($history_day);
+				}
+			}
+		}
 		
 		include("../artists/page-artist.php");
 	}
