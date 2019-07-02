@@ -9,6 +9,8 @@ style([
 
 script([
 	'/scripts/script-pronounce.js',
+	'/scripts/script-initDelete.js',
+	'/scripts/script-lazyLoadYouTube.js',
 	'/artists/script-page-artist.js',
 ]);
 
@@ -100,10 +102,13 @@ $artist_is_viewable = $artist_is_removed && $_SESSION['is_vip'] || !$artist_is_r
 				</div>
 				
 				<?php
-					if($artist_is_viewable) {
-						
-						// Videos
+					// If artist viewable, and requested videos, show videos
+					if($artist_is_viewable && $_GET['section'] === 'videos') {
 						include('partial-videos.php');
+					}
+					
+					// If artist viewable, but default view requested, show everything else
+					elseif($artist_is_viewable) {
 						
 						// Exclusive banner
 						if($artist_is_exclusive) {
@@ -249,13 +254,13 @@ $artist_is_viewable = $artist_is_removed && $_SESSION['is_vip'] || !$artist_is_r
 								<?php
 						}
 						
-						// Sidebar: videos
-						if($artist['videos']) {
+						// Sidebar: videos (unless viewing all videos)
+						if($artist['video'] && $_GET['section'] != 'videos') {
 							?>
 								<div class="text side__video-container">
-									<a class="lazy side__video-link" data-src="<?= 'http://img.youtube.com/vi/'.$artist['videos'][0]['youtube_id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$artist['videos'][0]['youtube_id']; ?>" target="_blank"></a>
-									<a class="symbol__previous side__videos-link" href="<?= '/artists/'.$artist['friendly'].'/&show=videos'; ?>"><?= lang('More videos', 'その他', 'hidden'); ?></a>
-									<span class="symbol__error any--weaken side__video-notice"><?= lang('Please <a class="a--inherit" href="/&show=videos">report</a> unofficial videos.', '非公式の動画を<a class="a--inherit" href="/&show=videos">報告して</a>ください。', 'hidden'); ?></span>
+									<a class="lazy side__video-link youtube__embed" data-id="<?= $artist['video'][0]['youtube_id']; ?>" data-src="<?= 'http://img.youtube.com/vi/'.$artist['video'][0]['youtube_id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$artist['video'][0]['youtube_id']; ?>" target="_blank"></a>
+									<a class="symbol__previous side__videos-link" href="<?= '/artists/'.$artist['friendly'].'/videos/'; ?>"><?= lang('More videos', 'その他', 'hidden'); ?></a>
+									<span class="symbol__error any--weaken side__video-notice"><?= lang('Please <a class="a--inherit" href="/artists/'.$artist['friendly'].'/videos/">report</a> unofficial videos.', '非公式の動画を<a class="a--inherit" href="/artists/'.$artist['friendly'].'/videos/">報告して</a>ください。', 'hidden'); ?></span>
 								</div>
 							<?
 						}
