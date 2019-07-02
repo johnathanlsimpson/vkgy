@@ -150,10 +150,22 @@ $artist_is_viewable = $artist_is_removed && $_SESSION['is_vip'] || !$artist_is_r
 															foreach($history_month as $history_day) {
 																foreach($history_day as $history_event_num => $history_event) {
 																	if(strlen($history_event['content'])) {
+																		
+																		// For certain types, set font to weaken
+																		$event_class = null;
+																		foreach(['is_uneditable', 'lineup', 'setlist'] as $weaken_type) {
+																			if(in_array($weaken_type, $history_event['type'])) {
+																				$event_class = 'any--weaken';
+																			}
+																		}
+																		if(count($history_event['type']) === 1 && $history_event['type'][0] === 'note') {
+																			$event_class = 'any--weaken';
+																		}
+																		
 																		?>
 																			<li class="bio__item" data-item-num="<?= $history_event_num; ?>" data-item-type="<?= implode(' ', $history_event['type']); ?>">
 																				<h4 class="bio__date <?= $history_event_num ? 'bio__date--multiple' : null; ?>"><?= $history_event['date_occurred']; ?></h4>
-																				<div class="bio__content <?= in_array('is_uneditable', $history_event['type']) ? 'any--weaken' : null; ?>">
+																				<div class="bio__content <?= $event_class; ?>">
 																					<h5 class="bio__title"></h5>
 																					<?= $history_event['content']; ?>
 																				</div>
@@ -169,6 +181,11 @@ $artist_is_viewable = $artist_is_removed && $_SESSION['is_vip'] || !$artist_is_r
 										}
 									?>
 								</div>
+				<style>
+					.artist__question {
+						color: hsl(var(--accent));
+					}
+				</style>
 							<?php
 						}
 						
