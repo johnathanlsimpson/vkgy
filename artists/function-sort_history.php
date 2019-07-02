@@ -105,120 +105,6 @@ function link_activity_area($history, $artist_areas) {
 	return $history;
 }
 
-// Loop through history entries tagged -release, and try to merge releases with multiple types
-function format_releases($history) {
-	$num_history = count($history);
-	
-	for($i=0; $i<$num_history; $i++) {
-		
-		// Make sure event is tagged release and that content is array (releases should always be array)
-		if(in_array('release', $history[$i]['type']) && is_array($history[$i]['content'])) {
-			
-			// Save base name of release
-			$release_name = $history[$i]['content']['romaji'] ?: $history[$i]['content']['name'];
-			
-			// Set up CDJapan link
-			$cdjapan_aff_id = 'PytJTGW7Lok/6128/A549875';
-			$cdjapan_link = 'https://www.cdjapan.co.jp/aff/click.cgi/'.$cdjapan_aff_id.'/searches?term.f=all&q='.str_replace('-', '+', friendly($release_name));
-			
-			// For the first release, save it as a normal link
-			$history[$i]['content'] =
-				'<a class="symbol__release" href="'.$history[$i]['content']['url'].'">'.
-				lang(
-					($history[$i]['content']['romaji'] ?: $history[$i]['content']['name']).
-					($history[$i]['content']['press_name'] ? ' ' : null).
-					($history[$i]['content']['press_romaji'] ?: $history[$i]['content']['press_name']).
-					($history[$i]['content']['type_name'] ? ' ' : null).
-					($history[$i]['content']['type_romaji'] ?: $history[$i]['content']['type_name']),
-					
-					$history[$i]['content']['name'].
-					($history[$i]['content']['press_name'] ? ' '.$history[$i]['content']['press_name'] : null).
-					($history[$i]['content']['type_name'] ? ' '.$history[$i]['content']['type_name'] : null),
-					
-					'hidden'
-				).
-				'</a>';
-			
-			// Check how many other entries on this day
-			$m = $i + 1;
-			$still_checking = true;
-			$num_same_day_events = 0;
-			while($still_checking) {
-				if($history[$m]['date_occurred'] === $history[$i]['date_occurred']) {
-					$still_checking = true;
-					$num_same_day_events++;
-					$m++;
-				}
-				else {
-					$still_checking = false;
-				}
-			}
-			
-			// If other entries on same day, look through any that are also a release
-			for($n=1; $n<=$num_same_day_events; $n++) {
-				$p = $i + $n;
-				
-				// If next entry is release
-				if(in_array('release', $history[$p]['type']) && is_array($history[$p]['content'])) {
-					
-					$tmp_content = '<a class="symbol__release" href="'.$history[$p]['content']['url'].'">';
-					
-					// If has same base name as current release and has press or type name, we'll save it as name only
-					if(($history[$p]['content']['romaji'] ?: $history[$p]['content']['name']) === $release_name) {
-						
-						if(strlen($history[$p]['content']['press_name'])) {
-							$tmp_content .= lang( ($history[$p]['content']['press_romaji'] ?: $history[$p]['content']['press_name']), $history[$p]['content']['press_name'], 'hidden' );
-						}
-						if(strlen($history[$p]['content']['press_name']) && strlen($history[$p]['content']['type_name'])) {
-							$tmp_content .= ' ';
-						}
-						if(strlen($history[$p]['content']['type_name'])) {
-							$tmp_content .= lang( ($history[$p]['content']['type_romaji'] ?: $history[$p]['content']['type_name']), $history[$p]['content']['type_name'], 'hidden' );
-						}
-					}
-					
-					// If release has different name, we'll save the full name
-					// But also set this one's name as the new base name
-					else {
-						$release_name = $history[$p]['content']['romaji'] ?: $history[$p]['content']['name'];
-						
-						$tmp_content .= lang(
-							($history[$p]['content']['romaji'] ?: $history[$p]['content']['name']).
-							($history[$p]['content']['press_name'] ? ' ' : null).
-							($history[$p]['content']['press_romaji'] ?: $history[$p]['content']['press_name']).
-							($history[$p]['content']['type_name'] ? ' ' : null).
-							($history[$p]['content']['type_romaji'] ?: $history[$p]['content']['type_name']),
-							
-							$history[$p]['content']['name'].
-							($history[$p]['content']['press_name'] ? ' '.$history[$p]['content']['press_name'] : null).
-							($history[$p]['content']['type_name'] ? ' '.$history[$p]['content']['type_name'] : null),
-							
-							'hidden'
-						);
-					}
-					
-					$tmp_content .= '</a>';
-					
-					// Add new link to current history entry
-					$history[$i]['content'] .= ' &nbsp; <span class="any--weaken">/</span> &nbsp; '.$tmp_content;
-					
-					// Unset from history array
-					unset($history[$p]['content']);
-				}
-			}
-			
-			// After combining releases, add CDJapan link
-			$history[$i]['content'] .= ' <a class="any__note a--inherit" href="'.$cdjapan_link.'">BUY</a>';
-			
-			// Since entries may be removed, reset count
-			$num_history = count($history);
-		}
-		
-	}
-	
-	return $history;
-}
-
 // Grab formation and disbandment dates
 function get_formation_dates($history) {
 	$num_history = count($history);
@@ -253,6 +139,19 @@ function get_formation_dates($history) {
 	}
 	
 	return $output;
+}
+
+// For certain history types, highlight any (?)'s
+function flag_questions($history) {
+	$num_history = count($history);
+	
+	for($i=0; $i<$num_history; $i++) {
+		if(in_array('lineup', $history[$i]['type']) && !is_array($history[$i]['content'])) {
+			$history[$i]['content'] = str_replace([' (&#63;)', ' (?)'], ' <span class="artist__question">(?)</span>', $history[$i]['content']);
+		}
+	}
+	
+	return $history;
 }
 
 // Reorder history by event type, and save into date-structured array
@@ -305,6 +204,81 @@ function structure_by_date($history) {
 				}
 			}
 		}
+	}
+	
+	return $history;
+}
+
+// Loop through history entries tagged -release, and try to merge releases with multiple types
+// Expects array of one day's history
+function format_releases($history) {
+	$num_history = count($history);
+	
+	// For any entries marked release, pull them out and combine any that have the same base name
+	for($i=0; $i<$num_history; $i++) {
+		if(in_array('release', $history[$i]['type']) && is_array($history[$i]['content'])) {
+			$base_name = $history[$i]['content']['romaji'] ?: $history[$i]['content']['name'];
+			$releases_on_day[$base_name][] = array_merge($history[$i], [ 'history_key' => $i ]);
+		}
+	}
+	
+	if(is_array($releases_on_day) && !empty($releases_on_day)) {
+		
+		// For each set of releases with same base name, transform into links
+		foreach($releases_on_day as $release_set) {
+			
+			// For releases on same day, sort by name/press/type
+			usort($release_set, function() {
+				return $a['content']['quick_name'] <=> $b['content']['quick_name'];
+			});
+			
+			// Loop through release sets , and transform content to link to release
+			// Show base release name only if first release in set, or if press/type not provided
+			foreach($release_set as $release_set_key => $release) {
+				
+				$release_name = lang( ($release['content']['romaji'] ?: $release['content']['name']), $release['content']['name'], 'hidden' );
+				$press_name = $release['content']['press_name'] ? lang( ($release['content']['press_romaji'] ?: $release['content']['press_name']), $release['content']['press_name'], 'hidden' ) : null;
+				$type_name = $release['content']['type_name'] ? lang( ($release['content']['type_romaji'] ?: $release['content']['type_name']), $release['content']['type_name'], 'hidden' ) : null;
+				
+				$new_content =
+					'<a class="'.($release_set_key === 0 ? 'symbol__release' : null).'" href="'.$release['content']['url'].'">'.
+					($release_set_key === 0 || (!$press_name && !$type_name) ? $release_name : null).
+					($release_name && $press_name ? ' ' : null).
+					$press_name.
+					(($release_name && !$press_name && $type_name) || ($press_name && $type_name) ? ' ' : null).
+					$type_name.
+					'</a>';
+				
+				// Set content of first item in release set to new link
+				if($release_set_key === 0) {
+					$release_set[0]['content'] = $new_content;
+				}
+				else {
+					$link_separator = ' &nbsp; <span class="any--weaken">/</span> &nbsp; ';
+					$release_set[0]['content'] .= $link_separator.$new_content;
+				}
+				
+				// If last release in set, add CDJapan link
+				if($release_set_key + 1 === count($release_set)) {
+					$cdjapan_aff_id = 'PytJTGW7Lok/6128/A549875';
+					$cdjapan_link = 'https://www.cdjapan.co.jp/aff/click.cgi/'.$cdjapan_aff_id.'/searches?term.f=all&q='.str_replace('-', '+', friendly($release['content']['romaji'] ?: $release['content']['name']));
+					$release_set[0]['content'] .= ' &nbsp; <a class="any__note a--inherit" href="'.$cdjapan_link.'">BUY</a>';
+				}
+				
+				// If nth (> first) release in release set, unset its entry from day, since it will be combined into one entry
+				if($release_set_key > 0) {
+					unset($history[$release['history_key']]);
+				}
+			}
+			
+			// After transforming release set and adding links to first item in set, put into original array
+			$history[$release_set[0]['history_key']]['content'] = $release_set[0]['content'];
+		}
+	}
+	
+	// After transforming day, reset keys and return
+	if(is_array($history) && !empty($history)) {
+		$history = array_values($history);
 	}
 	
 	return $history;
