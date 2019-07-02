@@ -1,0 +1,167 @@
+
+.label__container {
+	text-align: center;
+}
+.label__comma {
+	display: block;
+	margin: 1rem;
+}
+.label__company {
+	text-align: center;
+}
+.label__line {
+}
+.label__next {
+	align-self: center;
+	color: hsl(var(--attention--secondary));
+	margin-left: 1rem;
+	margin-right: 1rem;
+}
+.label__period {
+	align-items: center;
+	border: 1px solid hsl(var(--background));
+	border-radius: 3px;
+	padding: 0.5rem;
+}
+.artist__main-image-link {
+	display: inline-block;
+	margin: -1rem 0 1rem -1rem;
+	width: calc(100% + 2rem);
+}
+.artist__main-image {
+	vertical-align: middle;
+	width: 100%;
+}
+
+.images__container {
+	justify-content: space-between;
+	flex-wrap: wrap;
+	margin: -0.5rem;
+}
+.images__item.images__item {
+	display: block;
+	height: 4rem;
+	margin: 0.5rem;
+	padding: 0;
+	width: 4rem;
+}
+.images__link {
+	background-size: cover;
+	display: block;
+	height: 100%;
+}
+.images__link:hover {
+	opacity: 0.75;
+}
+#obscure-images:checked + .obscure__container {
+	max-height: 11rem;
+	overflow: hidden;
+}
+#obscure-images:checked + .obscure__container .obscure__item {
+	display: initial;
+}
+.rank__chart {
+	height: 180px;
+}
+.rank__graph {
+	align-items: flex-end;
+	height: 100%;
+	padding-left: 2ch;
+	position: absolute;
+	top: 0;
+	width: 100%;
+}
+.rank__avg {
+	left: 0;
+	position: absolute;
+	height: 100%;
+	top: 0;
+	width: 100%;
+}
+.rank__bar {
+	background: hsl(var(--interactive));
+	opacity: 0.5;
+	flex-grow: 1;
+	max-height: 100%;
+	position: static;
+}
+.rank__bar--year {
+	background: hsl(var(--attention));
+	opacity: 0.25;
+	pointer-events: none;
+}
+.rank__bar:hover::after {
+	content: attr(data-date);
+	bottom: -15px;
+	left: 0;
+	line-height: 15px;
+	max-width: 100%;
+	padding-left: 2ch;
+	pointer-events: none;
+	position: absolute;
+	white-space: pre;
+}
+.rank__bar:hover {
+	opacity: 1;
+}
+.rank__chart {
+	background-image:
+		linear-gradient(to bottom,
+			transparent 29px,
+			hsl(var(--background--bold)) 29px
+		);
+	background-repeat: repeat;
+	background-size: 100% 30px/*, 100% 100%*/;
+	height: 180px;
+}
+.rank__chart::before {
+	content: "S \A A \A B \A C \A D \A E";
+	line-height: 30px;
+	white-space: pre;
+}
+
+/* Side bar: video */
+.side__video-container {
+	border: none;
+	padding: 0;
+}
+.side__video-link {
+	display: block;
+	height: auto;
+	margin: 0 auto;
+	max-height: 180px;
+	max-width: 320px;
+	width: 100%;
+}
+.side__video-link::before {
+	content: "";
+	display: block;
+	padding-top: 56%;
+}
+.side__video-link::after {
+	background: #555;
+	border-radius: 15px/10px;
+	color: #bbb;
+	content: "▶";
+	display: block;
+	font-size: 28px;
+	left: 50%;
+	line-height: 50px;
+	position: absolute;
+	text-align: center;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: 75px;
+}
+.side__videos-link {
+	background: inherit;
+	border-top-right-radius: inherit;
+	bottom: 0;
+	padding: 0 0.5rem 0 0;
+	position: absolute;
+}
+.side__video-notice {
+	bottom: 0;
+	position: absolute;
+	transform: translateY(100%);
+}
