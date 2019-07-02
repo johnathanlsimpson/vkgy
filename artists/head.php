@@ -18,6 +18,7 @@ $page_header = lang($artist_header_en, $artist_header_jp, [ 'secondary_class' =>
 
 subnav([
 	'Profile' => '/artists/'.$artist['friendly'].'/',
+	'Videos' => '/artists/'.$artist['friendly'].'/videos/',
 	'Releases' => '/releases/'.$artist['friendly'].'/',
 	'News' => '/blog/artist/'.$artist['friendly'].'/',
 ]);
