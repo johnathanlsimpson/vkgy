@@ -2,6 +2,10 @@
 // Setup
 include_once('../php/include.php');
 include_once('../php/class-access_social_media.php');
+include_once('../php/class-access_video.php');
+
+$access_video = $access_video ?: new access_video($pdo);
+
 $access_social_media = $access_social_media ?: new access_social_media($pdo);
 $markdown_parser = $markdown_parser ?: new parse_markdown($pdo);
 $date_occurred_pattern = '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$';
@@ -197,11 +201,23 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 				// Update tag links
 				update_tags('blog_tags', 'blog_id', $id, 'tag_id', $_POST['tags'], $pdo);
 				
-				// Get artists and update links
 				if(is_array($references) && !empty($references)) {
+					
+					// Grab referenced artists and build list, so that we can tag them
 					foreach($references as $reference) {
 						if($reference['type'] === 'artist' && is_numeric($reference['id'])) {
 							$artist_tags[] = $reference['id'];
+						}
+					}
+					
+					// Grab videos and try to add with main artist
+					foreach($references as $reference) {
+						if($reference['type'] === 'video') {
+							if(is_array($artist_tags) && !empty($artist_tags)) {
+								$video_artist_id = $artist_tags[0];
+								
+								$video_data_data = $access_video->add_video($reference['id'], $video_artist_id);
+							}
 						}
 					}
 				}
