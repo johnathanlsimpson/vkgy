@@ -20,8 +20,6 @@ for(var i=0; i<approveElems.length; i++) {
 			statusContainer: $(this),
 			callbackOnSuccess: function(formElement, returnedData) {
 				
-				console.log(returnedData);
-				
 				// Fade out 'flagged' notice
 				var statusElem = formElement[0].parentElement;
 				statusElem.classList.add('any--fade-out');
