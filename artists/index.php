@@ -1,6 +1,7 @@
 <?php	
 	include_once("../artists/function-sort_musicians.php");
 	include_once("../php/class-access_user.php");
+	include_once('../php/class-access_video.php');
 	
 	breadcrumbs([
 		"Artists" => "/artists/"
@@ -8,6 +9,7 @@
 	
 	$access_artist = new access_artist($pdo);
 	$access_user = new access_user($pdo);
+	$access_video = new access_video($pdo);
 	$markdown_parser = new parse_markdown($pdo);
 	
 	$pageTitle = "Artist list | アーティスト一覧";
@@ -189,11 +191,13 @@
 			}
 		}
 		
-		// Videos
-		$sql_videos = 'SELECT artists_videos.*, users.username FROM artists_videos LEFT JOIN users ON users.id=artists_videos.user_id WHERE artists_videos.artist_id=?';
-		$stmt_videos = $pdo->prepare($sql_videos);
-		$stmt_videos->execute([ $artist['id'] ]);
-		$artist['videos'] = $stmt_videos->fetchAll();
+		// Default video
+		$artist['video'] = $access_video->access_video([ 'artist_id' => $artist['id'], 'is_approved' => true, 'get' => 'basics', 'limit' => 1 ]);
+		
+		// All videos
+		if($_GET['section'] === 'videos') {
+			$artist['videos'] = $access_video->access_video([ 'artist_id' => $artist['id'], 'get' => 'all' ]);
+		}
 		
 		// Links
 		include('function-format_artist_links.php');
