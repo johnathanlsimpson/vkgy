@@ -32,6 +32,85 @@
 		
 		
 		// ======================================================
+		// Given ID, add video to database
+		// ======================================================
+		function add_video($video_id, $artist_id = null) {
+			
+			// Check if video already in DB with that artist
+			$sql_check = 'SELECT 1 FROM videos WHERE youtube_id=? AND artist_id=? LIMIT 1';
+			$stmt_check = $this->pdo->prepare($sql_check);
+			$stmt_check->execute([ $video_id, $artist_id ]);
+			if($stmt_check->fetchColumn()) {
+			}
+			
+			// If not in DB already, try to get video data from YT
+			else {
+				$video_data = $this->get_youtube_data($video_id)[0];
+			}
+			
+			if(is_array($video_data) && !empty($video_data)) {
+				
+				// If channel ID found, allow upload to continue
+				if(strlen($video_data['channel_id'])) {
+					
+					// If artist provided, check if video is from official channel
+					// If artist not provided, try to find artist with that channel listed
+					$sql_artist = 'SELECT id FROM artists WHERE '.(is_numeric($artist_id) ? 'id=? AND ' : null).' official_links LIKE CONCAT("%", ?, "%") LIMIT 1';
+					$values_artist[] = 'youtube.com/channel/'.$video_data['channel_id'];
+					if(is_numeric($artist_id)) {
+						array_unshift($values_artist, $artist_id);
+					}
+					
+					$stmt_artist = $this->pdo->prepare($sql_artist);
+					$stmt_artist->execute($values_artist);
+					$rslt_artist = $stmt_artist->fetchColumn();
+					
+					// If artist was found by searching official channel, do one more check
+					// to see if video is already uploaded
+					if(is_numeric($rslt_artist)) {
+						$artist_id = $rslt_artist;
+						
+						// If video with same ID/artist is found, unset artist ID so query doesn't continue
+						$sql_check = 'SELECT 1 FROM videos WHERE youtube_id=? AND artist_id=? LIMIT 1';
+						$stmt_check = $this->pdo->prepare($sql_check);
+						$stmt_check->execute([ $video_id, $artist_id ]);
+						if($stmt_check->fetchColumn()) {
+							unset($artist_id);
+						}
+						
+						// If video not already in DB, continue
+						else {
+							$is_whitelisted = true;
+						}
+					}
+					
+					// If artist was provided, or was found by searching links, go ahead
+					if(is_numeric($artist_id)) {
+						$values_video = [
+							$artist_id,
+							is_numeric($release_id) ? $release_id : null,
+							$_SESSION['user_id'],
+							$video_id,
+							$video_data['date_occurred'],
+							$is_whitelisted ? 0 : 1,
+						];
+						
+						$sql_video = 'INSERT INTO videos (artist_id, release_id, user_id, youtube_id, date_occurred, is_flagged) VALUES (?, ?, ?, ?, ?, ?)';
+						$stmt_video = $this->pdo->prepare($sql_video);
+						if($stmt_video->execute($values_video)) {
+							$output = $video_data;
+						}
+						
+					}
+				}
+			}
+			
+			return $output;
+		}
+		
+		
+		
+		// ======================================================
 		// Given ID, pull data from YouTube
 		// ======================================================
 		function get_youtube_data($input_ids, $associative = false) {
