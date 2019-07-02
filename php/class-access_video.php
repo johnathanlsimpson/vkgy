@@ -85,11 +85,6 @@
 				$output = array_values($output);
 			}
 			
-			// Return single result, if requested
-			if(is_array($input_ids) && count($input_ids) === 1 && is_array($output) && count($output) === 1) {
-				$output = reset($output);
-			}
-			
 			return $output;
 		}
 		
@@ -142,7 +137,7 @@
 			}
 			
 			// ORDER -----------------------------------------------
-			$sql_order = $args['order'] ? (is_array($args['order']) && !empty($args['order']) ? $args['order'] : [ $args['order'] ]) : [ 'videos.date_added DESC' ];
+			$sql_order = $args['order'] ? (is_array($args['order']) && !empty($args['order']) ? $args['order'] : [ $args['order'] ]) : [ 'videos.date_occurred DESC' ];
 			
 			// LIMIT -----------------------------------------------
 			$sql_limit = $args['limit'] ?: ($args['get'] === 'count' || strlen($args['artist_id']) ? null : '100');
