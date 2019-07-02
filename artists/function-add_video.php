@@ -14,7 +14,7 @@ if(strlen($input_url) && $_SESSION['is_signed_in']) {
 	if($youtube_id) {
 		
 		// Get video data, if exists
-		$video_data = $access_video->get_youtube_data($youtube_id);
+		$video_data = $access_video->get_youtube_data($youtube_id)[0];
 		if(is_array($video_data) && !empty($video_data)) {
 			
 			// If channel ID provided, we'll use that
@@ -44,10 +44,11 @@ if(strlen($input_url) && $_SESSION['is_signed_in']) {
 						is_numeric($release_id) ? $release_id : null,
 						$_SESSION['user_id'],
 						$youtube_id,
+						$video_data['date_occurred'],
 						$is_whitelisted ? 0 : 1,
 					];
 					
-					$sql_video = 'INSERT INTO videos (artist_id, release_id, user_id, youtube_id, is_flagged) VALUES (?, ?, ?, ?, ?)';
+					$sql_video = 'INSERT INTO videos (artist_id, release_id, user_id, youtube_id, date_occurred, is_flagged) VALUES (?, ?, ?, ?, ?, ?)';
 					$stmt_video = $pdo->prepare($sql_video);
 					if($stmt_video->execute($values_video)) {
 						$output = $youtube_data;
