@@ -324,15 +324,16 @@ class CommentHandler {
 				self.initCommentButton('edit', newCommentTemplate.querySelector('.comment__edit'));
 				self.initCommentButton('delete', newCommentTemplate.querySelector('.comment__delete'));
 				
-				// Attach new comment at appropriate location
-				if(commentMethod === 'new') {
-					
-					// If not signed in, initialize edit button so name can be added
+				// If comment made (not edited) by non-user, offer to sign in
+				if(commentMethod === 'new' || commentMethod === 'reply') {
 					if(data.is_approved === '0') {
 						newCommentTemplate.querySelector('.comment__edit').click();
+						newCommentTemplate.querySelector('.comment__edit').style.background = 'blue';
 					}
-					
-					// Append new comment to parent thread
+				}
+				
+				// For new comments, create new thread; for replies, place in current thread
+				if(commentMethod === 'new') {
 					parentThread = self.getCommentElemParent('thread', submitButton);
 					newThreadTemplate.querySelector('.comment__thread').appendChild(newCommentTemplate);
 					parentThread.parentNode.insertBefore(newThreadTemplate, parentThread.nextSibling);
