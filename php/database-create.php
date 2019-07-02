@@ -707,6 +707,7 @@ CREATE TABLE IF NOT EXISTS `videos` (
   `release_id` int(11) DEFAULT NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
   `date_added` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_occurred` datetime DEFAULT NULL,
   `youtube_id` text COLLATE ".$pdo_config['db_collation']." NOT NULL,
   `is_flagged` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
@@ -954,6 +955,9 @@ ALTER TABLE `tags_releases`
 ALTER TABLE `users`
 	ADD PRIMARY KEY (`id`);
 
+ALTER TABLE `videos`
+	ADD PRIMARY KEY (`id`);
+
 ALTER TABLE `users_avatars`
 	ADD PRIMARY KEY (`id`),
 	ADD UNIQUE KEY `user_id` (`user_id`);
@@ -1114,6 +1118,8 @@ ALTER TABLE `users_tokens`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `users_views`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `videos`
+	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `views`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `vip`
@@ -1225,4 +1231,7 @@ ALTER TABLE `releases_wants`
 ALTER TABLE `users_badges`
 	ADD CONSTRAINT `users_badges_ibfk_1` FOREIGN KEY (`badge_id`) REFERENCES `badges` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
 	ADD CONSTRAINT `users_badges_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `videos`
+	ADD CONSTRAINT `videos_artists_ibfk_1` FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ";
