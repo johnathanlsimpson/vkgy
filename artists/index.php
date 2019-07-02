@@ -1,6 +1,7 @@
 <?php	
 	include_once("../artists/function-sort_musicians.php");
 	include_once("../php/class-access_user.php");
+	include_once('../php/class-access_video.php');
 	
 	breadcrumbs([
 		"Artists" => "/artists/"
@@ -8,6 +9,7 @@
 	
 	$access_artist = new access_artist($pdo);
 	$access_user = new access_user($pdo);
+	$access_video = new access_video($pdo);
 	$markdown_parser = new parse_markdown($pdo);
 	
 	$pageTitle = "Artist list | アーティスト一覧";
@@ -19,7 +21,9 @@
 		'Add artist' => '/artists/add/',
 	], 'interact', true);
 	
-	// Choose page
+	//
+	// Choose template and get base data
+	//
 	if(!empty($_GET["artist"])) {
 		$artist = $access_artist->access_artist(["friendly" => friendly($_GET["artist"]), "get" => "all"]);
 		
@@ -33,7 +37,12 @@
 				}
 			}
 			else {
-				$show_artist_page = true;
+				if($_GET['section'] === 'videos') {
+					$show_videos = true;
+				}
+				else {
+					$show_artist_page = true;
+				}
 			}
 		}
 		else {
@@ -50,7 +59,11 @@
 	}
 	$_GET["letter"] = preg_match('/'.'^[A-z0\-]$'.'/', $_GET["letter"]) ? $_GET["letter"] : 'a';
 	
-	// Show page: Edit
+	
+	
+	//
+	// Transform data & load page: edit
+	//
 	if($show_edit_page) {
 		$pageTitle = "Edit ".$artist["quick_name"];
 		
@@ -90,164 +103,10 @@
 		include("../artists/page-edit.php");
 	}
 	
-	// Show page: Profile
-	elseif($show_artist_page) {
-		
-		$pageTitle = $artist["quick_name"]." profile | ".$artist["name"]."&#12503;&#12525;&#12501;&#12451;&#12540;&#12523;";
-		$page_description = $artist["quick_name"]." profile, biography, members' history. 「".$artist["name"]."」のプロフィール、活動、リリース情報、など。".($artist["lineup"] ? " (".$artist["lineup"].")" : null);
-		$page_image = "https://vk.gy/artists/".$artist["friendly"]."/main.large.jpg";
-		
-		breadcrumbs([
-			$artist["quick_name"] => "/artists/".$artist["friendly"]."/",
-			"Profile" => "/artists/".$artist["friendly"]."/"
-		]);
-		
-		subnav([
-			"Edit artist" => "/artists/".$artist["friendly"]."/edit/"
-		], true);
-		
-		// Get musicians' band history
-		$artist["musicians"] = sort_musicians($artist["musicians"]);
-		
-		$sql_view = "INSERT INTO artists_views (artist_id, date_occurred, view_count) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE view_count = view_count + 1";
-		$stmt_view = $pdo->prepare($sql_view);
-		$stmt_view->execute([$artist["id"], date("Y-m-d")]);
-		
-		// Parse history
-		if(is_array($artist['history']) && !empty($artist['history'])) {
-			for($i=0; $i<count($artist['history']); $i++) {
-				$history_line = $artist['history'][$i];
-				
-				// Parse text
-				if(in_array('is_uneditable', $history_line['type'])) {
-				}
-				else {
-					$history_line['content'] = $markdown_parser->parse_markdown($history_line['content']);
-				}
-				
-				// Check if live schedule has entry at the same date
-				list($y, $m, $d) = explode('-', $history_line['date_occurred']);
-				
-				// If last entry for particular day, check if we have a corresponding live schedule entry
-				if(
-					(isset($artist['history'][$i + 1]) && $artist['history'][$i + 1]['date_occurred'] != $history_line['date_occurred'])
-					||
-					($i +1 === count($artist['history']))
-				) {
-					
-					// If entry ISN'T live schedule, go ahead with check
-					if(!in_array(14, $history_line['type'])) {
-						if(is_array($artist['lives']) && !empty($artist['lives']) && is_array($artist['lives'][$y][$m][$d])) {
-							$schedule_line = $artist['lives'][$y][$m][$d][0];
-							
-							$schedule_content =
-								'<a class="a--inherit" href="/lives/&area_id='.$schedule_line['area_id'].'">'.
-								lang(($schedule_line['area_romaji'] ?: $schedule_line['area_name']), $schedule_line['area_name'], ['secondary_class' => 'any--hidden']).
-								'</a>'.
-								' '.
-								'<a class="a--inherit" href="/lives/&livehouse_id='.$schedule_line['livehouse_id'].'">'.
-								lang(($schedule_line['livehouse_romaji'] ?: $schedule_line['livehouse_name']), $schedule_line['livehouse_name'], ['secondary_class' => 'any--hidden']).
-								'</a>';
-							
-							array_splice($artist['history'], ($i + 1), 0, 'live');
-							
-							$artist['history'][$i + 1] = [
-								'date_occurred' => $schedule_line['date_occurred'],
-								'content' => $schedule_content,
-								'type' => [ 14, 'is_uneditable' ],
-							];
-						}
-					}
-				}
-				
-				// Merge changes made back into history array
-				$artist['history'][$i] = $history_line;
-			}
-		}
-		
-		if(is_array($artist["history"])) {
-			$num_history = count($artist['history']);
-			
-			for($i=0; $i<$num_history; $i++) {
-				list($y, $m, $d) = explode('-', $artist['history'][$i]['date_occurred']);
-				
-				$tmp_history[$y][$artist['history'][$i]['date_occurred']][] = $artist['history'][$i];
-			}
-			
-			$artist['history'] = $tmp_history;
-		}
-		
-		// Unname history keys
-		if(is_array($artist["history"]) && !empty($artist["history"])) {
-			$artist["history"] = array_values($artist["history"]);
-			for($i = 0; $i < count($artist["history"]); $i++) {
-				$artist["history"][$i] = array_values($artist["history"][$i]);
-			}
-		}
-		
-		// Get history types
-		for($i = 0; $i < count($artist["history"]); $i++) {
-			for($n = 0; $n < count($artist["history"][$i]); $n++) {
-				for($m = 0; $m < count($artist["history"][$i][$n]); $m++) {
-					$types = "";
-					
-					foreach($artist["history"][$i][$n][$m]["type"] as $type) {
-						$types .= " ".$access_artist->artist_bio_types[$type]." ";
-					}
-					
-					$artist["history"][$i][$n][$m]["type"] = $types;
-				}
-			}
-		}
-		
-		// Reorder history
-		for($i = 0; $i < count($artist["history"]); $i++) {
-			for($n = 0; $n < count($artist["history"][$i]); $n++) {
-				$keys_to_move = [];
-				
-				for($m = 0; $m < count($artist["history"][$i][$n]); $m++) {
-					if(strstr($artist["history"][$i][$n][$m]["type"], " member ") !== false) {
-						$keys_to_move[] = $m;
-					}
-				}
-				
-				for($m = 0; $m < count($artist["history"][$i][$n]); $m++) {
-					if(strstr($artist["history"][$i][$n][$m]["type"], " schedule ") !== false) {
-						$keys_to_move[] = $m;
-					}
-				}
-				
-				for($m = 0; $m < count($artist["history"][$i][$n]); $m++) {
-					if(strstr($artist["history"][$i][$n][$m]["type"], " release ") !== false) {
-						$keys_to_move[] = $m;
-					}
-				}
-				
-				for($m = 0; $m < count($artist["history"][$i][$n]); $m++) {
-					if(strstr($artist["history"][$i][$n][$m]["type"], " disbandment ") !== false) {
-						$keys_to_move[] = $m;
-						$artist["date_ended"] = $artist["history"][$i][$n][$m]["date_occurred"] > $artist["date_ended"] ? $artist["history"][$i][$n][$m]["date_occurred"] : $artist["date_ended"];
-					}
-					if(strstr($artist["history"][$i][$n][$m]["type"], " formation ") !== false) {
-						$artist["date_occurred"] = $artist["history"][$i][$n][$m]["date_occurred"] > $artist["date_occurred"] ? $artist["history"][$i][$n][$m]["date_occurred"] : $artist["date_occurred"];
-					}
-				}
-				
-				for($m = 0; $m < count($artist["history"][$i][$n]); $m++) {
-					if(strstr($artist["history"][$i][$n][$m]["type"], " lineup ") !== false) {
-						$keys_to_move[] = $m;
-					}
-				}
-				
-				if(!empty($keys_to_move)) {
-					foreach($keys_to_move as $key) {
-						$artist["history"][$i][$n][] = $artist["history"][$i][$n][$key];
-						unset($artist["history"][$i][$n][$key]);
-					}
-					$artist["history"][$i][$n] = array_values($artist["history"][$i][$n]);
-				}
-			}
-		}
+	//
+	// Transform data & load page: profile or videos
+	//
+	if($show_videos || $show_artist_page) {
 		
 		// Format edit history
 		$sql_edit_history = 'SELECT edits_artists.*, users.username FROM edits_artists LEFT JOIN users ON users.id=edits_artists.user_id WHERE edits_artists.artist_id=? ORDER BY date_occurred DESC';
@@ -268,6 +127,13 @@
 			}
 			
 			$artist['edit_history'] = array_values($artist['edit_history']);
+		}
+		
+		// Pull out default image from images array
+		if(!empty($artist['images']) && is_numeric($artist['image_id'])) {
+			$artist['image'] = $artist['images'][$artist['image_id']];
+			unset($artist['images'][$artist['image_id']]);
+			$artist['images'] = array_values($artist['images']);
 		}
 		
 		// Get comments
@@ -325,10 +191,119 @@
 			}
 		}
 		
+		// History
+		include('function-sort_history.php');
+		$artist['history'] = parse_history_types($artist['history'], $access_artist);
+		$artist['history'] = insert_lives_into_history($artist['history'], $artist['lives']);
+		$artist['history'] = parse_history_markdown($artist['history'], $markdown_parser);
+		$artist['history'] = link_activity_area($artist['history'], $artist['areas']);
+		$artist['date_occurred'] = get_formation_dates($artist['history']);
+		$artist['history'] = inline_lists($artist['history']);
+		$artist['history'] = flag_questions($artist['history']);
+		$artist['history'] = structure_by_date($artist['history']);
+		foreach($artist['history'] as $y => $history_year) {
+			foreach($history_year as $m => $history_month) {
+				foreach($history_month as $d => $history_day) {
+					$artist['history'][$y][$m][$d] = format_releases($history_day);
+				}
+			}
+		}
+		
+		// Links
+		include('function-format_artist_links.php');
+		$artist['official_links'] = format_artist_links($artist['official_links']);
+		
+		// Remove empty arrays
+		foreach(['musicians', 'history', 'lives', 'images', 'videos', 'labels', 'official_links', 'edit_history'] as $key) {
+			if(is_array($artist[$key]) && !empty($artist[$key])) {
+			}
+			else {
+				unset($artist[$key]);
+			}
+		}
+		
+		// Back/forward navigation
+		if(is_array($rslt_next) && !empty($rslt_next)) {
+			if(count($rslt_next) === 2) {
+				$rslt_next[] = [ 'romaji' => $artist['romaji'], 'name' => $artist['name'], 'type' => $rslt_next[0]['type'] === 'previous' ? 'next' : 'previous' ];
+			}
+			foreach($rslt_next as $directional_artist) {
+				subnav([
+					[
+						'text' => lang( (  $directional_artist['romaji'] ?:   $directional_artist['name']),   $directional_artist['name'], 'hidden' ),
+						'url' => strlen(  $directional_artist['friendly']) ? '/artists/'.  $directional_artist['friendly'].'/' : null,
+						'position' =>   $directional_artist['type'] === 'rand' ? 'center' : (  $directional_artist['type'] === 'previous' ? 'left' : 'right'),
+					]
+				], 'directional');
+			}
+		}
+		
+		// Set up permissions
+		$artist_is_removed;
+		$artist_is_stub = $artist['musicians'] || $artist['history'] ? false : true;
+		$artist_is_viewable = $artist_is_removed && $_SESSION['is_vip'] || !$artist_is_removed ? true : false;
+	}
+	
+	//
+	// Transform data & load page: videos
+	//
+	if($show_videos) {
+		
+		// Set page variables
+		$page_title = $artist['quick_name'].' videos | '.$artist['name'].sanitize('の動画');
+		$page_description = 'Official videos by '.$artist['quick_name'].'. '.$artist['name'].sanitize('より公式の動画。');
+		$page_image = 'https://vk.gy/artists/'.$artist['friendly'].'/main.large.jpg';
+		
+		breadcrumbs([
+			$artist['quick_name'] => '/artists/'.$artist['friendly'].'/',
+			'Videos' => '/artists/'.$artist['friendly'].'/videos/',
+		]);
+		
+		// Get videos
+		if($_GET['section'] === 'videos') {
+			$artist['videos'] = $access_video->access_video([ 'artist_id' => $artist['id'], 'get' => 'all' ]);
+		}
+		
+		// Include template
+		include('page-videos.php');
+	}
+	
+	//
+	// Transform data & load page: profile
+	//
+	if($show_artist_page) {
+		
+		// Set page variables
+		$pageTitle = $artist["quick_name"]." profile | ".$artist["name"]."&#12503;&#12525;&#12501;&#12451;&#12540;&#12523;";
+		$page_description = $artist["quick_name"]." profile, biography, members' history. 「".$artist["name"]."」のプロフィール、活動、リリース情報、など。".($artist["lineup"] ? " (".$artist["lineup"].")" : null);
+		$page_image = "https://vk.gy/artists/".$artist["friendly"]."/main.large.jpg";
+		
+		breadcrumbs([
+			$artist["quick_name"] => "/artists/".$artist["friendly"]."/",
+			"Profile" => "/artists/".$artist["friendly"]."/"
+		]);
+		
+		subnav([
+			"Edit artist" => "/artists/".$artist["friendly"]."/edit/"
+		], true);
+		
+		// Get musicians' band history
+		$artist["musicians"] = sort_musicians($artist["musicians"]);
+		
+		$sql_view = "INSERT INTO artists_views (artist_id, date_occurred, view_count) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE view_count = view_count + 1";
+		$stmt_view = $pdo->prepare($sql_view);
+		$stmt_view->execute([$artist["id"], date("Y-m-d")]);
+		
+		// Default video
+		$artist['video'] = $access_video->access_video([ 'artist_id' => $artist['id'], 'is_approved' => true, 'get' => 'basics', 'limit' => 1 ]);
+		
 		include("../artists/page-artist.php");
 	}
 	
-	elseif($show_add_page) {
+	//
+	// Transform data & load page: add artist
+	//
+	if($show_add_page) {
 		$pageTitle = "Add artists";
 
 		breadcrumbs([
@@ -338,7 +313,10 @@
 		include("../artists/page-add.php");
 	}
 	
-	else {
+	//
+	// Transform data & load page: artist list
+	//
+	if(!$show_add_page && !$show_artist_page && !$show_videos && !$show_edit_page) {
 		$artist_list = $access_artist->access_artist(["letter" => $_GET["letter"], "get" => "artist_list"]);
 		$num_artists = count($artist_list);
 		

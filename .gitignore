@@ -10,6 +10,7 @@ uploads/*
 php/database-variables.php
 php/class-access_social_media-key.php
 php/class-login-key.php
+php/class-access_video-key.php
 google*
 test*
 */config-*.php

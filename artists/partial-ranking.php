@@ -26,17 +26,19 @@
 	$rslt_lives = $stmt_lives->fetchAll();
 
 	if(is_array($artist["history"]) && !empty($artist["history"])) {
-		for($a=0; $a<count($artist["history"]); $a++) {
-			for($b=0; $b<count($artist["history"][$a]); $b++) {
-				for($c=0; $c<count($artist["history"][$a][$b]); $c++) {
-					if(
-						!empty($artist["history"][$a][$b][$c]["date_occurred"])
-						&&
-						stripos($artist["history"][$a][$b][$c]["type"], "live") !== false
-						&&
-						stripos($artist["history"][$a][$b][$c]["content"], "oneman") !== false
-					) {
-						$oneman_lives[$artist["history"][$a][$b][$c]["date_occurred"]] = "";
+		foreach($artist['history'] as $history_year) {
+			foreach($history_year as $history_month) {
+				foreach($history_month as $history_day) {
+					foreach($history_day as $event) {
+						if(
+							!empty($event["date_occurred"])
+							&&
+							in_array('live', $event["type"])
+							&&
+							stripos($event["content"], "oneman") !== false
+						) {
+							$oneman_lives[$event["date_occurred"]] = "";
+						}
 					}
 				}
 			}

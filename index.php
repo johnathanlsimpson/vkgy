@@ -34,6 +34,7 @@
 	script([
 		"/scripts/external/script-jquery-3.2.1.js",
 		"/scripts/external/script-lazyload.js",
+		'/scripts/script-lazyLoadYouTube.js',
 		"/scripts/script-inlineSubmit.js",
 		"/scripts/script-initLazyLoad.js",
 		"/scripts/external/script-popper.js",

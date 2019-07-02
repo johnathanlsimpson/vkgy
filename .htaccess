@@ -77,6 +77,7 @@ RewriteRule  ^sig.jpg$                    /account/page-sig.php
 
 RewriteRule  ^artists/add/?$                                                     /?artists/&action=add
 RewriteRule  ^artists/([-\w]+)/?$                                                /?artists/&artist=$1
+RewriteRule  ^artists/([-\w]+)/videos/?$                                         /?artists/&artist=$1&section=videos
 RewriteRule  ^artists/([-\w]+)\.jpg$                                             /artists/page-image.php?friendly=$1
 RewriteRule  ^artists/([-\w]+)/edit/?$                                           /?artists/&action=edit&artist=$1
 RewriteRule  ^artists/([-\w]+)/main(?:\.(thumbnail|small|medium|large))?\.jpg?$  /images/page-image.php?artist=$1&method=$2

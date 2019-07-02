@@ -309,6 +309,10 @@
 						"releases.upc",
 						"releases.medium",
 					];
+					$sql_select[] = 'releases.press_name';
+					$sql_select[] = 'releases.press_romaji';
+					$sql_select[] = 'releases.type_name';
+					$sql_select[] = 'releases.type_romaji';
 					if($args['edit_ids']) {
 						$sql_select[] = 'users.username';
 						$sql_select[] = 'edits_releases.date_occurred AS date_edited';
