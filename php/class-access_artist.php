@@ -217,6 +217,7 @@
 			13 => "trouble",      // death, injury, arrest, etc
 			14 => "schedule",     // non-special live schedule
 			15 => "s",            // duplicate for schedule
+			16 => 'note',         // off-topic note
 		];
 		
 		
@@ -286,6 +287,7 @@
 								"trouble"      => "\bdeath\b|\bdies\b|\binjur|\barrest|\bjail\b|\bscandal|\bcancel",
 								"setlist"      => "setlist| \/ \d\.",
 								"schedule"     => "^[A-z0-9 ]+$",
+								'note'         => '^Note: ',
 							];
 							foreach($tag_patterns as $type => $pattern) {
 								if(preg_match("/".$pattern."/i", $line)) {
@@ -320,6 +322,13 @@
 									$area_id = $rslt_check_area['id'];
 								}
 							}
+						}
+						
+						// Note
+						if(is_array($line_type) && in_array(array_search('note', $this->artist_bio_types), $line_type)) {
+							$note_stem_pattern = '^[Nn]ote: ';
+							
+							$line = preg_replace('/'.$note_stem_pattern.'/', '', $line);
 						}
 						
 						// Name pronunciation
