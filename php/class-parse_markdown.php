@@ -1,5 +1,6 @@
 <?php
 	include_once("../php/include.php");
+	include_once('../php/class-access_video.php');
 	include_once("../php/external/class-parsedown.php");
 
 	class parse_markdown {
@@ -205,6 +206,7 @@
 			$access_label = new access_label($this->pdo);
 			$access_release = new access_release($this->pdo);
 			$access_user = new access_user($this->pdo);
+			$access_video = new access_video($this->pdo);
 			
 			$references = [];
 			
@@ -364,6 +366,67 @@
 				}
 			}
 			unset($matches);
+			
+			
+			
+			
+			
+			
+			// YouTube link >> data object
+			// -----------------------------------------------------
+			preg_match_all("/".$this->youtube_pattern."/", $input_content, $matches, PREG_OFFSET_CAPTURE);
+			if(is_array($matches)) {
+				$full_matches = $matches[0];
+				$ids          = $matches[1];
+				
+				if(is_array($full_matches)) {
+					foreach($full_matches as $key => $match) {
+						$full_match = $match[0];
+						$offset     = $match[1];
+						$length     = strlen($match[0]);
+						$id         = $ids[$key][0];
+						
+						//$video_data = $access_video->add_video($id, $artist_id);
+						
+						//if(is_array($video_data) && !empty($video_data)) {
+							//$output = $video_data;
+							$output["id"] = $id;
+							$output["offset"] = $offset;
+							$output["length"] = $length;
+							$output["type"] = 'video';
+							
+							$references[] = $output;
+						//}
+						
+						
+		//$returned_data = $access_video->add_video($youtube_id, $artist_id);
+						
+						/*$release = $access_release->access_release(["release_id" => $id, "get" => "basics"]);
+						
+						if(is_array($release)) {
+							$output = $release;
+							
+							$output["tracklist"] = is_array($release["tracklist"]) ? $release["tracklist"] : [];
+							$output["inline"] = substr($input_content, ($offset - 2), 2) === "](" ? true : false;
+							$output["id"] = $id;
+							$output["offset"] = $offset;
+							$output["length"] = $length;
+							$output["type"] = "release";
+							
+							if(is_numeric($output["id"]) && $output["id"] >= 0) {
+								$references[] = $output;
+							}
+						}*/
+					}
+				}
+			}
+			unset($matches);
+			
+			
+			
+			
+			
+			
 			
 			// Concert markdown >> data object
 			// -----------------------------------------------------
@@ -624,6 +687,17 @@
 						$output = str_replace(["\n", "\t", "\r"], "", ob_get_clean());
 					}
 					
+					// YouTube
+					elseif($reference_datum["type"] === "video" && !$ignore_references) {
+						ob_start();
+						?>
+							<div class="module module--youtube">
+								<a class="lazy youtube__embed" data-id="<?= $reference_datum['id']; ?>" data-src="<?= 'https://img.youtube.com/vi/'.$reference_datum['id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$reference_datum['id']; ?>" target="_blank"></a>
+							</div>
+						<?php
+						$output = str_replace(["\n", "\t", "\r"], "", ob_get_clean());
+					}
+					
 					if($reference_datum["inline"]) {
 						$reference_datum["offset"] = strpos($input_content, "\n", $reference_datum["offset"]);
 						$reference_datum["length"] = 0;
@@ -634,10 +708,7 @@
 			}
 			
 			if(!$ignore_references) {
-				$input_content = preg_replace_callback("/".$this->youtube_pattern."/", function($match) {
-					return '<div class="module module--youtube"><iframe src="https://www.youtube.com/embed/'.$match[1].'" frameborder="0" allowfullscreen></iframe></div>';
-				}, $input_content);
-				
+				// Twitter
 				$input_content = preg_replace_callback("/".$this->twitter_pattern."/", function($match) {
 					return '<div class="module module--twitter"><blockquote class="twitter-tweet" data-lang="en"><a href="https://twitter.com/'.$match[1].'/status/'.$match[2].'"></a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>';
 				}, $input_content);
