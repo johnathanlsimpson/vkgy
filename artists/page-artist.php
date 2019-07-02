@@ -8,7 +8,6 @@ style([
 ]);
 
 script([
-	'/scripts/script-lazyLoadYouTube.js',
 	'/artists/script-page-artist.js',
 ]);
 
