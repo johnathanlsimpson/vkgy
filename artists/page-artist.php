@@ -8,43 +8,9 @@ style([
 ]);
 
 script([
-	'/scripts/script-pronounce.js',
-	'/scripts/script-initDelete.js',
 	'/scripts/script-lazyLoadYouTube.js',
 	'/artists/script-page-artist.js',
 ]);
-
-// Back/forward navigation
-if(is_array($rslt_next) && !empty($rslt_next)) {
-	if(count($rslt_next) === 2) {
-		$rslt_next[] = [ 'romaji' => $artist['romaji'], 'name' => $artist['name'], 'type' => $rslt_next[0]['type'] === 'previous' ? 'next' : 'previous' ];
-	}
-	foreach($rslt_next as $directional_artist) {
-		subnav([
-			[
-				'text' => lang( (  $directional_artist['romaji'] ?:   $directional_artist['name']),   $directional_artist['name'], 'hidden' ),
-				'url' => strlen(  $directional_artist['friendly']) ? '/artists/'.  $directional_artist['friendly'].'/' : null,
-				'position' =>   $directional_artist['type'] === 'rand' ? 'center' : (  $directional_artist['type'] === 'previous' ? 'left' : 'right'),
-			]
-		], 'directional');
-	}
-}
-
-// Pull out default image from images array
-if(!empty($artist['images']) && is_numeric($artist['image_id'])) {
-	$artist['image'] = $artist['images'][$artist['image_id']];
-	unset($artist['images'][$artist['image_id']]);
-	$artist['images'] = array_values($artist['images']);
-}
-
-// Remove empty arrays
-foreach(['musicians', 'history', 'lives', 'images', 'videos', 'labels', 'official_links', 'edit_history'] as $key) {
-	if(is_array($artist[$key]) && !empty($artist[$key])) {
-	}
-	else {
-		unset($artist[$key]);
-	}
-}
 
 // Build in-page nav
 $in_page_navs = [
@@ -56,11 +22,6 @@ $in_page_navs = [
 	[ 'comments', 'Comment', 'コメント' ],
 ];
 $in_page_navs = array_filter($in_page_navs);
-
-// Set up permissions
-$artist_is_removed;
-$artist_is_stub = $artist['musicians'] || $artist['history'] ? false : true;
-$artist_is_viewable = $artist_is_removed && $_SESSION['is_vip'] || !$artist_is_removed ? true : false;
 ?>
 
 <div class="col c4-ABBB">
@@ -238,191 +199,11 @@ $artist_is_viewable = $artist_is_removed && $_SESSION['is_vip'] || !$artist_is_r
 			</div>
 			
 			<!-- Sidebar -->
-			<div class="artist__right">
-				
-				<!-- Stats -->
-				<div class="text text--outlined artist__details--second">
-					<?php include('partial-stats.php'); ?>
-				</div>
-				
-				<?php
-					if($artist_is_viewable) {
-						
-						// Sidebar: videos (unless viewing all videos)
-						if($artist['video'] && $_GET['section'] != 'videos') {
-							?>
-								<div class="text side__video-container">
-									<a class="lazy side__video-link youtube__embed" data-id="<?= $artist['video'][0]['youtube_id']; ?>" data-src="<?= 'https://img.youtube.com/vi/'.$artist['video'][0]['youtube_id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$artist['video'][0]['youtube_id']; ?>" target="_blank"></a>
-									<a class="symbol__previous side__videos-link" href="<?= '/artists/'.$artist['friendly'].'/videos/'; ?>"><?= lang('More videos', 'その他', 'hidden'); ?></a>
-									<span class="symbol__error any--weaken side__video-notice"><?= lang('Please <a class="a--inherit" href="/artists/'.$artist['friendly'].'/videos/">report</a> unofficial videos.', '非公式の動画を<a class="a--inherit" href="/artists/'.$artist['friendly'].'/videos/">報告して</a>ください。', 'hidden'); ?></span>
-								</div>
-							<?
-						}
-						
-						// Sidebar: images
-						if($artist["images"]) {
-								?>
-									<div>
-										<h3><?= lang('Images', '画像', 'div'); ?></h3>
-										<input class="obscure__input" id="obscure-images" type="checkbox" <?= count($artist['images']) > 4 ? 'checked' : null; ?> >
-										<div class="text text--outlined obscure__container obscure--faint">
-											<ul class="ul--inline any--flex images__container">
-												<?php
-													foreach($artist["images"] as $image) {
-														?>
-															<li class="images__item obscure__item">
-																<a class="images__link" href="<?= $image["url"]; ?>" style="background-image: url(<?= strtolower(str_replace(".", ".thumbnail.", $image["url"])); ?>);" target="_blank"></a>
-															</li>
-														<?php
-													}
-												?>
-											</ul>
-											<label class="input__button obscure__button" for="obscure-images">Show all</label>
-										</div>
-									</div>
-								<?php
-						}
-						
-						// Label history
-						if($artist["labels"]) {
-							?>
-								<h3><?= lang('Label history', '所属レーベル', 'div'); ?></h3>
-								<div class="label__container any--margin">
-									<?php
-										foreach($artist["labels"] as $period_key => $period) {
-											?>
-												<div class="label__period">
-													<?php
-														foreach($period as $organization_key => $organization) {
-															?>
-																<div class="label__organization">
-																	<?php
-																		foreach($organization as $company_key => $company) {
-																			?>
-																				<div class="label__company any--weaken-size">
-																					<?php
-																						if(!empty($company["friendly"])) {
-																							?>
-																								<a class="symbol__company" href="/labels/<?php echo $company["friendly"]; ?>/">
-																									<?php echo $company["quick_name"]; ?>
-																								</a>
-																							<?php
-																							echo $company["romaji"] ? " (".$company["name"].")" : null;
-																						}
-																						else {
-																							echo $company["quick_name"].($company["romaji"] ? " (".$company["name"].")" : null);
-																						}
-																						if(is_array($company["notes"])) {
-																							foreach($company["notes"] as $note) {
-																								?>
-																									<span class="any__note"><?php echo $note; ?></span>
-																								<?php
-																							}
-																						}
-																					?>
-																				</div>
-																			<?php
-																			if($company_key + 1 < count($organization)) {
-																				?>
-																					<div class="label__company label__line"><span class="symbol__line"></span></div>
-																				<?php
-																			}
-																		}
-																	?>
-																</div>
-															<?php
-															if($organization_key + 1 < count($period)) {
-																?>
-																	<span class="label__comma any--weaken-color"> &amp; </span>
-																<?php
-															}
-														}
-													?>
-												</div>
-											<?php
-											if($period_key + 1 < count($artist["labels"])) {
-												?>
-													<span class="symbol__down-caret label__next"></span>
-												<?php
-											}
-										}
-									?>
-								</div>
-							<?php
-						}
-						
-						// Links
-						if($artist["official_links"]) {
-							?>
-								<h3><?= lang('Links', 'リンク', 'div'); ?></h3>
-								<input class="obscure__input" id="obscure-links" type="checkbox" <?= count($artist['official_links']) > 4 ? 'checked' : null; ?> >
-								<div class="any--weaken text text--outlined obscure__container obscure--faint">
-									<ul>
-										<?php
-											foreach($artist["official_links"] as $link) {
-												?>
-													<li class="obscure__item">
-														<a href="<?= $link['url']; ?>" target="_blank"><?= $link['domain']; ?></a>
-														<a class="a--inherit" href="http://web.archive.org/web/1/<?= $link['url']; ?>" target="_blank">(saved)</a>
-													</li>
-												<?php
-											}
-										?>
-									</ul>
-									<label class="input__button obscure__button" for="obscure-links">Show all</label>
-								</div>
-							<?php
-						}
-						
-						// Tags
-						include("../artists/page-tags.php");
-						
-						// Popularity
-						include("../artists/partial-ranking.php");
-					}
-				?>
-			</div>
+			<div class="artist__right"><?php include('partial-sidebar.php'); ?></div>
 			
 		</div>
 		
-		<!-- Bottom -->
-		<div class="artist__bottom">
-			<?php
-				// Comments
-				include('../comments/partial-comments.php');
-				render_default_comment_section('artist', $artist['id'], $artist['comments'], $markdown_parser);
-				
-				// Edit history
-				if(is_array($artist["edit_history"]) && !empty($artist["edit_history"])) {
-					?>
-						<h3><?= lang('Edit history', '変更履歴', 'div'); ?></h3>
-						<input class="obscure__input" id="show-edits" type="checkbox" <?php echo count($artist["edit_history"]) > 4 ? "checked" : null; ?> />
-						<div class="text text--outlined obscure__container obscure--faint">
-							<ul class="ul--compact">
-								<?php
-									for($i = 0; $i < count($artist["edit_history"]); $i++) {
-										?>
-											<li class="obscure__item">
-												<span class="h4"><?= substr($artist["edit_history"][$i]["date_occurred"], 0, 10); ?></span>
-												<a class="user" href="<?php echo '/users/'.$artist["edit_history"][$i]["username"].'/'; ?>"><?= $artist["edit_history"][$i]["username"]; ?></a>
-												<?php
-													foreach($artist['edit_history'][$i]['content'] as $change) {
-														echo strlen($change) ? '<span class="symbol__edit any--weaken">'.$change.'</span> ' : null;
-													}
-												?>
-											</li>
-										<?php
-									}
-								?>
-							</ul>
-							<label class="input__button obscure__button" for="show-edits">
-								Show all
-							</label>
-						</div>
-					<?php
-				}
-			?>
-		</div>
+		<?php include('partial-bottom.php'); ?>
 		
 	</div>
 	
