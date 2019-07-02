@@ -8,7 +8,7 @@
 						
 						<!-- Flagged notice -->
 						<div class="video__flag-notice text text--compact text--outlined text--error symbol__error any--flex <?= $video['is_flagged'] ? null : 'any--hidden'; ?>" style="align-items: center; margin: 0 0 1rem 0; width: 100%;">
-							<?= lang('This video is awaiting approval.', 'この動画は承認待ちです。', 'div'); ?>
+							<?= lang('This video is awaiting approval.', 'この動画は承認待ちです。', 'hidden'); ?>
 							<?php
 								if($_SESSION['is_admin']) {
 									?>
