@@ -651,22 +651,22 @@
 				$args["letter"] = (strlen($args["letter"]) === 1 ? $args["letter"] : "-");
 				
 				if(preg_match("/"."[A-z]"."/", $args["letter"])) {
-					$sql_where[] = "friendly LIKE CONCAT(?, '%')";
+					$sql_where[] = "artists.friendly LIKE CONCAT(?, '%')";
 					$sql_values[] = $args["letter"];
 				}
 				else {
-					$sql_where[] = "friendly REGEXP '^[^A-z]'";
+					$sql_where[] = "artists.friendly REGEXP '^[^A-z]'";
 				}
 			}
 			if($args["friendly"]) {
 				if($args["get"] === "prev") {
-					$sql_where[] = "friendly < ? AND affiliation < '3'";
-					$sql_order[] = "friendly DESC";
+					$sql_where[] = "artists.friendly < ? AND affiliation < '3'";
+					$sql_order[] = "artists.friendly DESC";
 					$sql_limit = "LIMIT 1";
 				}
 				elseif($args["get"] === "next") {
-					$sql_where[] = "friendly > ? AND affiliation < '3'";
-					$sql_order[] = "friendly ASC";
+					$sql_where[] = "artists.friendly > ? AND affiliation < '3'";
+					$sql_order[] = "artists.friendly ASC";
 					$sql_limit = "LIMIT 1";
 				}
 				else {
@@ -784,7 +784,7 @@
 			$sql_join = is_array($sql_join) ? implode(' ', $sql_join) : null;
 			$sql_where = $sql_where ?: [];
 			$sql_values = $sql_values ?: [];
-			$sql_order = $sql_order ?: ["friendly ASC"];
+			$sql_order = $sql_order ?: ["artists.friendly ASC"];
 			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : $sql_limit ?: null;
 			
 			// QUERY
@@ -794,7 +794,7 @@
 			else {
 				if(!empty($sql_select)) {
 					
-					$sql_artist = "SELECT ".implode(", ", $sql_select)." FROM ".$sql_from.' '.$sql_join.' '.(!empty($sql_where) ? "WHERE (".implode(") AND (", $sql_where).")" : null).($sql_group ? 'GROUP BY '.implode(', ', $sql_group) : null)." ORDER BY ".implode(", ", $sql_order)." ".$sql_limit;
+					$sql_artist = "SELECT ".implode(", ", $sql_select)." FROM ".$sql_from.' '.$sql_join.' '.(!empty($sql_where) ? "WHERE (".implode(") AND (", $sql_where).")" : null).($sql_group ? ' GROUP BY '.implode(', ', $sql_group) : null)." ORDER BY ".implode(", ", $sql_order)." ".$sql_limit;
 					$stmt = $this->pdo->prepare($sql_artist);
 					
 					if($stmt) {
