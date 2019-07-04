@@ -1,3 +1,13 @@
+.controls__letters, .controls__title, .controls__search {
+	flex-grow: 1;
+}
+.controls__control {
+	display: inline-block;
+}
+.controls__container {
+	flex-wrap: wrap;
+}
+
 .list__item {
 	clear: both;
 	flex-basis: 400px;
