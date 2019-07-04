@@ -552,34 +552,6 @@
 						];
 					}
 				}
-				
-				// Add live schedule to artist bio
-				/*$lives = $access_live->access_live([ 'artist_id' => $artist_id, 'get' => 'name' ]);
-				
-				
-				$sql_schedule = "
-					SELECT
-						CONCAT_WS(' ', COALESCE(areas.romaji, areas.name), COALESCE(lives_livehouses.romaji, lives_livehouses.name)) AS quick_name,
-						lives.date_occurred
-					FROM lives_artists
-					LEFT JOIN lives ON lives.id=lives_artists.live_id
-					LEFT JOIN lives_livehouses ON lives_livehouses.id=lives.livehouse_id
-					LEFT JOIN areas ON areas.id=lives_livehouses.area_id
-					WHERE lives_artists.artist_id=?
-					ORDER BY lives.date_occurred DESC";
-				$stmt_schedule = $this->pdo->prepare($sql_schedule);
-				$stmt_schedule->execute([ $artist_id ]);
-				$rslt_schedule = $stmt_schedule->fetchAll();
-				
-				if(is_array($rslt_schedule) && !empty($rslt_schedule)) {
-					foreach($rslt_schedule as $live) {
-						$history[] = [
-							"date_occurred" => $live["date_occurred"],
-							"content" => $live["quick_name"],
-							"type" => ["14"]
-						];
-					}
-				}*/
 			}
 			
 			usort($history, function($a, $b) {
@@ -607,6 +579,15 @@
 				case "id"          : array_push($sql_select, "artists.id"); break;
 				case "list"        : array_push($sql_select, "artists.id", "artists.name", "artists.romaji", "COALESCE(artists.romaji, artists.name) AS quick_name", "artists.friendly", "artists.label_history"); break;
 				case "artist_list" : array_push($sql_select, "artists.id", "artists.name", "artists.romaji", "COALESCE(artists.romaji, artists.name) AS quick_name", "artists.friendly", "artists.is_exclusive"); break;
+			}
+			
+			if($args['get'] === 'artist_list') {
+				$sql_select[] = 'artists.description';
+				$sql_select[] = 'artists.pronunciation';
+				$sql_select[] = 'artists.active';
+				$sql_select[] = 'GROUP_CONCAT(tags_artists.name) AS tag_names';
+				$sql_select[] = 'GROUP_CONCAT(tags_artists.romaji) AS tag_romajis';
+				$sql_select[] = 'GROUP_CONCAT(tags_artists.friendly) AS tag_friendlys';
 			}
 			
 			// WHERE
@@ -791,6 +772,12 @@
 				}
 			}
 			
+			if($args['get'] === 'artist_list') {
+				$sql_join[] = 'LEFT JOIN artists_tags ON artists_tags.artist_id=artists.id';
+				$sql_join[] = 'LEFT JOIN tags_artists ON tags_artists.id=artists_tags.tag_id';
+				$sql_group[] = 'artists.id';
+			}
+			
 			// DEFAULTS
 			$sql_select = $sql_select ?: [];
 			$sql_from = $sql_from ?: 'artists';
@@ -807,7 +794,7 @@
 			else {
 				if(!empty($sql_select)) {
 					
-					$sql_artist = "SELECT ".implode(", ", $sql_select)." FROM ".$sql_from.' '.$sql_join.' '.(!empty($sql_where) ? "WHERE (".implode(") AND (", $sql_where).")" : null)." ORDER BY ".implode(", ", $sql_order)." ".$sql_limit;
+					$sql_artist = "SELECT ".implode(", ", $sql_select)." FROM ".$sql_from.' '.$sql_join.' '.(!empty($sql_where) ? "WHERE (".implode(") AND (", $sql_where).")" : null).($sql_group ? 'GROUP BY '.implode(', ', $sql_group) : null)." ORDER BY ".implode(", ", $sql_order)." ".$sql_limit;
 					$stmt = $this->pdo->prepare($sql_artist);
 					
 					if($stmt) {
