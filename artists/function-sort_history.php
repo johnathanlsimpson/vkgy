@@ -56,6 +56,9 @@ function insert_lives_into_history($history, $lives) {
 							'content' => $schedule_content,
 							'type' => [ 'schedule', 'is_uneditable' ],
 						];
+						
+						// Reset counter for loop
+						$num_history = count($history);
 					}
 				}
 			}
