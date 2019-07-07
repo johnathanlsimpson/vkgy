@@ -322,7 +322,9 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 			if(is_array($history[$i]["parsed_live"])) {
 				$live_parser->update_live($history[$i]["parsed_live"]);
 				
-				unset($history[$i]);
+				if($history[$i]['type'] === '(14)') {
+					unset($history[$i]);
+				}
 			}
 			
 			// Loop through and scrape activity areas
