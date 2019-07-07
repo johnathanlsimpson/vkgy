@@ -82,30 +82,26 @@
 			$rslt_id = is_numeric($rslt_nickname) ? $rslt_nickname : (is_numeric($rslt_name) ? $rslt_name : null);
 			
 			if(is_numeric($rslt_id)) {
-				$sql_get_name = "
+				$sql_livehouse = "
 					SELECT
-						CONCAT_WS(' ', COALESCE(areas.romaji, areas.name), COALESCE(lives_livehouses.romaji, lives_livehouses.name)) AS name
+						lives_livehouses.id,
+						areas.romaji AS area_romaji,
+						areas.name AS area_name,
+						lives_livehouses.romaji,
+						lives_livehouses.name
 					FROM
 						lives_livehouses
 					LEFT JOIN areas ON areas.id=lives_livehouses.area_id
 					WHERE lives_livehouses.id=?
 					LIMIT 1
 				";
-				$stmt_get_name = $this->pdo->prepare($sql_get_name);
-				$stmt_get_name->execute([ $rslt_id ]);
-				$rslt_get_name = $stmt_get_name->fetchColumn();
+				$stmt_livehouse = $this->pdo->prepare($sql_livehouse);
+				$stmt_livehouse->execute([ $rslt_id ]);
+				$rslt_livehouse = $stmt_livehouse->fetch();
 				
-				if(strlen($rslt_get_name) > 0) {
-					$livehouse_id = $rslt_id;
-					$livehouse_name = $rslt_get_name;
+				if(is_array($rslt_livehouse) && !empty($rslt_livehouse) && is_numeric($rslt_livehouse['id'])) {
+					return $rslt_livehouse;
 				}
-			}
-			
-			if(is_numeric($livehouse_id) && strlen($livehouse_name) > 0) {
-				return ["id" => $livehouse_id, "name" => $livehouse_name];
-			}
-			else {
-				return null;
 			}
 		}
 		
@@ -188,7 +184,7 @@
 			}
 				
 			if(!empty($livehouse["name"]) && $lineup && preg_match("/"."\d{4}-\d{2}-\d{2}"."/", $date_occurred)) {
-				return ["livehouse" => ["id" => $livehouse["id"], "name" => $livehouse["name"]], "date_occurred" => $date_occurred, "lineup" => $lineup, "additional_lineup" => $additional_lineup];
+				return ["livehouse" => $livehouse, "date_occurred" => $date_occurred, "lineup" => $lineup, "additional_lineup" => $additional_lineup];
 			}
 			else {
 				return false;
