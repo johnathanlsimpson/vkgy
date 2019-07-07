@@ -403,15 +403,21 @@
 								}
 								
 								if(is_array($parsed_live) && !empty($parsed_live)) {
+									$pattern_unnecessary_entry = '^Live (?:is |was )?held '.preg_quote($schedule_match[0]).'$';
+									
 									// If whole entry is just 'live at xxx.', change to -schedule tag
-									if($line == 'Live held '.$schedule_match[0]) {
-										$line = $parsed_live['livehouse']['name'];
+									if(preg_match('/'.$pattern_unnecessary_entry.'/', $line)) {
+										$line = ($parsed_live['livehouse']['area_romaji'] ?: $parsed_live['livehouse']['area_name']).' '.($parsed_live['livehouse']['romaji'] ?: $parsed_live['livehouse']['name']);
 										$line_type = [ array_search('schedule', $this->artist_bio_types) ];
 										$note = 'This was tagged -live, but it it looks like a -schedule entry. Add further information to retain the -live tag.';
 									}
 									else {
-										// If found a corresponding livehouse, make a note
-										$note = 'A livehouse is mentioned in this entry; remember, to quickly add to the live schedule, you just need the livehouse name (English ok) followed by <code>-s</code>.';
+										// If found a corresponding livehouse, make sure the reference is correct, note that live was added
+										$line = str_replace(
+											$schedule_match[0],
+											'at '.($parsed_live['livehouse']['area_romaji'] ?: $parsed_live['livehouse']['area_name']).($parsed_live['livehouse']['area_romaji'] ? ' ('.$parsed_live['livehouse']['area_name'].')' : null).' '.($parsed_live['livehouse']['romaji'] ?: $parsed_live['livehouse']['name']).($parsed_live['livehouse']['romaji'] ? ' ('.$parsed_live['livehouse']['name'].')' : null).'.',
+											$line
+										);
 									}
 								}
 								
@@ -429,7 +435,7 @@
 							$parsed_live = $this->live_parser->parse_raw_input($line, $date, $artist_id);
 							
 							if(is_array($parsed_live) && !empty($parsed_live)) {
-								$line = $parsed_live["livehouse"]["name"];
+								$line = ($parsed_live['livehouse']['area_romaji'] ?: $parsed_live['livehouse']['area_name']).' '.($parsed_live['livehouse']['romaji'] ?: $parsed_live['livehouse']['name']);
 								
 								$type_key = array_search(15, $line_type);
 								if(is_numeric($type_key)) {
