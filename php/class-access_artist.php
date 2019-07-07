@@ -403,7 +403,7 @@
 								}
 								
 								if(is_array($parsed_live) && !empty($parsed_live)) {
-									$pattern_unnecessary_entry = '^Live (?:is |was )?held '.preg_quote($schedule_match[0]).'$';
+									$pattern_unnecessary_entry = '^[Ll]ive (?:is |was )?held '.preg_quote($schedule_match[0]).'$';
 									
 									// If whole entry is just 'live at xxx.', change to -schedule tag
 									if(preg_match('/'.$pattern_unnecessary_entry.'/', $line)) {
@@ -418,6 +418,7 @@
 											'at '.($parsed_live['livehouse']['area_romaji'] ?: $parsed_live['livehouse']['area_name']).($parsed_live['livehouse']['area_romaji'] ? ' ('.$parsed_live['livehouse']['area_name'].')' : null).' '.($parsed_live['livehouse']['romaji'] ?: $parsed_live['livehouse']['name']).($parsed_live['livehouse']['romaji'] ? ' ('.$parsed_live['livehouse']['name'].')' : null).'.',
 											$line
 										);
+										
 									}
 								}
 								
