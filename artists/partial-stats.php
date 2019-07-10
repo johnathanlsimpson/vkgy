@@ -41,7 +41,7 @@
 			<h5>
 				<?php echo lang('Active', '活動期間', ['secondary_class' => 'any--hidden']); ?>
 			</h5>
-			<?php echo str_replace('0000', '', substr($artist['date_occurred'], 0, 4).'~'.substr($artist['date_ended'], 0, 4)); ?>
+			<?= $artist['date_occurred']; ?>
 		</div>
 	</div>
 	<div class="data__item">
