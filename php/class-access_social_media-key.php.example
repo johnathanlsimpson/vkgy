@@ -1,7 +1,7 @@
 <?php
 
 // Keys used when connecting to Twitter and Facebook in php/class-access_social_media.php
-// Make copy and rename to class-access_social_media-key.php
+// Make copy and rename to class-access_social_media-key.php 
 $fb_app_id = '';
 $fb_app_secret = '';
 $fb_default_access_token = '';
