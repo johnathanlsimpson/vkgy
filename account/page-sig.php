@@ -2,6 +2,15 @@
 	include_once("../php/include.php");
 	$access_blog = new access_blog($pdo);
 	
+	// Capture parameters
+	parse_str($_SERVER['QUERY_STRING'], $parameters);
+	if(is_array($parameters) && !empty($parameters)) {
+		$parameters = array_keys($parameters);
+		$username = sanitize($parameters[0]);
+		$theme = $parameters[1] === 'dark' ? 'dark' : 'light';
+	}
+	$username = strlen($username) ? $username : 'anonymous';
+	
 	// User info
 	$username = is_array($_GET) && !empty($_GET) ? sanitize(array_keys($_GET)[0]) : null;
 	$sql_user = "SELECT COUNT(releases_collections.release_id) AS num_releases, users.username, users.is_vip, users.rank FROM users LEFT JOIN releases_collections ON releases_collections.user_id=users.id WHERE users.username=? LIMIT 1";
@@ -42,20 +51,35 @@
 	imagealphablending($image, true);
 	
 	// Set image colors, fill
-	$color["bg"] = imagecolorallocate($image, 230,230,230);
-	$color["text"] = imagecolorallocate($image, 67,61,61);
-	$color["light"] = imagecolorallocate($image, 128,128,128);
-	$color["less_attention"] = imagecolorallocate($image, 111,17,49);
+	if($theme === 'light') {
+		$color["bg"] = imagecolorallocate($image, 230,230,230);
+		$color["text"] = imagecolorallocate($image, 67,61,61);
+		$color["light"] = imagecolorallocate($image, 128,128,128);
+		$color["less_attention"] = imagecolorallocate($image, 111,17,49);
+		$color['gold'] = imagecolorallocate($image, 218,165,32);
+	}
+	elseif($theme === 'dark') {
+		$color["bg"] = imagecolorallocate($image, 16,16,19);
+		$color["text"] = imagecolorallocate($image, 160,160,160);
+		$color["light"] = imagecolorallocate($image, 110,110,110);
+		$color["less_attention"] = imagecolorallocate($image, 250,100,130);
+		$color['gold'] = imagecolorallocate($image, 218,165,32);
+	}
 	imagefill($image,0,0,$color["bg"]);
-	
+		
 	// Add user avatar and logo
 	$avatar_img = '../usericons/avatar-'.$rslt_user["username"].'.png';
 	$avatar_img = file_exists($avatar_img) ? $avatar_img : '../usericons/avatar-anonymous.png';
 	$avatar_img = imagecreatefrompng($avatar_img);
 	imagecopyresampled($image, $avatar_img, 5, (150 - 60 - 5), 0, 0, 60, 60, 200, 200);
 	
-	$cage_img = imagecreatefromjpeg('../style/cage.jpg');
-	imagecopyresampled($image, $cage_img, 13.5, 10, 0, 0, 42, 65, 84, 130);
+	if($theme === 'light') {
+		$cage_img = imagecreatefromjpeg('../style/logomark-small-light.jpg');
+	}
+	elseif($theme === 'dark') {
+		$cage_img = imagecreatefromjpeg('../style/logomark-small-dark.jpg');
+	}
+	imagecopy($image, $cage_img, 13.5, 9, 0, 0, 44, 67);
 	
 	// Add text
 	$lines[] = [
@@ -149,6 +173,14 @@
 		"x" => 300
 	];
 	
+	$lines[] = [
+		'text' => $rslt_user['is_vip'] ? '★' : null,
+		'color' => 'gold',
+		'margin' => 5,
+		'size' => 9,
+		'x' => -4,
+		"preserve_y" => true,
+	];
 	$lines["username"] = [
 		"text" => $rslt_user["username"],
 		"color" => "less_attention",
@@ -167,7 +199,8 @@
 		"text" => "https://vk.gy/sig.jpg?yourUsername",
 		"color" => "light",
 		"size" => 10,
-		"x" => 300
+		"x" => 300,
+		"preserve_y" => true
 	];
 	
 	$x_margin = 10;

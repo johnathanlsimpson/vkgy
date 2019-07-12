@@ -15,7 +15,7 @@
 	<div class="card__image lazy" data-src="<?= $image_url; ?>">
 		<ul class="card__nav ul--inline any--weaken-size">
 			<li><a class="symbol__release" href="<?= '/releases/'.$friendly.'/'; ?>"><?= lang('Music', 'リリース', 'hidden'); ?></a></li>
-			<li><a class="symbol__news" href="<?= '/news/artist/'.$friendly.'/'; ?>"><?= lang('News', 'ニュース', 'hidden'); ?></a></li>
+			<li><a class="symbol__news" href="<?= '/blog/artist/'.$friendly.'/'; ?>"><?= lang('News', 'ニュース', 'hidden'); ?></a></li>
 			<?php
 				if($_SESSION['is_admin']) {
 					?>
