@@ -1,0 +1,21 @@
+.card__edit {
+	float: right;
+	line-height: 1.5rem;
+	z-index: 1;
+}
+.card__name .symbol__artist {
+	float: left;
+}
+.card__image {
+	background-position: center 25%;
+	background-repeat: no-repeat;
+	background-size: cover;
+	margin: 0.5rem -0.5rem -0.5rem -0.5rem;
+}
+.card__image:not([data-src=""]) {
+	padding-top: 5rem;
+}
+.card__nav {
+	background: hsla(var(--background), 0.9);
+	padding: 0.5rem;
+}
