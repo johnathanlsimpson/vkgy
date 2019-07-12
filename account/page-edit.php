@@ -173,19 +173,30 @@
 			<div class="col c1">
 				<div>
 					<h2>
-						Signature banner
+						Avatars and banners
 					</h2>
-					<div class="text">
-						<p>
-							Copy+paste the url below into your signature at forums to display your account's stats and the latest news:
-						</p>
-						<p>
-							<span class="any__code">https://vk.gy/sig.jpg?<?php echo $user["username"]; ?></span>
-						</p>
-						<p>
-							<img alt="Your signature banner" data-src="https://vk.gy/sig.jpg?<?php echo $user["username"]; ?>" />
-						</p>
-					</div>
+					<ul class="text">
+						<li>
+							Copy any URL below and paste it into your forum signature to display your account's latest stats, or your latest avatar.<br /><br />
+							<div class="symbol__help any--weaken">If you manually save and upload the image, it will not auto-update. The image will also not auto-update on certain services such as Twitter, even if you copy+paste the link as instructed.</div>
+						</li>
+						<li>
+							<code>https://vk.gy/sig.jpg?<?= $_SESSION['username']; ?></code><br /><br />
+							<img alt="signature banner - light" src="https://vk.gy/sig.jpg?<?= $_SESSION['username']; ?>" />
+						</li>
+						<li>
+							<code>https://vk.gy/sig.jpg?<?= $_SESSION['username']; ?>&amp;dark</code><br /><br />
+							<img alt="signature banner - light" src="https://vk.gy/sig.jpg?<?= $_SESSION['username']; ?>&amp;dark" />
+						</li>
+						<li>
+							<code>https://vk.gy/av.jpg?<?= $_SESSION['username']; ?></code><br /><br />
+							<img alt="avatar - light" src="https://vk.gy/av.jpg?<?= $_SESSION['username']; ?>" />
+						</li>
+						<li>
+							<code>https://vk.gy/av.jpg?<?= $_SESSION['username']; ?>&amp;dark</code><br /><br />
+							<img alt="avatar - light" src="https://vk.gy/av.jpg?<?= $_SESSION['username']; ?>&amp;dark" />
+						</li>
+					</ul>
 					
 					<h2>
 						Use vkgy with Mp3tag
