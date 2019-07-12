@@ -9,15 +9,20 @@
 	$image_url = image_exists($image_url, $this->pdo) ? $image_url : null;
 ?>
 
-<div class="text text--compact">
-	<a class="card__edit any--weaken-size symbol__edit <?= !$_SESSION['is_admin'] ? 'any--hidden' : null; ?>" href="<?= '/artists/'.$friendly.'/edit/'; ?>">Edit</a>
-	<a class="card__name" href="<?= '/artists/'.$friendly.'/'; ?>"><span class="symbol__artist"></span><?= $romaji ? lang($romaji, $name, 'div') : $name; ?></a>
+<div class="card text text--compact">
+	<a class="card__name a--inherit" href="<?= '/artists/'.$friendly.'/'; ?>"><span class="symbol__artist"></span><?= $romaji ? lang($romaji, $name, 'div') : $name; ?></a>
 	
 	<div class="card__image lazy" data-src="<?= $image_url; ?>">
-		<ul class="card__nav ul--inline">
-			<li><a class="symbol__artist" href="<?= '/artists/'.$friendly.'/'; ?>"><?= lang('Band', 'バンド', 'hidden'); ?></a></li>
+		<ul class="card__nav ul--inline any--weaken-size">
 			<li><a class="symbol__release" href="<?= '/releases/'.$friendly.'/'; ?>"><?= lang('Music', 'リリース', 'hidden'); ?></a></li>
 			<li><a class="symbol__news" href="<?= '/news/artist/'.$friendly.'/'; ?>"><?= lang('News', 'ニュース', 'hidden'); ?></a></li>
+			<?php
+				if($_SESSION['is_admin']) {
+					?>
+						<li><a class="symbol__edit" href="<?= '/artists/'.$friendly.'/edit/'; ?>"><?= lang('Edit', '編集', 'hidden'); ?></a></li>
+					<?php
+				}
+			?>
 		</ul>
 	</div>
 </div>
