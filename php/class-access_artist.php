@@ -28,7 +28,7 @@
 		// ======================================================
 		function artist_card($artist, $show_title = false) {
 			if(isset($artist) && is_array($artist) && !empty($artist)) {
-				include("../artists/page-card.php");
+				include("../artists/partial-card.php");
 			}
 		}
 		

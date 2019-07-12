@@ -109,7 +109,8 @@
 		$current_year = date('Y');
 
 		// Stat: Fan since
-		$stats['fan_since']['value'] = $user['fan_since'] ?: 0;
+		$stats['fan_since']['value'] = is_numeric($user['fan_since']) ? $user['fan_since'] : date('Y');
+		$fan_since_level_base = $stats['fan_since']['value'] - (date('Y') - $stats['fan_since']['value']);
 
 		// Stat: Member since
 		$stats['member_for']['value'] = ($current_year - substr($user['date_added'], 0, 4));
@@ -264,16 +265,16 @@
 				10
 			],
 			'fan_since' => [
-				1,
-				2,
-				3,
-				4,
-				5,
-				6,
-				7,
-				8,
-				9,
-				10
+				$fan_since_level_base + 0,
+				$fan_since_level_base + 1,
+				$fan_since_level_base + 2,
+				$fan_since_level_base + 3,
+				$fan_since_level_base + 4,
+				$fan_since_level_base + 5,
+				$fan_since_level_base + 6,
+				$fan_since_level_base + 7,
+				$fan_since_level_base + 8,
+				$fan_since_level_base + 9,
 			],
 			'worth' => [
 				100,
@@ -455,7 +456,7 @@
 																			echo substr($user["date_added"], 0, 10);
 																			break;
 																		case "gender":
-																			echo ''.(["&hearts;", "girl", "boy"][$user[$field]]).'';
+																			echo ''.(["-", "♀️", "♂️", "&hearts;"][$user[$field]]).'';
 																			break;
 																		case "birthday":
 																			echo substr($user[$field], 0, 4).'-'.substr($user[$field], 5, 2).'-'.substr($user[$field], 8, 2);

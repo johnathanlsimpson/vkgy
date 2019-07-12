@@ -49,15 +49,21 @@
 										<div class="input__group">
 											<label class="input__label">Gender</label>
 											<select class="input" name="gender" placeholder="select gender">
-												<option value="0" <?php echo $user["gender"] === "0" ? "selected" : null; ?>>prefer not to say</option>
-												<option value="1" <?php echo $user["gender"] === "1" ? "selected" : null; ?>>female</option>
-												<option value="2" <?php echo $user["gender"] === "2" ? "selected" : null; ?>>male</option>
-												<option value="3" <?php echo $user["gender"] === "3" ? "selected" : null; ?>>neither/other</option>
+												<option value="0" <?php echo $user["gender"] == "0" ? "selected" : null; ?>>prefer not to say</option>
+												<option value="1" <?php echo $user["gender"] == "1" ? "selected" : null; ?>>female</option>
+												<option value="2" <?php echo $user["gender"] == "2" ? "selected" : null; ?>>male</option>
+												<option value="3" <?php echo $user["gender"] == "3" ? "selected" : null; ?>>neither/other</option>
 											</select>
 										</div>
+									</div>
+									<div class="input__row">
 										<div class="input__group any--flex-grow">
 											<label class="input__label">Motto</label>
 											<input class="any--flex-grow" name="motto" placeholder="motto" value="<?php echo $user["motto"]; ?>" />
+										</div>
+										<div class="input__group">
+											<label class="input__label">VK Fan since</label>
+											<input name="fan_since" placeholder="yyyy" size="8" value="<?php echo $user['fan_since']; ?>" />
 										</div>
 									</div>
 								</li>
@@ -97,34 +103,19 @@
 										</div>
 									</div>
 								</li>
-								
-								<?php
-									if($is_vip) {
-										?>
-											<li>
-												<h3>
-													<span class="symbol__vip"></span> Temporarily limited to VIP members
-												</h3>
-												
-												<div class="input__row">
-													<div class="input__group">
-														<label class="input__label">VK Fan since</label>
-														<input name="fan_since" placeholder="YYYY" size="8" value="<?php echo $user['fan_since']; ?>" />
-													</div>
-													<div class="input__group">
-														<label class="input__label">Site theme</label>
-														
-														<input class="input__checkbox any--hidden" id="site_theme_0" name="site_theme" type="radio" value="0" <?php echo $user['site_theme'] === '0' ? 'checked' : null; ?> />
-														<label class="input__checkbox-label symbol__unchecked " for="site_theme_0">default</label>
-														
-														<input class="input__checkbox any--hidden" id="site_theme_1" name="site_theme" type="radio" value="1" <?php echo $user['site_theme'] === '1' ? 'checked' : null; ?> />
-														<label class="input__checkbox-label symbol__unchecked " for="site_theme_1">dark</label>
-													</div>
-												</div>
-											</li>
-										<?php
-									}
-								?>
+								<li>
+									<div class="input__row">
+										<div class="input__group">
+											<label class="input__label">Site theme</label>
+
+											<input class="input__checkbox any--hidden" id="site_theme_0" name="site_theme" type="radio" value="0" <?php echo $user['site_theme'] == 0 ? 'checked' : null; ?> />
+											<label class="input__checkbox-label symbol__unchecked " for="site_theme_0">default</label>
+
+											<input class="input__checkbox any--hidden" id="site_theme_1" name="site_theme" type="radio" value="1" <?php echo $user['site_theme'] == 1 ? 'checked' : null; ?> />
+											<label class="input__checkbox-label symbol__unchecked " for="site_theme_1">dark</label>
+										</div>
+									</div>
+								</li>
 							</ul>
 						</div>
 					</div>

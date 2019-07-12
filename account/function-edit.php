@@ -1,90 +1,118 @@
 <?php
-	include_once("../php/include.php");
+
+include_once('../php/include.php');
+
+if($_SESSION['is_signed_in']) {
 	
-	if($_SESSION["loggedIn"]) {
-		foreach(["name", "artist_id", "motto", "email", "website", "twitter", "facebook", "lastfm", "tumblr", 'fan_since', 'site_theme', 'gender'] as $key) {
-			$sql_values[$key] = sanitize($_POST[$key]) ?: null;
-		}
+	// Clean & set user preferences
+	foreach(['name', 'motto', 'email', 'website', 'twitter', 'facebook', 'lastfm', 'tumblr', 'fan_since', 'site_theme', 'gender'] as $key) {
+		$sql_values[$key] = sanitize($_POST[$key]);
+		$sql_values[$key] = strlen($sql_values[$key]) ? $sql_values[$key] : null;
+	}
+	
+	// Further clean some values
+	$email_pattern = '/^(?!(?:(?:\x22?\x5C[\x00-\x7E]\x22?)|(?:\x22?[^\x5C\x22]\x22?)){255,})(?!(?:(?:\x22?\x5C[\x00-\x7E]\x22?)|(?:\x22?[^\x5C\x22]\x22?)){65,}@)(?:(?:[\x21\x23-\x27\x2A\x2B\x2D\x2F-\x39\x3D\x3F\x5E-\x7E]+)|(?:\x22(?:[\x01-\x08\x0B\x0C\x0E-\x1F\x21\x23-\x5B\x5D-\x7F]|(?:\x5C[\x00-\x7F]))*\x22))(?:\.(?:(?:[\x21\x23-\x27\x2A\x2B\x2D\x2F-\x39\x3D\x3F\x5E-\x7E]+)|(?:\x22(?:[\x01-\x08\x0B\x0C\x0E-\x1F\x21\x23-\x5B\x5D-\x7F]|(?:\x5C[\x00-\x7F]))*\x22)))*@(?:(?:(?!.*[^.]{64,})(?:(?:(?:xn--)?[a-z0-9]+(?:-[a-z0-9]+)*\.){1,126}){1,}(?:(?:[a-z][a-z0-9]*)|(?:(?:xn--)[a-z0-9]+))(?:-[a-z0-9]+)*)|(?:\[(?:(?:IPv6:(?:(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){7})|(?:(?!(?:.*[a-f0-9][:\]]){7,})(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,5})?::(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,5})?)))|(?:(?:IPv6:(?:(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){5}:)|(?:(?!(?:.*[a-f0-9]:){5,})(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,3})?::(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,3}:)?)))?(?:(?:25[0-5])|(?:2[0-4][0-9])|(?:1[0-9]{2})|(?:[1-9]?[0-9]))(?:\.(?:(?:25[0-5])|(?:2[0-4][0-9])|(?:1[0-9]{2})|(?:[1-9]?[0-9]))){3}))\]))$/iD';
+	$sql_values['site_theme'] = is_numeric($sql_values['site_theme']) ? $sql_values['site_theme'] : 0;
+	$sql_values['email'] = preg_match($email_pattern, $sql_values['email']) ? $sql_values['email'] : null;
+	
+	// If email doesn't match pattern, make note
+	if($_POST['email'] && $sql_values['email'] != $_POST['email']) {
+		$output['result'] = 'Sorry, that email isn\'t allowed. Please try another one.';
+	}
+	
+	// Set some session variables based on potential changes
+	$_SESSION['site_theme'] = $sql_values['site_theme'];
+	
+	// Handle username change
+	$new_username = sanitize($_POST['new_username']) ?: null;
+	if(strlen($new_username)) {
 		
-		$_SESSION['site-theme'] = is_numeric($_POST['site_theme']) ? $_POST['site_theme'] : 0;
-		
-		$new_username = sanitize($_POST["new_username"]);
-		$current_password = $_POST["current_password"];
-		$new_password = $_POST["new_password_1"];
-		$new_password_confirmation = $_POST["new_password_2"];
-		
-		if(!empty($new_username)) {
-			if(preg_match("/"."^[\w\-\.]{3,}$"."/", $new_username)) {
-				$sql_check = "SELECT 1 FROM users WHERE username=? LIMIT 1";
-				$stmt_check = $pdo->prepare($sql_check);
-				$stmt_check->execute([$new_username]);
+		// Check that username is appropriate and isn't already used
+		if(preg_match('/'.'^[A-z0-9-]{3,}$'.'/', $new_username)) {
+			$sql_check_username = 'SELECT 1 FROM users WHERE username=? LIMIT 1';
+			$stmt_check_username = $pdo->prepare($sql_check_username);
+			$stmt_check_username->execute([ $new_username ]);
+			
+			if($stmt_check_username->fetchColumn() == 1) {
+				$output['result'] = 'Sorry, that username is taken.';
+			}
+			else {
 				
-				if(!$stmt_check->fetchColumn()) {
-					$sql_values["username"] = $new_username;
-				}
-				else {
-					$output["result"] = "Sorry, that username is already taken.";
-				}
-			}
-			else {
-				$output["result"] = "Usernames may only contain letters, numbers, underscores, hyphens, and/or periods, and must be at least 3 characters.";
-			}
-		}
-		
-		if(!empty($new_password)) {
-			if(!empty($current_password)) {
-				if($new_password === $new_password_confirmation) {
-					$sql_check = "SELECT password FROM users WHERE id=? LIMIT 1";
-					$stmt_check = $pdo->prepare($sql_check);
-					$stmt_check->execute([$_SESSION["userID"]]);
-					
-					$password = $stmt_check->fetchColumn();
-					if(password_verify($current_password, $password)) {
-						$sql_values["password"] = password_hash($new_password, PASSWORD_DEFAULT);
-					}
-					else {
-						$output["result"] = "Your current password is incorrect.";
-					}
-				}
-				else {
-					$output["result"] = "Your new password and confirmation don't match.";
-				}
-			}
-			else {
-				$output["result"] = "You must enter your current password to change it.";
-			}
-		}
-		
-		if(!$sql_values["email"] || preg_match("/"."^[\w\.\-\+]+@[\w\.\-]+$"."/", $sql_values["email"])) {
-			$sql_edit = "UPDATE users SET ".implode("=?, ", array_keys($sql_values))."=? WHERE id=? LIMIT 1";
-			
-			$sql_values = array_values($sql_values);
-			$sql_values[] = $_SESSION["userID"];
-			
-			$stmt_edit = $pdo->prepare($sql_edit);
-			
-			if($stmt_edit->execute($sql_values)) {
-				$output["status"] = "success";
-				$output["result"] = $output["result"] ? $output["result"]." Other updates successful." : "Profile successfully updated.";
-				
-				if(!empty($sql_values["username"])) {
-					setcookie("username", $sql_values["username"], time() + 60 * 60 * 24 * 40, "/", "vk.gy");
-					$_SESSION["username"] = $sql_values["username"];
-				}
-			}
-			else {
-				$output["result"] = "Sorry, your profile couldn't be updated.";
+				// If username available, set with main array of user settings, to be changed later
+				$sql_values['username'] = $new_username;
 			}
 		}
 		else {
-			$output["result"] = "That email address isn't allowed. Please try a simpler one.";
+			$output['result'] = 'Usernames must only contain letters, numbers, and/or hyphens, and must be at least 3 characters.';
+		}
+	}
+	
+	// Handle password change
+	if(strlen($_POST['new_password_1'])) {
+		if(strlen($_POST['current_password'])) {
+			if($_POST['new_password_1'] === $_POST['new_password_2']) {
+				
+				// Check current password
+				$sql_check_password = 'SELECT password FROM users WHERE id=? LIMIT 1';
+				$stmt_check_password = $pdo->prepare($sql_check_password);
+				$stmt_check_password->execute([ $_SESSION['user_id'] ]);
+				
+				if(password_verify($_POST['current_password'], $stmt_check_password->fetchColumn())) {
+					
+					// If current password matches, set with main array of user settings, to be changed later
+					$sql_values['password'] = password_hash($_POST['new_password_1'], PASSWORD_DEFAULT);
+				}
+				else {
+					$output['result'] = 'Current password is incorrect.';
+				}
+			}
+			else {
+				$output['result'] = 'New password and password confirmation don\'t match.';
+			}
+		}
+		else {
+			$output['result'] = 'Please enter your current password.';
+		}
+	}
+	
+	// Core update function
+	$sql_edit = 'UPDATE users SET '.implode('=?, ', array_keys($sql_values)).'=? WHERE id=? LIMIT 1';
+	$stmt_edit = $pdo->prepare($sql_edit);
+	
+	// Add user ID as last item in values
+	$sql_values['id'] = $_SESSION['user_id'];
+	
+	// Execute query
+	if($stmt_edit->execute( array_values($sql_values) )) {
+		
+		$output['status'] = 'success';
+		$output['result'] = $output['result'] ? $output['result'].' Other updates successful.' : 'Profile updated.';
+		
+		// If username was changed, rename avatar image file and update SESSION
+		if(strlen($sql_values['username']) && $sql_values['username'] != $_SESSION['username']) {
+			
+			// Rename avatar
+			$old_avatar = '../usericons/avatar-'.$_SESSION['username'].'.png';
+			$new_avatar = '../usericons/avatar-'.$sql_values['username'].'.png';
+			if(file_exists($old_avatar)) {
+				rename($old_avatar, $new_avatar);
+			}
+			
+			// Update session
+			$_SESSION['username'] = $sql_values['username'];
+			
+			// Note that username was changed, redirect to new profile
+			$output['result'] = 'Username changed; redirecting to <a href="/users/'.$sql_values['useranme'].'/">new profile</a>. <meta http-equiv="refresh" content="3;url=/users/'.$sql_values['username'].'/" />';
 		}
 	}
 	else {
-		$output["result"] = "Sorry, you must sign in to edit your account.";
+		$output['result'] = 'Couldn\'t update profile.';
 	}
-	
-	$output["status"] = $output["status"] ?: "error";
-	
-	echo json_encode($output);
-?>
+}
+else {
+	$output['result'] = 'Please sign in before editing your account.';
+}
+
+$output['status'] = $output['status'] ?: 'error';
+
+echo json_encode($output);

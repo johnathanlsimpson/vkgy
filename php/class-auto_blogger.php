@@ -45,10 +45,9 @@
 			// Set up "magic string" replacements for bio entries
 			$this->magic_strings = [
 				"lineup" => [
-					'secedes' => ['will secede', 'has seceded'],
-					'secede'  => ['will secede', 'have seceded'],
-					'joins'   => ['will join', 'has joined'],
-					'join'    => ['will join', 'have joined'],
+					'secede(?:s|d)?' => ['will secede', 'has seceded'],
+					'join(?:s|ed)' => ['will join', 'has joined'],
+					'join' => ['will join', 'have joined'],
 				],
 			];
 		}
@@ -259,8 +258,8 @@
 								$post[] = '('.$artist["id"].')/'.$artist["friendly"].'/\'s lineup '.($is_future ? 'will change' : 'has changed').':';
 								
 								$string = $content["content"];
-								foreach($this->magic_strings["lineup"] as $string_key => $string_replacements) {
-									$string = str_replace($string_key, ($is_future ? $string_replacements[0] : $string_replacements[1]), $string);
+								foreach($this->magic_strings["lineup"] as $string_pattern => $string_replacements) {
+									$string = preg_replace('/'.'(.*\b)('.$string_pattern.')(\b.*)'.'/', '$1'.($is_future ? $string_replacements[0] : $string_replacements[1]).'$3', $string);
 								}
 								$string  = substr($string, -1) === '.' ? substr($string, 0, -1) : $string;
 								$string .= ' on '.date('F jS', strtotime($content["date_occurred"])).'.';
