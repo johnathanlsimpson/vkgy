@@ -74,6 +74,7 @@ RewriteRule  ^users/([\w-\ \%\.]+)/?$       /?account/&username=$1
 RewriteRule  ^users/([\w-\ \%\.]+)/\&(.*)$  /account/page-download-collection.php?username=$1&$2
 RewriteRule  ^sign-out/?(.*)$             /?account/&action=sign-out$1
 RewriteRule  ^sig.jpg$                    /account/page-sig.php
+RewriteRule  ^av.jpg$                       /account/page-av.php
 
 RewriteRule  ^artists/add/?$                                                     /?artists/&action=add
 RewriteRule  ^artists/([-\w]+)/?$                                                /?artists/&artist=$1
