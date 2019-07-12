@@ -39,7 +39,7 @@ if($_SESSION["loggedIn"] && is_numeric($_SESSION["userID"])) {
 			
 			$image = new \Imagick();
 			try {
-				$image->setBackgroundColor("#e6e6e6");
+				$image->setBackgroundColor(new ImagickPixel('transparent'));
 				$image->readImageBlob($abba);
 				$image->setImageFormat("PNG");
 				$image->resizeImage(200, 200, $image->scaleImage, 0.9, true);
