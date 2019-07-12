@@ -1,7 +1,5 @@
-.card__edit {
-	float: right;
-	line-height: 1.5rem;
-	z-index: 1;
+.card {
+	color: hsl(var(--attention--secondary));
 }
 .card__name .symbol__artist {
 	float: left;
