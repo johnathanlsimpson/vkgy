@@ -43,6 +43,9 @@
 	// Setup search options
 	$q = [];
 	$result_limit = 100;
+	if(is_numeric($_GET['id'])) {
+		$q['id'] = sanitize($_GET['id']);
+	}
 	if(preg_match('/'.'[\d-]{4,10}'.'/', $_GET['date_occurred'])) {
 		$q['date_occurred'] = sanitize($_GET['date_occurred']);
 	}
@@ -92,7 +95,7 @@
 		<?php
 			if(is_array($q) && !empty($q)) {
 				?>
-					<div class="text text--outlined <?php echo is_array($lives) && !empty($lives) ? null : 'symbol__error text--error'; ?>">
+					<div class="text text--outlined <?php echo is_array($lives) && !empty($lives) ? 'text--notice symbol__help' : 'symbol__error text--error'; ?>">
 						<?php
 							echo is_array($lives) && !empty($lives) ? 'Showing: ' : 'No results for: ';
 							
@@ -130,7 +133,7 @@
 								echo '</code>';
 								echo $key != end(array_keys($q)) ? ', ' : null;
 							}
-							echo '&nbsp;&nbsp;&nbsp;<a class="symbol__arrow-right-circled" href="/lives/">Clear results?</a>';
+							echo '&nbsp;&nbsp;&nbsp;<a class="symbol__arrow-right-circled" href="/lives/">'.lang('Show all lives', '全てのライブ', 'hidden').'</a>';
 						?>
 					</div>
 				<?php
@@ -174,7 +177,7 @@
 									?>
 										<div class="lives__day any--weaken-color">
 											<h4 class="lives__date symbol__next symbol--right">
-												<?php echo $month.'-'.$day; ?>
+												<a class="a--inherit" href="/lives/&amp;date_occurred=<?= $year.'-'.$month; ?>"><?= $month; ?></a>-<a class="a--inherit" href="/lives/&amp;date_occurred=<?= $year.'-'.$month.'-'.$day; ?>"><?= $day; ?></a>
 											</h4>
 											
 											<?php
