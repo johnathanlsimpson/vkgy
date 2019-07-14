@@ -214,7 +214,7 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 					foreach($references as $reference) {
 						if($reference['type'] === 'video') {
 							if(is_array($artist_tags) && !empty($artist_tags)) {
-								$video_artist_id = $artist_tags[0];
+								$video_artist_id = end($artist_tags);
 								
 								$video_data_data = $access_video->add_video($reference['id'], $video_artist_id);
 							}
