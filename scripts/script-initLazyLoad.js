@@ -1,2 +1,7 @@
-var myLazyLoad = new LazyLoad();
-var myLazyLoadDiv = new LazyLoad({ elements_selector: ".lazy" });
+function initLazyLoad() {
+	var lazyLoadElems = new LazyLoad({
+		elements_selector: '.lazy',
+	});
+}
+
+initLazyLoad();
