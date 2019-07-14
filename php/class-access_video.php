@@ -53,6 +53,9 @@
 				// If channel ID found, allow upload to continue
 				if(strlen($video_data['channel_id'])) {
 					
+					// Set default as being flagged; unset later if channel already approved
+					$is_flagged = true;
+					
 					// If artist provided, check if video is from official channel
 					// If artist not provided, try to find artist with that channel listed
 					$sql_artist = 'SELECT id FROM artists WHERE '.(is_numeric($artist_id) ? 'id=? AND ' : null).' official_links LIKE CONCAT("%", ?, "%") LIMIT 1';
@@ -80,7 +83,7 @@
 						
 						// If video not already in DB, continue
 						else {
-							$is_whitelisted = true;
+							$is_flagged = false;
 						}
 					}
 					
@@ -92,13 +95,19 @@
 							$_SESSION['user_id'],
 							$video_id,
 							$video_data['date_occurred'],
-							$is_whitelisted ? 0 : 1,
+							$is_flagged ? 1 : 0,
 						];
 						
 						$sql_video = 'INSERT INTO videos (artist_id, release_id, user_id, youtube_id, date_occurred, is_flagged) VALUES (?, ?, ?, ?, ?, ?)';
 						$stmt_video = $this->pdo->prepare($sql_video);
 						if($stmt_video->execute($values_video)) {
-							$output = $video_data;
+							$output = array_merge($video_data, [
+								'approval_notice_class' => $is_flagged ? null : 'any--hidden',
+								'video_id' => $this->pdo->lastInsertID(),
+								'artist_id' => $artist_id,
+								'youtube_id' => $video_id,
+								'username' => $_SESSION['username']
+							]);
 						}
 						
 					}
