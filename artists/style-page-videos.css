@@ -31,3 +31,6 @@
 li + .video__empty-notice {
 	display: none;
 }
+.video__delete {
+	margin-left: auto;
+}
