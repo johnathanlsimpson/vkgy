@@ -4,9 +4,9 @@
 	$access_social_media = new access_social_media($pdo);
 	
 	// Get queued social media posts
-	$sql_queued_posts = 'SELECT * FROM queued_social WHERE date_occurred < ? AND is_completed IS NULL';
+	$sql_queued_posts = 'SELECT * FROM queued_social WHERE date_occurred <= ? AND date_occurred >= ? AND is_completed IS NULL';
 	$stmt_queued_posts = $pdo->prepare($sql_queued_posts);
-	$stmt_queued_posts->execute([ date('Y-m-d H:i:s') ]);
+	$stmt_queued_posts->execute([ date('Y-m-d H:i:s'), date('Y-m-d H:i:s', strtotime('-1 day')) ]);
 	$rslt_queued_posts = $stmt_queued_posts->fetchAll();
 	
 	if(is_array($rslt_queued_posts) && !empty($rslt_queued_posts)) {

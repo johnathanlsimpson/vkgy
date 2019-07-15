@@ -260,7 +260,7 @@
 														if($release["image"]) {
 															?>
 																<a class="release__image-link" href="<?php echo $release["image"]['url']; ?>" target="_blank">
-																	<img alt="<?php echo $release["artist"]["quick_name"]." - ".$release["quick_name"]; ?>" class="release__image" data-src="<?php echo preg_replace("/"."\.(\w+)$"."/", ".thumbnail.$1", $release["image"]['url']); ?>" />
+																	<img alt="<?php echo $release["artist"]["quick_name"]." - ".$release["quick_name"]; ?>" class="release__image lazy" data-src="<?php echo preg_replace("/"."\.(\w+)$"."/", ".thumbnail.$1", $release["image"]['url']); ?>" />
 																</a>
 															<?php
 														}

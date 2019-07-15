@@ -51,7 +51,7 @@
 							<div class="input__group">
 								<label class="input__label"><?php echo lang('Username', 'ユーザー名', ['secondary_class' => 'any--hidden']); ?></label>
 							</div>
-							<input class="any--flex-grow" name="register_username" pattern="[A-z0-9-]+" placeholder="username (ユーザ名)" title="A-z, 0-9, -" />
+							<input autocomplete="off" class="any--flex-grow" name="register_username" pattern="[A-z0-9-]+" placeholder="username (ユーザ名)" title="A-z, 0-9, -" />
 						</div>
 						
 						<div class="any--weaken register__note">
@@ -63,7 +63,7 @@
 						<div class="input__row">
 							<div class="input__group any--flex-grow">
 								<label class="input__label"><?php echo lang('Password', 'パスワード', ['secondary_class' => 'any--hidden']); ?></label>
-								<input class="any--flex-grow symbol__locked" name="register_password" placeholder="password (パスワード)" type="password" />
+								<input autocomplete="new-password" class="any--flex-grow symbol__locked" name="register_password" placeholder="password (パスワード)" type="password" />
 							</div>
 							<div class="input__group">
 								<input class="register__show any--hidden" id="register__show" type="checkbox" />

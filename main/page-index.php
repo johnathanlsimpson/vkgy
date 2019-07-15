@@ -272,7 +272,7 @@
 							<div class="input__group">
 								<label class="input__label"><?php echo lang('Username', 'ユーザー名', ['secondary_class' => 'any--hidden']); ?></label>
 							</div>
-							<input class="any--flex-grow" name="register_username" pattern="[A-z0-9-]+" placeholder="username (ユーザー名)" title="A-z, 0-9, -" />
+							<input autocomplete="off" class="any--flex-grow" name="register_username" pattern="[A-z0-9-]+" placeholder="username (ユーザー名)" title="A-z, 0-9, -" />
 						</div>
 						
 						<div class="any--weaken register__note">
@@ -284,7 +284,7 @@
 						<div class="input__row">
 							<div class="input__group any--flex-grow">
 								<label class="input__label"><?php echo lang('Password', 'パスワード', ['secondary_class' => 'any--hidden']); ?></label>
-								<input class="any--flex-grow symbol__locked" name="register_password" placeholder="password (パスワード)" type="password" />
+								<input autocomplete="new-password" class="any--flex-grow symbol__locked" name="register_password" placeholder="password (パスワード)" type="password" />
 							</div>
 							<div class="input__group">
 								<input class="register__show any--hidden" id="register__show" type="checkbox" />
@@ -343,7 +343,7 @@
 					<div class="input__row">
 						<div class="input__group">
 							<label class="input__label"><?php echo lang('Sign in', 'サインイン', ['secondary_class' => 'any--hidden']); ?></label>
-							<input class="any--flex-grow input" name="username" placeholder="username (ユーザー名)" autocomplete="username" />
+							<input class="any--flex-grow input" name="username" pattern="^[A-z0-9- \.]{3,}$" placeholder="username (ユーザー名)" autocomplete="username" />
 							<input class="any--flex-grow input--secondary symbol__locked" name="password" placeholder="password (パスワード)" autocomplete="current-password" type="password" />
 						</div>
 						<div class="input__group" data-role="submit-container">

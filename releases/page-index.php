@@ -127,7 +127,7 @@
 												 data-medium="<?php echo $release['medium']; ?>"
 												 style="order: <?php echo $release_ids_by_name[$release['id']]; ?>">
 											<a class="calendar__cover" href="<?php echo str_replace(['.small', '.thumbnail'], '', ($cover_image ?: $artist_image)); ?>" target="_blank" title="<?php echo ($cover_image ? '&ldquo;'.$release['quick_name'].'&rdquo; cover' : $release['artist']['quick_name'].' image'); ?>">
-												<img alt="<?php echo '&ldquo;'.$release['quick_name'].'&rdquo; cover'; ?>" data-src="<?php echo $cover_image ?: $artist_image; ?>" />
+												<img alt="<?php echo '&ldquo;'.$release['quick_name'].'&rdquo; cover'; ?>" class="lazy" data-src="<?php echo $cover_image ?: $artist_image; ?>" />
 											</a>
 											<div class="calendar__content">
 												<h5 class="calendar__date">
