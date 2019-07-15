@@ -179,6 +179,25 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 				$values_blog[] = $id;
 			}
 			else {
+				
+				// If adding brand new post
+				// Grab default image for first artist mentioned, in case no image is supplied by user
+				if(is_array($references) && !empty($references)) {
+					$last_ref = end($references);
+					
+					if($last_ref['type'] === 'artist') {
+						$sql_default_image = 'SELECT artists.image_id FROM artists WHERE id=? LIMIT 1';
+						$stmt_default_image = $pdo->prepare($sql_default_image);
+						$stmt_default_image->execute([ $last_ref['id'] ]);
+						$rslt_default_image = $stmt_default_image->fetchColumn();
+						
+						if(is_numeric($rslt_default_image)) {
+							$keys_blog[] = 'image_id';
+							$values_blog[] = $rslt_default_image;
+						}
+					}
+				}
+				
 				$keys_blog[] = 'user_id';
 				$values_blog[] = $_SESSION['userID'];
 				$sql_blog = 'INSERT INTO blog ('.implode(', ', $keys_blog).') VALUES ('.substr(str_repeat('?, ', count($values_blog)), 0, -2).')';
