@@ -141,11 +141,6 @@ $in_page_navs = array_filter($in_page_navs);
 										}
 									?>
 								</div>
-				<style>
-					.artist__question {
-						color: hsl(var(--accent));
-					}
-				</style>
 							<?php
 						}
 						
@@ -174,10 +169,9 @@ $in_page_navs = array_filter($in_page_navs);
 																		?></span>
 																		&nbsp;
 																		<?php
-																			foreach($schedule_day as $live) {
-																				$area = '<a class="a--inherit" href="/lives/&area_id='.$live['area_id'].'">'.lang(($live['area_romaji'] ?: $live['area_name']), $live['area_name'], 'hidden').'</a>';
-																				$livehouse = '<a class="a--inherit" href="/lives/&livehouse_id='.$live['livehouse_id'].'">'.lang(($live['livehouse_romaji'] ?: $live['livehouse_name']), $live['livehouse_name'], 'hidden').'</a>';
-																				echo $area.' '.$livehouse;
+																			foreach($schedule_day as $live_key => $live) {
+																				echo $live_key ? ', ' : null;
+																				echo '<a class="a--inherit" href="/lives/&id='.$live['id'].'">'.lang(($live['area_romaji'] ?: $live['area_name']), $live['area_name'], 'hidden').' '.lang(($live['livehouse_romaji'] ?: $live['livehouse_name']), $live['livehouse_name'], 'hidden').'</a>';
 																			}
 																		?>
 																	</li>

@@ -463,9 +463,11 @@ table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
 }
 .ol .li::before, ol li::before {
 	color: hsl(var(--text--secondary));
-	content: counter(defaultcounter);
+	content: counter(defaultcounter) ". ";
 	display: inline-block;
-	padding-right: 0.5rem;
+	float: left;
+	min-width: 1rem;
+	padding-right: 1ch;
 }
 .ul--bulleted > .li, .ul--bulleted > li {
 	padding-left: 1rem;

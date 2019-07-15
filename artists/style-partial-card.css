@@ -1,19 +1,49 @@
 .card {
+	align-items: flex-start;
+	background-position: center 25%;
+	background-size: cover;
 	color: hsl(var(--attention--secondary));
+	display: flex;
+	flex-direction: column;
+}
+.card__name {
+	display: inline-block;
+	margin: -0.5rem;
+	margin-bottom: 6rem;
+	overflow: hidden;
+	padding: 0.5rem;
+	padding-bottom: 0.1rem;
+	max-width: 100%;
+}
+.card[data-src=""] .card__name {
+	margin-bottom: 0rem;
 }
 .card__name .symbol__artist {
 	float: left;
 }
-.card__image {
-	background-position: center 25%;
-	background-repeat: no-repeat;
-	background-size: cover;
-	margin: 0.5rem -0.5rem -0.5rem -0.5rem;
+.card__name a {
+	background-clip: content-box;
+	display: inline-block;
+	max-width: 100%;
 }
-.card__image:not([data-src=""]) {
-	padding-top: 5rem;
+.card__name a div {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.card__name a div:first-of-type {
+	padding-left: 1rem;
+}
+.card__name .symbol__artist {
+	left: 0rem;
+	position: absolute;
+}
+.card__name, .card__nav {
+	background-color: hsla(var(--background), 0.8);
 }
 .card__nav {
-	background: hsla(var(--background), 0.9);
+	display: inline-block;
+	margin: -0.5rem;
 	padding: 0.5rem;
 }

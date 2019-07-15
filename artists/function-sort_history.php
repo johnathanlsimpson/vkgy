@@ -39,12 +39,10 @@ function insert_lives_into_history($history, $lives) {
 						// Create new bio line based on live
 						$schedule_line = $lives[$y][$m][$d][0];
 						$schedule_content =
-							'<a class="a--inherit symbol__company" href="/lives/&area_id='.$schedule_line['area_id'].'">'.
-								lang(($schedule_line['area_romaji'] ?: $schedule_line['area_name']), $schedule_line['area_name'], 'hidden').
-							'</a>'.
+							'<a class="a--inherit symbol__company" href="/lives/&id='.$schedule_line['id'].'">'.
+							lang(($schedule_line['area_romaji'] ?: $schedule_line['area_name']), $schedule_line['area_name'], 'hidden').
 							' '.
-							'<a class="a--inherit" href="/lives/&livehouse_id='.$schedule_line['livehouse_id'].'">'.
-								lang(($schedule_line['livehouse_romaji'] ?: $schedule_line['livehouse_name']), $schedule_line['livehouse_name'], 'hidden').
+							lang(($schedule_line['livehouse_romaji'] ?: $schedule_line['livehouse_name']), $schedule_line['livehouse_name'], 'hidden').
 							'</a>';
 						
 						// Make spot in history for live

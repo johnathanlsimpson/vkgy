@@ -20,43 +20,64 @@
 				<?php $access_artist->artist_card($artist_of_day); ?>
 			</div>
 		</div>
-
+		
+		<?php
+			/*include('../php/function-get_cdj_preorders.php');
+			$cdj_preorders = get_cdj_preorders();
+			$cdj_preorders = array_slice($cdj_preorders['list'], 0, 4);
+			
+			if(is_array($cdj_preorders) && !empty($cdj_preorders)) {
+				?>
+					<h3>
+						<?= lang('Preorder', 'プレオーダー', 'div'); ?>
+					</h3>
+					<ul class="text text--outlined">
+						<?php
+							foreach($cdj_preorders as $preorder) {
+								?>
+									<li><a href="http://www.cdjapan.co.jp/aff/click.cgi/e86NDzbdSLQ/6128/A549875/detailview.html%3FKEY%3D<?= $preorder['key']; ?>" target="_blank"><?= $preorder['artist'].' &ldquo;'.$preorder['title'].'&rdquo;'; ?></a></li>
+								<?php
+							}
+						?>
+					</ul>
+				<?php
+			}*/
+		?>
+		
+		
 		<div class="main__iod">
 			<h3>
 				<?php echo lang('Flyer of the day', '今日のフライヤー', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
 			</h3>
-			<div class="text text--outlined">
-				<p class="any__obscure iod__container">
-					<a class="iod__link"  href="<?php echo $image["url"]; ?>" target="_blank">
-						<img class="iod__image <?php echo $image["is_wide"] ? "iod--wide" : null; ?> lazy" data-src="<?php echo str_replace(".", ".medium.", $image["url"]); ?>" />
-					</a>
-				</p>
-				<p>
-					<a class="artist" data-name="<?php echo $image['artists'][0]["name"]; ?>" href="/artists/<?php echo $image['artists'][0]["friendly"]; ?>/"><?php echo $image['artists'][0]["quick_name"]; ?></a>
-				</p>
-				<p class="any--weaken">
-					<a class="symbol__vip" href="https://www.patreon.com/vkgy/" target="_blank">VIP members</a> can access high-res, unwatermarked version. <a href="/images/&type=flyer">View past flyers?</a>
-				</p>
+			<div class="text text--outlined text--compact" style="overflow: hidden;">
+				<a class="iod__link" href="<?php echo $image["url"]; ?>" target="_blank" style="background: hsl(var(--background)); display: block; height: auto; margin: calc(-0.5rem - 1px); margin-bottom: 0.5rem; width: 200px;">
+					<img class="iod__image <?php echo $image["is_wide"] ? "iod--wide" : null; ?> lazy" data-src="<?= str_replace(".", ".medium.", $image["url"]); ?>" style="height: auto; vertical-align: middle; width: 100%;" />
+				</a>
+				<a class="artist" data-name="<?= $image['artists'][0]['name']; ?>" href="<?= '/artists/'.$image['artists'][0]['friendly'].'/'; ?>">
+					<?= lang(($image['artists'][0]['romaji'] ?: $image['artists'][0]['name']), $image['artists'][0]['name'], 'hidden'); ?>
+				</a>
 			</div>
 		</div>
-
+		
 		<div class="main__ranking">
 			<h3>
-				<?php echo lang('Weekly artist ranking', '週間ランキング', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
+				<div class="h5">
+					<?= date('n/j', strtotime("-2 weeks sunday", time())).'~'.date('n/j', strtotime("-1 weeks sunday", time())); ?>
+				</div>
+				<?php echo lang('Band access ranking', 'アクセスランキング', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
 			</h3>
-			<div class="text text--outlined">
-				<ol>
-					<?php
-						foreach($rslt_rankings as $ranking) {
-							?>
-								<li>
-									<a class="artist" href="/artists/<?php echo $ranking["friendly"]; ?>/"><?php echo $ranking["quick_name"]; ?></a>
-								</li>
-							<?php
-						}
-					?>
-				</ol>
-			</div>
+			<ol class="text text--outlined text--compact ul--compact">
+				<?php
+					foreach($rslt_rankings as $ranking_num => $ranking) {
+						?>
+							<li class="ranking__item">
+								<span class="ranking__number symbol__user"></span>
+								<a class="artist artist--no-symbol" href="/artists/<?php echo $ranking["friendly"]; ?>/"><?php echo $ranking["quick_name"]; ?></a>
+							</li>
+						<?php
+					}
+				?>
+			</ol>
 		</div>
 	</div>
 
