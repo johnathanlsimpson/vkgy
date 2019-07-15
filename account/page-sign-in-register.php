@@ -19,7 +19,7 @@
 		<form action="" class="text sign-in__container <?php echo $_SERVER['HTTP_REFERER'] ? 'sign-in--back' : 'sign-in--refresh'; ?>" enctype="multipart/form-data" method="post" name="form__sign-in">
 			<div class="input__row">
 				<div class="input__group any--flex-grow">
-					<input class="any--flex-grow" name="username" pattern="^[\w- \.]{3,}$" placeholder="username (ユーザー名)" required />
+					<input class="any--flex-grow" name="username" pattern="^[A-z0-9- \.]{3,}$" placeholder="username (ユーザー名)" required />
 				</div>
 			</div>
 			<div class="input__row">
