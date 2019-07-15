@@ -127,14 +127,6 @@
 										'position' => 'left',
 									]
 								], 'directional');
-								/*?>
-									<h5>
-										Older
-									</h5>
-									<a href="/blog/<?php echo $entry["prev_next"][0]["friendly"]; ?>/" style="display: block;">
-										<?php echo $entry["prev_next"][0]["title"]; ?>
-									</a>
-								<?php*/
 							}
 						?>
 					</div>
@@ -158,14 +150,6 @@
 										'position' => 'right',
 									]
 								], 'directional');
-								/*?>
-								<h5>
-									Newer
-								</h5>
-								<a href="/blog/<?php echo $entry["prev_next"][1]["friendly"]; ?>/" style="display: block;">
-									<?php echo $entry["prev_next"][1]["title"]; ?>
-								</a>
-								<?php*/
 							}
 						?>
 					</div>
@@ -301,7 +285,7 @@
 
 					<div class="entry__content entry__main-column">
 						<a class="entry__image-link lazy" data-src="<?php echo str_replace('.', '.thumbnail.', $entry['image']['url']); ?>" href="<?php echo $entry['image']['url']; ?>">
-							<img class="entry__image lazy" data-src="<?php echo str_replace('.', '.large.', $entry['image']['url']); ?>" />
+							<img class="entry__image lazy webfeedsFeaturedVisual" data-src="<?php echo str_replace('.', '.large.', $entry['image']['url']); ?>" />
 						</a>
 
 						<div class="text text--centered">
