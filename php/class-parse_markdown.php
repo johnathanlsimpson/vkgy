@@ -631,56 +631,73 @@
 					
 					// Release
 					elseif($reference_datum["type"] === "release" && !$ignore_references) {
+						$cdjapan_link =
+							'http://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/searches?term.media_format=&amp;f=all&amp;q='.
+							($reference_datum["upc"] ? str_replace(["-000", "-00", "-0"], "-", $reference_datum["upc"]) : str_replace(" ", "+", $reference_datum["quick_name"]));
+						
 						ob_start();
 						?>
-							<div class="module module--release">
-								<div class="any--flex">
-									<?php
-										if(strlen($reference_datum['cover'])) {
-											?>
-												<a href="<?php echo $reference_datum['cover']; ?>" target="_blank">
-													<img alt="<?php echo $reference_datum['quick_name']; ?>" class="lazy" data-src="<?php echo str_replace('.', '.thumbnail.', $reference_datum['cover']); ?>" />
-												</a>
-												&nbsp;
-											<?php
-										}
-									?>
-									<div style="overflow: hidden;">
-										<h3>
-											<div class="h5">
-												<?php echo $reference_datum["date_occurred"]; ?>
-											</div>
-											<div>
-												<a class="artist a--inherit any--en" href="/artists/<?php echo $reference_datum["artist"]["friendly"]; ?>/"><?php echo $reference_datum["artist"]["quick_name"]; ?></a>
-												<a class="artist a--inherit any--ja any--hidden" href="/artists/<?php echo $reference_datum["artist"]["friendly"]; ?>/"><?php echo $reference_datum["artist"]["name"]; ?></a>
-											</div>
-											<div>
-												<a class="symbol__release any--en" href="/releases/<?php echo $reference_datum["artist"]["friendly"]."/".$reference_datum["id"]."/".$reference_datum["friendly"]; ?>/"><?php echo $reference_datum["quick_name"]; ?></a>
-												<a class="symbol__release any--ja any--hidden" href="/releases/<?php echo $reference_datum["artist"]["friendly"]."/".$reference_datum["id"]."/".$reference_datum["friendly"]; ?>/"><?php echo $reference_datum["name"].' '.$reference_datum["press_name"].' '.$reference_datum["type_name"]; ?></a>
-											</div>
-										</h3>
-										<ol class="ol--inline" style="text-align: left;">
-											<?php
-												foreach($reference_datum["tracklist"] as $discs) {
-													foreach($discs as $n => $disc) {
-														echo ($disc['disc_romaji'] ?: $disc['disc_name']).' ';
-														foreach($disc['sections'] as $section) {
-															foreach($section['tracks'] as $track) {
-																?>
-																	<li style="<?php echo $track['track_num'] == 1 ? 'counter-reset: defaultcounter;' : null; ?>">
-																		<?php echo '<span class="any--en">'.($track['romaji'] ?: $track['name']).'</span><span class="any--ja any--hidden">'.$track['name'].'</span>'; ?>
-																	</li>
-																<?php
-															}
+							<div class="module module--release any--flex">
+								<?php
+									if(is_array($reference_datum['image']) && !empty($reference_datum['image'])) {
+										?>
+											<a style="margin-right: 1ch; width: 100px;" href="<?= '/images/'.$reference_datum['image']['id'].'-cover.'.$reference_datum['image']['extension']; ?>" target="_blank">
+												<img alt="<?= $reference_datum['quick_name'].' cover'; ?>" src="<?= '/images/'.$reference_datum['image']['id'].'-cover.thumbnail.'.$reference_datum['image']['extension']; ?>" />
+											</a>
+										<?php
+									}
+								?>
+								<div style="width: 100%;">
+									<div class="h5">
+										<?= $reference_datum['date_occurred']; ?>
+									</div>
+									<a class="artist" data-name="<?= $reference_datum['artist']['name']; ?>" href="<?= '/artists/'.$reference_datum['artist']['friendly'].'/'; ?>">
+										<?= $reference_datum['artist']['romaji'] ? lang(($reference_datum['artist']['romaji'] ?: $reference_datum['artist']['name']), $reference_datum['artist']['name'], 'parentheses') : $reference_datum['artist']['name']; ?>
+									</a>
+									<br />
+									<a class="symbol__release" href="<?= '/releases/'.$reference_datum['artist']['friendly'].'/'.$reference_datum['id'].'/'.$reference_datum['friendly'].'/'; ?>">
+										<?php
+											if($reference_datum['romaji']) {
+												$romaji =
+													($reference_datum['romaji']).
+													($reference_datum['press_name'] ? (' '.$reference_datum['press_romaji'] ?: $reference_datum['press_name']) : null).
+													($reference_datum['type_name'] ? (' '.$reference_datum['type_romaji'] ?: $reference_datum['type_name']) : null);
+											}
+
+											$name = 
+												($reference_datum['name']).
+												($reference_datum['press_name'] ? ' '.$reference_datum['press_name'] : null).
+												($reference_datum['type_name'] ? ' '.$reference_datum['type_name'] : null);
+
+											if(strlen($reference_datum['romaji']) && $reference_datum['romaji'] != $reference_datum['name']) {
+												echo lang($romaji, $name, 'parentheses');
+											}
+											else {
+												echo $name;
+											}
+										?>
+									</a>
+									<ol class="ol--inline" style="margin: 0; text-align: left; width: 100%;">
+										<?php
+											foreach($reference_datum["tracklist"] as $discs) {
+												foreach($discs as $disc) {
+													
+													echo $disc['disc_name'] ? '<span class="module--disc">【'.($disc['disc_romaji'] ?: $disc['disc_name']).'】</span> ' : null;
+													
+													foreach($disc['sections'] as $section) {
+														foreach($section['tracks'] as $track) {
+															?>
+																<li style="<?php echo $track['track_num'] == 1 ? 'counter-reset: defaultcounter;' : null; ?>">
+																	<?= $track['romaji'] ? lang($track['romaji'], $track['name'], 'parentheses') : $track['name']; ?>
+																</li>
+															<?php
 														}
 													}
 												}
-											?>
-										</ol>
-									</div>
-									<div>
-										<a class="a--padded a--outlined" style="white-space: nowrap;" href="http://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/searches?term.media_format=&f=all&q=<?php echo $reference_datum["upc"] ? str_replace(["-000", "-00", "-0"], "-", $reference_datum["upc"]) : str_replace(" ", "+", $reference_datum["quick_name"]); ?>">CDJapan</a>
-									</div>
+											}
+										?>
+									</ol>
+									<a class="symbol__arrow-right-circled" href="<?= $cdjapan_link; ?>" target="_blank"><?= ($reference_datum['date_occurred'] > date('Y-m-d') ? 'Preorder' : 'Order').' at CDJapan'; ?></a>
 								</div>
 							</div>
 						<?php
