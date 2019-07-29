@@ -313,8 +313,6 @@
 						"CONCAT_WS(' ', COALESCE(releases.romaji, releases.name), COALESCE(releases.press_romaji, releases.press_name), COALESCE(releases.type_romaji, releases.type_name)) AS quick_name",
 						"AVG(releases_ratings.rating) AS rating",
 						'date_edited',
-						//"IF(images.id IS NOT NULL AND images.is_exclusive = '1', '1', '') AS cover_is_exclusive",
-						//"IF(images.id IS NOT NULL, CONCAT('/images/', images.id, '-', COALESCE(images.friendly, ''), '.', images.extension), '') AS cover"
 					];
 				}
 				if($args["get"] === "basics") {
@@ -330,15 +328,11 @@
 						"releases.type_romaji",
 						"releases.friendly",
 						"releases.date_occurred",
-						//"releases.medium",
-						//"releases.format",
 						"releases.upc",
 						"releases.artist_display_name",
 						"releases.artist_display_romaji",
 						"AVG(releases_ratings.rating) AS rating",
 						'releases.image_id',
-						//"IF(images.id IS NOT NULL AND images.is_exclusive = '1', '1', '') AS cover_is_exclusive",
-						//"IF(images.id IS NOT NULL, CONCAT('/images/', images.id, '-', COALESCE(images.friendly, ''), '.', images.extension), '') AS cover"
 					];
 				}
 				if(($args["get"] === "all" || $args["get"] === "basics") && $_SESSION["loggedIn"]) {
@@ -373,7 +367,6 @@
 						"releases.romaji",
 						"releases.friendly",
 						"releases.upc",
-						//"releases.medium",
 					];
 					$sql_select[] = 'releases.press_name';
 					$sql_select[] = 'releases.press_romaji';
@@ -397,9 +390,7 @@
 						"releases.name",
 						"releases.romaji",
 						"releases.friendly",
-						//"releases.medium",
 						'releases.image_id',
-						//"IF(images.id IS NOT NULL, CONCAT('/images/', images.id, '-', COALESCE(images.friendly, ''), '.', images.extension), '') AS cover"
 					];
 				}
 				elseif($args['get'] === 'id') {
@@ -465,73 +456,11 @@
 			}
 			$sql_from = $sql_from ?: 'releases';
 			
-			
-			/*else {
-				$sql_from[] = "releases";
-			}*/
-			/*if($args['get'] === 'all') {
-				$sql_select[] = 'date_edited';
-				$sql_from[] = '
-					LEFT JOIN
-						(
-							SELECT
-								MAX(edits_releases.date_occurred) AS date_edited, release_id
-							FROM
-								edits_releases
-							GROUP BY
-								release_id
-						)
-					AS tmp_edits
-					ON tmp_edits.release_id=releases.id
-				';
-			}
-			if(($args["get"] === "all" || $args["get"] === "basics") && $_SESSION["loggedIn"]) {
-				$sql_from[] = "";
-				$sql_from[] = "";
-				$sql_values[] = $_SESSION["userID"];
-				$sql_values[] = $_SESSION["userID"];
-			}*/
-			//if($args["get"] === "list") {
-				//$sql_from[] = 'LEFT JOIN artists ON artists.id=releases.artist_id';
-			//}
-			//$sql_from = is_array($sql_from) ? $sql_from : ["releases"];
-			
-			
-			
-			
-				/*if($args["get"] === "basics" || $args["get"] === "all") {
-					$sql_releases .= " ";
-					$sql_releases .= "LEFT JOIN releases_ratings AS user_rating ON user_rating.release_id=releases.id AND user_rating.".($_SESSION["loggedIn"] ? "user_id" : "ip_address")."=? ";
-					$sql_releases .= "";
-					array_unshift($sql_values, ($_SESSION["userID"] ?: ip2long($_SERVER["REMOTE_ADDR"])));
-				}*/
-			
-			
-			
-			
-			
 			//
 			// WHERE
 			//
 			// Default: empty
 			$sql_values = is_array($sql_values) ? $sql_values : [];
-			/*// If getting release by medium/format/venue/press type
-			if(strlen($args['medium'])) {
-				$sql_where[] = is_numeric($args['medium']) ? 'releases_attributes.id=?' : 'releases_attributes.friendly=?';
-				$sql_values[] = $args['medium'];
-			}
-			if(strlen($args['format'])) {
-				$sql_where[] = is_numeric($args['format']) ? 'releases_attributes.id=?' : 'releases_attributes.friendly=?';
-				$sql_values[] = $args['format'];
-			}
-			if(strlen($args['venue_limitation'])) {
-				$sql_where[] = is_numeric($args['venue_limitation']) ? 'releases_attributes.id=?' : 'releases_attributes.friendly=?';
-				$sql_values[] = $args['venue_limitation'];
-			}
-			if(strlen($args['press_limitation_name'])) {
-				$sql_where[] = is_numeric($args['press_limitation_name']) ? 'releases_attributes.id=?' : 'releases_attributes.friendly=?';
-				$sql_values[] = $args['press_limitation_name'];
-			}*/
 			// If getting user's collection
 			if(is_numeric($args["user_id"])) {
 				$sql_where[] = "releases_collections.user_id=?";
@@ -590,14 +519,6 @@
 				$sql_where[] = "releases.date_occurred<=?";
 				$sql_values[] = sanitize(str_replace(["y", "m", "d"], "0", $args["end_date"]));
 			}
-			if(!empty($args["medium"])) {
-				//$sql_where[] = "releases.medium LIKE CONCAT('%', ?, '%')";
-				//$sql_values[] = sanitize($args["medium"]);
-			}
-			if(!empty($args["format"])) {
-				//$sql_where[] = "releases.format LIKE CONCAT('%', ?, '%') OR releases.format_name LIKE CONCAT('%', ?, '%') OR releases.format_romaji LIKE CONCAT('%', ?, '%')";
-				//$sql_values = array_merge($sql_values, array_fill(0, 3, sanitize($args["format"])));
-			}
 			if(!empty($args["upc"])) {
 				$sql_where[] = "releases.upc LIKE CONCAT('%', ?, '%')";
 				$sql_values[] = sanitize($args["upc"]);
@@ -654,23 +575,6 @@
 					($sql_order ? 'ORDER BY '.implode(', ', $sql_order).' ' : null).
 					($sql_limit ?: null);
 				
-				
-				/*$sql_releases  = "SELECT ".implode(", ", $sql_select)." ";
-				$sql_releases .= "FROM ".implode(" ", $sql_from)." ";
-				if($args["get"] === "basics" || $args["get"] === "all") {
-					$sql_releases .= "LEFT JOIN releases_ratings ON releases_ratings.release_id = releases.id ";
-					$sql_releases .= "LEFT JOIN releases_ratings AS user_rating ON user_rating.release_id=releases.id AND user_rating.".($_SESSION["loggedIn"] ? "user_id" : "ip_address")."=? ";
-					$sql_releases .= "LEFT JOIN images ON images.id=releases.image_id ";
-					array_unshift($sql_values, ($_SESSION["userID"] ?: ip2long($_SERVER["REMOTE_ADDR"])));
-				}
-				
-				$sql_releases .= is_array($sql_where) && !empty($sql_where) ? "WHERE (".implode(") AND (", $sql_where).") ".$sql_force.' ' : null;
-				$sql_releases .= ($sql_group ? 'GROUP BY '.implode(', ', $sql_group) : null).' ORDER BY '.implode(', ', $sql_order);
-				$sql_releases .= " ".$sql_limit;*/
-				
-				//echo $sql_releases;
-				//echo '<br /><br /><pre>'.print_r($sql_values, true).'</pre>';
-				
 				// Run query
 				$stmt_releases = $this->pdo->prepare($sql_releases);
 				$stmt_releases->execute($sql_values);
@@ -718,7 +622,7 @@
 				if(is_array($releases) && !empty($releases)) {
 					
 					// Get medium/format/venue/limitation
-					if($args['get'] === 'basics' || $args['get'] === 'all' || $args['get'] === 'calendar') {
+					if($args['get'] === 'basics' || $args['get'] === 'all' || $args['get'] === 'calendar' || $args['get'] === 'list') {
 						$possible_attributes = $this->get_possible_attributes(true);
 						
 						$sql_attributes = 'SELECT releases_releases_attributes.* FROM releases_releases_attributes WHERE '.substr(str_repeat('releases_releases_attributes.release_id=? OR ', count($release_ids)), 0, -4);
