@@ -299,7 +299,7 @@
 								
 								// Send to auto poster, if newly-added release
 								if(!$is_edit) {
-									$auto_post_url = $auto_blogger->auto_post('release', $release);
+									$auto_post_url = $auto_blogger->auto_post('release', array_merge($release, ['attributes' => $release_attributes]));
 									
 									if($auto_post_url) {
 										$output["status"] = "success";
