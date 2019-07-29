@@ -125,6 +125,7 @@
 	}
 	
 	// Get medium/format/venue/limitation options
+	$access_release = $access_release ?: new access_release($pdo);
 	$release_attributes = $access_release->get_possible_attributes();
 	
 	// For selected attribute options, just need IDs
