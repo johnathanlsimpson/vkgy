@@ -252,49 +252,40 @@
 				</div>
 				
 				<?php
-					/*if(count($artists) >= 100) {
+					if($num_artists >= 100 || (is_numeric($search['page']))) {
 						?>
-							<div class="text text--outlined text--notice symbol__error">
-								Over 100 results were found. Consider narrowing your search.
+							<div class="col c3 any--weaken-color search__pages">
+								<div>
+									<?php
+										if($search['page'] > 1) {
+											?>
+												<a class="symbol__previous" href="?page=<?php echo ($artist_query['page'] - 1).($search['order'] ? '&order='.$search['order'] : null).$base_url; ?>">Page <?php echo ($artist_query['page'] - 1); ?></a>
+											<?php
+										}
+										else {
+											echo 'Page 1';
+										}
+									?>
+								</div>
+								<div style="text-align: center;">
+									Results <?php echo ($artist_query['offset'] + 1).' to '.($artist_query['offset'] + $num_artists); ?>
+								</div>
+								<div style="text-align: right;">
+									<?php
+										if($num_artists >= 100) {
+											?>
+												<a class="symbol__next" href="?page=<?php echo ($artist_query['page'] + 1).($search['order'] ? '&order='.$search['order'] : null).$base_url; ?>">Page <?php echo ($artist_query['page'] + 1); ?></a>
+											<?php
+										}
+										else {
+											echo 'Page '.($search['page'] ?: 1);
+										}
+									?>
+								</div>
 							</div>
 						<?php
-					}*/
+					}
 				?>
-					<?php
-						if($num_artists >= 100 || (is_numeric($search['page']))) {
-							?>
-								<div class="col c3 any--weaken-color search__pages">
-									<div>
-										<?php
-											if($search['page'] > 1) {
-												?>
-													<a class="symbol__previous" href="?page=<?php echo ($artist_query['page'] - 1).($search['order'] ? '&order='.$search['order'] : null).$base_url; ?>">Page <?php echo ($artist_query['page'] - 1); ?></a>
-												<?php
-											}
-											else {
-												echo 'Page 1';
-											}
-										?>
-									</div>
-									<div style="text-align: center;">
-										Results <?php echo ($artist_query['offset'] + 1).' to '.($artist_query['offset'] + $num_artists); ?>
-									</div>
-									<div style="text-align: right;">
-										<?php
-											if($num_artists >= 100) {
-												?>
-													<a class="symbol__next" href="?page=<?php echo ($artist_query['page'] + 1).($search['order'] ? '&order='.$search['order'] : null).$base_url; ?>">Page <?php echo ($artist_query['page'] + 1); ?></a>
-												<?php
-											}
-											else {
-												echo 'Page '.($search['page'] ?: 1);
-											}
-										?>
-									</div>
-								</div>
-							<?php
-						}
-					?>
 				
 				<div>
 					<div class="search__clear"></div>
@@ -307,7 +298,7 @@
 									ob_start();
 									?>
 										<tr class="search__item" data-name="<?php echo $artist["quick_name"]; ?>">
-											<td class="search__title">
+											<td class="search__title" style="width: 100%;">
 												<a class="symbol__artist" href="/artists/<?php echo $artist["friendly"]; ?>/">
 													<?php echo $artist["romaji"] ?: $artist["name"]; ?>
 												</a>
