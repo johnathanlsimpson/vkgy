@@ -28,7 +28,6 @@
 			<?php
 		}
 		
-		
 		?>
 			<div class="col c1">
 				
@@ -53,9 +52,18 @@
 					
 					<?php
 						foreach($releases as $release) {
+							
+							// Set medium(s) to string
+							$media = '';
+							if(is_array($release['medium']) && !empty($release['medium'])) {
+								foreach($release['medium'] as $medium) {
+									$media .= $medium['friendly'].' ';
+								}
+							}
+							
 							$release["is_omnibus"] = ($release["artist_id"] != $artist["id"] ? true : false);
 							?>
-								<div class="release__container" data-date="<?php echo $release["date_occurred"]; ?>" data-name="<?php echo $release["friendly"]; ?>" data-medium="<?php echo strtolower(implode(" ", is_array($release["medium"]) ? $release["medium"] : [])); ?>">
+								<div class="release__container" data-date="<?php echo $release["date_occurred"]; ?>" data-name="<?php echo $release["friendly"]; ?>" data-medium="<?= $media; ?>">
 									<div class="h2 <?php echo !$release["is_omnibus"] ? "" : ""; ?>">
 										<?php
 											if($release["artist_id"] != $artist["id"] || ($release["artist"]["display_name"] && $release["artist"]["display_name"] != $artist["name"])) {
