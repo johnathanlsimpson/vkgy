@@ -76,7 +76,22 @@
 	if(is_array($releases) && !empty($releases)) {
 		$releases = array_values($releases);
 	}
-	$num_releases = count($releases);
+	$num_releases = is_array($releases) ? count($releases) : 0;
+	
+	// Get medium/format/venue/limitation options
+	$release_attributes = $access_release->get_possible_attributes();
+	
+	// For selected attribute options, just need IDs
+	foreach(['medium', 'format', 'venue_limitation', 'press_limitation_name'] as $key) {
+		if(is_array($release[$key]) && !empty($release[$key])) {
+			foreach($release[$key] as $attribute_key => $attribute) {
+				$release[$key][$attribute_key] = $attribute['attribute_id'];
+			}
+		}
+		else {
+			$release[$key] = [];
+		}
+	}
 ?>
 
 <div class="col c1">
@@ -248,10 +263,12 @@
 						<select class="any--flex-grow input" name="medium" placeholder="choose medium">
 							<option></option>
 							<?php
-								foreach(["CD", "CD-R", "DVD", "DVD-R", "VHS", "CT", "MD", "8cm CD", "box set", "digital", "book"] as $medium) {
-									?>
-										<option value="<? echo $medium; ?>" <?php echo ($search["medium"] === $medium ? "selected" : null); ?> ><?php echo $medium; ?></option>
-									<?php
+								foreach($release_attributes as $attribute) {
+									if($attribute['type'] === 'medium') {
+										?>
+											<option data-name="<?= $attribute['friendly']; ?>" value="<?= $attribute['friendly']; ?>" <?= in_array($attribute['id'], $release['medium']) ? 'selected' : null; ?>><?= ($attribute['romaji'] ?: $attribute['name']).($attribute['romaji'] ? ' ('.$attribute['name'].')' : null); ?></option>
+										<?php
+									}
 								}
 							?>
 						</select>
@@ -263,10 +280,48 @@
 						<select class="any--flex-grow input" name="format" placeholder="choose format">
 							<option></option>
 							<?php
-								foreach(["demo", "maxi-single", "single", "mini-album", "full album", "collection", "omnibus", "live recording", "PV", "comment", "privilege", "photography", "other"] as $format) {
-									?>
-										<option value="<? echo $format; ?>" <?php echo ($search["format"] === $format ? "selected" : null); ?> ><?php echo $format; ?></option>
-									<?php
+								foreach($release_attributes as $attribute) {
+									if($attribute['type'] === 'format') {
+										?>
+											<option data-name="<?= $attribute['friendly']; ?>" value="<?= $attribute['friendly']; ?>" <?= in_array($attribute['id'], $release['format']) ? 'selected' : null; ?>><?= ($attribute['romaji'] ?: $attribute['name']).($attribute['romaji'] ? ' ('.$attribute['name'].')' : null); ?></option>
+										<?php
+									}
+								}
+							?>
+						</select>
+					</div>
+				</div>
+				<div class="input__row">
+					<div class="input__group any--flex-grow">
+						<label class="input__label">
+							Venue
+						</label>
+						<select class="any--flex-grow input" name="venue_limitation" placeholder="venue">
+							<option></option>
+							<?php
+								foreach($release_attributes as $attribute) {
+									if($attribute['type'] === 'venue_limitation') {
+										?>
+											<option data-name="<?= $attribute['friendly']; ?>" value="<?= $attribute['friendly']; ?>" <?= in_array($attribute['id'], $release['venue_limitation']) ? 'selected' : null; ?>><?= ($attribute['romaji'] ?: $attribute['name']).($attribute['romaji'] ? ' ('.$attribute['name'].')' : null); ?></option>
+										<?php
+									}
+								}
+							?>
+						</select>
+					</div>
+					<div class="input__group any--flex-grow">
+						<label class="input__label">
+							Press type
+						</label>
+						<select class="any--flex-grow input" name="press_limitation_name" placeholder="press type">
+							<option></option>
+							<?php
+								foreach($release_attributes as $attribute) {
+									if($attribute['type'] === 'press_limitation_name') {
+										?>
+											<option data-name="<?= $attribute['friendly']; ?>" value="<?= $attribute['id']; ?>" <?= in_array($attribute['id'], $release['press_limitation_name']) ? 'selected' : null; ?>><?= ($attribute['romaji'] ?: $attribute['name']).($attribute['romaji'] ? ' ('.$attribute['name'].')' : null); ?></option>
+										<?php
+									}
 								}
 							?>
 						</select>
