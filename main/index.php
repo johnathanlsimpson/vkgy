@@ -137,7 +137,8 @@ $sql_rankings = "
 	SELECT
 		SUM(artists_views.view_count) AS view_count,
 		COALESCE(artists.romaji, artists.name) AS quick_name,
-		artists.friendly
+		artists.friendly,
+		artists.name
 	FROM artists_views
 	LEFT JOIN artists ON artists.id=artists_views.artist_id
 	WHERE artists_views.date_occurred > ? AND artists_views.date_occurred < ?
