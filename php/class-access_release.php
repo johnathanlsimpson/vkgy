@@ -431,12 +431,12 @@
 				$sql_join[] = 'LEFT JOIN artists ON artists.id=releases.artist_id';
 			}
 			// If returning current rating and cover art
-			if($args['get'] === 'bassics' || $args['get'] === 'all') {
+			if($args['get'] === 'basics' || $args['get'] === 'all') {
 				$sql_join[] = 'LEFT JOIN releases_ratings ON releases_ratings.release_id=releases.id';
 				$sql_join[] = 'LEFT JOIN images ON images.id=releases.image_id';
 			}
 			// If returning user's rating/collected status/want status
-			if($args['get'] === 'bassics' || $args['get'] === 'all') {
+			if($args['get'] === 'basics' || $args['get'] === 'all') {
 				if($_SESSION['is_signed_in']) {
 					$sql_join[] = 'LEFT JOIN releases_ratings AS user_rating ON user_rating.release_id=releases.id AND user_rating.user_id=?';
 					$sql_join[] = 'LEFT JOIN releases_collections ON releases_collections.release_id=releases.id AND releases_collections.user_id=?';
