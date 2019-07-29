@@ -52,7 +52,7 @@
 	$num_artists = count($artists);
 ?>
 
-<div class="col c1">
+<div class="col c1 any--margin">
 	<div>
 		<h2>
 			Advanced search artists
@@ -210,9 +210,9 @@
 						?>
 					</div>
 				</div>
-				
-				<hr />
-				
+			</div>
+			
+			<div class="text text--docked">
 				<div class="input__row">
 					<div class="input__group any--flex-grow">
 						<button class="any--flex-grow">
