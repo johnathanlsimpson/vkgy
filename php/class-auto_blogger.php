@@ -22,6 +22,7 @@
 			
 			$this->markdown_parser = new parse_markdown($pdo);
 			$this->access_artist = new access_artist($pdo);
+			$this->access_release = new access_release($pdo);
 			$this->access_blog = new access_blog($pdo);
 			$this->cutoff_date = date("Y-m-d", strtotime("-1 week"));
 			$this->blog_tags = $this->access_blog->list_tags();
@@ -158,45 +159,63 @@
 		// ======================================================
 		// Parse medium/format and return concise format
 		// ======================================================
-		private function parse_format($medium, $format) {
-			// Parse medium and format to see which format to use in title
-			$agg_format = $medium.$format;
+		private function parse_format($attributes) {
 			
-			if(strpos($agg_format, '(omnibus)') !== false) {
-				$format = 'omnibus';
-			}
-			elseif(strpos($agg_format, '(CT)') !== false) {
-				$format = 'demotape';
-			}
-			elseif(strpos($agg_format, '(demo)') !== false && (strpos($agg_format, '(CD)') !== false || strpos($agg_format, '(CD-R)') !== false)) {
-				$format = 'demo CD';
-			}
-			elseif(strpos($agg_format, '(collection)') !== false && strpos($agg_format, '(full album)') !== false) {
-				$format = 'collection album';
-			}
-			elseif(strpos($agg_format, '(live recording)') !== false && strpos($agg_format, '(DVD)') !== false && strpos($agg_format, '(CD)') === false) {
-				$format = 'live DVD';
-			}
-			elseif(strpos($agg_format, '(collection)') !== false && strpos($agg_format, '(PV)') !== false && strpos($agg_format, '(DVD)') !== false && strpos($agg_format, '(live recording)') === false && strpos($agg_format, '(CD)') === false) {
-				$format = 'PV collection';
-			}
-			elseif(strpos($agg_format, '(maxi-single)') !== false) {
-				$format = 'maxi-single';
-			}
-			elseif(strpos($agg_format, '(single)') !== false) {
-				$format = 'single';
-			}
-			elseif(strpos($agg_format, '(full album)') !== false) {
-				$format = 'full album';
-			}
-			elseif(strpos($agg_format, '(mini-album)') !== false) {
-				$format = 'mini-album';
-			}
-			elseif(substr_count($medium, ')') < 3) {
-				$format = str_replace([')(', '(', ')'], ['+', '', ''], $medium);
-			}
-			else {
-				$format = 'release';
+			if(is_array($attributes) && !empty($attributes)) {
+				
+				$possible_attributes = $this->access_release->get_possible_attributes(true);
+				$media = [];
+				$formats = [];
+				
+				// Transform attribute IDs to friendly names
+				foreach($attributes as $attribute_key => $attribute_id) {
+					$attribute = $possible_attributes[$attribute_id];
+					
+					if($attribute['type'] === 'medium') {
+						$media[] = $attribute['romaji'] ?: $attribute['name'];
+					}
+					elseif($attribute['type'] === 'format') {
+						$formats[] = $attribute['romaji'] ?: $attribute['name'];
+					}
+				}
+				
+				// Go through logic tree and get common name for media/format pairing
+				if(in_array('omnibus', $formats)) {
+					$format = 'omnibus';
+				}
+				elseif(in_array('CT (DT)', $media)) {
+					$format = 'demotape';
+				}
+				elseif(in_array('demo', $formats) && (in_array('CD', $media) || in_array('CD-R', $media))) {
+					$format = 'demo CD';
+				}
+				elseif(in_array('collection (best)', $formats) && in_array('full album', $formats)) {
+					$format = 'collection album';
+				}
+				elseif(in_array('live recording', $formats) && in_array('DVD', $media) && !in_array('CD', $media)) {
+					$format = 'live DVD';
+				}
+				elseif(in_array('collection (best)', $formats) && in_array('PV', $formats) && in_array('DVD', $formats) && !in_array('live recording', $formats) && in_array('CD', $media)) {
+					$format = 'PV collection';
+				}
+				elseif(in_array('maxi-single', $formats)) {
+					$format = 'maxi-single';
+				}
+				elseif(in_array('single', $formats)) {
+					$format = 'single';
+				}
+				elseif(in_array('full album', $formats)) {
+					$format = 'full album';
+				}
+				elseif(in_array('mini-album', $formats)) {
+					$format = 'mini-album';
+				}
+				elseif(is_array($media) && !empty($media) && count($media) < 3) {
+					$format = implode('+', $media);
+				}
+				else {
+					$format = 'release';
+				}
 			}
 			
 			return $format;
@@ -230,7 +249,7 @@
 						
 						// Go through each potential post type, and write the post
 						if($content_type === "release") {
-							$format = $this->parse_format($content['medium'], $content['format']);
+							$format = $this->parse_format($content['attributes']);
 							
 							if($artist['friendly'] === 'omnibus') {
 								$title = 'New omnibus: &ldquo;'.($content["romaji"] ?: $content["name"]).'&rdquo;';
@@ -394,7 +413,7 @@
 														
 														if(preg_match('/'.'^https\:\/\/vk\.gy\/releases\/[A-z0-9-]+'.'/', $line)) {
 															$post["content"][$line_key] =
-																'They '.($is_future ? 'will' : 'have').' also put out a a new '.$this->parse_format($content['medium'], $content['format']).', '.
+																'They '.($is_future ? 'will' : 'have').' also put out a a new '.$this->parse_format($content['attributes']).', '.
 																'*'.($content["romaji"] ?: $content["name"]).'*'.($content["romaji"] ? ' (*'.$content["name"].'*)' : null).', '.
 																($content["type_name"] ? 'in multiple types' : null).' on '.date('F jS', strtotime($content["date_occurred"])).'.'.
 																"\n\n".
