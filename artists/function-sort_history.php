@@ -266,7 +266,7 @@ function format_releases($history) {
 				// If last release in set, add CDJapan link
 				if($release_set_key + 1 === count($release_set)) {
 					$cdjapan_aff_id = 'PytJTGW7Lok/6128/A549875';
-					$cdjapan_link = 'https://www.cdjapan.co.jp/aff/click.cgi/'.$cdjapan_aff_id.'/searches?term.f=all&q='.str_replace('-', '+', friendly($release['content']['romaji'] ?: $release['content']['name']));
+					$cdjapan_link = 'http://www.cdjapan.co.jp/aff/click.cgi/'.$cdjapan_aff_id.'/searches?f=all&q='.str_replace('-', '+', friendly($release['content']['romaji'] ?: $release['content']['name']));
 					$release_set[0]['content'] .= ' &nbsp; <a class="any__note a--inherit" href="'.$cdjapan_link.'">BUY</a>';
 				}
 				
