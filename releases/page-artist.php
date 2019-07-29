@@ -38,10 +38,10 @@
 							<a class="release__control input__checkbox-label symbol__up-caret" data-sort="name" data-dir="asc" href="">A-Z</a>
 						</div>
 						<div>
-							<label class="release__control input__checkbox-label input__checkbox-label--selected" data-filter for="all">All</label>
+							<label class="release__control input__checkbox-label input__checkbox-label--selected" data-filter for="all"><?= lang('all', '全て', 'hidden'); ?></label>
 							<label class="release__control input__checkbox-label" data-filter for="cd">CD</label>
-							<label class="release__control input__checkbox-label" data-filter for="dvd">DVD</label>
-							<label class="release__control input__checkbox-label" data-filter for="other">other</label>
+							<label class="release__control input__checkbox-label" data-filter for="dvd"><?= lang('video', '映像', 'hidden'); ?></label>
+							<label class="release__control input__checkbox-label" data-filter for="other"><?= lang('others', 'その他', 'hidden'); ?></label>
 						</div>
 					</div>
 					

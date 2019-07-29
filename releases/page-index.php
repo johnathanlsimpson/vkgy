@@ -58,8 +58,7 @@
 			
 			if(is_array($release['medium']) && !empty($release['medium'])) {
 				foreach($release['medium'] as $medium_key => $medium) {
-					$medium['friendly'] = strtolower($medium['friendly']);
-					$release['medium'][$medium_key] = strpos($medium['friendly'], 'cd') !== false || strpos($medium['friendly'], 'dvd') !== false ? $medium['friendly'] : 'other';
+					$release['medium'][$medium_key] = strtolower($medium['friendly']);
 				}
 				$release['medium'] = implode(' ', $release['medium']);
 			}
@@ -103,7 +102,7 @@
 						<div>
 							<label class="input__checkbox-label" for="filter--all">all</label>
 							<label class="input__checkbox-label" for="filter--cd">CD</label>
-							<label class="input__checkbox-label" for="filter--dvd">DVD</label>
+							<label class="input__checkbox-label" for="filter--dvd"><?= lang('video', '映像', 'hidden'); ?></label>
 							<label class="input__checkbox-label" for="filter--other">other</label>
 						</div>
 					</div>

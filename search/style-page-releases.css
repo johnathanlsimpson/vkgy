@@ -17,7 +17,7 @@
 	align-self: stretch;
 }
 #filter--cd:checked    ~ .search__results .search__item:not([data-medium*="cd"]),
-#filter--dvd:checked   ~ .search__results .search__item:not([data-medium*="dvd"]):not([data-medium*="vhs"]),
+#filter--dvd:checked   ~ .search__results .search__item:not([data-medium*="dvd"]):not([data-medium*="vhs"]):not([data-medium*="blu-ray"]),
 #filter--other:checked ~ .search__results .search__item[data-medium*="cd"],
 #filter--other:checked ~ .search__results .search__item[data-medium*="dvd"] {
 	display: none;

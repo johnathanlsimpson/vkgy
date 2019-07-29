@@ -161,7 +161,7 @@ select[name][name][name] + .selectize-control .item + .item::before {
 	display: none;
 }
 [id^="filter--cd"]:checked ~ .calendar__container .calendar__item:not([data-medium*="cd"]),
-[id^="filter--dvd"]:checked ~ .calendar__container .calendar__item:not([data-medium*="dvd"]),
+[id^="filter--dvd"]:checked ~ .calendar__container .calendar__item:not([data-medium*="dvd"]):not([data-medium*="vhs"]):not([data-medium*="blu-ray"]),
 [id^="filter--other"]:checked ~ .calendar__container .calendar__item:not([data-medium*="other"]) {
 	display: none;
 }
