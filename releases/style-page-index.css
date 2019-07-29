@@ -160,8 +160,8 @@ select[name][name][name] + .selectize-control .item + .item::before {
 [id^="order-by--name"]:checked ~ .calendar__container .calendar__header {
 	display: none;
 }
-[id^="filter--cd"]:checked ~ .calendar__container .calendar__item:not([data-medium*="(cd"]),
-[id^="filter--dvd"]:checked ~ .calendar__container .calendar__item:not([data-medium*="(dvd"]),
-[id^="filter--other"]:checked ~ .calendar__container .calendar__item:not([data-medium*="(other"]) {
+[id^="filter--cd"]:checked ~ .calendar__container .calendar__item:not([data-medium*="cd"]),
+[id^="filter--dvd"]:checked ~ .calendar__container .calendar__item:not([data-medium*="dvd"]):not([data-medium*="vhs"]):not([data-medium*="blu-ray"]),
+[id^="filter--other"]:checked ~ .calendar__container .calendar__item:not([data-medium*="other"]) {
 	display: none;
 }

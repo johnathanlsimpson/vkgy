@@ -55,8 +55,17 @@
 			$day = $release['date_occurred'];
 			$month = substr($day, 0, 7);
 			$alph_key = $release['artist']['friendly'].'-'.$release['friendly'].'-'.$release['id'];
-			$release['medium'] = strtolower(preg_replace('/'.'\((?!CD|DVD)[\w- ]+\)'.'/', '(other)', $release['medium']));
-
+			
+			if(is_array($release['medium']) && !empty($release['medium'])) {
+				foreach($release['medium'] as $medium_key => $medium) {
+					$release['medium'][$medium_key] = strtolower($medium['friendly']);
+				}
+				$release['medium'] = implode(' ', $release['medium']);
+			}
+			else {
+				$release['medium'] = 'other';
+			}
+			
 			$release_ids_by_name[$alph_key] = $release['id'];
 			$releases_by_date[$month][] = $release;
 		}
@@ -93,7 +102,7 @@
 						<div>
 							<label class="input__checkbox-label" for="filter--all">all</label>
 							<label class="input__checkbox-label" for="filter--cd">CD</label>
-							<label class="input__checkbox-label" for="filter--dvd">DVD</label>
+							<label class="input__checkbox-label" for="filter--dvd"><?= lang('video', '映像', 'hidden'); ?></label>
 							<label class="input__checkbox-label" for="filter--other">other</label>
 						</div>
 					</div>
@@ -120,11 +129,10 @@
 									$artist_url = '/artists/'.$release['artist']['friendly'].'/';
 									$artist_name = $release['artist']['quick_name'].($release['artist']['romaji'] ? ' <span class="any--weaken">('.$release['artist']['name'].')</span>' : null);
 									$release_name = $release['quick_name'].($release['romaji'] ? ' <span class="any--weaken">('.$release['name'].')</span>' : null);
-
 									?>
 										<div
 												 class="calendar__item text text--outlined text--compact any--flex any__obscure"
-												 data-medium="<?php echo $release['medium']; ?>"
+												 data-medium="<?= $release['medium']; ?>"
 												 style="order: <?php echo $release_ids_by_name[$release['id']]; ?>">
 											<a class="calendar__cover" href="<?php echo str_replace(['.small', '.thumbnail'], '', ($cover_image ?: $artist_image)); ?>" target="_blank" title="<?php echo ($cover_image ? '&ldquo;'.$release['quick_name'].'&rdquo; cover' : $release['artist']['quick_name'].' image'); ?>">
 												<img alt="<?php echo '&ldquo;'.$release['quick_name'].'&rdquo; cover'; ?>" class="lazy" data-src="<?php echo $cover_image ?: $artist_image; ?>" />

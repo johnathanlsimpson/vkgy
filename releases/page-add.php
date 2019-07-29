@@ -124,6 +124,22 @@
 		]);
 	}
 	
+	// Get medium/format/venue/limitation options
+	$access_release = $access_release ?: new access_release($pdo);
+	$release_attributes = $access_release->get_possible_attributes();
+	
+	// For selected attribute options, just need IDs
+	foreach(['medium', 'format', 'venue_limitation', 'press_limitation_name'] as $key) {
+		if(is_array($release[$key]) && !empty($release[$key])) {
+			foreach($release[$key] as $attribute_key => $attribute) {
+				$release[$key][$attribute_key] = $attribute['attribute_id'];
+			}
+		}
+		else {
+			$release[$key] = [];
+		}
+	}
+	
 	$release['images'] = is_array($release['images']) ? $release['images'] : [];
 	$release['images'] = array_values($release['images']);
 
@@ -318,12 +334,22 @@
 					<select class="input" name="medium[]" placeholder="medium" data-multiple="true" multiple>
 						<option></option>
 						<?php
-							$release["medium"] = is_array($release["medium"]) ? $release["medium"] : [];
+							//$release['medium'] = is_array($release['medium']) ? $release['medium'] : [];
+							
+							foreach($release_attributes as $attribute) {
+								if($attribute['type'] === 'medium') {
+									?>
+										<option data-name="<?= $attribute['friendly']; ?>" value="<?= $attribute['id']; ?>" <?= in_array($attribute['id'], $release['medium']) ? 'selected' : null; ?>><?= ($attribute['romaji'] ?: $attribute['name']).($attribute['romaji'] ? ' ('.$attribute['name'].')' : null); ?></option>
+									<?php
+								}
+							}
+							
+							/*$release["medium"] = is_array($release["medium"]) ? $release["medium"] : [];
 							foreach(["CD", "CD-R", "Blu-spec CD", "SHM-CD", "DVD", "DVD-R", "Blu-ray", "VHS", "CT", "MD", "8cm CD", "box set", "digital", "book", "vinyl EP", "vinyl LP", "flexi disc"] as $medium) {
 								?>
 									<option data-name="<?php echo $medium; ?>" value="<?php echo $medium; ?>" <?php echo in_array($medium, $release["medium"]) ? "selected" : null; ?>><?php echo $medium; ?></option>
 								<?php
-							}
+							}*/
 						?>
 					</select>
 				</div>
@@ -334,7 +360,17 @@
 					<select class="input" name="format[]" placeholder="format" data-multiple="true" multiple>
 						<option></option>
 						<?php
-							$release["format"] = is_array($release["format"]) ? $release["format"] : [];
+							//$release['format'] = is_array($release['format']) ? $release['format'] : [];
+							
+							foreach($release_attributes as $attribute) {
+								if($attribute['type'] === 'format') {
+									?>
+										<option data-name="<?= $attribute['friendly']; ?>" value="<?= $attribute['id']; ?>" <?= in_array($attribute['id'], $release['format']) ? 'selected' : null; ?>><?= ($attribute['romaji'] ?: $attribute['name']).($attribute['romaji'] ? ' ('.$attribute['name'].')' : null); ?></option>
+									<?php
+								}
+							}
+							
+							/*$release["format"] = is_array($release["format"]) ? $release["format"] : [];
 							foreach([
 								"demo",
 								"maxi-single",
@@ -355,7 +391,7 @@
 								?>
 									<option data-name="<?php echo $format; ?>" value="<?php echo $format; ?>" <?php echo in_array($format, $release["format"]) ? "selected" : null; ?>><?php echo $format; ?></option>
 								<?php
-							}
+							}*/
 						?>
 					</select>
 				</div>
@@ -377,7 +413,6 @@
 				</div>
 			</div>
 
-
 			<hr />
 
 
@@ -386,10 +421,19 @@
 					<div class="input__label">
 						Venue
 					</div>
-					<select class="input" name="venue_limitation">
-						<option></option>
+					<select class="input" data-multiple="true" name="venue_limitation[]" placeholder="venue(s)" multiple>
 						<?php
-							foreach([
+							//$release['venue_limitation'] = is_array($release['venue_limitation']) ? $release['venue_limitation'] : [];
+							
+							foreach($release_attributes as $attribute) {
+								if($attribute['type'] === 'venue_limitation') {
+									?>
+										<option data-name="<?= $attribute['friendly']; ?>" value="<?= $attribute['id']; ?>" <?= in_array($attribute['id'], $release['venue_limitation']) ? 'selected' : null; ?>><?= ($attribute['romaji'] ?: $attribute['name']).($attribute['romaji'] ? ' ('.$attribute['name'].')' : null); ?></option>
+									<?php
+								}
+							}
+							
+							/*foreach([
 								"available everywhere",
 								"lives only",
 								"official web shop only",
@@ -404,22 +448,32 @@
 								?>
 									<option data-name="<?php echo $venue; ?>" value="<?php echo $venue; ?>" <?php echo $release["venue_limitation"] === $venue || ($venue === "available everywhere" && empty($release["venue_limitation"])) ? "selected" : ""; ?>><?php echo $venue; ?></option>
 								<?php
-							}
+							}*/
 						?>
 					</select>
 				</div>
 				<div class="input__group any--flex-grow">
 					<div class="input__label">
-						Pressing
+						Pressing type
 					</div>
-					<select class="input" name="press_limitation_name">
-						<option></option>
+					<select class="input" name="press_limitation_name" placeholder="pressing type">
+						
 						<?php
-							foreach(["complete limited (&#23436;&#20840;&#38480;&#23450;&#30436;)", "initial limited (&#21021;&#22238;&#23436;&#20840;&#38480;&#23450;&#30436;)", "made-to-order (&#23436;&#20840;&#20104;&#32004;&#29983;&#29987;&#38480;&#23450;&#30436;)", "not for sale (&#38750;&#22770;&#21697;)"] as $press) {
+							//$release['pressing'] = is_array($release['pressing']) ? $release['pressing'] : [];
+							
+							foreach($release_attributes as $attribute) {
+								if($attribute['type'] === 'press_limitation_name') {
+									?>
+										<option data-name="<?= $attribute['friendly']; ?>" value="<?= $attribute['id']; ?>" <?= in_array($attribute['id'], $release['press_limitation_name']) ? 'selected' : null; ?>><?= ($attribute['romaji'] ?: $attribute['name']).($attribute['romaji'] ? ' ('.$attribute['name'].')' : null); ?></option>
+									<?php
+								}
+							}
+						
+							/*foreach(["complete limited (&#23436;&#20840;&#38480;&#23450;&#30436;)", "initial limited (&#21021;&#22238;&#23436;&#20840;&#38480;&#23450;&#30436;)", "made-to-order (&#23436;&#20840;&#20104;&#32004;&#29983;&#29987;&#38480;&#23450;&#30436;)", "not for sale (&#38750;&#22770;&#21697;)"] as $press) {
 								?>
 									<option data-name="<?php echo $press; ?>" value="<?php echo $press; ?>" <?php echo $release["press_limitation_name"] === $press ? "selected" : ""; ?>><?php echo $press; ?></option>
 								<?php
-							}
+							}*/
 						?>
 					</select>
 				</div>

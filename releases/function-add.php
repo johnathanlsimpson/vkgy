@@ -25,7 +25,7 @@
 				}
 				else {
 					$release = $_POST;
-					unset($release["post"]);
+					unset($release["post"], $release['medium'], $release['format'], $release['venue_limitation'], $release['press_limitation_name']);
 					$is_edit = is_numeric($release["id"]) ? true : false;
 					
 					
@@ -38,8 +38,6 @@
 					$release["friendly"]      = friendly($release["friendly"] ?: ($release["romaji"] ?: $release["name"])." ".($release["press_romaji"] ?: $release["press_name"])." ".($release["type_romaji"] ?: $release["type_name"]));
 					$release["date_occurred"] = str_replace(["y", "m", "d"], "0", $release["date_occurred"]) ?: "0000-00-00";
 					$release["notes"]         = sanitize($markdown_parser->validate_markdown($release["notes"])) ?: null;
-					$release["medium"]        = is_array($release["medium"]) && !empty(array_filter($release["medium"])) ? "(".implode(")(", array_filter($release["medium"])).")" : null;
-					$release["format"]        = is_array($release["format"]) && !empty(array_filter($release["format"])) ? "(".implode(")(", array_filter($release["format"])).")" : null;
 					
 					// Format price
 					if(strlen($release['price'])) {
@@ -177,6 +175,77 @@
 							if($stmt->execute($sql_values)) {
 								$release["id"] = is_numeric($release["id"]) ? $release["id"] : $pdo->lastInsertId();
 								
+								// Update medium/format/venue/pressing type
+								// For venue, set a default of 'available everywhere'
+								if(!is_array($_POST['venue_limitation']) || empty($_POST['venue_limitation'])) {
+									$_POST['venue_limitation'][] = 34;
+								}
+								if(!is_numeric($_POST['press_limitation_name'])) {
+									$_POST['press_limitation_name'] = 42;
+								}
+								
+								// Since all are 'release attributes', combine arrays, then update releases_releases_attributes
+								$release_attributes = [];
+								foreach(['medium', 'format', 'venue_limitation', 'press_limitation_name'] as $key) {
+									if(is_array($_POST[$key]) && !empty($_POST[$key])) {
+										$release_attributes = array_merge($release_attributes, $_POST[$key]);
+									}
+									elseif(!is_array($_POST[$key]) && is_numeric($_POST[$key])) {
+										$release_attributes[] = $_POST[$key];
+									}
+								}
+								
+								// Loop through release attributes and clean
+								if(is_array($release_attributes) && !empty($release_attributes)) {
+									foreach($release_attributes as $release_attribute_key => $release_attribute) {
+										if(!is_numeric($release_attribute)) {
+											unset($release_attributes[$release_attribute_key]);
+										}
+									}
+								}
+								
+								// Check current release/attribute connections
+								$sql_extant_attributes = 'SELECT * FROM releases_releases_attributes WHERE release_id=?';
+								$stmt_extant_attributes = $pdo->prepare($sql_extant_attributes);
+								$stmt_extant_attributes->execute([ $release['id'] ]);
+								$rslt_extant_attributes = $stmt_extant_attributes->fetchAll();
+								
+								foreach($rslt_extant_attributes as $extant_attribute_key => $extant_attribute) {
+									
+									// If already set, remove from query
+									if(in_array($extant_attribute['attribute_id'], $release_attributes)) {
+										$duplicate_key = array_search($extant_attribute['attribute_id'], $release_attributes);
+										unset($release_attributes[$duplicate_key]);
+									}
+									
+									// If was set but now isn't, remove from DB
+									else {
+										$values_del_attributes[] = $extant_attribute['id'];
+									}
+								}
+								
+								// Remove old attributes
+								if(is_array($values_del_attributes) && !empty($values_del_attributes)) {
+									$sql_del_attributes = 'DELETE FROM releases_releases_attributes WHERE '.substr(str_repeat('id=? OR ', count($values_del_attributes)), 0, -4);
+									$stmt_del_attributes = $pdo->prepare($sql_del_attributes);
+									$stmt_del_attributes->execute($values_del_attributes);
+								}
+								
+								// Add new attributes
+								if(is_array($release_attributes) && !empty($release_attributes)) {
+									$sql_new_attributes = 'INSERT INTO releases_releases_attributes (attribute_id, release_id) VALUES '.substr(str_repeat('(?, ?), ', count($release_attributes)), 0, -2);
+									
+									foreach($release_attributes as $release_attribute) {
+										$values_new_attributes[] = $release_attribute;
+										$values_new_attributes[] = $release['id'];
+									}
+									
+									$stmt_new_attributes = $pdo->prepare($sql_new_attributes);
+									$stmt_new_attributes->execute($values_new_attributes);
+								}
+								
+								
+								
 								$sql_edit_history = 'INSERT INTO edits_releases(release_id, user_id) VALUES (?, ?)';
 								$stmt_edit_history = $pdo->prepare($sql_edit_history);
 								$stmt_edit_history->execute([ $release['id'], $_SESSION['userID'] ]);
@@ -230,7 +299,7 @@
 								
 								// Send to auto poster, if newly-added release
 								if(!$is_edit) {
-									$auto_post_url = $auto_blogger->auto_post('release', $release);
+									$auto_post_url = $auto_blogger->auto_post('release', array_merge($release, ['attributes' => $release_attributes]));
 									
 									if($auto_post_url) {
 										$output["status"] = "success";

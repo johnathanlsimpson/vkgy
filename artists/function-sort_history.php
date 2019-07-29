@@ -37,13 +37,17 @@ function insert_lives_into_history($history, $lives) {
 					if(is_array($lives) && !empty($lives) && is_array($lives[$y][$m][$d])) {
 						
 						// Create new bio line based on live
-						$schedule_line = $lives[$y][$m][$d][0];
-						$schedule_content =
-							'<a class="a--inherit symbol__company" href="/lives/&id='.$schedule_line['id'].'">'.
-							lang(($schedule_line['area_romaji'] ?: $schedule_line['area_name']), $schedule_line['area_name'], 'hidden').
-							' '.
-							lang(($schedule_line['livehouse_romaji'] ?: $schedule_line['livehouse_name']), $schedule_line['livehouse_name'], 'hidden').
-							'</a>';
+						$schedule_lines = $lives[$y][$m][$d];
+						$schedule_content = null;
+						foreach($schedule_lines as $schedule_key => $schedule_line) {
+							$schedule_content .=
+								($schedule_key ? ', ' : null).
+								'<a class="a--inherit symbol__company" href="/lives/&id='.$schedule_line['id'].'">'.
+								lang(($schedule_line['area_romaji'] ?: $schedule_line['area_name']), $schedule_line['area_name'], 'hidden').
+								' '.
+								lang(($schedule_line['livehouse_romaji'] ?: $schedule_line['livehouse_name']), $schedule_line['livehouse_name'], 'hidden').
+								'</a>';
+						}
 						
 						// Make spot in history for live
 						array_splice($history, ($i + 1), 0, 'live');
@@ -262,7 +266,7 @@ function format_releases($history) {
 				// If last release in set, add CDJapan link
 				if($release_set_key + 1 === count($release_set)) {
 					$cdjapan_aff_id = 'PytJTGW7Lok/6128/A549875';
-					$cdjapan_link = 'https://www.cdjapan.co.jp/aff/click.cgi/'.$cdjapan_aff_id.'/searches?term.f=all&q='.str_replace('-', '+', friendly($release['content']['romaji'] ?: $release['content']['name']));
+					$cdjapan_link = 'http://www.cdjapan.co.jp/aff/click.cgi/'.$cdjapan_aff_id.'/searches?f=all&q='.str_replace('-', '+', friendly($release['content']['romaji'] ?: $release['content']['name']));
 					$release_set[0]['content'] .= ' &nbsp; <a class="any__note a--inherit" href="'.$cdjapan_link.'">BUY</a>';
 				}
 				

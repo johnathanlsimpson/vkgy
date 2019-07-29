@@ -366,3 +366,22 @@
 	color: hsl(var(--accent));
 	display: initial !important;
 }
+
+/* Flyer of day */
+.iod__container {
+	overflow: hidden;
+}
+.iod__link {
+	background: hsl(var(--background--bold));
+	display: block;
+	height: auto;
+	margin: calc(-0.5rem - 1px);
+	margin-bottom: 0.5rem;
+	text-align: center;
+}
+.iod__image {
+	height: auto;
+	max-width: 200px;
+	vertical-align: middle;
+	width: 100%;
+}

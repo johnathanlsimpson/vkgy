@@ -28,7 +28,6 @@
 			<?php
 		}
 		
-		
 		?>
 			<div class="col c1">
 				
@@ -39,10 +38,10 @@
 							<a class="release__control input__checkbox-label symbol__up-caret" data-sort="name" data-dir="asc" href="">A-Z</a>
 						</div>
 						<div>
-							<label class="release__control input__checkbox-label input__checkbox-label--selected" data-filter for="all">All</label>
+							<label class="release__control input__checkbox-label input__checkbox-label--selected" data-filter for="all"><?= lang('all', '全て', 'hidden'); ?></label>
 							<label class="release__control input__checkbox-label" data-filter for="cd">CD</label>
-							<label class="release__control input__checkbox-label" data-filter for="dvd">DVD</label>
-							<label class="release__control input__checkbox-label" data-filter for="other">other</label>
+							<label class="release__control input__checkbox-label" data-filter for="dvd"><?= lang('video', '映像', 'hidden'); ?></label>
+							<label class="release__control input__checkbox-label" data-filter for="other"><?= lang('others', 'その他', 'hidden'); ?></label>
 						</div>
 					</div>
 					
@@ -53,9 +52,18 @@
 					
 					<?php
 						foreach($releases as $release) {
+							
+							// Set medium(s) to string
+							$media = '';
+							if(is_array($release['medium']) && !empty($release['medium'])) {
+								foreach($release['medium'] as $medium) {
+									$media .= $medium['friendly'].' ';
+								}
+							}
+							
 							$release["is_omnibus"] = ($release["artist_id"] != $artist["id"] ? true : false);
 							?>
-								<div class="release__container" data-date="<?php echo $release["date_occurred"]; ?>" data-name="<?php echo $release["friendly"]; ?>" data-medium="<?php echo strtolower(implode(" ", is_array($release["medium"]) ? $release["medium"] : [])); ?>">
+								<div class="release__container" data-date="<?php echo $release["date_occurred"]; ?>" data-name="<?php echo $release["friendly"]; ?>" data-medium="<?= $media; ?>">
 									<div class="h2 <?php echo !$release["is_omnibus"] ? "" : ""; ?>">
 										<?php
 											if($release["artist_id"] != $artist["id"] || ($release["artist"]["display_name"] && $release["artist"]["display_name"] != $artist["name"])) {

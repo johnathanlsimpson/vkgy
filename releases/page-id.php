@@ -94,10 +94,13 @@
 
 										<div class="any--flex-grow">
 											<?php
-												if($release["artist_display_name"]) {
+												if($release['artist']['display_name']) {
 													?>
 														<h3>
-															<a itemprop="creditedTo" class="symbol__artist" href="/artists/<?php echo $release["artist"]["friendly"]; ?>/"><?php echo $release["artist_display_romaji"] ?: $release["artist_display_name"]; ?><span class="any--jp"><?php echo $release["artist_display_romaji"] ? " ".$release["artist_display_name"] : null; ?></span></a>
+															<span class="any__note"><?= lang('as', '名義', 'hidden'); ?></span>
+															<a itemprop="creditedTo" class="symbol__artist" href="/artists/<?php echo $release["artist"]["friendly"]; ?>/">
+																<?= $release['artist']['display_romaji'] ? lang($release['artist']['display_romaji'], $release['artist']['display_name'], 'parentheses') : $release['artist']['display_name']; ?>
+															</a>
 														</h3>
 													<?php
 												}
@@ -171,7 +174,7 @@
 													</div>
 												</div>
 												<?php
-													$release["format"] = $release["format_romaji"] ? $release["format_romaji"]." (".$release["format_name"].")" : $release["format_name"] ?: $release["format"];
+													//$release["format"] = $release["format_romaji"] ? $release["format_romaji"]." (".$release["format_name"].")" : $release["format_name"] ?: $release["format"];
 													foreach(["price", "upc", "medium", "format"] as $data_section) {
 														if(!empty($release[$data_section])) {
 															?>
@@ -185,21 +188,29 @@
 																				preg_match("/"."^([^ -]+)(.*)$"."/", $release["upc"], $upc_match);
 
 																				if($upc_match[1]) {
-																					echo '<a class="a--inherit" href="https://vk.gy/search/releases/?upc='.$upc_match[1].'#result">'.$upc_match[1].'</a>';
+																					echo '<a class="a--inherit" href="/search/releases/?upc='.$upc_match[1].'#result">'.$upc_match[1].'</a>';
 																					echo $upc_match[2];
 																				}
 																			}
 																			elseif($data_section === "medium") {
 																				if(is_array($release["medium"]) && !empty($release["medium"])) {
-																					$release["medium"] = array_filter($release["medium"]);
-
 																					foreach($release["medium"] as $m => $medium) {
-																						echo '<a class="a--inherit" href="https://vk.gy/search/releases/?medium='.$medium.'#result">'.$medium.'</a>';
+																						echo '<a class="a--inherit" href="/search/releases/?medium='.$medium['friendly'].'#result">'.lang($medium['romaji'] ?: $medium['name'], $medium['name'], 'hidden').'</a>';
 																						echo $m < (count($release["medium"]) - 1) ? ", " : null;
 																					}
 																				}
+																			}
+																			elseif($data_section === 'format') {
+																				if(strlen($release['format_name'])) {
+																					echo '<a class="a--inherit" href="/search/releases/?format='.$release['format'][0]['friendly'].'#result">'.lang($release['format_romaji'] ?: $release['format_name'], $release['format_name'], 'hidden').'</a>';
+																				}
 																				else {
-																					echo '<a class="a--inherit" href="https://vk.gy/search/releases/?medium='.$release["medium"].'#result">'.$release["medium"].'</a>';
+																					if(is_array($release['format']) && !empty($release['format'])) {
+																						foreach($release['format'] as $f => $format) {
+																							echo '<a class="a--inherit" href="/search/releases/?format='.$format['friendly'].'#result">'.lang($format['romaji'] ?: $format['name'], $format['name'], 'hidden').'</a>';
+																							echo $f < (count($release['format']) - 1) ? ', ' : null;
+																						}
+																					}
 																				}
 																			}
 																			else {
@@ -466,16 +477,31 @@
 											<h5>
 												Sales venue
 											</h5>
-											<?php echo $release["venue_limitation"]; ?>
+											<?php
+												if(is_array($release['venue_limitation']) && !empty($release['venue_limitation'])) {
+													foreach($release['venue_limitation'] as $v => $venue) {
+														echo '<a href="/search/releases/?venue_limitation='.$venue['friendly'].'#result">'.lang($venue['romaji'] ?: $venue['name'], $venue['name'], 'hidden').'</a>';
+														echo $v < (count($release['venue_limitation']) - 1) ? ', ' : null;
+													}
+												}
+												else {
+													echo '<a href="/search/releases/?venue_limitation=everywhere#result">'.lang('everywhere', '全国ショップ', 'hidden').'</a>';
+												}
+											?>
 										</td>
 										<?php
-											if(!empty($release["press_limitation_name"])) {
+											if(is_array($release['press_limitation_name']) && !empty($release["press_limitation_name"])) {
 												?>
 													<td class="marketing__cell">
 														<h5>
 															Press limitation
 														</h5>
-														<?php echo $release["press_limitation_name"]; ?>
+														<?php
+															foreach($release['press_limitation_name'] as $p => $press) {
+																echo '<a href="/search/releases/?press_limitation_name='.$press['friendly'].'#result">'.lang($press['romaji'] ?: $press['name'], $press['name'], 'hidden').'</a>';
+																echo $v < (count($release['press_limitation_name']) - 1) ? ', ' : null;
+															}
+														?>
 													</td>
 												<?php
 											}

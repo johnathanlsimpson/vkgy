@@ -20,7 +20,7 @@ var themeOneButton = document.getElementById('site_theme_1');
 var themeCSSLink = document.getElementById('stylesheet_theme');
 
 themeZeroButton.onclick = function(event) {
-	themeCSSLink.setAttribute('href', '/style/style-colors.css');
+	themeCSSLink.setAttribute('href', '/style/style-colors-0.css');
 };
 themeOneButton.onclick = function(event) {
 	themeCSSLink.setAttribute('href', '/style/style-colors-1.css');

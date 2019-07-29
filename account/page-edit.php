@@ -146,13 +146,13 @@
 							<div class="input__row">
 								<div class="input__group any--flex-grow">
 									<label class="input__label">New password</label>
-									<input autocomplete="off" class="any--flex-grow" name="new_password_1" placeholder="new password" type="password" />
+									<input autocomplete="new-password" class="any--flex-grow" name="new_password_1" placeholder="new password" type="password" />
 								</div>
 							</div>
 							<div class="input__row">
 								<div class="input__group any--flex-grow">
 									<label class="input__label">New password (confirm)</label>
-									<input autocomplete="off" class="any--flex-grow" name="new_password_2" placeholder="new password (confirm)" type="password" />
+									<input autocomplete="new-password" class="any--flex-grow" name="new_password_2" placeholder="new password (confirm)" type="password" />
 								</div>
 							</div>
 						</div>

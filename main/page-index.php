@@ -49,9 +49,9 @@
 			<h3>
 				<?php echo lang('Flyer of the day', '今日のフライヤー', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
 			</h3>
-			<div class="text text--outlined text--compact" style="overflow: hidden;">
-				<a class="iod__link" href="<?php echo $image["url"]; ?>" target="_blank" style="background: hsl(var(--background)); display: block; height: auto; margin: calc(-0.5rem - 1px); margin-bottom: 0.5rem; width: 200px;">
-					<img class="iod__image <?php echo $image["is_wide"] ? "iod--wide" : null; ?> lazy" data-src="<?= str_replace(".", ".medium.", $image["url"]); ?>" style="height: auto; vertical-align: middle; width: 100%;" />
+			<div class="iod__container text text--outlined text--compact">
+				<a class="iod__link" href="<?php echo $image["url"]; ?>" target="_blank">
+					<img class="iod__image <?php echo $image["is_wide"] ? "iod--wide" : null; ?> lazy" data-src="<?= str_replace(".", ".medium.", $image["url"]); ?>" />
 				</a>
 				<a class="artist" data-name="<?= $image['artists'][0]['name']; ?>" href="<?= '/artists/'.$image['artists'][0]['friendly'].'/'; ?>">
 					<?= lang(($image['artists'][0]['romaji'] ?: $image['artists'][0]['name']), $image['artists'][0]['name'], 'hidden'); ?>
@@ -72,7 +72,7 @@
 						?>
 							<li class="ranking__item">
 								<span class="ranking__number symbol__user"></span>
-								<a class="artist artist--no-symbol" href="/artists/<?php echo $ranking["friendly"]; ?>/"><?php echo $ranking["quick_name"]; ?></a>
+								<a class="artist artist--no-symbol" href="/artists/<?php echo $ranking["friendly"]; ?>/"><?= lang($ranking['quick_name'], $ranking['name'], 'hidden'); ?></a>
 							</li>
 						<?php
 					}

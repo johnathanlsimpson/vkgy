@@ -109,10 +109,10 @@
 		</h3>
 		<div class="text text--outlined">
 			<ul class="ul--bulleted">
-				<li><?php echo lang('Contribute information and news', '情報を追加する'); ?></li>
-				<li><?php echo lang('Comment, review, rate, and tag', 'コメント・評価・レビュー'); ?></li>
-				<li><?php echo lang('Customize your VK avatar', 'V系アバターを作る'); ?></li>
-				<li><?php echo lang('Track items you own and want to own', 'コレクション・ほしい物リスト'); ?></li>
+				<li><?php echo lang('Contribute information and news', '情報を追加する', 'div'); ?></li>
+				<li><?php echo lang('Comment, review, rate, and tag', 'コメント・評価・レビュー', 'div'); ?></li>
+				<li><?php echo lang('Customize your VK avatar', 'V系アバターを作る', 'div'); ?></li>
+				<li><?php echo lang('Track items you own and want to own', 'コレクション・ほしい物リスト', 'div'); ?></li>
 			</ul>
 		</div>
 	</div>

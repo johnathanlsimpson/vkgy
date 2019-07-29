@@ -18,22 +18,35 @@
 	$request = str_replace("/search/releases/?", "", $_SERVER["REQUEST_URI"]);
 	parse_str($request, $search);
 	
-	if(!empty($search["start_date"]) || !empty($search["end_date"])) {
-		$search["start_date"] = str_replace(["mm-dd", "dd"], ["01-01", "01"], $search["start_date"]);
-		$search["end_date"] = str_replace(["mm-dd", "dd"], ["01-01", "01"], $search["end_date"]);
+	// For dates, make sure input is just numbers and matches pattern
+	foreach(['start_date', 'end_date'] as $date_key) {
+		$search[$date_key] = str_replace(['yyyy-mm-dd', '-mm-dd', '-dd'], '', $search[$date_key]);
+		$search[$date_key] = preg_match('/'.'\d{4}(?:-\d{2})?(?:-\d{2})?'.'/', $search[$date_key]) ? $search[$date_key] : null;
+	}
+	
+	// For fuzzy dates, fill in missing data
+	if(strlen($search["start_date"]) || strlen($search["end_date"])) {
 		
-		if(empty($search["start_date"]) || empty($search["end_date"])) {
-			$search["start_date"] = $search["start_date"] ?: (preg_match("/"."\d{4}-\d{2}-\d{2}"."/", $search["end_date"]) ? $search["end_date"] : null);
-			$search["end_date"] = $search["end_date"] ?: (preg_match("/"."\d{4}-\d{2}-\d{2}"."/", $search["start_date"]) ? $search["start_date"] : null);
+		// If only end date specified, assume from start of time until end date
+		if(strlen($search['end_date']) && !strlen($search['start_date'])) {
+			$search['start_date'] = '0000-00-00';
 		}
 		
-		if(strlen($search["start_date"]) === 4) {
-			$search["end_date"] = $search["end_date"] ?: $search["start_date"]."-12-31";
-			$search["start_date"] .= "-01-01";
+		// If only start year specified, assume searching anything in that year
+		if(strlen($search['start_date']) === 4 && !strlen($search['end_date'])) {
+			$search['end_date'] = $search['start_date'].'-12-31';
+			$search['start_date'] .= '-01-01';
 		}
-		elseif(strlen($search["start_date"]) === 7) {
-			$search["end_date"] = $search["end_date"] ?: $search["start_date"]."-31";
-			$search["start_date"] .= "-01";
+		
+		// If only start month specified, assume searching anything in that month
+		if(strlen($search['start_date']) === 7 && !strlen($search['end_date'])) {
+			$search['end_date'] = $search['start_date'].'-31';
+			$search['start_date'] .= '-01';
+		}
+		
+		// If start day specified but not end day, assume just searching that day
+		if(strlen($search['start_date']) === 10 && !strlen($search['end_date'])) {
+			$search['end_date'] = $search['start_date'];
 		}
 	}
 	
@@ -54,7 +67,7 @@
 		$search_query['offset'] = ($search_query['page'] - 1) * 100;
 		$search_query['limit'] = 100;
 		$search_query['get'] = 'list';
-		$search_query['order'] = in_array($search['order'], array_keys($allowed_orders)) ? $allowed_orders[$search['order']] : 'order_name ASC';	
+		$search_query['order'] = in_array($search['order'], array_keys($allowed_orders)) ? $allowed_orders[$search['order']] : 'date_occurred DESC';	
 		$search_query['limit'] = $search_query['offset'].','.$search_query['limit'];
 		
 		foreach($search as $key => $value) {
@@ -76,10 +89,25 @@
 	if(is_array($releases) && !empty($releases)) {
 		$releases = array_values($releases);
 	}
-	$num_releases = count($releases);
+	$num_releases = is_array($releases) ? count($releases) : 0;
+	
+	// Get medium/format/venue/limitation options
+	$release_attributes = $access_release->get_possible_attributes();
+	
+	// For selected attribute options, just need IDs
+	foreach(['medium', 'format', 'venue_limitation', 'press_limitation_name'] as $key) {
+		if(is_array($release[$key]) && !empty($release[$key])) {
+			foreach($release[$key] as $attribute_key => $attribute) {
+				$release[$key][$attribute_key] = $attribute['attribute_id'];
+			}
+		}
+		else {
+			$release[$key] = [];
+		}
+	}
 ?>
 
-<div class="col c1">
+<div class="col c1 any--margin">
 	<div>
 		<h2>
 			Advanced search releases
@@ -248,10 +276,12 @@
 						<select class="any--flex-grow input" name="medium" placeholder="choose medium">
 							<option></option>
 							<?php
-								foreach(["CD", "CD-R", "DVD", "DVD-R", "VHS", "CT", "MD", "8cm CD", "box set", "digital", "book"] as $medium) {
-									?>
-										<option value="<? echo $medium; ?>" <?php echo ($search["medium"] === $medium ? "selected" : null); ?> ><?php echo $medium; ?></option>
-									<?php
+								foreach($release_attributes as $attribute) {
+									if($attribute['type'] === 'medium') {
+										?>
+											<option data-name="<?= $attribute['friendly']; ?>" value="<?= $attribute['friendly']; ?>" <?= $search['medium'] === $attribute['friendly'] ? 'selected' : null; ?>><?= ($attribute['romaji'] ?: $attribute['name']).($attribute['romaji'] ? ' ('.$attribute['name'].')' : null); ?></option>
+										<?php
+									}
 								}
 							?>
 						</select>
@@ -263,17 +293,52 @@
 						<select class="any--flex-grow input" name="format" placeholder="choose format">
 							<option></option>
 							<?php
-								foreach(["demo", "maxi-single", "single", "mini-album", "full album", "collection", "omnibus", "live recording", "PV", "comment", "privilege", "photography", "other"] as $format) {
-									?>
-										<option value="<? echo $format; ?>" <?php echo ($search["format"] === $format ? "selected" : null); ?> ><?php echo $format; ?></option>
-									<?php
+								foreach($release_attributes as $attribute) {
+									if($attribute['type'] === 'format') {
+										?>
+											<option data-name="<?= $attribute['friendly']; ?>" value="<?= $attribute['friendly']; ?>" <?= $search['format'] === $attribute['friendly'] ? 'selected' : null; ?>><?= ($attribute['romaji'] ?: $attribute['name']).($attribute['romaji'] ? ' ('.$attribute['name'].')' : null); ?></option>
+										<?php
+									}
 								}
 							?>
 						</select>
 					</div>
 				</div>
-				<div class="any--weaken-color symbol__help search__note">
-					Format searches are fuzzy: eg. &ldquo;CD&rdquo; will include CD-R results, and &ldquo;single&rdquo; will include maxi-single results.
+				<div class="input__row">
+					<div class="input__group any--flex-grow">
+						<label class="input__label">
+							Venue
+						</label>
+						<select class="any--flex-grow input" name="venue_limitation" placeholder="venue">
+							<option></option>
+							<?php
+								foreach($release_attributes as $attribute) {
+									if($attribute['type'] === 'venue_limitation') {
+										?>
+											<option data-name="<?= $attribute['friendly']; ?>" value="<?= $attribute['friendly']; ?>" <?= $search['venue_limitation'] === $attribute['friendly'] ? 'selected' : null; ?>><?= ($attribute['romaji'] ?: $attribute['name']).($attribute['romaji'] ? ' ('.$attribute['name'].')' : null); ?></option>
+										<?php
+									}
+								}
+							?>
+						</select>
+					</div>
+					<div class="input__group any--flex-grow">
+						<label class="input__label">
+							Press type
+						</label>
+						<select class="any--flex-grow input" name="press_limitation_name" placeholder="press type">
+							<option></option>
+							<?php
+								foreach($release_attributes as $attribute) {
+									if($attribute['type'] === 'press_limitation_name') {
+										?>
+											<option data-name="<?= $attribute['friendly']; ?>" value="<?= $attribute['id']; ?>" <?= $search['press_limitation_name'] === $attribute['friendly'] ? 'selected' : null; ?>><?= ($attribute['romaji'] ?: $attribute['name']).($attribute['romaji'] ? ' ('.$attribute['name'].')' : null); ?></option>
+										<?php
+									}
+								}
+							?>
+						</select>
+					</div>
 				</div>
 					
 				<hr />
@@ -326,14 +391,16 @@
 					</div>
 				</div>
 				
-				<div class="input__row">
-					<div class="input__group any--flex-grow">
-						<button class="any--flex-grow">
-							Submit search
-						</button>
-					</div>
-					<div class="input__group search__new">
-						<a class="" href="/search/releases/">Clear search</a>
+				<div class="text text--docked">
+					<div class="input__row">
+						<div class="input__group any--flex-grow">
+							<button class="any--flex-grow">
+								Submit search
+							</button>
+						</div>
+						<div class="input__group search__new">
+							<a class="" href="/search/releases/">Clear search</a>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -368,19 +435,9 @@
 					</h2>
 				</div>
 				
-				<?php
-					/*if($num_releases >= 100) {
-						?>
-							<div class="text text--outlined text--notice symbol__error">
-								Over 100 results were found. Consider narrowing your search.
-							</div>
-						<?php
-					}*/
-				?>
-				
 				<div>
 					<a href="?order=<?php echo ($search['order'] === 'date_occurred_desc' ? 'date_occurred_asc' : 'date_occurred_desc').$base_url; ?>">
-						<label class="search__sort input__checkbox-label <?php echo substr($search['order'], 0, 4) === 'date' ? 'input__checkbox-label--selected' : null; ?> <?php echo $search['order'] === 'date_occurred_asc' ? 'symbol__up-caret' : 'symbol__down-caret'; ?>">Date</label>
+						<label class="search__sort input__checkbox-label <?php echo substr($search['order'], 0, 4) === 'date' || !$search['order'] ? 'input__checkbox-label--selected' : null; ?> <?php echo $search['order'] === 'date_occurred_asc' ? 'symbol__up-caret' : 'symbol__down-caret'; ?>">Date</label>
 					</a>
 					<a href="?order=<?php echo ($search['order'] === 'name_asc' ? 'name_desc' : 'name_asc').$base_url; ?>">
 						<label class="search__sort input__checkbox-label <?php echo substr($search['order'], 0, 4) === 'name' ? 'input__checkbox-label--selected' : null; ?> <?php echo $search['order'] === 'name_desc' ? 'symbol__down-caret' : 'symbol__up-caret'; ?>">A-Z</label>
@@ -390,16 +447,16 @@
 					</a>
 					
 					<input class="input__checkbox" id="filter--all" name="filter" type="radio" checked />
-					<label class="search__filter input__checkbox-label symbol__unchecked" data-filter="" data-target="" for="filter--all">All</label>
+					<label class="search__filter input__checkbox-label symbol__unchecked" data-filter="" data-target="" for="filter--all"><?= lang('all', '全て', 'hidden'); ?></label>
 					
 					<input class="input__checkbox" id="filter--cd" name="filter" type="radio" />
 					<label class="search__filter input__checkbox-label symbol__unchecked" data-filter="cd" data-target="" for="filter--cd">CD</label>
 					
 					<input class="input__checkbox" id="filter--dvd" name="filter" type="radio" />
-					<label class="search__filter input__checkbox-label symbol__unchecked" data-filter="dvd" data-target="" for="filter--dvd">DVD</label>
+					<label class="search__filter input__checkbox-label symbol__unchecked" data-filter="dvd" data-target="" for="filter--dvd"><?= lang('video', '映像', 'hidden'); ?></label>
 					
 					<input class="input__checkbox" id="filter--other" name="filter" type="radio" />
-					<label class="search__filter input__checkbox-label symbol__unchecked" data-filter="other" data-target="" for="filter--other">Other</label>
+					<label class="search__filter input__checkbox-label symbol__unchecked" data-filter="other" data-target="" for="filter--other"><?= lang('other', 'その他', 'hidden'); ?></label>
 					
 					<div class="search__clear"></div>
 					
@@ -443,6 +500,16 @@
 						<ul class="any--weaken-color">
 							<?php
 								for($i=0; $i<$num_releases; $i++) {
+									
+									// Compress media to one string
+									$media = '';
+									if(is_array($releases[$i]['medium']) && !empty($releases[$i]['medium'])) {
+										foreach($releases[$i]['medium'] as $medium) {
+											$media .= ' '.$medium['friendly'];
+										}
+									}
+									$releases[$i]['medium'] = $media;
+									
 									?>
 										<li class="search__item" data-medium="<?php echo strtolower($releases[$i]['medium']); ?>">
 											<?php echo $releases[$i]['date_occurred']; ?>

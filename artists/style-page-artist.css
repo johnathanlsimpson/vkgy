@@ -319,3 +319,50 @@ td h3 {
 .h--nav :last-child {
 	margin-left: auto;
 }
+.history__nav {
+	align-items: flex-start;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+.history__nav > div {
+	margin-bottom: 1rem;
+}
+.history__nav label {
+	display: inline-block;
+}
+.bio__item {
+	display: none;
+}
+#history__all:checked ~ .history__nav [for="history__all"],
+#history__activity:checked ~ .history__nav [for="history__activity"],
+#history__release:checked ~ .history__nav [for="history__release"],
+#history__member:checked ~ .history__nav [for="history__member"],
+#history__live:checked ~ .history__nav [for="history__live"],
+#history__other:checked ~ .history__nav [for="history__other"] {
+	color: inherit;
+}
+#history__all:checked ~ .history__nav [for="history__all"]::before,
+#history__activity:checked ~ .history__nav [for="history__activity"]::before,
+#history__release:checked ~ .history__nav [for="history__release"]::before,
+#history__member:checked ~ .history__nav [for="history__member"]::before,
+#history__live:checked ~ .history__nav [for="history__live"]::before,
+#history__other:checked ~ .history__nav [for="history__other"]::before {
+	clip-path: url(#symbol__checked);
+}
+#history__all:checked ~ .bio__container .bio__item,
+#history__activity:checked ~ .bio__container .bio__item[data-item-type*="activity"],
+#history__activity:checked ~ .bio__container .bio__item[data-item-type*="formation"],
+#history__activity:checked ~ .bio__container .bio__item[data-item-type*="disbandment"],
+#history__release:checked ~ .bio__container .bio__item[data-item-type*="release"],
+#history__live:checked ~ .bio__container .bio__item[data-item-type*="live"],
+#history__member:checked ~ .bio__container .bio__item[data-item-type*="member"],
+#history__member:checked ~ .bio__container .bio__item[data-item-type*="lineup"],
+#history__other:checked ~ .bio__container .bio__item[data-item-type*="cancellation"],
+#history__other:checked ~ .bio__container .bio__item[data-item-type*="media"],
+#history__other:checked ~ .bio__container .bio__item[data-item-type*="other"],
+#history__other:checked ~ .bio__container .bio__item[data-item-type*="label"],
+#history__other:checked ~ .bio__container .bio__item[data-item-type*="setlist"],
+#history__other:checked ~ .bio__container .bio__item[data-item-type*="trouble"],
+#history__other:checked ~ .bio__container .bio__item[data-item-type*="note"] {
+	display: flex;
+}
