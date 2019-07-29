@@ -520,6 +520,15 @@ CREATE TABLE IF NOT EXISTS `releases` (
   `image_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
+CREATE TABLE IF NOT EXISTS `releases_attributes` (
+	`id` int(11) NOT NULL,
+	`type` int(11) NOT NULL DEFAULT '0' COMMENT 'medium / format / venue / press',
+	`name` text COLLATE ".$pdo_config['db_collation']." NOT NULL,
+	`romaji` text COLLATE ".$pdo_config['db_collation'].",
+	`friendly` text COLLATE ".$pdo_config['db_collation'].",
+	`is_default` tinyint(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
+
 CREATE TABLE IF NOT EXISTS `releases_collections` (
 	`id` int(11) NOT NULL,
 	`user_id` int(5) DEFAULT NULL,
@@ -544,6 +553,12 @@ CREATE TABLE IF NOT EXISTS `releases_ratings` (
 	`rating` int(11) NOT NULL DEFAULT '1',
 	`date_added` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation']." ROW_FORMAT=COMPACT;
+
+CREATE TABLE IF NOT EXISTS `releases_releases_attributes` (
+	`id` int(11) NOT NULL,
+	`release_id` int(11) NOT NULL,
+	`attribute_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
 CREATE TABLE IF NOT EXISTS `releases_tags` (
 	`id` int(11) NOT NULL,
@@ -909,6 +924,9 @@ ALTER TABLE `releases`
 	ADD KEY `artist_id` (`artist_id`),
 	ADD KEY `date_occurred` (`date_occurred`);
 
+ALTER TABLE `releases_attributes`
+	ADD PRIMARY KEY (`id`);
+
 ALTER TABLE `releases_collections`
 	ADD PRIMARY KEY (`id`),
 	ADD KEY `user_id` (`user_id`),
@@ -921,6 +939,11 @@ ALTER TABLE `releases_likes`
 ALTER TABLE `releases_ratings`
 	ADD PRIMARY KEY (`id`),
 	ADD KEY `user_id` (`user_id`);
+
+ALTER TABLE `releases_releases_attributes`
+	ADD PRIMARY KEY (`id`),
+	ADD KEY `attribute_id` (`attribute_id`),
+	ADD KEY `release_id` (`release_id`);
 
 ALTER TABLE `releases_tags`
 	ADD PRIMARY KEY (`id`);
@@ -1084,11 +1107,15 @@ ALTER TABLE `queued_social`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `releases`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `releases_attributes`
+	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `releases_collections`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `releases_likes`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `releases_ratings`
+	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `releases_releases_attributes`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `releases_tags`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
@@ -1217,6 +1244,10 @@ ALTER TABLE `releases_likes`
 
 ALTER TABLE `releases_ratings`
 	ADD CONSTRAINT `releases_ratings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+	
+ALTER TABLE `releases_releases_attributes`
+	ADD CONSTRAINT `releases_releases_attributes_ibfk_1` FOREIGN KEY (`attribute_id`) REFERENCES `releases_attributes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	ADD CONSTRAINT `releases_releases_attributes_ibfk_2` FOREIGN KEY (`release_id`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `releases_tags`
   ADD CONSTRAINT `releases_tags_ibfk_1` FOREIGN KEY (`release_id`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
