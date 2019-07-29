@@ -111,11 +111,6 @@ initializeInlineSubmit($("[name=add]"), "/releases/function-add.php",{
 	submitOnEvent : "submit",
 	showEditLink : true,
 	callbackOnSuccess : function(formElement, returnedData) {
-		/*var parentElems = $(".image__template:not(.any--hidden)");
-		$.each(parentElems, function() {
-			updateImageData($(this));
-		});*/
-		
 		var e = new Event('item-id-updated');
 		e.details = {
 			'id' : returnedData.id
