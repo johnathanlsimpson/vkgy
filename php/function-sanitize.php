@@ -22,8 +22,8 @@
 	function sanitize($input, $modifier = NULL) {
 		$input = standardize($input);
 		
-		$search = array("?", "\\", "<", ">", "\"", "'");
-		$replace = array("&#63;", "&#92;", "&#60;", "&#62;", "&#34;", "&#39;");
+		$search = array("?", "\\", "<", ">", "\"", "'", '﻿');
+		$replace = array("&#63;", "&#92;", "&#60;", "&#62;", "&#34;", "&#39;", '');
 		
 		if($modifier != "allowhtml") {
 			$input = str_replace($search, $replace, $input);
