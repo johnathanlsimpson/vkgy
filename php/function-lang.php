@@ -19,6 +19,19 @@ function lang($english_text, $japanese_text, $options = []) {
 			'secondary_class' => 'any--hidden',
 		];
 	}
+	elseif($options === 'conditional_div') {
+		if(!strlen($english_text)) {
+			$english_text = $japanese_text;
+		}
+		if($english_text != $japanese_text) {
+			$english_text .= '<div class="any--weaken">'.$japanese_text.'</div>';
+		}
+		
+		$options = [
+			'container' => 'div',
+			'secondary_class' => 'any--hidden',
+		];
+	}
 	elseif($options === 'div') {
 		$options = [
 			'container' => 'div',
