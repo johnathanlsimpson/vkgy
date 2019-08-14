@@ -7,6 +7,28 @@ $(document).on("click", "[data-show]", function(event) {
 	showElem($(this));
 });
 
+
+// When editing release, if main artist changed, change all track artists
+var idElem = document.querySelector('[name="id"]');
+if(idElem.value.length) {
+	var artistIdElem = document.querySelector('[name="artist_id"]');
+	var artistId = artistIdElem.value;
+	
+	artistIdElem.addEventListener('change', function() {
+		if(artistId > 0) {
+			var trackArtistElems = document.querySelectorAll('[name="tracklist[artist_id][]"]');
+			
+			for(var i=0; i<trackArtistElems.length; i++) {
+				if(trackArtistElems[i].value === artistId) {
+					trackArtistElems[i].value = null;
+					trackArtistElems[i].selectize.clear();
+				}
+			}
+		}
+	});
+}
+
+
 // Set showElem() to fire on artist options if release artist is omnibus
 if($("[name=artist_id]").val() === "0") {
 	showElem({ "data_show" : "track--show-artist" });
@@ -202,6 +224,7 @@ autosize($(".autosize"));
 
 // Clean song title
 function cleanSongTitle(inputTitle) {
+	inputTitle = inputTitle.trim();
 	inputTitle = inputTitle.replace(/^(?:(\d{1,3}))?(?:([\.．・]{1}))? ?/, '');
 	return inputTitle;
 }
@@ -220,8 +243,25 @@ document.addEventListener("paste", function(event) {
 			
 			var currElem = event.target;
 			
+			// Check if all lines are wrapped by 「」
+			var checkForBrackets = false;
+			var firstTrack = cleanSongTitle(pasteText[0]);
+			var secondTrack = cleanSongTitle(pasteText[1]);
+			var bracketText = '「」';
+			if(firstTrack.slice(0,1) + firstTrack.slice(-1) === bracketText && secondTrack.slice(0,1) + secondTrack.slice(-1) === bracketText) {
+				checkForBrackets = true;
+			}
+			
 			for(var i=0; i<numPastedLines; i++) {
-				currElem.value = currElem.value + cleanSongTitle(pasteText[i]);
+				var cleanedTitle = cleanSongTitle(pasteText[i]);
+				
+				if(checkForBrackets) {
+					if(cleanedTitle.slice(0,1) + cleanedTitle.slice(-1) === bracketText) {
+						cleanedTitle = cleanedTitle.slice(1,-1);
+					}
+				}
+				
+				currElem.value = currElem.value + cleanedTitle;
 				
 				if(i + 1 < numPastedLines) {
 					var isParent = false;
