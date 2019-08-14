@@ -19,27 +19,33 @@ class grassthread_scraper {
 	public  function __construct($pdo) {
 		if(!isset($pdo) || !$pdo->getAttribute(PDO::ATTR_CONNECTION_STATUS)) {
 			include_once("../php/database-connect.php");
-			$this->pdo = $pdo;
 		}
-		else {
-			$this->pdo = $pdo;
+		
+		$this->pdo = $pdo;
+		
+		// Get possible attributes and format into assoc array by friendly name
+		$this->access_release = new access_release($this->pdo);
+		$this->possible_attributes = $this->access_release->get_possible_attributes(true);
+		foreach($this->possible_attributes as $attribute_key => $attribute) {
+			$this->possible_attributes[$attribute['friendly']] = $attribute;
+			unset($this->possible_attributes[$attribute_key]);
 		}
 		
 		$this->kana = new Kana();
 		
 		$this->release_formats = [
-			'デモテープ'     => ['medium' => 'CT',   'format' => 'demo'],
-			'cdシングル'     => ['medium' => 'CD',   'format' => 'single'],
-			'maxiシングル'   => ['medium' => 'CD',   'format' => 'maxi-single'],
-			'cdアルバム'     => ['medium' => 'CD',   'format' => 'full-album'],
-			'参加オムニバス' => ['medium' => 'CD',   'format' => 'omnibus'],
-			'オムニバス'     => ['medium' => 'CD',   'format' => 'omnibus'],
-			'映像作品'       => ['medium' => 'DVD',  'format' => null],
-			'書籍'           => ['medium' => 'Book', 'format' => null],
-			'dvd'            => ['medium' => 'DVD',  'format' => null],
-			'cd'             => ['medium' => 'CD',   'format' => null],
-			'ビデオ'         => ['medium' => 'VHS',  'format' => null],
-			'md'             => ['medium' => 'MD',   'format' => null],
+			'デモテープ'     => ['medium' => 'ct',   'format' => 'demo'],
+			'cdシングル'     => ['medium' => 'cd',   'format' => 'single'],
+			'maxiシングル'   => ['medium' => 'cd',   'format' => 'maxi-single'],
+			'cdアルバム'     => ['medium' => 'cd',   'format' => 'full-album'],
+			'参加オムニバス' => ['medium' => 'cd',   'format' => 'omnibus'],
+			'オムニバス'     => ['medium' => 'cd',   'format' => 'omnibus'],
+			'映像作品'       => ['medium' => 'dvd',  'format' => null],
+			'書籍'           => ['medium' => 'book', 'format' => null],
+			'dvd'            => ['medium' => 'dvd',  'format' => null],
+			'cd'             => ['medium' => 'cd',   'format' => null],
+			'ビデオ'         => ['medium' => 'vhs',  'format' => null],
+			'md'             => ['medium' => 'md',   'format' => null],
 		];
 		
 		$this->positions = [
@@ -49,6 +55,8 @@ class grassthread_scraper {
 			'Bass',
 			'Drums',
 			'Keyboard',
+			'Other',
+			'Roadie'
 		];
 	}
 	
@@ -406,9 +414,10 @@ class grassthread_scraper {
 	
 	private function parse_release_table($table, $release_format) {
 		if(is_array($table) && !empty($table)) {
+			
 			// Get medium/format from first row of table, then unset that row
-			$medium = $this->release_formats[$release_format]['medium'];
-			$format = $this->release_formats[$release_format]['format'];
+			$medium = $this->possible_attributes[$this->release_formats[$release_format]['medium']]['id'];
+			$format = $this->possible_attributes[$this->release_formats[$release_format]['format']]['id'];
 			unset($table[0]);
 			
 			// For remaining rows
@@ -436,25 +445,26 @@ class grassthread_scraper {
 				// Parse note
 				if(preg_match_all('/'.'限定(\d+)'.'/', $note, $matches)) {
 					$releases[$release_key]['press_limitation_num'] = $matches[1][0];
-					$releases[$release_key]['press_limitation_name'] = 'complete limited (完全限定盤)';
+					$releases[$release_key]['press_limitation_name'] = $this->possible_attributes['complete-limit']['id'];
 				}
 				if(strpos($note, '配付') !== false || strpos($note, '配布') !== false) {
 					$releases[$release_key]['price'] = '0 yen';
-					$releases[$release_key]['venue_limitation'] = 'lives only';
-					$releases[$release_key]['press_limitation_name'] = 'not for sale (非売品)';
+					$releases[$release_key]['venue_limitation'][0] = $this->possible_attributes['lives']['id'];
+					$releases[$release_key]['press_limitation_name'] = $this->possible_attributes['not-for-sale']['id'];
 				}
 				if(strpos($note, '会場限定') !== false) {
-					$releases[$release_key]['venue_limitation'] = 'lives only';
+					$releases[$release_key]['venue_limitation'][0] = $this->possible_attributes['lives']['id'];
 				}
-				if(($medium === 'dvd' || $medium === 'vhs') && strpos($note, 'ライブ') !== false) {
-					$releases[$release_key]['format'][0] = $format ?: 'live recording';
+				if(($medium === $this->possible_attributes['dvd']['id'] || $medium === $this->possible_attributes['vhs']['id']) && strpos($note, 'ライブ') !== false) {
+					$releases[$release_key]['format'][0] = $format ?: $this->possible_attributes['live-recording']['id'];
 				}
 				if(strpos($note, 'ベスト') !== false) {
-					$releases[$release_key]['format'][1] = $format ?: 'collection';
+					$releases[$release_key]['format'][1] = $format ?: $this->possible_attributes['collection']['id'];
 				}
 				
-				// Set venue
-				$releases[$release_key]['venue_limitation'] = $releases[$release_key]['venue_limitation'] ?: 'available everywhere';
+				// Set default venue & press-type
+				$releases[$release_key]['venue_limitation'][0] = strlen($releases[$release_key]['venue_limitation'][0]) ? $releases[$release_key]['venue_limitation'][0] : $this->possible_attributes['everywhere']['id'];
+				$releases[$release_key]['press_limitation_name'] = strlen($releases[$release_key]['press_limitation_name']) ? $releases[$release_key]['press_limitation_name'] : $this->possible_attributes['unspecified-limit']['id'];
 				
 				// Explode tracklist, in case tracklist uses breaks instead of separate rows
 				$tmp_tracklist = explode("\n", $tr[3]['content']);
@@ -486,25 +496,26 @@ class grassthread_scraper {
 				}
 				
 				// Set format based on num tracks
-				if(is_array($releases[$release_key]['tracklist']) && $releases[$release_key]['format'][0] != 'demo') {
+				if(is_array($releases[$release_key]['tracklist']) && $releases[$release_key]['format'][0] != $this->possible_attributes['demo']['id']) {
 					$num_tracks = count($releases[$release_key]['tracklist']);
 					
 					if($num_tracks < 3) {
-						$releases[$release_key]['format'][0] = 'single';
+						$releases[$release_key]['format'][0] = $this->possible_attributes['single']['id'];
 					}
 					if($num_tracks === 3 || $num_tracks === 4) {
-						$releases[$release_key]['format'][0] = 'maxi-single';
+						$releases[$release_key]['format'][0] = $this->possible_attributes['maxi-single']['id'];
 					}
 					if($num_tracks >= 5 && $num_tracks <= 7) {
-						$releases[$release_key]['format'][0] = 'mini-album';
+						$releases[$release_key]['format'][0] = $this->possible_attributes['mini-album']['id'];
 					}
 					if($num_tracks >= 8) {
-						$releases[$release_key]['format'][0] = 'full-album';
+						$releases[$release_key]['format'][0] = $this->possible_attributes['full-album']['id'];
 					}
 				}
 			
 				// Re-clean notes
-				if($note === '配布' || $note === '配付' || $note === '会場限定') {
+				$note = trim($note);
+				if($note === '配布' || $note === '配付' || $note === '会場限定' || preg_match('/'.'^限定\d+枚$'.'/', $note)) {
 					$releases[$release_key]['notes'] = null;
 				}
 			}
@@ -916,7 +927,7 @@ if($data) {
 	// Add releases
 	if(is_array($data['releases']) && !empty($data['releases'])) {
 		foreach($data['releases'] as $add_release) {
-			$release_artist_id = $add_release['format'][0] === 'omnibus' ? 0 : $extant_artist_id;
+			$release_artist_id = $add_release['format'][0] === 24 ? 0 : $extant_artist_id;
 			
 			$sql_check_release = 'SELECT 1 FROM releases WHERE artist_id=? AND name=? AND date_occurred=? LIMIT 1';
 			$stmt_check_release = $pdo->prepare($sql_check_release);
