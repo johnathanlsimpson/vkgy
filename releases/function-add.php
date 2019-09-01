@@ -172,6 +172,7 @@
 						
 						// Run query
 						if($stmt) {
+							
 							if($stmt->execute($sql_values)) {
 								$release["id"] = is_numeric($release["id"]) ? $release["id"] : $pdo->lastInsertId();
 								
@@ -205,6 +206,7 @@
 								}
 								
 								// Check current release/attribute connections
+								$values_del_attributes = [];
 								$sql_extant_attributes = 'SELECT * FROM releases_releases_attributes WHERE release_id=?';
 								$stmt_extant_attributes = $pdo->prepare($sql_extant_attributes);
 								$stmt_extant_attributes->execute([ $release['id'] ]);
@@ -234,6 +236,7 @@
 								// Add new attributes
 								if(is_array($release_attributes) && !empty($release_attributes)) {
 									$sql_new_attributes = 'INSERT INTO releases_releases_attributes (attribute_id, release_id) VALUES '.substr(str_repeat('(?, ?), ', count($release_attributes)), 0, -2);
+									$values_new_attributes = [];
 									
 									foreach($release_attributes as $release_attribute) {
 										$values_new_attributes[] = $release_attribute;

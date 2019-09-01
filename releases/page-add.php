@@ -334,8 +334,6 @@
 					<select class="input" name="medium[]" placeholder="medium" data-multiple="true" multiple>
 						<option></option>
 						<?php
-							//$release['medium'] = is_array($release['medium']) ? $release['medium'] : [];
-							
 							foreach($release_attributes as $attribute) {
 								if($attribute['type'] === 'medium') {
 									?>
@@ -343,13 +341,6 @@
 									<?php
 								}
 							}
-							
-							/*$release["medium"] = is_array($release["medium"]) ? $release["medium"] : [];
-							foreach(["CD", "CD-R", "Blu-spec CD", "SHM-CD", "DVD", "DVD-R", "Blu-ray", "VHS", "CT", "MD", "8cm CD", "box set", "digital", "book", "vinyl EP", "vinyl LP", "flexi disc"] as $medium) {
-								?>
-									<option data-name="<?php echo $medium; ?>" value="<?php echo $medium; ?>" <?php echo in_array($medium, $release["medium"]) ? "selected" : null; ?>><?php echo $medium; ?></option>
-								<?php
-							}*/
 						?>
 					</select>
 				</div>
@@ -360,8 +351,6 @@
 					<select class="input" name="format[]" placeholder="format" data-multiple="true" multiple>
 						<option></option>
 						<?php
-							//$release['format'] = is_array($release['format']) ? $release['format'] : [];
-							
 							foreach($release_attributes as $attribute) {
 								if($attribute['type'] === 'format') {
 									?>
@@ -369,29 +358,6 @@
 									<?php
 								}
 							}
-							
-							/*$release["format"] = is_array($release["format"]) ? $release["format"] : [];
-							foreach([
-								"demo",
-								"maxi-single",
-								"single",
-								"mini-album",
-								"full album",
-								"collection",
-								"omnibus",
-								"sample",
-								"live recording",
-								"PV",
-								"comment",
-								"privilege",
-								"photography",
-								"promotional",
-								"other"
-							] as $format) {
-								?>
-									<option data-name="<?php echo $format; ?>" value="<?php echo $format; ?>" <?php echo in_array($format, $release["format"]) ? "selected" : null; ?>><?php echo $format; ?></option>
-								<?php
-							}*/
 						?>
 					</select>
 				</div>
@@ -432,23 +398,6 @@
 									<?php
 								}
 							}
-							
-							/*foreach([
-								"available everywhere",
-								"lives only",
-								"official web shop only",
-								"online only",
-								"select stores only",
-								"mail-order only",
-								"lives and official web shop only",
-								"lives and mail-order",
-								"industry only",
-								"magazine insert"
-							] as $venue) {
-								?>
-									<option data-name="<?php echo $venue; ?>" value="<?php echo $venue; ?>" <?php echo $release["venue_limitation"] === $venue || ($venue === "available everywhere" && empty($release["venue_limitation"])) ? "selected" : ""; ?>><?php echo $venue; ?></option>
-								<?php
-							}*/
 						?>
 					</select>
 				</div>
@@ -459,8 +408,6 @@
 					<select class="input" name="press_limitation_name" placeholder="pressing type">
 						
 						<?php
-							//$release['pressing'] = is_array($release['pressing']) ? $release['pressing'] : [];
-							
 							foreach($release_attributes as $attribute) {
 								if($attribute['type'] === 'press_limitation_name') {
 									?>
@@ -468,12 +415,6 @@
 									<?php
 								}
 							}
-						
-							/*foreach(["complete limited (&#23436;&#20840;&#38480;&#23450;&#30436;)", "initial limited (&#21021;&#22238;&#23436;&#20840;&#38480;&#23450;&#30436;)", "made-to-order (&#23436;&#20840;&#20104;&#32004;&#29983;&#29987;&#38480;&#23450;&#30436;)", "not for sale (&#38750;&#22770;&#21697;)"] as $press) {
-								?>
-									<option data-name="<?php echo $press; ?>" value="<?php echo $press; ?>" <?php echo $release["press_limitation_name"] === $press ? "selected" : ""; ?>><?php echo $press; ?></option>
-								<?php
-							}*/
 						?>
 					</select>
 				</div>
@@ -669,6 +610,11 @@
 			?>
 			
 			<hr />
+			
+			<div class="symbol__help any--weaken-color" style="margin-bottom: 1rem;">
+				Note: for faster entry, you can copy + paste a list of song titles separated by line breaks.
+			</div>
+			
 			<button class="track__control" type="button" data-clear>Clear tracklist</button>
 		</div>
 		<div class="any--hidden track__template">

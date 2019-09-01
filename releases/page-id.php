@@ -174,7 +174,6 @@
 													</div>
 												</div>
 												<?php
-													//$release["format"] = $release["format_romaji"] ? $release["format_romaji"]." (".$release["format_name"].")" : $release["format_name"] ?: $release["format"];
 													foreach(["price", "upc", "medium", "format"] as $data_section) {
 														if(!empty($release[$data_section])) {
 															?>
@@ -279,125 +278,118 @@
 								</div>
 
 								<div>
-									<h3>
-										Tracklist
-									</h3>
-									<div class="text">
-										<div class="any--flex release__tracklist-container">
-											<div class="any--flex-grow">
+									<table class="text release__tracklist">
+										<?php
+											include_once('../php/function-render_component.php');
+											
+											ob_start();
+												?>
+													<tr class="release__disc">
+														<th class="h4" colspan="3"><span class="track__symbol symbol__release"></span>{disc_name}</th>
+													</tr>
 												<?php
-													if(is_array($release["tracklist"]["discs"]) && !empty($release["tracklist"]["discs"])) {
-														foreach($release["tracklist"]["discs"] as $disc_num => $disc) {
-															$n = 1;
-															?>
-																<table class="release__tracklist">
-																	<?php
-																		if($disc["disc_name"]) {
-																			?>
-																					<tr>
-																						<th class="h4 release__disc" colspan="3">
-																							<div class="any--flex">
-																								<div class="symbol__release">&nbsp;</div>
-																								<div>
-																									<?php echo $disc["disc_romaji"] ?: $disc["disc_name"]; ?>
-																									<div class="any--jp any--weaken">
-																										<?php echo $disc["disc_romaji"] ? $disc["disc_name"] : null; ?>
-																									</div>
-																								</div>
-																							</div>
-																						</th>
-																					</tr>
-																			<?php
-																		}
-																		foreach($disc["sections"] as $section_num => $section) {
-																			if($section["section_name"]) {
-																				?>
-																						<tr>
-																							<th class="h4 release__section" colspan="3">
-																								<div class="any--flex">
-																									<div class="symbol__section">&nbsp;</div>
-																									<div>
-																										<?php echo $section["section_romaji"] ?: $section["section_name"]; ?>
-																										<div class="any--jp any--weaken">
-																											<?php echo $section["section_romaji"] ? $section["section_name"] : null; ?>
-																										</div>
-																									</div>
-																								</div>
-																							</th>
-																						</tr>
-																				<?php
+											$template_disc = ob_get_clean();
+											
+											ob_start();
+												?>
+													<tr class="release__section">
+														<th class="h4" colspan="3"><span class="track__symbol symbol__section"></span>{section_name}</th>
+													</tr>
+												<?php
+											$template_section = ob_get_clean();
+											
+											ob_start();
+												?>
+													<tr class="release__track">
+														<td class="track__num any--weaken">{track_num}.</td>
+														<td class="track__artist {artist_class}"><a class="artist artist--no-symbol track--no-wrap" data-name="{artist_official_name}" data-quickname="{artist_quick_name}" href="/releases/{artist_friendly}/">{artist_name}</a></td>
+														<td class="track__name" data-track="{track_official_name}">{track_name}</td>
+													</tr>
+												<?php
+											$template_track = ob_get_clean();
+											
+											if(is_array($release['tracklist']['discs']) && !empty($release['tracklist']['discs'])) {
+												foreach($release['tracklist']['discs'] as $disc_num => $disc) {
+													
+													// Show disc title
+													if(count($release['tracklist']['discs']) > 1) {
+														echo render_component($template_disc, [
+															'disc_name' => strlen($disc['disc_name']) ? lang($disc['disc_romaji'], $disc['disc_name'], 'conditional_div') : 'Disc '.$disc_num
+														]);
+													}
+													
+													if(is_array($disc['sections']) && !empty($disc['sections'])) {
+														foreach($disc['sections'] as $section_num => $section) {
+															
+															// Show section title
+															if(count($disc['sections']) > 1) {
+																echo render_component($template_section, [
+																	'section_name' => strlen($section['section_name']) ? lang($section['section_romaji'], $section['section_name'], 'conditional_div') : 'Section '.$section_num
+																]);
+															}
+															
+															if(is_array($section['tracks']) && !empty($section['tracks'])) {
+																foreach($section['tracks'] as $track_num => $track) {
+																	
+																	// Save official name
+																	$track_official_name = $track['name'];
+																	
+																	// If omnibus-like or has display name, show artist name, otherwise show nothing
+																	$artist_official_name = $track['artist']['display_name'] ?: $track['artist']['name'];
+																	$artist_name = null;
+																	if(strlen($track['artist']['display_name']) || $track['artist']['id'] != $release['artist']['id']) {
+																		$artist_name = strlen($track['artist']['display_name']) ? lang($track['artist']['display_romaji'], $track['artist']['display_name'], 'conditional_div') : lang($track['artist']['romaji'], $track['artist']['name'], 'conditional_div');
+																	}
+																	
+																	// Wrap (notes) in track names with spans so they can be styled
+																	// First flip note array and work backward
+																	// And if (notes) provided in Japanese name, but not romaji, copy+paste
+																	if(is_array($track['notes']) && !empty($track['notes'])) {
+																		$track['notes'] = array_reverse($track['notes']);
+																		
+																		foreach($track['notes'] as $note) {
+																			if(strlen($track['romaji']) && !strlen($note['romaji'])) {
+																				$note['romaji'] = $note['name'];
 																			}
-																			foreach($section["tracks"] as $track) {
-																				?>
-																					<tr>
-																						<td class="any--weaken track__num"><?php echo $track["track_num"]."."; $n++; ?></td>
-																						<td class="track__artist any--weaken"><!--
-																				--><?php
-																								if($track["artist"]["id"] != $release["artist"]["id"]) {
-																									?>
-																										<a class="track__artist-link artist artist--no-symbol" href="/releases/<?php echo $track["artist"]["friendly"]; ?>/">
-																											<?php
-																												echo $track["artist"]["display_romaji"] ?: ($track["artist"]["display_name"] ?: $track["artist"]["quick_name"]);
-
-																												if($track["artist"]["display_romaji"] || (!$track["artist"]["display_name"] && $track["artist"]["romaji"])) {
-																													?>
-																														<div class="any--jp any--weaken track__artist-romaji"><?php echo $track["artist"]["display_romaji"] ? $track["artist"]["display_name"] : (!$track["artist"]["display_name"] && $track["artist"]["romaji"] ? $track["artist"]["name"] : null); ?></div>
-																													<?php
-																												}
-																											?>
-																										</a>
-																									<?php
-																								}
-																							?><!--
-																			--></td>
-																						<td class="track__name" data-track="<?php echo $track["name"]; ?>">
-																							<?php
-																								if(!empty($track["notes"])) {
-																									$track["notes"] = array_reverse($track["notes"]);
-
-																									foreach($track["notes"] as $note) {
-																										if($track["romaji"]) {
-																											$track["name"] = substr_replace($track["name"], ' ('.$note["name"].')', $note["name_offset"], $note["name_length"]);
-																										}
-																										else {
-																											$track["name"] = substr_replace($track["name"], ' <span class="any__note">'.$note["name"].'</span>', $note["name_offset"], $note["name_length"]);
-																										}
-
-																										if($track["romaji"] && $note["romaji"]) {
-																											$track["romaji"] = substr_replace($track["romaji"], ' <span class="any__note">'.$note["romaji"].'</span>', $note["romaji_offset"], $note["romaji_length"]);
-																										}
-																									}
-																								}
-
-																								echo $track["romaji"] ?: $track["name"];
-
-																								if(!empty($track["romaji"])) {
-																									?>
-																										<div class="any--jp any--weaken">
-																											<?php
-																												echo $track["name"];
-																											?>
-																										</div>
-																									<?php
-																								}
-																							?>
-																						</td>
-																					</tr>
-																				<?php
+																			
+																			foreach(['name', 'romaji'] as $key) {
+																				if(strlen($track[$key])) {
+																					$note[$key] = '<span class="any__note"><span class="track__parenth">(</span>'.$note[$key].'<span class="track__parenth">)</span></span>';
+																					
+																					if(is_numeric($note[$key.'_offset']) && is_numeric($note[$key.'_length'])) {
+																						$track[$key] = substr_replace($track[$key], $note[$key], $note[$key.'_offset'], $note[$key.'_length']);
+																					}
+																					else {
+																						$track[$key] .= $note[$key];
+																					}
+																				}
 																			}
 																		}
-																?>
-															</table>
-															<?php
+																	}
+																	
+																	echo render_component($template_track, [
+																		'track_num' => $track_num,
+																		'artist_official_name' => $artist_official_name,
+																		'artist_name' => $artist_name,
+																		'artist_quick_name' => $track['artist']['display_name'] ? ($track['artist']['display_romaji'] ?: $track['artist']['display_name']) : $track['artist']['romaji'] ?: $track['artist']['name'],
+																		'artist_friendly' => $track['artist']['friendly'],
+																		'artist_class' => !strlen($artist_name) ? 'track--no-artist' : null,
+																		'track_official_name' => $track_official_name,
+																		'track_name' => lang($track['romaji'], $track['name'], 'conditional_div')
+																	]);
+																}
+															}
 														}
 													}
-													else {
-														?><div class="text--error symbol__error">Sorry, something went wrong. Please refresh the page and try again.</div><?php
-													}
+												}
+											}
+											else {
 												?>
-											</div>
-										</div>
-									</div>
+													<tr><td class="symbol__error any--weaken-color" colspan="3">An error occurred. Please refresh.</td></tr>
+												<?php
+											}
+										?>
+									</table>
 
 									<?php
 										if(!empty($release["notes"])) {
