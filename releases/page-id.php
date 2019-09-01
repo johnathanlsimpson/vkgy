@@ -301,7 +301,7 @@
 											ob_start();
 												?>
 													<tr class="release__track">
-														<td class="track__num any--weaken-color">{track_num}.</td>
+														<td class="track__num any--weaken">{track_num}.</td>
 														<td class="track__artist {artist_class}"><a class="artist artist--no-symbol track--no-wrap" data-name="{artist_official_name}" data-quickname="{artist_quick_name}" href="/releases/{artist_friendly}/">{artist_name}</a></td>
 														<td class="track__name" data-track="{track_official_name}">{track_name}</td>
 													</tr>

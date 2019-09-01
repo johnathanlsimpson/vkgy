@@ -29,6 +29,12 @@
 	white-space: nowrap;
 	width: 1ch;
 }
+.track__num,
+.track__num.track__num.track__num {
+	padding-right: 0;
+	padding-top: calc(0.5rem + 1px);
+	width: calc(2rem - 2px);
+}
 /* For artist column, make no-wrap with ellipsis */
 .track--no-wrap,
 .track--no-wrap div {
@@ -61,17 +67,20 @@
 .release__section th {
 	padding-left: 2rem;
 }
+.release__disc th {
+	color: hsl(var(--accent));
+}
 .track__symbol {
 	left: 0;
 	position: absolute;
 }
+.release__section .track__symbol {
+	top: 3px;
+}
 /* Add appropriate top/bottom padding to disc and section headers */
+.release__disc th,
 .release__section th {
 	padding-bottom: 0.5rem;
-}
-.release__track + .release__section th,
-.release__disc + .release__section th {
-	padding-top: 0.5rem;
 }
 /* Add fake border to disc header, since we can't use margin and padding */
 .release__track + .release__disc th {
