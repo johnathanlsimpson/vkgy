@@ -35,6 +35,9 @@
 	padding-top: calc(0.5rem + 1px);
 	width: calc(2rem - 2px);
 }
+tr:first-of-type .track__num.track__num.track__num {
+	padding-top: 1px;
+}
 /* For artist column, make no-wrap with ellipsis */
 .track--no-wrap,
 .track--no-wrap div {
