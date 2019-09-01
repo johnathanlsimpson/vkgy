@@ -318,7 +318,7 @@
 	//
 	if(!$show_add_page && !$show_artist_page && !$show_videos && !$show_edit_page) {
 		$artist_list = $access_artist->access_artist(["letter" => $_GET["letter"], "get" => "artist_list"]);
-		$num_artists = count($artist_list);
+		$num_artists = is_array($artist_list) ? count($artist_list) : 0;
 		
 		$full_artist_list = $access_artist->access_artist(["get" => "list"]);
 		for($i = 0; $i < count($full_artist_list); $i++) {

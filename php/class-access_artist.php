@@ -559,34 +559,6 @@
 						];
 					}
 				}
-				
-				// Add live schedule to artist bio
-				/*$lives = $access_live->access_live([ 'artist_id' => $artist_id, 'get' => 'name' ]);
-				
-				
-				$sql_schedule = "
-					SELECT
-						CONCAT_WS(' ', COALESCE(areas.romaji, areas.name), COALESCE(lives_livehouses.romaji, lives_livehouses.name)) AS quick_name,
-						lives.date_occurred
-					FROM lives_artists
-					LEFT JOIN lives ON lives.id=lives_artists.live_id
-					LEFT JOIN lives_livehouses ON lives_livehouses.id=lives.livehouse_id
-					LEFT JOIN areas ON areas.id=lives_livehouses.area_id
-					WHERE lives_artists.artist_id=?
-					ORDER BY lives.date_occurred DESC";
-				$stmt_schedule = $this->pdo->prepare($sql_schedule);
-				$stmt_schedule->execute([ $artist_id ]);
-				$rslt_schedule = $stmt_schedule->fetchAll();
-				
-				if(is_array($rslt_schedule) && !empty($rslt_schedule)) {
-					foreach($rslt_schedule as $live) {
-						$history[] = [
-							"date_occurred" => $live["date_occurred"],
-							"content" => $live["quick_name"],
-							"type" => ["14"]
-						];
-					}
-				}*/
 			}
 			
 			usort($history, function($a, $b) {
@@ -614,6 +586,15 @@
 				case "id"          : array_push($sql_select, "artists.id"); break;
 				case "list"        : array_push($sql_select, "artists.id", "artists.name", "artists.romaji", "COALESCE(artists.romaji, artists.name) AS quick_name", "artists.friendly", "artists.label_history"); break;
 				case "artist_list" : array_push($sql_select, "artists.id", "artists.name", "artists.romaji", "COALESCE(artists.romaji, artists.name) AS quick_name", "artists.friendly", "artists.is_exclusive"); break;
+			}
+			
+			if($args['get'] === 'artist_list') {
+				$sql_select[] = 'artists.description';
+				$sql_select[] = 'artists.pronunciation';
+				$sql_select[] = 'artists.active';
+				$sql_select[] = 'GROUP_CONCAT(tags_artists.name) AS tag_names';
+				$sql_select[] = 'GROUP_CONCAT(tags_artists.romaji) AS tag_romajis';
+				$sql_select[] = 'GROUP_CONCAT(tags_artists.friendly) AS tag_friendlys';
 			}
 			
 			// WHERE
@@ -677,22 +658,22 @@
 				$args["letter"] = (strlen($args["letter"]) === 1 ? $args["letter"] : "-");
 				
 				if(preg_match("/"."[A-z]"."/", $args["letter"])) {
-					$sql_where[] = "friendly LIKE CONCAT(?, '%')";
+					$sql_where[] = "artists.friendly LIKE CONCAT(?, '%')";
 					$sql_values[] = $args["letter"];
 				}
 				else {
-					$sql_where[] = "friendly REGEXP '^[^A-z]'";
+					$sql_where[] = "artists.friendly REGEXP '^[^A-z]'";
 				}
 			}
 			if($args["friendly"]) {
 				if($args["get"] === "prev") {
-					$sql_where[] = "friendly < ? AND affiliation < '3'";
-					$sql_order[] = "friendly DESC";
+					$sql_where[] = "artists.friendly < ? AND affiliation < '3'";
+					$sql_order[] = "artists.friendly DESC";
 					$sql_limit = "LIMIT 1";
 				}
 				elseif($args["get"] === "next") {
-					$sql_where[] = "friendly > ? AND affiliation < '3'";
-					$sql_order[] = "friendly ASC";
+					$sql_where[] = "artists.friendly > ? AND affiliation < '3'";
+					$sql_order[] = "artists.friendly ASC";
 					$sql_limit = "LIMIT 1";
 				}
 				else {
@@ -798,13 +779,19 @@
 				}
 			}
 			
+			if($args['get'] === 'artist_list') {
+				$sql_join[] = 'LEFT JOIN artists_tags ON artists_tags.artist_id=artists.id';
+				$sql_join[] = 'LEFT JOIN tags_artists ON tags_artists.id=artists_tags.tag_id';
+				$sql_group[] = 'artists.id';
+			}
+			
 			// DEFAULTS
 			$sql_select = $sql_select ?: [];
 			$sql_from = $sql_from ?: 'artists';
 			$sql_join = is_array($sql_join) ? implode(' ', $sql_join) : null;
 			$sql_where = $sql_where ?: [];
 			$sql_values = $sql_values ?: [];
-			$sql_order = $sql_order ?: ["friendly ASC"];
+			$sql_order = $sql_order ?: ["artists.friendly ASC"];
 			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : $sql_limit ?: null;
 			
 			// QUERY
@@ -814,7 +801,7 @@
 			else {
 				if(!empty($sql_select)) {
 					
-					$sql_artist = "SELECT ".implode(", ", $sql_select)." FROM ".$sql_from.' '.$sql_join.' '.(!empty($sql_where) ? "WHERE (".implode(") AND (", $sql_where).")" : null)." ORDER BY ".implode(", ", $sql_order)." ".$sql_limit;
+					$sql_artist = "SELECT ".implode(", ", $sql_select)." FROM ".$sql_from.' '.$sql_join.' '.(!empty($sql_where) ? "WHERE (".implode(") AND (", $sql_where).")" : null).($sql_group ? ' GROUP BY '.implode(', ', $sql_group) : null)." ORDER BY ".implode(", ", $sql_order)." ".$sql_limit;
 					$stmt = $this->pdo->prepare($sql_artist);
 					
 					if($stmt) {
