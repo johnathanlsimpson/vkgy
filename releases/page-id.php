@@ -18,7 +18,7 @@
 		
 		background("/artists/".$release["artist"]["friendly"]."/main.large.jpg");
 		
-		style("/releases/style-page-id.css");
+		style("/releases/style-page-id-inartistic.css");
 		
 		script([
 			"/scripts/script-rateAlbum.js",
