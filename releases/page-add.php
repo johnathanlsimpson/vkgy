@@ -12,7 +12,12 @@
 		lang('Search', 'サーチ', ['secondary_class' => 'any--hidden']) => '/search/releases/',
 	]);
 	
-	$page_header = lang('Add release', 'リリースを追加する', ['container' => 'div']);
+	if(is_numeric($_GET['release'])) {
+		$page_header = lang('Edit release', 'リリースを編集する', ['container' => 'div']);
+	}
+	else {
+		$page_header = lang('Add release', 'リリースを追加する', ['container' => 'div']);
+	}
 	
 	subnav([
 		lang('Add release', 'リリースを追加する', ['secondary_class' => 'any--hidden']) => '/releases/add/',
