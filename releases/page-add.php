@@ -287,6 +287,18 @@
 									</option>
 								<?php
 							}
+							elseif(strlen($_GET['artist'])) {
+								$access_preselected_artist = new access_artist($pdo);
+								$preselected_artist = $access_preselected_artist->access_artist(['friendly' => sanitize($_GET['artist']), 'get' => 'name']);
+								
+								if(is_array($preselected_artist) && !empty($preselected_artist)) {
+									?>
+										<option data-name="<?= $preselected_artist['quick_name']; ?>" value="<?= $preselected_artist['id']; ?>" selected>
+											<?= $preselected_artist['quick_name']; ?>
+										</option>
+									<?php
+								}
+							}
 						?>
 					</select>
 				</div>
