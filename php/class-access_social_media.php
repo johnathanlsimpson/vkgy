@@ -40,7 +40,7 @@
 			];
 			
 			// Patreon link
-			$this->patreon_url = 'https://patreon.com/vkgy/';
+			$this->patreon_url = 'https://patreon.com/vkgy';
 			
 			// Get FB/Twitter keys
 			include('../php/class-access_social_media-key.php');
