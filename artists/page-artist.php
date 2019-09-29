@@ -83,9 +83,14 @@ $in_page_navs = array_filter($in_page_navs);
 						// Stub notice
 						if($artist_is_stub) {
 							?>
-								<div class="text text--outlined symbol__error">
-									This artist doesn't have much information yet. Please comment below if you have any information.
-								</div>
+								<div class="text text--outlined symbol__error"><?= lang('This artist doesn\'t have much information yet. Please comment below if you have any information.', 'このアーティストにとって、情報は限られています。追加情報がある場合は、気軽にコメントしてください。', 'hidden'); ?></div>
+							<?php
+						}
+						
+						// Non-visual notice
+						if($artist_is_non_visual) {
+							?>
+								<div class="text text--outlined symbol__error"><?= lang('This is artist is non-VK. Information may be truncated or inaccurate, and is provided only to give context to related artists/musicians.', 'このアーティストは非V系です。情報は、切り捨てられたり不正確になったりする場合があります。', 'hidden'); ?></div>
 							<?php
 						}
 						
