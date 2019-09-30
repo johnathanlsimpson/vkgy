@@ -172,6 +172,10 @@
 					$artist_is_exclusive = true;
 				}
 				
+				if($tag['friendly'] === 'non-visual') {
+					$artist_is_non_visual = true;
+				}
+				
 				if($tag['friendly'] === 'removed') {
 					$artist_is_removed = true;
 				}

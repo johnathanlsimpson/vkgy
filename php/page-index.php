@@ -85,7 +85,7 @@
 				<a class="secondary-nav__social secondary-nav__facebook a--inherit symbol__facebook" href="https://facebook.com/vkgy.official/" target="_blank"></a>
 				<a class="secondary-nav__social secondary-nav__youtube  a--inherit symbol__youtube" href="https://youtube.com/c/vkgyofficial" target="_blank"></a>
 				<a class="secondary-nav__social secondary-nav__discord  a--inherit symbol__discord" href="https://discord.gg/jw8jzXn" target="_blank"></a>
-				<a class="secondary-nav__social secondary-nav__patreon  a--inherit symbol__patreon" href="https://patreon.com/vkgy/" target="_blank"></a>
+				<a class="secondary-nav__social secondary-nav__patreon  a--inherit symbol__patreon" href="https://patreon.com/vkgy" target="_blank"></a>
 				
 				<a class="head__link secondary-nav__link secondary-nav__sign-out a--inherit symbol__exit     any--signed-in-only"  href="/sign-out/"><?php echo lang('Sign out', 'サインアウト', ['secondary_class' => 'any--hidden']); ?></a>
 				<a class="head__link secondary-nav__link secondary-nav__register a--inherit symbol__register any--signed-out-only" href="/account/"><?php echo lang('Register', 'アカウントの作成', ['secondary_class' => 'any--hidden']); ?></a>
@@ -124,7 +124,7 @@
 				<div class="primary-nav__right any--flex any--weaken-color">
 					<a class="head__link primary-nav__add a--inherit any--signed-in-only" href="/blog/add/" title="Add Blog Post"><span class="symbol__news symbol--standalone"></span></a>
 					<a class="head__link primary-nav__add a--inherit any--signed-in-only" title="Add Artist" href="/artists/add/"><span class="symbol__artist symbol--standalone"></span></a>
-					<a class="head__link primary-nav__add a--inherit any--signed-in-only" title="Add Release" href="/releases/add/"><span class="symbol__release symbol--standalone"></span></a>
+					<a class="head__link primary-nav__add a--inherit any--signed-in-only" title="Add Release" href="/releases/add/<?= strlen($_GET['artist']) ? $_GET['artist'].'/' : null; ?>"><span class="symbol__release symbol--standalone"></span></a>
 					<a class="head__link primary-nav__add a--inherit any--signed-in-only" title="Add Musician" href="/musicians/add/"><span class="symbol__musician symbol--standalone"></span></a>
 					<a class="head__link primary-nav__add a--inherit any--signed-in-only" title="Add Label" href="/labels/add/"><span class="symbol__company symbol--standalone"></span></a>
 					
@@ -299,7 +299,7 @@
 						SINCE 2004
 					</div>
 					
-					<a class="a--padded a--outlined cta__link a--patreon" href="https://www.patreon.com/vkgy/" target="_blank"><img src="/style/logo-patreon.png" style="height: 1rem;" /> <?php echo lang('Support vkgy', 'パトレオン', ['secondary_class' => 'any--hidden']); ?></a>
+					<a class="a--padded a--outlined cta__link a--patreon" href="https://www.patreon.com/vkgy" target="_blank"><img src="/style/logo-patreon.png" style="height: 1rem;" /> <?php echo lang('Support vkgy', 'パトレオン', ['secondary_class' => 'any--hidden']); ?></a>
 				</div>
 				
 				<div class="any--weaken footer__right">
@@ -333,7 +333,7 @@
 							<h5>
 								Patreon
 							</h5>
-							<a href="https://www.patreon.com/vkgy/" target="_blank">vkgy</a>
+							<a href="https://www.patreon.com/vkgy" target="_blank">vkgy</a>
 						</li>
 					</ul>
 				</div>

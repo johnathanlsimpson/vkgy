@@ -12,7 +12,12 @@
 		lang('Search', 'サーチ', ['secondary_class' => 'any--hidden']) => '/search/releases/',
 	]);
 	
-	$page_header = lang('Add release', 'リリースを追加する', ['container' => 'div']);
+	if(is_numeric($_GET['release'])) {
+		$page_header = lang('Edit release', 'リリースを編集する', ['container' => 'div']);
+	}
+	else {
+		$page_header = lang('Add release', 'リリースを追加する', ['container' => 'div']);
+	}
 	
 	subnav([
 		lang('Add release', 'リリースを追加する', ['secondary_class' => 'any--hidden']) => '/releases/add/',
@@ -281,6 +286,18 @@
 										?>
 									</option>
 								<?php
+							}
+							elseif(strlen($_GET['artist'])) {
+								$access_preselected_artist = new access_artist($pdo);
+								$preselected_artist = $access_preselected_artist->access_artist(['friendly' => sanitize($_GET['artist']), 'get' => 'name']);
+								
+								if(is_array($preselected_artist) && !empty($preselected_artist)) {
+									?>
+										<option data-name="<?= $preselected_artist['quick_name']; ?>" value="<?= $preselected_artist['id']; ?>" selected>
+											<?= $preselected_artist['quick_name']; ?>
+										</option>
+									<?php
+								}
 							}
 						?>
 					</select>

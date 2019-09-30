@@ -139,9 +139,25 @@
 														foreach($period as $band_key => $band) {
 															if(is_numeric($band["id"])) {
 																?>
-																	<a class="artist" href="/artists/<?php echo $band["friendly"]; ?>/"><?php echo $band["quick_name"]; ?></a>
-																	<?php echo $band["romaji"] ? " (".$band["name"].")" : null; ?>
+																	<a class="artist" href="/artists/<?php echo $band["friendly"]; ?>/">
+																		<?php 
+																			if(strlen($band['display_name']) || strlen($band['display_romaji'])) {
+																				echo lang($band['display_romaji'] ?: $band['display_name'], $band['display_name'], 'hidden');
+																			}
+																			else {
+																				echo lang($band['romaji'] ?: $band['name'], $band['name'], 'hidden');
+																			}	
+																		?>
+																	</a>
 																<?php
+																
+																if(strlen($band['display_romaji'])) {
+																	echo lang('('.$band['display_name'].')', null, 'hidden');
+																}
+																elseif(strlen($band['romaji'])) {
+																	echo lang('('.$band['name'].')', null, 'hidden');
+																}
+																
 															}
 															else {
 																echo $band["romaji"] ?: $band["name"].($band["romaji"] ? " (".$band["name"].")" : null);

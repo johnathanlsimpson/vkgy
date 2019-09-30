@@ -10,7 +10,7 @@
 
 * All ''editors,, can: add/edit artists, add/edit musicians, add/edit labels, add/edit livehouses, edit others' news posts, and moderate comments, + the above.
 
-* All ''VIP users,, can: view unwatermarked full-res images, access the dev blog, get features earlier, access the exclusive Discord channel, use exclusive avatar items, and more. [Support on Patreon](https://www.patreon.com/vkgy/) to become VIP.
+* All ''VIP users,, can: view unwatermarked full-res images, access the dev blog, get features earlier, access the exclusive Discord channel, use exclusive avatar items, and more. [Support on Patreon](https://www.patreon.com/vkgy) to become VIP.
 
 
 

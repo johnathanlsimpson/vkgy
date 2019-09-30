@@ -126,10 +126,10 @@ RewriteRule  ^musicians/(\d+)/[\w-]+/?$  /?musicians/&musician=$1
 
 RewriteRule  ^php/?$  / [R=permanent,L]
 
-RewriteRule  ^releases/add/?$                         /?releases/page-add
+RewriteRule  ^releases/add/?([\w-]+)?/?$              /?releases/page-add&artist=$1$2
 RewriteRule  ^releases/([\w\-]+)/?$                   /?releases/&artist=$1
-RewriteRule  ^releases/[\w\-]+/(\d+)/[\w\-]+/?$       /?releases/&id=$1
-RewriteRule  ^releases/[\w\-]+/(\d+)/[\w\-]+/edit/?$  /?releases/page-add&release=$1
+RewriteRule  ^releases/[\w\-]*/(\d+)/[\w\-]*/?$       /?releases/&id=$1
+RewriteRule  ^releases/[\w\-]*/(\d+)/[\w\-]*/edit/?$  /?releases/page-add&release=$1
 
 RewriteRule  ^tag-source  /releases/page-tag-source.php
 
