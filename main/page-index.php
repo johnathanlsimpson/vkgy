@@ -214,7 +214,7 @@
 
 			<input class="obscure__input" id="obscure-updates" type="checkbox" checked />
 			<div class="text text--outlined obscure__container obscure--faint obscure--height">
-				<ul>
+				<ul style="z-index: 1;">
 					<?php
 						for($i=0; $i<$num_updates; $i++) {
 							?>
