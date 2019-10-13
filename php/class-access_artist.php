@@ -35,6 +35,56 @@
 		
 		
 		// ======================================================
+		// Add artist website
+		// ======================================================
+		function add_website($artist_id, $website_urls) {
+			
+			// Artist ID must be provided
+			if(is_numeric($artist_id)) {
+				
+				// If string (one URL) given, convert to array
+				if(!is_array($website_urls) && strlen($website_urls)) {
+					$website_urls = [ $website_urls ];
+				}
+				
+				// If new URLs provided
+				if(is_array($website_urls) && !empty($website_urls)) {
+					
+					// Grab previous URLs
+					$sql_extant = 'SELECT official_links FROM artists WHERE id=? LIMIT 1';
+					$stmt_extant = $this->pdo->prepare($sql_extant);
+					$stmt_extant->execute([ $artist_id ]);
+					$rslt_extant = $stmt_extant->fetchColumn;
+					$rslt_extant = explode("\n", $rslt_extant);
+					$rslt_extant = array_filter($rslt_extant);
+					
+					// Loop through new URLs, check if in extant list
+					// Want to add URL filtering functions here too
+					$num_new_websites = count($website_urls);
+					for($i=0; $i<$num_new_websites; $i++) {
+						if(in_array($website_urls, $rslt_extant)) {
+							unset($website_urls[$i]);
+						}
+					}
+					
+					// Combine extant URLs and new URLs, then update DB
+					if(is_array($website_urls) && !empty($website_urls)) {
+						$website_urls = implode("\n", $website_urls);
+						
+						$sql_add = 'UPDATE artists SET official_links=CONCAT(official_links, "\n", ?) WHERE id=? LIMIT 1';
+						$stmt_add = $this->pdo->prepare($sql_add);
+						if($stmt_add->execute([ $website_urls, $artist_id ])) {
+							return true;
+						}
+					}
+					
+				}
+			}
+		}
+		
+		
+		
+		// ======================================================
 		// Get related artists
 		// ======================================================
 		function get_related_artists($artist_id, $type = null) {
