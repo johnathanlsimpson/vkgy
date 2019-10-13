@@ -89,6 +89,20 @@
 					
 					// If artist was provided, or was found by searching links, go ahead
 					if(is_numeric($artist_id)) {
+						
+						// If user is an admin (who can approve channel anyway), approve and add channel to artist's links
+						if($is_flagged && $_SESSION['is_admin']) {
+							$is_flagged = false;
+							
+							// Get artist class
+							if(!$this->access_artist) {
+								include_once('../php/class-access_artist.php');
+								$this->access_artist = new access_artist($this->pdo);
+							}
+							
+							$this->access_artist->add_website($artist_id, 'youtube.com/channel/'.$video_data['channel_id']);
+						}
+						
 						$values_video = [
 							$artist_id,
 							is_numeric($release_id) ? $release_id : null,
