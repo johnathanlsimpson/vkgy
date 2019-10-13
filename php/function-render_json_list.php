@@ -7,7 +7,7 @@ $access_label = $access_label ?: new access_label($pdo);
 $access_musician = $access_musician ?: new access_musician($pdo);
 $access_release = $access_release ?: new access_release($pdo);
 
-function render_json_list($input_type, $input = null, $input_id_type = null, $include_friendly = null) {
+function render_json_list($input_type, $input = null, $input_id_type = null, $include_friendly = null, $first_option_id = null) {
 	global $pdo;
 	global $access_artist, $access_label, $access_musician, $access_release;
 	global $artist_list, $label_list, $musician_list, $release_list;
@@ -31,6 +31,15 @@ function render_json_list($input_type, $input = null, $input_id_type = null, $in
 		$input = is_array($input) ? $input : [];
 		$input = array_values($input);
 		$num_input = count($input);
+		
+		// If given 'first option', add to array of data
+		// Next function will loop through and overwrite it
+		// with the data of the same ID from the database call,
+		// but in the top position
+		if(is_numeric($first_option_id)) {
+			array_unshift($input, [ 'id' => $first_option_id ]);
+			$num_input++;
+		}
 		
 		// Loop through array and build chunk
 		for($i=0; $i<$num_input; $i++) {
