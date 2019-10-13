@@ -17,7 +17,7 @@
 		include_once('../php/function-render_json_list.php');
 		render_json_list('artist');
 		
-		$page_header = 'Edit blog entry';
+		$page_header = ($entry ? 'Edit' : 'Add').' blog entry';
 		
 		?>
 			<div class="col c1">
