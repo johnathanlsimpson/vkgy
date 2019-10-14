@@ -168,7 +168,10 @@
 		<div class="text obscure__container obscure--long comments__container">
 			<ul>
 				<?php
+					$access_user = new access_user($pdo);
 					for($i=0; $i<count($comments); $i++) {
+						$comments[$i]['user'] = array_merge($comments[$i]['user'], $access_user->access_user([ 'username' => $comments[$i]['user']['username'], 'get' => 'name' ]));
+						
 						$comment_class = null;
 						$comments[$i]['user']['avatar_url'] = '/usericons/avatar-'.(file_exists('../usericons/avatar-'.$comments[$i]['user']['username'].'.png') ? $comments[$i]['user']['username'] : 'anonymous').'.png?'.date('YmdH');
 						
@@ -185,7 +188,7 @@
 									
 									<div class="comment__comment">
 										<h5 class="any--flex">
-											<a class="user a--inherit comment__user" href="/users/<?php echo $comments[$i]["user"]["username"]; ?>/"><?php echo $comments[$i]["user"]["username"]; ?></a>
+											<a class="user a--inherit comment__user symbol__user-<?= $comments[$i]['user']['icon']; ?>" href="/users/<?php echo $comments[$i]["user"]["username"]; ?>/"><?php echo $comments[$i]["user"]["username"]; ?></a>
 											<?php echo substr($comments[$i]["date_occurred"], 5); ?>
 										</h5>
 										
