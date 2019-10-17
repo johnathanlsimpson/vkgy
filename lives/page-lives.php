@@ -3,8 +3,6 @@
 	include_once('../php/function-render_json_list.php');
 	$access_live = new access_live($pdo);
 	
-	$page_header = lang('Lives list', 'ライブ一覧', ['container' => 'div']);
-	
 	script([
 		'/scripts/external/script-selectize.js',
 		'/scripts/script-initSelectize.js',
@@ -68,26 +66,34 @@
 	// Get data
 	$lives = $access_live->access_live(array_merge($q, [ 'get' => 'basics', 'keys' => 'date' ]));
 	$num_lives = $access_live->access_live(array_merge($q, [ 'get' => 'count', 'limit' => null ])) ?: 0;
-		
+	
 	// Set pages
 	$current_page = is_numeric($_GET['page']) ? $_GET['page'] : 1;
 	$total_pages = ceil($num_lives / $result_limit);
 	unset($q['limit'], $q['order']);
 	
-	$directional_nav[] = [
-		'position' => 'left',
-		'text' => 'Page '.($current_page > 1 ? $current_page - 1 : 1),
-		'url' => $current_page > 1 ? '&'.http_build_query($q).'&page='.($current_page - 1) : null
-	];
-	$directional_nav[] = [
-		'position' => 'center',
-		'text' => 'Results '.(($current_page * $result_limit) - $result_limit + 1).'~'.($current_page < $total_pages ? $current_page * $result_limit : $num_lives - (($current_page * $result_limit) - $result_limit)),
-	];
-	$directional_nav[] = [
-		'position' => 'right',
-		'text' => 'Page '.($current_page < $total_pages ? $current_page + 1 : $current_page),
-		'url' => $current_page < $total_pages ? '&'.http_build_query($q).'&page='.($current_page + 1) : null
-	];
+	// Set title and nav
+	if(is_numeric($q['id']) && count($lives) === 1) {
+		$page_header = lang('Live info', 'ライブ情報', ['container' => 'div']);
+	}
+	else {
+		$page_header = lang('Lives list', 'ライブ一覧', ['container' => 'div']);
+		
+		$directional_nav[] = [
+			'position' => 'left',
+			'text' => 'Page '.($current_page > 1 ? $current_page - 1 : 1),
+			'url' => $current_page > 1 ? '&'.http_build_query($q).'&page='.($current_page - 1) : null
+		];
+		$directional_nav[] = [
+			'position' => 'center',
+			'text' => 'Results '.(($current_page * $result_limit) - $result_limit + 1).'~'.($current_page < $total_pages ? $current_page * $result_limit : $num_lives - (($current_page * $result_limit) - $result_limit)),
+		];
+		$directional_nav[] = [
+			'position' => 'right',
+			'text' => 'Page '.($current_page < $total_pages ? $current_page + 1 : $current_page),
+			'url' => $current_page < $total_pages ? '&'.http_build_query($q).'&page='.($current_page + 1) : null
+		];
+	}
 ?>
 
 <div class="col c1 any--margin">
@@ -138,33 +144,35 @@
 					</div>
 				<?php
 			}
-		?>
-		
-		<div class="senary-nav__container any--margin">
-			<div class="senary-nav__left">
-				<a class="input__checkbox-label input__checkbox-label--selected <?php echo $_GET['order'] === 'asc' ? 'symbol__up-caret' : 'symbol__down-caret'; ?>" href="<?php echo '&order='.($_GET['order'] === 'asc' ? 'desc' : 'asc').'&'.http_build_query($q); ?>">Date</a>
-			</div>
 			
-			<div class="senary-nav__center">
-			</div>
+			if(!is_numeric($q['id'])) {
+				?>
+					<div class="senary-nav__container any--margin">
+						<div class="senary-nav__left">
+							<a class="input__checkbox-label input__checkbox-label--selected <?php echo $_GET['order'] === 'asc' ? 'symbol__up-caret' : 'symbol__down-caret'; ?>" href="<?php echo '&order='.($_GET['order'] === 'asc' ? 'desc' : 'asc').'&'.http_build_query($q); ?>">Date</a>
+						</div>
+						
+						<div class="senary-nav__center">
+						</div>
+						
+						<div class="senary-nav__right">
+							<select class="input" data-source="areas" name="area_id" placeholder="area" style="width: 20ch;">
+								<option>any</option>
+								<?php echo is_numeric($_GET['area_id']) ? '<option value="'.$_GET['area_id'].'" selected></option>' : null; ?>
+							</select>
+							<select class="input" data-source="livehouses" name="livehouse_id" placeholder="livehouse" style="width: 20ch;">
+								<option>any</option>
+								<?php echo is_numeric($_GET['livehouse_id']) ? '<option value="'.$_GET['livehouse_id'].'" selected></option>' : null; ?>
+							</select>
+							<select class="input" data-source="years" name="date_occurred" placeholder="year" style="width: 8ch;">
+								<option>any</option>
+								<?php echo is_numeric($_GET['date_occurred']) ? '<option value="'.$_GET['date_occurred'].'" selected>'.$_GET['date_occurred'].'</option>' : null; ?>
+							</select>
+						</div>
+					</div>
+				<?php
+			}
 			
-			<div class="senary-nav__right">
-				<select class="input" data-source="areas" name="area_id" placeholder="area" style="width: 20ch;">
-					<option>any</option>
-					<?php echo is_numeric($_GET['area_id']) ? '<option value="'.$_GET['area_id'].'" selected></option>' : null; ?>
-				</select>
-				<select class="input" data-source="livehouses" name="livehouse_id" placeholder="livehouse" style="width: 20ch;">
-					<option>any</option>
-					<?php echo is_numeric($_GET['livehouse_id']) ? '<option value="'.$_GET['livehouse_id'].'" selected></option>' : null; ?>
-				</select>
-				<select class="input" data-source="years" name="date_occurred" placeholder="year" style="width: 8ch;">
-					<option>any</option>
-					<?php echo is_numeric($_GET['date_occurred']) ? '<option value="'.$_GET['date_occurred'].'" selected>'.$_GET['date_occurred'].'</option>' : null; ?>
-				</select>
-			</div>
-		</div>
-		
-		<?php
 			foreach($lives as $year => $live_year) {
 				foreach($live_year as $month => $live_month) {
 					?>
@@ -184,6 +192,7 @@
 												foreach($live_day as $live) {
 													?>
 														<div class="lives__live text">
+															
 															<a class="a--inherit any--weaken-size" href="<?php echo '/lives/&area_id='.$live['area_id']; ?>"><?php echo lang(($live['area_romaji'] ?: $live['area_name']), $live['area_name'], ['secondary_class' => 'any--hidden']); ?></a>
 															<a class="a--inherit" href="<?php echo '/lives/&livehouse_id='.$live['livehouse_id']; ?>"><?php echo lang(($live['livehouse_romaji'] ?: $live['livehouse_name']), $live['livehouse_name'], ['secondary_class' => 'any--hidden']); ?></a>
 															
@@ -208,6 +217,13 @@
 																		}
 																	}
 																?>
+															<?php
+																if($_SESSION['is_admin']) {
+																	?>
+																		<a class="symbol__edit a--inherit any--weaken-size" href="/lives/<?= $live['id']; ?>/edit/" style="margin-left:1ch;">Edit</a>
+																	<?php
+																}
+															?>
 															</ul>
 														</div>
 													<?php
