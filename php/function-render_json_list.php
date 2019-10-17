@@ -7,7 +7,7 @@ $access_label = $access_label ?: new access_label($pdo);
 $access_musician = $access_musician ?: new access_musician($pdo);
 $access_release = $access_release ?: new access_release($pdo);
 
-function render_json_list($input_type, $input = null, $input_id_type = null, $include_friendly = null) {
+function render_json_list($input_type, $input = null, $input_id_type = null, $include_friendly = null, $first_option_id = null) {
 	global $pdo;
 	global $access_artist, $access_label, $access_musician, $access_release;
 	global $artist_list, $label_list, $musician_list, $release_list;
@@ -24,13 +24,30 @@ function render_json_list($input_type, $input = null, $input_id_type = null, $in
 			$input = ${'access_' . $input_type}->{'access_' . $input_type}([ $input_id_type => $input, 'get' => 'name' ]);
 		}
 		elseif(!is_array($input) && !strlen($input)) {
-			$input = ${'access_' . $input_type}->{'access_' . $input_type}([ 'get' => 'name' ]);
+			if($input_type === 'livehouse') {
+				$sql_livehouses = 'SELECT lives_livehouses.id, CONCAT_WS(" ", COALESCE(areas.romaji, areas.name), COALESCE(lives_livehouses.romaji, lives_livehouses.name)) AS romaji, CONCAT_WS(" ", areas.name, lives_livehouses.name) AS name FROM lives_livehouses LEFT JOIN areas ON areas.id=lives_livehouses.area_id';
+				$stmt_livehouses = $pdo->prepare($sql_livehouses);
+				$stmt_livehouses->execute();
+				$input = $stmt_livehouses->fetchAll();
+			}
+			else {
+				$input = ${'access_' . $input_type}->{'access_' . $input_type}([ 'get' => 'name' ]);
+			}
 		}
 		
 		// Clean array
 		$input = is_array($input) ? $input : [];
 		$input = array_values($input);
 		$num_input = count($input);
+		
+		// If given 'first option', add to array of data
+		// Next function will loop through and overwrite it
+		// with the data of the same ID from the database call,
+		// but in the top position
+		if(is_numeric($first_option_id)) {
+			array_unshift($input, [ 'id' => $first_option_id ]);
+			$num_input++;
+		}
 		
 		// Loop through array and build chunk
 		for($i=0; $i<$num_input; $i++) {

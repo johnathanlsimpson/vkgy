@@ -13,12 +13,15 @@
 		function __construct($pdo) {
 			if(!isset($pdo) || !$pdo->getAttribute(PDO::ATTR_CONNECTION_STATUS)) {
 				include_once("../php/database-connect.php");
-				
-				$this->pdo = $pdo;
 			}
-			else {
-				$this->pdo = $pdo;
-			}
+			$this->pdo = $pdo;
+			
+			$this->allowed_icons = [
+				'crown',
+				'heart',
+				'star',
+				'flower',
+			];
 		}
 		
 		
@@ -36,7 +39,7 @@
 			// SELECT
 			switch($args["get"]) {
 				case "name" :
-					$sql_select = ["id", "username"];
+					$sql_select = ['id', 'username', 'rank', 'is_vip', 'icon'];
 					break;
 				case "all" :
 					$sql_select = [
@@ -109,6 +112,16 @@
 					$stmt_user = $this->pdo->prepare($sql_user);
 					$stmt_user->execute($sql_values);
 					$users = $stmt_user->fetchAll();
+					$num_users = count($users) ?: 0;
+					
+					// Transform icon values
+					for($i=0; $i<$num_users; $i++) {
+						if(isset($users[$i]['icon'])) {
+							$icon_num = $users[$i]['icon'];
+							$icon_num = is_numeric($icon_num) ? $icon_num : 0;
+							$users[$i]['icon'] = $this->allowed_icons[$icon_num];
+						}
+					}
 					
 					//echo $_SESSION['username'] === 'inartistic' ? '***'.print_r($sql_user, true).print_r($sql_values, true) : null;
 					

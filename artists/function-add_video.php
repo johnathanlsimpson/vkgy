@@ -19,6 +19,9 @@ if(strlen($input_url) && $_SESSION['is_signed_in']) {
 			$output = $returned_data;
 			$output['status'] = 'success';
 		}
+		else {
+			$output['result'] = 'No returned data.';
+		}
 		
 	}
 	else {

@@ -116,6 +116,7 @@ RewriteRule  ^labels/([\w\-]+)/?$       /?labels/&label=$1
 RewriteRule  ^labels/([\w\-]+)/edit/?$  /?labels/&action=edit&label=$1
 
 RewriteRule  ^lives/areas/edit/?$                          /?lives/&action=edit&method=areas
+RewriteRule  ^lives/(\d+)/edit/?$                          /?lives/&action=edit&method=live&id=$1
 RewriteRule  ^lives/livehouses/edit(?:/page/(\d+))?/?$     /?lives/&action=edit&method=livehouses&page=$1
 RewriteRule  ^lives/livehouses/(\d+)/edit/?$               /?lives/&action=edit&method=livehouses&id=$1
 RewriteRule  ^lives/livehouses/add/?$                      /?lives/&action=add&method=livehouses

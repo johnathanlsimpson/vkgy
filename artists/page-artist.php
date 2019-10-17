@@ -195,6 +195,7 @@ $in_page_navs = array_filter($in_page_navs);
 																			foreach($schedule_day as $live_key => $live) {
 																				echo $live_key ? ', ' : null;
 																				echo '<a class="a--inherit" href="/lives/&id='.$live['id'].'">'.lang(($live['area_romaji'] ?: $live['area_name']), $live['area_name'], 'hidden').' '.lang(($live['livehouse_romaji'] ?: $live['livehouse_name']), $live['livehouse_name'], 'hidden').'</a>';
+																				echo $_SESSION['is_admin'] ? '<a class="symbol__edit a--inherit" href="/lives/'.$live['id'].'/edit/" style="margin-left:1ch;">Edit</a>' : null;
 																			}
 																		?>
 																	</li>

@@ -16,7 +16,7 @@
 		}
 		
 		if(is_array($image) && !empty($image)) {
-			$name                = sanitize(strtolower($image['name']));
+			$name                = preg_replace('/'.'[^A-z0-9\-\.]'.'/', '', $image['name']);
 			$type                = $image['type'];
 			$tmp_name            = $image['tmp_name'];
 			$error               = $image['error'];

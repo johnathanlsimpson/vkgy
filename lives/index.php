@@ -51,6 +51,9 @@
 	if($_GET['page'] === 'livehouses') {
 		$view_livehouses = true;
 	}
+	if($_GET['method'] === 'live' && $_GET['action'] === 'edit') {
+		$edit_live = true;
+	}
 	
 	
 	// Get data: add/edit livehouses
@@ -177,6 +180,14 @@
 	
 	elseif($view_livehouses) {
 		include('page-livehouses.php');
+	}
+	
+	elseif($edit_live) {
+		$access_live = new access_live($pdo);
+		$live = $access_live->access_live([ 'id' => sanitize($_GET['id']), 'get' => 'all', 'limit' => 1 ]);
+		$live = is_array($live[0]) ? $live[0] : null;
+		
+		include('page-edit-live.php');
 	}
 	
 	else {

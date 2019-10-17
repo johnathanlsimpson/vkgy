@@ -147,6 +147,12 @@
 	
 	$release['images'] = is_array($release['images']) ? $release['images'] : [];
 	$release['images'] = array_values($release['images']);
+	
+	// If artist isn't set, but is mentioned in URL, get artist's data
+	if(strlen($_GET['artist'])) {
+		$access_preselected_artist = new access_artist($pdo);
+		$release['artist'] = $access_preselected_artist->access_artist([ 'friendly' => sanitize($_GET['artist']), 'get' => 'name' ]);
+	}
 
 	$pageTitle = !empty($release["quick_name"]) ? "Edit: ".$release["quick_name"]." - ".$release["artist"]["quick_name"] : "Add release";
 ?>
@@ -162,7 +168,7 @@
 <div class="col c1 any--signed-in-only any--margin">
 	<?php
 		include_once('../php/function-render_json_list.php');
-		render_json_list('artist');
+		render_json_list('artist', null, null, null, $release['artist']['id']);
 		render_json_list('label');
 		render_json_list('song', []);
 	?>
@@ -173,12 +179,12 @@
 			if($release["artist"]) {
 				?>
 					<h1>
-						<a class="a--inherit artist symbol__artist" data-get="artist_url" data-get-into="href" href="/artists/<?php echo $release["artist"]["friendly"]; ?>/">
+						<a class="a--inherit artist symbol__artist" data-name="<?= $release['artist']['name']; ?>" data-get="artist_url" data-get-into="href" href="/releases/<?php echo $release["artist"]["friendly"]; ?>/">
 							<span data-get="artist_quick_name"><?php echo $release["artist"]["quick_name"]; ?></span>
 						</a>
 						<div class="any--weaken">
-							<a class="a--inherit symbol__release" data-get="url" data-get-into="href" href="/releases/<?php echo $release["artist"]["friendly"]."/".$release["id"]."/".$release["friendly"]; ?>/">
-								<span data-get="quick_name"><?php echo $release["quick_name"]; ?></span>
+							<a class="a--inherit symbol__release" data-get="url" data-get-into="href" href="/releases/<?= $release["artist"]["friendly"].'/'.(is_numeric($release['id']) ? $release["id"].'/'.$release["friendly"].'/' : null); ?>">
+								<span data-get="quick_name"><?= strlen($release["quick_name"]) ? $release['quick_name'] : '(new release)'; ?></span>
 							</a>
 						</div>
 					</h1>
@@ -286,18 +292,6 @@
 										?>
 									</option>
 								<?php
-							}
-							elseif(strlen($_GET['artist'])) {
-								$access_preselected_artist = new access_artist($pdo);
-								$preselected_artist = $access_preselected_artist->access_artist(['friendly' => sanitize($_GET['artist']), 'get' => 'name']);
-								
-								if(is_array($preselected_artist) && !empty($preselected_artist)) {
-									?>
-										<option data-name="<?= $preselected_artist['quick_name']; ?>" value="<?= $preselected_artist['id']; ?>" selected>
-											<?= $preselected_artist['quick_name']; ?>
-										</option>
-									<?php
-								}
 							}
 						?>
 					</select>

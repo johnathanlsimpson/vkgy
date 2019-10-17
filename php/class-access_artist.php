@@ -35,6 +35,56 @@
 		
 		
 		// ======================================================
+		// Add artist website
+		// ======================================================
+		function add_website($artist_id, $website_urls) {
+			
+			// Artist ID must be provided
+			if(is_numeric($artist_id)) {
+				
+				// If string (one URL) given, convert to array
+				if(!is_array($website_urls) && strlen($website_urls)) {
+					$website_urls = [ $website_urls ];
+				}
+				
+				// If new URLs provided
+				if(is_array($website_urls) && !empty($website_urls)) {
+					
+					// Grab previous URLs
+					$sql_extant = 'SELECT official_links FROM artists WHERE id=? LIMIT 1';
+					$stmt_extant = $this->pdo->prepare($sql_extant);
+					$stmt_extant->execute([ $artist_id ]);
+					$rslt_extant = $stmt_extant->fetchColumn;
+					$rslt_extant = explode("\n", $rslt_extant);
+					$rslt_extant = array_filter($rslt_extant);
+					
+					// Loop through new URLs, check if in extant list
+					// Want to add URL filtering functions here too
+					$num_new_websites = count($website_urls);
+					for($i=0; $i<$num_new_websites; $i++) {
+						if(in_array($website_urls, $rslt_extant)) {
+							unset($website_urls[$i]);
+						}
+					}
+					
+					// Combine extant URLs and new URLs, then update DB
+					if(is_array($website_urls) && !empty($website_urls)) {
+						$website_urls = implode("\n", $website_urls);
+						
+						$sql_add = 'UPDATE artists SET official_links=CONCAT(official_links, "\n", ?) WHERE id=? LIMIT 1';
+						$stmt_add = $this->pdo->prepare($sql_add);
+						if($stmt_add->execute([ $website_urls, $artist_id ])) {
+							return true;
+						}
+					}
+					
+				}
+			}
+		}
+		
+		
+		
+		// ======================================================
 		// Get related artists
 		// ======================================================
 		function get_related_artists($artist_id, $type = null) {
@@ -437,6 +487,28 @@
 							
 							if(is_array($parsed_live) && !empty($parsed_live)) {
 								$line = ($parsed_live['livehouse']['area_romaji'] ?: $parsed_live['livehouse']['area_name']).' '.($parsed_live['livehouse']['romaji'] ?: $parsed_live['livehouse']['name']);
+								
+								// If user supplied other bands on that live date, show them so they can confirm that those bands were found in DB
+								// Btw, skip first element of parsed lineup since it will always be the artist being edited
+								if(is_array($parsed_live['lineup'][1]) || is_array($parsed_live['additional_lineup'])) {
+									$note = 'Also linked: ';
+									
+									if(is_array($parsed_live['lineup']) && !empty($parsed_live['lineup'])) {
+										foreach($parsed_live['lineup'] as $parsed_lineup) {
+											if(is_array($parsed_lineup)) {
+												$note .= '<a class="artist" data-name="'.$parsed_lineup['name'].'" href="/artists/'.$parsed_lineup['friendly'].'/" target="_blank">'.lang($parsed_lineup['romaji'] ?: $parsed_lineup['name'], $parsed_lineup['name'], 'hidden').'</a>, ';
+											}
+										}
+									}
+									
+									if(is_array($parsed_live['additional_lineup']) && !empty($parsed_live['additional_lineup'])) {
+										foreach($parsed_live['additional_lineup'] as $parsed_additional_lineup) {
+											$note .= $parsed_additional_lineup.', ';
+										}
+									}
+									
+									$note = substr($note, 0, -2);
+								}
 								
 								$type_key = array_search(15, $line_type);
 								if(is_numeric($type_key)) {

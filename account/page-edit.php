@@ -76,7 +76,7 @@
 										</div>
 									</div>
 									
-									<?php echo !$user["email"] ? '<div class="symbol__error" style="margin-top: 1rem;">Consider adding an email address in case your password is forgotten.</div>' : null; ?>
+									<?php echo !$user["email"] ? '<div class="symbol__error error" style="margin-top: 1rem;">Consider adding an email address in case your password is forgotten.</div>' : null; ?>
 								</li>
 								
 								<li>
@@ -107,14 +107,49 @@
 									<div class="input__row">
 										<div class="input__group">
 											<label class="input__label">Site theme</label>
-
+											
 											<input class="input__checkbox any--hidden" id="site_theme_0" name="site_theme" type="radio" value="0" <?php echo $user['site_theme'] == 0 ? 'checked' : null; ?> />
 											<label class="input__checkbox-label symbol__unchecked " for="site_theme_0">default</label>
-
+											
 											<input class="input__checkbox any--hidden" id="site_theme_1" name="site_theme" type="radio" value="1" <?php echo $user['site_theme'] == 1 ? 'checked' : null; ?> />
 											<label class="input__checkbox-label symbol__unchecked " for="site_theme_1">dark</label>
 										</div>
 									</div>
+								</li>
+								<li>
+									<div class="input__row">
+										<div class="input__group">
+											<label class="input__label">Username style</label>
+											
+											<?php
+												if($user['is_vip']) {
+													?>
+														<input class="input__checkbox any--hidden" id="icon_0" name="icon" type="radio" value="0" <?= $user['icon'] === 'crown' ? 'checked' : null; ?> />
+														<label class="input__checkbox-label symbol__unchecked " for="icon_0"><span class="symbol__user-crown symbol--standalone" style="margin: 0 0.25ch 0 0.5ch;"></span><?= $user['username']; ?></label>
+														
+														<input class="input__checkbox any--hidden" id="icon_1" name="icon" type="radio" value="1" <?= $user['icon'] === 'heart' ? 'checked' : null; ?> />
+														<label class="input__checkbox-label symbol__unchecked " for="icon_1"><span class="symbol__user-heart symbol--standalone" style="margin: 0 0.25ch 0 0.5ch;"></span><?= $user['username']; ?></label>
+														
+														<input class="input__checkbox any--hidden" id="icon_2" name="icon" type="radio" value="2" <?= $user['icon'] === 'star' ? 'checked' : null; ?> />
+														<label class="input__checkbox-label symbol__unchecked " for="icon_2"><span class="symbol__user-star symbol--standalone" style="margin: 0 0.25ch 0 0.5ch;"></span><?= $user['username']; ?></label>
+														
+														<input class="input__checkbox any--hidden" id="icon_3" name="icon" type="radio" value="3" <?= $user['icon'] === 'flower' ? 'checked' : null; ?> />
+														<label class="input__checkbox-label symbol__unchecked " for="icon_3"><span class="symbol__user-flower symbol--standalone" style="margin: 0 0.25ch 0 0.5ch;"></span><?= $user['username']; ?></label>
+													<?php
+												}
+												else {
+													?>
+														<label class="input__checkbox-label symbol__checked input__checkbox-label--selected" for="icon_0"><span class="symbol__user-crown symbol--standalone" style="margin: 0 0.25ch 0 0.5ch;"></span><?= $user['username']; ?></label>
+														<label class="input__checkbox-label" style="background:none;"><span class="symbol__user-heart symbol--standalone" style="margin: 0 0.25ch 0 0;"></span><?= $user['username']; ?></label>
+														<label class="input__checkbox-label" style="background:none;"><span class="symbol__user-star symbol--standalone" style="margin: 0 0.25ch 0 0;"></span><?= $user['username']; ?></label>
+														<label class="input__checkbox-label" style="background:none;"><span class="symbol__user-flower symbol--standalone" style="margin: 0 0.25ch 0 0;"></span><?= $user['username']; ?></label>
+													<?php
+												}
+											?>
+										</div>
+									</div>
+									
+									<?= $user['is_vip'] ? '<span class="symbol__vip">This feature can be accessed after becoming a <a href="https://patreon.com/vkgy" target="_blank">VIP member</a>.</span>' : null; ?>
 								</li>
 							</ul>
 						</div>

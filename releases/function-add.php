@@ -288,7 +288,7 @@
 											
 											$output["url"] = "/releases/".$artist["friendly"]."/".$release["id"]."/".$release["friendly"]."/";
 											$output["quick_name"] = ($release["romaji"] ?: $release["name"])." ".($release["press_romaji"] ?: $release["press_name"])." ".($release["type_romaji"] ?: $release["type_name"]);
-											$output["artist_url"] = "/artists/".$artist["friendly"]."/";
+											$output["artist_url"] = "/releases/".$artist["friendly"]."/";
 											$output["artist_quick_name"] = $artist["quick_name"];
 											$output["id"] = $release["id"];
 											$output["artist_id"] = $artist["id"];

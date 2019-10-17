@@ -315,7 +315,7 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 		
 		if(!is_object($live_parser)) {
 			$live_parser = new parse_live($pdo);
-			$live_parser->remove_artist_lives($artist_id);
+			//$live_parser->remove_artist_lives($artist_id);
 		}
 		
 		for($i=0; $i < $num_history; $i++) {

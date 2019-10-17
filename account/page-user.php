@@ -416,7 +416,7 @@
 
 						<div>
 							<h1 class="user__username">
-								<a class="a--inherit user" href="/user/<?php echo $user["username"]; ?>/"><?php echo $user["username"]; ?></a>
+								<a class="a--inherit symbol__user-nature <?= 'symbol__user-'.$user['icon']; ?>" href="/user2/<?php echo $user["username"]; ?>/"><?php echo $user["username"]; ?></a>
 							</h1>
 
 							<?php
