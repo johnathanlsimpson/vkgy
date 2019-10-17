@@ -494,8 +494,8 @@
 									$note = 'Also linked: ';
 									
 									if(is_array($parsed_live['lineup']) && !empty($parsed_live['lineup'])) {
-										foreach($parsed_live['lineup'] as $parsed_lineup) {
-											if(is_array($parsed_lineup)) {
+										foreach($parsed_live['lineup'] as $parsed_lineup_key => $parsed_lineup) {
+											if(is_array($parsed_lineup) && $parsed_lineup_key > 0) {
 												$note .= '<a class="artist" data-name="'.$parsed_lineup['name'].'" href="/artists/'.$parsed_lineup['friendly'].'/" target="_blank">'.lang($parsed_lineup['romaji'] ?: $parsed_lineup['name'], $parsed_lineup['name'], 'hidden').'</a>, ';
 											}
 										}
