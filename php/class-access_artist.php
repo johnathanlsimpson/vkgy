@@ -488,6 +488,28 @@
 							if(is_array($parsed_live) && !empty($parsed_live)) {
 								$line = ($parsed_live['livehouse']['area_romaji'] ?: $parsed_live['livehouse']['area_name']).' '.($parsed_live['livehouse']['romaji'] ?: $parsed_live['livehouse']['name']);
 								
+								// If user supplied other bands on that live date, show them so they can confirm that those bands were found in DB
+								// Btw, skip first element of parsed lineup since it will always be the artist being edited
+								if(is_array($parsed_live['lineup'][1]) || is_array($parsed_live['additional_lineup'])) {
+									$note = 'Also linked: ';
+									
+									if(is_array($parsed_live['lineup']) && !empty($parsed_live['lineup'])) {
+										foreach($parsed_live['lineup'] as $parsed_lineup) {
+											if(is_array($parsed_lineup)) {
+												$note .= '<a class="artist" data-name="'.$parsed_lineup['name'].'" href="/artists/'.$parsed_lineup['friendly'].'/" target="_blank">'.lang($parsed_lineup['romaji'] ?: $parsed_lineup['name'], $parsed_lineup['name'], 'hidden').'</a>, ';
+											}
+										}
+									}
+									
+									if(is_array($parsed_live['additional_lineup']) && !empty($parsed_live['additional_lineup'])) {
+										foreach($parsed_live['additional_lineup'] as $parsed_additional_lineup) {
+											$note .= $parsed_additional_lineup.', ';
+										}
+									}
+									
+									$note = substr($note, 0, -2);
+								}
+								
 								$type_key = array_search(15, $line_type);
 								if(is_numeric($type_key)) {
 									$line_type[$type_key] = 14;
