@@ -1,0 +1,10 @@
+.update__result {
+	marign-bottom: 0;
+	margin-top: 1rem;
+}
+.update__result:empty {
+	display: none;
+}
+.update__edit {
+	margin-left: 1rem;
+}
