@@ -206,7 +206,6 @@
 		// ======================================================
 		function update_live($input) {
 			if(is_array($input) && !empty($input)) {
-				//print_r($input);
 				
 				// Set variables
 				$livehouse_id = $input["livehouse"]["id"];
@@ -253,9 +252,11 @@
 						// For any remaining artists (that exist in the database), link them to the live
 						if(is_array($lineup) && !empty($lineup)) {
 							foreach($lineup as $lineup_artist) {
+								
 								$sql_update_lineup = "INSERT INTO lives_artists (live_id, artist_id) VALUES (?, ?)";
 								$stmt_update_lineup = $this->pdo->prepare($sql_update_lineup);
 								$stmt_update_lineup->execute([ $rslt_check_live["id"], $lineup_artist['id'] ]);
+								
 							}
 						}
 						
@@ -290,16 +291,18 @@
 							$rslt_add_live_id = $this->pdo->lastInsertId();
 						}
 						
-						if(is_array($lineup) && !empty($lineup)) {
+						if(is_array($lineup) && !empty($lineup) && is_numeric($rslt_add_live_id)) {
 							foreach($lineup as $lineup_artist) {
-								if(is_numeric($rslt_add_live_id)) {
-									$sql_add_lineup = "INSERT INTO lives_artists (live_id, artist_id) VALUES (?, ?)";
-									$stmt_add_lineup = $this->pdo->prepare($sql_add_lineup);
-									if($stmt_add_lineup->execute([ $rslt_add_live_id, $lineup_artist['id'] ])) {
-										return true;
-									}
-								}
+								$values_add_lineup[] = $rslt_add_live_id;
+								$values_add_lineup[] = $lineup_artist['id'];
 							}
+								
+								$sql_add_lineup = "INSERT INTO lives_artists (live_id, artist_id) VALUES ".substr(str_repeat('(?,?), ', count($lineup)), 0, -2);
+								$stmt_add_lineup = $this->pdo->prepare($sql_add_lineup);
+
+								if($stmt_add_lineup->execute($values_add_lineup)) {
+									return true;
+								}
 						}
 					}
 				}
