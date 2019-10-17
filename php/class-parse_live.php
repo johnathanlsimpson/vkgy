@@ -147,8 +147,12 @@
 				}
 				
 				if(is_numeric($artist_id)) {
-					$lineup[] = $artist_id;
-					$lineup_contains_linked_artist = true;
+					$artist = $this->access_artist->access_artist([ 'id' => $artist_id, 'get' => 'name', 'limit' => 1 ]);
+					
+					if(is_array($artist) && !empty($artist)) {
+						$lineup[] = $artist;
+						$lineup_contains_linked_artist = true;
+					}
 				}
 				
 				if(isset($raw_input[1]) && strlen($raw_input[1]) > 0) {
@@ -156,25 +160,27 @@
 					
 					if(is_array($raw_input[1]) && !empty($raw_input[1])) {
 						foreach($raw_input[1] as $lineup_artist) {
-							$tmp_lineup_artist = friendly($lineup_artist);
-							$tmp_lineup_artist = $this->access_artist->access_artist(["friendly" => $tmp_lineup_artist, "get" => "id", "limit" => "1"]);
-							$tmp_lineup_artist = is_array($tmp_lineup_artist) ? $tmp_lineup_artist["id"] : null;
+							//$tmp_lineup_artist = friendly($lineup_artist);
+							//$tmp_lineup_artist = $this->access_artist->access_artist(["friendly" => $tmp_lineup_artist, "get" => "name", "limit" => "1"]);
+							//$tmp_lineup_artist = is_array($tmp_lineup_artist) ? $tmp_lineup_artist["id"] : null;
+							$tmp_lineup_artist = $this->access_artist->access_artist([ 'name' => $lineup_artist, 'get' => 'name', 'limit' => 1 ]);
+							$tmp_lineup_artist = is_array($tmp_lineup_artist) ? $tmp_lineup_artist : null;
 							
-							if(is_numeric($tmp_lineup_artist)) {
-								$lineup[] = $tmp_lineup_artist;
-								$lineup_contains_linked_artist = true;
-							}
-							else{
-								$tmp_lineup_artist = $this->access_artist->access_artist(["name" => $lineup_artist, "get" => "id", "limit" => "1"]);
-								$tmp_lineup_artist = is_array($tmp_lineup_artist) ? $tmp_lineup_artist["id"] : null;
-								
-								if(is_numeric($tmp_lineup_artist)) {
-									$lineup[] = $tmp_lineup_artist;
+							//if(is_numeric($tmp_lineup_artist)) {
+								//$lineup[] = $tmp_lineup_artist;
+								//$lineup_contains_linked_artist = true;
+							//}
+							//else{
+								//$tmp_lineup_artist = $this->access_artist->access_artist(["name" => $lineup_artist, "get" => "name", "limit" => "1"]);
+								//$tmp_lineup_artist = is_array($tmp_lineup_artist) ? $tmp_lineup_artist["id"] : null;
+							if(is_array($tmp_lineup_artist[0]) && !empty($tmp_lineup_artist[0])) {
+								//if(is_numeric($tmp_lineup_artist)) {
+									$lineup[] = $tmp_lineup_artist[0];
 									$lineup_contains_linked_artist = true;
-								}
-								else {
-									$additional_lineup[] = $lineup_artist;
-								}
+								//}
+							}
+							else {
+								$additional_lineup[] = $lineup_artist;
 							}
 						}
 					}
@@ -200,6 +206,8 @@
 		// ======================================================
 		function update_live($input) {
 			if(is_array($input) && !empty($input)) {
+				//print_r($input);
+				
 				// Set variables
 				$livehouse_id = $input["livehouse"]["id"];
 				$date_occurred = $input["date_occurred"];
@@ -227,18 +235,27 @@
 						// For any artists that are already linked to the live, remove them from the list of artists that need to be linked
 						if(is_array($rslt_lineup) && !empty($rslt_lineup)) {
 							foreach($rslt_lineup as $lineup_artist) {
-								if(in_array($lineup_artist["artist_id"], $lineup)) {
-									unset($lineup[array_search($lineup_artist["artist_id"], $lineup)]);
+								
+								if(is_array($lineup) && !empty($lineup)) {
+									foreach($lineup as $provided_lineup_key => $provided_lineup_artist) {
+										if($provided_lineup_artist['id'] === $lineup_artist['artist_id']) {
+											unset($lineup[$provided_lineup_key]);
+										}
+									}
 								}
+								
+								//if(in_array($lineup_artist["artist_id"], $lineup)) {
+									//unset($lineup[array_search($lineup_artist["artist_id"], $lineup)]);
+								//}
 							}
 						}
 						
 						// For any remaining artists (that exist in the database), link them to the live
 						if(is_array($lineup) && !empty($lineup)) {
-							foreach($lineup as $lineup_artist_id) {
+							foreach($lineup as $lineup_artist) {
 								$sql_update_lineup = "INSERT INTO lives_artists (live_id, artist_id) VALUES (?, ?)";
 								$stmt_update_lineup = $this->pdo->prepare($sql_update_lineup);
-								$stmt_update_lineup->execute([ $rslt_check_live["id"], $lineup_artist_id ]);
+								$stmt_update_lineup->execute([ $rslt_check_live["id"], $lineup_artist['id'] ]);
 							}
 						}
 						
@@ -278,7 +295,7 @@
 								if(is_numeric($rslt_add_live_id)) {
 									$sql_add_lineup = "INSERT INTO lives_artists (live_id, artist_id) VALUES (?, ?)";
 									$stmt_add_lineup = $this->pdo->prepare($sql_add_lineup);
-									if($stmt_add_lineup->execute([ $rslt_add_live_id, $lineup_artist ])) {
+									if($stmt_add_lineup->execute([ $rslt_add_live_id, $lineup_artist['id'] ])) {
 										return true;
 									}
 								}
