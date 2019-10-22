@@ -160,24 +160,12 @@
 					
 					if(is_array($raw_input[1]) && !empty($raw_input[1])) {
 						foreach($raw_input[1] as $lineup_artist) {
-							//$tmp_lineup_artist = friendly($lineup_artist);
-							//$tmp_lineup_artist = $this->access_artist->access_artist(["friendly" => $tmp_lineup_artist, "get" => "name", "limit" => "1"]);
-							//$tmp_lineup_artist = is_array($tmp_lineup_artist) ? $tmp_lineup_artist["id"] : null;
 							$tmp_lineup_artist = $this->access_artist->access_artist([ 'name' => $lineup_artist, 'get' => 'name', 'limit' => 1 ]);
 							$tmp_lineup_artist = is_array($tmp_lineup_artist) ? $tmp_lineup_artist : null;
 							
-							//if(is_numeric($tmp_lineup_artist)) {
-								//$lineup[] = $tmp_lineup_artist;
-								//$lineup_contains_linked_artist = true;
-							//}
-							//else{
-								//$tmp_lineup_artist = $this->access_artist->access_artist(["name" => $lineup_artist, "get" => "name", "limit" => "1"]);
-								//$tmp_lineup_artist = is_array($tmp_lineup_artist) ? $tmp_lineup_artist["id"] : null;
 							if(is_array($tmp_lineup_artist[0]) && !empty($tmp_lineup_artist[0])) {
-								//if(is_numeric($tmp_lineup_artist)) {
-									$lineup[] = $tmp_lineup_artist[0];
-									$lineup_contains_linked_artist = true;
-								//}
+								$lineup[] = $tmp_lineup_artist[0];
+								$lineup_contains_linked_artist = true;
 							}
 							else {
 								$additional_lineup[] = $lineup_artist;
