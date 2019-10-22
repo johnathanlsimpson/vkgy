@@ -20,6 +20,81 @@
 		
 		
 		// ======================================================
+		// Delete certain lives
+		// ======================================================
+		function batch_delete_live_links($args = []) {
+			
+			// Delete all lives by artist
+			if(is_numeric($args['artist_id'])) {
+				$sql_where[] = 'lives_artists.artist_id=?';
+				$sql_values[] = $args['artist_id'];
+			}
+			
+			// Ignore certain lives
+			if(is_array($args['lives_to_ignore']) && !empty($args['lives_to_ignore'])) {
+				$sql_where[] = 'lives_artists.live_id NOT IN ('.substr(str_repeat('?, ', count($args['lives_to_ignore'])), 0, -2).')';
+				
+				foreach($args['lives_to_ignore'] as $live_id) {
+					$sql_values[] = $live_id;
+				}
+			}
+			
+			// Get lives that match specifications
+			$sql_get_lives = 'SELECT live_id FROM lives_artists WHERE '.implode(' AND ', $sql_where);
+			$stmt_get_lives = $this->pdo->prepare($sql_get_lives);
+			$stmt_get_lives->execute( $sql_values );
+			$selected_lives = $stmt_get_lives->fetchAll();
+			
+			// Delete selected live links
+			if(is_array($selected_lives) && !empty($selected_lives)) {
+				
+				// For now, let's limit the scope
+				if(is_numeric($args['artist_id'])) {
+					
+					$values_delete_links[] = $args['artist_id'];
+					foreach($selected_lives as $selected_live) {
+						$values_delete_links[] = $selected_live['live_id'];
+					}
+					
+					$sql_delete_links = 'DELETE FROM lives_artists WHERE artist_id=? AND ('.substr(str_repeat('live_id=? OR ', count($selected_lives)), 0, -4).')';
+					$stmt_delete_links = $this->pdo->prepare($sql_delete_links);
+					if($stmt_delete_links->execute( $values_delete_links )) {
+						$live_links_deleted = true;
+					}
+					
+				}
+			}
+			
+			// If lives links deleted, let's remove lives with no artists left
+			if($live_links_deleted && is_array($selected_lives) && !empty($selected_lives)) {
+				
+				foreach($selected_lives as $selected_live) {
+					$values_get_orphans[] = $selected_live['live_id'];
+				}
+				
+				$sql_get_orphans = 'SELECT lives.id FROM lives LEFT JOIN lives_artists ON lives_artists.live_id=lives.id WHERE lives.lineup IS NULL AND lives_artists.artist_id IS NULL AND ('.substr( str_repeat('lives.id=? OR ', count($selected_lives)), 0, -4 ).') GROUP BY lives.id';
+				$stmt_get_orphans = $this->pdo->prepare($sql_get_orphans);
+				$stmt_get_orphans->execute( $values_get_orphans );
+				$orphaned_lives = $stmt_get_orphans->fetchAll();
+				
+				// Delete any found orphans
+				if(is_array($orphaned_lives) && !empty($orphaned_lives)) {
+					
+					foreach($orphaned_lives as $orphaned_live) {
+						$values_delete_orphans[] = $orphaned_live['id'];
+					}
+					
+					$sql_delete_orphans = 'DELETE FROM lives WHERE '.substr( str_repeat('id=? OR ', count($values_delete_orphans)), 0, -4);
+					$stmt_delete_orphans = $this->pdo->prepare($sql_delete_orphans);
+					$stmt_delete_orphans->execute( $values_delete_orphans );
+				}
+				
+			}
+		}
+		
+		
+		
+		// ======================================================
 		// Build 'concert' object
 		// ======================================================
 		function access_live($args = []) {

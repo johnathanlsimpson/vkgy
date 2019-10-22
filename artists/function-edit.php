@@ -313,14 +313,19 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 			}
 		}
 		
+		// Init schedule updater
 		if(!is_object($live_parser)) {
 			$live_parser = new parse_live($pdo);
-			//$live_parser->remove_artist_lives($artist_id);
 		}
 		
 		for($i=0; $i < $num_history; $i++) {
+			
+			// If history item was successfully interpreted as a schedule,
+			// add to full live schedule list so we can reference it later and delete any
+			// entries that aren't still present. Also, remove from history array,
+			// so that no other transforms are performed on it
 			if(is_array($history[$i]["parsed_live"])) {
-				$live_parser->update_live($history[$i]["parsed_live"]);
+				$all_extant_lives[] = $live_parser->update_live($history[$i]["parsed_live"]);
 				
 				if($history[$i]['type'] === '(14)') {
 					unset($history[$i]);
@@ -336,7 +341,15 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 			if(strlen($history[$i]['pronunciation'])) {
 				$pronunciation = $history[$i]['pronunciation'];
 			}
+			
 		}
+		
+		// Find and remove lives which are no longer mentioned in the artist's bio
+		if(!is_object($access_live)) {
+			$access_live = new access_live($pdo);
+		}
+		$access_live->batch_delete_live_links([ 'artist_id' => $artist_id, 'lives_to_ignore' => $all_extant_lives ]);
+		
 		
 		// Update activity areas in DB
 		if(is_array($area_ids) && !empty($area_ids)) {

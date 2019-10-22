@@ -39,8 +39,6 @@
 		$error = 'Sorry, only administrators may edit lives.';
 	}
 
-//echo '<pre>'.print_r($live, true).'</pre>';
-
 	if($edit_is_allowed) {
 		?>
 			<form action="/lives/function-update_live.php" enctype="multipart/form-data" id="form__edit" method="post" name="form__edit">
