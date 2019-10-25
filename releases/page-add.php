@@ -511,7 +511,7 @@
 								<div class="input__group track__artist">
 									<label class="input__label">Artist</label>
 									<select class="input" data-populate-on-click="true" name="tracklist[artist_id][]"               placeholder="artist(s)"  data-source="artists" data-multiple="true">
-										<option></option>
+										<option value=""></option>
 										?artist
 									</select>
 								</div>
@@ -520,7 +520,7 @@
 									<input class="input"             value="?artist_display_name"  name="tracklist[artist_display_name][]"    placeholder="artist name" />
 									<input class="input--secondary"  value="?artist_display_romaji"  name="tracklist[artist_display_romaji][]"  placeholder="(romaji)" />
 								</div>
-
+								
 								<div class="track__song-controls input__group">
 									<button class="track__song-control track__reorder" tabindex="-1" type="button">⇅</button>
 								</div>
@@ -528,7 +528,7 @@
 									<button class="track__song-control" data-add="song" tabindex="-1" type="button">+</button>
 								</div>
 							</div>
-
+							
 							<div class="input__row track__tracklist-controls">
 								<div class="input__group">
 									<button class="track__control" data-add="disc" type="button">
