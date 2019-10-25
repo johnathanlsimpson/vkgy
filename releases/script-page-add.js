@@ -141,7 +141,7 @@ submitButton.addEventListener('submit', function(event) {
 		artistIdElems.forEach(function(artistIdElem) {
 			artistIdElem.innerHTML = '<option value="" selected></option>';
 		});
-	}
+	} 
 
 	// Use the initInlineSubmit function, set to fire immediately
 	initializeInlineSubmit($("[name=add]"), "/releases/function-add.php",{
