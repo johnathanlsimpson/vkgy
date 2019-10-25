@@ -128,17 +128,33 @@ $(document).on("click", "[data-add]", function(event) {
 // Init inputmask() on appropriate elements
 $(":input").inputmask();
 
-// Submit
-initializeInlineSubmit($("[name=add]"), "/releases/function-add.php",{
-	submitOnEvent : "submit",
-	showEditLink : true,
-	callbackOnSuccess : function(formElement, returnedData) {
-		var e = new Event('item-id-updated');
-		e.details = {
-			'id' : returnedData.id
-		};
-		document.dispatchEvent(e);
-	}
+// Grab submit button press, transform certain inputs, then submit
+var submitButton = document.querySelector('[name=add]');
+submitButton.addEventListener('submit', function(event) {
+	event.preventDefault();
+	
+	// Selectize empties any <select>s that we tabbed through but didn't make a selection
+	// So for tracks' artist_id, lets fill those back up with an empty value
+	// Otherwise we get random missing array entries in the data sent to server
+	var artistIdElems = document.querySelectorAll('[name^="tracklist[artist_id]"]:empty');
+	if(artistIdElems.length > 0) {
+		artistIdElems.forEach(function(artistIdElem) {
+			artistIdElem.innerHTML = '<option value="" selected></option>';
+		});
+	} 
+
+	// Use the initInlineSubmit function, set to fire immediately
+	initializeInlineSubmit($("[name=add]"), "/releases/function-add.php",{
+		showEditLink : true,
+		callbackOnSuccess : function(formElement, returnedData) {
+			var e = new Event('item-id-updated');
+			e.details = {
+				'id' : returnedData.id
+			};
+			document.dispatchEvent(e);
+		}
+	});
+	
 });
 
 // Delete
