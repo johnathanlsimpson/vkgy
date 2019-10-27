@@ -880,6 +880,7 @@ if($data) {
 	
 	if(is_array($extant_artist_history)) {
 		for($i=0; $i<count($extant_artist_history); $i++) {
+			
 			if(!in_array('is_uneditable', $extant_artist_history[$i]['type'])) {
 				$new_line  = $extant_artist_history[$i]['date_occurred'].' ';
 				$new_line .= $extant_artist_history[$i]['content'].' -';
@@ -895,6 +896,7 @@ if($data) {
 			}
 		}
 	}
+	
 	$extant_artist_history = $new_history;
 	unset($new_history);
 	
@@ -911,6 +913,9 @@ if($data) {
 		
 		$data['artist']['bio'] = $extant_artist_history.implode("\n\n", $data['artist']['bio']);
 		$data['artist']['bio'] = implode("\n\n", array_unique(explode("\n\n", $data['artist']['bio'])));
+	}
+	else {
+		$data['artist']['bio'] = $extant_artist_history;
 	}
 	
 	// Edit artist
