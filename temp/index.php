@@ -950,7 +950,7 @@ if($data) {
 	// Add releases
 	if(is_array($data['releases']) && !empty($data['releases'])) {
 		foreach($data['releases'] as $add_release) {
-			$release_artist_id = $add_release['format'][0] === 24 ? 0 : $extant_artist_id;
+			$release_artist_id = $add_release['format'][0] === 20 ? 0 : $extant_artist_id;
 			
 			$sql_check_release = 'SELECT 1 FROM releases WHERE artist_id=? AND name=? AND date_occurred=? LIMIT 1';
 			$stmt_check_release = $pdo->prepare($sql_check_release);
