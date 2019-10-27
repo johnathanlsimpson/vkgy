@@ -42,14 +42,14 @@
 		include('../artists/head.php');
 		
 		subnav([
-			'Edit release' => '/releases/'.$release['artist']['friendly'].'/'.$release['id'].'/'.$release['friendly'].'/edit/',
+			'Edit release' => '/releases/'.$release['artist']['friendly'].'/'.$release['id'].'/'.$release['friendly'].'/edit/'.(is_numeric($_GET['prev_next_artist']) ? '&prev_next_artist='.sanitize($_GET['prev_next_artist']) : null),
 		], 'interact', true);
 		
 		if(is_array($release["prev_next"]) && !empty($release["prev_next"])) {
 			foreach($release["prev_next"] as $link) {
 				subnav([
 					[
-						'text' => $link['quick_name'],
+						'text' => lang($link['romaji'] ?: $link['name'], $link['name'], 'hidden'),
 						'url' => $link['url'],
 						'position' => $link['type'] === 'next' ? 'right' : 'left',
 					],
@@ -71,6 +71,27 @@
 								<div>
 									<div class="text text--outlined text--error symbol__vip">
 										This article has been locked, and is only viewable to VIP members. Please use discretion.
+									</div>
+								</div>
+							</div>
+						<?php
+					}
+					
+					// If is omnibus (etc) but was reached by clicking prev/next in an artist's disco, show notice
+					if($needs_traversal_notice) {
+						?>
+							<div class="col c1">
+								<div>
+									<div class="text text--outlined text--notice symbol__help">
+										<?php
+											$traversal_artist_url = '/releases/'.$traversal_artist['friendly'].'/';
+											$traversal_reset_url = '/releases/'.$release['artist']['friendly'].'/'.$release['id'].'/'.$release['friendly'].'/';
+											echo lang(
+												'The &ldquo;previous/next release&rdquo; links above are based <a class="artist" data-name="'.$traversal_artist['name'].'" href="'.$traversal_artist_url.'">'.($traversal_artist['romaji'] ?: $traversal_artist['name']).'</a>\'s discography. <a class="symbol__next" href="'.$traversal_reset_url.'">Reset?</a>',
+												'上記の「戻る/進む」リンクは、<a class="artist" data-name="'.$traversal_artist['name'].'" href="'.$traversal_artist_url.'">'.$traversal_artist['name'].'</a>のディスコグラフィーに基づいています。 <a class="symbol__next" href="'.$traversal_reset_url.'">リセットする?</a>',
+												'hidden'
+											);
+										?>
 									</div>
 								</div>
 							</div>

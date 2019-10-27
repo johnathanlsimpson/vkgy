@@ -15,6 +15,12 @@
 	if(is_numeric($_GET["id"])) {
 		$release = $access_release->access_release(["release_id" => $_GET["id"], "get" => "all"]);
 		
+		// If on omnibus release while cycling through artist's disco, make note
+		if(is_numeric($_GET['prev_next_artist']) && $release['artist']['id'] != $_GET['prev_next_artist']) {
+			$traversal_artist = $access_artist->access_artist([ 'id' => sanitize($_GET['prev_next_artist']), 'get' => 'name' ]);
+			$needs_traversal_notice = true;
+		}
+		
 		// Tags
 		$sql_tags = "SELECT * FROM tags_releases ORDER BY friendly ASC";
 		$stmt_tags = $pdo->prepare($sql_tags);
