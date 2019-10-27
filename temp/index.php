@@ -3,6 +3,7 @@
 <?php
 include_once('../php/include.php');
 include_once('../php/external/class-kana.php');
+include('../artists/function-sort_history.php');
 
 class grassthread_scraper {
 	private $document_version;
@@ -876,12 +877,28 @@ if($data) {
 	// Get old bio, turn to string
 	$access_artist = new access_artist($pdo);
 	$extant_artist_history = $access_artist->get_history($rslt_artist_name['id']);
+	
+	// Add artist's lives to bio
+	$access_live = new access_live($pdo);
+	$extant_lives = $access_live->access_live([ 'artist_id' => $rslt_artist_name['id'], 'get' => 'name' ]);
+	
+	foreach($extant_lives as $live_key => $live) {
+		$extant_lives[$live_key] = [
+			'date_occurred' => $live['date_occurred'],
+			'content' => ($live['area_romaji'] ?: $live['area_name']).' '.($live['livehouse_romaji'] ?: $live['livehouse_name']),
+			'type' => [ 14 ],
+		];
+	}
+	$extant_artist_history = array_merge($extant_artist_history, $extant_lives);
+	
+	// Clear 'new history' to be used in a minute
 	$new_history = '';
 	
 	if(is_array($extant_artist_history)) {
 		for($i=0; $i<count($extant_artist_history); $i++) {
 			
-			if(!in_array('is_uneditable', $extant_artist_history[$i]['type'])) {
+			// Ignore any history entries that were produced by discography
+			if(!isset($extant_artist_history[$i]['content']['name'])) {
 				$new_line  = $extant_artist_history[$i]['date_occurred'].' ';
 				$new_line .= $extant_artist_history[$i]['content'].' -';
 				
@@ -913,9 +930,10 @@ if($data) {
 		
 		$data['artist']['bio'] = $extant_artist_history.implode("\n\n", $data['artist']['bio']);
 		$data['artist']['bio'] = implode("\n\n", array_unique(explode("\n\n", $data['artist']['bio'])));
+		$data['artist']['bio'] = trim($data['artist']['bio']);
 	}
 	else {
-		$data['artist']['bio'] = $extant_artist_history;
+		$data['artist']['bio'] = trim($extant_artist_history);
 	}
 	
 	// Edit artist
