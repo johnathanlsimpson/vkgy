@@ -26,6 +26,9 @@
 	$accessTokenSecret = $twitter_access_token_secret;
 	$twitter = new Twitter($consumerKey, $consumerSecret, $accessToken, $accessTokenSecret);
 	
+	// Grab params from Cron Job
+	//parse_str($argv[1], $get_params);
+	
 	// Get top three artists from last week
 	$sql_rankings = "
 		SELECT
@@ -55,7 +58,8 @@
 			$band_images[] = $access_image->get_image([ 'artist' => $band['friendly'], 'image_path_only' => true, 'not_vip' => true ]);
 		}
 		
-		if($_GET['method'] === 'twitter') {
+		// Twitter
+		//if($get_params['method'] === 'twitter') {
 			// Build message
 			$twitter_message = '
 				Access Ranking ∙ アクセスランキング
@@ -72,9 +76,10 @@
 			
 			// Tweet
 			$twitter->send($twitter_message, $band_images);
-		}
+		//}
 		
-		if($_GET['method'] === 'facebook') {
+		// Facebook
+		//if($get_params['method'] === 'facebook') {
 			// Build message
 			$fb_message = '
 				Access Ranking ∙ '.(date("m.d", strtotime("-2 weeks sunday", time()))).'～'.date("m.d", strtotime("-1 weeks sunday", time())).'
@@ -105,7 +110,7 @@
 			
 			// Post to FB using recently-uploaded images
 			$fb->post('/'.$fb_page_id.'/feed', [ 'message' => $fb_message, 'attached_media' => $fb_photo_param ]);
-		}
+		//}
 		
 	}
 ?>
