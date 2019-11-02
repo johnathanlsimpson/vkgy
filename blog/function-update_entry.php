@@ -207,6 +207,11 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 			if($stmt_blog->execute($values_blog)) {
 				if(!$is_edit) {
 					$id = $pdo->lastInsertId();
+					
+					// If default image was automatically set, add to images_blog
+					$sql_images_link = 'INSERT INTO images_blog (blog_id, image_id) VALUES (?, ?)';
+					$stmt_images_link = $pdo->prepare($sql_images_link);
+					$stmt_images_link->execute([ $id, $rslt_default_image ]);
 				}
 				
 				// Output
