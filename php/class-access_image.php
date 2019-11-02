@@ -362,7 +362,7 @@
 			if(strlen($artist_friendly)) {
 				$sql_artist = "SELECT images.id AS image_id FROM artists LEFT JOIN images ON images.id=artists.image_id WHERE artists.friendly=? LIMIT 1";
 				$stmt_artist = $this->pdo->prepare($sql_artist);
-				$stmt_artist->execute([ 1, sanitize($artist_friendly) ]);
+				$stmt_artist->execute([ sanitize($artist_friendly) ]);
 				$rslt_artist = $stmt_artist->fetchColumn();
 			}
 			
