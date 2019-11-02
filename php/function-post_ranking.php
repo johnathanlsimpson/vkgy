@@ -26,8 +26,9 @@
 	$accessTokenSecret = $twitter_access_token_secret;
 	$twitter = new Twitter($consumerKey, $consumerSecret, $accessToken, $accessTokenSecret);
 	
-	// Grab params from Cron Job
-	//parse_str($argv[1], $get_params);
+	// Since argv is turned off for this server, have Cron call function-post_ranking_twitter or _facebook, and set $post_type in accordance
+	// (Run them sepeartely because it may take enough time to upload six images that the script will time out)
+	// $post_type = 'twitter';
 	
 	// Get top three artists from last week
 	$sql_rankings = "
@@ -59,7 +60,7 @@
 		}
 		
 		// Twitter
-		//if($get_params['method'] === 'twitter') {
+		if($post_type === 'twitter') {
 			// Build message
 			$twitter_message = '
 				Access Ranking ∙ アクセスランキング
@@ -76,10 +77,10 @@
 			
 			// Tweet
 			$twitter->send($twitter_message, $band_images);
-		//}
+		}
 		
 		// Facebook
-		//if($get_params['method'] === 'facebook') {
+		if($post_type === 'facebook') {
 			// Build message
 			$fb_message = '
 				Access Ranking ∙ '.(date("m.d", strtotime("-2 weeks sunday", time()))).'～'.date("m.d", strtotime("-1 weeks sunday", time())).'
@@ -96,6 +97,7 @@
 			$fb_message = str_replace("\t", '', $fb_message);
 			$fb_message = trim($fb_message);
 			$fb_message = html_entity_decode($fb_message);
+			
 			// Covertly upload artist images to FB
 			if(is_array($band_images) && !empty($band_images)) {
 				foreach($band_images as $band_image) {
@@ -110,7 +112,7 @@
 			
 			// Post to FB using recently-uploaded images
 			$fb->post('/'.$fb_page_id.'/feed', [ 'message' => $fb_message, 'attached_media' => $fb_photo_param ]);
-		//}
+		}
 		
 	}
 ?>
