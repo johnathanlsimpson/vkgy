@@ -15,6 +15,8 @@
 			'Add release' => '/releases/add/'.$release['artist']['friendly'].'/',
 		], 'interact', true);
 		
+		$active_page = '/releases/'.$release['artist']['friendly'].'/';
+		
 		// If on omnibus release while cycling through artist's disco, make note
 		if(is_numeric($_GET['prev_next_artist']) && $release['artist']['id'] != $_GET['prev_next_artist']) {
 			$traversal_artist = $access_artist->access_artist([ 'id' => sanitize($_GET['prev_next_artist']), 'get' => 'name' ]);

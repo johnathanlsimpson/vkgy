@@ -129,8 +129,8 @@ RewriteRule  ^php/?$  / [R=permanent,L]
 
 RewriteRule  ^releases/add/?([\w-]+)?/?$              /?releases/page-add&artist=$1$2
 RewriteRule  ^releases/([\w\-]+)/?$                   /?releases/&artist=$1
-RewriteRule  ^releases/[\w\-]*/(\d+)/[\w\-]*/?(?:\&prev_next_artist=(\d+))?$       /?releases/&id=$1&prev_next_artist=$2
-RewriteRule  ^releases/[\w\-]*/(\d+)/[\w\-]*/edit/?(?:\&prev_next_artist=(\d+))?$  /?releases/page-add&release=$1&prev_next_artist=$2
+RewriteRule  ^releases/([\w\-]*)/(\d+)/[\w\-]*/?(?:\&prev_next_artist=(\d+))?$       /?releases/&id=$2&artist=$1&prev_next_artist=$3
+RewriteRule  ^releases/([\w\-]*)/(\d+)/[\w\-]*/edit/?(?:\&prev_next_artist=(\d+))?$  /?releases/page-add&release=$2&artist=$1&prev_next_artist=$3
 
 RewriteRule  ^tag-source  /releases/page-tag-source.php
 

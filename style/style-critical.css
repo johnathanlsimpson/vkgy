@@ -1000,24 +1000,17 @@
 		border-top: 2px solid transparent;
 		padding: 0.5rem;
 	}
+	.tertiary-nav__link:hover {
+		border-top-color: currentColor;
+	}
 	.tertiary-nav--active,
 	.tertiary-nav--active:hover {
 		background: hsl(var(--background--secondary));
+		background-image: linear-gradient(currentColor, transparent 75%), linear-gradient(currentColor, transparent 75%);
+		background-position: top left, top right;
+		background-repeat: no-repeat;
+		background-size: 2px 100%;
 		border-top-color: currentColor;
-	}
-	.tertiary-nav--active::after,
-	.tertiary-nav__link:hover::after {
-		border: 0.5rem solid transparent;
-		border-top-color: currentColor;
-		bottom: 0;
-		content: "";
-		display: block;
-		height: 0;
-		left: 50%;
-		pointer-events: none;
-		position: absolute;
-		transform: translate(-50%, 100%);
-		width: 0;
 	}
 
 
