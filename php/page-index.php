@@ -172,7 +172,7 @@
 				if(is_array($section_nav) && !empty($section_nav)) {
 					foreach($section_nav as $nav) {
 						if(!$nav['signed_in_only'] || ($nav['signed_in_only'] && $_SESSION['loggedIn'])) {
-							$nav['class'] = explode('&', $_SERVER['REQUEST_URI'])[0] === $nav['url'] ? 'tertiary-nav--active' : null;
+							$nav['class'] = explode('&', $_SERVER['REQUEST_URI'])[0] === $nav['url'] || $active_page === $nav['url'] ? 'tertiary-nav--active' : null;
 							?>
 								<a class="tertiary-nav__link  a--inherit a--padded <?php echo $nav['class']; ?>" href="<?php echo $nav['url']; ?>"><?php echo $nav['text']; ?></a>
 							<?php
