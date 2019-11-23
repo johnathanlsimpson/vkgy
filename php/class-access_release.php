@@ -169,15 +169,92 @@
 		// ======================================================
 		// Previous and next items in artist's discography
 		// ======================================================
-		function get_prev_next($release_id, $artist_friendly = "") {
+		function get_prev_next($release_id, $artist_id) {
 			if(is_numeric($release_id)) {
-				$sql = "SELECT 'prev' AS type, CONCAT_WS(' ', COALESCE(r2.romaji, r2.name), COALESCE(r2.press_romaji, r2.press_name), COALESCE(r2.type_romaji, r2.type_name)) AS quick_name, CONCAT_WS('/', '', 'releases', ?, r2.id, r2.friendly, '') AS url FROM releases r1, releases r2 WHERE r1.id=? AND r2.artist_id=r1.artist_id AND (r2.date_occurred<r1.date_occurred OR (r2.date_occurred=r1.date_occurred AND r2.friendly<r1.friendly)) ORDER BY r2.date_occurred DESC, r2.friendly DESC LIMIT 1";
 				
-				$sql_prev_next = "(".$sql.") UNION (".str_replace(["prev", "<", "DESC"], ["next", ">", "ASC"], $sql).")";
-				$stmt_prev_next = $this->pdo->prepare($sql_prev_next);
-				$stmt_prev_next->execute([$artist_friendly, $release_id, $artist_friendly, $release_id]);
+				// Get sortable name of current record
+				$sql_current = 'SELECT CONCAT_WS("-", releases.date_occurred, releases.friendly, releases.id) AS sort_name, artist_id FROM releases WHERE releases.id=? LIMIT 1';
+				$stmt_current = $this->pdo->prepare($sql_current);
+				$stmt_current->execute([ $release_id ]);
+				$current = $stmt_current->fetch();
 				
-				return $stmt_prev_next->fetchAll();
+				// If sortable name found, continue
+				if(is_array($current) && !empty($current)) {
+					
+					if(is_numeric($artist_id)) {
+						$current['artist_id'] = sanitize($artist_id);
+					}
+				
+					// Search for tracks featuring artist (to account for omnibuses),
+					// create sortable name and sort by that, then get previous and next records.
+					// For selected records, do another join to get URL, artist ID, etc.
+					$sql_prev_next = '
+						SELECT
+							prev_next.type,
+							artists.id AS artist_id,
+							CONCAT(CONCAT_WS("/", "", "releases", artists.friendly, releases.id, releases.friendly, ""), IF(releases.artist_id<>?, CONCAT("&prev_next_artist=", ?), "")) AS url,
+							CONCAT_WS(" ", COALESCE(releases.romaji, releases.name), COALESCE(releases.press_romaji, releases.press_name), COALESCE(releases.type_romaji, releases.type_name)) AS romaji,
+							CONCAT_WS(" ", releases.name, releases.press_name, releases.type_name) AS name
+							
+						FROM
+							(
+								(
+									SELECT
+										"prev" AS type,
+										CONCAT_WS("-", releases.date_occurred, releases.friendly, releases.id) AS sort_name,
+										releases_tracklists.release_id
+									FROM
+										releases_tracklists
+									LEFT JOIN
+										releases ON releases.id=releases_tracklists.release_id
+									WHERE
+										releases_tracklists.artist_id=?
+										AND
+										CONCAT_WS("-", releases.date_occurred, releases.friendly, releases.id)<?
+									GROUP BY
+										releases_tracklists.release_id
+									ORDER BY
+										sort_name DESC
+									LIMIT
+										1
+								)
+								
+								UNION
+								
+								(
+									SELECT
+										"next" AS type,
+										CONCAT_WS("-", releases.date_occurred, releases.friendly, releases.id) AS sort_name,
+										releases_tracklists.release_id
+									FROM
+										releases_tracklists
+									LEFT JOIN
+										releases ON releases.id=releases_tracklists.release_id
+									WHERE
+										releases_tracklists.artist_id=?
+										AND
+										CONCAT_WS("-", releases.date_occurred, releases.friendly, releases.id)>?
+									GROUP BY
+										releases_tracklists.release_id
+									ORDER BY
+										sort_name ASC
+									LIMIT
+										1
+								)
+							) prev_next
+							
+						LEFT JOIN
+							releases ON releases.id=prev_next.release_id
+						LEFT JOIN
+							artists ON artists.id=releases.artist_id
+					';
+					
+					$stmt_prev_next = $this->pdo->prepare($sql_prev_next);
+					$stmt_prev_next->execute([ $current['artist_id'], $current['artist_id'], $current['artist_id'], $current['sort_name'], $current['artist_id'], $current['sort_name'] ]);
+					$rslt_prev_next = $stmt_prev_next->fetchAll();
+					
+					return $rslt_prev_next ?: false;
+				}
 			}
 		}
 		
@@ -686,7 +763,7 @@
 						
 						// Get prev/next
 						if($args['get'] === 'all' && is_numeric($args['release_id'])) {
-							$releases[$release_id]["prev_next"] = $this->get_prev_next($release_id, $releases[$release_id]["artist"]["friendly"]);
+							$releases[$release_id]["prev_next"] = $this->get_prev_next($release_id, is_numeric($_GET['prev_next_artist']) ? sanitize($_GET['prev_next_artist']) : $releases[$release_id]['artist']['id'] );
 						}
 						
 						// Get images

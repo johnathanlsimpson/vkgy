@@ -192,41 +192,36 @@
 			}
 			
 			if(is_array($release["prev_next"]) && !empty($release["prev_next"])) {
+				foreach($release["prev_next"] as $link) {
+					$link['url'] = explode('&', $link['url']);
+					$link['url'] = $link['url'][0].'edit/'.($link['url'][1] ? '&'.$link['url'][1] : null);
+					subnav([
+						[
+							'text' => lang($link['romaji'] ?: $link['name'], $link['name'], 'hidden'),
+							'url' => $link['url'],
+							'position' => $link['type'] === 'next' ? 'right' : 'left',
+						],
+					], 'directional');
+				}
+			}
+			
+			// If is omnibus (etc) but was reached by clicking prev/next in an artist's disco, show notice
+			if(is_numeric($_GET['prev_next_artist']) && $release['artist']['id'] != $_GET['prev_next_artist']) {
+				$traversal_artist = $access_artist->access_artist([ 'id' => sanitize($_GET['prev_next_artist']), 'get' => 'name' ]);
 				?>
-					<div class="col c2 any--margin">
-						<div class="release__prev-next">
-							<?php
-								foreach($release["prev_next"] as $link) {
-									if($link["type"] === "prev") {
-										?>
-											<h5>
-												Previous release
-											</h5>
-											<a href="<?php echo $link["url"].'edit/'; ?>">
-												<span class="symbol__previous"></span>
-												<?php echo $link["quick_name"]; ?>
-											</a>
-										<?php
-									}
-								}
-							?>
-						</div>
-						<div style="text-align: right;">
-							<?php
-								foreach($release["prev_next"] as $link) {
-									if($link["type"] === "next") {
-										?>
-											<h5>
-												Next release
-											</h5>
-											<a href="<?php echo $link["url"].'edit/'; ?>">
-												<?php echo $link["quick_name"]; ?>
-												<span class="symbol__next"></span>
-											</a>
-										<?php
-									}
-								}
-							?>
+					<div class="col c1">
+						<div>
+							<div class="text text--outlined text--notice symbol__help">
+								<?php
+									$traversal_artist_url = '/releases/'.$traversal_artist['friendly'].'/';
+									$traversal_reset_url = '/releases/'.$release['artist']['friendly'].'/'.$release['id'].'/'.$release['friendly'].'/edit/';
+									echo lang(
+										'The &ldquo;previous/next release&rdquo; links above are based <a class="artist" data-name="'.$traversal_artist['name'].'" href="'.$traversal_artist_url.'">'.($traversal_artist['romaji'] ?: $traversal_artist['name']).'</a>\'s discography. <a class="symbol__next" href="'.$traversal_reset_url.'">Reset?</a>',
+										'上記の「戻る/進む」リンクは、<a class="artist" data-name="'.$traversal_artist['name'].'" href="'.$traversal_artist_url.'">'.$traversal_artist['name'].'</a>のディスコグラフィーに基づいています。 <a class="symbol__next" href="'.$traversal_reset_url.'">リセットする?</a>',
+										'hidden'
+									);
+								?>
+							</div>
 						</div>
 					</div>
 				<?php

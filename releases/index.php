@@ -6,14 +6,20 @@
 		'Releases' => '/releases/',
 	]);
 	
-	subnav([
-		'Add release' => '/releases/add/',
-	], 'interact', true);
-	
 	$page_header = lang('Releases', 'リリース', ['container' => 'div']);
 	
 	if(is_numeric($_GET["id"])) {
 		$release = $access_release->access_release(["release_id" => $_GET["id"], "get" => "all"]);
+		
+		subnav([
+			'Add release' => '/releases/add/'.$release['artist']['friendly'].'/',
+		], 'interact', true);
+		
+		// If on omnibus release while cycling through artist's disco, make note
+		if(is_numeric($_GET['prev_next_artist']) && $release['artist']['id'] != $_GET['prev_next_artist']) {
+			$traversal_artist = $access_artist->access_artist([ 'id' => sanitize($_GET['prev_next_artist']), 'get' => 'name' ]);
+			$needs_traversal_notice = true;
+		}
 		
 		// Tags
 		$sql_tags = "SELECT * FROM tags_releases ORDER BY friendly ASC";
@@ -57,6 +63,10 @@
 		
 		if(!empty($_GET["artist"])) {
 			$artist = $access_artist->access_artist([ "friendly" => $_GET["artist"], "get" => "name", "limit" => "1" ]);
+			
+			subnav([
+				'Add release' => '/releases/add/'.$artist['friendly'].'/',
+			], 'interact', true);
 			
 			if(is_array($artist) && !empty($artist)) {
 				$releases = $access_release->access_release([ "artist_id" => $artist["id"], "get" => "basics" ]);
