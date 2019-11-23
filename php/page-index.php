@@ -124,7 +124,7 @@
 				<div class="primary-nav__right any--flex any--weaken-color">
 					<a class="head__link primary-nav__add a--inherit any--signed-in-only" href="/blog/add/" title="Add Blog Post"><span class="symbol__news symbol--standalone"></span></a>
 					<a class="head__link primary-nav__add a--inherit any--signed-in-only" title="Add Artist" href="/artists/add/"><span class="symbol__artist symbol--standalone"></span></a>
-					<a class="head__link primary-nav__add a--inherit any--signed-in-only" title="Add Release" href="/releases/add/<?= strlen($_GET['artist']) ? $_GET['artist'].'/' : null; ?>"><span class="symbol__release symbol--standalone"></span></a>
+					<a class="head__link primary-nav__add a--inherit any--signed-in-only" title="Add Release" href="/releases/add/<?= strlen($_GET['artist']) ? friendly($_GET['artist']).'/' : null; ?>"><span class="symbol__release symbol--standalone"></span></a>
 					<a class="head__link primary-nav__add a--inherit any--signed-in-only" title="Add Musician" href="/musicians/add/"><span class="symbol__musician symbol--standalone"></span></a>
 					<a class="head__link primary-nav__add a--inherit any--signed-in-only" title="Add Label" href="/labels/add/"><span class="symbol__company symbol--standalone"></span></a>
 					
