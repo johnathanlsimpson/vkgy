@@ -4,7 +4,7 @@
 	]);
 	
 	subnav([
-		'Add release' => '/releases/add/',
+		'Add release' => '/releases/add/'.(strlen($_GET['artist']) ? friendly($_GET['artist']).'/' : null),
 	], 'interact', true);
 	
 	subnav([
@@ -22,6 +22,8 @@
 	subnav([
 		lang('Add release', 'リリースを追加する', ['secondary_class' => 'any--hidden']) => '/releases/add/',
 	]);
+	
+	$active_page = '/releases/add/';
 	
 	script([
 		"/scripts/external/script-autosize.js",
