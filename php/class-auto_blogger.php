@@ -244,7 +244,7 @@
 						$sql_image_id = 'SELECT image_id FROM artists WHERE id=? LIMIT 1';
 						$stmt_image_id = $this->pdo->prepare($sql_image_id);
 						$stmt_image_id->execute([ $artist_id ]);
-						$rlst_image_id = $stmt_image_id->fetchColumn();
+						$rslt_image_id = $stmt_image_id->fetchColumn();
 						$image_id = is_numeric($rslt_image_id) ? $rslt_image_id : null;
 						
 						// Go through each potential post type, and write the post
