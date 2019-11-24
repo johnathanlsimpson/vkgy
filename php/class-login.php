@@ -100,7 +100,7 @@
 			// Check if signed in via session -> else check cookie -> if signed in, create new hash cookie, update session
 			public function check_login() {
 				if($_SESSION["loggedIn"]) {
-					if(!strlen($_SESSION['site_lang']) || !strlen($_SESSION['site-theme'])) {
+					if(!strlen($_SESSION['site_lang']) || !strlen($_SESSION['site_theme'])) {
 						$sql_prefs = 'SELECT site_lang, site_theme FROM users WHERE id=? LIMIT 1';
 						$stmt_prefs = $this->pdo->prepare($sql_prefs);
 						$stmt_prefs->execute([ $_SESSION['userID'] ]);
@@ -108,7 +108,7 @@
 						
 						if(is_array($rslt_prefs) && !empty($rslt_prefs)) {
 							$_SESSION['site_lang'] = $rslt_prefs['site_lang'];
-							$_SESSION['site-theme'] = $rslt_prefs['site_theme'];
+							$_SESSION['site_theme'] = $rslt_prefs['site_theme'];
 						}
 					}
 					
@@ -129,7 +129,7 @@
 								
 								$session_data = [
 									'userID' => $row['id'],
-									'site-theme' => $row['site_theme'],
+									'site_theme' => $row['site_theme'],
 									'admin' => $row['rank'],
 									'loggedIn' => 1,
 									
@@ -184,7 +184,7 @@
 					if($row) {
 						$session_data = [
 							'userID' => $row['id'],
-							'site-theme' => $row['site_theme'],
+							'site_theme' => $row['site_theme'],
 							'admin' => $row['rank'],
 							'loggedIn' => 1,
 							
@@ -245,7 +245,7 @@
 			
 			// Sign out: destroy session and cookie
 			public function sign_out() {
-				foreach(["userID", 'user_id', "username", "admin", 'is_admin', "icon", "hash", "loggedIn", 'is_signed_in', 'is_vip', 'site-theme', 'site_theme', 'site_lang', "remember_me"] as $key) {
+				foreach(["userID", 'user_id', "username", "admin", 'is_admin', "icon", "hash", "loggedIn", 'is_signed_in', 'is_vip', 'site_theme', 'site_theme', 'site_lang', "remember_me"] as $key) {
 					unset($_SESSION[$key]);
 					setcookie($key, "", time() - 60 * 60 * 24 * 40, "/", $this->domain, true, true);
 				}
