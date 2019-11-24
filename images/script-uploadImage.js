@@ -71,6 +71,13 @@ function updateImageData(changedElem) {
 	var resultElem = parentElem.querySelector('.image__result');
 	var preparedFormData = {};
 	
+	if(changedElem.name === 'image_description') {
+		var markdownElem = parentElem.querySelector('[data-get="image_markdown"]');
+		var markdown = markdownElem.textContent.split('](');
+		markdown = '![' + changedElem.value + '](' + markdown[1];
+		markdownElem.textContent = markdown;
+	}
+	
 	var inputElems = parentElem.querySelectorAll('[name]');
 	inputElems.forEach(function(inputElem) {
 		if(inputElem.nodeName === 'SELECT') {
