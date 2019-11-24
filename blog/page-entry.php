@@ -329,7 +329,7 @@
 								
 								// For each image, if already used in blog, unset from image gallery
 								for($i=0; $i<$num_images; $i++) {
-									if(strpos($entry['content'], '/images/'.$image_gallery[$i]['id']) !== false) {
+									if(strpos($entry['content'], '/images/'.$image_gallery[$i]['id']) !== false || $entry['image_id'] === $image_gallery[$i]['id']) {
 										unset($image_gallery[$i]);
 									}
 								}

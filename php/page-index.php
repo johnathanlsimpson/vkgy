@@ -21,7 +21,7 @@
 		
 		<title><?php echo $page_title; ?></title>
 		
-		<link rel="stylesheet" id="stylesheet_theme" href="<?php echo '/style/style-colors-'.(is_numeric($_SESSION['site-theme']) ? $_SESSION['site-theme'] : 0).'.css'; ?>" />
+		<link rel="stylesheet" id="stylesheet_theme" href="<?php echo '/style/style-colors-'.(is_numeric($_SESSION['site_theme']) ? $_SESSION['site_theme'] : 0).'.css'; ?>" />
 		<link rel="stylesheet" href="/style/style-critical.css<?php echo '?'.date('Ymd'); ?>" />
 		<?php
 			if(is_array($GLOBALS["styles"])) {
