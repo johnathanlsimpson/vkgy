@@ -10,7 +10,7 @@
 				?>
 					<li class="image__template any--flex" data-get="image_status" data-get-into="data-image-status">
 						<!-- Thumbnail -->
-						<div class="image__image" data-get="image_style" data-get-into="style" style="background-image:url({background_url});">
+						<div class="image__image" style="background-image:url({background_url});">
 							<span class="image__status"></span>
 						</div>
 						
