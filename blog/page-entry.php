@@ -318,6 +318,45 @@
 								}
 							?>
 						</div>
+						
+						<?php
+							// If entry has associated images, see if we need a separate image gallery
+							if(is_array($entry['images']) && !empty($entry['images'])) {
+								
+								// Copy images array and reset keys
+								$image_gallery = array_values($entry['images']);
+								$num_images = count($entry['images']);
+								
+								// For each image, if already used in blog, unset from image gallery
+								for($i=0; $i<$num_images; $i++) {
+									if(strpos($entry['content'], '/images/'.$image_gallery[$i]['id']) !== false) {
+										unset($image_gallery[$i]);
+									}
+								}
+								
+								// If any images remain in image gallery, display them
+								if(is_array($image_gallery) && !empty($image_gallery)) {
+									?>
+										<h3>
+											<?= lang('Other images', 'イメージギャラリー', 'div'); ?>
+										</h3>
+										<div class="text text--outlined">
+											<div class="entry__thumbnails">
+												<?php
+													foreach($image_gallery as $image) {
+														?>
+															<a class="entry__thumbnail-link" href="<?= '/images/'.$image['id'].'.'.$image['extension']; ?>" target="_blank">
+																<img class="entry__thumbnail" src="<?= '/images/'.$image['id'].'.thumbnail.'.$image['extension']; ?>" />
+															</a>
+														<?php
+													}
+												?>
+											</div>
+										</div>
+									<?php
+								}
+							}
+						?>
 					</div>
 
 					<aside class="entry__supplements entry__side">
