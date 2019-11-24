@@ -85,3 +85,19 @@
 .module--image img {
 	vertical-align: middle;
 }
+.entry__thumbnails {
+	display: flex;
+	flex-wrap: wrap;
+	margin: -1rem -1rem 0 0;
+}
+.entry__thumbnail-link {
+	flex-grow: 1;
+	margin: 1rem 1rem 0 0;
+	max-width: 150px;
+}
+.entry__thumbnail {
+	display: inline-block;
+	width: 100%;
+	object-fit: cover;
+	vertical-align: middle;
+}
