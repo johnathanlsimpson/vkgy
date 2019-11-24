@@ -115,6 +115,7 @@ imageUploadElem.addEventListener('change', function() {
 			var newImageElem = document.importNode(imageTemplate.content, true);
 			var itemIdElem = newImageElem.querySelector('[name^=image_' + itemType + '_id]');
 			var newOptionElem = document.createElement('option');
+			var thumbnailElem = newImageElem.querySelector('.image__image');
 			
 			newImageElem.querySelector('[name=image_item_type]').value = itemType;
 			newImageElem.querySelector('[name=image_item_id]').value = itemId;
@@ -124,6 +125,9 @@ imageUploadElem.addEventListener('change', function() {
 			newOptionElem.selected = true;
 			
 			itemIdElem.prepend(newOptionElem);
+			
+			// Set thumbnail preview while uploading
+			thumbnailElem.style.backgroundImage = 'url(' + window.URL.createObjectURL(thisImage) + ')';
 			
 			initializeInlineSubmit($(newImageElem), '/images/function-upload_image.php', {
 				'preparedFormData' : { 'image' : thisImage, 'item_type' : itemType, 'item_id' : itemId },
@@ -153,6 +157,8 @@ imageUploadElem.addEventListener('change', function() {
 			initImageDeleteButtons();
 		}
 	}
+	
+	imageUploadElem.value = '';
 });
 
 // Handle item ID change
