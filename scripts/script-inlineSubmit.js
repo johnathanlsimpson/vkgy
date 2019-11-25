@@ -86,7 +86,16 @@ function submit(formElement, processorUrl, inputArgs) {
 	for(var key in args.preparedFormData) {
 		formData.append(key, args.preparedFormData[key]);
 	}
-		
+	
+	// For any tributable elements which generated contenteditable clones,
+	// make sure that the clone's text is put into the appropriate formData value
+	var tributableElems = formElement[0].querySelectorAll('.any--tributable:not(.any--tributing)');
+	tributableElems.forEach(function(tributableElem, index) {
+		var tributableElemName = tributableElem.getAttribute('name');
+		var tributingElem = formElement[0].querySelector('.any--tributing[data-name="' + tributableElemName + '"]');
+		formData.set(tributableElemName, tributingElem.textContent);
+	});
+	
 	$.ajax({
 		url:         processorUrl,
 		data:        formData,
