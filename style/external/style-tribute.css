@@ -1,16 +1,16 @@
 .tribute-container {
 	background: hsl(var(--background--bold));
 	border: 2px solid hsl(var(--interactive--secondary));
-  display: block;
-  height: auto;
+	display: block;
+	height: auto;
 	left: 0;
-  max-height: 300px;
-  max-width: 500px;
-  overflow: auto;
+	max-height: 300px;
+	max-width: 500px;
+	overflow: auto;
 	padding: 0.25rem;
 	position: absolute;
 	top: 0;
-  z-index: 999999;
+	z-index: 999999;
 }
 .tribute-container ul {
 	margin: 0;
@@ -32,4 +32,35 @@
 .tribute-container li span, .tribute-container .menu-highlighted {
 	background: hsl(var(--background));
 	color: hsl(var(--attention--secondary));
+}
+.any--tributing:empty:before {
+	content: attr(placeholder);
+	display: block; /* For Firefox */
+	opacity: 0.65;
+}
+.any--tributing .any__tribute {
+	font-size: 0;
+}
+.any--tributing .any__tribute::before, [contenteditable] .any__tribute::after {
+	font-size: 1rem;
+}
+.any--tributing .any__tribute::after {
+	content: attr(data-text);
+}
+.any__tribute {
+	background: rgba(0,0,0, 0.1);
+	border-radius: 2px;
+	display: inline-block;
+	padding: 0 4px;
+}
+.any--tributing {
+	cursor: text;
+}
+.any--tributing.input__textarea {
+	flex: 1;
+	height: auto;
+	min-height: 3rem;
+	overflow: auto;
+	resize: vertical;
+	white-space: pre-wrap;
 }
