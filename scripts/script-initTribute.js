@@ -1,3 +1,94 @@
+// Shim for matchAll, from https://stackoverflow.com/questions/432493/
+function* matchAll(str, regexp) {
+	const flags = regexp.global ? regexp.flags : regexp.flags + "g";
+	const re = new RegExp(regexp, flags);
+	let match;
+	while (match=re.exec(str)) {
+		yield match;
+	}
+}
+
+// Given a string, find all Markdown matches
+function insertTributeTokens(inputString) {
+	
+	// Markdown patterns
+	var patterns = {
+		artist: /(?<=[^\w\/]|^)(?:\((\d+)\))?\/(?! )([^\/\n]+)(?! )\/(?:\[([^\[\]\/\n]+)\])?(?=\W|$)/g,
+		label: /(?<=[^\w\/\=]|^)(?:\{(\d+)\})?\=(?! )([^\=\/\n]+)(?! )\=(?:\[([^\[\]\/\=\n]+)\])?(?=\W|$)/g
+	};
+	
+	// For each pattern, get matches
+	Object.entries(patterns).forEach(([patternType, pattern]) => {
+		var matches = inputString.matchAll(pattern);
+		for(var match of matches) {
+			var fullMatch = match[0];
+			var matchData = {
+				id: match[1],
+				name: match[2] || null,
+				displayName: match[3] || null
+			}
+			
+			inputString = inputString.replace(fullMatch, getTributeToken(matchData, patternType));
+		}
+	});
+	
+	return inputString;
+}
+
+// Given string, format into tribute token
+function getTributeToken(input, tributeType, returnType = 'rich') {
+	
+	// Set vars
+	var id, name, displayName, friendly;
+	var richTemplate, textTemplate, symbol, url, dataText, innerText;
+	
+	// Determine type of input
+	if(typeof input === 'object' && input.hasOwnProperty('id') && input.hasOwnProperty('name')) {
+		id = input.id;
+		name = input.name;
+		friendly = input.friendly || null;
+		displayName = input.displayName || null;
+	}
+	else if(typeof input === 'object' && input.hasOwnProperty('original')) {
+		id = input.original[0];
+		friendly = input.original[1];
+		name = input.original[2].split(' (')[0];
+	}
+	
+	// Templates
+	if(tributeType === 'artist') {
+		symbol    = 'symbol__artist';
+		url       = friendly ? '/artists/' + friendly + '/' : null;
+		innerText = '(' + id + ')' + '/' + name + '/';
+		dataText  = name;
+	}
+	else if(tributeType === 'label') {
+		symbol    = 'symbol__company';
+		url       = friendly ? '/labels/' + friendly + '/' : null;
+		innerText = '{' + id + '}' + '=' + name + '=';
+		dataText  = name;
+	}
+	else if(tributeType === 'musician') {
+		symbol    = 'symbol__musician';
+		url       = id ? '/musicians/' + id + '/' : null;
+		innerText = name;
+		dataText  = name;
+	}
+	
+	// Return requested type
+	if(returnType === 'rich') {
+		return '' +
+			'<span contenteditable="false">' +
+				'<' + (url ? 'a href="' + url + '" target="_blank"' : 'span') + ' class="any__tribute ' + symbol + '" data-text="' + dataText + '">' +
+					innerText + 
+				'</' + (url ? 'a' : 'span') + '>' +
+			'</span>';
+	}
+	else if(returnType === 'text') {
+		return dataText;
+	}
+}
+
 // Setup options for tribute.js
 function tributeSetup(tributeType) {
 	var optionList, selectLinkTemplate, selectTextTemplate, trigger, valuesx;
@@ -5,33 +96,12 @@ function tributeSetup(tributeType) {
 	
 	// Depending on collection type, use different source and return different string
 	if(tributeType == 'artist') {
-		optionList = document.querySelector('[data-contains="artists"]');
-		selectLinkTemplate = function(item) {
-			return '' + '<span contenteditable="false">' + '<a class="any__tribute symbol__artist" href="/artists/' + item.original[1] + '/" data-text="' + item.original[2].split(' (')[0] + '">' + '(' + item.original[0] + ')/' + item.original[2].split(' (')[0] + '/' + '</a>' + '</span>';
-		}
-		selectTextTemplate = function(item) {
-			return '(' + item.original[0] + ')/' + item.original[1] + '/';
-		}
 		trigger = '/';
 	}
 	else if(tributeType === 'label') {
-		optionList = document.querySelector('[data-contains="labels"]');
-		selectLinkTemplate = function(item) {
-			return '' + '<span contenteditable="false">' + '<a class="any__tribute symbol__company" href="/labels/' + item.original[1] + '/" data-text="' + item.original[2].split(' (')[0] + '">' + '{' + item.original[0] + '}=' + item.original[2].split(' (')[0] + '=' + '</a>' + '</span>';
-		}
-		selectTextTemplate = function(item) {
-			return '{' + item.original[0] + '}=' + item.original[1] + '=';
-		}
 		trigger = '=';
 	}
 	else if(tributeType === 'musician') {
-		optionList = document.querySelector('[data-contains="musicians"]');
-		selectLinkTemplate = function(item) {
-			return '' + '<span contenteditable="false">' + '<a class="any__tribute symbol__musician" href="/musicians/' + item.original[1] + '/" data-text="' + item.original[2].split(' (')[0] + '">' + '{' + item.original[0] + '}=' + item.original[2].split(' (')[0] + '=' + '</a>' + '</span>';
-		}
-		selectTextTemplate = function(item) {
-			return item.original[2];
-		}
 		trigger = ':';
 	}
 	
@@ -41,14 +111,7 @@ function tributeSetup(tributeType) {
 		requireLeadingSpace: true,
 		
 		selectTemplate: function(item) {
-			if(typeof item === 'undefined') {
-				return null;
-			}
-			else if(this.range.isContentEditable(this.current.element)) {
-				return selectLinkTemplate(item);
-			}
-			
-			return selectTextTemplate(item);
+			return getTributeToken(item, tributeType);
 		},
 		
 		trigger: trigger,
@@ -109,4 +172,41 @@ function initTribute() {
 function detachTribute() {
 }
 
+// Find inputs which use tribute.js and replace with contenteditable clones that can actually use it
+function cloneTributableElems() {
+	
+	// Get elements which use the tribute.js script, but ignore clones
+	var tributableElems = document.querySelectorAll('.any--tributable:not(.any--tributing)');
+	
+	// For each tributable input, clone it as a contenteditable div
+	tributableElems.forEach(function(tributableElem, index) {
+		var newElem = document.createElement('div');
+		
+		// Set classes and attributes for clone
+		newElem.classList = tributableElem.classList;
+		newElem.classList.remove('autosize');
+		newElem.classList.add('any--tributing');
+		newElem.setAttribute('placeholder', tributableElem.getAttribute('placeholder') || '');
+		newElem.setAttribute('data-name', tributableElem.getAttribute('name'));
+		newElem.setAttribute('contenteditable', true);
+		
+		// Get text of original input, change references to tribute tokens, insert into clone
+		var originalText = tributableElem.textContent;
+		//console.log(originalText);
+		//
+		
+		// Hide original input and show contenteditable clone
+		tributableElem.style.display = 'none';
+		tributableElem.parentNode.insertBefore(newElem, tributableElem);
+		newElem.innerHTML = originalText;
+		newElem.innerHTML = insertTributeTokens(originalText);
+		
+		// We might want a keyup listener at some point?
+		/*newElem.addEventListener('keyup', debounce(() => {
+			tributableElem.value = newElem.textContent;
+		}, 1000));*/
+	});
+}
+
+cloneTributableElems();
 initTribute();
