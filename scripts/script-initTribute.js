@@ -204,7 +204,7 @@ function cloneTributableElems() {
 		// We might want a keyup listener at some point?
 		/*newElem.addEventListener('keyup', debounce(() => {
 			tributableElem.value = newElem.textContent;
-		}, 1000));*/
+		}, 1000)); */
 	});
 }
 
