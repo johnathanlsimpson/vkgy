@@ -3,7 +3,7 @@ function* matchAll(str, regexp) {
 	const flags = regexp.global ? regexp.flags : regexp.flags + "g";
 	const re = new RegExp(regexp, flags);
 	let match;
-	while (match=re.exec(str)) {
+	while((match=re.exec(str))) {
 		yield match;
 	}
 }
@@ -13,14 +13,18 @@ function insertTributeTokens(inputString) {
 	
 	// Markdown patterns
 	var patterns = {
-		artist: /(?<=[^\w\/]|^)(?:\((\d+)\))?\/(?! )([^\/\n]+)(?! )\/(?:\[([^\[\]\/\n]+)\])?(?=\W|$)/g,
-		label: /(?<=[^\w\/\=]|^)(?:\{(\d+)\})?\=(?! )([^\=\/\n]+)(?! )\=(?:\[([^\[\]\/\=\n]+)\])?(?=\W|$)/g
+		artist: /(?<=[^\w\/]|^)(?:\((\d+)\))?\/(?! )([^\/\n]+)(?! )\/(?=\W|$)/g,
+		label: /(?<=[^\w\/\=]|^)(?:\{(\d+)\})?\=(?! )([^\=\/\n]+)(?! )\=(?=\W|$)/g
 	};
 	
 	// For each pattern, get matches
 	Object.entries(patterns).forEach(([patternType, pattern]) => {
 		var matches = inputString.matchAll(pattern);
+		var replacedMatches = [];
+		
 		for(var match of matches) {
+			
+			// Set match data
 			var fullMatch = match[0];
 			var matchData = {
 				id: match[1],
@@ -28,7 +32,15 @@ function insertTributeTokens(inputString) {
 				displayName: match[3] || null
 			}
 			
-			inputString = inputString.replace(fullMatch, getTributeToken(matchData, patternType));
+			// Given match data, get token that will replace it
+			var matchReplacement = getTributeToken(matchData, patternType);
+			
+			// Replace original text with token (if we haven't done so already)
+			// Splitting and rejoining since replace only grabs first, and using regex here is a mess
+			if(!replacedMatches.includes(fullMatch)) {
+				inputString = inputString.split(fullMatch).join(matchReplacement);
+				replacedMatches.push(fullMatch);
+			}
 		}
 	});
 	
@@ -78,11 +90,11 @@ function getTributeToken(input, tributeType, returnType = 'rich') {
 	// Return requested type
 	if(returnType === 'rich') {
 		return '' +
-			'<span contenteditable="false">' +
+			'&VeryThinSpace;<span contenteditable="false">' +
 				'<' + (url ? 'a href="' + url + '" target="_blank"' : 'span') + ' class="any__tribute ' + symbol + '" data-text="' + dataText + '">' +
 					innerText + 
 				'</' + (url ? 'a' : 'span') + '>' +
-			'</span>';
+			'</span>&VeryThinSpace;';
 	}
 	else if(returnType === 'text') {
 		return dataText;
@@ -180,7 +192,12 @@ function cloneTributableElems() {
 	
 	// For each tributable input, clone it as a contenteditable div
 	tributableElems.forEach(function(tributableElem, index) {
+		
+		// Create empty clone element (& wrap in span to fight issue where Chrome inserts divs)
 		var newElem = document.createElement('div');
+		var newElemWrapper = document.createElement('span');
+		newElemWrapper.classList.add('any__tribute-wrapper');
+		newElemWrapper.appendChild(newElem);
 		
 		// Set classes and attributes for clone
 		newElem.classList = tributableElem.classList;
@@ -192,12 +209,10 @@ function cloneTributableElems() {
 		
 		// Get text of original input, change references to tribute tokens, insert into clone
 		var originalText = tributableElem.textContent;
-		//console.log(originalText);
-		//
 		
 		// Hide original input and show contenteditable clone
 		tributableElem.style.display = 'none';
-		tributableElem.parentNode.insertBefore(newElem, tributableElem);
+		tributableElem.parentNode.insertBefore(newElemWrapper, tributableElem);
 		newElem.innerHTML = originalText;
 		newElem.innerHTML = insertTributeTokens(originalText);
 		
