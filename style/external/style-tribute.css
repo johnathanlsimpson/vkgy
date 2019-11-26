@@ -51,16 +51,21 @@
 	background: rgba(0,0,0, 0.1);
 	border-radius: 2px;
 	display: inline-block;
+	margin-bottom: 2px;
 	padding: 0 4px;
 }
 .any--tributing {
 	cursor: text;
 }
 .any--tributing.input__textarea {
-	flex: 1;
+	display: inline-block;
 	height: auto;
 	min-height: 3rem;
 	overflow: auto;
 	resize: vertical;
 	white-space: pre-wrap;
+	width: 100%;
+}
+.any__tribute-wrapper {
+	flex: 1;
 }
