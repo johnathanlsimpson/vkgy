@@ -88,12 +88,16 @@ function submit(formElement, processorUrl, inputArgs) {
 	}
 	
 	// For any tributable elements which generated contenteditable clones,
-	// make sure that the clone's text is put into the appropriate formData value
 	var tributableElems = formElement[0].querySelectorAll('.any--tributable:not(.any--tributing)');
+	
+	// make sure that the clone's text is put into the appropriate formData value
 	tributableElems.forEach(function(tributableElem, index) {
 		var tributableElemName = tributableElem.getAttribute('name');
 		var tributingElem = formElement[0].querySelector('.any--tributing[data-name="' + tributableElemName + '"]');
-		formData.set(tributableElemName, tributingElem.textContent);
+		
+		// Thin spaces are inserted around tributes; remove these
+		var tributingValue = tributingElem.textContent.replace(/ |&VeryThinSpace;|&#8202;|&#x200A;/g, '');
+		formData.set(tributableElemName, tributingValue);
 	});
 	
 	$.ajax({
