@@ -221,6 +221,11 @@ class CommentHandler {
 		else {
 			commentContainer.querySelector('.commentate__content').focus();
 		}
+		
+		// Re-initialized Tribute.js
+		setTimeout(function() {
+			initTribute();
+		}, 0);
 	}
 	
 	
@@ -276,7 +281,9 @@ class CommentHandler {
 		threadContainer.querySelector('.comment__container:last-of-type .commentate__content').focus();
 		
 		// Re-initialized Tribute.js
-		initTribute();
+		setTimeout(function() {
+			initTribute();
+		}, 0);
 	}
 	
 	
@@ -313,9 +320,10 @@ class CommentHandler {
 					'name' : data.name,
 				};
 				
-				// Un-focus submit button, empty content area
+				// Un-focus submit button, empty content area, send change event
 				submitButton.blur();
 				commentateElem.querySelector('.commentate__content').value = null;
+				commentateElem.querySelector('.commentate__content').dispatchEvent(new Event('change'));
 				
 				// Get template for new comment, populate with returned data from new comment, then initialize reply/edit buttons
 				newCommentTemplate = self.populateComment(newCommentTemplate, newCommentData);
