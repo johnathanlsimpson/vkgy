@@ -233,7 +233,7 @@
 	}
 	[class*="symbol__"]::before,
 	.artist:not(.artist--no-symbol)::before,
-	.company::before, .text a[href^="/labels/"]:not([href$="/labels/"])::before,
+	.company::before,
 	.loading::before,
 	.user::before, .text a[href^="/user/"]:not([href$="/user/"])::before {
 		background: currentColor;
