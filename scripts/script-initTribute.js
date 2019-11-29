@@ -8,13 +8,34 @@ function* matchAll(str, regexp) {
 	}
 }
 
+
+// When focus contenteditable, make sure cursor is at end, from: https://stackoverflow.com/questions/4233265/
+function placeCaretAtEnd(el) {
+	el.focus();
+	if(typeof window.getSelection != 'undefined' && typeof document.createRange != 'undefined') {
+		var range = document.createRange();
+		range.selectNodeContents(el);
+		range.collapse(false);
+		var sel = window.getSelection();
+		sel.removeAllRanges();
+		sel.addRange(range);
+	}
+	else if(typeof document.body.createTextRange != 'undefined') {
+		var textRange = document.body.createTextRange();
+		textRange.moveToElementText(el);
+		textRange.collapse(false);
+		textRange.select();
+	}
+}
+
+
 // Given a string, find all Markdown matches
 function insertTributeTokens(inputString) {
 	
-	// Markdown patterns
+	// Markdown patterns, minutes [DisplayName] portion
 	var patterns = {
-		artist: /(?<=[^\w\/]|^)(?:\((\d+)\))?\/(?! )([^\/\n]+)(?! )\/(?:\[([^\[\]\/\n]+)\])?(?=\W|$)/g,
-		label: /(?<=[^\w\/\=]|^)(?:\{(\d+)\})?\=(?! )([^\=\/\n]+)(?! )\=(?:\[([^\[\]\/\=\n]+)\])?(?=\W|$)/g
+		artist: /(?<=[^\w\/]|^)(?:\((\d+)\))?\/(?! )([^\/\n]+)(?! )\/(?=\W|$)/g,
+		label: /(?<=[^\w\/\=]|^)(?:\{(\d+)\})?\=(?! )([^\=\/\n]+)(?! )\=(?=\W|$)/g
 	};
 	
 	// For each pattern, get matches
@@ -39,6 +60,7 @@ function insertTributeTokens(inputString) {
 			// Splitting and rejoining since replace only grabs first, and using regex here is a mess
 			if(!replacedMatches.includes(fullMatch)) {
 				inputString = inputString.split(fullMatch).join(matchReplacement);
+				inputString = inputString.split('\n<span').join('\n&VeryThinSpace;<span');
 				replacedMatches.push(fullMatch);
 			}
 		}
@@ -46,6 +68,7 @@ function insertTributeTokens(inputString) {
 	
 	return inputString;
 }
+
 
 // Given string, format into tribute token
 function getTributeToken(input, tributeType, returnType = 'rich') {
@@ -90,16 +113,20 @@ function getTributeToken(input, tributeType, returnType = 'rich') {
 	// Return requested type
 	if(returnType === 'rich') {
 		return '' +
-			'&VeryThinSpace;<span contenteditable="false">' +
-				'<' + (url ? 'a href="' + url + '" target="_blank"' : 'span') + ' class="any__tribute ' + symbol + '" data-text="' + dataText + '">' +
-					innerText + 
+			'<span contenteditable="false">' +
+				'&VeryThinSpace;' +
+				'<' + (url ? 'a' : 'span') + (url ? ' href="' + url + '" target="_blank"' : '') + '>' +
+					'<span class="any__tribute ' + symbol + '" data-text="' + dataText + '"></span>' + 
+					'<span class="any__tribute-inner">' + innerText + '</span>' +
 				'</' + (url ? 'a' : 'span') + '>' +
-			'</span>&VeryThinSpace;';
+				'&VeryThinSpace;' +
+			'</span>';
 	}
 	else if(returnType === 'text') {
 		return dataText;
 	}
 }
+
 
 // Setup options for tribute.js
 function tributeSetup(tributeType) {
@@ -136,6 +163,7 @@ function tributeSetup(tributeType) {
 	return tributeOptions;
 }
 
+
 // Send typed text to PHP search function
 function remoteSearch(text, returnToTribute, tributeType) {
 	var URL = '/php/function-tribute_search.php';
@@ -162,6 +190,7 @@ function remoteSearch(text, returnToTribute, tributeType) {
 	xhr.send();
 }
 
+
 // Init tribute.js object and add default collections
 var defaultTribute = new Tribute({
 	collection: [
@@ -171,27 +200,18 @@ var defaultTribute = new Tribute({
 	]
 });
 
-// Attach tribute.js to appropriate inputs
+
+// Find inputs which use tribute.js, replace with contenteditable clones, init tribute.js on clones
 function initTribute() {
-	defaultTribute.detach(document.querySelectorAll('.any--tributable'));
-	
-	setTimeout(function() {
-		defaultTribute.attach(document.querySelectorAll('.any--tributable'));
-	}, 100);
-}
-
-// Detach tribute.js
-function detachTribute() {
-}
-
-// Find inputs which use tribute.js and replace with contenteditable clones that can actually use it
-function cloneTributableElems() {
 	
 	// Get elements which use the tribute.js script, but ignore clones
-	var tributableElems = document.querySelectorAll('.any--tributable:not(.any--tributing)');
+	var tributableElems = document.querySelectorAll('.any--tributable:not(.any--tributed):not(.any--tributing)');
 	
 	// For each tributable input, clone it as a contenteditable div
 	tributableElems.forEach(function(tributableElem, index) {
+		
+		// Check if original input was given focus, if so we'll move focus to clone later
+		var tributableIsFocused = document.activeElement === tributableElem;
 		
 		// Create empty clone element (& wrap in span to fight issue where Chrome inserts divs)
 		var newElem = document.createElement('div');
@@ -199,22 +219,57 @@ function cloneTributableElems() {
 		newElemWrapper.classList.add('any__tribute-wrapper');
 		newElemWrapper.appendChild(newElem);
 		
-		// Set classes and attributes for clone
+		// Give focus to clone if appropriate
+		if(tributableIsFocused) {
+			setTimeout(function() {
+				placeCaretAtEnd(newElem);
+			}, 0);
+		}
+		
+		// Copy classes from original to clone, add tributing class, and remove unnecessary classes
+		// (Doing this to make sure we don't mess up any specific JS that targets by class name. Prob not the best method?)
 		newElem.classList = tributableElem.classList;
-		newElem.classList.remove('autosize');
 		newElem.classList.add('any--tributing');
+		newElem.classList.forEach(function(className, index) {
+			if(className.startsWith('any') || className.startsWith('input')) {
+			}
+			else {
+				newElem.classList.remove(className);
+			}
+		});
+		
+		// Set other attributes of new element
 		newElem.setAttribute('placeholder', tributableElem.getAttribute('placeholder') || '');
 		newElem.setAttribute('data-name', tributableElem.getAttribute('name'));
 		newElem.setAttribute('contenteditable', true);
 		
-		// Get text of original input, change references to tribute tokens, insert into clone
+		// Get text of original input, insert into clone
 		var originalText = tributableElem.textContent;
-		
-		// Hide original input and show contenteditable clone
-		tributableElem.style.display = 'none';
-		tributableElem.parentNode.insertBefore(newElemWrapper, tributableElem);
 		newElem.innerHTML = originalText;
+		
+		// Hide original input, throw active class on it
+		tributableElem.style.display = 'none';
+		tributableElem.classList.add('any--tributed');
+		
+		// Hide original input, mark original, show contenteditable clone, insert tokens into clone
+		tributableElem.parentNode.insertBefore(newElemWrapper, tributableElem);
 		newElem.innerHTML = insertTributeTokens(originalText);
+		
+		// Init tribute.js on clone
+		defaultTribute.attach(newElem);
+		
+		// Watch clone for paste, and remove formatting from pasted content
+		newElem.addEventListener('paste', function(event) {
+			event.preventDefault();
+			var text = event.clipboardData.getData('text/plain');
+			text = insertTributeTokens(text);
+			document.execCommand('insertHTML', false, text);
+		});
+		
+		// Watch original input: if it's changed (i.e. form submits and input clears), update clone
+		tributableElem.addEventListener('change', function(event) {
+			newElem.innerHTML = tributableElem.textContent;
+		});
 		
 		// We might want a keyup listener at some point?
 		/*newElem.addEventListener('keyup', debounce(() => {
@@ -223,5 +278,5 @@ function cloneTributableElems() {
 	});
 }
 
-cloneTributableElems();
+
 initTribute();
