@@ -90,15 +90,35 @@ function submit(formElement, processorUrl, inputArgs) {
 	// For any tributable elements which generated contenteditable clones,
 	var tributableElems = formElement[0].querySelectorAll('.any--tributable:not(.any--tributing)');
 	
-	// make sure that the clone's text is put into the appropriate formData value
-	tributableElems.forEach(function(tributableElem, index) {
-		var tributableElemName = tributableElem.getAttribute('name');
-		var tributingElem = formElement[0].querySelector('.any--tributing[data-name="' + tributableElemName + '"]');
-		
-		// Thin spaces are inserted around tributes; remove these
-		var tributingValue = tributingElem.textContent.replace(/ |&VeryThinSpace;|&#8202;|&#x200A;/g, '');
-		formData.set(tributableElemName, tributingValue);
-	});
+	// Make sure that the clone's text is put into the appropriate formData value
+	if(tributableElems.length) {
+		tributableElems.forEach(function(tributableElem, index) {
+			var tributableElemName = tributableElem.getAttribute('name');
+			var tributingElem = formElement[0].querySelector('.any--tributing[data-name="' + tributableElemName + '"]');
+			
+			if(tributingElem) {
+				// Clean output
+				var cleanedOutput = tributingElem.innerHTML;
+				
+				// There's a chrome bug where display: block inserts divs for new lines, which fucks up artist bio (etc)
+				// (But if we set it to inline-block, tribute.js has issues with the cursor)
+				// So replace all divs with regular line breaks, remove residual divs, then set back as innerHTML so textContent will be right
+				cleanedOutput = cleanedOutput.replace(/<div><br>/g, '\n');
+				cleanedOutput = cleanedOutput.replace(/<div>/g, '\n');
+				cleanedOutput = cleanedOutput.replace(/<\/div>|<br>/g, '');
+				tributingElem.innerHTML = cleanedOutput;
+				
+				// Then we have to clean up the textContent and replace hard spaces with normal
+				// And remove any VeryThinSpace's, which may or may not be used to prevent bugs with tribute.js
+				cleanedOutput = tributingElem.textContent;
+				cleanedOutput = cleanedOutput.replace(/&nbsp;/g, ' ');
+				cleanedOutput = cleanedOutput.replace(/ |&VeryThinSpace;|&#8202;|&#x200A;/g, '');
+				
+				// Set formData value with cleaned output
+				formData.set(tributableElemName, cleanedOutput);
+			}
+		});
+	}
 	
 	$.ajax({
 		url:         processorUrl,
