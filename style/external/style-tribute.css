@@ -38,7 +38,7 @@
 	display: block; /* For Firefox */
 	opacity: 0.65;
 }
-.any--tributing .any__tribute {
+.any--tributing .any__tribute-inner {
 	font-size: 0;
 }
 .any--tributing .any__tribute::before, [contenteditable] .any__tribute::after {
@@ -58,7 +58,7 @@
 	cursor: text;
 }
 .any--tributing.input__textarea {
-	display: inline-block;
+	/*display: inline-block;*/
 	height: auto;
 	min-height: 3rem;
 	overflow: auto;
