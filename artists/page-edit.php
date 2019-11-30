@@ -185,7 +185,7 @@
 								<div class="text">
 									<div class="input__row">
 										<div class="input__group any--flex-grow">
-											<textarea class="autoresize input__textarea any--flex-grow any--tributable edit__history" name="bio"><?php
+											<textarea class="autoresize input__textarea any--flex-grow any--tributable edit__history" name="bio" placeholder="" data-is-previewed="true"><?php
 												if(is_array($artist["history"])) {
 													$n = 0;
 													foreach($artist["history"] as $history_line) {
