@@ -49,10 +49,10 @@ function debounce(func, wait, immediate) {
 // Given a string, find all Markdown matches
 function insertTributeTokens(inputString) {
 	
-	// Markdown patterns, minutes [DisplayName] portion
+	// Markdown patterns, minus [DisplayName] portion, and minus lookbehind since FF doesn't support it
 	var patterns = {
-		artist: /(?<=[^\w\/]|^)(?:\((\d+)\))?\/(?! )([^\/\n]+)(?! )\/(?=\W|$)/g,
-		label: /(?<=[^\w\/\=]|^)(?:\{(\d+)\})?\=(?! )([^\=\/\n]+)(?! )\=(?=\W|$)/g
+		artist: /([^\w\/]|^)(?:\((\d+)\))?\/(?! )([^\/\n]+)(?! )\/(?=\W|$)/g,
+		label: /([^\w\/\=]|^)(?:\{(\d+)\})?\=(?! )([^\=\/\n]+)(?! )\=(?=\W|$)/g
 	};
 	
 	// For each pattern, get matches
@@ -65,13 +65,14 @@ function insertTributeTokens(inputString) {
 			// Set match data
 			var fullMatch = match[0];
 			var matchData = {
-				id: match[1],
-				name: match[2] || null,
-				displayName: match[3] || null
+				prevChar: match[1],
+				id: match[2],
+				name: match[3] || null,
+				displayName: match[4] || null
 			}
 			
 			// Given match data, get token that will replace it
-			var matchReplacement = getTributeToken(matchData, patternType);
+			var matchReplacement = matchData.prevChar + getTributeToken(matchData, patternType);
 			
 			// Replace original text with token (if we haven't done so already)
 			// Splitting and rejoining since replace only grabs first, and using regex here is a mess
@@ -129,7 +130,11 @@ function getTributeToken(input, tributeType, returnType = 'rich') {
 	
 	// Return requested type
 	if(returnType === 'rich') {
+		
+		// If using FF, add extra spaces to fix cursor bug
+		var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 		return '' +
+			(isFirefox ? '&VeryThinSpace;' : '') +
 			'<span contenteditable="false">' +
 				'&VeryThinSpace;' +
 				'<' + (url ? 'a' : 'span') + (url ? ' href="' + url + '" target="_blank"' : '') + '>' +
@@ -137,7 +142,8 @@ function getTributeToken(input, tributeType, returnType = 'rich') {
 					'<span class="any__tribute-inner">' + innerText + '</span>' +
 				'</' + (url ? 'a' : 'span') + '>' +
 				'&VeryThinSpace;' +
-			'</span>';
+			'</span>' +
+			(isFirefox ? '&VeryThinSpace;' : '');
 	}
 	else if(returnType === 'text') {
 		return dataText;
@@ -259,9 +265,6 @@ function initTribute() {
 		
 		// Create empty clone element (& wrap in span to fight issue where Chrome inserts divs)
 		var newElem = document.createElement('div');
-		var newElemWrapper = document.createElement('span');
-		newElemWrapper.classList.add('any__tribute-wrapper');
-		newElemWrapper.appendChild(newElem);
 		
 		// Give focus to clone if appropriate
 		if(tributableIsFocused) {
@@ -296,7 +299,7 @@ function initTribute() {
 		tributableElem.classList.add('any--tributed');
 		
 		// Hide original input, mark original, show contenteditable clone, insert tokens into clone
-		tributableElem.parentNode.insertBefore(newElemWrapper, tributableElem);
+		tributableElem.parentNode.insertBefore(newElem, tributableElem);
 		newElem.innerHTML = insertTributeTokens(originalText);
 		
 		// Init tribute.js on clone
@@ -325,6 +328,56 @@ function initTribute() {
 				tributableElem.dispatchEvent(new Event('change'));
 			}, 400));
 		}
+		
+		// And since FF has an 8 year old bug wherein backspace on contenteditable="false" doesn't work, let's address that
+		// https://bugzilla.mozilla.org/show_bug.cgi?id=685445, from https://stackoverflow.com/questions/2177958/
+		var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+		if(isFirefox) {
+			newElem.addEventListener('keydown', function(event) {
+				var key = event.key;
+				if(key === 'Backspace') {
+					var selection = window.getSelection();
+					if(!selection.isCollapsed || !selection.rangeCount) {
+						return;
+					}
+					
+					var curRange = selection.getRangeAt(selection.rangeCount - 1);
+					if (curRange.commonAncestorContainer.nodeType == 3 && curRange.startOffset > 0) {
+						// we are in child selection. The characters of the text node is being deleted
+						return;
+					}
+					
+					var range = document.createRange();
+					if(selection.anchorNode != this) {
+						// selection is in character mode. expand it to the whole editable field
+						range.selectNodeContents(this);
+						range.setEndBefore(selection.anchorNode);
+					}
+					else if(selection.anchorOffset > 0) {
+						range.setEnd(this, selection.anchorOffset);
+					}
+					else {
+						// reached the beginning of editable field
+						return;
+					}
+					range.setStart(this, range.endOffset - 1);
+					
+					var previousNode = range.cloneContents().lastChild;
+					if(previousNode && previousNode.contentEditable == 'false') {
+						// this is some rich content, e.g. smile. We should help the user to delete it
+						range.deleteContents();
+						
+						// Since we have to delete this way, FF can't undo via ctrl+z
+						// Only idea is to revert to original text, but then there's an issue with the cursor going to weird places
+						// Dealing with lack of ctrl+z seems less annoying than the 'fix', so maybe readdress at a future point
+						//range.insertNode(document.createTextNode(previousNode.textContent.trim()));
+						
+						event.preventDefault();
+					}
+				}
+			});
+		}
+		
 	});
 }
 
