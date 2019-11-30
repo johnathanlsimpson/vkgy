@@ -29,6 +29,23 @@ function placeCaretAtEnd(el) {
 }
 
 
+// Debounce function for live previews, from https://davidwalsh.name/javascript-debounce-function
+function debounce(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
+}
+
+
 // Given a string, find all Markdown matches
 function insertTributeTokens(inputString) {
 	
@@ -201,6 +218,33 @@ var defaultTribute = new Tribute({
 });
 
 
+// Clean up content from a tributing element before sending somewhere else
+function cleanTributingContent(tributingElem) {
+	
+	// Clean output
+	var cleanedOutput = tributingElem.innerHTML;
+	var dummyElem = document.createElement('p');
+
+	// There's a chrome bug where display: block inserts divs for new lines, which fucks up artist bio (etc)
+	// (But if we set it to inline-block, tribute.js has issues with the cursor)
+	// So replace all divs with regular line breaks, remove residual divs, then set back as innerHTML so textContent will be right
+	cleanedOutput = cleanedOutput.replace(/<div><br>/g, '\n');
+	cleanedOutput = cleanedOutput.replace(/<div>/g, '\n');
+	cleanedOutput = cleanedOutput.replace(/<\/div>|<br>/g, '');
+	//tributingElem.innerHTML = cleanedOutput;
+	dummyElem.innerHTML = cleanedOutput;
+
+	// Then we have to clean up the textContent and replace hard spaces with normal
+	// And remove any VeryThinSpace's, which may or may not be used to prevent bugs with tribute.js
+	//cleanedOutput = tributingElem.textContent;
+	cleanedOutput = dummyElem.textContent;
+	cleanedOutput = cleanedOutput.replace(/&nbsp;/g, ' ');
+	cleanedOutput = cleanedOutput.replace(/ |&VeryThinSpace;|&#8202;|&#x200A;/g, '');
+	
+	return cleanedOutput;
+}
+
+
 // Find inputs which use tribute.js, replace with contenteditable clones, init tribute.js on clones
 function initTribute() {
 	
@@ -266,15 +310,21 @@ function initTribute() {
 			document.execCommand('insertHTML', false, text);
 		});
 		
-		// Watch original input: if it's changed (i.e. form submits and input clears), update clone
+		// If original input is cleared, clear clone
 		tributableElem.addEventListener('change', function(event) {
-			newElem.innerHTML = tributableElem.textContent;
+			if(tributableElem.value == '') {
+				newElem.innerHTML = '';
+			}
 		});
 		
-		// We might want a keyup listener at some point?
-		/*newElem.addEventListener('keyup', debounce(() => {
-			tributableElem.value = newElem.textContent;
-		}, 1000)); */
+		// If we need to preview element, set listener here
+		var elemNeedsPreview = tributableElem.dataset.isPreviewed;
+		if(elemNeedsPreview) {
+			newElem.addEventListener('keyup', debounce(() => {
+				tributableElem.value = cleanTributingContent(newElem);
+				tributableElem.dispatchEvent(new Event('change'));
+			}, 400));
+		}
 	});
 }
 
