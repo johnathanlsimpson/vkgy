@@ -53,19 +53,17 @@
 	display: inline-block;
 	margin-bottom: 2px;
 	padding: 0 4px;
+	white-space: normal;
 }
 .any--tributing {
 	cursor: text;
+	flex: 1;
 }
 .any--tributing.input__textarea {
-	/*display: inline-block;*/
 	height: auto;
 	min-height: 3rem;
 	overflow: auto;
 	resize: vertical;
 	white-space: pre-wrap;
 	width: 100%;
-}
-.any__tribute-wrapper {
-	flex: 1;
 }
