@@ -735,6 +735,44 @@ function () {
               _this.tribute.hideMenu();
             }, 0);
           }
+									else {
+										
+										
+		var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+										if(isFirefox) {
+    var docFragment = document.createDocumentFragment();
+
+    //add a new line
+    var newEle = document.createTextNode('\n');
+    docFragment.appendChild(newEle);
+
+    //add the br, or p, or something else
+    //newEle = document.createElement('br');
+    //docFragment.appendChild(newEle);
+
+    //make the br replace selection
+    var range = window.getSelection().getRangeAt(0);
+    range.deleteContents();
+    range.insertNode(docFragment);
+
+    //create a new range
+    range = document.createRange();
+    range.setStartAfter(newEle);
+    range.collapse(true);
+
+    //make the cursor there
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    event.preventDefault();
+	//	return false; 
+										}
+										
+										
+										
+										
+									}
         },
         escape: function escape(e, el) {
           if (_this.tribute.isActive) {

@@ -79,6 +79,8 @@
 						</div>
 					</div>
 					
+					<div class="text text--outlined text--info console"></div>
+					
 					<h3>
 						Advanced
 					</h3>

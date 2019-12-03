@@ -51,9 +51,6 @@
 .text li p + p {
 	margin-top: 1.75rem;
 }
-.text p:empty {
-	display: none;
-}
 
 /**
 * ========================================================
