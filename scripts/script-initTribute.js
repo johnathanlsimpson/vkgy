@@ -142,14 +142,16 @@ function getTributeToken(input, tributeType, returnType = 'rich') {
 	// Return requested type
 	if(returnType === 'rich') {
 		return '' +
-			'▒<span class="tribute__wrapper" contenteditable="false">' +
+			(isFirefox || !isFirefox ? '﻿' : '') +
+			'<span class="tribute__wrapper" contenteditable="false">' +
 				'&VeryThinSpace;' +
 				'<' + (url ? 'a' : 'span') + ' class="tribute__container" ' + (url ? ' href="' + url + '" target="_blank"' : '') + '>' +
 					'<span class="any__tribute ' + symbol + '" data-text="' + dataText + '"></span>' + 
 					'<span class="any__tribute-inner">' + innerText + '</span>' +
 				'</' + (url ? 'a' : 'span') + '>' +
 				'&VeryThinSpace;' +
-			'</span>▒';
+			'</span>' +
+			(isFirefox || !isFirefox ? '﻿' : '');
 	}
 	else {
 		return innerText;
@@ -278,7 +280,31 @@ function initTribute() {
 			newElem.style.display = 'inline-block';
 			wrapperElem.style.flex = '1';
 			wrapperElem.appendChild(newElem);
+			
+			var x = document.createElement('div');
+			//x.classList.add('symbol__help');
+			x.classList.add('any--weaken');
+			x.innerHTML = '' +
+				//'keyboard shortcuts: ' +
+				'<kbd style="border:1px solid currentColor;box-shadow:inset 0 -2px 0 currentColor;border-radius:3px;padding:2px 4px;">/</kbd> artist' +
+				' &nbsp;&nbsp; ' + 
+				'<kbd style="border:1px solid currentColor;box-shadow:inset 0 -2px 0 currentColor;border-radius:3px;padding:2px 4px;">=</kbd> company' +
+				' &nbsp;&nbsp; ' + 
+				'<kbd style="border:1px solid currentColor;box-shadow:inset 0 -2px 0 currentColor;border-radius:3px;padding:2px 4px;">@</kbd> user' +
+				'';
+			wrapperElem.appendChild(x);
+			
+			var y = document.createElement('label');
+			y.classList.add('symbol__checked');
+			y.textContent = 'Switch';
+			y.style.position = 'absolute';
+			y.style.right = 0;
+			y.style.bottom = 0;
+			wrapperElem.appendChild(y);
 		}
+		
+		
+		
 		
 		// Give focus to clone if appropriate
 		if(tributableIsFocused) {
@@ -348,6 +374,14 @@ function initTribute() {
 			}, 400));
 		}
 		
+		// If we're using Firefox, we need additional logic to handle moving around the tokens
+		// Actually, since Chrome doesn't quite handle cursor before the token, let's just always use this :|
+		if(isFirefox || !isFirefox) {
+			newElem.addEventListener('keydown', function(event) {
+				handleFirefoxMovement(event);
+			});
+		}
+		
 	});
 }
 
@@ -356,21 +390,15 @@ function initTribute() {
 initTribute();
 
 
-// Let's debug Firefox fixes
-var allTributeElements = document.querySelectorAll('.any--tributing');
-var fakeConsole = document.querySelector('.console');
-
-allTributeElements.forEach(function(element) {
-	element.addEventListener('keydown', function(event) {
-		firefox(event);
-	});
-});
-
-
 // Firefox fixes
-function firefox(event) {
-	var keyPressed = event.key;
+function handleFirefoxMovement(event) {
 	
+	// Get keypress and set some vars
+	var keyPressed = event.key;
+	var debugOn = false;
+	var tokenSeparator = '﻿';
+	
+	// Get our nodes and selections and stuff
 	var parentNode = event.target;
 	var currSelection = window.getSelection();
 	var currNode = currSelection.anchorNode;
@@ -378,341 +406,215 @@ function firefox(event) {
 	var currPosition = currSelection.anchorOffset;
 	var numNodes = parentNode.childNodes.length;
 	
-	var prevNode, prevPrevNode, prevPrevNodeLength;
-	var nextNode, nextNextNode, nextNextNodeLength;
+	// Get previous and next nodes, if they exist
+	var prevNode, prevPrevNode, nextNode, nextNextNode;
 	if(currNodeIndex > 0) {
 		prevNode = currNode.previousSibling || null;
 		prevPrevNode = prevNode && currNodeIndex > 1 ? prevNode.previousSibling : null;
-		prevPrevNodeLength = prevPrevNode ? prevPrevNode.length : null;
 	}
 	if(currNodeIndex + 1 < numNodes) {
 		nextNode = currNode.nextSibling || null;
 		nextNextNode = nextNode && currNodeIndex + 2 < numNodes ? nextNode.nextSibling : null;
-		nextNextNodeLength = nextNextNode ? nextNextNode.length : null;
 	}
 	
-	console.log(currSelection);
-	console.log(currNode);
-	console.log(currNode.previousSibling);
-	console.log(currNode.nodeType);
+	// Only worry about deletion, backspace, left, and right
+	// And ignore multicharacter selections (but might deal with them in the future)
+	var weCare = ['ArrowLeft', 'ArrowRight', 'Backspace', 'Delete'].includes(keyPressed);
+	var isCollapsed = currSelection.isCollapsed;
 	
-	/*
-	/////
-	///// we need to ignore user selections but guide them if they select stupid, i guess
-	////
-	*/
+	// Set up some other variables
+	var weStillCare;
+	var cursorPosition, cursorPositionType;
 	
-	// Only worry about things happening in text nodes
+	// Perform some tests to find where cursor is at
+	if(weCare && isCollapsed) {
 		
-		// Only worry about deletion, backspace, left, and right
-		var weCare = ['ArrowLeft', 'ArrowRight', 'Backspace', 'Delete'].includes(keyPressed);
-		var weStillCare;
-		var cursorPosition, cursorPositionType;
-		
-		// Perform some tests to find where cursor is at
-		if(weCare) {
+		// Normal text events
+		if(currNode.nodeType === 3) {
 			
-			// Normal text events
-			if(currNode.nodeType === 3) {
-				
-				// A: .|▒<span/>▒?.  If next node exists, and character at position is ▒, and at next to last position in node, and next node is .tribute__wrapper, and next next node begins with ▒
-				if(nextNode && currNode.textContent[currPosition] === '▒' && currPosition + 1 === currNode.length && nextNode.classList.contains('tribute__wrapper')) {
-					cursorPositionType = 'A';
-					console.log('A: .|▒<span/>▒?.');
-				}
-				
-				// B: .▒?|<span/>▒?  If next node exists, and at end of node, and next node is .tribute__wrapper
-				else if(nextNode && currPosition === currNode.length && nextNode.classList.contains('tribute__wrapper')) {
-					cursorPositionType = 'B';
-					console.log('B: .▒?|<span/>▒?');
-				}
-				
-				// C: .▒?<span/>|▒?  If we managed to get in front of ▒ (at beginning of node, and next character is ▒, and previous node is .tribute__wrapper), move after it
-				else if(prevNode && currPosition === 0 && prevNode.classList.contains('tribute__wrapper')) {
-					cursorPositionType = 'C';
-					console.log('C: .▒?<span/>|▒?');
-				}
-				
-				// F: .▒?<span/>▒|  If we're after token, and previous node is .tribute__wrapper), move after it
-				else if(prevNode && currPosition === 1 && currNode.textContent[0] === '▒' && prevNode.classList.contains('tribute__wrapper')) {
-					cursorPositionType = 'F';
-					console.log('F: .▒?<span/>▒|');
-				}
-				
+			// LEFT ▒?|<span/>▒?
+			if(nextNode && currPosition === currNode.length && nextNode.classList && nextNode.classList.contains('tribute__wrapper')) {
+				cursorPositionType = 'LEFT';
+				if(debugOn) { console.log('LEFT: ▒?|<span/>▒?'); }
 			}
 			
-			// If we manage to get within a token :B
-			else if(currNode.nodeType === 1) {
-				
-				// D: .▒?<sp|an/>▒?  If we managed to get inside a token
-				if(currNode.classList.contains('tribute__wrapper')) {
-					cursorPositionType = 'D';
-					console.log('D: .▒?<sp|an/>▒?');
-				}
-				
-				// E: .▒?<sp<sp|an>an/>▒?  If we managed to get inside a span *within* a token
-				else if(currNode.classList.contains('any__tribute-inner') || currNode.classList.contains('any__tribute') || currNode.classList.contains('tribute__container')) {
-					cursorPositionType = 'E';
-					console.log('E: .▒?<sp<sp|an>an/>▒?');
-				}
-				
+			// LEFT_ALT |▒<span/>▒?
+			else if(nextNode && currNode.textContent[currPosition] === tokenSeparator && currPosition + 1 === currNode.length && nextNode.classList && nextNode.classList.contains('tribute__wrapper')) {
+				cursorPositionType = 'LEFT_ALT';
+				if(debugOn) { console.log('LEFT_ALT: |▒<span/>▒?'); }
 			}
 			
-			if(cursorPositionType) {
-				weStillCare = true;
+			// RIGHT ▒?<span/>|▒?
+			else if(prevNode && currPosition === 0 && prevNode.classList && prevNode.classList.contains('tribute__wrapper')) {
+				cursorPositionType = 'RIGHT';
+				if(debugOn) { console.log('RIGHT: ▒?<span/>|▒?'); }
+			}
+			
+			// RIGHT_ALT ▒?<span/>▒|
+			else if(prevNode && currPosition === 1 && currNode.textContent[0] === tokenSeparator && prevNode.classList.contains('tribute__wrapper')) {
+				cursorPositionType = 'RIGHT_ALT';
+				if(debugOn) { console.log('RIGHT_ALT: ▒?<span/>▒|'); }
+			}
+			
+		}
+		
+		// If we manage to get within a token
+		else if(currNode.nodeType === 1) {
+			
+			// INSIDE ▒?<sp|an/>▒?
+			if(currNode.classList.contains('tribute__wrapper')) {
+				cursorPositionType = 'INSIDE';
+				if(debugOn) { console.log('INSIDE: .▒?<sp|an/>▒?'); }
+			}
+			
+			// INSIDE_ALT ▒?<sp<sp|an>an/>▒
+			else if(currNode.classList.contains('any__tribute-inner') || currNode.classList.contains('any__tribute') || currNode.classList.contains('tribute__container')) {
+				cursorPositionType = 'INSIDE_ALT';
+				if(debugOn) { console.log('INSIDE_ALT: .▒?<sp<sp|an>an/>▒?'); }
+			}
+			
+		}
+		
+		if(cursorPositionType) {
+			weStillCare = true;
+		}
+	}
+	
+	// If we still care, decide which logic to perform
+	if(weStillCare && isCollapsed) {
+		if(debugOn) {
+			event.preventDefault();
+		}
+		
+		// Move [LEFT_ALT] -> LEFT
+		if(cursorPositionType === 'LEFT_ALT') {
+			if(keyPressed === 'Delete' || keyPressed === 'ArrowRight') {
+				currSelection.collapse(currNode, currNode.length);
+				handleFirefoxMovement(event);
 			}
 		}
 		
-		// If we still care, decide which logic to perform
-		if(weStillCare) {
-			//event.preventDefault();
-			
-			// Delete at: .|▒<span/>▒?
-			if(cursorPositionType === 'A' && keyPressed === 'Delete') {
-				
-				// If character after span is ▒, include that
-				if(nextNextNode.textContent[0] === '▒') {
-					currSelection.extend(nextNextNode, 1);
-				}
-				else {
-					currSelection.extend(nextNextNode, 0);
-				}
-				
-			}
-			
-			// Move right at: .|▒<span/>▒? or .▒?|<span/>▒?
-			if((cursorPositionType === 'A' || cursorPositionType === 'B') && keyPressed === 'ArrowRight') {
-				
-				if(nextNextNode) {
-					currSelection.collapse(nextNextNode, 0);
-				}
-				
-			}
-			
-			// Delete at: .▒?|<span/>▒?
-			if(cursorPositionType === 'B' && keyPressed === 'Delete') {
-				
-				// If previous character ▒, include that
-				if(prevNode && prevNode[prevNode.length - 1] === '▒') {
-					currSelection.collapse(prevNode, prevNode.length - 1);
-				}
-				
-				// If character after span is ▒, include that
-				if(nextNextNode.textContent[0] === '▒') {
-					currSelection.extend(nextNextNode, 1);
-				}
-				else {
-					currSelection.extend(nextNextNode, 0);
-				}
-				
-			}
-			
-			// Left at: .▒?|<span/>▒?
-			if(cursorPositionType === 'B' && (keyPressed === 'ArrowLeft' || keyPressed === 'Backspace')) {
-				
-				// If previous character ▒, include that
-				if(currNode.textContent[currNode.length - 1] === '▒') {
-					currSelection.collapse(currNode, currNode.length - 1);
-				}
-				
-			}
-			
-			
-			// Move right at: .▒?<span/>|▒?
-			if(cursorPositionType === 'C' && keyPressed === 'ArrowRight') {
-				
-				if(currNode.textContent[0] === '▒') {
-					currSelection.collapse(currNode, 1);
-				}
-				
-			}
-			
-			// Move left at: .▒?<span/>|▒? or .▒?<span/>▒|
-			if((cursorPositionType === 'C' || cursorPositionType === 'F') && keyPressed === 'ArrowLeft') {
-				
-				if(prevPrevNode) {
-					if(prevPrevNode.textContent[prevPrevNodeLength - 1] === '▒') {
-						currSelection.extend(prevPrevNode, prevPrevNodeLength - 1);
-					}
-					else {
-						currSelection.extend(prevPrevNode, 0);
-					}
-				}
-				else if(prevNode) {
-					currSelection.extend(prevNode, 0);
-				}
-				
-			}
-			
-			// Move and possibly delete at: .▒?<span/>|▒? or .▒?<span/>▒|
-			if((cursorPositionType === 'C' || cursorPositionType === 'F') && keyPressed === 'Backspace') {
-				
-				if(currNode.textContent[0] === '▒') {
-					currSelection.collapse(currNode, 1);
-				}
-				
-				if(prevPrevNode) {
-					if(prevPrevNode.textContent[prevPrevNodeLength - 1] === '▒') {
-						currSelection.extend(prevPrevNode, prevPrevNodeLength - 1);
-					}
-					else {
-						currSelection.extend(prevPrevNode, 0);
-					}
-				}
-				else if(prevNode) {
-					currSelection.extend(prevNode, 0);
-				}
-				
-			}
-			
-			// Move and possibly delete at: .▒?<span/>|▒?
-			if(cursorPositionType === 'C' && keyPressed === 'Delete') {
-				
-				if(currNode.textContent[0] === '▒') {
-					
-					// If previous character of current node is ▒, move back 1 to include that in selection
-					currSelection.collapse(currNode, currPosition + 1);
-					
-				}
-				
-			}
-			
-			
-			// Move for later deletion at: .▒?<sp|an/>▒?
-			if(cursorPositionType === 'D' && (keyPressed === 'Delete')) {
-				
-				// If previous node exists and is text, put cursor at end or before ▒
-				if(prevNode && prevNode.nodeType === 3) {
-					if(prevNode.length > 0 && prevNode.textContent[prevNode.length - 1] === '▒') {
-						currSelection.collapse(prevNode, prevNode.length - 1);
-					}
-					else {
-						currSelection.collapse(prevNode, prevNode.length);
-					}
-					firefox(event);
-				}
-				
-			}
-			
-			// Move for later backspace at: .▒?<sp|an/>▒?
-			if(cursorPositionType === 'D' && (keyPressed === 'Backspace')) {
-				
-				// If previous node exists and is text, put cursor at end or before ▒
-				if(prevNode && prevNode.nodeType === 3) {
-					if(nextNode.textContent[0] === '▒') {
-						currSelection.collapse(nextNode, 1);
-					}
-					else {
-						currSelection.collapse(nextNode, 0);
-					}
-					firefox(event);
-				}
-				
-			}
-			
-			// Move left at: .▒?<sp|an/>▒?
-			if(cursorPositionType === 'D' && keyPressed === 'ArrowLeft') {
-				
-				// If previous node exists and is text, put cursor at end or before ▒
-				if(prevNode && prevNode.nodeType === 3) {
-					if(prevNode.length > 0 && prevNode.textContent[prevNode.length - 1] === '▒') {
-						currSelection.collapse(prevNode, prevNode.length - 1);
-					}
-					else {
-						currSelection.collapse(prevNode, prevNode.length);
-					}
-					event.preventDefault();
-				}
-				
-			}
-			
-			// Move right at: .▒?<sp|an/>▒?
-			if(cursorPositionType === 'D' && keyPressed === 'ArrowRight') {
-				
-				// If previous node exists and is text, put cursor at end or before ▒
-				if(nextNode && nextNode.nodeType === 3) {
-					if(nextNode.textContent[0] === '▒') {
-						currSelection.collapse(nextNode, 1);
-					}
-					else {
-						currSelection.collapse(nextNode, 0);
-					}
-					event.preventDefault();
-				}
-				
-			}
-			
-			
-			// Move out of: .▒?<sp<sp|an>an/>▒?.
-			if(cursorPositionType === 'E') {
-				
-				// Move selection to parent, and cycle back through
-				currSelection.collapse(currNode.parentNode, 0);
-				firefox(event);
-				
+		// Move [RIGHT_ALT] -> RIGHT
+		if(cursorPositionType === 'RIGHT_ALT') {
+			if(keyPressed === 'ArrowLeft' || keyPressed === 'Backspace') {
+				currSelection.collapse(currNode, 0);
+				handleFirefoxMovement(event);
 			}
 		}
 		
+		// Move [INSIDE_ALT] -> INSIDE
+		if(cursorPositionType === 'INSIDE_ALT') {
+			currSelection.collapse(currNode.parentNode, 0);
+			handleFirefoxMovement(event);
+		}
 		
-		// Delete token
-		/*if(keyPressed === 'Delete') {
-			event.preventDefault();
-			
-			// A: .|▒<span/>▒?.  If next node exists, and character at position is ▒, and at next to last position in node, and next node is .tribute__wrapper, and next next node begins with ▒
-			if(nextNode && currNode.textContent[currPosition] === '▒' && currPosition + 1 === currNode.length && nextNode.classList.contains('tribute__wrapper')) {
-				
-				console.log('A: .|▒<span/>▒?.');
+		// Move [INSIDE] -> LEFT or RIGHT
+		if(cursorPositionType === 'INSIDE') {
+			if(keyPressed === 'ArrowLeft' || keyPressed === 'Delete') {
+				if(prevNode) {
+					currSelection.collapse(prevNode, prevNode.length);
+				}
+				else {
+					currSelection.collapse(currNode, 0);
+				}
 			}
 			
-			// B: .▒?|<span/>▒?  If next node exists, and at end of node, and next node is .tribute__wrapper
-			else if(nextNode && currPosition === currNode.length && nextNode.classList.contains('tribute__wrapper')) {
-				
-				// If previous character of current node is ▒, move back 1 to include that in selection
-				if(currPosition > 0 && currNode.textContent[currPosition - 1] === '▒') {
-					currSelection.collapse(currNode, currPosition - 1);
+			else if(keyPressed === 'ArrowRight' || keyPressed === 'Backspace') {
+				if(nextNode) {
+					currSelection.collapse(nextNode, 0);
 				}
-				
-				// If character after span is ▒, include that
-				if(nextNextNode.textContent[0] === '▒') {
+				else {
+					currSelection.collapse(currNode, currNode.length);
+				}
+			}
+			
+			handleFirefoxMovement(event);
+		}
+		
+		// Left or Backspace at [LEFT]
+		if(cursorPositionType === 'LEFT' && (keyPressed === 'ArrowLeft' || keyPressed === 'Backspace')) {
+			// If previous character ▒, include that
+			if(currNode.textContent[currNode.length - 1] === tokenSeparator) {
+				currSelection.collapse(currNode, currNode.length - 1);
+			}
+		}
+		
+		// Right at [LEFT]
+		if(cursorPositionType === 'LEFT' && keyPressed === 'ArrowRight') {
+			if(nextNextNode) {
+				currSelection.collapse(nextNextNode, 0);
+			}
+			else {
+				currSelection.collapse(currNode, currNode.length);
+			}
+		}
+		
+		// Delete at [LEFT]
+		// If right after newline, and token followed by text node, cursor moves up for some reason
+		// Could maybe stop Delete and trigger Backspace, but too complicated to worry about for now
+		if(cursorPositionType === 'LEFT' && keyPressed === 'Delete') {
+			// If previous character ▒, include that
+			if(currNode.textContent[currNode.length - 1] === tokenSeparator) {
+				currSelection.collapse(currNode, currNode.length - 1);
+			}
+			
+			// If character after span is ▒, include that
+			if(nextNextNode) {
+				if(nextNextNode.textContent[0] === tokenSeparator) {
 					currSelection.extend(nextNextNode, 1);
 				}
 				else {
 					currSelection.extend(nextNextNode, 0);
 				}
-				
-				console.log('B: .▒?|<span/>▒?');
 			}
-			
-			// C: .▒?<span/>|▒?  If we managed to get in front of ▒ (at beginning of node, and next character is ▒, and previous node is .tribute__wrapper), move after it
-			else if(prevNode && currPosition === 0 && currNode.textContent[currPosition] === '▒' && prevNode.classList.contains('tribute__wrapper')) {
-				
-				// If previous character of current node is ▒, move back 1 to include that in selection
-				currSelection.collapse(currNode, currPosition + 1);
-				
-				// If there's another character after ▒, assume they meant to delete that
-				if(currPosition + 2 <= currNode.length) {
-					currSelection.extend(currNode, currPosition + 2);
-				}
-				
-				console.log('C: .▒?<span/>|▒?');
+			else {
+				currSelection.extend(nextNode, nextNode.length);
 			}
-			
-		}*/
-
-		/*if(keyPressed === 'Backspace' && prevNode) {
-			event.preventDefault();
-
-			// If prev node exists, and in text node, and at position 1, and character at position 0 is ▒, and previous node is .tribute__wrapper
-			if(prevNode && currPosition === 1 && currNode.textContent[0] === '▒' && prevNode.classList.contains('tribute__wrapper')) {
-				currSelection.extend(prevPrevNode, prevPrevNodeLength);
-				console.log('At: <span/>|');
-			}
-
-			// If prev node exists, and in text mode, and at position 0, and previous node is .tribute__wrapper
-			else if(prevNode && currPosition === 0 && prevNode.classList.contains('tribute__wrapper')) {
-				currSelection.extend(prevPrevNode, prevPrevNodeLength);
-				console.log('At: <span>▒|');
-			}
-		}*/
+		}
 		
+		// Left at [RIGHT]
+		if(cursorPositionType === 'RIGHT' && keyPressed === 'ArrowLeft') {
+			if(prevPrevNode) {
+				if(prevPrevNode.textContent[prevPrevNode.length] === tokenSeparator) {
+					currSelection.collapse(prevPrevNode, prevPrevNode.length - 1);
+				}
+				else {
+					currSelection.collapse(prevPrevNode, prevPrevNode.length);
+				}
+			}
+			else {
+				currSelection.collapse(prevNode, 0);
+			}
+		}
+		
+		// Backspace at [RIGHT]
+		if(cursorPositionType === 'RIGHT' && keyPressed === 'Backspace') {
+			if(currNode.textContent[0] === tokenSeparator) {
+				currSelection.collapse(currNode, 1);
+			}
+			else {
+				currSelection.collapse(currNode, 0);
+			}
+
+			if(prevPrevNode) {
+				if(prevPrevNode.textContent[prevPrevNode.length - 1] === tokenSeparator) {
+					currSelection.extend(prevPrevNode, prevPrevNode.length - 1);
+				}
+				else {
+					currSelection.extend(prevPrevNode, prevPrevNode.length);
+				}
+			}
+			else {
+				currSelection.extend(prevNode, 0);
+			}
+		}
+		
+		// Right or Delete at [RIGHT]
+		if(cursorPositionType === 'RIGHT' && (keyPressed === 'ArrowRight' || keyPressed === 'Delete')) {
+			if(currNode.textContent[0] === tokenSeparator) {
+				currSelection.collapse(currNode, 1);
+			}
+		}
+		
+	}
 }
