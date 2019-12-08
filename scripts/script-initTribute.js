@@ -138,29 +138,37 @@ function getTributeToken(input, tributeType, returnType = 'rich') {
 		innerText = name;
 		dataText  = name;
 	}
+	else if(tributeType === 'user') {
+		symbol    = 'symbol__user';
+		url       = '/users/' + name + '/';
+		innerText = '@' + name;
+		dataText  = name;
+	}
 	
 	// Return requested type
 	if(returnType === 'rich') {
 		return '' +
-			(isFirefox || !isFirefox ? '﻿' : '') +
+			'﻿' +
 			'<span class="tribute__wrapper" contenteditable="false">' +
 				'&VeryThinSpace;' +
 				'<' + (url ? 'a' : 'span') + ' class="tribute__container" ' + (url ? ' href="' + url + '" target="_blank"' : '') + '>' +
-					'<span class="any__tribute ' + symbol + '" data-text="' + dataText + '"></span>' + 
-					'<span class="any__tribute-inner">' + innerText + '</span>' +
+					'<span class="tribute__display ' + symbol + '" data-text="' + dataText + '"></span>' + 
+					'<span class="tribute__text">' + innerText + '</span>' +
 				'</' + (url ? 'a' : 'span') + '>' +
 				'&VeryThinSpace;' +
 			'</span>' +
-			(isFirefox || !isFirefox ? '﻿' : '');
+			'﻿';
 	}
 	else {
-		return innerText;
+		var helper = document.createElement('div');
+		helper.innerHTML = innerText;
+		return helper.textContent;
 	}
 }
 
 
 // Setup options for tribute.js
-function tributeSetup(tributeType) {
+function tributeSetup(tributeType, returnType = 'rich') {
 	var optionList, selectLinkTemplate, selectTextTemplate, trigger, valuesx;
 	var optionListIsParsed;
 	
@@ -174,6 +182,9 @@ function tributeSetup(tributeType) {
 	else if(tributeType === 'musician') {
 		trigger = ':';
 	}
+	else if(tributeType === 'user') {
+		trigger = '@';
+	}
 	
 	var tributeOptions = {
 		lookup: '2',
@@ -181,7 +192,7 @@ function tributeSetup(tributeType) {
 		requireLeadingSpace: true,
 		
 		selectTemplate: function(item) {
-			return getTributeToken(item, tributeType);
+			return getTributeToken(item, tributeType, returnType);
 		},
 		
 		trigger: trigger,
@@ -223,11 +234,20 @@ function remoteSearch(text, returnToTribute, tributeType) {
 
 
 // Init tribute.js object and add default collections
-var defaultTribute = new Tribute({
+var richTribute = new Tribute({
 	collection: [
 		tributeSetup('artist'),
 		tributeSetup('label'),
-		tributeSetup('musician')
+		tributeSetup('musician'),
+		tributeSetup('user')
+	]
+});
+var plainTribute = new Tribute({
+	collection: [
+		tributeSetup('artist', 'plain'),
+		tributeSetup('label', 'plain'),
+		tributeSetup('musician', 'plain'),
+		tributeSetup('user', 'plain')
 	]
 });
 
@@ -252,21 +272,96 @@ function cleanTributingContent(tributingElem, fullClean = true) {
 	if(fullClean) {
 		cleanedOutput = dummyElem.textContent;
 		cleanedOutput = cleanedOutput.replace(/&nbsp;/g, ' ');
-		cleanedOutput = cleanedOutput.replace(/ |&VeryThinSpace;|&#8202;|&#x200A;/g, '');
+		cleanedOutput = cleanedOutput.replace(/﻿| |&VeryThinSpace;|&#8202;|&#x200A;/g, '');
 	}
 	
 	return cleanedOutput;
 }
 
 
+// Init switcher between contenteditable and original element
+function showHideTributingElem(args) {
+	
+	// Set up elements
+	var switchElem = args.switch || null;
+	var origElem = args.orig || null;
+	var tributingElem = args.tributing || null;
+	var tributingWrapperElem = args.wrapper || null;
+	
+	// Set switch direction and variables
+	var switchTo = args.switchTo || ( switchElem && switchElem.getAttribute('data-switch-to') ? switchElem.getAttribute('data-switch-to') : null );
+	var hiddenClass = 'any--hidden';
+	var currentText;
+	
+	// At least the plain (orig) & rich (tributing) elements are required, and switch dir must be specified
+	if(origElem && tributingElem) {
+		if(switchTo === 'rich' || switchTo === 'plain') {
+			
+			// Set which elements will switch
+			var hideElem = switchTo === 'rich' ? origElem : ( tributingWrapperElem || tributingElem );
+			var showElem = switchTo === 'rich' ? ( tributingWrapperElem || tributingElem ) : origElem;
+			var actvElem = switchTo === 'rich' ? tributingElem : origElem;
+			
+			// Copy content from one element to the other
+			if(switchTo === 'rich') {
+				currentText = insertTributeTokens(origElem.value);
+				tributingElem.innerHTML = currentText;
+			}
+			else {
+				currentText = cleanTributingContent(tributingElem, true);
+				origElem.value = currentText;
+			}
+			
+			// Disable or enable contenteditable element
+			if(switchTo === 'rich') {
+				tributingElem.setAttribute('data-ignore', 'false');
+			}
+			else {
+				tributingElem.setAttribute('data-ignore', 'true');
+			}
+			
+			// Update button
+			switchElem.textContent = (switchTo === 'rich' ? 'Plain editor' : 'Rich editor');
+			switchElem.setAttribute('data-switch-to', (switchTo === 'rich' ? 'plain' : 'rich'));
+			
+			// Hide elements
+			hideElem.classList.add(hiddenClass);
+			
+			// Show elements
+			showElem.classList.remove(hiddenClass);
+			autosize.destroy(showElem);
+			autosize(showElem);
+			
+			// Focus shown element
+			actvElem.focus();
+			if(switchTo === 'rich') {
+				placeCaretAtEnd(actvElem);
+			}
+			else {
+				actvElem.setSelectionRange(currentText.length, currentText.length);
+			}
+		}
+	}
+}
+
+
 // Find inputs which use tribute.js, replace with contenteditable clones, init tribute.js on clones
 function initTribute() {
-	
 	// Get elements which use the tribute.js script, but ignore clones
-	var tributableElems = document.querySelectorAll('.any--tributable:not(.any--tributed):not(.any--tributing)');
+	var tributableElems = document.querySelectorAll('.any--tributable:not(.tributable--tributed):not(.tributable--tributing)');
 	
 	// For each tributable input, clone it as a contenteditable div
 	tributableElems.forEach(function(tributableElem, index) {
+		
+		
+		
+		// Temporary test flag: init plain tribute on textareas, but do nothing else
+		if(typeof testTribute === 'undefined' || !testTribute) {
+			plainTribute.attach(tributableElem);
+		}
+		else {
+		
+		
 		
 		// Check if original input was given focus, if so we'll move focus to clone later
 		var tributableIsFocused = document.activeElement === tributableElem;
@@ -274,37 +369,39 @@ function initTribute() {
 		// Create empty clone element (& wrap in span to fight issue where Chrome inserts divs)
 		var newElem = document.createElement('p');
 		
+		// Create wrapper element that flexes; created elem needs to be display-block to avoid divs on newline
 		var useWrapper = true;
 		var wrapperElem = document.createElement('div');
-		if(useWrapper) {
-			newElem.style.display = 'inline-block';
-			wrapperElem.style.flex = '1';
-			wrapperElem.appendChild(newElem);
-			
-			var x = document.createElement('div');
-			//x.classList.add('symbol__help');
-			x.classList.add('any--weaken');
-			x.innerHTML = '' +
-				//'keyboard shortcuts: ' +
-				'<kbd style="border:1px solid currentColor;box-shadow:inset 0 -2px 0 currentColor;border-radius:3px;padding:2px 4px;">/</kbd> artist' +
-				' &nbsp;&nbsp; ' + 
-				'<kbd style="border:1px solid currentColor;box-shadow:inset 0 -2px 0 currentColor;border-radius:3px;padding:2px 4px;">=</kbd> company' +
-				' &nbsp;&nbsp; ' + 
-				'<kbd style="border:1px solid currentColor;box-shadow:inset 0 -2px 0 currentColor;border-radius:3px;padding:2px 4px;">@</kbd> user' +
-				'';
-			wrapperElem.appendChild(x);
-			
-			var y = document.createElement('label');
-			y.classList.add('symbol__checked');
-			y.textContent = 'Switch';
-			y.style.position = 'absolute';
-			y.style.right = 0;
-			y.style.bottom = 0;
-			wrapperElem.appendChild(y);
+		wrapperElem.appendChild(newElem);
+		wrapperElem.classList.add('tributable__wrapper');
+		
+		// Generate shortcut hints & editor switcher, place within wrapper
+		// But hide hints or show only certain hints, as specified
+		var hintElem = document.createElement('div');
+		hintElem.classList.add('tributable__hints');
+		hintElem.classList.add('any--weaken-color');
+		if(tributableElem.getAttribute('data-suppress-hints') != 'true') {
+			hintElem.innerHTML = '' +
+				'<span>' +
+					(!tributableElem.hasAttribute('data-hint-only') || tributableElem.getAttribute('data-hint-only') === 'artist' ? '<span><kbd>/</kbd> artist</span> &nbsp; ' : '') +
+					(!tributableElem.hasAttribute('data-hint-only') || tributableElem.getAttribute('data-hint-only') === 'label' ? '<span><kbd>=</kbd> label</span> &nbsp; ' : '') +
+					(!tributableElem.hasAttribute('data-hint-only') || tributableElem.getAttribute('data-hint-only') === 'user' ? '<span><kbd>@</kbd> user</span>' : '') +
+				'</span>'
+			'';
 		}
+		tributableElem.parentElement.appendChild(hintElem);
 		
-		
-		
+		// Create button to switch between contenteditable and plain input, attach listener to it
+		var switchElem = document.createElement('button');
+		switchElem.classList.add('tributable__switch');
+		switchElem.classList.add('symbol__random');
+		switchElem.setAttribute('type', 'button');
+		switchElem.setAttribute('data-switch-to', 'plain');
+		switchElem.textContent = 'Plain editor';
+		hintElem.appendChild(switchElem);
+		switchElem.addEventListener('click', function(event) {
+			showHideTributingElem({ orig: tributableElem, tributing: newElem, wrapper: wrapperElem, switch: switchElem });
+		});
 		
 		// Give focus to clone if appropriate
 		if(tributableIsFocused) {
@@ -316,9 +413,10 @@ function initTribute() {
 		// Copy classes from original to clone, add tributing class, and remove unnecessary classes
 		// (Doing this to make sure we don't mess up any specific JS that targets by class name. Prob not the best method?)
 		newElem.classList = tributableElem.classList;
-		newElem.classList.add('any--tributing');
+		newElem.classList.add('tributable--tributing');
+		newElem.classList.add('tributable__container');
 		newElem.classList.forEach(function(className, index) {
-			if(className.startsWith('any') || className.startsWith('input')) {
+			if(className.startsWith('any') || className.startsWith('input') || className.startsWith('tributable')) {
 			}
 			else {
 				newElem.classList.remove(className);
@@ -328,15 +426,15 @@ function initTribute() {
 		// Set other attributes of new element
 		newElem.setAttribute('placeholder', tributableElem.getAttribute('placeholder') || '');
 		newElem.setAttribute('data-name', tributableElem.getAttribute('name'));
-		newElem.setAttribute('contenteditable', true);
+		newElem.setAttribute('contenteditable', 'false');
 		
 		// Get text of original input, insert into clone
 		var originalText = tributableElem.textContent;
 		newElem.innerHTML = originalText;
 		
 		// Hide original input, throw active class on it
-		tributableElem.style.display = 'none';
-		tributableElem.classList.add('any--tributed');
+		tributableElem.classList.add('any--hidden');
+		tributableElem.classList.add('tributable--tributed');
 		
 		// Hide original input, mark original, show contenteditable clone, insert tokens into clone
 		if(useWrapper) {
@@ -347,8 +445,9 @@ function initTribute() {
 		}
 		newElem.innerHTML = insertTributeTokens(originalText);
 		
-		// Init tribute.js on clone
-		defaultTribute.attach(newElem);
+		// Init tribute.js on clone and orig element
+		richTribute.attach(newElem);
+		plainTribute.attach(tributableElem);
 		
 		// Watch clone for paste, and remove formatting from pasted content
 		newElem.addEventListener('paste', function(event) {
@@ -376,13 +475,19 @@ function initTribute() {
 		
 		// If we're using Firefox, we need additional logic to handle moving around the tokens
 		// Actually, since Chrome doesn't quite handle cursor before the token, let's just always use this :|
-		if(isFirefox || !isFirefox) {
-			newElem.addEventListener('keydown', function(event) {
-				handleFirefoxMovement(event);
-			});
-		}
+		newElem.addEventListener('keydown', function(event) {
+			handleFirefoxMovement(event);
+		});
+	
+	
+	
+	// End test flag
+	}
+	
+	
 		
 	});
+	
 }
 
 
@@ -399,9 +504,10 @@ function handleFirefoxMovement(event) {
 	var tokenSeparator = '﻿';
 	
 	// Get our nodes and selections and stuff
-	var parentNode = event.target;
+	var targetNode = event.target;
 	var currSelection = window.getSelection();
 	var currNode = currSelection.anchorNode;
+	var parentNode = currNode.parentNode;
 	var currNodeIndex = Array.prototype.indexOf.call(parentNode.childNodes, currNode);
 	var currPosition = currSelection.anchorOffset;
 	var numNodes = parentNode.childNodes.length;
@@ -429,6 +535,28 @@ function handleFirefoxMovement(event) {
 	// Perform some tests to find where cursor is at
 	if(weCare && isCollapsed) {
 		
+		if(debugOn) {
+			console.log('----');
+			console.log('Current node: ');
+			console.log(currNode);
+			console.log('Current node length: ' + currNode.length);
+			console.log('Current position: ' + currPosition);
+			console.log('Current node index: ' + currNodeIndex);
+			console.log('Num nodes: ' + numNodes);
+			console.log('Parent node: ');
+			console.log(parentNode);
+			console.log('Previous node: ');
+			console.log(prevNode || null);
+			console.log('Next node: ');
+			console.log(nextNode || null);
+			console.log('Next node type: ' + (nextNode ? nextNode.nodeType : null));
+			console.log('Next node textContent: ' + (nextNode ? nextNode.textContent : null));
+			console.log('Next node textContent length: ' + (nextNode ? nextNode.textContent.length : null));
+			console.log('Next node = ' + tokenSeparator + '? ' + (nextNode ? nextNode.textContent === tokenSeparator : null));
+			console.log('Next next node: ');
+			console.log(nextNextNode || null);
+		}
+		
 		// Normal text events
 		if(currNode.nodeType === 3) {
 			
@@ -439,21 +567,33 @@ function handleFirefoxMovement(event) {
 			}
 			
 			// LEFT_ALT |▒<span/>▒?
-			else if(nextNode && currNode.textContent[currPosition] === tokenSeparator && currPosition + 1 === currNode.length && nextNode.classList && nextNode.classList.contains('tribute__wrapper')) {
+			else if(nextNode && currNode.textContent[currPosition] === tokenSeparator && currPosition + 1 === currNode.length && (nextNode.classList && nextNode.classList.contains('tribute__wrapper'))) {
 				cursorPositionType = 'LEFT_ALT';
 				if(debugOn) { console.log('LEFT_ALT: |▒<span/>▒?'); }
 			}
 			
+			// LEFT_FF |▒<span/>▒?
+			else if(nextNode && currPosition === currNode.textContent.length && nextNode.textContent.length === 0 && nextNextNode && nextNextNode.textContent === tokenSeparator) {
+				cursorPositionType = 'LEFT_FF';
+				if(debugOn) { console.log('LEFT_FF: |▒<span/>▒?'); }
+			}
+			
 			// RIGHT ▒?<span/>|▒?
-			else if(prevNode && currPosition === 0 && prevNode.classList && prevNode.classList.contains('tribute__wrapper')) {
+			if(prevNode && currPosition === 0 && prevNode.nodeType === 1 && prevNode.classList && prevNode.classList.contains('tribute__wrapper')) {
 				cursorPositionType = 'RIGHT';
 				if(debugOn) { console.log('RIGHT: ▒?<span/>|▒?'); }
 			}
 			
 			// RIGHT_ALT ▒?<span/>▒|
-			else if(prevNode && currPosition === 1 && currNode.textContent[0] === tokenSeparator && prevNode.classList.contains('tribute__wrapper')) {
+			else if(prevNode && currPosition === 1 && currNode.textContent[0] === tokenSeparator && prevNode.nodeType === 1 && prevNode.classList.contains('tribute__wrapper')) {
 				cursorPositionType = 'RIGHT_ALT';
 				if(debugOn) { console.log('RIGHT_ALT: ▒?<span/>▒|'); }
+			}
+			
+			// RIGHT_FF ▒?<span/>▒|
+			else if(prevNode && currPosition === 0 && prevNode.textContent.length === 0 && prevPrevNode && prevPrevNode.textContent === tokenSeparator) {
+				cursorPositionType = 'RIGHT_FF';
+				if(debugOn) { console.log('RIGHT_FF: ▒?<span/>▒|'); }
 			}
 			
 		}
@@ -468,7 +608,7 @@ function handleFirefoxMovement(event) {
 			}
 			
 			// INSIDE_ALT ▒?<sp<sp|an>an/>▒
-			else if(currNode.classList.contains('any__tribute-inner') || currNode.classList.contains('any__tribute') || currNode.classList.contains('tribute__container')) {
+			else if(currNode.classList.contains('tribute__text') || currNode.classList.contains('tribute__display') || currNode.classList.contains('tribute__container')) {
 				cursorPositionType = 'INSIDE_ALT';
 				if(debugOn) { console.log('INSIDE_ALT: .▒?<sp<sp|an>an/>▒?'); }
 			}
@@ -494,21 +634,132 @@ function handleFirefoxMovement(event) {
 			}
 		}
 		
+		// Move [LEFT_FF] -> LEFT
+		else if(cursorPositionType === 'LEFT_FF') {
+			if(keyPressed === 'Delete' || keyPressed === 'ArrowRight') {
+				currSelection.collapse(nextNextNode, nextNextNode.length);
+				handleFirefoxMovement(event);
+			}
+		}
+		
 		// Move [RIGHT_ALT] -> RIGHT
-		if(cursorPositionType === 'RIGHT_ALT') {
+		else if(cursorPositionType === 'RIGHT_ALT') {
 			if(keyPressed === 'ArrowLeft' || keyPressed === 'Backspace') {
 				currSelection.collapse(currNode, 0);
 				handleFirefoxMovement(event);
 			}
 		}
 		
+		// Move [RIGHT_FF] -> RIGHT
+		else if(cursorPositionType === 'RIGHT_FF') {
+			if(keyPressed === 'ArrowLeft' || keyPressed === 'Backspace') {
+				currSelection.collapse(prevPrevNode, 0);
+				handleFirefoxMovement(event);
+			}
+		}
+		
 		// Move [INSIDE_ALT] -> INSIDE
-		if(cursorPositionType === 'INSIDE_ALT') {
+		else if(cursorPositionType === 'INSIDE_ALT') {
 			currSelection.collapse(currNode.parentNode, 0);
 			handleFirefoxMovement(event);
 		}
 		
-		// Move [INSIDE] -> LEFT or RIGHT
+		// Operations from LEFT position
+		if(cursorPositionType === 'LEFT') {
+			
+			// Left or Backspace at [LEFT]
+			if(keyPressed === 'ArrowLeft' || keyPressed === 'Backspace') {
+				// If previous character ▒, include that
+				if(currNode.textContent[currNode.length - 1] === tokenSeparator) {
+					currSelection.collapse(currNode, currNode.length - 1);
+				}
+			}
+			
+			// Right at [LEFT]
+			else if(keyPressed === 'ArrowRight') {
+				if(nextNextNode) {
+					currSelection.collapse(nextNextNode, 0);
+				}
+				else {
+					currSelection.collapse(currNode, currNode.length);
+				}
+			}
+			
+			// Delete at [LEFT]
+			// If right after newline, and token followed by text node, cursor moves up for some reason
+			// Could maybe stop Delete and trigger Backspace, but too complicated to worry about for now
+			else if(keyPressed === 'Delete') {
+				// If previous character ▒, include that
+				if(currNode.textContent[currNode.length - 1] === tokenSeparator) {
+					currSelection.collapse(currNode, currNode.length - 1);
+				}
+				
+				// If character after span is ▒, include that
+				if(nextNextNode) {
+					if(nextNextNode.textContent[0] === tokenSeparator) {
+						currSelection.extend(nextNextNode, 1);
+					}
+					else {
+						currSelection.extend(nextNextNode, 0);
+					}
+				}
+				else {
+					currSelection.extend(nextNode, nextNode.length);
+				}
+			}
+			
+		}
+		
+		// Operations at RIGHT position
+		else if(cursorPositionType === 'RIGHT') {
+			
+			// Left at [RIGHT]
+			if(keyPressed === 'ArrowLeft') {
+				if(prevPrevNode) {
+					if(prevPrevNode.textContent[prevPrevNode.length] === tokenSeparator) {
+						currSelection.collapse(prevPrevNode, prevPrevNode.length - 1);
+					}
+					else {
+						currSelection.collapse(prevPrevNode, prevPrevNode.length);
+					}
+				}
+				else {
+					currSelection.collapse(prevNode, 0);
+				}
+			}
+			
+			// Backspace at [RIGHT]
+			else if(keyPressed === 'Backspace') {
+				if(currNode.textContent[0] === tokenSeparator) {
+					currSelection.collapse(currNode, 1);
+				}
+				else {
+					currSelection.collapse(currNode, 0);
+				}
+				
+				if(prevPrevNode) {
+					if(prevPrevNode.textContent[prevPrevNode.length - 1] === tokenSeparator) {
+						currSelection.extend(prevPrevNode, prevPrevNode.length - 1);
+					}
+					else {
+						currSelection.extend(prevPrevNode, prevPrevNode.length);
+					}
+				}
+				else {
+					currSelection.extend(prevNode, 0);
+				}
+			}
+			
+			// Right or Delete at [RIGHT]
+			else if(keyPressed === 'ArrowRight' || keyPressed === 'Delete') {
+				if(currNode.textContent[0] === tokenSeparator) {
+					currSelection.collapse(currNode, 1);
+				}
+			}
+			
+		}
+		
+		// Operations from INSIDE position
 		if(cursorPositionType === 'INSIDE') {
 			if(keyPressed === 'ArrowLeft' || keyPressed === 'Delete') {
 				if(prevNode) {
@@ -531,90 +782,32 @@ function handleFirefoxMovement(event) {
 			handleFirefoxMovement(event);
 		}
 		
-		// Left or Backspace at [LEFT]
-		if(cursorPositionType === 'LEFT' && (keyPressed === 'ArrowLeft' || keyPressed === 'Backspace')) {
-			// If previous character ▒, include that
-			if(currNode.textContent[currNode.length - 1] === tokenSeparator) {
-				currSelection.collapse(currNode, currNode.length - 1);
-			}
-		}
+	}
+	
+	// For Firefox only (...) capture enter and force it to do newline
+	// instead of br (and since element is p, divs are prevented); there are too many issues
+	// with navigating around brs, and too many issues handling nav around tokens with divs
+	else if(isFirefox && keyPressed === 'Enter') {
 		
-		// Right at [LEFT]
-		if(cursorPositionType === 'LEFT' && keyPressed === 'ArrowRight') {
-			if(nextNextNode) {
-				currSelection.collapse(nextNextNode, 0);
-			}
-			else {
-				currSelection.collapse(currNode, currNode.length);
-			}
-		}
-		
-		// Delete at [LEFT]
-		// If right after newline, and token followed by text node, cursor moves up for some reason
-		// Could maybe stop Delete and trigger Backspace, but too complicated to worry about for now
-		if(cursorPositionType === 'LEFT' && keyPressed === 'Delete') {
-			// If previous character ▒, include that
-			if(currNode.textContent[currNode.length - 1] === tokenSeparator) {
-				currSelection.collapse(currNode, currNode.length - 1);
-			}
+		// If tribute menu is open, allow enter to work as normal
+		if(!richTribute.isActive) {
 			
-			// If character after span is ▒, include that
-			if(nextNextNode) {
-				if(nextNextNode.textContent[0] === tokenSeparator) {
-					currSelection.extend(nextNextNode, 1);
-				}
-				else {
-					currSelection.extend(nextNextNode, 0);
-				}
-			}
-			else {
-				currSelection.extend(nextNode, nextNode.length);
-			}
-		}
-		
-		// Left at [RIGHT]
-		if(cursorPositionType === 'RIGHT' && keyPressed === 'ArrowLeft') {
-			if(prevPrevNode) {
-				if(prevPrevNode.textContent[prevPrevNode.length] === tokenSeparator) {
-					currSelection.collapse(prevPrevNode, prevPrevNode.length - 1);
-				}
-				else {
-					currSelection.collapse(prevPrevNode, prevPrevNode.length);
-				}
-			}
-			else {
-				currSelection.collapse(prevNode, 0);
+			// If it's possible to get a range here, get the range, then add text node with break
+			// Since cursor won't move to new line, add another empty node, and put cursor there
+			if(currSelection.getRangeAt && currSelection.rangeCount) {
+				
+				event.preventDefault();
+				
+				var breakRange = currSelection.getRangeAt(0);
+				var breakNode = document.createTextNode('\n');
+				var cursorNode = document.createTextNode('');
+				
+				// Insert them reverse, since they're inserted where the cursor currently is
+				breakRange.insertNode(cursorNode);
+				breakRange.insertNode(breakNode);
+				
+				currSelection.collapse(cursorNode, 0);
 			}
 		}
-		
-		// Backspace at [RIGHT]
-		if(cursorPositionType === 'RIGHT' && keyPressed === 'Backspace') {
-			if(currNode.textContent[0] === tokenSeparator) {
-				currSelection.collapse(currNode, 1);
-			}
-			else {
-				currSelection.collapse(currNode, 0);
-			}
-
-			if(prevPrevNode) {
-				if(prevPrevNode.textContent[prevPrevNode.length - 1] === tokenSeparator) {
-					currSelection.extend(prevPrevNode, prevPrevNode.length - 1);
-				}
-				else {
-					currSelection.extend(prevPrevNode, prevPrevNode.length);
-				}
-			}
-			else {
-				currSelection.extend(prevNode, 0);
-			}
-		}
-		
-		// Right or Delete at [RIGHT]
-		if(cursorPositionType === 'RIGHT' && (keyPressed === 'ArrowRight' || keyPressed === 'Delete')) {
-			if(currNode.textContent[0] === tokenSeparator) {
-				currSelection.collapse(currNode, 1);
-			}
-		}
-		
 	}
 }
