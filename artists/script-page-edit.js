@@ -54,7 +54,7 @@ $(".edit__delete-musician").each(function() {
 
 // Preview bio
 previewBio($(".edit__history"), $(".edit__history-preview"), $("[name=id]").val());
-$(".edit__history").on("keyup", function(event) {
+$(".edit__history").on("change", function(event) {
 	previewBio($(this), $(".edit__history-preview"), $("[name=id]").val());
 });
 

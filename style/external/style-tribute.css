@@ -1,16 +1,16 @@
 .tribute-container {
 	background: hsl(var(--background--bold));
 	border: 2px solid hsl(var(--interactive--secondary));
-  display: block;
-  height: auto;
+	display: block;
+	height: auto;
 	left: 0;
-  max-height: 300px;
-  max-width: 500px;
-  overflow: auto;
+	max-height: 300px;
+	max-width: 500px;
+	overflow: auto;
 	padding: 0.25rem;
 	position: absolute;
 	top: 0;
-  z-index: 999999;
+	z-index: 999999;
 }
 .tribute-container ul {
 	margin: 0;
@@ -32,4 +32,67 @@
 .tribute-container li span, .tribute-container .menu-highlighted {
 	background: hsl(var(--background));
 	color: hsl(var(--attention--secondary));
+}
+
+/* Wrapper around generated textarea/input */
+.tributable__wrapper {
+	flex: 1;
+}
+/* Generated textarea/input */
+.tributable__container {
+	cursor: text;
+	display: inline-block; /* Disable div creation within contenteditable element */
+}
+.tributable__container.input__textarea {
+	height: auto;
+	min-height: 3rem;
+	overflow: auto;
+	resize: vertical;
+	white-space: pre-wrap;
+	width: 100%;
+}
+.tributable__container:empty:before {
+	content: attr(placeholder);
+	display: block; /* For Firefox */
+	opacity: 0.65;
+}
+.tribute__text {
+	font-size: 0;
+}
+.tribute__display::before, .tribute__display::after {
+	font-size: 1rem;
+}
+.tribute__display::after {
+	content: attr(data-text);
+}
+.tribute__display {
+	background: rgba(0,0,0, 0.1);
+	border-radius: 2px;
+	display: inline-block;
+	margin-bottom: 2px;
+	padding: 0 4px;
+	white-space: normal;
+}
+.tributable__hints {
+	align-items: flex-start;
+	display: flex;
+	margin-left: 0.5rem;
+	overflow: hidden;
+	padding: 0.5rem 0;
+	width: 100%;
+}
+.tributable__hints span span {
+	display: inline-block;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.tributable__switch {
+	margin: -2px 0 0 auto;
+	opacity: 0.75;
+	white-space: nowrap;
+}
+.tributable__switch:hover {
+	opacity: 1;
 }

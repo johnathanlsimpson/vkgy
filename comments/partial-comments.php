@@ -1,6 +1,7 @@
 <?php
 	script([
 		'/scripts/external/script-tribute.js',
+		'/scripts/script-autosize.js',
 		'/scripts/script-initTribute.js',
 		'/scripts/script-signIn.js',
 		'/comments/script-update.js',

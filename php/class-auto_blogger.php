@@ -320,10 +320,19 @@
 							if($stmt_add->execute([ $title, $friendly, $post, $image_id, $user_id ])) {
 								$blog_id = $this->pdo->lastInsertId();
 								
+								// Associate blog with image
+								if(is_numeric($image_id)) {
+									$sql_image = 'INSERT INTO images_blog (blog_id, image_id) VALUES (?, ?)';
+									$stmt_image = $this->pdo->prepare($sql_image);
+									$stmt_image->execute([ $blog_id, $image_id ]);
+								}
+								
+								// Tag entry
 								$sql_tags = 'INSERT INTO blog_tags (blog_id, tag_id, user_id) VALUES (?, ?, ?), (?, ?, ?)';
 								$stmt_tags = $this->pdo->prepare($sql_tags);
 								$stmt_tags->execute([ $blog_id, $this->blog_tags['auto-generated'], $_SESSION['userID'], $blog_id, $this->blog_tags[$tag], $_SESSION['userID'] ]);
 								
+								// Tag artists in entry
 								$sql_artist_tags = 'INSERT INTO blog_artists (blog_id, artist_id, user_id) VALUES (?, ?, ?)';
 								$stmt_artist_tags = $this->pdo->prepare($sql_artist_tags);
 								$stmt_artist_tags->execute([ $blog_id, $artist_id, $_SESSION['userID'] ]);

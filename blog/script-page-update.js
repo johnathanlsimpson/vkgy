@@ -19,10 +19,8 @@ function previewEntry() {
 
 previewEntry();
 
-var typingTimer;
-$("[name=content]").on("input propertychange paste", function() {
-	clearTimeout(typingTimer);
-	typingTimer = setTimeout(previewEntry, 200);
+$("[name=content]").on("input propertychange paste change", function() {
+	previewEntry();
 });
 
 // Init inputmask() on appropriate elements

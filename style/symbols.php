@@ -93,7 +93,7 @@
 				-webkit-clip-path: url(#symbol__musician);
 				will-change: transform;
 			}
-			.company::before, .text a[href^="/labels/"]:not([href$="/labels/"])::before {
+			.company::before {
 				clip-path: url(#symbol__company);
 				-webkit-clip-path: url(#symbol__company);
 				will-change: transform;

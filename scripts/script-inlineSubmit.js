@@ -86,7 +86,26 @@ function submit(formElement, processorUrl, inputArgs) {
 	for(var key in args.preparedFormData) {
 		formData.append(key, args.preparedFormData[key]);
 	}
-		
+	
+	// For any tributable elements which generated contenteditable clones,
+	var tributableElems = formElement[0].querySelectorAll('.any--tributable:not(.tributable--tributing)');
+	
+	// Make sure that the clone's text is put into the appropriate formData value
+	if(tributableElems.length) {
+		tributableElems.forEach(function(tributableElem, index) {
+			var tributableElemName = tributableElem.getAttribute('name');
+			var tributingElem = formElement[0].querySelector('.tributable--tributing[data-name="' + tributableElemName + '"]');
+			
+			if(tributingElem && tributingElem.getAttribute('data-ignore') != 'true') {
+				if(typeof cleanTributingContent === 'function') {
+					var cleanedOutput = cleanTributingContent(tributingElem);
+					
+					formData.set(tributableElemName, cleanedOutput);
+				}
+			}
+		});
+	}
+	
 	$.ajax({
 		url:         processorUrl,
 		data:        formData,
