@@ -88,15 +88,15 @@ function submit(formElement, processorUrl, inputArgs) {
 	}
 	
 	// For any tributable elements which generated contenteditable clones,
-	var tributableElems = formElement[0].querySelectorAll('.any--tributable:not(.any--tributing)');
+	var tributableElems = formElement[0].querySelectorAll('.any--tributable:not(.tributable--tributing)');
 	
 	// Make sure that the clone's text is put into the appropriate formData value
 	if(tributableElems.length) {
 		tributableElems.forEach(function(tributableElem, index) {
 			var tributableElemName = tributableElem.getAttribute('name');
-			var tributingElem = formElement[0].querySelector('.any--tributing[data-name="' + tributableElemName + '"]');
+			var tributingElem = formElement[0].querySelector('.tributable--tributing[data-name="' + tributableElemName + '"]');
 			
-			if(tributingElem) {
+			if(tributingElem && tributingElem.getAttribute('data-ignore') != 'true') {
 				if(typeof cleanTributingContent === 'function') {
 					var cleanedOutput = cleanTributingContent(tributingElem);
 					
