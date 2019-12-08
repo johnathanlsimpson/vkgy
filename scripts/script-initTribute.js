@@ -87,6 +87,7 @@ function insertTributeTokens(inputString) {
 				replacedMatches.push(fullMatch);
 			}
 		}
+		
 	});
 	
 	return inputString;
@@ -250,8 +251,7 @@ var plainTribute = new Tribute({
 
 
 // Clean up content from a tributing element before sending somewhere else
-function cleanTributingContent(tributingElem, fullClean = true) {
-	
+function cleanTributingContent(tributingElem, args = []) {
 	// Clean output
 	var cleanedOutput = tributingElem.innerHTML;
 	var dummyElem = document.createElement('p');
@@ -266,19 +266,11 @@ function cleanTributingContent(tributingElem, fullClean = true) {
 	
 	// Then we have to clean up the textContent and replace hard spaces with normal
 	// And remove any VeryThinSpace's, which may or may not be used to prevent bugs with tribute.js
-	if(fullClean) {
+	if(args.fullClean) {
 		cleanedOutput = dummyElem.textContent;
 		cleanedOutput = cleanedOutput.replace(/&nbsp;|\u00a0/g, ' ');
-		cleanedOutput = cleanedOutput.replace(/▨|﻿| |&VeryThinSpace;|&#8202;|&#x200A;/g, '');
+		cleanedOutput = cleanedOutput.replace(/﻿| |&VeryThinSpace;|&#8202;|&#x200A;/g, '');
 		cleanedOutput = cleanedOutput.replace(/ +/g, ' ');
-		
-		// Chrome seems to insert a linebreak at the end of input, prob to keep element from collapsing
-		// If we purposely put a newline there, there should be 2, so it should be safe to remove last one
-		if(isChrome) {
-			if(cleanedOutput.charCodeAt(cleanedOutput.length - 1) === 10) {
-				cleanedOutput = cleanedOutput.substr(0, cleanedOutput.length - 1);
-			}
-		}
 	}
 	
 	return cleanedOutput;
@@ -314,7 +306,7 @@ function showHideTributingElem(args) {
 				tributingElem.innerHTML = currentText;
 			}
 			else {
-				currentText = cleanTributingContent(tributingElem, true);
+				currentText = cleanTributingContent(tributingElem, { fullClean: true });
 				origElem.value = currentText;
 			}
 			
@@ -442,14 +434,18 @@ function initTribute() {
 		tributableElem.classList.add('any--hidden');
 		tributableElem.classList.add('tributable--tributed');
 		
-		// Hide original input, mark original, show contenteditable clone, insert tokens into clone
+		// Hide original input, mark original, show contenteditable clone
 		if(useWrapper) {
 			tributableElem.parentNode.insertBefore(wrapperElem, tributableElem);
 		}
 		else {
 			tributableElem.parentNode.insertBefore(newElem, tributableElem);
 		}
+		
+		// Parse originalText and insert tokens
+		// Then add br; otherwise, Chrome will add a newline, which isn't visible, but affects text
 		newElem.innerHTML = insertTributeTokens(originalText);
+		newElem.appendChild(document.createElement('br'));
 		
 		// Init tribute.js on clone and orig element
 		richTribute.attach(newElem);
@@ -474,7 +470,7 @@ function initTribute() {
 		var elemNeedsPreview = tributableElem.dataset.isPreviewed;
 		if(elemNeedsPreview) {
 			newElem.addEventListener('keyup', debounce(() => {
-				tributableElem.value = cleanTributingContent(newElem, true);
+				tributableElem.value = cleanTributingContent(newElem, { fullClean: true, removeTrailingSpace: true });
 				tributableElem.dispatchEvent(new Event('change'));
 			}, 350));
 		}

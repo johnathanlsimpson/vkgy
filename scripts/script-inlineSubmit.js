@@ -98,7 +98,7 @@ function submit(formElement, processorUrl, inputArgs) {
 			
 			if(tributingElem && tributingElem.getAttribute('data-ignore') != 'true') {
 				if(typeof cleanTributingContent === 'function') {
-					var cleanedOutput = cleanTributingContent(tributingElem, true);
+					var cleanedOutput = cleanTributingContent(tributingElem, { fullClean: true, removeTrailingSpace: true });
 					formData.set(tributableElemName, cleanedOutput);
 				}
 			}
