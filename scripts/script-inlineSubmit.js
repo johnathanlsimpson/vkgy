@@ -98,8 +98,7 @@ function submit(formElement, processorUrl, inputArgs) {
 			
 			if(tributingElem && tributingElem.getAttribute('data-ignore') != 'true') {
 				if(typeof cleanTributingContent === 'function') {
-					var cleanedOutput = cleanTributingContent(tributingElem);
-					
+					var cleanedOutput = cleanTributingContent(tributingElem, true);
 					formData.set(tributableElemName, cleanedOutput);
 				}
 			}

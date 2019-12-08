@@ -83,10 +83,6 @@ function insertTributeTokens(inputString) {
 			// Splitting and rejoining since replace only grabs first, and using regex here is a mess
 			if(!replacedMatches.includes(fullMatch)) {
 				inputString = inputString.split(fullMatch).join(matchReplacement);
-				//inputString = inputString.split('\n<span').join('\n&VeryThinSpace;<span');
-				//inputString = inputString.split(/^<span/g).join('▒<span');
-				//inputString = inputString.split('\n<span').join('\n▒<span');
-				//inputString = inputString.split(/<\/span>$/g).join('</span>▒');
 				replacedMatches.push(fullMatch);
 			}
 		}
@@ -271,8 +267,9 @@ function cleanTributingContent(tributingElem, fullClean = true) {
 	// And remove any VeryThinSpace's, which may or may not be used to prevent bugs with tribute.js
 	if(fullClean) {
 		cleanedOutput = dummyElem.textContent;
-		cleanedOutput = cleanedOutput.replace(/&nbsp;/g, ' ');
-		cleanedOutput = cleanedOutput.replace(/﻿| |&VeryThinSpace;|&#8202;|&#x200A;/g, '');
+		cleanedOutput = cleanedOutput.replace(/&nbsp;|\u00a0/g, ' ');
+		cleanedOutput = cleanedOutput.replace(/▨|﻿| |&VeryThinSpace;|&#8202;|&#x200A;/g, '');
+		cleanedOutput = cleanedOutput.replace(/ +/g, ' ');
 	}
 	
 	return cleanedOutput;
@@ -468,7 +465,7 @@ function initTribute() {
 		var elemNeedsPreview = tributableElem.dataset.isPreviewed;
 		if(elemNeedsPreview) {
 			newElem.addEventListener('keyup', debounce(() => {
-				tributableElem.value = cleanTributingContent(newElem);
+				tributableElem.value = cleanTributingContent(newElem, true);
 				tributableElem.dispatchEvent(new Event('change'));
 			}, 400));
 		}
