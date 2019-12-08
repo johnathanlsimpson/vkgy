@@ -476,7 +476,7 @@ function initTribute() {
 			newElem.addEventListener('keyup', debounce(() => {
 				tributableElem.value = cleanTributingContent(newElem, true);
 				tributableElem.dispatchEvent(new Event('change'));
-			}, 400));
+			}, 350));
 		}
 		
 		// If we're using Firefox, we need additional logic to handle moving around the tokens
