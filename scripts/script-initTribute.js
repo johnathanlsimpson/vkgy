@@ -1,6 +1,7 @@
 // Firefox doesn't properly handle breaks within contenteditable, deletion of tokens, backspacing of tokens, cursor around tokens, etc
 // Wasn't able to find a pratical solution for handling all of these issues, so just disabling for FF.
 var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+var isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
 
 
 // Shim for matchAll, from https://stackoverflow.com/questions/432493/
@@ -270,6 +271,14 @@ function cleanTributingContent(tributingElem, fullClean = true) {
 		cleanedOutput = cleanedOutput.replace(/&nbsp;|\u00a0/g, ' ');
 		cleanedOutput = cleanedOutput.replace(/▨|﻿| |&VeryThinSpace;|&#8202;|&#x200A;/g, '');
 		cleanedOutput = cleanedOutput.replace(/ +/g, ' ');
+		
+		// Chrome seems to insert a linebreak at the end of input, prob to keep element from collapsing
+		// If we purposely put a newline there, there should be 2, so it should be safe to remove last one
+		if(isChrome) {
+			if(cleanedOutput.charCodeAt(cleanedOutput.length - 1) === 10) {
+				cleanedOutput = cleanedOutput.substr(0, cleanedOutput.length - 1);
+			}
+		}
 	}
 	
 	return cleanedOutput;
