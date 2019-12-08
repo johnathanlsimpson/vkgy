@@ -33,21 +33,39 @@
 	background: hsl(var(--background));
 	color: hsl(var(--attention--secondary));
 }
-.any--tributing:empty:before {
+
+/* Wrapper around generated textarea/input */
+.tributable__wrapper {
+	flex: 1;
+}
+/* Generated textarea/input */
+.tributable__container {
+	cursor: text;
+	display: inline-block; /* Disable div creation within contenteditable element */
+}
+.tributable__container.input__textarea {
+	height: auto;
+	min-height: 3rem;
+	overflow: auto;
+	resize: vertical;
+	white-space: pre-wrap;
+	width: 100%;
+}
+.tributable__container:empty:before {
 	content: attr(placeholder);
 	display: block; /* For Firefox */
 	opacity: 0.65;
 }
-.any--tributing .any__tribute-inner {
+.tribute__text {
 	font-size: 0;
 }
-.any--tributing .any__tribute::before, [contenteditable] .any__tribute::after {
+.tribute__display::before, .tribute__display::after {
 	font-size: 1rem;
 }
-.any--tributing .any__tribute::after {
+.tribute__display::after {
 	content: attr(data-text);
 }
-.any__tribute {
+.tribute__display {
 	background: rgba(0,0,0, 0.1);
 	border-radius: 2px;
 	display: inline-block;
@@ -55,15 +73,26 @@
 	padding: 0 4px;
 	white-space: normal;
 }
-.any--tributing {
-	cursor: text;
-	flex: 1;
-}
-.any--tributing.input__textarea {
-	height: auto;
-	min-height: 3rem;
-	overflow: auto;
-	resize: vertical;
-	white-space: pre-wrap;
+.tributable__hints {
+	align-items: flex-start;
+	display: flex;
+	margin-left: 0.5rem;
+	overflow: hidden;
+	padding: 0.5rem 0;
 	width: 100%;
+}
+.tributable__hints span span {
+	display: inline-block;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.tributable__switch {
+	margin: -2px 0 0 auto;
+	opacity: 0.75;
+	white-space: nowrap;
+}
+.tributable__switch:hover {
+	opacity: 1;
 }
