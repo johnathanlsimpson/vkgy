@@ -1,3 +1,6 @@
+// Call autosize() on textareas
+autosize($(".autosize"));
+
 class CommentHandler {
 	constructor() {
 		// Get username from signed-in element at top of page. Doesn't actually go into DB or anything, just for visual of adding new comment.
@@ -222,6 +225,9 @@ class CommentHandler {
 			commentContainer.querySelector('.commentate__content').focus();
 		}
 		
+		// Call autosize() on textareas
+		autosize($(".autosize"));
+		
 		// Re-initialized Tribute.js
 		setTimeout(function() {
 			initTribute();
@@ -279,6 +285,9 @@ class CommentHandler {
 		// Append new comment/commentate container to parent and focus
 		threadContainer.appendChild(newCommentTemplate);
 		threadContainer.querySelector('.comment__container:last-of-type .commentate__content').focus();
+		
+		// Call autosize() on textareas
+		autosize($(".autosize"));
 		
 		// Re-initialized Tribute.js
 		setTimeout(function() {
