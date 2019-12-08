@@ -127,12 +127,12 @@
 													<label class="input__label">
 														Label history
 													</label>
-													<textarea class="autoresize any--flex-grow input__textarea any--tributable" name="label_history" placeholder="(1)&#10;(1), (2)&#10;(3) (management only)"><?php echo $artist["label_history"]; ?></textarea>
+													<textarea class="autoresize any--flex-grow input__textarea any--tributable" data-hint-only="label" name="label_history" placeholder="(1)&#10;(1), (2)&#10;(3) (management only)"><?php echo $artist["label_history"]; ?></textarea>
 												</div>
 											</div>
-											<div class="any--weaken-color" style="padding-top: 1rem;"><span class="symbol__help"></span>
+											<!--<div class="any--weaken-color" style="padding-top: 1rem;"><span class="symbol__help"></span>
 												This section has been updated with autocomplete: type <code>=</code> to activate. Or type the ID of the label like so: <code>{123}</code>. See the <a href="/documentation/markdown/">documentation</a> for details.
-											</div>
+											</div>-->
 										</li>
 										<li>
 											<div class="input__row">
