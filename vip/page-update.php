@@ -40,7 +40,7 @@
 							<div class="input__row">
 								<div class="input__group any--flex-grow">
 									<label class="input__label">Entry</label>
-									<textarea class="autosize input__textarea any--flex-grow any--tributable" name="content" placeholder="your entry here"><?php echo $entry["content"]; ?></textarea>
+									<textarea class="autosize input__textarea any--flex-grow any--tributable" data-is-previewed="true" name="content" placeholder="your entry here"><?php echo $entry["content"]; ?></textarea>
 								</div>
 							</div>
 

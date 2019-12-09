@@ -1,6 +1,7 @@
 // Firefox doesn't properly handle breaks within contenteditable, deletion of tokens, backspacing of tokens, cursor around tokens, etc
 // Wasn't able to find a pratical solution for handling all of these issues, so just disabling for FF.
 var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+var isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
 
 
 // Shim for matchAll, from https://stackoverflow.com/questions/432493/
@@ -83,13 +84,10 @@ function insertTributeTokens(inputString) {
 			// Splitting and rejoining since replace only grabs first, and using regex here is a mess
 			if(!replacedMatches.includes(fullMatch)) {
 				inputString = inputString.split(fullMatch).join(matchReplacement);
-				//inputString = inputString.split('\n<span').join('\n&VeryThinSpace;<span');
-				//inputString = inputString.split(/^<span/g).join('▒<span');
-				//inputString = inputString.split('\n<span').join('\n▒<span');
-				//inputString = inputString.split(/<\/span>$/g).join('</span>▒');
 				replacedMatches.push(fullMatch);
 			}
 		}
+		
 	});
 	
 	return inputString;
@@ -253,8 +251,7 @@ var plainTribute = new Tribute({
 
 
 // Clean up content from a tributing element before sending somewhere else
-function cleanTributingContent(tributingElem, fullClean = true) {
-	
+function cleanTributingContent(tributingElem, args = []) {
 	// Clean output
 	var cleanedOutput = tributingElem.innerHTML;
 	var dummyElem = document.createElement('p');
@@ -269,10 +266,11 @@ function cleanTributingContent(tributingElem, fullClean = true) {
 	
 	// Then we have to clean up the textContent and replace hard spaces with normal
 	// And remove any VeryThinSpace's, which may or may not be used to prevent bugs with tribute.js
-	if(fullClean) {
+	if(args.fullClean) {
 		cleanedOutput = dummyElem.textContent;
-		cleanedOutput = cleanedOutput.replace(/&nbsp;/g, ' ');
+		cleanedOutput = cleanedOutput.replace(/&nbsp;|\u00a0/g, ' ');
 		cleanedOutput = cleanedOutput.replace(/﻿| |&VeryThinSpace;|&#8202;|&#x200A;/g, '');
+		cleanedOutput = cleanedOutput.replace(/ +/g, ' ');
 	}
 	
 	return cleanedOutput;
@@ -308,7 +306,7 @@ function showHideTributingElem(args) {
 				tributingElem.innerHTML = currentText;
 			}
 			else {
-				currentText = cleanTributingContent(tributingElem, true);
+				currentText = cleanTributingContent(tributingElem, { fullClean: true });
 				origElem.value = currentText;
 			}
 			
@@ -436,14 +434,18 @@ function initTribute() {
 		tributableElem.classList.add('any--hidden');
 		tributableElem.classList.add('tributable--tributed');
 		
-		// Hide original input, mark original, show contenteditable clone, insert tokens into clone
+		// Hide original input, mark original, show contenteditable clone
 		if(useWrapper) {
 			tributableElem.parentNode.insertBefore(wrapperElem, tributableElem);
 		}
 		else {
 			tributableElem.parentNode.insertBefore(newElem, tributableElem);
 		}
+		
+		// Parse originalText and insert tokens
+		// Then add br; otherwise, Chrome will add a newline, which isn't visible, but affects text
 		newElem.innerHTML = insertTributeTokens(originalText);
+		newElem.appendChild(document.createElement('br'));
 		
 		// Init tribute.js on clone and orig element
 		richTribute.attach(newElem);
@@ -468,9 +470,9 @@ function initTribute() {
 		var elemNeedsPreview = tributableElem.dataset.isPreviewed;
 		if(elemNeedsPreview) {
 			newElem.addEventListener('keyup', debounce(() => {
-				tributableElem.value = cleanTributingContent(newElem);
+				tributableElem.value = cleanTributingContent(newElem, { fullClean: true, removeTrailingSpace: true });
 				tributableElem.dispatchEvent(new Event('change'));
-			}, 400));
+			}, 350));
 		}
 		
 		// If we're using Firefox, we need additional logic to handle moving around the tokens

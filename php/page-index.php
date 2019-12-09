@@ -391,7 +391,7 @@
 			var sc_security="59674422";
 		</script>
 		<script language="javascript" src="//www.statcounter.com/counter/counter.js" type="text/javascript"></script>
-		<script language="javascript"><?= $_SESSION['username'] === 'inartistic' ? 'var testTribute = "true";' : null; ?>;</script>
+		<script language="javascript"><?= $_SESSION['is_vip'] ? 'var testTribute = "true";' : null; ?>;</script>
 		<?php
 			include_once("../style/symbols.php");
 		?>

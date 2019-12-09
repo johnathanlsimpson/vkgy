@@ -1,28 +1,64 @@
 <?php
 include_once('../php/include.php');
 
+// Given song title, clean up and escape for output in a json list
+function clean_song_title($input) {
+	$input = preg_replace("/"."\s+"."/u", " ", $input);
+	$input = preg_replace("/"."^[\s\n\t]*(.+?)[\s\n\t]*$"."/", "$1", $input);
+	$input = preg_replace("/"."^\s*(.+?)\s*$"."/u", "$1", $input);
+	$input = str_replace("&#92;", "\\", $input);
+	$input = str_replace(["\\(", "\\)"], ["\\\\&#40;", "\\\\&#41;"], $input);
+	$input = sanitize($input);
+	$input = str_replace(["&#65374;", "&#8764;", "&#8765;", "&#12316;"], "~", $input);
+	$input = str_replace(["&#65378;", "&#65379;", "&#65339;", "&#65341;", "&#65288;", "&#65289;"], ["&#12300;", "&#12301;", "[", "]", "(", ")"], $input);
+	$input = preg_replace("/"."(.*?)\"(.+?)\"(.*?)"."/", "$1&ldquo;$2&rdquo;$3", $input);
+	$input = preg_replace("/"."(.*?)&#34;(.+?)&#34;(.*?)"."/", "$1&ldquo;$2&rdquo;$3", $input);
+	$input = preg_replace("/"."(\(.+\))"."/", "", $input);
+	$input = preg_replace("/"."^ (.*)"."/", "$1", $input);
+	$input = preg_replace("/"."(.*?) $"."/", "$1", $input);
+	$input = preg_replace("/"."(.*?) \\$"."/", "$1", $input);
+	return $input;
+}
+
 // Set access functions if necessary
 $access_artist = $access_artist ?: new access_artist($pdo);
 $access_label = $access_label ?: new access_label($pdo);
 $access_musician = $access_musician ?: new access_musician($pdo);
 $access_release = $access_release ?: new access_release($pdo);
 
+// Grab data of a certain type and output it as a json object
 function render_json_list($input_type, $input = null, $input_id_type = null, $include_friendly = null, $first_option_id = null) {
 	global $pdo;
 	global $access_artist, $access_label, $access_musician, $access_release;
 	global $artist_list, $label_list, $musician_list, $release_list;
 	global $list_is_rendered;
 	
-	// Check if already called
+	// Check if list was already generated
 	if(!$list_is_rendered[$input_type]) {
 		$list_is_rendered[$input_type] = true;
 		
-		// If not given array, get data
+		// If provided array of data, do nothing, and format it later
 		if(is_array($input)) {
 		}
+		
+		// If given ID and data type, get data for that ID
 		elseif(!is_array($input) && is_numeric($input) && strlen($input_type)) {
-			$input = ${'access_' . $input_type}->{'access_' . $input_type}([ $input_id_type => $input, 'get' => 'name' ]);
+			
+			// If given artist ID and type is songs, do a manual search for all tracks by that artist
+			if($input_type === 'song') {
+				$sql_songs = 'SELECT id, name, romaji FROM releases_tracklists WHERE artist_id=? GROUP BY COALESCE(romaji, name) ORDER BY COALESCE(romaji, name) ASC';
+				$stmt_songs = $pdo->prepare($sql_songs);
+				$stmt_songs->execute([ sanitize($input) ]);
+				$input = $stmt_songs->fetchAll();
+			}
+			
+			// Otherwise do a generic search
+			else {
+				$input = ${'access_' . $input_type}->{'access_' . $input_type}([ $input_id_type => $input, 'get' => 'name' ]);
+			}
 		}
+		
+		// If given name, do generic search for name
 		elseif(!is_array($input) && !strlen($input)) {
 			if($input_type === 'livehouse') {
 				$sql_livehouses = 'SELECT lives_livehouses.id, CONCAT_WS(" ", COALESCE(areas.romaji, areas.name), COALESCE(lives_livehouses.romaji, lives_livehouses.name)) AS romaji, CONCAT_WS(" ", areas.name, lives_livehouses.name) AS name FROM lives_livehouses LEFT JOIN areas ON areas.id=lives_livehouses.area_id';
@@ -96,6 +132,12 @@ function render_json_list($input_type, $input = null, $input_id_type = null, $in
 			elseif($input_type === 'release') {
 				$input_chunk[] = $input[$i]['friendly'];
 				$input_chunk[] = $input[$i]['quick_name'];
+			}
+			
+			// Song
+			elseif($input_type === 'song') {
+				$input_chunk['name'] = clean_song_title($input[$i]['name']);
+				$input_chunk['quick_name'] = $input[$i]['romaji'] ? clean_song_title($input[$i]['romaji']).' ('.clean_song_title($input[$i]['name']).')' : clean_song_title($input[$i]['name']);
 			}
 			
 			// Year

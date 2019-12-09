@@ -139,6 +139,12 @@ $in_page_navs = array_filter($in_page_navs);
 																		foreach(['is_uneditable', 'lineup', 'setlist'] as $weaken_type) {
 																			if(in_array($weaken_type, $history_event['type'])) {
 																				$event_class = 'any--weaken';
+																				
+																				if(in_array('is_uneditable', $history_event['type']) && in_array('release', $history_event['type'])) {
+																					if(strpos($history_event['content'], '/releases/omnibus/') !== false) {
+																						$history_event['content'] = preg_replace('/'.'(releases\/omnibus\/\d+\/[A-z0-9-]*\/)'.'/', '$1&prev_next_artist='.$artist['id'], $history_event['content']);
+																					}
+																				}
 																			}
 																		}
 																		if(count($history_event['type']) === 1 && $history_event['type'][0] === 'note') {
