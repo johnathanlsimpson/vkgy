@@ -2,6 +2,10 @@
 	function clean_values(&$value, $key) {
 		$value = sanitize($value);
 		
+		// Sanitize seems to be replacing spaces with &nbsp; *sometimes*, which we don't really want
+		// but rather than modify sanitize which is used across the site, let's start here
+		$value = str_replace('&nbsp;', ' ', $value);
+		
 		foreach([
 			"&#92;("     => "\\(",
 			"&#92;)"     => "\\)",

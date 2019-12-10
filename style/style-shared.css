@@ -600,7 +600,7 @@ table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
 	white-space: nowrap;
 	width: 0;
 }
-.input__label + .input__textarea {
+.input__label + .input__textarea, .input__label + .tributable__wrapper .input__textarea {
 	margin-top: 1rem;
 }
 .input, .input--secondary, .input__button, .input__checkbox-label, .input__select, .input__textarea, button, input, select, textarea {
