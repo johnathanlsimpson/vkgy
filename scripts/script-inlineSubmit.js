@@ -87,18 +87,27 @@ function submit(formElement, processorUrl, inputArgs) {
 		formData.append(key, args.preparedFormData[key]);
 	}
 	
-	// For any tributable elements which generated contenteditable clones,
-	var tributableElems = formElement[0].querySelectorAll('.any--tributable:not(.tributable--tributing)');
-	
-	// Make sure that the clone's text is put into the appropriate formData value
+	// Select any inputs which had contenteditable versions generated, and update formData with data from the contenteditable
+	var tributableElems = formElement[0].querySelectorAll('.tributable--tributed');
 	if(tributableElems.length) {
 		tributableElems.forEach(function(tributableElem, index) {
-			var tributableElemName = tributableElem.getAttribute('name');
-			var tributingElem = formElement[0].querySelector('.tributable--tributing[data-name="' + tributableElemName + '"]');
 			
+			// Get the original element's name, then move to parent and grab the accompanying contenteditable element
+			var tributableElemName = tributableElem.getAttribute('name');
+			var tributingElem = tributableElem.parentElement.querySelector('.tributable--tributing[data-name="' + tributableElemName + '"]');
+			
+			// If contenteditable element has data-ignore (i.e. hidden), leave original value
 			if(tributingElem && tributingElem.getAttribute('data-ignore') != 'true') {
+				
+				// Clean content of contenteditable element
 				if(typeof cleanTributingContent === 'function') {
 					var cleanedOutput = cleanTributingContent(tributingElem, { fullClean: true, removeTrailingSpace: true });
+					
+					// If this element is one of many with same name (e.g. history[]), use index to make sure correct formData entry is updated
+					if(tributableElemName.substr(-2) === '[]') {
+						tributableElemName = tributableElemName.substring(0, tributableElemName.length - 2) + '[' + index + ']';
+					}
+					
 					formData.set(tributableElemName, cleanedOutput);
 				}
 			}
