@@ -121,13 +121,13 @@ function getTributeToken(input, tributeType, returnType = 'rich') {
 	if(tributeType === 'artist') {
 		symbol    = 'symbol__artist';
 		url       = friendly ? '/artists/' + friendly + '/' : null;
-		innerText = '(' + id + ')' + '/' + name + '/';
+		innerText = ( isNaN(id) ? '' : '(' + id + ')' ) + '/' + name + '/';
 		dataText  = name;
 	}
 	else if(tributeType === 'label') {
 		symbol    = 'symbol__company';
 		url       = friendly ? '/labels/' + friendly + '/' : null;
-		innerText = '{' + id + '}' + '=' + name + '=';
+		innerText = ( isNaN(id) ? '' : '{' + id + '}' ) + '=' + name + '=';
 		dataText  = name;
 	}
 	else if(tributeType === 'musician') {
