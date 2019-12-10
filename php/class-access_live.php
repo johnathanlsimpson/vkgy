@@ -119,6 +119,8 @@
 				$sql_select[] = 'lives.id';
 				$sql_select[] = 'lives.date_occurred';
 				$sql_select[] = 'lives.lineup';
+				$sql_select[] = 'lives.name';
+				$sql_select[] = 'lives.romaji';
 			}
 			if($args['get'] === 'all') {
 				$sql_select[] = 'lives.*';

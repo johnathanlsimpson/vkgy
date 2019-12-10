@@ -4,6 +4,8 @@ include_once('../php/include.php');
 
 if(is_array($_POST) && !empty($_POST)) {
 	$livehouse_id = sanitize($_POST['livehouse_id']);
+	$name = sanitize($_POST['name']) ?: null;
+	$romaji = sanitize($_POST['romaji']) ?: null;
 	
 	$date_occurred = sanitize($_POST['date_occurred']);
 	$date_occurred = str_replace(['y', 'm', 'd'], '0', $date_occurred);
@@ -115,9 +117,10 @@ if(is_array($_POST) && !empty($_POST)) {
 				}
 				
 				// Do other edits
-				$sql_edit_live = 'UPDATE lives SET date_occurred=?, livehouse_id=?, lineup=? WHERE id=? LIMIT 1';
+				$sql_edit_live = 'UPDATE lives SET date_occurred=?, livehouse_id=?, lineup=?, name=?, romaji=? WHERE id=? LIMIT 1';
 				$stmt_edit_live = $pdo->prepare($sql_edit_live);
-				if($stmt_edit_live->execute([ $date_occurred, $livehouse_id, $lineup, $id ])) {
+				
+				if($stmt_edit_live->execute([ $date_occurred, $livehouse_id, $lineup, $name, $romaji, $id ])) {
 					
 					// Output
 					$output['id'] = $id;
@@ -155,9 +158,9 @@ if(is_array($_POST) && !empty($_POST)) {
 					$lineup = strlen($lineup) ? $lineup : null;
 					
 					// Add live
-					$sql_add_live = 'INSERT INTO lives (date_occurred, livehouse_id, lineup, user_id) VALUES (?, ?, ?, ?)';
+					$sql_add_live = 'INSERT INTO lives (date_occurred, livehouse_id, lineup, user_id, name, romaji) VALUES (?, ?, ?, ?, ?, ?)';
 					$stmt_add_live = $pdo->prepare($sql_add_live);
-					if($stmt_add_live->execute([ $date_occurred, $livehouse_id, $lineup, $_SESSION['user_id'] ])) {
+					if($stmt_add_live->execute([ $date_occurred, $livehouse_id, $lineup, $_SESSION['user_id'], $name, $romaji ])) {
 						$id = $pdo->lastInsertId();
 						
 						// Output

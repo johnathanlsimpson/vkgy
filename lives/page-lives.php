@@ -196,6 +196,15 @@
 															<a class="a--inherit any--weaken-size" href="<?php echo '/lives/&area_id='.$live['area_id']; ?>"><?php echo lang(($live['area_romaji'] ?: $live['area_name']), $live['area_name'], ['secondary_class' => 'any--hidden']); ?></a>
 															<a class="a--inherit" href="<?php echo '/lives/&livehouse_id='.$live['livehouse_id']; ?>"><?php echo lang(($live['livehouse_romaji'] ?: $live['livehouse_name']), $live['livehouse_name'], ['secondary_class' => 'any--hidden']); ?></a>
 															
+															<?php
+																if(strlen($live['name'])) {
+																	echo '<br />';
+																	echo '<br />';
+																	echo $live['romaji'] ? lang($live['romaji'], $live['name'], 'div') : $live['name'];
+																	echo '<br />';
+																}
+															?>
+															
 															<ul class="lives__artists ul--inline">
 																<?php
 																	if(is_array($live['artists']) && !empty($live['artists'])) {

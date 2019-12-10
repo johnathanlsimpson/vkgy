@@ -103,6 +103,17 @@
 										?></textarea>
 									</div>
 								</div>
+								
+								<div class="input__row">
+									<div class="input__group any--flex-grow">
+										<span class="input__label">
+											Title
+										</span>
+										<input class="input" name="name" placeholder="event title" />
+										<input class="input input--secondary" name="romaji" placeholder="(romaji)" />
+									</div>
+								</div>
+								
 							</li>
 						</ul>
 					</div>
