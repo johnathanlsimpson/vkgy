@@ -14,7 +14,7 @@
 <div class="card text text--compact lazy" data-src="<?= $image_url; ?>">
 	<span class="card__name">
 		<a class="a--inherit" href="<?= '/artists/'.$friendly.'/'; ?>">
-			<span class="symbol__artist" style="float:left;"></span>
+			<span class="symbol__artist"></span>
 			<?php
 				if(strlen($display_name)) {
 					echo lang(
@@ -32,6 +32,7 @@
 				}
 			?>
 		</a>
+		<?= $artist['is_alternate_name'] ? '<span class="card__notice h5 symbol__help">'.lang('alternate name', '別名', 'hidden').'</span>' : null; ?>
 	</span>
 	<ul class="card__nav ul--inline any--weaken-size">
 		<li><a class="symbol__release" href="<?= '/releases/'.$friendly.'/'; ?>"><?= lang('Music', 'リリース', 'hidden'); ?></a></li>
