@@ -669,9 +669,62 @@
 				$sql_select[] = 'GROUP_CONCAT(tags_artists.friendly) AS tag_friendlys';
 			}
 			
+			//
 			// WHERE
+			//
 			$sql_where = [];
 			$sql_values = [];
+			
+			// By name: check artist table and name-change table at the same time, grab IDs, continue
+			if(strlen($args['name']) && $_SESSION['username'] === 'inartistic') {
+				
+				// Set some variables
+				$name_search_type = $args['exact_name'] ? 'exact' : ( $args['fuzzy'] && mb_strlen( html_entity_decode($args['name'], ENT_QUOTES, 'utf-8') ) > 2 ? 'fuzzy' : 'default' );
+				$friendlied_name = friendly($args['name']);
+				$sanitized_name = sanitize($args['name']);
+				
+				// Exact search
+				if($name_search_type === 'exact') {
+					$sql_name = 'SELECT * FROM ( (SELECT id, "" AS display_name, "" AS display_romaji FROM artists WHERE name=? OR romaji=?) UNION ALL (SELECT artist_id AS id, name AS display_name, romaji AS display_romaji FROM artists_names WHERE name=? OR romaji=?) ) names';
+					$values_name = [ $sanitized_name, $sanitized_name, $sanitized_name, $sanitized_name ];
+				}
+				
+				// Fuzzy search
+				else if($name_search_type === 'fuzzy') {
+					$sql_name = 'SELECT * FROM ( ( SELECT id, "" AS display_name, "" AS display_romaji FROM artists WHERE friendly=? OR name=? OR romaji=? OR name LIKE CONCAT("%", ?, "%") OR romaji LIKE CONCAT("%", ?, "%") ) UNION ALL ( SELECT artist_id AS id, name AS display_name, romaji AS display_romaji FROM artists_names WHERE friendly=? OR name=? OR romaji=? OR name LIKE CONCAT("%", ?, "%") OR romaji LIKE CONCAT("%", ?, "%") ) ) names';
+					$values_name = [ $friendlied_name, $sanitized_name, $sanitized_name, $sanitized_name, $sanitized_name, $friendlied_name, $sanitized_name, $sanitized_name, $sanitized_name, $sanitized_name ];
+				}
+				
+				// Generic search
+				else {
+					$sql_name = 'SELECT * FROM ( ( SELECT id, "" AS display_name, "" AS display_romaji FROM artists WHERE friendly=? OR name=? OR romaji=? ) UNION ALL ( SELECT artist_id AS id, name AS display_name, romaji AS display_romaji FROM artists_names WHERE friendly=? OR name=? OR romaji=? ) ) names';
+					$values_name = [ $friendlied_name, $sanitized_name, $sanitized_name, $friendlied_name, $sanitized_name, $sanitized_name ];
+				}
+				
+				// Run query to get IDs of matching artists
+				$stmt_name = $this->pdo->prepare($sql_name);
+				$stmt_name->execute($values_name);
+				$rslt_name = $stmt_name->fetchAll();
+				
+				// Pass results as IDs
+				if(is_array($rslt_name) && !empty($rslt_name)) {
+					
+					// Unset name arg, change to ID
+					unset($args['name']);
+					$args['ids'] = [];
+					
+					// Add IDs to arg
+					foreach($rslt_name as $name) {
+						$args['ids'][] = $name['id'];
+						
+						// If display name (i.e. name-change result), save for later
+						if(strlen($name['display_name'])) {
+							$display_names[$name['id']][] = [ 'display_name' => $name['display_name'], 'display_romaji' => $name['display_romaji'] ];
+						}
+					}
+				}
+				
+			}
 			
 			// [PRE-SELECT] Tag
 			if(is_array($args["tags"]) && !empty($args["tags"])) {
@@ -758,7 +811,9 @@
 				$sql_where[] = 'artists.active=?';
 				$sql_values[] = $args['active'];
 			}
-			if($args["name"]) {
+			
+			// Search by name
+			if($args["name"] && $_SESSION['username'] != 'inartistic') {
 				$tmp_name = html_entity_decode($args["name"], ENT_QUOTES, "utf-8");
 				
 				if($args["fuzzy"] && mb_strlen($tmp_name) > 2) {
@@ -774,6 +829,7 @@
 					array_push($sql_values, friendly($args["name"]), sanitize($args["name"]), sanitize($args["name"]));
 				}
 			}
+			
 			if(is_numeric($args["label_id"])) {
 				$sql_where[] = "label_history LIKE CONCAT('%{', ?, '}%')";
 				$sql_values[] = $args["label_id"];
@@ -921,6 +977,38 @@
 									$stmt_areas = $this->pdo->prepare($sql_areas);
 									if($stmt_areas->execute([ $artists[$i]['id'] ])) {
 										$artists[$i]['areas'] = $stmt_areas->fetchAll();
+									}
+								}
+							}
+							
+							// If have an array of display names, that means we did a search for name changes, so let's duplicate those artists with their display names
+							if($args['get'] === 'name') {
+								if(is_array($display_names) && !empty($display_names)) {
+									for($i=0; $i<$num_artists; $i++) {
+										
+										$this_artist_id = $artists[$i]['id'];
+										
+										// If display name array has key that matches artist's id,
+										if($display_names[$this_artist_id][0]) {
+											
+											// Make new array with artist info + display names + clone flag
+											$clone_artist = array_merge($artists[$i], $display_names[$this_artist_id][0]);
+											$clone_artist['is_clone'] = 1;
+											
+											// Splice new array after current array (and increase artist count so loop continues)
+											array_splice($artists, $i + 1, 0, [ $clone_artist ]);
+											$num_artists++;
+											
+											// Remove display name that was just added from display name array, then reset keys so next check works
+											unset($display_names[$this_artist_id][0]);
+											if(count($display_names[$this_artist_id])) {
+												$display_names[$this_artist_id] = array_values($display_names[$this_artist_id]);
+											}
+											else {
+												unset($display_names[$this_artist_id]);
+											}
+											
+										}
 									}
 								}
 							}
