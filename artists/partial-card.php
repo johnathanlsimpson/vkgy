@@ -4,6 +4,8 @@
 	$name = sanitize($artist['name']);
 	$romaji = sanitize($artist['romaji']);
 	$friendly = sanitize($artist['friendly']);
+	$display_name = sanitize($artist['display_name']);
+	$display_romaji = sanitize($artist['display_romaji']);
 	
 	$image_url = '/artists/'.$friendly.'/main.medium.jpg';
 	$image_url = image_exists($image_url, $this->pdo) ? $image_url : null;
@@ -12,13 +14,22 @@
 <div class="card text text--compact lazy" data-src="<?= $image_url; ?>">
 	<span class="card__name">
 		<a class="a--inherit" href="<?= '/artists/'.$friendly.'/'; ?>">
-			<span class="symbol__artist"></span>
+			<span class="symbol__artist" style="float:left;"></span>
 			<?php
-				echo lang(
-					'<div>'.($romaji ?: $name).'</div>'.($romaji ? '<div class="any--weaken">'.$name.'</div>' : null),
-					'<div>'.$name.'</div>',
-					'hidden'
-				);
+				if(strlen($display_name)) {
+					echo lang(
+						'<div>'.($display_romaji ?: $display_name).'</div>'.($display_romaji ? '<div class="any--weaken">'.$display_name.'</div>' : null),
+						'<div>'.$display_name.'</div>',
+						'hidden'
+					);
+				}
+				else {
+					echo lang(
+						'<div>'.($romaji ?: $name).'</div>'.($romaji ? '<div class="any--weaken">'.$name.'</div>' : null),
+						'<div>'.$name.'</div>',
+						'hidden'
+					);
+				}
 			?>
 		</a>
 	</span>
