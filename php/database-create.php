@@ -110,6 +110,17 @@ CREATE TABLE IF NOT EXISTS `artists_musicians` (
 	`unique_id` varchar(21) COLLATE ".$pdo_config['db_collation']." NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
+CREATE TABLE IF NOT EXISTS `artists_names` (
+  `id` int(11) NOT NULL,
+  `artist_id` int(11) NOT NULL,
+  `name` text COLLATE ".$pdo_config['db_collation']." NOT NULL,
+  `romaji` text COLLATE ".$pdo_config['db_collation'].",
+  `friendly` text COLLATE ".$pdo_config['db_collation'].",
+  `date_occurred` datetime DEFAULT NULL,
+  `date_added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_id` int(11) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
+
 CREATE TABLE IF NOT EXISTS `artists_tags` (
 	`id` int(11) NOT NULL,
 	`artist_id` int(11) NOT NULL,
@@ -789,6 +800,10 @@ ALTER TABLE `artists_musicians`
 	ADD KEY `musician_id` (`musician_id`),
 	ADD KEY `artist_id` (`artist_id`);
 
+ALTER TABLE `artists_names`
+	ADD PRIMARY KEY (`id`),
+	ADD KEY `artist_id` (`artist_id`);
+
 ALTER TABLE `artists_tags`
 	ADD PRIMARY KEY (`id`),
 	ADD KEY `artist_id` (`artist_id`),
@@ -1035,6 +1050,8 @@ ALTER TABLE `artists_bio`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `artists_musicians`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `artists_names`
+	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `artists_tags`
 	MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `artists_views`
@@ -1175,6 +1192,9 @@ ALTER TABLE `artists_bio`
 ALTER TABLE `artists_musicians`
 	ADD CONSTRAINT `artists_musicians_ibfk_1` FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`) ON DELETE CASCADE,
 	ADD CONSTRAINT `artists_musicians_ibfk_2` FOREIGN KEY (`musician_id`) REFERENCES `musicians` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `artists_names`
+	ADD CONSTRAINT `artists_names_ibfk_1` FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `artists_tags`
   ADD CONSTRAINT `artists_tags_ibfk_1` FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
