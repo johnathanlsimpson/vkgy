@@ -676,7 +676,7 @@
 			$sql_values = [];
 			
 			// By name: check artist table and name-change table at the same time, grab IDs, continue
-			if(strlen($args['name']) && $_SESSION['username'] === 'inartistic') {
+			if(strlen($args['name']) /*&& $_SESSION['username'] === 'inartistic'*/ ) {
 				
 				// Set some variables
 				$name_search_type = $args['exact_name'] ? 'exact' : ( $args['fuzzy'] && mb_strlen( html_entity_decode($args['name'], ENT_QUOTES, 'utf-8') ) > 2 ? 'fuzzy' : 'default' );
@@ -716,12 +716,18 @@
 					// Add IDs to arg
 					foreach($rslt_name as $name) {
 						$args['ids'][] = $name['id'];
+						$num_duplicates[$name['id']]++;
 						
 						// If display name (i.e. name-change result), save for later
 						if(strlen($name['display_name'])) {
 							$display_names[$name['id']][] = [ 'display_name' => $name['display_name'], 'display_romaji' => $name['display_romaji'] ];
 						}
 					}
+				}
+				
+				// If no results returned, unset sql_select so query stops
+				else {
+					unset($sql_select);
 				}
 				
 			}
@@ -813,7 +819,7 @@
 			}
 			
 			// Search by name
-			if($args["name"] && $_SESSION['username'] != 'inartistic') {
+			/*if($args["name"] && $_SESSION['username'] != 'inartistic') {
 				$tmp_name = html_entity_decode($args["name"], ENT_QUOTES, "utf-8");
 				
 				if($args["fuzzy"] && mb_strlen($tmp_name) > 2) {
@@ -828,7 +834,7 @@
 					$sql_where[] = "artists.friendly=? OR artists.name=? OR artists.romaji=?";
 					array_push($sql_values, friendly($args["name"]), sanitize($args["name"]), sanitize($args["name"]));
 				}
-			}
+			}*/
 			
 			if(is_numeric($args["label_id"])) {
 				$sql_where[] = "label_history LIKE CONCAT('%{', ?, '}%')";
@@ -991,13 +997,32 @@
 										// If display name array has key that matches artist's id,
 										if($display_names[$this_artist_id][0]) {
 											
-											// Make new array with artist info + display names + clone flag
-											$clone_artist = array_merge($artists[$i], $display_names[$this_artist_id][0]);
-											$clone_artist['is_clone'] = 1;
+											// If number of ID occurrences are greater than number of display names, that means we have an organic artist result + a changed name result, so make a clean clone first
+											if($num_duplicates[$this_artist_id] === count($display_names) + 1) {
+												
+												// Splice vanilla artist after current array (and increase artist count so loop continues)
+												array_splice($artists, $i, 0, [ $artists[$i] ]);
+												$num_artists++;
+												
+												// Unset num duplicates so we don't worry about this again
+												unset($num_duplicates[$this_artist_id]);
+											}
 											
-											// Splice new array after current array (and increase artist count so loop continues)
-											array_splice($artists, $i + 1, 0, [ $clone_artist ]);
-											$num_artists++;
+											// If there's another display name after this, clone this array so we can use it in the next loop
+											if(count($display_names[$this_artist_id]) > 1) {
+												
+												// Make new array with artist info + display names + clone flag
+												$clone_artist = $artists[$i];
+												
+												// Splice new array after current array (and increase artist count so loop continues)
+												array_splice($artists, $i + 1, 0, [ $clone_artist ]);
+												$num_artists++;
+												
+											}
+											
+											// Merge this artist with the display name info
+											$artists[$i] = array_merge($artists[$i], $display_names[$this_artist_id][0]);
+											$artists[$i]['is_alternate_name'] = true;
 											
 											// Remove display name that was just added from display name array, then reset keys so next check works
 											unset($display_names[$this_artist_id][0]);
