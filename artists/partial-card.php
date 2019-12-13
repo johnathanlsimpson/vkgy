@@ -32,7 +32,6 @@
 				}
 			?>
 		</a>
-		<?= $artist['is_alternate_name'] ? '<span class="card__notice h5 symbol__help">'.lang('alternate name', '別名', 'hidden').'</span>' : null; ?>
 	</span>
 	<ul class="card__nav ul--inline any--weaken-size">
 		<li><a class="symbol__release" href="<?= '/releases/'.$friendly.'/'; ?>"><?= lang('Music', 'リリース', 'hidden'); ?></a></li>
@@ -46,3 +45,14 @@
 		?>
 	</ul>
 </div>
+
+<?php
+	if($artist['is_alternate_name']) {
+		?>
+			<div class="text text--outlined card__note" style="">
+				<div class="h5"><?= lang('alternate name', '別名', 'hidden'); ?></div>
+				<span class="any--weaken"><a class="a--inherit" href="<?= '/artists/'.$friendly.'/'; ?>"><?= $romaji ? lang($romaji, $name, 'parentheses') : $name; ?></a></span>
+			</div>
+		<?php
+	}
+?>
