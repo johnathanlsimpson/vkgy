@@ -116,6 +116,7 @@ CREATE TABLE IF NOT EXISTS `artists_names` (
   `name` text COLLATE ".$pdo_config['db_collation']." NOT NULL,
   `romaji` text COLLATE ".$pdo_config['db_collation'].",
   `friendly` text COLLATE ".$pdo_config['db_collation'].",
+  `pronunciation` text COLLATE ".$pdo_config['db_collation'].",
   `date_occurred` datetime DEFAULT NULL,
   `date_added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `user_id` int(11) NOT NULL DEFAULT '0'
