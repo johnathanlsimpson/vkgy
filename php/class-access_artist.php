@@ -679,10 +679,11 @@
 			if(strlen($args['name']) /*&& $_SESSION['username'] === 'inartistic'*/ ) {
 				
 				// Set some variables
-				$name_search_type = $args['exact_name'] ? 'exact' : ( $args['fuzzy'] && mb_strlen( html_entity_decode($args['name'], ENT_QUOTES, 'utf-8') ) > 2 ? 'fuzzy' : 'default' );
+				$converted_name = html_entity_decode($args['name'], ENT_QUOTES, 'utf-8');
 				$friendlied_name = friendly($args['name']);
 				$sanitized_name = sanitize($args['name']);
-				
+				$pronunciation = sanitize( str_replace(' ', '・', mb_convert_kana($converted_name, 'sKC', 'utf-8') ) );
+				$name_search_type = $args['exact_name'] ? 'exact' : ( $args['fuzzy'] && mb_strlen( $converted_name ) > 2 ? 'fuzzy' : 'default' );
 				
 				// Exact search
 				if($name_search_type === 'exact') {
@@ -707,8 +708,8 @@
 							) 
 						) names';
 					$values_name = [ 
-						$friendlied_name, $sanitized_name, $sanitized_name, $sanitized_name, $sanitized_name, $sanitized_name, 
-						$friendlied_name, $sanitized_name, $sanitized_name, $sanitized_name, $sanitized_name, $sanitized_name 
+						$friendlied_name, $sanitized_name, $sanitized_name, $pronunciation, $sanitized_name, $sanitized_name,
+						$friendlied_name, $sanitized_name, $sanitized_name, $pronunciation, $sanitized_name, $sanitized_name
 					];
 				}
 				
@@ -729,8 +730,8 @@
 							)
 						) names';
 					$values_name = [ 
-						$friendlied_name, $sanitized_name, $sanitized_name, $sanitized_name,
-						$friendlied_name, $sanitized_name, $sanitized_name, $sanitized_name 
+						$friendlied_name, $sanitized_name, $sanitized_name, $pronunciation,
+						$friendlied_name, $sanitized_name, $sanitized_name, $pronunciation
 					];
 				}
 				
