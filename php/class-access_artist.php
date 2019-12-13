@@ -248,6 +248,25 @@
 		
 		
 		// ======================================================
+		// Cleaning pronunciation string
+		// ======================================================
+		function clean_pronunciation($input) {
+			
+			$input = html_entity_decode($input);
+			$input = mb_convert_kana($input, 'sKC', 'utf-8');
+			$input = preg_replace('/'.'\+|\.|:'.'/', ' ', $input);
+			$input = preg_replace('/'.'\s+'.'/', ' ', $input);
+			$input = trim($input);
+			$input = str_replace(' ', '・', $input);
+			$input = sanitize($input);
+			
+			$output = strlen($input) ? $input : null;
+			return $output;
+		}
+		
+		
+		
+		// ======================================================
 		// Artist biography types
 		// ======================================================
 		public $artist_bio_types = [
@@ -381,21 +400,114 @@
 							$line = preg_replace('/'.$note_stem_pattern.'/', '', $line);
 						}
 						
+						//
 						// Name pronunciation
+						//
+						
+						// If line type 4 (name change) or 10 (formation), look for pronunciation, clean, return
 						if(is_array($line_type) && (in_array(10, $line_type) || in_array(4, $line_type))) {
-							$pronunciation_pattern = '(?:\(\d+\)|\/|\]) \(([&#; A-z0-9]+)\)[ \.]';
-							$katakana_pattern = '^[ぁ-んァ-ン 　・]+$';
+							
+							$pronunciation_pattern = '(?:\(\d+\)|\/|\]) \(([&#; A-z0-9\+\:\.]+)\)[ \.]';
+							$katakana_pattern = '^[ぁ-んァ-ン 　\+:\.・]+$';
 							
 							if(preg_match('/'.$pronunciation_pattern.'/', $line, $pronunciation_match)) {
 								if(strlen($pronunciation_match[1])) {
 									$pronunciation_string = html_entity_decode($pronunciation_match[1], ENT_QUOTES, 'UTF-8');
 									
 									if(preg_match('/'.$katakana_pattern.'/', $pronunciation_string)) {
-										$pronunciation = sanitize($pronunciation_string);
+										
+										$pronunciation = $this->clean_pronunciation($pronunciation_string);
+										
 									}
 								}
 							}
 						}
+						
+						//
+						// Set alternate names
+						//
+						
+						// If line is type 4 (name change), get possible display name
+						if(is_array($line_type) && in_array(4, $line_type)) {
+							
+							// If line is probably *band* name change
+							if(strpos($line, 'their name') !== false || strpos($line, 'its name') !== false) {
+								
+								// Split line at 'changes thier name to', since we only care about the newer name
+								$temp_line = explode('name to', $line);
+								$possible_display_name = strlen($temp_line[1]) ? $temp_line[1] : null;
+								
+							}
+							
+						}
+						
+						// If line is type 10 (formation), get possible display name
+						if(is_array($line_type) && in_array(10, $line_type)) {
+							
+							$possible_display_name = $line;
+							
+						}
+						
+						// If possible display name from one of above, continue
+						if(strlen($possible_display_name)) {
+							
+							// Modified version of artist regex; requires display name and captures only display name + pronunciation
+							$display_name_pattern = '(?<=[^\w\/]|^)(?:\(\d+\))?\/(?! )(?:[^\/\n]+)(?! )\/(?:\[([^\[\]\/\n]+)\])(?=\W|$)(?: \(([&#; A-z0-9\+\:\.]+)\))?[ \.]';
+							
+							// If second chunk of line contains a display name, then we assume that the artist change their name to something which will change again, so we want this to be in the alternate names table
+							if(preg_match('/'.$display_name_pattern.'/', $possible_display_name, $new_name_match)) {
+								
+								// If display name returned
+								if(strlen($new_name_match[1])) {
+									
+									$display_name = $new_name_match[1];
+									$display_romaji = null;
+									$display_pronunciation = $new_name_match[2] ? $this->clean_pronunciation($new_name_match[2]) : null;
+									
+									// If display name contains JP and romaji
+									if(preg_match('/'.'(.+?) \((.+?)\)'.'/', $display_name, $display_name_chunks)) {
+										$display_name = $display_name_chunks[2];
+										$display_romaji = $display_name_chunks[1];
+									}
+									$display_friendly = friendly( $display_romaji ?: $display_name );
+									
+									// Make sure that display name != current name & not already in DB
+									// Since MySQL can't handle =null, we'll have to check if romaji is null and change query/values accordingly
+									if($display_romaji === null) {
+										$sql_check = 'SELECT 1 FROM ( (SELECT 1 FROM artists WHERE id=? AND name=? AND romaji IS NULL) UNION (SELECT 1 FROM artists_names WHERE artist_id=? AND name=? AND romaji IS NULL) ) current_names';
+										$values_check = [
+											$artist_id, $display_name,
+											$artist_id, $display_name
+										];
+									}
+									else {
+										$sql_check = 'SELECT 1 FROM ( (SELECT 1 FROM artists WHERE id=? AND name=? AND romaji=?) UNION (SELECT 1 FROM artists_names WHERE artist_id=? AND name=? AND romaji=?) ) current_names';
+										$values_check = [
+											$artist_id, $display_name, $display_romaji,
+											$artist_id, $display_name, $display_romaji
+										];
+									}
+									$stmt_check = $this->pdo->prepare($sql_check);
+									$stmt_check->execute($values_check);
+									$rslt_check = $stmt_check->fetchColumn();
+									
+									if(!$rslt_check) {
+										
+										// Add this to the table of artists' display names
+										$sql_display_name = 'INSERT INTO artists_names (artist_id, name, romaji, friendly, pronunciation, date_occurred, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)';
+										$stmt_display_name = $this->pdo->prepare($sql_display_name);
+										$stmt_display_name->execute([ $artist_id, $display_name, $display_romaji, $display_friendly, $display_pronunciation, $date, $_SESSION['user_id'] ]);
+										
+									}
+									
+								}
+								
+							}
+							
+						}
+						
+						// Unset display name stuff
+						unset($possible_display_name, $display_name, $display_romaji, $display_friendly, $display_pronunciation, $tmp_line);
 						
 						// Set up live parser
 						if(!is_object($this->live_parser)) {
@@ -679,9 +791,11 @@
 			if(strlen($args['name']) /*&& $_SESSION['username'] === 'inartistic'*/ ) {
 				
 				// Set some variables
-				$name_search_type = $args['exact_name'] ? 'exact' : ( $args['fuzzy'] && mb_strlen( html_entity_decode($args['name'], ENT_QUOTES, 'utf-8') ) > 2 ? 'fuzzy' : 'default' );
+				$converted_name = html_entity_decode($args['name'], ENT_QUOTES, 'utf-8');
 				$friendlied_name = friendly($args['name']);
 				$sanitized_name = sanitize($args['name']);
+				$pronunciation = $this->clean_pronunciation($converted_name);
+				$name_search_type = $args['exact_name'] ? 'exact' : ( $args['fuzzy'] && mb_strlen( $converted_name ) > 2 ? 'fuzzy' : 'default' );
 				
 				// Exact search
 				if($name_search_type === 'exact') {
@@ -691,14 +805,46 @@
 				
 				// Fuzzy search
 				else if($name_search_type === 'fuzzy') {
-					$sql_name = 'SELECT * FROM ( ( SELECT id, "" AS display_name, "" AS display_romaji FROM artists WHERE friendly=? OR name=? OR romaji=? OR name LIKE CONCAT("%", ?, "%") OR romaji LIKE CONCAT("%", ?, "%") ) UNION ALL ( SELECT artist_id AS id, name AS display_name, romaji AS display_romaji FROM artists_names WHERE friendly=? OR name=? OR romaji=? OR name LIKE CONCAT("%", ?, "%") OR romaji LIKE CONCAT("%", ?, "%") ) ) names';
-					$values_name = [ $friendlied_name, $sanitized_name, $sanitized_name, $sanitized_name, $sanitized_name, $friendlied_name, $sanitized_name, $sanitized_name, $sanitized_name, $sanitized_name ];
+					$sql_name = '
+						SELECT * FROM ( 
+							( 
+								SELECT id, "" AS display_name, "" AS display_romaji 
+								FROM artists 
+								WHERE friendly=? OR name=? OR romaji=? OR pronunciation=? OR name LIKE CONCAT("%", ?, "%") OR romaji LIKE CONCAT("%", ?, "%") 
+							)
+							UNION ALL 
+							(
+								SELECT artist_id AS id, name AS display_name, romaji AS display_romaji 
+								FROM artists_names 
+								WHERE friendly=? OR name=? OR romaji=? OR pronunciation=? OR name LIKE CONCAT("%", ?, "%") OR romaji LIKE CONCAT("%", ?, "%")
+							) 
+						) names';
+					$values_name = [ 
+						$friendlied_name, $sanitized_name, $sanitized_name, $pronunciation, $sanitized_name, $sanitized_name,
+						$friendlied_name, $sanitized_name, $sanitized_name, $pronunciation, $sanitized_name, $sanitized_name
+					];
 				}
 				
 				// Generic search
 				else {
-					$sql_name = 'SELECT * FROM ( ( SELECT id, "" AS display_name, "" AS display_romaji FROM artists WHERE friendly=? OR name=? OR romaji=? ) UNION ALL ( SELECT artist_id AS id, name AS display_name, romaji AS display_romaji FROM artists_names WHERE friendly=? OR name=? OR romaji=? ) ) names';
-					$values_name = [ $friendlied_name, $sanitized_name, $sanitized_name, $friendlied_name, $sanitized_name, $sanitized_name ];
+					$sql_name = '
+						SELECT * FROM ( 
+							( 
+								SELECT id, "" AS display_name, "" AS display_romaji 
+								FROM artists 
+								WHERE friendly=? OR name=? OR romaji=? OR pronunciation=?
+							)
+							UNION ALL
+							(
+								SELECT artist_id AS id, name AS display_name, romaji AS display_romaji 
+								FROM artists_names 
+								WHERE friendly=? OR name=? OR romaji=? OR pronunciation=?
+							)
+						) names';
+					$values_name = [ 
+						$friendlied_name, $sanitized_name, $sanitized_name, $pronunciation,
+						$friendlied_name, $sanitized_name, $sanitized_name, $pronunciation
+					];
 				}
 				
 				// Run query to get IDs of matching artists

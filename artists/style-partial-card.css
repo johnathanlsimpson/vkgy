@@ -47,6 +47,6 @@
 	margin: -0.5rem;
 	padding: 0.5rem;
 }
-.card__notice {
-	display: block;
+.card__note {
+	margin-top: calc(-3rem - 3px);
 }
