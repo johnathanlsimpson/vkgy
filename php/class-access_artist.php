@@ -683,6 +683,7 @@
 				$friendlied_name = friendly($args['name']);
 				$sanitized_name = sanitize($args['name']);
 				
+				
 				// Exact search
 				if($name_search_type === 'exact') {
 					$sql_name = 'SELECT * FROM ( (SELECT id, "" AS display_name, "" AS display_romaji FROM artists WHERE name=? OR romaji=?) UNION ALL (SELECT artist_id AS id, name AS display_name, romaji AS display_romaji FROM artists_names WHERE name=? OR romaji=?) ) names';
@@ -691,14 +692,46 @@
 				
 				// Fuzzy search
 				else if($name_search_type === 'fuzzy') {
-					$sql_name = 'SELECT * FROM ( ( SELECT id, "" AS display_name, "" AS display_romaji FROM artists WHERE friendly=? OR name=? OR romaji=? OR name LIKE CONCAT("%", ?, "%") OR romaji LIKE CONCAT("%", ?, "%") ) UNION ALL ( SELECT artist_id AS id, name AS display_name, romaji AS display_romaji FROM artists_names WHERE friendly=? OR name=? OR romaji=? OR name LIKE CONCAT("%", ?, "%") OR romaji LIKE CONCAT("%", ?, "%") ) ) names';
-					$values_name = [ $friendlied_name, $sanitized_name, $sanitized_name, $sanitized_name, $sanitized_name, $friendlied_name, $sanitized_name, $sanitized_name, $sanitized_name, $sanitized_name ];
+					$sql_name = '
+						SELECT * FROM ( 
+							( 
+								SELECT id, "" AS display_name, "" AS display_romaji 
+								FROM artists 
+								WHERE friendly=? OR name=? OR romaji=? OR pronunciation=? OR name LIKE CONCAT("%", ?, "%") OR romaji LIKE CONCAT("%", ?, "%") 
+							)
+							UNION ALL 
+							(
+								SELECT artist_id AS id, name AS display_name, romaji AS display_romaji 
+								FROM artists_names 
+								WHERE friendly=? OR name=? OR romaji=? OR pronunciation=? OR name LIKE CONCAT("%", ?, "%") OR romaji LIKE CONCAT("%", ?, "%")
+							) 
+						) names';
+					$values_name = [ 
+						$friendlied_name, $sanitized_name, $sanitized_name, $sanitized_name, $sanitized_name, $sanitized_name, 
+						$friendlied_name, $sanitized_name, $sanitized_name, $sanitized_name, $sanitized_name, $sanitized_name 
+					];
 				}
 				
 				// Generic search
 				else {
-					$sql_name = 'SELECT * FROM ( ( SELECT id, "" AS display_name, "" AS display_romaji FROM artists WHERE friendly=? OR name=? OR romaji=? ) UNION ALL ( SELECT artist_id AS id, name AS display_name, romaji AS display_romaji FROM artists_names WHERE friendly=? OR name=? OR romaji=? ) ) names';
-					$values_name = [ $friendlied_name, $sanitized_name, $sanitized_name, $friendlied_name, $sanitized_name, $sanitized_name ];
+					$sql_name = '
+						SELECT * FROM ( 
+							( 
+								SELECT id, "" AS display_name, "" AS display_romaji 
+								FROM artists 
+								WHERE friendly=? OR name=? OR romaji=? OR pronunciation=?
+							)
+							UNION ALL
+							(
+								SELECT artist_id AS id, name AS display_name, romaji AS display_romaji 
+								FROM artists_names 
+								WHERE friendly=? OR name=? OR romaji=? OR pronunciation=?
+							)
+						) names';
+					$values_name = [ 
+						$friendlied_name, $sanitized_name, $sanitized_name, $sanitized_name,
+						$friendlied_name, $sanitized_name, $sanitized_name, $sanitized_name 
+					];
 				}
 				
 				// Run query to get IDs of matching artists
