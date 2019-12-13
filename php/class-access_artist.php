@@ -383,14 +383,22 @@
 						
 						// Name pronunciation
 						if(is_array($line_type) && (in_array(10, $line_type) || in_array(4, $line_type))) {
-							$pronunciation_pattern = '(?:\(\d+\)|\/|\]) \(([&#; A-z0-9]+)\)[ \.]';
-							$katakana_pattern = '^[ぁ-んァ-ン 　・]+$';
+							
+							$pronunciation_pattern = '(?:\(\d+\)|\/|\]) \(([&#; A-z0-9\+\:\.]+)\)[ \.]';
+							$katakana_pattern = '^[ぁ-んァ-ン 　\+:\.・]+$';
 							
 							if(preg_match('/'.$pronunciation_pattern.'/', $line, $pronunciation_match)) {
 								if(strlen($pronunciation_match[1])) {
 									$pronunciation_string = html_entity_decode($pronunciation_match[1], ENT_QUOTES, 'UTF-8');
 									
 									if(preg_match('/'.$katakana_pattern.'/', $pronunciation_string)) {
+										
+										// Standardize; convert hiragana and half-width katakana to full-width katakana, replace spaces with dots, trim, replace double dots
+										$pronunciation_string = mb_convert_kana($pronunciation_string, 'sKC', 'utf-8');
+										$pronunciation_string = preg_replace('/'.'\+|\.|:'.'/', ' ', $pronunciation_string);
+										$pronunciation_string = preg_replace('/'.'\s+'.'/', ' ', $pronunciation_string);
+										$pronunciation_string = trim($pronunciation_string);
+										$pronunciation_string = str_replace(' ', '・', $pronunciation_string);
 										$pronunciation = sanitize($pronunciation_string);
 									}
 								}
