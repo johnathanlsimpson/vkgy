@@ -460,7 +460,7 @@
 								// If display name returned
 								if(strlen($new_name_match[1])) {
 									
-									$display_name = $new_name_match[1];
+									$display_name = str_replace(['\\[', '\\]'], ['[', ']'], $new_name_match[1]);
 									$display_romaji = null;
 									$display_pronunciation = $new_name_match[2] ? $this->clean_pronunciation($new_name_match[2]) : null;
 									
