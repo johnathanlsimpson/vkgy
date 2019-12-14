@@ -414,7 +414,7 @@
 								if(strlen($pronunciation_match[1])) {
 									$pronunciation_string = html_entity_decode($pronunciation_match[1], ENT_QUOTES, 'UTF-8');
 									
-									if(preg_match('/'.$katakana_pattern.'/', $pronunciation_string)) {
+									if(preg_match('/'.$katakana_pattern.'/u', $pronunciation_string)) {
 										
 										$pronunciation = $this->clean_pronunciation($pronunciation_string);
 										
