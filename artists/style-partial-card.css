@@ -48,5 +48,6 @@
 	padding: 0.5rem;
 }
 .card__note {
+	border-top: none;
 	margin-top: calc(-3rem - 3px);
 }
