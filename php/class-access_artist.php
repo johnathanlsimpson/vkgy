@@ -253,12 +253,17 @@
 		function clean_pronunciation($input) {
 			
 			$input = html_entity_decode($input);
-			$input = mb_convert_kana($input, 'sKC', 'utf-8');
-			$input = preg_replace('/'.'\+|\.|:'.'/', ' ', $input);
-			$input = preg_replace('/'.'\s+'.'/', ' ', $input);
-			$input = trim($input);
-			$input = str_replace(' ', '・', $input);
-			$input = sanitize($input);
+			if(preg_match('/'.'[ぁ-んァ-ン]'.'/u', $input)) {
+				$input = mb_convert_kana($input, 'sKC', 'utf-8');
+				$input = preg_replace('/'.'\+|\.|:'.'/', ' ', $input);
+				$input = preg_replace('/'.'\s+'.'/', ' ', $input);
+				$input = trim($input);
+				$input = str_replace(' ', '・', $input);
+				$input = sanitize($input);
+			}
+			else {
+				$input = null;
+			}
 			
 			$output = strlen($input) ? $input : null;
 			return $output;
@@ -452,7 +457,7 @@
 						if(strlen($possible_display_name)) {
 							
 							// Modified version of artist regex; requires display name and captures only display name + pronunciation
-							$display_name_pattern = '(?<=[^\w\/]|^)(?:\(\d+\))?\/(?! )(?:[^\/\n]+)(?! )\/(?:\[([^\[\]\/\n]+)\])(?=\W|$)(?: \(([&#; A-z0-9\+\:\.]+)\))?[ \.]';
+							$display_name_pattern = '(?<=[^\w\/]|^)(?:\(\d+\))?\/(?! )(?:[^\/\n]+)(?! )\/(?:\[([^\[\]\/\n]+)\])(?=\W|$)(?: \(([&#; A-z0-9\+\:\.]+)\))?[ \.]|$';
 							
 							// If second chunk of line contains a display name, then we assume that the artist change their name to something which will change again, so we want this to be in the alternate names table
 							if(preg_match('/'.$display_name_pattern.'/', $possible_display_name, $new_name_match)) {
