@@ -32,10 +32,16 @@ $current_avatar = [
 		],
 	],
 	'eye' => [
-		'shape' => [
+		'shape-left' => [
 			'shapes' => [ ($_POST["register_avatar"] === 'gecko' ? 'gecko' : 'bat') => '' ],
 		],
-		'accent' => [
+		'accent-left' => [
+			'colors' => [ 'red-medium' => '' ],
+		],
+		'shape-right' => [
+			'shapes' => [ ($_POST["register_avatar"] === 'gecko' ? 'gecko' : 'bat') => '' ],
+		],
+		'accent-right' => [
 			'colors' => [ 'red-medium' => '' ],
 		],
 	],
