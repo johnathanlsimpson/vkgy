@@ -54,6 +54,39 @@ if($artist_is_viewable) {
 			<?php
 	}
 	
+	// Similarly named artists
+	// Get artists with same name or same pronunciation, then combine results (to eliminate duplicates) and remove current artist from result
+	$possible_dupes_by_name = $access_artist->access_artist([ 'name' => $artist['name'], 'get' => 'name', 'associative' => true ]);
+	$possible_dupes_by_pronunciation = strlen($artist['pronunciation']) ? $access_artist->access_artist([ 'name' => $artist['pronunciation'], 'get' => 'name', 'associative' => true ]) : [];
+	$possible_dupes = $possible_dupes_by_name + $possible_dupes_by_pronunciation;
+	unset($possible_dupes[$artist['id']]);
+	
+	if(is_array($possible_dupes) && !empty($possible_dupes)) {
+		?>
+			<h3>
+				<?= lang('Similarly named', '同じ名前', 'div'); ?>
+			</h3>
+			<div class="text text--outlined any--weaken-color">
+				<?php
+					foreach($possible_dupes as $dupe_key => $dupe) {
+						if(strlen($dupe['romaji'])) {
+							echo lang(
+								'<a class="artist a--inherit" href="/artists/'.$dupe['friendly'].'/">'.$dupe['romaji'].'</a> ('.$dupe['name'].')',
+								'<a class="artist a--inherit" href="/artists/'.$dupe['friendly'].'/">'.$dupe['name'].'</a>',
+								'hidden'
+							);
+						}
+						else {
+							echo '<a class="artist a--inherit" href="/artists/'.$dupe['friendly'].'/">'.$dupe['name'].'</a>';
+						}
+						
+						echo $dupe_key === end( array_keys($possible_dupes) ) ? null : ' &nbsp; ';
+					}
+				?>
+			</div>
+		<?php
+	}
+	
 	// Label history
 	if($artist["labels"]) {
 		?>
