@@ -159,7 +159,7 @@
 											$class .= $layer_name."__".($part_attributes["extends_part"] ?: $part_name)."--".$shape_name;
 											$class .= $part_attributes['attributes']['is_mirror'] ? ' avatar--right' : null;
 											
-											$transform = $shape["transform"] ?: null;
+											$transform = ($shape["transform"] ?: null).($part_attributes['attributes']['is_mirror'] ? ' scale(-1,1) translate(-600,0)' : null);
 											$clip_path = ($shape["clip_path"] ? 'url(#'.$shape["clip_path"].')' : null);
 											
 											if($part_attributes['extends_part'] && !isset($this->filtered_avatar_options[$layer_name][$part_name]["colors"])) {
