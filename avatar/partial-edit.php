@@ -100,8 +100,13 @@
 						<div class="avatar__group text text--outlined">
 							<ul>
 							<?php
+								
+								// Set a counter that increments only when a new 'shape selectable' layer is encountered, so we can add a border on top
+								$i = 0;
+								
 								foreach($layer_parts as $part_name => $part_attributes) {
 									if($part_attributes["shape_is_selectable"]) {
+										echo $i++ ? '</ul><ul>' : null;
 										?>
 											<li class="avatar__shape">
 												<div class="input__row">
