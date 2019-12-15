@@ -52,6 +52,8 @@
 			if(is_array($filter_layers) && !empty($filter_layers)) {
 				foreach($filter_layers as $layer_name => $parts) {
 					foreach($parts as $part_name => $part_attributes) {
+						
+						
 						foreach($part_attributes as $attribute_name => $attribute) {
 							if($attribute_name === "shapes" || $attribute_name === "colors") {
 								foreach($attribute as $selection_name => $selection) {
@@ -80,6 +82,8 @@
 			if(is_array($filter_layers) && !empty($filter_layers) && is_array($possible_avatar_layers)) {
 				foreach($possible_avatar_layers as $layer_name => $parts) {
 					foreach($parts as $part_name => $part_attributes) {
+						
+						
 						
 						foreach($part_attributes as $attribute_name => $attribute) {
 							if($attribute_name === "shapes" || $attribute_name === "colors") {
@@ -153,6 +157,7 @@
 										if(!$part_attributes["extends_part"] || isset($this->filtered_avatar_options[$layer_name][$part_attributes["extends_part"]]["shapes"][$shape_name])) {
 											$class  = "{$layer_name}__{$part_name} ";
 											$class .= $layer_name."__".($part_attributes["extends_part"] ?: $part_name)."--".$shape_name;
+											$class .= $part_attributes['attributes']['is_mirror'] ? ' avatar--right' : null;
 											
 											$transform = $shape["transform"] ?: null;
 											$clip_path = ($shape["clip_path"] ? 'url(#'.$shape["clip_path"].')' : null);
