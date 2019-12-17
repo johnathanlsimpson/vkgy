@@ -5,10 +5,35 @@ include_once('../php/include.php');
 if($_SESSION['is_signed_in']) {
 	
 	// Clean & set user preferences
-	foreach(['name', 'motto', 'email', 'website', 'twitter', 'facebook', 'lastfm', 'tumblr', 'fan_since', 'site_theme', 'gender', 'icon'] as $key) {
+	foreach(['name', 'motto', 'email', 'facebook', 'lastfm', 'tumblr', 'fan_since', 'site_theme', 'gender', 'icon'] as $key) {
 		$sql_values[$key] = sanitize($_POST[$key]);
 		$sql_values[$key] = strlen($sql_values[$key]) ? $sql_values[$key] : null;
 	}
+	
+	// If Twitter supplied, make sure we get username
+	if(strlen($_POST['twitter'])) {
+		$twitter = $_POST['twitter'];
+		
+		// If URL was supplied, explode and get last portion (assumed to be username)
+		$twitter = explode('/', $twitter);
+		$twitter = array_filter($twitter);
+		$twitter = end($twitter);
+		
+		// Ignore @ or any other symbols, then sanitize
+		preg_match('/'.'(\w{5,15})'.'/', $twitter, $twitter_match);
+		$twitter = is_array($twitter_match) && strlen($twitter_match[1]) ? sanitize($twitter_match[1]) : null;
+	}
+	$sql_values['twitter'] = $twitter;
+	
+	// If OHP supplied, make sure protocol given
+	if(strlen($_POST['website'])) {
+		$website = $_POST['website'];
+		
+		if(strpos($_POST['website'], 'http') != 0) {
+			$website = 'https://'.$website;
+		}
+	}
+	$sql_values['website'] = $website;
 	
 	// Further clean some values
 	$email_pattern = '/^(?!(?:(?:\x22?\x5C[\x00-\x7E]\x22?)|(?:\x22?[^\x5C\x22]\x22?)){255,})(?!(?:(?:\x22?\x5C[\x00-\x7E]\x22?)|(?:\x22?[^\x5C\x22]\x22?)){65,}@)(?:(?:[\x21\x23-\x27\x2A\x2B\x2D\x2F-\x39\x3D\x3F\x5E-\x7E]+)|(?:\x22(?:[\x01-\x08\x0B\x0C\x0E-\x1F\x21\x23-\x5B\x5D-\x7F]|(?:\x5C[\x00-\x7F]))*\x22))(?:\.(?:(?:[\x21\x23-\x27\x2A\x2B\x2D\x2F-\x39\x3D\x3F\x5E-\x7E]+)|(?:\x22(?:[\x01-\x08\x0B\x0C\x0E-\x1F\x21\x23-\x5B\x5D-\x7F]|(?:\x5C[\x00-\x7F]))*\x22)))*@(?:(?:(?!.*[^.]{64,})(?:(?:(?:xn--)?[a-z0-9]+(?:-[a-z0-9]+)*\.){1,126}){1,}(?:(?:[a-z][a-z0-9]*)|(?:(?:xn--)[a-z0-9]+))(?:-[a-z0-9]+)*)|(?:\[(?:(?:IPv6:(?:(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){7})|(?:(?!(?:.*[a-f0-9][:\]]){7,})(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,5})?::(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,5})?)))|(?:(?:IPv6:(?:(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){5}:)|(?:(?!(?:.*[a-f0-9]:){5,})(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,3})?::(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,3}:)?)))?(?:(?:25[0-5])|(?:2[0-4][0-9])|(?:1[0-9]{2})|(?:[1-9]?[0-9]))(?:\.(?:(?:25[0-5])|(?:2[0-4][0-9])|(?:1[0-9]{2})|(?:[1-9]?[0-9]))){3}))\]))$/iD';

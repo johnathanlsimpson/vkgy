@@ -305,6 +305,9 @@
 				$break_pattern = "\n\n(?=(?:\d{4}-)?(?:\d{2}-)?\d{2} )";
 				$bio_lines = preg_split("/".$break_pattern."/", $content);
 				
+				// Get list of all of artist's lives; we'll use it later to make sure we're not parsing a live twice
+				$all_current_lives = $this->access_live->access_live([ 'artist_id' => $artist_id, 'get' => 'name', 'keys' => 'date' ]);
+				
 				if(is_array($bio_lines)) {
 					foreach($bio_lines as $line) {
 						
@@ -564,7 +567,7 @@
 											break;
 										}
 										else {
-											$parsed_live = $this->live_parser->parse_raw_input($possible_livehouse, $date, $artist_id);
+											$parsed_live = $this->live_parser->parse_raw_input($possible_livehouse, $date, $artist_id, $all_current_lives);
 										}
 									}
 								}
@@ -600,7 +603,7 @@
 							(in_array(array_search('schedule', $this->artist_bio_types), $line_type) || in_array(array_search('s', $this->artist_bio_types), $line_type))
 						) {
 							
-							$parsed_live = $this->live_parser->parse_raw_input($line, $date, $artist_id);
+							$parsed_live = $this->live_parser->parse_raw_input($line, $date, $artist_id, $all_current_lives);
 							
 							if(is_array($parsed_live) && !empty($parsed_live)) {
 								$line = ($parsed_live['livehouse']['area_romaji'] ?: $parsed_live['livehouse']['area_name']).' '.($parsed_live['livehouse']['romaji'] ?: $parsed_live['livehouse']['name']);
@@ -793,7 +796,7 @@
 			$sql_values = [];
 			
 			// By name: check artist table and name-change table at the same time, grab IDs, continue
-			if(strlen($args['name']) /*&& $_SESSION['username'] === 'inartistic'*/ ) {
+			if(strlen($args['name']) ) {
 				
 				// Set some variables
 				$converted_name = html_entity_decode($args['name'], ENT_QUOTES, 'utf-8');

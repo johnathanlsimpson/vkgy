@@ -133,17 +133,53 @@
 		// being optional), and the date, and parses that into
 		// live data.
 		// ======================================================
-		function parse_raw_input($raw_input, $date_occurred, $artist_id = null, $sanitized = false) {
+		function parse_raw_input($raw_input, $date_occurred, $artist_id = null, $extant_lives = []) {
 			if(!is_object($this->access_artist)) {
 				$this->access_artist = new access_artist($this->pdo);
 			}
 			
+			// Explode raw bio entry content to get only livehouse portion (e.g. 'o-west - megaromania')
 			$raw_input = explode(" - ", $raw_input, 2);
 			
 			if(is_array($raw_input) && !empty($raw_input)) {
+				
 				if(!empty($raw_input[0])) {
-					$raw_input[0] = sanitize($raw_input[0]);
-					$livehouse = $this->get_livehouse($raw_input[0]);
+					
+					// If current (extant) lives provided, loop through and see if this one is already in there
+					// Assumes that extant lives are formated in $lives[year][month][day][i] format
+					if(is_array($extant_lives) && !empty($extant_lives)) {
+						
+						// Get year/month/date of date occurred
+						list($y, $m, $d) = explode('-', $date_occurred);
+						
+						// Check if extant lives contains a live from this date
+						if( is_array($extant_lives[$y]) && is_array($extant_lives[$y][$m]) && is_array($extant_lives[$y][$m][$d]) ) {
+							
+							// Loop through extant lives on this date and check for one that matches this venue name
+							foreach($extant_lives[$y][$m][$d] as $extant_live) {
+								
+								// If livehouse name of extant live matches raw input, then we'll return the livehouse info and avoid an extra DB call
+								$extant_live_livehouse = ($extant_live['area_romaji'] ?: $extant_live['area_name']).' '.($extant_live['livehouse_romaji'] ?: $extant_live['livehouse_name']);
+								if($raw_input[0] === $extant_live_livehouse) {
+									
+									// Return only area name and livehouse name, in the format that's used by in access_artist
+									$livehouse = [ 'id' => $extant_live['livehouse_id'], 'name' => $extant_live['livehouse_name'], 'romaji' => $extant_live['livehouse_romaji'], 'area_name' => $extant_live['area_name'], 'area_romaji' => $extant_live['area_romaji'] ];
+									$live_id = $extant_live['id'];
+									
+								}
+								
+							}
+							
+						}
+						
+					}
+					
+					// If livehouse isn't already found, let's do a DB call and search for it
+					if(!is_array($livehouse) || empty($livehouse)) {
+						$raw_input[0] = sanitize($raw_input[0]);
+						$livehouse = $this->get_livehouse($raw_input[0]);
+					}
+					
 				}
 				
 				if(is_numeric($artist_id)) {
@@ -178,11 +214,12 @@
 			}
 				
 			if(!empty($livehouse["name"]) && $lineup && preg_match("/"."\d{4}-\d{2}-\d{2}"."/", $date_occurred)) {
-				return ["livehouse" => $livehouse, "date_occurred" => $date_occurred, "lineup" => $lineup, "additional_lineup" => $additional_lineup];
+				return ['id' => is_numeric($live_id) ? $live_id : null, "livehouse" => $livehouse, "date_occurred" => $date_occurred, "lineup" => $lineup, "additional_lineup" => $additional_lineup];
 			}
 			else {
 				return false;
 			}
+			
 		}
 		
 		// ======================================================
