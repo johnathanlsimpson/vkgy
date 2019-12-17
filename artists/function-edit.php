@@ -325,7 +325,13 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 			// entries that aren't still present. Also, remove from history array,
 			// so that no other transforms are performed on it
 			if(is_array($history[$i]["parsed_live"])) {
-				$all_extant_lives[] = $live_parser->update_live($history[$i]["parsed_live"]);
+				
+				if(is_numeric($history[$i]['parsed_live']['id'])) {
+					$all_extant_lives[] = $history[$i]['parsed_live']['id'];
+				}
+				else {
+					$all_extant_lives[] = $live_parser->update_live($history[$i]["parsed_live"]);
+				}
 				
 				if($history[$i]['type'] === '(14)') {
 					unset($history[$i]);
