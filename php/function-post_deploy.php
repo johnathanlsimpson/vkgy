@@ -76,7 +76,7 @@
 				foreach($commits as $commit) {
 					$content = trim($commit["message"]);
 					
-					if(strpos($content, 'Merge') !== 0) {
+					if(strpos($content, 'Merge') !== 0 && $array_payload['refs'] === 'refs/heads/master') {
 						if(strlen($commit['author']['email'])) {
 							$sql_user = "SELECT id FROM users WHERE email=? LIMIT 1";
 							$stmt_user = $pdo->prepare($sql_user);
