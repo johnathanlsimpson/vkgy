@@ -8,6 +8,79 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 	$markdown_parser = new parse_markdown($pdo);
 	
 	if(is_numeric($_POST["id"]) && $_SESSION["loggedIn"]) {
+		
+		//
+		// Get differences
+		//
+		function get_differences($original_data, $new_data) {
+			
+			// If given string for original data, assume it was urlencoded
+			if(!is_array($original_data)) {
+				parse_str(urldecode($original_data), $original_data);
+			}
+			
+			// Get differences between most values
+			$differences = array_diff( $new_data, $original_data );
+			
+			// Loop through data and clean up
+			foreach($original_data as $original_key => $original_value) {
+				
+				// Remove any inputs named original*
+				if(strpos($original_key, 'original') === 0) {
+					unset($differences[$original_key]);
+				}
+				
+				else {
+					
+					// Try to look through and catch any changes that were made in nested arrays
+					// This could be a thorough for arrays that are super nested, but I'm tired
+					if(is_array($original_value)) {
+						
+						foreach($original_value as $nested_key => $nested_value) {
+							
+							if(is_array($nested_value)) {
+								
+								// We have to account for the possibility that orig value was an array, but was removed, so new value isn't array
+								// Make sure we make note of strings that have been removed or arrays which have been removed, but we don't want to add "empty difference arrays"
+								$diff = array_diff( $new_data[$original_key][$nested_key] ?: [], $original_data[$original_key][$nested_key] );
+								if(!empty($diff) || !isset($new_data[$original_key][$nested_key])) {
+									$differences[$original_key][$nested_key] = $diff;
+								}
+								
+							}
+							else {
+								
+								$diff = array_diff( $new_data[$original_key] ?: [], $original_data[$original_key] );
+								if(!empty($diff) || !isset($new_data[$original_key])) {
+									$differences[$original_key] = $diff;
+								}
+								
+							}
+							
+						}
+						
+					}
+					
+					// Or if it's a long field (with line breaks), explode by line and compare that way
+					elseif(strpos($original_value, "\n") !== false) {
+						
+						$diff = array_diff( explode("\n", $new_data[$original_key]), explode("\n", $original_value) );
+						if(!empty($diff)) {
+							$differences[$original_key] = $diff;
+						}
+						
+					}
+					
+				}
+				
+			}
+			
+			return $differences;
+			
+		}
+		
+		$differences = sanitize( json_encode( get_differences($_POST['original'], $_POST ) ) );
+		
 		$update_keys = [
 			"name",
 			"romaji",
@@ -44,6 +117,7 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 			$stmt = $pdo->prepare($sql_artist);
 			
 			if($stmt->execute($sql_artist_values)) {
+				echo '3';
 				
 				// Cycle through edits and update edit history
 				if(strlen($_POST['changes'])) {
@@ -55,10 +129,14 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 					$changes = array_filter($changes);
 					$changes = array_unique($changes);
 					
+					print_r($changes);
+					
 					if(is_array($changes) && !empty($changes)) {
 						
+						echo '1';
+						
 						// Prepare SQL statements
-						$sql_artist_edits = 'INSERT INTO edits_artists (artist_id, user_id, content) VALUES (?, ?, ?)';
+						$sql_artist_edits = 'INSERT INTO edits_artists (artist_id, user_id, content, content_preview) VALUES (?, ?, ?, ?)';
 						$stmt_artist_edits = $pdo->prepare($sql_artist_edits);
 						
 						$sql_musician_edits = 'INSERT INTO edits_musicians (musician_id, user_id, content) VALUES (?, ?, ?)';
@@ -95,7 +173,11 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 								
 								// Insert change into edits DB
 								if(strlen($change)) {
-									if($stmt_artist_edits->execute([ $_POST['id'], $_SESSION['userID'], $change ])) {
+									if($stmt_artist_edits->execute([ $_POST['id'], $_SESSION['userID'], $differences, $change ])) {
+										echo 'y';
+									}
+									else {
+										echo 'n';
 									}
 								}
 							}
