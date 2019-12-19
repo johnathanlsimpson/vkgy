@@ -40,6 +40,7 @@
 						?>
 						
 						<input id="form__changes" name="changes" type="hidden" />
+						<input id="form__original" name="original" type="hidden" />
 						
 						<div class="col c1">
 							<div>
