@@ -27,7 +27,7 @@
 		'Edit artist' => '/artists/'.$artist['friendly'].'/edit/',
 	]);
 	
-	if($_SESSION["admin"] > 0) { 
+	if($_SESSION["admin"] > 0) {  
 			if(!empty($artist)) {
 				$artist['images'] = is_array($artist['images']) ? array_values($artist['images']) : [];
 				?>
