@@ -33,7 +33,6 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 			// Replace line breaks in new data
 			array_walk_recursive($new_data, function(&$value, $key) {
 				$value = str_replace(["\r\n", "\r"], "\n", $value);
-				$value .= 'z';
 			});
 			
 			// If given string for original data, assume it was urlencoded
@@ -43,17 +42,17 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 			
 			unset($original_data['changes'], $original_data['original'], $new_data['changes'], $new_data['original']);
 			
-			$diff = array_diff(array_map('json_encode', $original_data), array_map('json_encode', $new_data));
+		//	$diff = array_diff(array_map('json_encode', $original_data), array_map('json_encode', $new_data));
 			
 			global $output;
 			//$output['result'] = print_r($original_data['musicians'][155]['position'], true).print_r($new_data['musicians'][155]['position'], true);
-			ob_start(); var_dump(reset($original_data['musicians'])); $x = ob_get_clean();
-						ob_start(); var_dump(reset($new_data['musicians'])); $y = ob_get_clean();
-		$output['result'] .= print_r($x, true);
-			$output['result'] .= "<br /><br />";
-		$output['result'] .= print_r($y, true);
-		$x = ['position' => 2, 'x' => ['x']];
-$new = ['position' => 1, 'x' => ['x']];
+		//	ob_start(); var_dump(reset($original_data['musicians'])); $x = ob_get_clean();
+			//			ob_start(); var_dump(reset($new_data['musicians'])); $y = ob_get_clean();
+		//$output['result'] .= print_r($x, true);
+		//	$output['result'] .= "<br /><br />";
+		//$output['result'] .= print_r($y, true);
+	//	$x = ['position' => 2, 'x' => ['x']];
+//$new = ['position' => 1, 'x' => ['x']];
 //$output['result'] = print_r( array_udiff($new_data, $original_data, function($a, $b) {return $a <=> $b;}), true );
 			// Get differences between most values
 			$differences = array_diff( $new_data, $original_data );
@@ -80,43 +79,17 @@ $new = ['position' => 1, 'x' => ['x']];
 							
 							if(is_array($nested_value)) {
 								
-			//$output['result'] .= 'orig value 2 '.print_r($original_data[$original_key][$nested_key], true)."<br />";
-			//$output['result'] .= 'new value 2 '.print_r($new_data[$original_key][$nested_key], true)."<br />";
-			//$output['result'] .= 'diff '.($new_data[$original_key][$nested_key] === $original_data[$original_key][$nested_key])."<br /><br />";
-								
-			//$output['result'] = print_r($original_data[$original_key][$nested_key], true).'*'.print_r($new_data[$original_key][$nested_key], true);
-								
-								// We have to account for the possibility that orig value was an array, but was removed, so new value isn't array
-								// Make sure we make note of strings that have been removed or arrays which have been removed, but we don't want to add "empty difference arrays"
-								$diff = array_diff( $new_data[$original_key][$nested_key], $original_data[$original_key][$nested_key] );
-								
-								
-								
-								if($nested_key === 155) {
-								//	$output['result'] .= 'orig array<pre>'.print_r($original_data[$original_key][$nested_key],true).'</pre>'."\n\n";
-									//$output['result'] .= 'new array<pre>'.print_r($new_data[$original_key][$nested_key],true).'</pre>'."\n\n";
-									//$output['result'] .= 'array diff<pre>'.print_r(array_diff( $new_data[$original_key][$nested_key], $original_data[$original_key][$nested_key] ),true).'</pre>'."\n\n";
-								//	$output['result'] .= 'array diff test<pre>'.print_r(array_diff( ['position' => $new_data[$original_key][$nested_key]['position']], ['position' => $original_data[$original_key][$nested_key]['position']] ),true).'</pre>'."\n\n";
-								}
-								
-								
-								
-								
-								
-								
-								$output['result'] .= 'rawdiff<pre>'.print_r($diff, true).'</pre>';
-								
-								if(!empty($diff) || !isset($new_data[$original_key][$nested_key])) {
-									$differences[$original_key][$nested_key] = $diff;
+								foreach($nested_value as $nested_nested_key => $nested_nested_value) {
+									if($original_data[$original_key][$nested_key][$nested_nested_key] != $new_data[$original_key][$nested_key][$nested_nested_key]) {
+										$differences[$original_key][$nested_key][$nested_nested_key] = $new_data[$original_key][$nested_key][$nested_nested_key];
+									}
 								}
 								
 							}
 							else {
 								
-								$diff = array_diff( $new_data[$original_key], $original_data[$original_key] );
-								$output['result'] .= 'rawdiff2<pre>'.print_r($diff, true).'</pre>';
-								if(!empty($diff) || !isset($new_data[$original_key])) {
-									$differences[$original_key] = $diff;
+								if($original_data[$original_key][$nested_key] != $new_data[$original_key][$nested_key]) {
+									$differences[$original_key][$nested_key] = $new_data[$original_key][$nested_key];
 								}
 								
 							}
@@ -125,8 +98,24 @@ $new = ['position' => 1, 'x' => ['x']];
 						
 					}
 					
+					else {
+						if(strpos($original_value, "\n") !== false) {
+							
+							$diff = array_diff( explode("\n", $new_data[$original_key]), explode("\n", $original_value) );
+							
+							if(!empty($diff) || strpos($new_data[$original_key], "\n") === false) {
+								$differences[$original_key] = $diff;
+							}
+							
+						}
+						elseif($original_data[$original_key] != $new_data[$original_key]) {
+							$differences[$original_key] = $new_data[$original_key];
+						}
+						
+					}
+					
 					// Or if text, let's see if it's a long field, let's separate it and compare each line
-					elseif(strpos($original_value, "\n") !== false) {
+					/*elseif(strpos($original_value, "\n") !== false) {
 						
 						$diff = array_diff( explode("\n", $new_data[$original_key]), explode("\n", $original_value) );
 						
@@ -134,7 +123,7 @@ $new = ['position' => 1, 'x' => ['x']];
 							$differences[$original_key] = $diff;
 						}
 						
-					}
+					}*/
 					
 				}
 				
