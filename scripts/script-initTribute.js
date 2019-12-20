@@ -269,7 +269,7 @@ function cleanTributingContent(tributingElem, args = []) {
 	if(args.fullClean) {
 		cleanedOutput = dummyElem.textContent;
 		cleanedOutput = cleanedOutput.replace(/&nbsp;|\u00a0/g, ' ');
-		cleanedOutput = cleanedOutput.replace(/﻿| |&VeryThinSpace;|&#8202;|&#x200A;/g, '');
+		cleanedOutput = cleanedOutput.replace(/﻿|&#8203;| |&VeryThinSpace;|&#8202;|&#x200A;/g, '');
 		cleanedOutput = cleanedOutput.replace(/ +/g, ' ');
 	}
 	
@@ -471,7 +471,7 @@ function initTribute() {
 		if(elemNeedsPreview) {
 			newElem.addEventListener('keyup', debounce(() => {
 				tributableElem.value = cleanTributingContent(newElem, { fullClean: true, removeTrailingSpace: true });
-				tributableElem.dispatchEvent(new Event('change'));
+				tributableElem.dispatchEvent(new Event('change', { bubbles: true }));
 			}, 350));
 		}
 		
@@ -487,7 +487,7 @@ function initTribute() {
 	}
 	
 	
-		
+	
 	});
 	
 }

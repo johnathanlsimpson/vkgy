@@ -181,6 +181,11 @@ function submit(formElement, processorUrl, inputArgs) {
 						args.callbackOnSuccess(formElement, returnedData);
 					}
 				}
+				
+				// Reset form watcher
+				if(typeof initChangeWatcher === 'function') {
+					initChangeWatcher(formElement[0]);
+				}
 			}
 		}
 	});

@@ -1,5 +1,8 @@
 <?php
 	function standardize($input) {
+		
+		// Standardiz line breaks
+		$input = str_replace(["\r\n", "\r"], "\n", $input);
 		$input = mb_convert_kana($input, "aKV", "UTF-8");
 		$input = str_replace(["˜", "∼", "～", "〜"], "~", $input);
 		$input = str_replace("…", "・・・", $input);

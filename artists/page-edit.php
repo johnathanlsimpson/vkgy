@@ -10,6 +10,7 @@
 		"/scripts/script-initDelete.js",
 		"/scripts/script-initSelectize.js",
 		'/scripts/script-initTribute.js',
+		'/scripts/script-initChangeWatcher.js',
 		
 		"/artists/script-previewBio.js",
 		"/artists/script-exclusive.js",
@@ -128,7 +129,7 @@
 													<label class="input__label">
 														Label history
 													</label>
-													<textarea class="autoresize any--flex-grow input__textarea any--tributable" data-hint-only="label" name="label_history" placeholder="(1)&#10;(1), (2)&#10;(3) (management only)"><?php echo $artist["label_history"]; ?></textarea>
+													<textarea class="autoresize any--flex-grow input__textarea any--tributable" data-change-is-previewed="true" data-hint-only="label" name="label_history" placeholder="(1)&#10;(1), (2)&#10;(3) (management only)"><?php echo $artist["label_history"]; ?></textarea>
 												</div>
 											</div>
 											<!--<div class="any--weaken-color" style="padding-top: 1rem;"><span class="symbol__help"></span>
