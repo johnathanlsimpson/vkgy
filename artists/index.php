@@ -36,6 +36,22 @@
 					$error = 'Sorry, only admin users may access the edit artist page. Showing artist list instead.';
 				}
 			}
+			elseif($_GET['action'] === 'edits') {
+				
+				if(is_numeric($_GET['id'])) {
+					
+					if($_SESSION['is_vip']) {
+						$edit_id = sanitize($_GET['id']);
+					}
+					else {
+						$error = 'Sorry, only VIP members can view full edit.';
+					}
+					
+				}
+				
+				$show_edits_page = true;
+				
+			}
 			else {
 				if($_GET['section'] === 'videos') {
 					$show_videos = true;
@@ -101,6 +117,65 @@
 		}
 		
 		include("../artists/page-edit.php");
+	}
+
+	//
+	// Specific edits
+	//
+	if($show_edits_page) {
+		
+		$page_title = 'Edit history: '.$artist['quick_name'].($artist['romaji'] ? ' ('.$artist['name'].')' : null);
+		
+		breadcrumbs([
+			'Edits' => '/artists/'.$artist['friendly'].'/edits/'
+		]);
+		
+		// Get specific edit
+		if(is_numeric($edit_id)) {
+			breadcrumbs([
+				$edit_id => '/artists/'.$artist['friendly'].'/edits/'.$edit_id.'/'
+			]);
+			
+			$sql_edit_history = 'SELECT edits_artists.*, users.username FROM edits_artists LEFT JOIN users ON users.id=edits_artists.user_id WHERE edits_artists.id=? LIMIT 1';
+			$stmt_edit_history = $pdo->prepare($sql_edit_history);
+			$stmt_edit_history->execute([ $edit_id ]);
+			$edit = $stmt_edit_history->fetch();
+			$num_edits = is_array($edit) ? count($edit) : 0;
+			
+			if($num_edits > 0) {
+				$edit['content'] = json_decode($edit['content'], true);
+			}
+			else {
+				$error = 'Sorry, the specified edit couldn\'t be found. Showing all edits instead.';
+				unset($edit_id);
+			}
+		}
+		
+		// Get all edits
+		if(!is_numeric($edit_id)) {
+			$sql_edit_history = 'SELECT edits_artists.*, users.username FROM edits_artists LEFT JOIN users ON users.id=edits_artists.user_id WHERE edits_artists.artist_id=? ORDER BY date_occurred DESC';
+			$stmt_edit_history = $pdo->prepare($sql_edit_history);
+			$stmt_edit_history->execute([ $artist['id'] ]);
+			$edits = $stmt_edit_history->fetchAll();
+			$num_edits = is_array($edits) ? count($edits) : 0;
+			
+			if($num_edits > 0) {
+				foreach($edits as $edit_key => $edit) {
+					// Decode JSON, and since we're showing all edits, only show fields that were edited
+					$content = $edits[$edit_key]['content'];
+					$content = json_decode($content, true) ?: $content;
+					$content = is_array($content) ? implode(', ', array_keys($content) ) : $content;
+					$edits[$edit_key]['content'] = $content;
+				}
+			}
+			else {
+				$error = 'Sorry, no edits could be found.';
+			}
+		}
+		
+		include('head.php');
+		include('page-edits.php');
+		
 	}
 	
 	//
@@ -320,7 +395,7 @@
 	//
 	// Transform data & load page: artist list
 	//
-	if(!$show_add_page && !$show_artist_page && !$show_videos && !$show_edit_page) {
+	if(!$show_add_page && !$show_artist_page && !$show_videos && !$show_edit_page && !$show_edits_page) {
 		$artist_list = $access_artist->access_artist(["letter" => $_GET["letter"], "get" => "artist_list"]);
 		$num_artists = is_array($artist_list) ? count($artist_list) : 0;
 		

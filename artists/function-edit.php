@@ -12,7 +12,7 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 		//
 		// Get differences
 		//
-		function stringify_differences($differences) {
+		function stringify_differences($differences, $difference_key = null) {
 			
 			if(is_array($differences)) {
 				array_walk_recursive($differences, function(&$value, $key) {
@@ -21,6 +21,10 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 			}
 			else {
 				$differences = sanitize($differences);
+			}
+			
+			if(strlen($difference_key)) {
+				$differences = [ $difference_key => $differences ];
 			}
 			
 			$differences = json_encode($differences);
@@ -40,104 +44,72 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 				parse_str($original_data, $original_data);
 			}
 			
+			// Ignore fields which are used to track changes
 			unset($original_data['changes'], $original_data['original'], $new_data['changes'], $new_data['original']);
 			
-		//	$diff = array_diff(array_map('json_encode', $original_data), array_map('json_encode', $new_data));
+			// Set up differences container
+			$differences = [];
 			
-			global $output;
-			//$output['result'] = print_r($original_data['musicians'][155]['position'], true).print_r($new_data['musicians'][155]['position'], true);
-		//	ob_start(); var_dump(reset($original_data['musicians'])); $x = ob_get_clean();
-			//			ob_start(); var_dump(reset($new_data['musicians'])); $y = ob_get_clean();
-		//$output['result'] .= print_r($x, true);
-		//	$output['result'] .= "<br /><br />";
-		//$output['result'] .= print_r($y, true);
-	//	$x = ['position' => 2, 'x' => ['x']];
-//$new = ['position' => 1, 'x' => ['x']];
-//$output['result'] = print_r( array_udiff($new_data, $original_data, function($a, $b) {return $a <=> $b;}), true );
-			// Get differences between most values
-			$differences = array_diff( $new_data, $original_data );
-			//unset($differences['original']);
-			
-			//$output['result'] .= 'orig value '.$original_data['musicians'][156]['position']."<br />";
-			//$output['result'] .= 'new value '.$new_data['musicians'][156]['position']."<br />";
-			
-			// Loop through data and clean up
+			// Since subarrays aren't handled by array_diff, let's take care of those first
+			// Let's also remove any other data with a name like original_*
 			foreach($original_data as $original_key => $original_value) {
 				
-				// Remove any inputs named original*
 				if(strpos($original_key, 'original') === 0) {
-					unset($differences[$original_key]);
+					unset($new_data[$original_key], $original_data[$original_key]);
 				}
 				
 				else {
 					
-					// Try to look through and catch any changes that were made in nested arrays
-					// This could be a thorough for arrays that are super nested, but I'm tired
+					// e.g. musicians
 					if(is_array($original_value)) {
-						
-						foreach($original_value as $nested_key => $nested_value) {
+						foreach($original_value as $sub_key => $sub_value) {
 							
-							if(is_array($nested_value)) {
+							// e.g. musicians[221]
+							if(is_array($sub_value)) {
 								
-								foreach($nested_value as $nested_nested_key => $nested_nested_value) {
-									if($original_data[$original_key][$nested_key][$nested_nested_key] != $new_data[$original_key][$nested_key][$nested_nested_key]) {
-										$differences[$original_key][$nested_key][$nested_nested_key] = $new_data[$original_key][$nested_key][$nested_nested_key];
-									}
+								// Here, since we're comparing two arrays of values, if the diff is empty, that means there were no changes, so let's not place it on top
+								// (But if any of the subvalues were deleted, that empty subvalue will still be retained)
+								$diff = array_diff_assoc( $new_data[$original_key][$sub_key], $original_data[$original_key][$sub_key] );
+								if(!empty($diff)) {
+									$differences[$original_key][$sub_key] = $diff;
 								}
 								
+								unset($new_data[$original_key][$sub_key], $original_data[$original_key][$sub_key]);
 							}
 							else {
+								$differences[$original_key] = array_diff_assoc( $new_data[$original_key], $original_data[$original_key] );
 								
-								if($original_data[$original_key][$nested_key] != $new_data[$original_key][$nested_key]) {
-									$differences[$original_key][$nested_key] = $new_data[$original_key][$nested_key];
-								}
-								
+								unset($new_data[$original_key], $original_data[$original_key]);
 							}
 							
 						}
 						
 					}
-					
-					else {
-						if(strpos($original_value, "\n") !== false) {
-							
-							$diff = array_diff( explode("\n", $new_data[$original_key]), explode("\n", $original_value) );
-							
-							if(!empty($diff) || strpos($new_data[$original_key], "\n") === false) {
-								$differences[$original_key] = $diff;
-							}
-							
-						}
-						elseif($original_data[$original_key] != $new_data[$original_key]) {
-							$differences[$original_key] = $new_data[$original_key];
-						}
-						
-					}
-					
-					// Or if text, let's see if it's a long field, let's separate it and compare each line
-					/*elseif(strpos($original_value, "\n") !== false) {
-						
-						$diff = array_diff( explode("\n", $new_data[$original_key]), explode("\n", $original_value) );
-						
-						if(!empty($diff) || strpos($new_data[$original_key], "\n") === false) {
-							$differences[$original_key] = $diff;
-						}
-						
-					}*/
 					
 				}
 				
 			}
 			
+			// Get the rest of the data differences
+			$differences = array_merge($differences, array_diff_assoc( $new_data, $original_data ));
 			
-			$output['result'] .= 'diffs<pre>'.print_r($differences, true).'</pre>';
+			// Loop through differences, and for any differences of long text, explode and see if we can get more specific
+			foreach($differences as $diff_key => $diff_value) {
+				
+				if(!is_array($diff_value) && strpos($diff_value, "\n") !== false) {
+					
+					// Using array_diff here since we don't care about keys e.g. no two bio entries should be the same (???)
+					$differences[$diff_key] = array_diff( explode("\n", $new_data[$diff_key]), explode("\n", $original_data[$diff_key]) );
+					
+				}
+				
+			}
+			
 			return $differences;
 			
 		}
 		
 		$changes = get_differences($_POST['original'], $_POST);
-		
-		//$output['result'] = print_r($changes, true);
 		
 		$update_keys = [
 			"name",
@@ -176,80 +148,46 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 			if($stmt->execute($sql_artist_values)) {
 				
 				// Cycle through edits and update edit history
-				//if(strlen($_POST['changes'])) {
+				if(is_array($changes) && !empty($changes)) {
 					
-					// Explode changes input and clean
-					/*$changes = $_POST['changes'];
-					$changes = preg_match('/'.'^[\w-\[\]\,]+$'.'/', $changes) ? $changes : null;
-					$changes = explode(',', $changes);
-					$changes = array_filter($changes);
-					$changes = array_unique($changes);*/
-				
-					if(is_array($changes) && !empty($changes)) {
-						
-						// Prepare SQL statements
-						$sql_artist_edits = 'INSERT INTO edits_artists (artist_id, user_id, name, content) VALUES (?, ?, ?, ?)';
-						$stmt_artist_edits = $pdo->prepare($sql_artist_edits);
-						
-						$sql_musician_edits = 'INSERT INTO edits_musicians (musician_id, user_id, name, content) VALUES (?, ?, ?, ?)';
-						$stmt_musician_edits = $pdo->prepare($sql_musician_edits);
-						
-						foreach($changes as $change_key => $change) {
-							if($change_key !== 'changes') {
-								
-								// If change to musician, clean and insert into separate DB
-								if($change_key === 'musicians') {
-									foreach($change as $musician_id => $musician_changes) {
-										foreach($musician_changes as $musician_change_key => $musician_change) {
-											if($stmt_musician_edits->execute([ sanitize($musician_id), $_SESSION['userID'], sanitize($musician_change_key), stringify_differences($musician_change) ])) {
-											}
+					// Prepare SQL statements
+					$sql_artist_edits = 'INSERT INTO edits_artists (artist_id, user_id, content) VALUES (?, ?, ?)';
+					$stmt_artist_edits = $pdo->prepare($sql_artist_edits);
+					
+					$sql_musician_edits = 'INSERT INTO edits_musicians (musician_id, user_id, content) VALUES (?, ?, ?)';
+					$stmt_musician_edits = $pdo->prepare($sql_musician_edits);
+					
+					foreach($changes as $change_key => $change) {
+						if($change_key !== 'changes') {
+							
+							// If change to musician, clean and insert into separate DB
+							if($change_key === 'musicians') {
+								foreach($change as $musician_id => $musician_changes) {
+									foreach($musician_changes as $musician_change_key => $musician_change) {
+										if($stmt_musician_edits->execute([ sanitize($musician_id), $_SESSION['userID'], stringify_differences($musician_change, $musician_change_key) ])) {
 										}
-										
-										$musician_name = 
-											$_POST['musicians'][$musician_id]['as_romaji'] ?:
-											($_POST['musicians'][$musician_id]['as_name'] ?:
-											($_POST['musicians'][$musician_id]['romaji'] ?:
-											($_POST['musicians'][$musician_id]['name'] ?:
-											$_POST['musicians'][$musician_id]['friendly'])));
-										
-										$change[$musician_name] = $musician_changes;
-										unset($change[$musician_id]);
 									}
-								}
-								/*if(preg_match('/'.'^musicians\[(\d+)\]\[(\w+)\]$'.'/', $change, $change_match)) {
-									$musician_id = $change_match[1];
 									
-									if(is_array($_POST['musicians']) && is_array($_POST['musicians'][$musician_id])) {
-										if($stmt_musician_edits->execute([ $musician_id, $_SESSION['userID'], sanitize($change_match[2]) ])) {
-										}
-										
-										$musician_name = 
-											$_POST['musicians'][$musician_id]['as_romaji'] ?:
-											($_POST['musicians'][$musician_id]['as_name'] ?:
-											($_POST['musicians'][$musician_id]['romaji'] ?:
-											($_POST['musicians'][$musician_id]['name'] ?:
-											$_POST['musicians'][$musician_id]['friendly'])));
-										
-										$change = 'musician ('.$musician_name.') '.$change_match[2];
-									}
-									else {
-										$change = null;
-									}
-								}*/
-								
-								// Clean change again
-								//$change = str_replace('_', ' ', $change);
-								//$change = sanitize($change);
-								
-								// Insert change into edits DB
-								if(is_array($change) || strlen($change)) {
-									if($stmt_artist_edits->execute([ $_POST['id'], $_SESSION['userID'], sanitize($change_key), stringify_differences($change) ])) {
-									}
+									$musician_name = 
+										$_POST['musicians'][$musician_id]['as_romaji'] ?:
+										($_POST['musicians'][$musician_id]['as_name'] ?:
+										($_POST['musicians'][$musician_id]['romaji'] ?:
+										($_POST['musicians'][$musician_id]['name'] ?:
+										$_POST['musicians'][$musician_id]['friendly'])));
+									
+									$change[$musician_name] = $musician_changes;
+									unset($change[$musician_id]);
+								}
+							}
+							
+							// Insert change into edits DB
+							if(is_array($change) || strlen($change)) {
+								if($stmt_artist_edits->execute([ $_POST['id'], $_SESSION['userID'], stringify_differences($change, $change_key) ])) {
 								}
 							}
 						}
 					}
-				//}
+				}
 				
 				$output["status"] = "success";
 				$output["artist_quick_name"] = $update_values["romaji"] ?: $update_values["name"];
