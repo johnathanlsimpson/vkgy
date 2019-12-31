@@ -3,7 +3,6 @@
 	$page_header = lang('Member profile', 'プロフィール', ['container' => 'div']);
 
 		include_once("../avatar/class-avatar.php");
-		include_once("../avatar/avatar-options.php");
 		include_once("../avatar/avatar-definitions.php");
 
 		$access_artist = new access_artist($pdo);
