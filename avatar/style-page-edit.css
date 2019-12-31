@@ -63,7 +63,7 @@
 		margin-right: 0;
 	}
 }
-.avatar__random {
+.avatar__random, .avatar__reset {
 	margin-left: 0.5rem;
 }
 .avatar__result:empty {

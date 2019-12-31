@@ -12,3 +12,47 @@ avatarGroupLinks.forEach(function(elem) {
 		elem.classList.add('tertiary-nav--active');
 	});
 });
+
+// Randomize
+var randButton = document.getElementsByClassName('avatar__random')[0];
+randButton.addEventListener('click', function(event) {
+	event.preventDefault();
+	chooseAvatarParts('random')
+});
+
+// Reset
+var resetButton = document.getElementsByClassName('avatar__reset')[0];
+resetButton.addEventListener('click', function(event) {
+	event.preventDefault();
+	chooseAvatarParts('reset')
+});
+
+// Randomize/reset avatar parts (loop through and hide all but one layer)
+function chooseAvatarParts(method) {
+	var radioElems = document.querySelectorAll('[name=form__avatar] .input__checkbox');
+	var elemName, prevName, selectedNum;
+	
+	for(var i=0; i<radioElems.length; i++) {
+		elemName = radioElems[i].getAttribute('name');
+		
+		if(prevName != elemName) {
+			selectedElems = document.querySelectorAll('[name=' + elemName + ']');
+			
+			if(method === 'random') {
+				selectedNum = Math.floor(Math.random() * Math.floor(selectedElems.length));
+			}
+			else if(method === 'reset') {
+				selectedNum = 0;
+			}
+			
+			for(var n=0; n<selectedElems.length; n++) {
+				selectedElems[n].checked = false;
+			}
+			
+			console.log(selectedElems[selectedNum]);
+			selectedElems[selectedNum].checked = true;
+		}
+		
+		prevName = elemName;
+	}
+}

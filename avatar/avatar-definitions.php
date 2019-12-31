@@ -1,6 +1,71 @@
 <?php
-	include_once("../avatar/avatar-options.php");
 	
+	/*
+	** This file contains all definitions (gradients, clip paths, some CSS) that is included with the avatars wherever they are
+	*/
+	
+	// Get JSON list of all possible avatar parts, paths, and colors, and parse into array
+	ob_start();
+	include_once('avatar-options.json');
+	$avatar_layers = ob_get_clean();
+	$avatar_layers = json_decode( $avatar_layers, true );
+	
+	// Loop through list of possible parts, and make right-hand versions of left-handed parts available
+	foreach($avatar_layers as $section_key => $section) {
+		if(is_array($section['attributes']) && $section['attributes']['mirror_is_selectable']) {
+			
+			// Loop through each layer of the section
+			foreach($section as $layer_key => $layer) {
+				
+				if($layer_key != 'attributes') {
+					
+					// Make copy of left (default) layer, change 'left' to 'right' in name, add to section, note that new layer needs CSS flip
+					$new_layer_key = str_replace('-left', '-right', $layer_key);
+					$section[$new_layer_key] = $layer;
+					$section[$new_layer_key]['attributes']['is_mirror'] = true;
+					
+					// For eyes, make sure they're face the same direction (...)
+					/*if($layer['positions'] && is_array($layer['positions'])) {
+						echo '+++++'.print_r($layer['positions'], true);
+						foreach($layer['positions'] as $position_key => $position_value) {
+							if($position_key === 'left') {
+								$section[$new_layer_key]['positions']['right'] = $position_value;
+								unset($section[$new_layer_key]['positions']['left']);
+							}
+							elseif($position_key === 'right') {
+								$section[$new_layer_key]['positions']['left'] = $position_value;
+								unset($section[$new_layer_key]['positions']['right']);
+							} 
+						}
+					}*/
+					if($layer_key === 'iris-left' || $layer_key === 'pupil-left') {
+						$section[$new_layer_key]['positions']['right'] = $section[$layer_key]['positions']['left'];
+						$section[$new_layer_key]['positions']['left'] = $section[$layer_key]['positions']['right'];
+						$section[$new_layer_key]['attributes']['shape_is_selectable'] = false;
+					}
+					
+					// In the copy's description, replace instances of 'left' with 'right'
+					if($layer['description']) {
+						$section[$new_layer_key]['description']['en'] = str_replace('(left)', '(right)', $section[$new_layer_key]['description']['en']);
+						$section[$new_layer_key]['description']['ja'] = str_replace('(左)', '(右)', $section[$new_layer_key]['description']['ja']);
+					}
+					
+					if($layer['attributes']['clipped_by']) {
+						$section[$new_layer_key]['attributes']['clipped_by'] = str_replace('-left', '-right', $section[$new_layer_key]['attributes']['clipped_by']);
+					}
+					
+					// Make sure 'extends part' refers to the copy's layers instead of the original's
+					if($layer['extends_part']) {
+						$section[$new_layer_key]['extends_part'] = str_replace('-left', '-right', $section[$new_layer_key]['extends_part']);
+					}
+				}
+				
+			}
+			
+			$avatar_layers[$section_key] = $section;
+		}
+	}
+
 	ob_start();
 ?>
 
@@ -37,6 +102,11 @@
 		}
 		.avatar__filter--opacity-25 {
 			fill-opacity: 0.25;
+			stroke-opacity: 0.25;
+		}
+		.avatar__filter--opacity-50 {
+			fill-opacity: 0.50;
+			stroke-opacity: 0.50;
 		}
 		.avatar__filter--smear {
 			filter: url(#avatar__filter--smear);
