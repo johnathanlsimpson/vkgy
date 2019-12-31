@@ -93,8 +93,6 @@
 				$filtered_groups['eye']['iris-right']['positions'] = [ $right_position => '' ];
 			}
 			
-			//echo '<pre>'.print_r($filtered_groups, true).'</pre>';
-			
 			return $filtered_groups;
 		}
 		
@@ -152,8 +150,6 @@
 				}
 			}
 			
-			//echo '<pre>'.print_r($all_groups, true).'</pre>';
-			
 			return $all_groups;
 		}
 		
@@ -177,12 +173,11 @@
 									if(is_array($shape_option)) {
 										if(!$layer["extends_part"] || isset($this->filtered_avatar_options[$group_name][$layer["extends_part"]]["shapes"][$shape_option_name])) {
 											$class  = "{$group_name}__{$layer_name} ";
+											$class .= $layer['extends_part'] && !$shape_option['fill'] ? $group_name.'__'.$layer['extends_part'].' ' : null;
 											$class .= $group_name."__".($layer["extends_part"] ?: $layer_name)."--".$shape_option_name;
 											$class .= $layer['attributes']['is_mirror'] ? ' avatar--right' : null;
-											$g_class = "{$group_name}__{$layer_name} ";
 											
 											$g_transform = ($shape_option["transform"] ?: null).($layer['attributes']['is_mirror'] ? ' scale(-1,1) translate(-600,0)' : null);
-											//$clip_path = ($shape_option["clip_path"] ? 'url(#'.$shape_option["clip_path"].')' : null);
 											
 											// Movement
 											$position = $this->filtered_avatar_options[$group_name][$layer_name]['positions'];
@@ -208,19 +203,6 @@
 											
 											// Set fill using color found above (unless custom path is used, which may have fill baked in)
 											$fill = !$shape_option['custom'] || strpos($shape_option['custom'], 'fill=') === 0 ? 'fill="'.$color.'"' : null;
-											//$fill = $shape_strpos($shape_option['custom'], 'fill=') === false ? ''
-											
-											// If layer does not have any colors set, but extends another layer, grab colors from other layer
-											//if($layer['extends_part'] && !isset($this->filtered_avatar_options[$group_name][$layer_name]["colors"])) {
-												//$color = $shape_option["fill"] ?: $this->filtered_avatar_options[$group_name][$layer['extends_part']]["colors"].'YYYY';
-											//}
-											//else {
-												//$color = $shape_option["fill"] ?: $this->filtered_avatar_options[$group_name][$layer_name]["colors"].'ZZZZ';
-											//}
-											//$color = is_array($color) ? reset($color) : ($color ?: null);
-											//$fill  = $show_fallbacks && is_array($color) && $color['fallback'] ? 'fill="'.$color['fallback'].'"' : null;
-											//$color = is_array($color) ? $color["color"] : $color;
-											//$fill  = $fill ?: (strpos($shape_option["custom"], "fill=") === false ? 'fill="'.$color.'"' : null);
 											
 											// Set stroke if specified, otherwise make sure there's none
 											$stroke = $shape_option['stroke'] ? 'stroke="'.$shape_option['stroke'].'" stroke-width="2"' : 'stroke="none"';
