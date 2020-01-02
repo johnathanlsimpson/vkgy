@@ -597,7 +597,7 @@
 				$sql_values[] = sanitize(str_replace(["y", "m", "d"], "0", $args["end_date"]));
 			}
 			if(!empty($args["upc"])) {
-				$sql_where[] = "releases.upc LIKE CONCAT('%', ?, '%')";
+				$sql_where[] = "releases.upc LIKE CONCAT(?, '%')";
 				$sql_values[] = sanitize($args["upc"]);
 			}
 			if(!empty($args["jan_code"])) {
