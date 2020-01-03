@@ -18,7 +18,10 @@
 		
 		background("/artists/".$release["artist"]["friendly"]."/main.large.jpg");
 		
-		style("/releases/style-page-id.css");
+		style([
+			'/releases/style-page-id.css',
+			'/releases/style-partial-tracklist.css'
+		]);
 		
 		script([
 			"/scripts/script-rateAlbum.js",
@@ -112,7 +115,7 @@
 												<?php
 											}
 										?>
-
+										
 										<div class="any--flex-grow">
 											<?php
 												if($release['artist']['display_name']) {
@@ -131,13 +134,13 @@
 													<span itemprop="name" data-album="<?php echo $release["name"]." ".($release["press_name"] ?: null)." ".($release["type_name"] ?: null); ?>" data-albumsort="<?php echo $release["romaji"] ? $release["romaji"]." ".($release["press_romaji"] ?: $release["press_name"])." ".($release["type_romaji"] ?: $release["type_name"]) : null; ?>">
 														<?php
 															echo $release["romaji"] ?: $release["name"];
-
+															
 															if($release["press_name"]) {
 																?>
 																	<span class="any--weaken a--outlined"><?php echo $release["press_romaji"] ?: $release["press_name"]; ?></span>
 																<?php
 															}
-
+															
 															if($release["type_name"]) {
 																?>
 																	<span class="any--weaken a--outlined"><?php echo $release["type_romaji"] ?: $release["type_name"]; ?></span>
@@ -145,7 +148,7 @@
 															}
 														?>
 													</span>
-
+													
 													<?php
 														if($release["romaji"] || $release["press_romaji"] || $release["type_romaji"]) {
 															?>
@@ -162,13 +165,13 @@
 												<span class="any--ja any--hidden">
 													<?php
 														echo $release["name"];
-
+														
 														if($release["press_name"]) {
 															?>
 																<span class="any--weaken a--outlined"><?php echo $release["press_name"]; ?></span>
 															<?php
 														}
-
+														
 														if($release["type_name"]) {
 															?>
 																<span class="any--weaken a--outlined"><?php echo $release["type_name"]; ?></span>
@@ -206,7 +209,7 @@
 																		<?php
 																			if($data_section === "upc") {
 																				preg_match("/"."^([^ -]+)(.*)$"."/", $release["upc"], $upc_match);
-
+																				
 																				if($upc_match[1]) {
 																					echo '<a class="a--inherit" href="/search/releases/?upc='.$upc_match[1].'#result">'.$upc_match[1].'</a>';
 																					echo $upc_match[2];
@@ -243,9 +246,9 @@
 														}
 													}
 												?>
-
+												
 											</div>
-
+											
 											<div class="input__row">
 												<div class="input__group">
 													<label class="collect input__checkbox-label <?php echo $release["is_owned"] ? "input__checkbox-label--selected symbol__checked" : "symbol__unchecked"; ?>" data-action="own" data-id="<?php echo $release["id"]; ?>">I own this</label>
@@ -253,12 +256,12 @@
 												<div class="input__group">
 													<label class="collect input__checkbox-label <?php echo $release["is_wanted"] ? "input__checkbox-label--selected symbol__checked" : "symbol__unchecked"; ?>" data-action="want" data-id="<?php echo $release["id"]; ?>">I want this</label>
 												</div>
-
+												
 												<div class="collect__result text text--outlined text--notice symbol__help"></div>
 											</div>
 											<ul class="input__row">
 												<span itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating"><span class="any--hidden" itemprop="ratingValue"><?php echo $release["rating"]; ?></span><span class="any--hidden" itemprop="reviewCount">1</span></span>
-
+												
 												<div class="input__group data__item" data-year="<?php echo substr($release["date_occurred"], 0, 4); ?>" data-date="<?php echo $release["date_occurred"]; ?>">
 													<div>
 														<h5>
@@ -288,7 +291,7 @@
 													</div>
 												</div>
 											</ul>
-
+											
 											<div class="input__row">
 												<div class="input__group">
 													<a class="a--outlined a--padded any--weaken-size" href="http://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/searches?term.media_format=&f=all&q=<?php echo $release["upc"] ? str_replace(["-000", "-00", "-0"], "-", $release["upc"]) : str_replace(" ", "+", $release["quick_name"]); ?>" target="_blank"><?php echo $release["upc"] ? "Buy at CDJapan" : "Search at CDJapan"; ?></a>
@@ -297,7 +300,7 @@
 										</div>
 									</div>
 								</div>
-
+								
 								<div>
 									<table class="text release__tracklist">
 										<?php
@@ -321,7 +324,7 @@
 											
 											ob_start();
 												?>
-													<tr class="release__track">
+													<tr class="release__track {track_class}">
 														<td class="track__num any--weaken">{track_num}.</td>
 														<td class="track__artist {artist_class}"><a class="artist artist--no-symbol track--no-wrap" data-name="{artist_official_name}" data-quickname="{artist_quick_name}" href="/releases/{artist_friendly}/">{artist_name}</a></td>
 														<td class="track__name" data-track="{track_official_name}">{track_name}</td>
@@ -351,6 +354,9 @@
 															
 															if(is_array($section['tracks']) && !empty($section['tracks'])) {
 																foreach($section['tracks'] as $track_num => $track) {
+																	
+																	// If only track and name is "contents unknown", set class to hide track numbering
+																	$track_class = $track['name'] === '(contents unknown)' && count($section['tracks']) === 1 ? 'track--hide-number' : null;
 																	
 																	// Save official name
 																	$track_official_name = $track['name'];
@@ -389,6 +395,7 @@
 																	}
 																	
 																	echo render_component($template_track, [
+																		'track_class' => $track_class,
 																		'track_num' => $track_num,
 																		'artist_official_name' => $artist_official_name,
 																		'artist_name' => $artist_name,
@@ -411,7 +418,7 @@
 											}
 										?>
 									</table>
-
+									
 									<?php
 										if(!empty($release["notes"])) {
 											?>
