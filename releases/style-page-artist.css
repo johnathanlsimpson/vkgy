@@ -1,22 +1,3 @@
-.release__tracklist {
-	text-align: left;
-}
-.release__track-name {
-	width: 100%;
-}
-.release__track-name * {
-	vertical-align: inherit;
-}
-.release__track-num {
-	white-space: nowrap;
-}
-.release__disc {
-	padding-bottom: 1rem;
-}
-.release__section {
-	padding-bottom: 1rem;
-	padding-top: 1rem;
-}
 .release__data {
 	margin-left: 1rem;
 	text-transform: uppercase;
@@ -27,8 +8,6 @@
 	display: block;
 	text-align: center;
 	width: 100%;
-}
-.release__data > * + * {
 }
 
 .collect__container {
@@ -68,50 +47,4 @@
 .release__image-link, .release__image {
 	display: block;
 	width: 100px;
-}
-
-
-@media(max-width: 799.9px) {
-	.track__name {
-		padding-top: 0;
-	}
-	.track__num, .track__artist {
-		display: block;
-		padding: 0;
-		padding-top: 0.5rem;
-		width: auto;
-	}
-	.track__artist:empty {
-		padding: 0;
-	}
-	.track__name {
-		display: block;
-		padding: 0;
-		padding-top: 0.5rem;
-		padding-bottom: 0.5rem;
-	}
-}
-@media(min-width: 800px) {
-	.track__num, .track__artist, .track__name {
-		display: table-cell;
-	}
-	.track__artist:empty {
-		max-width: 0;
-		min-width: 0;
-		padding-left: 0;
-		padding-right: 0;
-		width: 0;
-	}
-	.track__artist:not(:empty) {
-		max-width: 150px;
-		min-width: 150px;
-		width: 150px;
-	}
-	.track__artist-romaji {
-		display: block;
-	}
-	.track__artist-romaji::before, .track__artist-romaji::after {
-		content: none;
-		display: none;
-	}
 }

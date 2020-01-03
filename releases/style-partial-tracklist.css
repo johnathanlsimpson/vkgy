@@ -1,0 +1,114 @@
+/* Make entire table left and vertically aligned */
+.release__tracklist {
+	text-align: left;
+}
+.release__tracklist td {
+	vertical-align: top;
+}
+/* Hide track number if release's contents are completely unknown */
+.track--hide-number .track__num {
+	display: none;
+}
+/* For track num and artist, set width (a.k.a. min-width for cell) */
+.track__num,
+.track__artist {
+	max-width: 300px;
+	overflow: hidden;
+	white-space: nowrap;
+	width: 1ch;
+}
+.track__num,
+.track__num.track__num.track__num {
+	padding-right: 0;
+	padding-top: calc(0.5rem + 1px);
+	width: calc(2rem - 2px);
+}
+tr:first-of-type .track__num.track__num.track__num {
+	padding-top: 1px;
+}
+/* For artist column, make no-wrap with ellipsis */
+.track--no-wrap,
+.track--no-wrap div {
+	display: block;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+/* For tracks with no artist, make only border of td visible */
+.track--no-artist,
+.track--no-artist.track--no-artist.track--no-artist {
+	height: 1px;
+	padding-right: 0;
+	width: 1px;
+}
+/* Hide parentheses in notes in selected language, and show parentheses in non-selected lang */
+#language-en:checked ~ .col .track__name .any--en > .any__note .track__parenth,
+#language-ja:checked ~ .col .track__name .any--ja > .any__note .track__parenth {
+	color: transparent;
+	font-size: 0;
+}
+#language-en:checked ~ .col .track__name .any--en .any--weaken .any__note {
+	background-color: transparent;
+	padding-left: 0;
+	padding-right: 0;
+}
+/* For disc and section headers, pad to left and position symbol in gap */
+.release__disc th,
+.release__section th {
+	padding-left: 2rem;
+}
+.release__disc th {
+	color: hsl(var(--accent));
+}
+.track__symbol {
+	left: 0;
+	position: absolute;
+}
+.release__section .track__symbol {
+	top: 3px;
+}
+/* Add appropriate top/bottom padding to disc and section headers */
+.release__disc th,
+.release__section th {
+	padding-bottom: 0.5rem;
+}
+/* Add fake border to disc header, since we can't use margin and padding */
+.release__track + .release__disc th {
+	background-image: linear-gradient(to right, hsl(var(--text--secondary)) 50%, hsla(var(--text--secondary), 0) 0);
+	background-position: left 1rem;
+	background-repeat: repeat-x;
+	background-size: 2px 1px;
+	padding-top: 2.5rem;
+}
+/* Mobile views--have to be super specific because of td:last-of-type, etc */
+@media(max-width: 599.9px) {
+	/* Keep number to left and stack artist name and song title */
+	.track__artist,
+	.track__artist.track__artist.track__artist,
+	.track__name {
+		display: block;
+		max-width: 100%;
+		width: 100%;
+	}
+	.track--no-wrap {
+		display: inline-block;
+	}
+	/* On mobile, remove padding & border between artist & track name (& hide no-artist) */
+	.track__artist,
+	.track__artist.track__artist.track__artist {
+		padding-bottom: 0;
+	}
+	.track--no-artist,
+	.track--no-artist.track--no-artist.track--no-artist {
+		height: 1px;
+		padding: 0;
+	}
+	.track__artist:not(.track--no-artist) + .track__name {
+		padding-top: 0;
+	}
+	.track__name,
+	.track__name.track__name.track__name {
+		border-top: none;
+	}
+}
