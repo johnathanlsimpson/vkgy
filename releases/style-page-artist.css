@@ -36,6 +36,9 @@
 .release__control {
 	display: inline-block;
 }
+.release__pseudonym {
+	margin-bottom: 1rem;
+}
 
 #cd:checked ~ .release__container:not([data-medium*="cd"]) { display: none; }
 #dvd:checked ~ .release__container:not([data-medium*="dvd"]):not([data-medium*="vhs"]):not([data-medium*="blu-ray"]) { display: none; }

@@ -151,11 +151,11 @@
 	$release['images'] = array_values($release['images']);
 	
 	// If artist isn't set, but is mentioned in URL, get artist's data
-	if(strlen($_GET['artist'])) {
+	if(empty($release['artist']) && strlen($_GET['artist'])) {
 		$access_preselected_artist = new access_artist($pdo);
 		$release['artist'] = $access_preselected_artist->access_artist([ 'friendly' => sanitize($_GET['artist']), 'get' => 'name' ]);
 	}
-
+	
 	$pageTitle = !empty($release["quick_name"]) ? "Edit: ".$release["quick_name"]." - ".$release["artist"]["quick_name"] : "Add release";
 ?>
 
