@@ -5,10 +5,31 @@ include_once('../php/include.php');
 if($_SESSION['is_signed_in']) {
 	
 	// Clean & set user preferences
-	foreach(['name', 'motto', 'email', 'facebook', 'lastfm', 'tumblr', 'fan_since', 'site_theme', 'gender', 'icon'] as $key) {
+	foreach(['name', 'motto', 'email', 'facebook', 'lastfm', 'tumblr', 'fan_since', 'site_theme', 'icon'] as $key) {
 		$sql_values[$key] = sanitize($_POST[$key]);
 		$sql_values[$key] = strlen($sql_values[$key]) ? $sql_values[$key] : null;
 	}
+	
+	// Clean pronouns
+	if(in_array($_POST['pronouns'], ['prefer not to say', 'she/her', 'he/him', 'they/them', 'custom'])) {
+		$pronouns = $_POST['pronouns'];
+		
+		if($pronouns === 'custom' && strlen($_POST['custom_pronouns'])) {
+			$custom_pronouns = $_POST['custom_pronouns'];
+			
+			if(in_array( preg_replace('/'.'[^A-z]'.'/', '', $custom_pronouns), ['attack', 'helicopter'] )) {
+				$pronouns = 'prefer not to say';
+			}
+			else {
+				$pronouns = $custom_pronouns;
+			}
+			
+		}
+	}
+	else {
+		$pronouns = 'prefer not to say';
+	}
+	$sql_values['pronouns'] = sanitize($pronouns);
 	
 	// If Twitter supplied, make sure we get username
 	if(strlen($_POST['twitter'])) {

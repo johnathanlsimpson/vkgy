@@ -437,12 +437,12 @@
 							?>
 
 							<?php
-								if($user['motto'] || $user['birthday'] || $user['gender'] || $user['website'] || $user['twitter'] || $user['tumblr'] || $user['facebook'] || $user['lastfm']) {
+								if($user['motto'] || $user['birthday'] || $user['pronouns'] || $user['website'] || $user['twitter'] || $user['tumblr'] || $user['facebook'] || $user['lastfm']) {
 									?>
 										<!-- User details -->
 										<ul class="user__data data__container">
 											<?php
-												foreach(['birthday', 'gender', 'website', 'twitter', 'tumblr', 'facebook', 'lastfm'] as $field) {
+												foreach(['birthday', 'pronouns', 'website', 'twitter', 'tumblr', 'facebook', 'lastfm'] as $field) {
 													if((!empty($user[$field]) || $user[$field] === 0) && $user[$field] != '0000-00-00') {
 														?>
 															<li class="data__item">
@@ -454,8 +454,8 @@
 																		case "member since":
 																			echo substr($user["date_added"], 0, 10);
 																			break;
-																		case "gender":
-																			echo ''.(["-", "♀️", "♂️", "&hearts;"][$user[$field]]).'';
+																		case "pronouns":
+																			echo $user[$field] ? sanitize($user[$field]) : 'prefer not to say';
 																			break;
 																		case "birthday":
 																			echo substr($user[$field], 0, 4).'-'.substr($user[$field], 5, 2).'-'.substr($user[$field], 8, 2);
