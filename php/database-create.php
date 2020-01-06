@@ -668,7 +668,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 	`lastfm` mediumtext COLLATE ".$pdo_config['db_collation'].",
 	`icon` mediumtext COLLATE ".$pdo_config['db_collation'].",
 	`birthday` date DEFAULT NULL,
-	`gender` tinyint(2) DEFAULT '0',
+	`gender` mediumtext COLLATE ".$pdo_config['db_collation'].",
 	`date_added` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
 	`artist_id` int(11) DEFAULT NULL,
 	`ip_address` varchar(50) COLLATE ".$pdo_config['db_collation']." DEFAULT NULL,

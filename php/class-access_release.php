@@ -479,6 +479,10 @@
 					$sql_select[] = "REPLACE(REPLACE(releases.price, ',', ''), ' yen', '') AS price";
 					$sql_select[] = "releases_collections.is_for_sale";
 				}
+				if(is_numeric($args["user_id"]) && $args['get'] === 'list') {
+					$sql_select[] = "REPLACE(REPLACE(releases.price, ',', ''), ' yen', '') AS price";
+					$sql_select[] = "releases_collections.is_for_sale";
+				}
 			}
 			
 			//

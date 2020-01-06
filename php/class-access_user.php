@@ -57,7 +57,7 @@
 						"users.lastfm",
 						"users.icon",
 						"users.birthday",
-						"users.gender",
+						"users.pronouns",
 						"users.date_added",
 						"users.artist_id",
 						'users.fan_since',
