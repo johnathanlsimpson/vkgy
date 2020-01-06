@@ -77,15 +77,15 @@
 								$release_display_romaji =
 									($release['romaji'] ?: $release['name']).
 									($release['press_name'] ? ' <span class="any--weaken a--outlined">'.($release['press_romaji'] ?: $release['press_name']).'</span>' : null ).
-									($release['romaji_name'] ? ' <span class="any--weaken a--outlined">'.($release['romaji_romaji'] ?: $release['romaji_name']).'</span>' : null );
+									($release['type_name'] ? ' <span class="any--weaken a--outlined">'.($release['type_romaji'] ?: $release['type_name']).'</span>' : null );
 							}
 							else {
 								$release_display_romaji = null;
 							}
 							$release_display_name =
 								($release['name']).
-								($release['press_name'] ? ' <span class="any--weaken a--outlined">'.($release['press_name']).'</span>' : null ).
-								($release['romaji_name'] ? ' <span class="any--weaken a--outlined">'.($release['romaji_name']).'</span>' : null );
+								($release['press_name'] ? ' <span class="any--weaken a--outlined">'.$release['press_name'].'</span>' : null ).
+								($release['type_name'] ? ' <span class="any--weaken a--outlined">'.$release['type_name'].'</span>' : null );
 							
 							?>
 							<div class="release__container" data-date="<?= $release['date_occurred']; ?>" data-name="<?= $release['friendly']; ?>" data-medium="<?= $media; ?>">
