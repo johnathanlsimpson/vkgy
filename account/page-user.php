@@ -443,7 +443,7 @@
 										<ul class="user__data data__container">
 											<?php
 												foreach(['birthday', 'pronouns', 'website', 'twitter', 'tumblr', 'facebook', 'lastfm'] as $field) {
-													if((!empty($user[$field]) || $user[$field] === 0) && $user[$field] != '0000-00-00') {
+													if(strlen($user[$field]) && !in_array($user[$field], ['0000-00-00', 'prefer not to say', 'custom'])) {
 														?>
 															<li class="data__item">
 																<h5>

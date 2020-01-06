@@ -48,7 +48,7 @@
 										</div>
 										<div class="input__group">
 											<label class="input__label">pronouns</label>
-											<select class="input" name="pronouns" placeholder="select pronouns" onchange="this.dataset.value=this.value;">
+											<select class="input" name="pronouns" placeholder="select pronouns">
 												<option value="prefer not to say" <?= $user['pronouns'] === 'prefer not to say' ? 'selected' : null; ?>>prefer not to say</option>
 												<option value="she/her" <?= $user['pronouns'] === 'she/her' ? 'selected' : null; ?>>she/her</option>
 												<option value="he/him" <?= $user['pronouns'] == 'he/him' ? 'selected' : null; ?>>he/him</option>
