@@ -326,7 +326,7 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 			// so that no other transforms are performed on it
 			if(is_array($history[$i]["parsed_live"])) {
 				
-				if(is_numeric($history[$i]['parsed_live']['id'])) {
+				if(is_numeric($history[$i]['parsed_live']['id']) && is_array($history[$i]['parsed_live']['lineup']) && count($history[$i]['parsed_live']['lineup']) < 2) {
 					$all_extant_lives[] = $history[$i]['parsed_live']['id'];
 				}
 				else {

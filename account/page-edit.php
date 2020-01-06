@@ -47,13 +47,15 @@
 											<input data-inputmask="'alias': '####-##-##'" max-length="10" name="birthday" placeholder="yyyy-mm-dd" size="10" value="<?php echo $user["birthday"]; ?>" />
 										</div>
 										<div class="input__group">
-											<label class="input__label">Gender</label>
-											<select class="input" name="gender" placeholder="select gender">
-												<option value="0" <?php echo $user["gender"] == "0" ? "selected" : null; ?>>prefer not to say</option>
-												<option value="1" <?php echo $user["gender"] == "1" ? "selected" : null; ?>>female</option>
-												<option value="2" <?php echo $user["gender"] == "2" ? "selected" : null; ?>>male</option>
-												<option value="3" <?php echo $user["gender"] == "3" ? "selected" : null; ?>>neither/other</option>
+											<label class="input__label">pronouns</label>
+											<select class="input" name="pronouns" placeholder="select pronouns">
+												<option value="prefer not to say" <?= $user['pronouns'] === 'prefer not to say' ? 'selected' : null; ?>>prefer not to say</option>
+												<option value="she/her" <?= $user['pronouns'] === 'she/her' ? 'selected' : null; ?>>she/her</option>
+												<option value="he/him" <?= $user['pronouns'] == 'he/him' ? 'selected' : null; ?>>he/him</option>
+												<option value="they/them" <?= $user['pronouns'] === 'they/them' ? 'selected' : null; ?>>they/them</option>
+												<option value="custom" <?= !in_array($user['pronouns'], ['prefer not to say', 'she/her', 'he/him', 'they/them']) ? 'selected' : null; ?>>custom</option>
 											</select>
+											<input class="input input--secondary any--hidden" name="custom_pronouns" placeholder="custom pronouns" value="<?= !in_array($user['pronouns'], ['prefer not to say', 'she/her', 'he/him', 'they/them']) ? $user['pronouns'] : null; ?>" />
 										</div>
 									</div>
 									<div class="input__row">
