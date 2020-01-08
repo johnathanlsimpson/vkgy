@@ -407,6 +407,8 @@
 			<!-- User header -->
 			<div class="col c1">
 				<div>
+					<?= $_SESSION['username'] == $user['username'] ? '<div class="text text--outlined text--notice symbol__help"><a href="/account/">Profile settings</a> and <a href="/account/edit-avatar/">avatar editing</a> have been moved to separate pages.</div>' : null; ?>
+					
 					<div class="text user__card any--flex" style="min-height: 100px; box-sizing: content-box;">
 						
 						<?= $_SESSION['username'] == $user['username'] ? '<a class="user__avatar-link" href="/account/edit-avatar/"><span class="user__avatar-text symbol__edit">'.lang('Edit avatar', 'アバター変更', 'hidden').'</span>' : null; ?>
@@ -418,8 +420,8 @@
 						<div>
 							<h1 class="user__username">
 								<a class="a--inherit symbol__user-nature <?= 'symbol__user-'.$user['icon']; ?>" href="/users/<?php echo $user["username"]; ?>/"><?php echo $user["username"]; ?></a>
-								<?= $_SESSION['username'] === $user['username'] ? '<a class="symbol__edit" href="/account/" style="font-size:1rem;font-weight:normal;line-height:1;vertical-align:middle;">'.lang('Edit settings', '情報変更', 'hidden').'</a>' : null; ?>
-								<?= $_SESSION['username'] === $user['username'] ? '<a class="symbol__edit" href="/account/edit-avatar/" style="font-size:1rem;font-weight:normal;line-height:1;vertical-align:middle;">'.lang('Edit avatar', 'アバター変更', 'hidden').'</a>' : null; ?>
+								<?= $_SESSION['username'] == $user['username'] ? '<a class="symbol__edit" href="/account/" style="font-size:1rem;font-weight:normal;line-height:1;vertical-align:middle;">'.lang('Edit settings', '情報変更', 'hidden').'</a>' : null; ?>
+								<?= $_SESSION['username'] == $user['username'] ? '<a class="symbol__edit" href="/account/edit-avatar/" style="font-size:1rem;font-weight:normal;line-height:1;vertical-align:middle;">'.lang('Edit avatar', 'アバター変更', 'hidden').'</a>' : null; ?>
 							</h1>
 							
 							<?php
