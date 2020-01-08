@@ -4,8 +4,33 @@ include_once('../php/include.php');
 
 if($_SESSION['is_signed_in']) {
 	
+	// Clean socials
+	foreach(['facebook', 'lastfm', 'twitter', 'mh'] as $key) {
+		$value = $_POST[$key];
+		if(strlen($value)) {
+			$value = explode('/', $value);
+			$value = array_filter($value);
+			$value = end($value);
+			$value = preg_replace('/'.'[^\w\.\-]'.'/', '', $value);
+		}
+		$value = strlen($value) ? sanitize($value) : null;
+		$sql_values[$key] = $value;
+	}
+	
+	// Clean website
+	if(strlen($_POST['website'])) {
+		$website = $_POST['website'];
+		if(!preg_match('/'.'^https?:\/\/'.'/', $website)) {
+			$website = strpos($website, '//') === 0 ? 'https:'.$website : 'https://'.$website;
+		}
+	}
+	$sql_values['website'] = strlen($website) ? sanitize($website) : null;
+	
+	// Clean fan since
+	$sql_values['fan_since'] = is_numeric($_POST['fan_since']) && $_POST['fan_since'] > 1980 && $_POST['fan_since'] <= date('Y') ? sanitize($_POST['fan_since']) : null;
+	
 	// Clean & set user preferences
-	foreach(['name', 'motto', 'email', 'facebook', 'lastfm', 'tumblr', 'fan_since', 'site_theme', 'icon'] as $key) {
+	foreach(['name', 'motto', 'email', 'site_theme', 'icon'] as $key) {
 		$sql_values[$key] = sanitize($_POST[$key]);
 		$sql_values[$key] = strlen($sql_values[$key]) ? $sql_values[$key] : null;
 	}
@@ -21,7 +46,7 @@ if($_SESSION['is_signed_in']) {
 				$pronouns = 'prefer not to say';
 			}
 			else {
-				$pronouns = $custom_pronouns;
+				$pronouns = strlen($custom_pronouns) ? $custom_pronouns : 'prefer not to say';
 			}
 			
 		}
@@ -31,7 +56,7 @@ if($_SESSION['is_signed_in']) {
 	}
 	$sql_values['pronouns'] = sanitize($pronouns);
 	
-	// If Twitter supplied, make sure we get username
+	/*// If Twitter supplied, make sure we get username
 	if(strlen($_POST['twitter'])) {
 		$twitter = $_POST['twitter'];
 		
@@ -54,7 +79,7 @@ if($_SESSION['is_signed_in']) {
 			$website = 'https://'.$website;
 		}
 	}
-	$sql_values['website'] = $website;
+	$sql_values['website'] = $website;*/
 	
 	// Further clean some values
 	$email_pattern = '/^(?!(?:(?:\x22?\x5C[\x00-\x7E]\x22?)|(?:\x22?[^\x5C\x22]\x22?)){255,})(?!(?:(?:\x22?\x5C[\x00-\x7E]\x22?)|(?:\x22?[^\x5C\x22]\x22?)){65,}@)(?:(?:[\x21\x23-\x27\x2A\x2B\x2D\x2F-\x39\x3D\x3F\x5E-\x7E]+)|(?:\x22(?:[\x01-\x08\x0B\x0C\x0E-\x1F\x21\x23-\x5B\x5D-\x7F]|(?:\x5C[\x00-\x7F]))*\x22))(?:\.(?:(?:[\x21\x23-\x27\x2A\x2B\x2D\x2F-\x39\x3D\x3F\x5E-\x7E]+)|(?:\x22(?:[\x01-\x08\x0B\x0C\x0E-\x1F\x21\x23-\x5B\x5D-\x7F]|(?:\x5C[\x00-\x7F]))*\x22)))*@(?:(?:(?!.*[^.]{64,})(?:(?:(?:xn--)?[a-z0-9]+(?:-[a-z0-9]+)*\.){1,126}){1,}(?:(?:[a-z][a-z0-9]*)|(?:(?:xn--)[a-z0-9]+))(?:-[a-z0-9]+)*)|(?:\[(?:(?:IPv6:(?:(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){7})|(?:(?!(?:.*[a-f0-9][:\]]){7,})(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,5})?::(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,5})?)))|(?:(?:IPv6:(?:(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){5}:)|(?:(?!(?:.*[a-f0-9]:){5,})(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,3})?::(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,3}:)?)))?(?:(?:25[0-5])|(?:2[0-4][0-9])|(?:1[0-9]{2})|(?:[1-9]?[0-9]))(?:\.(?:(?:25[0-5])|(?:2[0-4][0-9])|(?:1[0-9]{2})|(?:[1-9]?[0-9]))){3}))\]))$/iD';
@@ -134,7 +159,6 @@ if($_SESSION['is_signed_in']) {
 	if($stmt_edit->execute( array_values($sql_values) )) {
 		
 		$output['status'] = 'success';
-		$output['result'] = $output['result'] ? $output['result'].' Other updates successful.' : 'Profile updated.';
 		
 		// If username was changed, rename avatar image file and update SESSION
 		if(strlen($sql_values['username']) && $sql_values['username'] != $_SESSION['username']) {

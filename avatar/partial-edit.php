@@ -3,17 +3,13 @@
 	include_once("../avatar/avatar-definitions.php");
 	
 	style([
-		"/avatar/style-page-edit.css",
+		"/avatar/style-partial-edit.css",
 	]);
 	
 	script([
 		"/avatar/script-page-edit.js",
 	]);
 ?>
-
-<h2>
-	<?php echo lang('VK avatar', 'V系アバター', ['container' => 'div']); ?>
-</h2>
 
 <!-- 'Edit avatar' container -->
 <form action="/avatar/function-edit.php" class="col c2" method="post" name="form__avatar">
@@ -66,9 +62,10 @@
 	<!-- 'Edit avatar': left side -->
 	<div class="avatar__column any--margin">
 		
+		
 		<!-- Avatar preview -->
 		<div class="text avatar__container">
-			<svg version="1.1" id="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="600px" height="600px" viewBox="0 0 600 600" enable-background="new 0 0 600 600" xml:space="preserve">
+			<svg class="any--fade-in" style="animation-delay:0.5s;" version="1.1" id="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="600px" height="600px" viewBox="0 0 600 600" enable-background="new 0 0 600 600" xml:space="preserve">
 				<?php
 					$avatar = new avatar($avatar_layers);
 					echo $avatar->get_avatar_paths();
@@ -78,10 +75,11 @@
 		
 		<!-- Save button -->
 		<div class="avatar__buttons any--flex">
-			<button class="avatar__save" type="submit"><?php echo lang('Save', '保存する', ['secondary_class' => 'any--hidden']); ?></button>
+			<button class="avatar__save" type="submit"><?= lang('Save', '保存する', 'hidden'); ?></button>
 			<span data-role="status"></span>
-			<button class="symbol__random avatar__random" type="button"><?php echo lang('Random', 'ランダム', ['secondary_class' => 'any--hidden']); ?></button>
-			<button class="symbol__oldest avatar__reset" type="button"><?php echo lang('Reset', 'リセット', ['secondary_class' => 'any--hidden']); ?></button>
+			<?= $_SESSION['is_signed_in'] ? '<a class="symbol__user avatar__profile" href="/users/'.$_SESSION['username'].'/">Profile</a>' : null; ?>
+			<button class="symbol__oldest avatar__reset" type="button"><?= lang('Reset', 'リセット', 'hidden'); ?></button>
+			<button class="symbol__random avatar__random" type="button"><?= lang('Random', 'ランダム', 'hidden'); ?></button>
 		</div>
 		
 		<!-- Error box -->

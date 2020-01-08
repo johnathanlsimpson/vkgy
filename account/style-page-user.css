@@ -69,6 +69,25 @@
 	height: 200px;
 	width: 200px;
 }
+.user__avatar-text {
+	display: none;
+}
+.user__avatar-link:hover .user__avatar-text {
+	align-items: center;
+	background: hsla(var(--background), 0.75);
+	border: 4px solid hsl(var(--background--secondary));
+	border-radius: 50%;
+	bottom: 1rem;
+	box-sizing: border-box;
+	display: flex;
+	font-weight: bold;
+	justify-content: center;
+	left: 0;
+	position: absolute;
+	right: 1rem;
+	top: 0;
+	z-index: 1;
+}
 .user--no-avatar .head__base {
 	fill: hsl(var(--background));
 }

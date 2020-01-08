@@ -14,7 +14,7 @@
 	
 	$access_artist = new access_artist($pdo);
 	
-	$page_header = lang('Account', 'アカウント', ['container' => 'div']);
+	$page_header = lang('Change account settings', 'アカウント', 'div');
 	
 	if($_SESSION["loggedIn"] && is_numeric($_SESSION["userID"])) {
 		$sql_check = "SELECT 1 FROM users WHERE id=? AND is_vip=1 LIMIT 1";
@@ -24,28 +24,45 @@
 	}
 	
 	if(is_array($user) && !empty($user)) {
+		$user['fan_since'] = is_numeric($user['fan_since']) ? $user['fan_since'] : date('Y');
+		$max_fan_since = date('Y');
+		$mid_fan_since = $max_fan_since - 15;
+		$min_fan_since = $max_fan_since - 30;
 		?>
 			<span class="any--hidden" data-contains="artists" hidden><?php echo json_encode($artist_list); unset($artist_list); ?></span>
 			
 			<form action="/accounts/function-edit.php" class="col c1 any--margin" enctype="multipart/form-data" method="post" name="form__edit">
 				<div class="col c3-AAB">
 					<div>
-						<h2>
-							Optional account settings
-						</h2>
 						
-						<div class="text">
-							<ul>
+						<h3>
+							<?= lang('Profile options', '会員情報', 'div'); ?>
+						</h3>
+						<ul class="text">
+								<li class="input__row">
+									<div class="input__group any--flex-grow">
+										<label class="input__label">Name</label>
+										<input class="any--flex-grow" name="name" placeholder="name" value="<?php echo $user["name"]; ?>" />
+									</div>
+									<div class="input__group">
+										<label class="input__label">Birthday</label>
+										<input data-inputmask="'alias': '####-##-##'" max-length="10" name="birthday" placeholder="yyyy-mm-dd" size="10" value="<?php echo $user["birthday"]; ?>" />
+									</div>
+							</li>
+							<li class="input__row">
+								<div class="input__group any--flex-grow" style="flex-wrap:wrap;">
+									<label class="input__label">VK fan since</label>
+									<input class="fan-since__input" min="<?= $min_fan_since; ?>" max="<?= $max_fan_since; ?>" name="fan_since" step="1" type="range" value="<?= $user['fan_since']; ?>" />
+									<div class="fan-since__labels">
+										<span class="any__note fan-since__tooltip" style="<?= '--fan-since-min:'.$min_fan_since.'; --fan-since:'.$user['fan_since'].';'; ?>"><?= $user['fan_since']; ?></span> 
+										<span class="any__note any--weaken-color fan-since__label" style="">~<?= $min_fan_since; ?></span>
+										<span class="any__note any--weaken-color fan-since__label" style=""><?= $mid_fan_since; ?></span>
+										<span class="any__note any--weaken-color fan-since__label" style=""><?= $max_fan_since; ?></span>
+									</div>
+								</div>
+								</li>
 								<li>
 									<div class="input__row">
-										<div class="input__group any--flex-grow">
-											<label class="input__label">Name</label>
-											<input class="any--flex-grow" name="name" placeholder="name" value="<?php echo $user["name"]; ?>" />
-										</div>
-										<div class="input__group">
-											<label class="input__label">Birthday</label>
-											<input data-inputmask="'alias': '####-##-##'" max-length="10" name="birthday" placeholder="yyyy-mm-dd" size="10" value="<?php echo $user["birthday"]; ?>" />
-										</div>
 										<div class="input__group">
 											<label class="input__label">pronouns</label>
 											<select class="input" name="pronouns" placeholder="select pronouns">
@@ -55,60 +72,116 @@
 												<option value="they/them" <?= $user['pronouns'] === 'they/them' ? 'selected' : null; ?>>they/them</option>
 												<option value="custom" <?= !in_array($user['pronouns'], ['prefer not to say', 'she/her', 'he/him', 'they/them']) ? 'selected' : null; ?>>custom</option>
 											</select>
-											<input class="input input--secondary any--hidden" name="custom_pronouns" placeholder="custom pronouns" value="<?= !in_array($user['pronouns'], ['prefer not to say', 'she/her', 'he/him', 'they/them']) ? $user['pronouns'] : null; ?>" />
+											<input class="input input--secondary any--hidden" name="custom_pronouns" placeholder="your pronouns" value="<?= !in_array($user['pronouns'], ['prefer not to say', 'she/her', 'he/him', 'they/them', 'custom']) ? $user['pronouns'] : null; ?>" />
 										</div>
-									</div>
-									<div class="input__row">
 										<div class="input__group any--flex-grow">
 											<label class="input__label">Motto</label>
 											<input class="any--flex-grow" name="motto" placeholder="motto" value="<?php echo $user["motto"]; ?>" />
 										</div>
-										<div class="input__group">
-											<label class="input__label">VK Fan since</label>
-											<input name="fan_since" placeholder="yyyy" size="8" value="<?php echo $user['fan_since']; ?>" />
-										</div>
 									</div>
 								</li>
+							</ul>
+						
+						<h3>
+							<?= lang('Socials', 'ウエブサイト', 'div'); ?>
+						</h3>
+						
+						<style>
+							.social__prefix {
+								bottom: 0;
+								font-family: monospace;
+								left: calc(0.5rem + 0.5rem); /* left margin on input elements */
+								line-height: 2rem;
+								pointer-events: none;
+								position: absolute;
+								z-index: 1;
+							}
+							.social__prefix + input {
+								font-family: monospace;
+							}
+						</style>
+						
+						<ul class="text">
+							<li class="input__row">
+								<div class="input__group any--flex-grow">
+									<label class="input__label">Website</label>
+									<input class="any--flex-grow" name="website" placeholder="https://yoursite.com" value="<?= $user['website']; ?>" />
+								</div>
+							</li>
+							
+							<li class="input__row">
+								<div class="input__group any--flex-grow">
+									<label class="input__label">Twitter</label>
+									<span class="social__prefix">@</span>
+									<input class="any--flex-grow" name="twitter" placeholder="username" style="padding-left:calc(0.75rem + 1ch);" value="<?= $user['twitter']; ?>" />
+								</div>
+							</li>
+							
+							<li class="input__row">
+								<div class="input__group any--flex-grow">
+									<label class="input__label">Facebook</label>
+									<span class="social__prefix">facebook.com/</span>
+									<input class="any--flex-grow" name="facebook" placeholder="username" style="padding-left:calc(0.75rem + 13ch);" value="<?= $user['facebook']; ?>" />
+								</div>
+							</li>
+							
+							<li class="input__row">
+								<div class="input__group any--flex-grow">
+									<label class="input__label">last.fm</label>
+									<span class="social__prefix">last.fm/user/</span>
+									<input class="any--flex-grow" name="lastfm" placeholder="username" style="padding-left:calc(0.75rem + 13ch);" value="<?= $user['lastfm']; ?>" />
+								</div>
+							</li>
+							
+							<li class="input__row">
+								<div class="input__group any--flex-grow">
+									<label class="input__label">Monochrome Heaven</label>
+									<span class="social__prefix">monochrome-heaven.com/profile/</span>
+									<input class="any--flex-grow" name="mh" placeholder="123-username" style="padding-left:calc(0.75rem + 30ch);" value="<?= $user['mh']; ?>" />
+								</div>
+							</li>
+						</ul>
+						
+						<script>
+							let socialElems = document.querySelectorAll('[class^="social__"] + input');
+							
+							socialElems.forEach((elem) => {
+								let socialType = elem.name.substring(7);
+								let socialPattern;
+								let pastedValue;
 								
-								<li>
-									<div class="input__row">
-										<div class="input__group any--flex-grow">
-											<label class="input__label">Email</label>
-											<input class="any--flex-grow" name="email" placeholder="email" type="email" value="<?php echo $user["email"]; ?>" />
-										</div>
-									</div>
+								// Set proper padding
+								let elemStyles = window.getComputedStyle(elem);
+								let paddingLeft = elemStyles.getPropertyValue('padding-left');
+								elem.style.fontFamily = 'inherit';
+								elem.style.paddingLeft = paddingLeft;
+								
+								
+								elem.addEventListener('paste', (event) => {
+									event.preventDefault();
 									
-									<?php echo !$user["email"] ? '<div class="symbol__error error" style="margin-top: 1rem;">Consider adding an email address in case your password is forgotten.</div>' : null; ?>
-								</li>
-								
-								<li>
-									<div class="input__row">
-										<div class="input__group any--flex-grow">
-											<label class="input__label">Website</label>
-											<input class="any--flex-grow" name="website" placeholder="https://yoursite.com" value="<?php echo $user["website"]; ?>" />
-										</div>
-										<div class="input__group any--flex-grow">
-											<label class="input__label">Twitter</label>
-											<input class="any--flex-grow" name="twitter" placeholder="twitter username" value="<?php echo $user["twitter"]; ?>" />
-										</div>
-										<div class="input__group any--flex-grow">
-											<label class="input__label">Facebook</label>
-											<input class="any--flex-grow" name="facebook" placeholder="facebook username" value="<?php echo $user["facebook"]; ?>" />
-										</div>
-										<div class="input__group any--flex-grow">
-											<label class="input__label">last.fm</label>
-											<input class="any--flex-grow" name="lastfm" placeholder="last.fm username" value="<?php echo $user["lastfm"]; ?>" />
-										</div>
-										<div class="input__group any--flex-grow">
-											<label class="input__label">Tumblr</label>
-											<input class="any--flex-grow" name="tumblr" placeholder="tumblr username" value="<?php echo $user["tumblr"]; ?>" />
-										</div>
-									</div>
-								</li>
+									pastedValue = event.clipboardData || window.clipboardData;
+									pastedValue = pastedValue.getData('text');
+									
+									if(socialType != 'website') {
+										pastedValue = pastedValue.replace('@', '').replace(/\/$/, '');
+										pastedValue = pastedValue.split('/');
+										pastedValue = pastedValue[pastedValue.length - 1];
+									}
+									
+									window.document.execCommand('insertText', false, pastedValue);
+								});
+							})
+						</script>
+						
+						<h3>
+							<?= lang('Site customization', '表示', 'div'); ?>
+						</h3>
+						<ul class="text">
 								<li>
 									<div class="input__row">
 										<div class="input__group">
-											<label class="input__label">Site theme</label>
+											<label class="input__label"><?= lang('Site theme', '背景画像', 'hidden'); ?></label>
 											
 											<input class="input__checkbox any--hidden" id="site_theme_0" name="site_theme" type="radio" value="0" <?php echo $user['site_theme'] == 0 ? 'checked' : null; ?> />
 											<label class="input__checkbox-label symbol__unchecked " for="site_theme_0">default</label>
@@ -121,7 +194,7 @@
 								<li>
 									<div class="input__row">
 										<div class="input__group">
-											<label class="input__label">Username style</label>
+											<label class="input__label"><?= lang('Username style', 'アイコン', 'hidden'); ?></label>
 											
 											<?php
 												if($user['is_vip']) {
@@ -153,15 +226,28 @@
 									
 									<?= $user['is_vip'] ? '<span class="symbol__vip">This feature can be accessed after becoming a <a href="https://patreon.com/vkgy" target="_blank">VIP member</a>.</span>' : null; ?>
 								</li>
-							</ul>
-						</div>
+						</ul>
 					</div>
 					
 					<div>
 						<h3>
+							Email address
+						</h3>
+						<div class="text text--outlined <?= strlen($user['email']) ? null : 'text--error'; ?> ">
+							<div class="input__row">
+								<div class="input__group any--flex-grow">
+									<label class="input__label">Email</label>
+									<input class="any--flex-grow" name="email" placeholder="email" type="email" value="<?= $user["email"]; ?>" />
+								</div>
+							</div>
+							
+							<?= strlen($user['email']) ? null : '<div class="symbol__error" style="margin-top:1rem;">Your password cannot be recovered if you don\'t have an email address listed.</div>'; ?>
+						</div>
+						
+						<h3>
 							Change username
 						</h3>
-						<div class="text">
+						<div class="text text--outlined">
 							<div class="input__row">
 								<div class="input__group any--flex-grow">
 									<label class="input__label">New username</label>
@@ -173,7 +259,7 @@
 						<h3>
 							Change password
 						</h3>
-						<div class="text">
+						<div class="text text--outlined">
 							<div class="input__row">
 								<div class="input__group any--flex-grow">
 									<label class="input__label">Current password</label>
@@ -196,13 +282,20 @@
 					</div>
 				</div>
 				
-				<div>
-					<div class="any--flex">
+				<div class="text text--docked">
+					
+					<div class="any--flex" data-role="submit-container">
 						<button class="any--flex-grow" name="submit" type="submit">
 							Save settings
 						</button>
 						<span data-role="status"></span>
 					</div>
+					
+					<div class="any--flex any--hidden" data-role="edit-container">
+						<a class="any--align-center a--outlined a--padded any--flex-grow symbol__user" href="<?= '/users/'.$_SESSION['username'].'/'; ?>">View profile</a>
+						<a class="add__edit any--weaken-color a--outlined a--padded symbol__edit" data-role="edit" href="/account/" style="margin-left:1rem;">Edit again</a>
+					</div>
+					
 					<div class="edit__result text text--outlined text--notice" data-role="result"></div>
 				</div>
 			</form>

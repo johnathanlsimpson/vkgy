@@ -1,6 +1,6 @@
 <?php
 	if(!empty($user) && is_array($user)) {
-	$page_header = lang('Member profile', 'プロフィール', ['container' => 'div']);
+		$page_header = lang('Member profile', 'プロフィール', ['container' => 'div']);
 
 		include_once("../avatar/class-avatar.php");
 		include_once("../avatar/avatar-definitions.php");
@@ -408,16 +408,20 @@
 			<div class="col c1">
 				<div>
 					<div class="text user__card any--flex" style="min-height: 100px; box-sizing: content-box;">
-
+						
+						<?= $_SESSION['username'] == $user['username'] ? '<a class="user__avatar-link" href="/account/edit-avatar/"><span class="user__avatar-text symbol__edit">'.lang('Edit avatar', 'アバター変更', 'hidden').'</span>' : null; ?>
 						<svg class="user__avatar <?php echo $avatar_class; ?>" version="1.1" id="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="0px" height="0px" viewBox="0 0 600 600" enable-background="new 0 0 600 600" xml:space="preserve">
 							<?php echo $user["avatar"]; ?>
 						</svg>
-
+						<?= $_SESSION['username'] == $user['username'] ? '</a>' : null; ?>
+						
 						<div>
 							<h1 class="user__username">
 								<a class="a--inherit symbol__user-nature <?= 'symbol__user-'.$user['icon']; ?>" href="/users/<?php echo $user["username"]; ?>/"><?php echo $user["username"]; ?></a>
+								<?= $_SESSION['username'] === $user['username'] ? '<a class="symbol__edit" href="/account/" style="font-size:1rem;font-weight:normal;line-height:1;vertical-align:middle;">'.lang('Edit settings', '情報変更', 'hidden').'</a>' : null; ?>
+								<?= $_SESSION['username'] === $user['username'] ? '<a class="symbol__edit" href="/account/edit-avatar/" style="font-size:1rem;font-weight:normal;line-height:1;vertical-align:middle;">'.lang('Edit avatar', 'アバター変更', 'hidden').'</a>' : null; ?>
 							</h1>
-
+							
 							<?php
 								if($user["is_admin"] > 1) {
 									?>
@@ -437,17 +441,17 @@
 							?>
 
 							<?php
-								if($user['motto'] || $user['birthday'] || $user['pronouns'] || $user['website'] || $user['twitter'] || $user['tumblr'] || $user['facebook'] || $user['lastfm']) {
+								if($user['motto'] || $user['birthday'] || $user['pronouns'] || $user['website'] || $user['twitter'] || $user['mh'] || $user['facebook'] || $user['lastfm']) {
 									?>
 										<!-- User details -->
 										<ul class="user__data data__container">
 											<?php
-												foreach(['birthday', 'pronouns', 'website', 'twitter', 'tumblr', 'facebook', 'lastfm'] as $field) {
+												foreach(['birthday', 'pronouns', 'website', 'twitter', 'tumblr', 'facebook', 'lastfm', 'mh'] as $field) {
 													if(strlen($user[$field]) && !in_array($user[$field], ['0000-00-00', 'prefer not to say', 'custom'])) {
 														?>
 															<li class="data__item">
 																<h5>
-																	<?php echo $field; ?>
+																	<?= $field; ?>
 																</h5>
 																<?php
 																	switch($field) {
@@ -461,7 +465,7 @@
 																			echo substr($user[$field], 0, 4).'-'.substr($user[$field], 5, 2).'-'.substr($user[$field], 8, 2);
 																			break;
 																		case "website":
-																			echo '<a class="a--inherit" href="'.$user[$field].'">'.$user[$field].'</a>';
+																			echo '<a class="a--inherit" href="'.$user[$field].'">'.preg_replace('/'.'(.*)\/$'.'/', '$1', preg_replace('/'.'^https?:\/\/(?:www.)?(.*?)'.'/', '$1', $user[$field])).'</a>';
 																			break;
 																		case "twitter":
 																			echo '<a class="a--inherit" href="https://twitter.com/'.$user[$field].'">@'.$user[$field].'</a>';
@@ -474,6 +478,9 @@
 																			break;
 																		case "lastfm":
 																			echo '<a class="a--inherit" href="https://last.fm/user/'.$user[$field].'">'.$user[$field].'</a>';
+																			break;
+																		case "mh":
+																			echo '<a class="a--inherit" href="https://www.monochrome-heaven.com/profile/'.$user[$field].'/">'.preg_replace('/'.'^\d+-(.*)$'.'/', '$1', $user[$field]).'</a>';
 																			break;
 																	}
 																?>
@@ -541,44 +548,6 @@
 				</div>
 			</div>
 
-			<!-- Badges -->
-			<?php if($_SESSION['username'] === 'inartistic') { include('page-badges.php'); } ?>
-
-			<!-- Edit -->
-			<?php
-				if($_SESSION["username"] === $user["username"]) {
-					?>
-						<div class="col c1 user__edit" >
-							<?php
-								include_once("../avatar/class-avatar.php");
-								
-								$sql_avatar = "SELECT * FROM users_avatars WHERE user_id=? LIMIT 1";
-								$stmt_avatar = $pdo->prepare($sql_avatar);
-								$stmt_avatar->execute([ $user["id"] ]);
-								$rslt_avatar = $stmt_avatar->fetch();
-								
-								$avatar = new avatar(null, $rslt_avatar["content"], ["is_vip" => $is_vip]);
-								$current_avatar = $avatar->get_selected_options();
-								
-								include("../avatar/partial-edit.php");
-							?>
-						</div>
-						
-						<input class="obscure__input" id="obscure-edit" type="checkbox" checked />
-						<div class="col c1 user__edit obscure__container obscure--height obscure--alt" id="user__edit">
-							<div>
-								<h1>
-									Edit your account
-								</h1>
-							</div>
-
-							<?php include("page-edit.php"); ?>
-
-							<label class="input__button obscure__button" for="obscure-edit">Show options</label>
-						</div>
-					<?php
-				}
-			?>
 
 			<!-- Collection -->
 			<div class="col <?php echo $num_wants ? 'c3-AAB' : 'c1'; ?>">
@@ -694,38 +663,6 @@
 							?>
 						</ul>
 					</div>
-				</div>
-			</div>
-
-			<!-- Prev Next -->
-			<div class="col c3 any--margin any--weaken-color">
-				<div>
-					<h5>
-						&larr; A
-					</h5>
-					<?php echo $next_users['prev'] ? '<a class="user" href="/user/'.$next_users['prev'].'/">'.$next_users['prev'].'</a>' : 'N/A'; ?>
-
-					<h5>
-						Older
-					</h5>
-					<?php echo $next_users['older'] ? '<a class="a--inherit user" href="/user/'.$next_users['older'].'/">'.$next_users['older'].'</a>' : 'N/A'; ?>
-				</div>
-				<div style="text-align: center;">
-					<h5>
-						Random
-					</h5>
-					<?php echo $next_users['rand2'] ? '<a class="user" href="/user/'.$next_users['rand2'].'/">'.$next_users['rand2'].'</a>' : 'N/A'; ?>
-				</div>
-				<div style="text-align: right;">
-					<h5>
-						Z &rarr;
-					</h5>
-					<?php echo $next_users['next'] ? '<a class="user" href="/user/'.$next_users['next'].'/">'.$next_users['next'].'</a>' : 'N/A'; ?>
-
-					<h5>
-						Newer
-					</h5>
-					<?php echo $next_users['newer'] ? '<a class="user a--inherit" href="/user/'.$next_users['newer'].'/">'.$next_users['newer'].'</a>' : 'N/A'; ?>
 				</div>
 			</div>
 		<?php

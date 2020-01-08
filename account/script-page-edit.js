@@ -5,6 +5,7 @@ lookForSelectize();
 // Submit edits
 // --------------------------------------------------------
 initializeInlineSubmit($("[name=form__edit]"), "/account/function-edit.php", {
+	showEditLink : true,
 	submitOnEvent: "submit"
 });
 
@@ -43,4 +44,16 @@ pronounsSelector.addEventListener('change', function(event) {
 	else { console.log('c');
 		pronounsElem.classList.add('any--hidden');
 	}
+});
+
+
+// Move/update tooltip with "fan since" range
+// --------------------------------------------------------
+let sinceElem = document.querySelector('.fan-since__input');
+let sinceLabel = document.querySelector('.fan-since__tooltip');
+
+sinceElem.addEventListener('change', () => {
+	let sinceValue = sinceElem.value;
+	sinceLabel.innerHTML = sinceValue > sinceElem.min ? sinceValue : '~' + sinceValue;
+	sinceLabel.style.setProperty('--fan-since', sinceValue);
 });
