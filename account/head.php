@@ -6,7 +6,9 @@ breadcrumbs([
 
 if($_SESSION['loggedIn']) {
 	subnav([
-		lang('My account', 'マイアカウント', ['secondary_class' => 'any--hidden']) => '/users/'.$_SESSION['username'].'/',
+		lang('My profile', 'マイページ', 'hidden') => '/users/'.$_SESSION['username'].'/',
+		lang('Edit settings', '情報変更', 'hidden') => '/account/',
+		lang('Edit avatar', 'アバター変更', 'hidden') => '/account/edit-avatar/',
 	]);
 }
 else {
@@ -16,7 +18,6 @@ else {
 }
 subnav([
 	lang('Member list', 'メンバー一覧', ['secondary_class' => 'any--hidden']) => '/users/',
-	lang('Documentation', 'ガイド', ['secondary_class' => 'any--hidden']) => '/documentation/',
 ]);
 if($_SESSION['loggedIn']) {
 	subnav([

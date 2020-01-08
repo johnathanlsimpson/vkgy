@@ -55,6 +55,7 @@
 						"users.tumblr",
 						"users.facebook",
 						"users.lastfm",
+						'users.mh',
 						"users.icon",
 						"users.birthday",
 						"users.pronouns",

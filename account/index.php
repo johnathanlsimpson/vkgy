@@ -27,13 +27,18 @@ include('../account/head.php');
 		}
 	}
 	if(!$template && $_SESSION["loggedIn"]) {
-		$user = $access_user->access_user(["username" => sanitize($_SESSION["username"]), "get" => "all"]);
-		if(is_array($user) && !empty($user)) {
-			$template = "account";
+		if($_GET['page'] === 'edit-avatar') {
+			$template = 'edit-avatar';
 		}
 		else {
-			$error = "Sorry, that user doesn't exist. Showing all users instead.";
-			$template = "users";
+			$user = $access_user->access_user(["username" => sanitize($_SESSION["username"]), "get" => "all"]);
+			if(is_array($user) && !empty($user)) {
+				$template = "account";
+			}
+			else {
+				$error = "Sorry, that user doesn't exist. Showing all users instead.";
+				$template = "users";
+			}
 		}
 	}
 	$template = strlen($template) ? $template : "sign-in";
@@ -84,6 +89,16 @@ include('../account/head.php');
 		breadcrumbs([ "Member list" => "/users/", $user["username"] => "/users/".$user["username"]."/", "Edit" => "/account/edit/" ]);
 		
 		include("page-edit.php");
+	}
+	
+	// Edit avatar
+	// =======================================================
+	if($template === 'edit-avatar') {
+		$page_title = "Edit avatar";
+		
+		breadcrumbs([ "Member list" => "/users/", $user["username"] => "/users/".$user["username"]."/", "Edit" => "/account/edit/" ]);
+		
+		include("page-edit-avatar.php");
 	}
 	
 	// Sign in/register

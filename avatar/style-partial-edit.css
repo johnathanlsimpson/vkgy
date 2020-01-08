@@ -6,7 +6,6 @@
 }
 @media(min-height: 600px) {
 	.avatar__column {
-		border-top: 1rem solid hsl(var(--background--alt));
 		top: 3rem;
 	}
 }
@@ -30,8 +29,8 @@
 .avatar__container svg {
 	height: auto;
 	max-width: 100%;
-	width: 200px;
 	vertical-align: top;
+	width: 200px;
 }
 @media(min-width: 800px) {
 	.avatar__container svg {
@@ -41,6 +40,7 @@
 
 /* Left side: buttons */
 .avatar__buttons {
+	align-items: center;
 	margin-top: -2.5rem;
 }
 @media(min-height: 600px) {
@@ -54,16 +54,20 @@
 		padding: 0;
 	}
 }
-.avatar__save {
-	margin-right: auto;
-}
 @media(min-width: 800px) {
 	.avatar__save {
 		flex-grow: 1;
 		margin-right: 0;
 	}
 }
-.avatar__random, .avatar__reset {
+.avatar__profile {
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
+}
+.avatar__reset {
+	margin-left: auto;
+}
+.avatar__random {
 	margin-left: 0.5rem;
 }
 .avatar__result:empty {
@@ -85,7 +89,6 @@
 
 /* Right side: UI */
 .avatar__nav {
-	background-color: hsl(var(--background--alt));
 	position: -webkit-sticky;
 	position: sticky;
 	text-transform: capitalize;
@@ -98,7 +101,6 @@
 }
 @media(min-width: 800px) {
 	.avatar__nav {
-		border-top: 1rem solid hsl(var(--background--alt));
 		top: 3rem;
 	}
 }
@@ -106,7 +108,6 @@
 	cursor: pointer;
 }
 .avatar__nav .tertiary-nav--active {
-	background-color: hsl(var(--background--alt));
 }
 .avatar__group {
 	display: none;
