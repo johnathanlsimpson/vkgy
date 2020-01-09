@@ -108,7 +108,7 @@
 		$current_year = date('Y');
 
 		// Stat: Fan since
-		$stats['fan_since']['value'] = is_numeric($user['fan_since']) ? $user['fan_since'] : date('Y');
+		$stats['fan_since']['value'] = is_numeric($user['fan_since']) ? $user['fan_since'] : substr($user['date_added'], 0, 4);
 		$fan_since_level_base = $stats['fan_since']['value'] - (date('Y') - $stats['fan_since']['value']);
 
 		// Stat: Member since
@@ -409,7 +409,7 @@
 				<div>
 					<?= $_SESSION['username'] == $user['username'] ? '<div class="text text--outlined text--notice symbol__help"><a href="/account/">Profile settings</a> and <a href="/account/edit-avatar/">avatar editing</a> have been moved to separate pages.</div>' : null; ?>
 					
-					<div class="text user__card any--flex" style="min-height: 100px; box-sizing: content-box;">
+					<div class="text user__card any--flex" style="">
 						
 						<?= $_SESSION['username'] == $user['username'] ? '<a class="user__avatar-link" href="/account/edit-avatar/"><span class="user__avatar-text symbol__edit">'.lang('Edit avatar', 'アバター変更', 'hidden').'</span>' : null; ?>
 						<svg class="user__avatar <?php echo $avatar_class; ?>" version="1.1" id="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="0px" height="0px" viewBox="0 0 600 600" enable-background="new 0 0 600 600" xml:space="preserve">
@@ -417,31 +417,17 @@
 						</svg>
 						<?= $_SESSION['username'] == $user['username'] ? '</a>' : null; ?>
 						
-						<div>
+						<div class="user__card-data">
 							<h1 class="user__username">
-								<a class="a--inherit symbol__user-nature <?= 'symbol__user-'.$user['icon']; ?>" href="/users/<?php echo $user["username"]; ?>/"><?php echo $user["username"]; ?></a>
-								<?= $_SESSION['username'] == $user['username'] ? '<a class="symbol__edit" href="/account/" style="font-size:1rem;font-weight:normal;line-height:1;vertical-align:middle;">'.lang('Edit settings', '情報変更', 'hidden').'</a>' : null; ?>
-								<?= $_SESSION['username'] == $user['username'] ? '<a class="symbol__edit" href="/account/edit-avatar/" style="font-size:1rem;font-weight:normal;line-height:1;vertical-align:middle;">'.lang('Edit avatar', 'アバター変更', 'hidden').'</a>' : null; ?>
+								<a class="a--inherit <?= 'symbol__user-'.$user['icon']; ?>" href="/users/<?php echo $user["username"]; ?>/"><?php echo $user["username"]; ?></a>
+								<?php
+									echo $user['is_admin'] === 28 ? '<span class="any__note symbol__star--full user__flair">Boss</span>' : null;
+									echo $user['is_admin'] ? '<span class="any__note symbol__star--full user__flair">Editor</span>' : null;
+									echo $user['is_vip'] ? '<span class="any__note symbol__star--full user__flair">VIP</span>' : null;
+									echo $_SESSION['username'] == $user['username'] ? '<a class="symbol__edit" href="/account/" style="font-size:1rem;font-weight:normal;line-height:1;vertical-align:middle;">'.lang('Edit', '情報変更', 'hidden').'</a>' : null;
+								?>
 							</h1>
 							
-							<?php
-								if($user["is_admin"] > 1) {
-									?>
-										<span class="any__note symbol__star--full user__flair">Boss</span>
-									<?php
-								}
-								if($user["is_admin"]) {
-									?>
-										<span class="any__note symbol__star--full user__flair">Editor</span>
-									<?php
-								}
-								if($user["is_vip"]) {
-									?>
-										<span class="any__note symbol__star--full user__flair">VIP</span>
-									<?php
-								}
-							?>
-
 							<?php
 								if($user['motto'] || $user['birthday'] || $user['pronouns'] || $user['website'] || $user['twitter'] || $user['mh'] || $user['facebook'] || $user['lastfm']) {
 									?>
@@ -493,7 +479,7 @@
 											?>
 										</ul>
 									<?php
-
+									
 									if($user['motto']) {
 										?>
 											<div class="user__motto"><?php echo $user['motto']; ?></div>
@@ -512,17 +498,17 @@
 				<div class="any--margin stats__wrapper">
 					<h2 class="stats__title">
 						<div class="any--en">
-							Member statistics <sup class="any--weaken">&beta;</sup>
+							Member rank
 						</div>
 						<div class="any--jp any--weaken">
-							<?php echo sanitize('ランク'); ?> <sup class="any--weaken">&beta;</sup>
+							<?php echo sanitize('ランク'); ?>
 						</div>
 					</h2>
-
+					
 					<div class="stat__level h5 level__container" data-level="<?php echo $level_num; ?>">
 						<span class="level__deco"></span>
 					</div>
-
+					
 					<div class="stat__container">
 						<ul class="data__container">
 							<?php
@@ -530,16 +516,18 @@
 									foreach($stats as $stat) {
 										$data_class = $stat['value'] == 0 || $stat['value'] === 'N/A' ? 'data--hide-level' : null;
 										?>
-											<li class="stat__item data__item <?php echo $data_class; ?>">
-												<div class="h5 level__container" data-level="<?php echo $stat['level']; ?>" data-emoji="<?php echo $stat['emoji']; ?>">
+											<li class="stat__item data__item <?php echo $data_class; ?>" data-emoji="<?php echo $stat['emoji']; ?>">
+												
+												<div class="h5 stat-level__container" data-level="<?php echo $stat['level']; ?>">
 													<span class="level__deco"></span>
 												</div>
-
+												
 												<h5>
 													<?php echo $stat['title']; ?>
 												</h5>
-
+												
 												<?php echo $stat['value']; ?>
+												
 											</li>
 										<?php
 									}

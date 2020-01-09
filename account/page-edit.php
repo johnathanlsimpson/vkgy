@@ -86,21 +86,6 @@
 							<?= lang('Socials', 'ウエブサイト', 'div'); ?>
 						</h3>
 						
-						<style>
-							.social__prefix {
-								bottom: 0;
-								font-family: monospace;
-								left: calc(0.5rem + 0.5rem); /* left margin on input elements */
-								line-height: 2rem;
-								pointer-events: none;
-								position: absolute;
-								z-index: 1;
-							}
-							.social__prefix + input {
-								font-family: monospace;
-							}
-						</style>
-						
 						<ul class="text">
 							<li class="input__row">
 								<div class="input__group any--flex-grow">
@@ -111,33 +96,33 @@
 							
 							<li class="input__row">
 								<div class="input__group any--flex-grow">
-									<label class="input__label">Twitter</label>
+									<label class="input__label">Twitter username</label>
 									<span class="social__prefix">@</span>
-									<input class="any--flex-grow" name="twitter" placeholder="username" style="padding-left:calc(0.75rem + 1ch);" value="<?= $user['twitter']; ?>" />
+									<input class="any--flex-grow" name="twitter" placeholder="username" style="padding-left:calc(0rem + 3ch);" value="<?= $user['twitter']; ?>" />
 								</div>
 							</li>
 							
 							<li class="input__row">
 								<div class="input__group any--flex-grow">
-									<label class="input__label">Facebook</label>
-									<span class="social__prefix">facebook.com/</span>
-									<input class="any--flex-grow" name="facebook" placeholder="username" style="padding-left:calc(0.75rem + 13ch);" value="<?= $user['facebook']; ?>" />
+									<label class="input__label">Facebook username</label>
+									<span class="social__prefix">fb.com/</span>
+									<input class="any--flex-grow" name="facebook" placeholder="username" style="padding-left:calc(0rem + 8ch);" value="<?= $user['facebook']; ?>" />
 								</div>
 							</li>
 							
 							<li class="input__row">
 								<div class="input__group any--flex-grow">
-									<label class="input__label">last.fm</label>
+									<label class="input__label">last.fm username</label>
 									<span class="social__prefix">last.fm/user/</span>
-									<input class="any--flex-grow" name="lastfm" placeholder="username" style="padding-left:calc(0.75rem + 13ch);" value="<?= $user['lastfm']; ?>" />
+									<input class="any--flex-grow" name="lastfm" placeholder="username" style="padding-left:calc(0rem + 12ch);" value="<?= $user['lastfm']; ?>" />
 								</div>
 							</li>
 							
 							<li class="input__row">
 								<div class="input__group any--flex-grow">
-									<label class="input__label">Monochrome Heaven</label>
-									<span class="social__prefix">monochrome-heaven.com/profile/</span>
-									<input class="any--flex-grow" name="mh" placeholder="123-username" style="padding-left:calc(0.75rem + 30ch);" value="<?= $user['mh']; ?>" />
+									<label class="input__label">Monochrome Heaven username</label>
+									<span class="social__prefix">m-h.com/profile/</span>
+									<input class="any--flex-grow" name="mh" placeholder="123-username" style="padding-left:calc(0rem + 15ch);" value="<?= $user['mh']; ?>" />
 								</div>
 							</li>
 						</ul>
@@ -152,10 +137,8 @@
 								
 								// Set proper padding
 								let elemStyles = window.getComputedStyle(elem);
-								let paddingLeft = elemStyles.getPropertyValue('padding-left');
-								elem.style.fontFamily = 'inherit';
-								elem.style.paddingLeft = paddingLeft;
-								
+								let paddingLeft = elem.previousElementSibling.offsetWidth;
+								elem.style.paddingLeft = 'calc(0.5rem + ' + paddingLeft + 'px + 5px)';
 								
 								elem.addEventListener('paste', (event) => {
 									event.preventDefault();
