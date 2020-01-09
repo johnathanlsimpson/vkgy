@@ -43,6 +43,7 @@
 	-webkit-appearance: none;
 	background: hsl(var(--background--bold));
 	border-radius: 50%;
+	border: none;
 	box-shadow: 0 0 0 3px hsl(var(--background));
 	height: var(--fan-since-thumb-width);
 	width: var(--fan-since-thumb-width);
@@ -51,6 +52,7 @@
 	-webkit-appearance: none;
 	background: hsl(var(--background--bold));
 	border-radius: 50%;
+	border: none;
 	box-shadow: 0 0 0 3px hsl(var(--background));
 	box-sizing: border-box;
 	height: var(--fan-since-thumb-width);
@@ -63,4 +65,13 @@
 .fan-since__input::-moz-range-thumb:active,
 .fan-since__input:focus::-moz-range-thumb {
 	border: 2px solid hsl(var(--interactive--secondary));
+}
+.social__prefix {
+	bottom: 0;
+	color: hsl(var(--text--secondary));
+	left: calc(0.5rem + 0.5rem); /* left margin on input elements */
+	line-height: 2rem;
+	pointer-events: none;
+	position: absolute;
+	z-index: 1;
 }
