@@ -10,31 +10,21 @@
 
 
 
-## Linking articles
+## Linking artists, labels, and users
 
 * [vkgy](https://vk.gy/) has its own special version of Markdown that has additional features.
 
  To generate an artist link, type its name in ''/slashes/,,, and the system will do the rest. In most areas, as soon as you type the first ''/,,, the system will offer autocomplete suggestions.
 
- You can use Japanese or romaji, and don't have to capitalize or include symbols—the system will pull those automatically.
+ Similarly, typing ''=,, will produce a list of labels, and typing ''@,, will produce a list of vkgy users.
 
- Note that, when editing a page, artist links will appear like this: ''(123)/band name/,,. The ''(123),, is the numeric link to the artist; but the system will add that part automatically, as long as you've used ''/slashes/,,.
+ {@inartistic said that /orgel/ belonged to =matina=.}
 
- {/la sadies/ and /sugar forkful/ sound nothing alike.}
-
-* You can even link an artist while displaying a different name, by following the /slashes/ with the [display name]:
+* If you would like to link an artist but display a different name, you can follow the /slashes/ with the [display name] like so:
 
  {/inspire/ used to be called /inspire/[Ruin's;lave].}
 
-* Linking to labels is the same as linking to artists, but you use ''=,, instead, ''=like this=,,. Again, in most places, as soon as you type ''=,,, the autocomplete will start working.
-
- Also like artists, you can link to a label while displaying a different name, if you want.
-
- ''=soleil matina= sometimes called itself =soleil matina=[MATINA].,, ''→,, [[<a class="symbol__company" href="/labels/soleil-matina/">Soleil Matina</a> sometimes called itself <a class="symbol__company" href="/labels/soleil-matina/">MATINA</a>.]]
-
-* You can reference other vkgy users with an @:
-
- {@inartistic}
+ Please note that the [display name] must immediately follow the artist's name (if there is a space between them, it will not work).
 
 
 
@@ -49,3 +39,17 @@
 * Easily embed release information from vkgy, or tweets, or YouTube videos, just by pasting the link:
 
  ''https://vk.gy/releases/munou-na-lucid/18113/shinshoku-refrain/\n\nhttps://twitter.com/vkgy_/status/1114272537062588416\n\nhttps://www.youtube.com/watch?v=iRUXRpYY0JU,,
+
+
+
+## Advanced: how linking works
+
+* **Most users don't have to worry about this**, but if you're curious, this is how linking works.
+
+ When you type ''/,, and select an artist, a pretty token with that artist's name will be shown in the textarea. However, the text that's *actually* added will look like this: ''(123)/band name/[optional display name],,.
+
+ The ''(123),, portion is the most important part: the artist's ID. This is what's used by the database to generate the link. The ''/band name/,, portion is purely decorative, and is there for the editor's sake. And ''[optional display name],, is of course used to set an alternate display name.
+
+ So with that being the case, you may occasionally encounter plain text that looks like ''(123),,―that just means that someone manually entered the band ID instead of using the handy dropdown.
+
+ A similar pattern is followed for labels: ''{123}=label name=[optional display name],,.

@@ -1,8 +1,8 @@
 ## Who can contribute to vkgy
 
-* If you would like to contribute to the [vkgy](https://vk.gy/) library, simply [register](https://vk.gy/account/) and request to be an ''editor,, [on Discord](https://discord.gg/jw8jzXn) or [Twitter](https://twitter.com/vkgy_).
+* Anyone with ''editor,, status may contribute. If you would like to help, please [register](https://vk.gy/account/) and request to be an ''editor,, [on Discord](https://discord.gg/jw8jzXn) or [Twitter](https://twitter.com/vkgy_).
 
- (You can also just leave a comment anywhere that you have extra information, or put it in the #research channel [on Discord](https://discord.gg/jw8jzXn).)
+ Alternatively, you may leave a comment with information, and one of our editors will add the information for you. You may also leave information in the #research channel [on Discord](https://discord.gg/jw8jzXn).
 
 * All ''visitors,, can: read pages, leave comments, like comments, and rate releases.
 
@@ -14,26 +14,24 @@
 
 
 
-## A primer for editors
+## Introduction to editing
 
-* [Artists](https://vk.gy/artists/) and [releases](https://vk.gy/releases/) get their own links up top, but you can also access the [musicians](https://vk.gy/musicians/) and [labels](https://vk.gy/labels/) sections by going through the [database](https://vk.gy/database/).
+* There are many sections to which you can contribute information: [artists](https://vk.gy/artists/), [releases](https://vk.gy/releases/), [musicians](https://vk.gy/musicians/), [record labels](https://vk.gy/labels/), [livehouses](https://vk.gy/livehouses/), and [lives](https://vk.gy/lives/).
 
- The [database](https://vk.gy/database/) page also allows you to quickly see all items that have been edited recently.
+ Other useful sections are [comments](https://vk.gy/comments/), [documentation](https://vk.gy/documentation/), [images](https://vk.gy/images/), and [users](https://vk.gy/users/). VIP users may also access [change logs](https://vk.gy/vip/).
 
- There are also [comments](https://vk.gy/comments/), [documentation](https://vk.gy/documentation/), [images](https://vk.gy/images/), [livehouses](https://vk.gy/livehouses/), [users](https://vk.gy/users/), and [VIP](https://vk.gy/vip/) sections.
+* For adding and editing information, [vkgy](https://vk.gy/) uses its own flavor of Markdown. It allows us to write in plain text and generate rich documents.
 
-* [vkgy](https://vk.gy/) is designed to make it easy and quick to add information, while avoiding duplicates and weird formatting. The downside is that there's sometimes a learning curve.
+ For example, when leaving a comment, you can write an artist's name in ''/slashes/,,, and it will be converted into a link with the correct name. And in fact, as soon as you type ''/,,, a dropdown will appear which will help you type the artist's name more quickly.
+ 
+ {/dali/ and /la sadies/ are cool.}
 
- One of the first things you have to get used to is Markdown—a system for formatting text and linking artists. See **[Markdown](/documentation/markdown/)** for the full guide, but here's a quick primer on linking artists:
+ See **[Markdown](/documentation/markdown/)** for more information.
 
- In comments etc., you can make special artist links by enclosing their name between ''/slashes/,,. You can use romaji or Japanese, and can ommit symbols. The system will attempt to find that artist in the database and turn it into a working link in the final text:
+* To add a page, navigate to the appropriate section and click the “add” link in the top right. To edit a page, navigate to that page and click “edit” in the top right.
 
- {/dali/, /sugar forkful/, and /la sadies/ are cool.}
-
-* In each section, there's a link at the top-right to add to that section (e.g. “add artists”). If you're allowed to edit a certain page, the link for that will be at the top-right too.
-
- As each section has its own unique shortcuts and features, whenever you add to a section or edit a page, the relevant documentation will be available at the bottom of the page. You can always access *all* documentation [here](https://vk.gy/documentation/), or can ask for help [on Discord](https://discord.gg/jw8jzXn).
-
- It's often helpful to look at [recent edits](https://vk.gy/database/) and see how other users did them.
+ In most places, there are shortcuts to help you add data more quickly and easily. So be sure to check the relevant [documentation](https://vk.gy/documentation/) at the bottom of each page.
+ 
+ Although we try to make editing as simple as possible, there is a learning curve. So please don't hesitate to ask for help [on Discord](https://discord.gg/jw8jzXn).
 
 * Note that some additions to the database (upcoming releases, upcoming member changes, brand new bands) will automatically generate news posts about them. If a news post was generated, you'll be notified and will be able to edit it, if you want.
