@@ -351,16 +351,6 @@ function initTribute() {
 	// For each tributable input, clone it as a contenteditable div
 	tributableElems.forEach(function(tributableElem, index) {
 		
-		
-		
-		// Temporary test flag: init plain tribute on textareas, but do nothing else
-		if(typeof testTribute === 'undefined' || !testTribute) {
-			plainTribute.attach(tributableElem);
-		}
-		else {
-		
-		
-		
 		// Check if original input was given focus, if so we'll move focus to clone later
 		var tributableIsFocused = document.activeElement === tributableElem;
 		
@@ -480,13 +470,6 @@ function initTribute() {
 		newElem.addEventListener('keydown', function(event) {
 			handleFirefoxMovement(event);
 		});
-	
-	
-	
-	// End test flag
-	}
-	
-	
 		
 	});
 	
