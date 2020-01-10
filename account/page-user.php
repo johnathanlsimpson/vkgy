@@ -407,8 +407,6 @@
 			<!-- User header -->
 			<div class="col c1">
 				<div>
-					<?= $_SESSION['username'] == $user['username'] ? '<div class="text text--outlined text--notice symbol__help"><a href="/account/">Profile settings</a> and <a href="/account/edit-avatar/">avatar editing</a> have been moved to separate pages.</div>' : null; ?>
-					
 					<div class="text user__card any--flex" style="">
 						
 						<?= $_SESSION['username'] == $user['username'] ? '<a class="user__avatar-link" href="/account/edit-avatar/"><span class="user__avatar-text symbol__edit">'.lang('Edit avatar', 'アバター変更', 'hidden').'</span>' : null; ?>
@@ -518,15 +516,17 @@
 										?>
 											<li class="stat__item data__item <?php echo $data_class; ?>" data-emoji="<?php echo $stat['emoji']; ?>">
 												
-												<div class="h5 stat-level__container" data-level="<?php echo $stat['level']; ?>">
-													<span class="level__deco"></span>
-												</div>
-												
 												<h5>
 													<?php echo $stat['title']; ?>
 												</h5>
 												
 												<?php echo $stat['value']; ?>
+												
+												<span class="any--weaken"><?= $stat['level'] ? 'LV.'.$stat['level'] : null; ?></span>
+												
+												<div class="h5 stat-level__container" data-level="<?php echo $stat['level']; ?>">
+													<span class="level__deco"></span>
+												</div>
 												
 											</li>
 										<?php
