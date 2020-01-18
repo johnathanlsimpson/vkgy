@@ -1,5 +1,6 @@
 <?php
-	// Object/array to plain array
+	
+	// Helper function to turn object into array
 	function object_to_array($obj) {
 		if(is_object($obj)) $obj = (array) $obj;
 		if(is_array($obj)) {
@@ -12,10 +13,11 @@
 		return $new;       
 	}
 	
+	// Handles updating the VIP blog with the update that just occurred
 	function update_development($pdo, $args = []) {
 		if($pdo instanceof PDO) {
 			$title         = strlen($args["title"]) ? sanitize($args["title"]) : 'Development '.date('n/j');
-			$friendly      = strlen($args["friendly"]) ? friendly($args["friendly"]) : friendly($title);
+			$friendly      = strlen($args["friendly"]) ? friendly($args["friendly"]) : 'development-'.date('Y-m-d');
 			$user_id       = is_numeric($args["user_id"]) ? $args["user_id"] : 0;
 			$header        = "Here are today's development updates. As always, thank you for supporting vkgy!\n\n---\n\n";
 			$flyer_str     = 'Added 1 flyer to queue.';
@@ -24,6 +26,8 @@
 			$replace_regex = '\r?\n?'.$content;
 			
 			if($content) {
+				
+				// If flyers were uploaded to DB, add line about it (or increase count if line already added)
 				if($args["type"] === "flyer") {
 					$sql_curr_log = "SELECT * FROM vip WHERE friendly=? LIMIT 1";
 					$stmt_curr_log = $pdo->prepare($sql_curr_log);
@@ -36,15 +40,25 @@
 					}
 				}
 				
+				// Get current VIP post if it exists
 				$sql_curr_post = 'SELECT * FROM vip WHERE friendly=? LIMIT 1';
 				$stmt_curr_post = $pdo->prepare($sql_curr_post);
 				$stmt_curr_post->execute([ $friendly ]);
 				$rslt_curr_post = $stmt_curr_post->fetch();
 				
-				$sql_log_commit = "INSERT INTO vip (title, friendly, content, user_id) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE content = CONCAT(REGEXP_REPLACE(content, '".$replace_regex."', ''), ?, ?)";
+				// If post already exists, make sure we're not adding the same update multiple times
+				if(is_array($rslt_curr_post) && !empty($rslt_curr_post)) {
+					$updated_content = $rslt_curr_post['content'];
+					
+					if(strpos($updated_content, $content) === false) {
+						$updated_content .= "\n".$content;
+					}
+				}
+				
+				$sql_log_commit = "INSERT INTO vip (title, friendly, content, user_id) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE content=?";
 				$stmt_log_commit = $pdo->prepare($sql_log_commit);
 				
-				if($stmt_log_commit->execute([ $title, $friendly, $header.$content, $user_id, "\n", $content ])) {
+				if($stmt_log_commit->execute([ $title, $friendly, $header.$content, $user_id, $updated_content ])) {
 					return true;
 				}
 				else {
@@ -62,7 +76,7 @@
 		file_put_contents('deploy/log.txt', "Args:\n".print_r($args, true), FILE_APPEND | LOCK_EX);
 	}
 
-	// Post deploy
+	// Fires after files are deployed from Github; triggers log and blog update
 	function post_deploy() {
 		global $payload;
 		global $pdo;
@@ -76,7 +90,7 @@
 				foreach($commits as $commit) {
 					$content = trim($commit["message"]);
 					
-					if(strpos($content, 'Merge') !== 0) {
+					if($array_payload['ref'] === 'refs/heads/master') {
 						if(strlen($commit['author']['email'])) {
 							$sql_user = "SELECT id FROM users WHERE email=? LIMIT 1";
 							$stmt_user = $pdo->prepare($sql_user);
