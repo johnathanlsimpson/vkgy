@@ -23,11 +23,6 @@
 						$output["title"] = $title;
 						$output["url"] = "/vip/".$friendly."/";
 						$output["edit_url"] = "/vip/".$friendly."/edit/";
-						
-						// Since entry was updated (presumably because additional site updates were made), make sure it shows as new for everyone
-						$sql_views = 'DELETE FROM vip_views WHERE post_id=?';
-						$stmt_views = $pdo->prepare($sql_views);
-						$stmt_views->execute([ $id ]);
 					}
 					else {
 						$output['result'] = 'Couldn\'t update entry.';

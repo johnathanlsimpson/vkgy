@@ -52,6 +52,11 @@
 					
 					if(strpos($updated_content, $content) === false) {
 						$updated_content .= "\n".$content;
+						
+						// Since entry was updated, make sure it shows as new for everyone
+						$sql_views = 'DELETE FROM vip_views WHERE post_id=?';
+						$stmt_views = $pdo->prepare($sql_views);
+						$stmt_views->execute([ $rslt_curr_post['id'] ]);
 					}
 				}
 				
