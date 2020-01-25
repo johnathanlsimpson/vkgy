@@ -1,0 +1,85 @@
+.user__username, .user__flair, .user__data, .user__motto, .user__empty {
+	margin-bottom: 0;
+	margin-top: 1rem;
+}
+.user__username {
+	margin-top: 0;
+}
+.user__data {
+	margin-bottom: -0.5rem;
+	margin-top: 0.5rem;
+}
+.user__flair {
+	text-transform: uppercase;
+}
+.user__card {
+	align-items: center;
+	min-height: 100px;
+	box-sizing: content-box;
+}
+.user__card-data {
+	margin: 0 1rem;
+}
+.user__card-data .any__note {
+	font-size: 0.9rem;
+	font-weight: normal;
+	vertical-align: bottom;
+	margin-right: 1ch;
+	margin-bottom: 4px;
+}
+@media(max-width:800px) {
+	.user__card {
+		flex-direction: column;
+	}
+	.user__motto {
+		margin-top: 1rem;
+		text-align: center;
+	}
+	.user__username {
+		margin: 1rem 0;
+		text-align: center;
+	}
+}
+.user__motto {
+	color: hsl(var(--attention--secondary));
+}
+.user__motto::before {
+	content: "\201C";
+}
+.user__motto::after {
+	content: "\201D";
+}
+.user__edit {
+	background: hsl(var(--background--alt));
+	padding-top: 3rem;
+	margin-bottom: 3rem;
+}
+.user__avatar {
+	background: hsl(var(--background--secondary));
+	border-radius: 50%;
+	display: inline-block;
+	flex: none;
+	height: 200px;
+	vertical-align: middle;
+	width: 200px;
+}
+.user__avatar-text {
+	display: none;
+}
+.user__avatar-link:hover .user__avatar-text {
+	align-items: center;
+	background: hsla(var(--background--secondary), 0.8);
+	border-radius: 50%;
+	bottom: 0;
+	box-sizing: border-box;
+	display: flex;
+	justify-content: center;
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 1;
+}
+.user--no-avatar .head__base {
+	fill: hsl(var(--background));
+}

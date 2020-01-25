@@ -810,7 +810,7 @@
 								}
 							}
 							
-							$releases[$release_id]["comments"] = $this->access_comment->access_comment(["id" => $releases[$release_id]["id"], 'user_id' => $_SESSION['userID'], "type" => "release", "get" => "all"]);
+							$releases[$release_id]["comments"] = $this->access_comment->access_comment(["id" => $releases[$release_id]["id"], 'get_user_likes' => true, "type" => "release", "get" => "all"]);
 						}
 					}
 					
