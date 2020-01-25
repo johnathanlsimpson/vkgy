@@ -69,6 +69,11 @@
 								}
 								else {
 									$release_artist_display = $release['artist']['romaji'] ? lang( $release['artist']['romaji'], $release['artist']['name'], 'parentheses' ) : $release['artist']['name'];
+									
+									// If artist is omnibus, prevent "(omnibus) ((オムニバス))"
+									if($release['artist']['friendly'] === 'omnibus') {
+										$release_artist_display = str_replace( '<span class="any--en">(</span>(&#12458;&#12512;&#12491;&#12496;&#12473;)<span class="any--en">)</span>', '<span class="any--en"></span>(&#12458;&#12512;&#12491;&#12496;&#12473;)<span class="any--en"></span>', $release_artist_display );
+									}
 								}
 							}
 							
