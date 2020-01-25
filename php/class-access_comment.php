@@ -82,6 +82,10 @@
 			if($args['limit_threads']) {
 				$sql_where[] = 'comments.thread_id IS NULL';
 			}
+			if(is_numeric($args['user_id'])) {
+				$sql_where[] = 'comments.user_id=?';
+				$sql_values[] = $args['user_id'];
+			}
 			
 			// GROUP
 			if($args["get"] === "count") {
