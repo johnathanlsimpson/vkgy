@@ -105,7 +105,7 @@
 											<?php
 										}
 									?>
-									<a href="<?= '/releases/'.$artist['friendly'].'/'.$release['id'].'/'.$release['friendly'].'/'; ?>">
+									<a href="<?= '/releases/'.$artist['friendly'].'/'.$release['id'].'/'.$release['friendly'].'/'.($release['artist']['id'] != $artist['id'] ? '&prev_next_artist='.$artist['id'] : null); ?>">
 										<?= $release_display_romaji ? lang($release_display_romaji, $release_display_name, 'div') : $release_display_name; ?>
 									</a>
 								</div>
