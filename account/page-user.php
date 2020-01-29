@@ -537,98 +537,107 @@
 					</div>
 				</div>
 			</div>
-
-
+			
 			<!-- Collection -->
 			<div class="col <?php echo $num_wants ? 'c3-AAB' : 'c1'; ?>">
 				<div>
-					<div class="any--flex" style="justify-content: space-between;">
-						<h2>
-							<div class="any--en">
-								Collection
-							</div>
-							<div class="any--jp any--weaken">
-								<?php echo sanitize('コレクション'); ?>
-							</div>
-						</h2>
-
-						<div class="collection__controls">
-							<label class="collection__control input__checkbox-label input__checkbox-label--selected" data-filter="" for="filter-all">all</label>
-							<label class="collection__control input__checkbox-label" data-filter="" for="filter-for-sale">for sale</label>
-						</div>
-					</div>
-
-					<div class="collection__wrapper text" id="collection-wrapper">
-						<input class="any--hidden" id="filter-all" name="filter-for-sale" type="radio" value="0" />
-						<input class="any--hidden" id="filter-for-sale" name="filter-for-sale" type="radio" value="1" />
-
-						<ul class="any--weaken-color collection__container" id="collection-container">
-							<?php
-								if(is_array($collection) && !empty($collection)) {
-									for($i=0; $i<$num_collected; $i++) {
-										$curr_artist = $collection[$i]['artist_id'];
-										$curr_letter = substr($artists[$collection[$i]['artist_id']]['friendly'], 0, 1);
-										$curr_letter = is_numeric($curr_letter) ? '#' : $curr_letter;
-
-										$item_class = $collection[$i]['is_for_sale'] ? 'collection--for-sale' : null;
-
-										if($curr_letter != $prev_letter) {
-											
-											?>
-												<li class="collection__header">
-													<h4>
-														<?php echo $curr_letter; ?>
-													</h4>
-												</li>
-											<?php
-											
-										}
-
-										if($curr_artist != $prev_artist) {
-											
-											?>
-												<li class="collection__artist">
-													<a class="artist" href="<?php echo '/artists/'.$artists[$collection[$i]['artist_id']]['friendly'].'/'; ?>"><?php echo $artists[$collection[$i]['artist_id']]['quick_name']; ?></a>
-												</li>
-											<?php
-											
-										}
+					<h2 class="collection__title">
+						<?php
+							if($_SESSION['username'] === $user['username']) {
+								echo '<a class="symbol__download collection__download" href="/users/'.$_SESSION['username'].'/&action=download" style="">CSV</a>';
+								echo '<a class="symbol__download collection__download" href="/users/'.$_SESSION['username'].'/&action=download&limit=selling" style="">CSV (for sale)</a>';
+							}
+						?>
+						<?= lang($user['username'].'\'s VK collection', $user['username'].'のV系コレクション', 'div'); ?>
+					</h2>
+					
+					<div style="clear:both;"></div>
+					
+					<input class="any--hidden" id="filter-for-sale" name="filter-for-sale" type="radio" value="1" />
+					<label class="collection__control input__checkbox-label symbol__unchecked" data-filter="for-sale" for="filter-for-sale">for sale</label>
+					
+					<input class="any--hidden" id="filter-all" name="filter-for-sale" type="radio" value="0" checked />
+					<label class="collection__control input__checkbox-label symbol__unchecked" data-filter="all" for="filter-all">all</label>
+					
+					<span class="collection__control symbol__filter"></span>
+					
+					<ul class="any--weaken-color collection__container text" id="collection-container">
+						<?php
+							if(is_array($collection) && !empty($collection)) {
+								
+								// Loop through collection and get artists/letters that are for sale
+								$for_sale_artists = [];
+								$for_sale_letters = [];
+								for($i=0; $i<$num_collected; $i++) {
+									if($collection[$i]['is_for_sale']) {
+										$for_sale_artists[ $collection[$i]['artist_id'] ] = '';
 										
+										$for_sale_letter = substr( $artists[ $collection[$i]['artist_id'] ]['friendly'] , 0, 1 );
+										$for_sale_letter = $for_sale_letter === '-' || is_numeric($for_sale_letter) ? '#' : $for_sale_letter;
+										$for_sale_letters[ $for_sale_letter ] = '';
+									}
+								}
+								$for_sale_artists = array_keys($for_sale_artists);
+								$for_sale_letters = array_keys($for_sale_letters);
+								
+								// Loop through collection and render
+								for($i=0; $i<$num_collected; $i++) {
+									$curr_artist = $collection[$i]['artist_id'];
+									$curr_letter = substr($artists[$collection[$i]['artist_id']]['friendly'], 0, 1);
+									$curr_letter = is_numeric($curr_letter) ? '#' : $curr_letter;
+									
+									if($curr_letter != $prev_letter) {
 										?>
-											<li class="collection__item <?php echo $item_class; ?>">
-												<?php
-													if($_SESSION["username"] === $user["username"]) {
-														?>
-															<label class="collection__sell input__checkbox-label <?php echo $collection[$i]["is_for_sale"] ? "input__checkbox-label--selected symbol__checked" : "symbol__unchecked"; ?> collect" data-action="sell" data-id="<?php echo $collection[$i]["id"]; ?>">sell?</label>
-														<?php
-													}
-												?>
-
-												<a class="a--inherit" href="<?php echo '/releases/'.$artists[$collection[$i]['artist_id']]['friendly'].'/'.$collection[$i]['id'].'/'.$collection[$i]['friendly'].'/'; ?>"><?php echo $collection[$i]['quick_name']; ?></a>
-
-												<?php
-													if($_SESSION["username"] != $user["username"] && $collection[$i]["is_for_sale"]) {
-														?>
-															<span class="any__note collection__selling">for sale</span>
-														<?php
-													}
-												?>
+											<li class="collection__header <?= in_array($curr_letter, $for_sale_letters) ? 'collection--for-sale' : null; ?>">
+												<h4>
+													<?= $curr_letter; ?>
+												</h4>
 											</li>
 										<?php
-										
-										$prev_artist = $curr_artist;
-										$prev_letter = $curr_letter;
 									}
 									
-								}
-								else {
+									if($curr_artist != $prev_artist) {
+										?>
+											<li class="collection__artist <?= in_array($curr_artist, $for_sale_artists) ? 'collection--for-sale' : null; ?>">
+												<a class="artist" href="<?php echo '/artists/'.$artists[$collection[$i]['artist_id']]['friendly'].'/'; ?>"><?php echo $artists[$collection[$i]['artist_id']]['quick_name']; ?></a>
+											</li>
+										<?php
+									}
+									
 									?>
-										<span class="symbol__error">This user hasn't collected any releases yet.</span>
+										<li class="collection__item <?= $collection[$i]['is_for_sale'] ? 'collection--for-sale' : null; ?>">
+											<?php
+												if($_SESSION["username"] === $user["username"]) {
+													?>
+														<label class="collection__sell input__checkbox-label <?php echo $collection[$i]["is_for_sale"] ? "input__checkbox-label--selected symbol__checked" : "symbol__unchecked"; ?> collect" data-action="sell" data-id="<?php echo $collection[$i]["id"]; ?>">sell?</label>
+													<?php
+												}
+											?>
+											
+											<a class="a--inherit" href="<?php echo '/releases/'.$artists[$collection[$i]['artist_id']]['friendly'].'/'.$collection[$i]['id'].'/'.$collection[$i]['friendly'].'/'; ?>"><?php echo $collection[$i]['quick_name']; ?></a>
+											
+											<?php
+												if($_SESSION["username"] != $user["username"] && $collection[$i]["is_for_sale"]) {
+													?>
+														<span class="any__note collection__selling">for sale</span>
+													<?php
+												}
+											?>
+										</li>
 									<?php
+									
+									$prev_artist = $curr_artist;
+									$prev_letter = $curr_letter;
 								}
-							?>
-						</ul>
-					</div>
+								
+							}
+							else {
+								?>
+									<span class="symbol__error">This user hasn't collected any releases yet.</span>
+								<?php
+							}
+						?>
+					</ul>
 				</div>
 				<div class="collection__wants <?php echo !$num_wants ? 'any--hidden' : null; ?>">
 					<h3>
