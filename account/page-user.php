@@ -319,7 +319,6 @@ foreach($stats as $key => $stat) {
 if($level_num < 1) {
 	$level_num = ($stats['comments']['value'] || $stats['collection']['value']) ? 1 : 0;
 }
-
 // Stats: format
 foreach($stats as $key => $stat) {
 	$stats[$key]['value'] = $key != 'fan_since' && $key != 'oldest' ? number_format($stat['value']) : $stat['value'];
@@ -336,7 +335,6 @@ foreach($stats as $key => $stat) {
 	elseif($key === 'newest') {
 		$stats[$key]['value'] = $stat['value'] + $current_year;
 	}
-
 	$stats[$key]['title'] = $stats[$key]['title'] ?: str_replace('_', ' ', $key);
 }
 

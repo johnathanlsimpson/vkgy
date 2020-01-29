@@ -53,7 +53,7 @@
 		$entry = $stmt_entry->fetch();
 		
 		if(is_array($entry) && !empty($entry)) {
-			$entry["comments"] = $access_comment->access_comment(["id" => $entry["id"], 'user_id' => $_SESSION['userID'], "type" => "vip", "get" => "all"]);
+			$entry["comments"] = $access_comment->access_comment(["id" => $entry["id"], 'get_user_likes' => true, "type" => "vip", "get" => "all"]);
 		}
 		else {
 			unset($entry);

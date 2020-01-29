@@ -1,0 +1,25 @@
+[data-type="images"] .activity__symbol {
+	overflow: hidden;
+}
+.activity__symbol {
+	border-radius: 50%;
+	font-size: 2rem;
+	height: 2rem;
+	line-height: 1;
+	margin-right: 1rem;
+	text-align: center;
+	width: 2rem;
+}
+.activity--has-image::before {
+	display: none;
+}
+.activity__image {
+	height: 150%;
+	object-fit: cover;
+	left: 50%;
+	transform: translateX(-50%);
+	top: -30%;
+}
+.activity__content:not(:empty) {
+	margin-top: 0.5rem;
+}
