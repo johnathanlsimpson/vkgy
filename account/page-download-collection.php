@@ -40,11 +40,16 @@
 		for($i=0; $i<$num_collected; $i++) {
 			if($_GET["limit"] !== "selling" || ($_GET["limit"] === "selling" && $collection[$i]["is_for_sale"])) {
 				
-				$medium = [];
-				foreach($collection[$i]['medium'] as $media) {
-					$medium[] = $media['romaji'] ?: $media['name'];
+				if(is_array($collection[$i]['medium'])) {
+					$medium = [];
+					foreach($collection[$i]['medium'] as $media) {
+						$medium[] = $media['romaji'] ?: $media['name'];
+					}
+					$medium = is_array($medium) ? implode(', ', $medium) : null;
 				}
-				$medium = is_array($medium) ? implode(', ', $medium) : null;
+				else {
+					$medium = null;
+				}
 				$collection[$i]['medium'] = $medium;
 				
 				if($collection[$i]['romaji'] || $collection[$i]['press_romaji'] || $collection[$i]['type_name']) {
