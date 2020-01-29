@@ -445,6 +445,7 @@ if(strlen($next_users['rand1'])) {
 				<?php
 					$activity_limit = 15;
 					$activity_offset = 0;
+					$show_symbols = false;
 					include('partial-activity.php');
 				?>
 				<a class="a--padded a--outlined obscure__button" href="<?= '/users/'.$user['username'].'/activity/'; ?>" style="background:hsl(var(--background--secondary));"><?= lang('View activity', '活動を表示する', 'hidden'); ?></a>
