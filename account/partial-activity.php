@@ -287,7 +287,7 @@ foreach($rslt_activity as $activity) {
 	);
 	?>
 		<li class="flex activity__item" data-type="<?= $activity['type']; ?>">
-			<span class="any--weaken-color activity__symbol <?= $image ? 'activity--has-image' : null; ?> <?= 'symbol__'.$symbol; ?>">
+			<span class="any--weaken-color activity__symbol <?= $image ? 'activity--has-image' : null; ?> <?= 'symbol__'.$symbol; ?> <?= $show_symbols === false ? 'any--hidden' : null; ?>">
 				<?= $image ? '<img class="activity__image" src="'.$image.'" />' : null; ?>
 			</span>
 			
