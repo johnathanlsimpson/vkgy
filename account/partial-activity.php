@@ -44,7 +44,8 @@ foreach($activity_tables as $activity_table) {
 		FROM 
 			'.$activity_table.' 
 		WHERE
-			user_id=? 
+			user_id=?
+			'.($activity_table === 'blog' ? 'AND is_queued=0' : null).'
 		'.($group_activity_by[$activity_table] ? 'GROUP BY '.$activity_table.'.'.$group_activity_by[$activity_table] : null).'
 		ORDER BY 
 			id DESC 
@@ -72,12 +73,13 @@ foreach($rslt_activity as $activity) {
 			$activity_name = 'artists.name';
 			$activity_romaji = 'artists.romaji';
 			$activity_url = 'CONCAT_WS("/", "", "artists", artists.friendly, "")';
-			$activity_join = 'artists ON artists.id=artists_tags.artist_id';
+			$activity_join = 'artists ON artists.id=artists_tags.artist_id LEFT JOIN images ON images.id=artists.image_id';
 			break;
 		case('blog'):
 			$singular = 'blog';
 			$activity_name = 'blog.title';
 			$activity_url = 'CONCAT_WS("/", "", "blog", blog.friendly, "")';
+			$activity_join = 'images ON images.id=blog.image_id';
 			$activity_join = null;
 			break;
 		case('comments'):
@@ -100,7 +102,7 @@ foreach($rslt_activity as $activity) {
 			$activity_name = 'artists.name';
 			$activity_romaji = 'artists.romaji';
 			$activity_url = 'CONCAT_WS("/", "", "artists", artists.friendly, "")';
-			$activity_join = 'artists ON artists.id=edits_artists.artist_id';
+			$activity_join = 'artists ON artists.id=edits_artists.artist_id LEFT JOIN images ON images.id=artists.image_id';
 			break;
 		case('edits_labels'):
 			$activity_name = 'labels.name';
@@ -118,7 +120,7 @@ foreach($rslt_activity as $activity) {
 			$activity_name = 'CONCAT_WS(" ", releases.name, COALESCE(releases.press_name, ""), COALESCE(releases.type_name, ""))';
 			$activity_romaji = 'CONCAT_WS(" ", COALESCE(releases.romaji, releases.name), COALESCE(releases.press_romaji, releases.press_name, ""), COALESCE(releases.type_romaji, releases.type_name, ""))';
 			$activity_url = 'CONCAT_WS("/", "", "releases", artists.friendly, releases.id, releases.friendly, "")';
-			$activity_join = 'releases ON releases.id=edits_releases.release_id LEFT JOIN artists ON artists.id=releases.artist_id';
+			$activity_join = 'releases ON releases.id=edits_releases.release_id LEFT JOIN artists ON artists.id=releases.artist_id LEFT JOIN images ON images.id=releases.image_id';
 			$activity_group = 'edits_releases.release_id';
 			break;
 		case('images'):
@@ -139,31 +141,31 @@ foreach($rslt_activity as $activity) {
 			$activity_name = 'CONCAT_WS(" ", releases.name, COALESCE(releases.press_name, ""), COALESCE(releases.type_name, ""))';
 			$activity_romaji = 'CONCAT_WS(" ", COALESCE(releases.romaji, releases.name), COALESCE(releases.press_romaji, releases.press_name, ""), COALESCE(releases.type_romaji, releases.type_name, ""))';
 			$activity_url = 'CONCAT_WS("/", "", "releases", artists.friendly, releases.id, releases.friendly, "")';
-			$activity_join = 'artists ON artists.id=releases.artist_id';
+			$activity_join = 'artists ON artists.id=releases.artist_id LEFT JOIN images ON images.id=releases.image_id';
 			break;
 		case('releases_collections'):
 			$activity_name = 'releases.name';
 			$activity_romaji = 'releases.romaji';
 			$activity_url = 'CONCAT_WS("/", "", "releases", artists.friendly, releases.id, releases.friendly, "")';
-			$activity_join = 'releases ON releases.id=releases_collections.release_id LEFT JOIN artists ON artists.id=releases.artist_id';
+			$activity_join = 'releases ON releases.id=releases_collections.release_id LEFT JOIN artists ON artists.id=releases.artist_id LEFT JOIN images ON images.id=releases.image_id';
 			break;
 		case('releases_ratings'):
 			$activity_name = 'releases.name';
 			$activity_romaji = 'releases.romaji';
 			$activity_url = 'CONCAT_WS("/", "", "releases", artists.friendly, releases.id, releases.friendly, "")';
-			$activity_join = 'releases ON releases.id=releases_ratings.release_id LEFT JOIN artists ON artists.id=releases.artist_id';
+			$activity_join = 'releases ON releases.id=releases_ratings.release_id LEFT JOIN artists ON artists.id=releases.artist_id LEFT JOIN images ON images.id=releases.image_id';
 			break;
 		case('releases_tags'):
 			$activity_name = 'releases.name';
 			$activity_romaji = 'releases.romaji';
 			$activity_url = 'CONCAT_WS("/", "", "releases", artists.friendly, releases.id, releases.friendly, "")';
-			$activity_join = 'releases ON releases.id=releases_tags.release_id LEFT JOIN artists ON artists.id=releases.artist_id';
+			$activity_join = 'releases ON releases.id=releases_tags.release_id LEFT JOIN artists ON artists.id=releases.artist_id LEFT JOIN images ON images.id=releases.image_id';
 			break;
 		case('releases_wants'):
 			$activity_name = 'releases.name';
 			$activity_romaji = 'releases.romaji';
 			$activity_url = 'CONCAT_WS("/", "", "releases", artists.friendly, releases.id, releases.friendly, "")';
-			$activity_join = 'releases ON releases.id=releases_wants.release_id LEFT JOIN artists ON artists.id=releases.artist_id';
+			$activity_join = 'releases ON releases.id=releases_wants.release_id LEFT JOIN artists ON artists.id=releases.artist_id LEFT JOIN images ON images.id=releases.image_id';
 			break;
 		case('videos'):
 			$activity_url = 'CONCAT_WS("/", "", "artists", artists.friendly, "videos", "")';
@@ -179,7 +181,8 @@ foreach($rslt_activity as $activity) {
 			"'.$activity['id'].'" AS id, 
 			'.( $activity_url ?: 'NULL' ).' AS url, 
 			'.( $activity_name ?: 'NULL' ).' AS name, 
-			'.( $activity_romaji ?: 'NULL' ).' AS romaji 
+			'.( $activity_romaji ?: 'NULL' ).' AS romaji,
+			'.( strpos($activity_join, 'images') === false ? 'NULL' : 'CONCAT("/images/", images.id, ".thumbnail.", images.extension)' ).' AS image
 		FROM 
 			'.($activity_from ?: $activity['type']).' '.
 			( $activity_join ? 'LEFT JOIN '.$activity_join : null ).' 
@@ -201,7 +204,7 @@ foreach($rslt_activity_urls as $activity_key => $activity_url) {
 
 foreach($rslt_activity as $activity) {
 	switch($activity['type']) {
-		case('artist_tags'):
+		case('artists_tags'):
 			$symbol = 'tag';
 			$supertitle = $user['username'].'tagged <a class="a--inherit symbol__artist" href="'.$activity['url'].'">'.lang($activity['romaji'] ?: $activity['name'], $activity['name'], 'hidden').'</a>.';
 			break;
@@ -220,7 +223,7 @@ foreach($rslt_activity as $activity) {
 			$symbol = 'like';
 			$supertitle = $user['username'].' liked a comment by '.($activity['name'] ? '<a class="a--inherit symbol__user" href="/users/'.$activity['name'].'/">'.$activity['name'].'</a>' : 'an anonymous user').'.';
 			break;
-		case('comments_external_likes'):
+		case('external_comments_likes'):
 			$symbol = 'like';
 			$supertitle = '<a class="symbol__user a--inherit" href="/users/'.$activity['name'].'">'.$activity['name'].'</a> liked a comment by '.$user['username'].'.';
 			break;
@@ -243,7 +246,7 @@ foreach($rslt_activity as $activity) {
 		case('images'):
 			$symbol = 'plus';
 			$supertitle = $user['username'].' added <a class="a--inherit" href="'.$activity['url'].'">an image</a>.';
-			$image = str_replace('.', '.thumbnail.', $activity['url']);
+			$activity['image'] = str_replace('.', '.thumbnail.', $activity['url']);
 			break;
 		case('lives'):
 			$symbol = 'ticket';
@@ -285,11 +288,10 @@ foreach($rslt_activity as $activity) {
 		($activity['date_occurred'] > date('Y') ? null : substr($activity['date_occurred'], 0, 4).'年').date('n月j日', strtotime($activity['date_occurred'])),
 		'hidden'
 	);
+	
 	?>
 		<li class="flex activity__item" data-type="<?= $activity['type']; ?>">
-			<span class="any--weaken-color activity__symbol <?= $image ? 'activity--has-image' : null; ?> <?= 'symbol__'.$symbol; ?> <?= $show_symbols === false ? 'any--hidden' : null; ?>">
-				<?= $image ? '<img class="activity__image" src="'.$image.'" />' : null; ?>
-			</span>
+			<a class="any--weaken-color activity__symbol <?= $activity['image'] ? 'activity--has-image' : null; ?> <?= 'symbol__'.$symbol; ?> <?= $show_symbols === false ? 'any--hidden' : null; ?>" href="<?= $activity['url']; ?>"><?= $activity['image'] ? '<img class="activity__image lazy" src="'.$activity['image'].'" />' : null; ?></a>
 			
 			<span>
 				<span class="any--weaken-size activity__subtitle">

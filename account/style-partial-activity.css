@@ -2,23 +2,45 @@
 	overflow: hidden;
 }
 .activity__symbol {
-	border-radius: 50%;
-	font-size: 2rem;
-	height: 2rem;
+	background: hsla(var(--background--secondary), 1);
+	border-radius: 3px;
+	height: 50px;
 	line-height: 1;
+	overflow: hidden;
 	margin-right: 1rem;
 	text-align: center;
-	width: 2rem;
+	width: 50px;
 }
-.activity--has-image::before {
-	display: none;
+.activity__symbol:hover {
+	background: hsla(var(--background--secondary), 0.75);
+}
+.activity__symbol::before {
+	color: hsl(var(--text));
+	bottom: 0;
+	margin: 0;
+	opacity: 1;
+	position: absolute;
+	right: 0;
+	z-index: 2;
+}
+.activity__symbol::after {
+	background: hsl(var(--background));
+	border-radius: 5px 0 0 0;
+	bottom: 0;
+	content: "";
+	display: block;
+	height: 1rem;
+	padding: 2px 0 0 2px;
+	position: absolute;
+	right: 0;
+	width: 1rem;
+	z-index: 1;
 }
 .activity__image {
-	height: 150%;
+	height: 100%;
 	object-fit: cover;
-	left: 50%;
-	transform: translateX(-50%);
-	top: -30%;
+	object-position: center;
+	width: 100%;
 }
 .activity__content:not(:empty) {
 	margin-top: 0.5rem;
