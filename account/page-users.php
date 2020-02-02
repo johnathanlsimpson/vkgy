@@ -8,6 +8,16 @@
 		"/account/style-page-users.css"
 	]);
 	
+	subnav([
+		lang('Member list', 'メンバー一覧', 'hidden') => '/users/',
+	]);
+	
+	if(!$_SESSION['is_signed_in']) {
+		subnav([
+			lang('Register/Sign in', '登録・サインイン', 'hidden') => '/account/',
+		]);
+	}
+	
 	$page_header = lang('Member list', 'メンバー一覧', ['container' => 'div']);
 ?>
 
