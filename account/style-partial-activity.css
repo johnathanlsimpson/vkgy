@@ -11,8 +11,14 @@
 	text-align: center;
 	width: 50px;
 }
+.text--outlined .activity__symbol {
+	background: hsl(var(--background));
+}
 .activity__symbol:hover {
 	background: hsla(var(--background--secondary), 0.75);
+}
+.text--outlined .activity__symbol:hover {
+	background: hsla(var(--background), 0.75);
 }
 .activity__symbol::before {
 	color: hsl(var(--text));
@@ -35,6 +41,9 @@
 	right: 0;
 	width: 1rem;
 	z-index: 1;
+}
+.text--outlined .activity__symbol::after {
+	background: hsl(var(--background--secondary));
 }
 .activity__image {
 	height: 100%;

@@ -1,6 +1,12 @@
 <?php
 
-$page_header = lang('Member profile', 'プロフィール', ['container' => 'div']);
+$page_header = lang(
+	$user['username'].'\''.(substr($user['username'], -1) == 's' ? null : 's').' profile',
+	$user['username'].'のプロフィール',
+	'div'
+);
+
+include('head-user.php');
 
 $access_artist = new access_artist($pdo);
 
@@ -445,7 +451,6 @@ if(strlen($next_users['rand1'])) {
 				<?php
 					$activity_limit = 15;
 					$activity_offset = 0;
-					$show_symbols = false;
 					include('partial-activity.php');
 				?>
 				<a class="a--padded a--outlined obscure__button" href="<?= '/users/'.$user['username'].'/activity/'; ?>" style="background:hsl(var(--background--secondary));"><?= lang('View activity', '活動を表示する', 'hidden'); ?></a>
