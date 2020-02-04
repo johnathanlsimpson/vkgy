@@ -125,7 +125,7 @@ class access_points {
 			// Check if points already rewarded for this action on this day
 			$sql_check = 'SELECT 1 FROM users_points WHERE user_id=? AND point_type=? AND item_id=? AND date_occurred>=?';
 			$stmt_check = $this->pdo->prepare($sql_check);
-			$stmt_check->execute([ $args['user_id'], $point_type, $args['item_id'], substr($args['date_occurred'], 0, 20) ]);
+			$stmt_check->execute([ $args['user_id'], $point_type, $args['item_id'], substr($args['date_occurred'], 0, 10) ]);
 			$rslt_check = $stmt_check->fetchColumn();
 			
 			if($rslt_check) {
