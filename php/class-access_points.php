@@ -100,11 +100,14 @@ class access_points {
 		
 		// Set defaults
 		$args = array_merge([
-			'user_id' => null,
-			'item_id' => null,
+			'user_id' => is_numeric($args['user_id']) ? $args['user_id'] : ($_SESSION['is_signed_in'] ? $_SESSION['user_id'] : null),
+			'item_id' => 0,
 			'point_type' => null,
 			'date_occurred' => date('Y-m-d H:i:s'),
+			'allow_multiple' => false,
 		], $args);
+		
+		$args['check_date'] = $args['allow_multiple'] ? '9999-12-31' : substr($args['date_occurred'], 0, 10).' 00:00:00';
 		
 		// Clean arguments
 		foreach($args as $arg_key => $arg) {
@@ -125,7 +128,7 @@ class access_points {
 			// Check if points already rewarded for this action on this day
 			$sql_check = 'SELECT 1 FROM users_points WHERE user_id=? AND point_type=? AND item_id=? AND date_occurred>=?';
 			$stmt_check = $this->pdo->prepare($sql_check);
-			$stmt_check->execute([ $args['user_id'], $point_type, $args['item_id'], substr($args['date_occurred'], 0, 10) ]);
+			$stmt_check->execute([ $args['user_id'], $point_type, $args['item_id'], $args['check_date'] ]);
 			$rslt_check = $stmt_check->fetchColumn();
 			
 			if($rslt_check) {
