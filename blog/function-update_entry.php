@@ -212,6 +212,10 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 					$sql_images_link = 'INSERT INTO images_blog (blog_id, image_id) VALUES (?, ?)';
 					$stmt_images_link = $pdo->prepare($sql_images_link);
 					$stmt_images_link->execute([ $id, $rslt_default_image ]);
+					
+					// Award point
+					$access_points = new access_points($pdo);
+					$access_points->award_points([ 'point_type' => 'added-blog', 'allow_multiple' => true ]);
 				}
 				
 				// Output

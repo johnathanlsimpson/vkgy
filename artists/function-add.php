@@ -123,6 +123,10 @@
 								$output["result"][] = '<a class="artist" href="/artists/'.$friendly.'/">'.($romaji ?: $name).'</a> successfully added. No musicians linked to artist.';
 								$output["status"] = "success";
 							}
+							
+							// Award point
+							$access_points = new access_points($pdo);
+							$access_points->award_points([ 'point_type' => 'added-artist', 'allow_multiple' => true ]);
 						}
 						else {
 							$output["result"][] = ($romaji ?: $name)." could not be added";

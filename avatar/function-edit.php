@@ -49,6 +49,10 @@ if($_SESSION["loggedIn"] && is_numeric($_SESSION["userID"])) {
 				$output["result"][] = $ex->getMessage();
 			}
 		}
+		
+		// Award point
+		$access_points = new access_points($pdo);
+		$access_points->award_points([ 'point_type' => 'edited-avatar' ]);
 	}
 	else {
 		$output["result"][] = "Your avatar could not be updated.";
