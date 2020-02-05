@@ -76,8 +76,7 @@
 		<!-- Save button -->
 		<div class="avatar__buttons any--flex">
 			<button class="avatar__save" type="submit"><?= lang('Save', '保存する', 'hidden'); ?></button>
-			<span data-role="status"></span>
-			<?= $_SESSION['is_signed_in'] ? '<a class="symbol__user avatar__profile" href="/users/'.$_SESSION['username'].'/">Profile</a>' : null; ?>
+			<span class="avatar__status" data-role="status"></span>
 			<button class="symbol__oldest avatar__reset" type="button"><?= lang('Reset', 'リセット', 'hidden'); ?></button>
 			<button class="symbol__random avatar__random" type="button"><?= lang('Random', 'ランダム', 'hidden'); ?></button>
 		</div>

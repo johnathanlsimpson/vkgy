@@ -48,6 +48,11 @@
 		padding: 0 0.5rem;
 	}
 }
+@media(max-width: 799.9px) {
+	.avatar__buttons button::before {
+		display: none;
+	}
+}
 @media(min-width: 800px) {
 	.avatar__buttons {
 		margin-top: 0.5rem;
@@ -57,11 +62,10 @@
 @media(min-width: 800px) {
 	.avatar__save {
 		flex-grow: 1;
-		margin-right: 0;
 	}
 }
-.avatar__profile {
-	margin-left: 0.5rem;
+.avatar__save, .avatar__status {
+	margin-left: 0;
 	margin-right: 0.5rem;
 }
 .avatar__reset {
