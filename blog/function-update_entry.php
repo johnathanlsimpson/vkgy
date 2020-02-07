@@ -205,6 +205,7 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 			
 			$stmt_blog = $pdo->prepare($sql_blog);
 			if($stmt_blog->execute($values_blog)) {
+				
 				if(!$is_edit) {
 					$id = $pdo->lastInsertId();
 					
@@ -212,10 +213,6 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 					$sql_images_link = 'INSERT INTO images_blog (blog_id, image_id) VALUES (?, ?)';
 					$stmt_images_link = $pdo->prepare($sql_images_link);
 					$stmt_images_link->execute([ $id, $rslt_default_image ]);
-					
-					// Award point
-					$access_points = new access_points($pdo);
-					$access_points->award_points([ 'point_type' => 'added-blog', 'allow_multiple' => true ]);
 				}
 				
 				// Output
@@ -276,6 +273,15 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 						$social_post = $access_social_media->build_post([ 'title' => $title, 'url' => 'https://vk.gy'.$output['url'], 'id' => $id, 'twitter_authors' => $twitter_authors ], 'blog_post');
 						$access_social_media->queue_post($social_post, 'both', date('Y-m-d H:i:s', strtotime('+30 minutes')));
 					}
+				}
+				
+				// Award point
+				$access_points = new access_points($pdo);
+				if($is_edit) {
+					$access_points->award_points([ 'point_type' => 'edited-blog', 'allow_multiple' => false, 'item_id' => $id ]);
+				}
+				else {
+					$access_points->award_points([ 'point_type' => 'added-blog' ]);
 				}
 			}
 			else {

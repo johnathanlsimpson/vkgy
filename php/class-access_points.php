@@ -85,6 +85,8 @@ class access_points {
 			// Miscellaneous
 			'collected-release'       =>  1,
 			'marked-for-sale'         =>  1,
+			'wanted-release'          =>  1,
+			'sold-release'            =>  1,
 			
 		] as $point_type => $point_value) {
 			$this->point_types[] = $point_type;
@@ -104,7 +106,7 @@ class access_points {
 			'item_id' => 0,
 			'point_type' => null,
 			'date_occurred' => date('Y-m-d H:i:s'),
-			'allow_multiple' => false,
+			'allow_multiple' => true,
 		], $args);
 		
 		$args['check_date'] = $args['allow_multiple'] ? '9999-12-31' : substr($args['date_occurred'], 0, 10).' 00:00:00';

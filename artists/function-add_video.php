@@ -18,6 +18,10 @@ if(strlen($input_url) && $_SESSION['is_signed_in']) {
 		if(is_array($returned_data) && !empty($returned_data)) {
 			$output = $returned_data;
 			$output['status'] = 'success';
+			
+			// Award point
+			$access_points = new access_points($pdo);
+			$access_points->award_points([ 'point_type' => 'added-video' ]);
 		}
 		else {
 			$output['result'] = 'No returned data.';
