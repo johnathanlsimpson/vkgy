@@ -31,6 +31,75 @@ class access_points {
 	// ======================================================
 	function access_points($args = []) {
 		
+		// Select
+		switch($args['get']) {
+			case 'basics':
+				$select[] = 'COUNT(1) AS num_points';
+				$select[] = 'SUM(users_points.point_value) AS points_value';
+				$select[] = 'users_points.point_type';
+				$select[] = 'MAX(users_points.date_occurred) AS date_occurred';
+				break;
+		}
+		
+		// From
+		switch(true) {
+			case $from:
+				break;
+			default:
+				$from = 'users_points';
+		}
+		
+		// Where
+		switch(true) {
+			case is_numeric($args['user_id']):
+				$where[] = 'users_points.user_id=?';
+				$values[] = $args['user_id'];
+				break;
+		}
+		
+		// Group
+		switch(true) {
+			case $args['get'] === 'basics':
+				$group_by[] = 'users_points.point_type';
+				break;
+		}
+		
+		// Query
+		$sql_access = 'SELECT '.implode(', ', $select).' FROM '.$from.' WHERE '.implode(' AND ', $where).($group_by ? ' GROUP BY '.implode(', ', $group_by) : null);
+		$stmt_access = $this->pdo->prepare($sql_access);
+		$stmt_access->execute( $values );
+		$points = $stmt_access->fetchAll();
+		$num_points = count($points);
+		
+		// Additional data: get total count
+		$meta_array = [ 'points_value' => 0, 'point_type' => 'meta' ];
+		for($i=0; $i<$num_points; $i++) {
+			$meta_array['point_value'] += $points[$i]['points_value'];
+			$meta_array['date_occurred'] = $meta_array['date_occurred'] > $points[$i]['date_occurred'] ? $meta_array['date_occurred'] : $points[$i]['date_occurred'];
+		}
+		
+		// Format data: get point type name
+		for($i=0; $i<$num_points; $i++) {
+			$points[$i]['point_type'] = $this->point_types[$points[$i]['point_type']];
+		}
+		
+		// Format data: make associative if necessary
+		if($args['associative']) {
+			for($i=0; $i<$num_points; $i++) {
+				$points[$points[$i]['point_type']] = $points[$i];
+				unset($points[$i]);
+			}
+		}
+		
+		// Format data: add meta array
+		if($args['associative']) {
+			$points['meta'] = $meta_array;
+		}
+		else {
+			array_unshift($points, $meta_array);
+		}
+		
+		return $points;
 	}
 	
 	// ======================================================
