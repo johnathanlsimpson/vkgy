@@ -163,7 +163,7 @@ class access_badge {
 	function notify_if_new_badge() {
 		
 		// If user is signed in
-		if($_SESSION['is_signed_in'] && !$_SESSION['hide_badge_notices']) {
+		/*if($_SESSION['is_signed_in'] && !$_SESSION['hide_badge_notices']) {
 			
 			// Get unseen badge, if exists
 			$unseen_badge = $this->access_badge([ 'user_id' => $_SESSION['user_id'], 'is_unseen' => true, 'get' => 'badge', 'limit' => 1 ]);
@@ -187,7 +187,7 @@ class access_badge {
 					$stmt_seen->execute([ 0, $_SESSION['user_id'], $unseen_badge['id'] ]);
 				}
 			}
-		}
+		}*/
 		
 		return $output;
 	}
