@@ -397,6 +397,98 @@ if(strlen($next_users['rand1'])) {
 		<!-- User card -->
 		<?php include('partial-card.php'); ?>
 		
+		<?php include('partial-badges.php'); ?>
+		
+		<?php
+			$s = 'SELECT SUM(point_value) AS num_points FROM users_points WHERE user_id=?';
+			$t = $pdo->prepare($s);
+			$t->execute([ $user['id'] ]);
+			$r = $t->fetchAll();
+			echo '<pre>'.print_r($r, true).'</pre>';
+		?>
+		
+		<!-- New stats -->
+		<div class="any--margin">
+			<h2>
+				<?= lang('Member level', 'ユーザーレベル', 'div'); ?>
+			</h2>
+			
+			<ul class="data__container">
+				
+				<li class="data__item" data-emoji="💬">
+					<h5>
+						Comments
+					</h5>
+					<?= $user_points['added-comment']['num_points'] ?: 0; ?>
+				</li>
+				
+				<li class="data__item" data-emoji="👍">
+					<h5>
+						Likes received
+					</h5>
+					<?= $user_points['comment-liked']['num_points'] ?: 0; ?>
+				</li>
+				
+				<li class="data__item" data-emoji="🤝">
+					<h5>
+						Likes given
+					</h5>
+					<?= $user_points['liked-comment']['num_points'] ?: 0; ?>
+				</li>
+				
+				<li class="data__item" data-emoji="✍🏻">
+					<h5>
+						Posts added
+					</h5>
+					<?= $user_points['added-blog']['num_points'] ?: 0; ?>
+				</li>
+				
+				<li class="data__item" data-emoji="🎤">
+					<h5>
+						Artists added
+					</h5>
+					<?= $user_points['added-artist']['num_points'] ?: 0; ?>
+				</li>
+				
+				<li class="data__item" data-emoji="💿">
+					<h5>
+						Releases added
+					</h5>
+					<?= $user_points['added-release']['num_points'] ?: 0; ?>
+				</li>
+				
+				<li class="data__item" data-emoji="📼">
+					<h5>
+						Other additions
+					</h5>
+					<?= $user_points['added-release']['num_points'] ?: 0; ?>
+				</li>
+				
+				<li class="data__item" data-emoji="📝">
+					<h5>
+						Database edits
+					</h5>
+					<?= $user_points['edits']['num_points'] ?: 0; ?>
+				</li>
+				
+				<li class="data__item" data-emoji="⭐">
+					<h5>
+						Items rated
+					</h5>
+					<?= $user_points['rated']['num_points'] ?: 0; ?>
+				</li>
+				
+				<li class="data__item" data-emoji="🏷️">
+					<h5>
+						Items tagged
+					</h5>
+					<?= $user_points['tagged']['num_points'] ?: 0; ?>
+				</li>
+				
+			</ul>
+			
+		</div>
+		
 		<!-- Stats -->
 		<div class="any--margin stats__wrapper">
 			<h2 class="stats__title">
@@ -473,6 +565,48 @@ if(strlen($next_users['rand1'])) {
 		</h2>
 		
 		<div style="clear:both;"></div>
+		
+		<div class="text text--outlined" style="margin-bottom:1rem;">
+			<ul class="data__container">
+				
+				<li class="data__item" data-emoji="🎧">
+					<h5>
+						Items owned
+					</h5>
+					<?= $user_points['tagged']['num_points'] ?: 0; ?>
+				</li>
+				
+				<li class="data__item" data-emoji="💸">
+					<h5>
+						Estimated worth
+					</h5>
+					<?= $user_points['tagged']['num_points'] ?: 0; ?>
+				</li>
+				
+				<li class="data__item" data-emoji="👴">
+					<h5>
+						Oldest item
+					</h5>
+					<?= $user_points['tagged']['num_points'] ?: 0; ?>
+				</li>
+				
+				<li class="data__item" data-emoji="👶">
+					<h5>
+						Newest item
+					</h5>
+					<?= $user_points['tagged']['num_points'] ?: 0; ?>
+				</li>
+				
+				<li class="data__item" data-emoji="🆕">
+					<h5>
+						Last updated
+					</h5>
+					<?= $user_points['tagged']['num_points'] ?: 0; ?>
+				</li>
+				
+			</ul>
+		</div>
+		
 		
 		<input class="any--hidden" id="filter-for-sale" name="filter-for-sale" type="radio" value="1" />
 		<label class="collection__control input__checkbox-label symbol__unchecked" data-filter="for-sale" for="filter-for-sale">for sale</label>
