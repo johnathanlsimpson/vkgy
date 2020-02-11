@@ -99,12 +99,18 @@
 }
 .stat-level__container .level__deco { display: none; }
 
+.data__item {
+	padding-left:2.5rem;
+}
+.data__item h5 {
+	margin-left: -2rem;
+}
 [data-emoji]::before {
+	bottom: 0;
 	content: attr(data-emoji);
-	font-size: 1rem;
+	filter: grayscale(0);
+	left: 0.5rem;
 	position: absolute;
-	right: 0;
-	z-index: 1;
 }
 .stat__item:hover {
 	filter: grayscale(0);

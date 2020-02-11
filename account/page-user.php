@@ -413,84 +413,131 @@ if(strlen($next_users['rand1'])) {
 				<?= lang('Member level', 'ユーザーレベル', 'div'); ?>
 			</h2>
 			
-			<ul class="data__container">
+			<div class="flex">
+				<div style="width:200px; text-align:center; margin-right:1rem;">
+					<!--<span style="color:hsl(var(--attention--secondary));font-size:3rem;font-weight:bold;">
+						<h5>
+							level
+						</h5>
+						<?= floor( $user_points['meta']['point_value'] / 100 ) + 1; ?>
+					</span>-->
+			
+			<div class="stat__level h5 level__container" data-level="<?php echo $level_num; ?>">
+				<span class="level__deco"></span>
+			</div>
+					
+					
+					<div class="any--flex">
+							<span style="width:71%;"></span>
+						
+							<div class="any--weaken-size" style="color:hsl(var(--attention--secondary));white-space:nowrap;">
+								<strong><?= $user_points['meta']['point_value']; ?>,000 pt</strong>
+							</div>
+					</div>
+					<div style="border-left:2px solid hsl(var(--attention--secondary));height:0.5rem;left:calc(91% - 1px); box-sizing:border-box;">
+						
+					</div>
+					<div style="height:0.5rem;border-radius:0.25rem;background:hsl(var(--background));background-image:linear-gradient(hsl(var(--attention--secondary)), hsl(var(--attention--secondary)));
+																	background-repeat:no-repeat;
+																	background-size: 91% 100%;
+																	
+																	">
+						
+					</div>
+					<div style="border-right:2px solid hsl(var(--background));height:calc(0.5rem + 2px);right:2px;margin-top:-2px;">
+						
+					</div>
+					<div class="any--weaken" style="text-align:right;">
+						1,599
+					</div>
+					
+					<div class="any--weaken" style="margin-top:0.5rem;">
+						<a class="a--inherit" href="">#1,008</a> 
+					</div>
+				</div>
 				
-				<li class="data__item" data-emoji="💬">
-					<h5>
-						Comments
-					</h5>
-					<?= $user_points['added-comment']['num_points'] ?: 0; ?>
-				</li>
+			<div class="text text--outlined">
+				<ul class="data__container">
+					
+					<li class="data__item" data-emoji="💬">
+						<h5>
+							Comments
+						</h5>
+						<?= $user_points['added-comment']['num_points'] ?: 0; ?>
+					</li>
+					
+					<li class="data__item" data-emoji="👍">
+						<h5>
+							Likes received
+						</h5>
+						<?= $user_points['comment-liked']['num_points'] ?: 0; ?>
+					</li>
+					
+					<li class="data__item" data-emoji="🤝">
+						<h5>
+							Likes given
+						</h5>
+						<?= $user_points['liked-comment']['num_points'] ?: 0; ?>
+					</li>
+					
+					<li class="data__item" data-emoji="✍🏻">
+						<h5>
+							Posts added
+						</h5>
+						<?= $user_points['added-blog']['num_points'] ?: 0; ?>
+					</li>
+					
+					<li class="data__item" data-emoji="🎤">
+						<h5>
+							Artists added
+						</h5>
+						<?= $user_points['added-artist']['num_points'] ?: 0; ?>
+					</li>
+					
+					<li class="data__item" data-emoji="💿">
+						<h5>
+							Releases added
+						</h5>
+						<?= $user_points['added-release']['num_points'] ?: 0; ?>
+					</li>
+					
+					<li class="data__item" data-emoji="📼">
+						<h5>
+							Other additions
+						</h5>
+						<?= $user_points['added-release']['num_points'] ?: 0; ?>
+					</li>
+					
+					<li class="data__item" data-emoji="📝">
+						<h5>
+							Database edits
+						</h5>
+						<?= $user_points['edits']['num_points'] ?: 0; ?>
+					</li>
+					
+					<li class="data__item" data-emoji="⭐">
+						<h5>
+							Items rated
+						</h5>
+						<?= $user_points['rated']['num_points'] ?: 0; ?>
+					</li>
+					
+					<li class="data__item" data-emoji="🏷️">
+						<h5>
+							Items tagged
+						</h5>
+						<?= $user_points['tagged']['num_points'] ?: 0; ?>
+					</li>
+					
+				</ul>
+			</div>
 				
-				<li class="data__item" data-emoji="👍">
-					<h5>
-						Likes received
-					</h5>
-					<?= $user_points['comment-liked']['num_points'] ?: 0; ?>
-				</li>
-				
-				<li class="data__item" data-emoji="🤝">
-					<h5>
-						Likes given
-					</h5>
-					<?= $user_points['liked-comment']['num_points'] ?: 0; ?>
-				</li>
-				
-				<li class="data__item" data-emoji="✍🏻">
-					<h5>
-						Posts added
-					</h5>
-					<?= $user_points['added-blog']['num_points'] ?: 0; ?>
-				</li>
-				
-				<li class="data__item" data-emoji="🎤">
-					<h5>
-						Artists added
-					</h5>
-					<?= $user_points['added-artist']['num_points'] ?: 0; ?>
-				</li>
-				
-				<li class="data__item" data-emoji="💿">
-					<h5>
-						Releases added
-					</h5>
-					<?= $user_points['added-release']['num_points'] ?: 0; ?>
-				</li>
-				
-				<li class="data__item" data-emoji="📼">
-					<h5>
-						Other additions
-					</h5>
-					<?= $user_points['added-release']['num_points'] ?: 0; ?>
-				</li>
-				
-				<li class="data__item" data-emoji="📝">
-					<h5>
-						Database edits
-					</h5>
-					<?= $user_points['edits']['num_points'] ?: 0; ?>
-				</li>
-				
-				<li class="data__item" data-emoji="⭐">
-					<h5>
-						Items rated
-					</h5>
-					<?= $user_points['rated']['num_points'] ?: 0; ?>
-				</li>
-				
-				<li class="data__item" data-emoji="🏷️">
-					<h5>
-						Items tagged
-					</h5>
-					<?= $user_points['tagged']['num_points'] ?: 0; ?>
-				</li>
-				
-			</ul>
+			</div>
 			
 		</div>
 		
 		<!-- Stats -->
-		<div class="any--margin stats__wrapper">
+		<!--<div class="any--margin stats__wrapper">
 			<h2 class="stats__title">
 				<div class="any--en">
 					Member rank
@@ -532,7 +579,7 @@ if(strlen($next_users['rand1'])) {
 					?>
 				</ul>
 			</div>
-		</div>
+		</div>-->
 	</div>
 
 	<!-- User activity -->
