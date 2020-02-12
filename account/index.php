@@ -109,11 +109,6 @@ if($template === "user") {
 	
 	// For certain point types, merge points
 	$points_to_merge = [
-		//'artists' => ['added-artist', 'edited-artist'],
-		//'blog' => ['added-blog', 'edited-blog'],
-		//'labels' => ['added-label', 'edited-label'],
-		//'musicians' => ['added-musician', 'edited-musician'],
-		//'releases' => ['added-release', 'edited-release'],
 		'added-other' => ['added-label', 'added-livehouse', 'added-image', 'added-video'],
 		'edits' => ['edited-artist', 'edited-blog', 'edited-label', 'edited-live', 'edited-musician', 'edited-release'],
 		'rated' => ['rated-artist', 'rated-release'],
@@ -141,34 +136,39 @@ if($template === "user") {
 		
 	}
 	
-	// Get point rank
+	// Get total points of all users
 	$sql_rank = '
-		SELECT SUM(users_points.point_value) AS point_sum, users_points.user_id
+		SELECT SUM(users_points.point_value) AS point_sum, users_points.user_id, users.username
 		FROM users_points
 		LEFT JOIN users ON users.id=users_points.user_id
 		GROUP BY users_points.user_id
-		ORDER BY point_sum ASC';
+		ORDER BY point_sum DESC';
 	$stmt_rank = $pdo->prepare($sql_rank);
 	$stmt_rank->execute();
 	$rslt_rank = $stmt_rank->fetchAll();
+	$num_ranked = count($rslt_rank);
 	
-	//echo '<pre>'.print_r($rslt_rank, true).'</pre>';
-	
-	for($i=0; $i<count($rslt_rank); $i++) {
+	// Get ranking among other users, based on points
+	for($i=0; $i<$num_ranked; $i++) {
 		if($rslt_rank[$i]['user_id'] === $user['id']) {
-			echo 'yo';
+			
+			$user_points['meta']['rank'] = $i + 1;
+			
 			if($i>0) {
-				$rank['previous'] = $rslt_rank[$i - 1];
+				$rank['above'] = $rslt_rank[$i - 1];
+				$rank['above']['rank'] = $i;
 			}
-			if($i+1<count($rslt_rank)) {
-				$rank['next'] = $rslt_rank[$i + 1];
+			if($i+1<$num_ranked) {
+				$rank['below'] = $rslt_rank[$i + 1];
+				$rank['below']['rank'] = $i + 2; 
 			}
 			break;
+			
 		}
 	}
 	
 	echo '***';
-	echo '<pre>'.print_r($rank, true).'</pre>';
+	echo '<pre>'.print_r($rslt_rank, true).'</pre>';
 	
 	/*SET @PreviousRecord = NULL;
 SET @Rank = 0;

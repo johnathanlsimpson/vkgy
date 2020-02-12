@@ -414,7 +414,7 @@ if(strlen($next_users['rand1'])) {
 			</h2>
 			
 			<div class="flex">
-				<div style="width:200px; text-align:center; margin-right:1rem;">
+				<div style="width:200px; margin-right:1rem;">
 					<!--<span style="color:hsl(var(--attention--secondary));font-size:3rem;font-weight:bold;">
 						<h5>
 							level
@@ -426,6 +426,7 @@ if(strlen($next_users['rand1'])) {
 				<span class="level__deco"></span>
 			</div>
 					
+				<ul class="ul--no-bullet">
 					<li class="meter__container any--weaken" style="--progress-percent: 20%;">
 						<div class="meter__current">
 							<span class="meter__spacer"></span>
@@ -439,10 +440,58 @@ if(strlen($next_users['rand1'])) {
 					</li>
 					
 					<li>
-					
+						<div class="rank__row any--weaken-color <?= $rank['above'] ? null : 'any--hidden'; ?> ">
+							<a class="a--inherit" href="<?= '/users/'.$rank['above']['username'].'/'; ?>"><?= $rank['above']['username']; ?></a>
+							<span class="rank__rank any--weaken" data-rank="<?= $rank['above']['rank']; ?>"></span>
+						</div>
+						
+						<div class="rank__row">
+							<a class="" href="<?= '/users/'.$user['username'].'/'; ?>"><?= $user['username']; ?></a>
+							<span class="rank__rank any--weaken" data-rank="<?= $user_points['meta']['rank']; ?>"></span>
+						</div>
+						
+						<div class="rank__row any--weaken-color <?= $rank['below'] ? null : 'any--hidden'; ?> ">
+							<a class="a--inherit" href="<?= '/users/'.$rank['below']['username'].'/'; ?>"><?= $rank['below']['username']; ?></a>
+							<span class="rank__rank any--weaken" data-rank="<?= $rank['below']['rank']; ?>"></span>
+						</div>
 					</li>
+				</ul>
 					
 					<style>
+						.rank__row {
+							clear: both;
+							line-height: 1.5rem;
+						}
+						.rank__rank {
+							float: right;
+							line-height: inherit;
+							margin: 0 0 2px 2px;
+						}
+						.rank__rank[data-level="1"]::after {
+							content: "";
+						}
+						.rank__rank::before {
+							content: "#";
+							font-size: 0.75em;
+						}
+						.rank__rank::after {
+							content: attr(data-rank);
+						}
+						.rank__rank[data-rank="1"]::before,
+						.rank__rank[data-rank="2"]::before,
+						.rank__rank[data-rank="3"]::before {
+							content: none;
+						}
+						.rank__rank[data-rank="1"]::after {
+							content: "🏆 #1";
+						}
+						.rank__rank[data-rank="2"]::after {
+							content: "🥈 #2";
+						}
+						.rank__rank[data-rank="3"]::after {
+							content: "🥉 #3";
+						}
+						
 						.meter__container {
 							--stem-height: 0.75rem;
 							display: flex;
