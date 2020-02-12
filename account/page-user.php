@@ -426,6 +426,63 @@ if(strlen($next_users['rand1'])) {
 				<span class="level__deco"></span>
 			</div>
 					
+					<li class="meter__container any--weaken" style="--progress-percent: 20%;">
+						<div class="meter__current">
+							<span class="meter__spacer"></span>
+							<span class="meter__current-num"><?= $user_points['meta']['point_value']; ?> pt</span>
+						</div>
+						<div class="meter__bar">
+						</div>
+						<div class="meter__goal">
+							1,599
+						</div>
+					</li>
+					
+					<li>
+					
+					</li>
+					
+					<style>
+						.meter__container {
+							--stem-height: 0.75rem;
+							display: flex;
+							flex-direction: column;
+						}
+						.meter__current, .meter__goal {
+							background-repeat: no-repeat;
+							background-size: var(--progress-percent) var(--stem-height);
+						}
+						.meter__current {
+							background-image: linear-gradient(to left, hsl(var(--attention--secondary)) 2px, transparent 0);
+							background-position: left bottom;
+							color: hsl(var(--attention--secondary));
+							display: flex;
+							font-weight: bold;
+							padding-bottom: var(--stem-height);
+						}
+						.meter__spacer {
+							margin-right: -0.5rem;
+							width: var(--progress-percent);
+						}
+						.meter__current-num {
+							white-space: nowrap;
+						}
+						.meter__bar {
+							background: hsl(var(--background));
+							background-image: linear-gradient( to right, hsl(var(--attention--secondary)) var(--progress-percent), transparent 0 );
+							background-repeat: no-repeat;
+							border-radius: 0.25rem;
+							height: 0.5rem;
+						}
+						.meter__goal {
+							background-image: linear-gradient(to left, hsl(var(--background)) 2px, transparent 0);
+							background-position: right 5px top;
+							padding-top: var(--stem-height);
+							text-align: right;
+						}
+					</style>
+					
+					
 					
 					<div class="any--flex">
 							<span style="width:71%;"></span>
