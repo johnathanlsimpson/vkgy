@@ -71,15 +71,15 @@ if(is_array($wants) && !empty($wants)) {
 }
 
 // Check VIP
-if($_SESSION["loggedIn"] && is_numeric($_SESSION["userID"])) {
+/*if($_SESSION["loggedIn"] && is_numeric($_SESSION["userID"])) {
 	$sql_check = "SELECT 1 FROM users WHERE id=? AND is_vip=1 LIMIT 1";
 	$stmt_check = $pdo->prepare($sql_check);
 	$stmt_check->execute([ $_SESSION["userID"] ]);
 	$is_vip = $stmt_check->fetchColumn();
-}
+}*/
 
 // Stats: Setup
-$stats = [
+/*$stats = [
 	'fan_since' => ['emoji' => '🕒'],
 	'member_for' => ['emoji' => '💝'],
 	'comments' => ['emoji' => '💬'],
@@ -95,7 +95,7 @@ $stats = [
 	'ratings' => ['emoji' => '📊'],
 	'tagged' => ['emoji' => '🔖'],
 ];
-$current_year = date('Y');
+$current_year = date('Y');*/
 
 // Stat: Fan since
 $stats['fan_since']['value'] = is_numeric($user['fan_since']) ? $user['fan_since'] : substr($user['date_added'], 0, 4);
@@ -105,7 +105,7 @@ $fan_since_level_base = $stats['fan_since']['value'] - (date('Y') - $stats['fan_
 $stats['member_for']['value'] = ($current_year - substr($user['date_added'], 0, 4));
 
 // Stat: Comments
-$sql_num_comments = 'SELECT COUNT(1) FROM comments WHERE user_id=?';
+/*$sql_num_comments = 'SELECT COUNT(1) FROM comments WHERE user_id=?';
 $stmt_num_comments = $pdo->prepare($sql_num_comments);
 $stmt_num_comments->execute([ $user['id'] ]);
 $stats['comments']['value'] = $stmt_num_comments->fetchColumn();
@@ -166,7 +166,7 @@ SELECT COUNT(1) AS num_edits FROM
 ';
 $stmt_db_edits = $pdo->prepare($sql_db_edits);
 $stmt_db_edits->execute([ $user['id'], $user['id'], $user['id'] ]);
-$stats['edits']['value'] = $stmt_db_edits->fetchColumn();
+$stats['edits']['value'] = $stmt_db_edits->fetchColumn();*/
 
 // Stat: Collection
 $sql_num_collection = 'SELECT COUNT(1) FROM releases_collections WHERE user_id=?';
@@ -209,7 +209,7 @@ for($i=0; $i<$num_collection_price; $i++) {
 }
 
 // Stat: Ratings
-$sql_ratings = 'SELECT COUNT(1) FROM releases_ratings WHERE user_id=?';
+/*$sql_ratings = 'SELECT COUNT(1) FROM releases_ratings WHERE user_id=?';
 $stmt_ratings = $pdo->prepare($sql_ratings);
 $stmt_ratings->execute([ $user['id'] ]);
 $stats['ratings']['value'] = $stmt_ratings->fetchColumn();
@@ -225,10 +225,10 @@ SELECT COUNT(1) AS num_tags FROM
 ';
 $stmt_tags = $pdo->prepare($sql_tags);
 $stmt_tags->execute([ $user['id'], $user['id'] ]);
-$stats['tagged']['value'] = $stmt_tags->fetchColumn();
+$stats['tagged']['value'] = $stmt_tags->fetchColumn();*/
 
 // Stats: determine level
-$levels = [
+/*$levels = [
 	'default' => [
 		1,
 		5,
@@ -342,7 +342,7 @@ foreach($stats as $key => $stat) {
 		$stats[$key]['value'] = $stat['value'] + $current_year;
 	}
 	$stats[$key]['title'] = $stats[$key]['title'] ?: str_replace('_', ' ', $key);
-}
+}*/
 
 // User links
 $sql_next = "
@@ -399,170 +399,100 @@ if(strlen($next_users['rand1'])) {
 		
 		<?php include('partial-badges.php'); ?>
 		
-		<?php
-			$s = 'SELECT SUM(point_value) AS num_points FROM users_points WHERE user_id=?';
-			$t = $pdo->prepare($s);
-			$t->execute([ $user['id'] ]);
-			$r = $t->fetchAll();
-			echo '<pre>'.print_r($r, true).'</pre>';
-		?>
-		
 		<!-- New stats -->
 		<div class="any--margin">
-			<h2>
-				<?= lang('Member level', 'ユーザーレベル', 'div'); ?>
-			</h2>
 			
 			<div class="flex">
-				<div style="width:200px; margin-right:1rem;">
-					<!--<span style="color:hsl(var(--attention--secondary));font-size:3rem;font-weight:bold;">
-						<h5>
-							level
-						</h5>
-						<?= floor( $user_points['meta']['point_value'] / 100 ) + 1; ?>
-					</span>-->
-			
-			<div class="stat__level h5 level__container" data-level="<?php echo $level_num; ?>">
-				<span class="level__deco"></span>
-			</div>
+				
+				<!-- Stats left -->
+				<div class="level__wrapper">
 					
-				<ul class="ul--no-bullet">
-					<li class="meter__container any--weaken" style="--progress-percent: 20%;">
-						<div class="meter__current">
+					<!-- Current level -->
+					<div class="text level__container">
+						<span class="level__points">1,588</span>
+						<span class="level__pt"><?= lang('pt', '点', 'hidden'); ?></span>
+						<br />
+						<span class="any__note level__level symbol__star--full">LV 9</span>
+					</div>
+					
+					<!-- Next level progress -->
+					<div class="text meter__container" style="--progress-percent: 20%;">
+						<div class="meter__current any--weaken-size">
 							<span class="meter__spacer"></span>
 							<span class="meter__current-num"><?= $user_points['meta']['point_value']; ?> pt</span>
 						</div>
-						<div class="meter__bar">
-						</div>
-						<div class="meter__goal">
-							1,599
-						</div>
-					</li>
-					
-					<li>
-						<div class="rank__row any--weaken-color <?= $rank['above'] ? null : 'any--hidden'; ?> ">
-							<a class="a--inherit" href="<?= '/users/'.$rank['above']['username'].'/'; ?>"><?= $rank['above']['username']; ?></a>
-							<span class="rank__rank any--weaken" data-rank="<?= $rank['above']['rank']; ?>"></span>
-						</div>
-						
-						<div class="rank__row">
-							<a class="" href="<?= '/users/'.$user['username'].'/'; ?>"><?= $user['username']; ?></a>
-							<span class="rank__rank any--weaken" data-rank="<?= $user_points['meta']['rank']; ?>"></span>
-						</div>
-						
-						<div class="rank__row any--weaken-color <?= $rank['below'] ? null : 'any--hidden'; ?> ">
-							<a class="a--inherit" href="<?= '/users/'.$rank['below']['username'].'/'; ?>"><?= $rank['below']['username']; ?></a>
-							<span class="rank__rank any--weaken" data-rank="<?= $rank['below']['rank']; ?>"></span>
-						</div>
-					</li>
-				</ul>
-					
-					<style>
-						.rank__row {
-							clear: both;
-							line-height: 1.5rem;
-						}
-						.rank__rank {
-							float: right;
-							line-height: inherit;
-							margin: 0 0 2px 2px;
-						}
-						.rank__rank[data-level="1"]::after {
-							content: "";
-						}
-						.rank__rank::before {
-							content: "#";
-							font-size: 0.75em;
-						}
-						.rank__rank::after {
-							content: attr(data-rank);
-						}
-						.rank__rank[data-rank="1"]::before,
-						.rank__rank[data-rank="2"]::before,
-						.rank__rank[data-rank="3"]::before {
-							content: none;
-						}
-						.rank__rank[data-rank="1"]::after {
-							content: "🏆 #1";
-						}
-						.rank__rank[data-rank="2"]::after {
-							content: "🥈 #2";
-						}
-						.rank__rank[data-rank="3"]::after {
-							content: "🥉 #3";
-						}
-						
-						.meter__container {
-							--stem-height: 0.75rem;
-							display: flex;
-							flex-direction: column;
-						}
-						.meter__current, .meter__goal {
-							background-repeat: no-repeat;
-							background-size: var(--progress-percent) var(--stem-height);
-						}
-						.meter__current {
-							background-image: linear-gradient(to left, hsl(var(--attention--secondary)) 2px, transparent 0);
-							background-position: left bottom;
-							color: hsl(var(--attention--secondary));
-							display: flex;
-							font-weight: bold;
-							padding-bottom: var(--stem-height);
-						}
-						.meter__spacer {
-							margin-right: -0.5rem;
-							width: var(--progress-percent);
-						}
-						.meter__current-num {
-							white-space: nowrap;
-						}
-						.meter__bar {
-							background: hsl(var(--background));
-							background-image: linear-gradient( to right, hsl(var(--attention--secondary)) var(--progress-percent), transparent 0 );
-							background-repeat: no-repeat;
-							border-radius: 0.25rem;
-							height: 0.5rem;
-						}
-						.meter__goal {
-							background-image: linear-gradient(to left, hsl(var(--background)) 2px, transparent 0);
-							background-position: right 5px top;
-							padding-top: var(--stem-height);
-							text-align: right;
-						}
-					</style>
-					
-					
-					
-					<div class="any--flex">
-							<span style="width:71%;"></span>
-						
-							<div class="any--weaken-size" style="color:hsl(var(--attention--secondary));white-space:nowrap;">
-								<strong><?= $user_points['meta']['point_value']; ?>,000 pt</strong>
-							</div>
-					</div>
-					<div style="border-left:2px solid hsl(var(--attention--secondary));height:0.5rem;left:calc(91% - 1px); box-sizing:border-box;">
-						
-					</div>
-					<div style="height:0.5rem;border-radius:0.25rem;background:hsl(var(--background));background-image:linear-gradient(hsl(var(--attention--secondary)), hsl(var(--attention--secondary)));
-																	background-repeat:no-repeat;
-																	background-size: 91% 100%;
-																	
-																	">
-						
-					</div>
-					<div style="border-right:2px solid hsl(var(--background));height:calc(0.5rem + 2px);right:2px;margin-top:-2px;">
-						
-					</div>
-					<div class="any--weaken" style="text-align:right;">
-						1,599
+						<div class="meter__bar"></div>
+						<div class="meter__goal any--weaken">1,599</div>
+						<span class="any__note meter__level">LV 10</span>
 					</div>
 					
-					<div class="any--weaken" style="margin-top:0.5rem;">
-						<a class="a--inherit" href="">#1,008</a> 
-					</div>
 				</div>
 				
-			<div class="text text--outlined">
+				<style>
+					.level__wrapper {
+						display: flex;
+						flex-direction: column;
+					}
+
+					.level__container {
+						margin-bottom: 1rem;
+						text-align: center;
+						white-space: nowrap;
+					}
+					.level__points, .level__pt {
+						color: hsl(var(--attention--secondary));
+					}
+					.level__points {
+						font-size: 1.5rem;
+						font-weight: bold;
+					}
+
+					.meter__container {
+						--stem-height: 0.75rem;
+						display: flex;
+						flex-direction: column;
+					}
+					.meter__current, .meter__bar, .meter__goal {
+						width: 100px;
+					}
+					.meter__current, .meter__goal {
+						background-repeat: no-repeat;
+						background-size: var(--progress-percent) var(--stem-height);
+					}
+					.meter__current {
+						background-image: linear-gradient(to left, hsl(var(--attention--secondary)) 2px, transparent 0);
+						background-position: left bottom;
+						color: hsl(var(--attention--secondary));
+						display: flex;
+						font-weight: bold;
+						padding-bottom: var(--stem-height);
+					}
+					.meter__spacer {
+						margin-right: -0.5rem;
+						width: var(--progress-percent);
+					}
+					.meter__current-num {
+						white-space: nowrap;
+					}
+					.meter__bar {
+						background: hsl(var(--background--bold));
+						background-image: linear-gradient( to right, hsl(var(--attention--secondary)) var(--progress-percent), transparent 0 );
+						background-repeat: no-repeat;
+						border-radius: 0.25rem;
+						height: 0.5rem;
+					}
+					.meter__goal {
+						background-image: linear-gradient(to left, hsl(var(--background--bold)) 2px, transparent 0);
+						background-position: right 5px top;
+						padding-top: var(--stem-height);
+						text-align: right;
+					}
+					.meter__level {
+						align-self: flex-end;
+					}
+				</style>
+				
+			<div class="">
 				<ul class="data__container">
 					
 					<li class="data__item" data-emoji="💬">
@@ -641,51 +571,6 @@ if(strlen($next_users['rand1'])) {
 			</div>
 			
 		</div>
-		
-		<!-- Stats -->
-		<!--<div class="any--margin stats__wrapper">
-			<h2 class="stats__title">
-				<div class="any--en">
-					Member rank
-				</div>
-				<div class="any--jp any--weaken">
-					<?php echo sanitize('ランク'); ?>
-				</div>
-			</h2>
-			
-			<div class="stat__level h5 level__container" data-level="<?php echo $level_num; ?>">
-				<span class="level__deco"></span>
-			</div>
-			
-			<div class="stat__container">
-				<ul class="data__container">
-					<?php
-						if(is_array($stats) && !empty($stats)) {
-							foreach($stats as $stat) {
-								$data_class = $stat['value'] == 0 || $stat['value'] === 'N/A' ? 'data--hide-level' : null;
-								?>
-									<li class="stat__item data__item <?php echo $data_class; ?>" data-emoji="<?php echo $stat['emoji']; ?>">
-										
-										<h5>
-											<?= $stat['title']; ?>
-										</h5>
-										
-										<?= $stat['value']; ?>
-										
-										<span class="any--weaken"><?= $stat['level'] ? 'LV.'.$stat['level'] : null; ?></span>
-										
-										<div class="h5 stat-level__container" data-level="<?php echo $stat['level']; ?>">
-											<span class="level__deco"></span>
-										</div>
-										
-									</li>
-								<?php
-							}
-						}
-					?>
-				</ul>
-			</div>
-		</div>-->
 	</div>
 
 	<!-- User activity -->
@@ -714,7 +599,7 @@ if(strlen($next_users['rand1'])) {
 					echo '<a class="symbol__download collection__download" href="/users/'.$_SESSION['username'].'/&action=download&limit=selling" style="">CSV (for sale)</a>';
 				}
 			?>
-			<?= lang($user['username'].'\'s VK collection', $user['username'].'のV系コレクション', 'div'); ?>
+			<?= lang($user['username'].'\'s vkei collection', $user['username'].' V系コレクション', 'div'); ?>
 		</h2>
 		
 		<div style="clear:both;"></div>

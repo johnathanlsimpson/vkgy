@@ -137,7 +137,7 @@ if($template === "user") {
 	}
 	
 	// Get total points of all users
-	$sql_rank = '
+	/*$sql_rank = '
 		SELECT SUM(users_points.point_value) AS point_sum, users_points.user_id, users.username
 		FROM users_points
 		LEFT JOIN users ON users.id=users_points.user_id
@@ -165,27 +165,7 @@ if($template === "user") {
 			break;
 			
 		}
-	}
-	
-	echo '***';
-	echo '<pre>'.print_r($rslt_rank, true).'</pre>';
-	
-	/*SET @PreviousRecord = NULL;
-SET @Rank = 0;
-SELECT 
-    points,
-    user_id,
-    CASE
-		WHEN @PreviousRecord = points 
-        THEN @Rank
-		WHEN @PreviousRecord := points
-        THEN @Rank := @Rank + 1
-     	END
-    AS EmpSalaryRank
-FROM (SELECT SUM(point_value) AS points, user_id FROM users_points GROUP BY user_id ) a
-ORDER BY points DESC;
-	
-	echo '<pre>'.print_r($user_points, true).'</pre>';*/
+	}*/
 	
 	include('page-user.php');
 }
