@@ -227,7 +227,7 @@ if(is_array($rslt_activity) && !empty($rslt_activity)) {
 				break;
 			case('external_comments_likes'):
 				$symbol = 'like';
-				$supertitle = '<a class="symbol__user a--inherit" href="/users/'.$activity['name'].'">'.$activity['name'].'</a> liked a comment by '.$user['username'].'.';
+				$supertitle = '<a class="symbol__user a--inherit" href="/users/'.$activity['name'].'/">'.$activity['name'].'</a> liked a comment by '.$user['username'].'.';
 				break;
 			case('edits_artists'):
 				$symbol = 'artist';
@@ -311,5 +311,26 @@ if(is_array($rslt_activity) && !empty($rslt_activity)) {
 	}
 }
 else {
-	echo '<span class="symbol__error">'.lang('No activity has been recorded.', 'アクティビティは記録されていません。', 'hidden').'</span>';
+	?>
+		<li class="flex activity__item" data-type="joined">
+			<a class="any--weaken-color activity__symbol symbol__user <?= $show_symbols === false ? 'any--hidden' : null; ?>" href="<?= '/users/'.$user['username'].'/'; ?>"></a>
+			<span>
+				<span class="any--weaken-size activity__subtitle">
+					<?= $user['username']; ?> joined.
+					<span class="any--weaken-color activity__date"><?= substr($user['date_added'], 0, 10); ?></span>
+				</span>
+				<div class="activity__content"></div>
+			</span>
+		</li>
+		
+		<li class="flex activity__item" data-type="joined">
+			<a class="any--weaken-color activity__symbol symbol__help <?= $show_symbols === false ? 'any--hidden' : null; ?>" href="<?= '/users/'.$user['username'].'/'; ?>"></a>
+			<span>
+				<span class="any--weaken-size activity__subtitle">
+					No other activity.
+				</span>
+				<div class="activity__content"></div>
+			</span>
+		</li>
+	<?php
 }

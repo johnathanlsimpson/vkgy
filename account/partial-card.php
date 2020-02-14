@@ -78,9 +78,6 @@
 					<?php
 				}
 			}
-			else {
-				echo '<div class="user__empty symbol__error any--weaken-color">This user\'s profile is empty.</div>';
-			}
 		?>
 	</div>
 	

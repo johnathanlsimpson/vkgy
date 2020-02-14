@@ -32,7 +32,7 @@ for($i=0; $i<$num_wants; $i++) {
 
 // Wants: Get
 $wants = $access_release->access_release([ 'ids' => $wants_ids, 'get' => 'quick_name' ]);
-$wants = array_values($wants);
+$wants = is_array($wants) ? array_values($wants) : null;
 
 // Collection: Get
 $collection = $access_release->access_release([ 'user_id' => $user['id'], 'get' => 'quick_name' ]);
@@ -175,23 +175,31 @@ $stmt_num_collection->execute([ $user['id'] ]);
 $stats['collection']['value'] = $stmt_num_collection->fetchColumn();
 
 // Stat: Oldest Release
-$sql_oldest = 'SELECT releases.date_occurred FROM releases_collections LEFT JOIN releases ON releases.id=releases_collections.release_id WHERE releases_collections.user_id=? AND releases.date_occurred IS NOT NULL AND releases.date_occurred > "0000-00-00" ORDER BY releases.date_occurred ASC LIMIT 1';
+$sql_oldest = 'SELECT SUBSTRING(releases.date_occurred, 1, 4) FROM releases_collections LEFT JOIN releases ON releases.id=releases_collections.release_id WHERE releases_collections.user_id=? AND releases.date_occurred IS NOT NULL AND releases.date_occurred > "0000-00-00" ORDER BY releases.date_occurred ASC LIMIT 1';
 $stmt_oldest = $pdo->prepare($sql_oldest);
 $stmt_oldest->execute([ $user['id'] ]);
 $rslt_oldest = $stmt_oldest->fetchColumn();
-$rslt_oldest = substr($rslt_oldest, 0, 4);
-if(is_numeric($rslt_oldest)) {
-	$stats['oldest']['value'] = $current_year - $rslt_oldest;
-}
+$stats['oldest']['value'] = $rslt_oldest && is_numeric($rslt_oldest) ? $rslt_oldest : null;
 
 // Stat: Newest Release
-$sql_newest = 'SELECT releases.date_occurred FROM releases_collections LEFT JOIN releases ON releases.id=releases_collections.release_id WHERE releases_collections.user_id=? AND releases.date_occurred IS NOT NULL AND releases.date_occurred > "0000-00-00" ORDER BY releases.date_occurred DESC LIMIT 1';
+$sql_newest = 'SELECT SUBSTRING(releases.date_occurred, 1, 4) FROM releases_collections LEFT JOIN releases ON releases.id=releases_collections.release_id WHERE releases_collections.user_id=? AND releases.date_occurred IS NOT NULL AND releases.date_occurred > "0000-00-00" ORDER BY releases.date_occurred DESC LIMIT 1';
 $stmt_newest = $pdo->prepare($sql_newest);
 $stmt_newest->execute([ $user['id'] ]);
 $rslt_newest = $stmt_newest->fetchColumn();
-$rslt_newest = substr($rslt_newest, 0, 4);
-if(is_numeric($rslt_newest)) {
-	$stats['newest']['value'] = $rslt_newest - $current_year;
+$stats['newest']['value'] = $rslt_newest && is_numeric($rslt_newest) ? $rslt_newest : null;
+
+// Stat: Latest Release
+$sql_latest = 'SELECT date_occurred FROM releases_collections WHERE user_id=? ORDER BY date_occurred DESC LIMIT 1';
+$stmt_latest = $pdo->prepare($sql_latest);
+$stmt_latest->execute([ $user['id'] ]);
+$rslt_latest = $stmt_latest->fetchColumn();
+
+// Format latest release
+if( $rslt_latest > date('Y-m-d', strtotime('this week')) ) {
+	$stats['latest']['value'] = lang( date('l', strtotime($rslt_latest)), ['日','月','火','水','木','金','土'][date('w', strtotime($rslt_latest))].'曜日', 'hidden' );
+}
+else {
+	$stats['latest']['value'] = substr($rslt_latest, 0, 10) ?: null;
 }
 
 // Stat: Collection value
@@ -409,44 +417,57 @@ if(strlen($next_users['rand1'])) {
 					
 					<!-- Current level -->
 					<div class="text level__container">
-						<span class="level__points">1,588</span>
-						<span class="level__pt"><?= lang('pt', '点', 'hidden'); ?></span>
-						<br />
-						<span class="any__note level__level symbol__star--full">LV 9</span>
+						<h5>Level 9</h5>
+						<span class="level__points">
+							<span class="level__point-num"><?= number_format( $user_points['meta']['point_value'] ); ?></span>
+							<?= lang('pt', '点', 'hidden'); ?>
+						</span>
+						
 					</div>
 					
 					<!-- Next level progress -->
 					<div class="text meter__container" style="--progress-percent: 20%;">
+						<h5>Next level</h5>
 						<div class="meter__current any--weaken-size">
 							<span class="meter__spacer"></span>
 							<span class="meter__current-num"><?= $user_points['meta']['point_value']; ?> pt</span>
 						</div>
 						<div class="meter__bar"></div>
 						<div class="meter__goal any--weaken">1,599</div>
-						<span class="any__note meter__level">LV 10</span>
 					</div>
 					
 				</div>
 				
 				<style>
+					/* Stats left side */
 					.level__wrapper {
 						display: flex;
 						flex-direction: column;
+						line-height: 1;
+						text-align: center;
 					}
-
+					.level__wrapper h5 {
+						margin-bottom: 0.5rem;
+					}
+					
+					/* Current level */
 					.level__container {
+						display: flex;
+						flex-direction: column;
+						line-height: 1;
 						margin-bottom: 1rem;
 						text-align: center;
 						white-space: nowrap;
 					}
-					.level__points, .level__pt {
+					.level__points {
 						color: hsl(var(--attention--secondary));
 					}
-					.level__points {
+					.level__point-num {
 						font-size: 1.5rem;
 						font-weight: bold;
 					}
-
+					
+					/* Next level */
 					.meter__container {
 						--stem-height: 0.75rem;
 						display: flex;
@@ -487,86 +508,115 @@ if(strlen($next_users['rand1'])) {
 						padding-top: var(--stem-height);
 						text-align: right;
 					}
+					.meter__goal::after {
+						content: " pt";
+					}
 					.meter__level {
 						align-self: flex-end;
 					}
+					
+					/* Stats right side */
+					.stats__container {
+						margin-left: var(--gutter);
+						padding: 0.5rem;
+					}
+					.stats__container .data__item {
+						flex-basis: 30%;
+					}
+					@media(min-width:800px) {
+						.stats__container .data__item {
+							flex-basis: 150px;
+						}
+					}
+					.stats__container [data-emoji]::after,
+					.collection__stats [data-emoji]::after{
+						content: attr(data-emoji);
+						filter: grayscale(0);
+						float: left;
+						margin-right: 1ch;
+					}
+					
+					/* Collection stats */
+					.collection__stats {
+						margin-bottom: 1rem;
+					}
 				</style>
 				
-			<div class="">
-				<ul class="data__container">
-					
-					<li class="data__item" data-emoji="💬">
-						<h5>
-							Comments
-						</h5>
-						<?= $user_points['added-comment']['num_points'] ?: 0; ?>
-					</li>
-					
-					<li class="data__item" data-emoji="👍">
-						<h5>
-							Likes received
-						</h5>
-						<?= $user_points['comment-liked']['num_points'] ?: 0; ?>
-					</li>
-					
-					<li class="data__item" data-emoji="🤝">
-						<h5>
-							Likes given
-						</h5>
-						<?= $user_points['liked-comment']['num_points'] ?: 0; ?>
-					</li>
-					
-					<li class="data__item" data-emoji="✍🏻">
-						<h5>
-							Posts added
-						</h5>
-						<?= $user_points['added-blog']['num_points'] ?: 0; ?>
-					</li>
-					
-					<li class="data__item" data-emoji="🎤">
-						<h5>
-							Artists added
-						</h5>
-						<?= $user_points['added-artist']['num_points'] ?: 0; ?>
-					</li>
-					
-					<li class="data__item" data-emoji="💿">
-						<h5>
-							Releases added
-						</h5>
-						<?= $user_points['added-release']['num_points'] ?: 0; ?>
-					</li>
-					
-					<li class="data__item" data-emoji="📼">
-						<h5>
-							Other additions
-						</h5>
-						<?= $user_points['added-release']['num_points'] ?: 0; ?>
-					</li>
-					
-					<li class="data__item" data-emoji="📝">
-						<h5>
-							Database edits
-						</h5>
-						<?= $user_points['edits']['num_points'] ?: 0; ?>
-					</li>
-					
-					<li class="data__item" data-emoji="⭐">
-						<h5>
-							Items rated
-						</h5>
-						<?= $user_points['rated']['num_points'] ?: 0; ?>
-					</li>
-					
-					<li class="data__item" data-emoji="🏷️">
-						<h5>
-							Items tagged
-						</h5>
-						<?= $user_points['tagged']['num_points'] ?: 0; ?>
-					</li>
-					
-				</ul>
-			</div>
+				<div class="stats__container">
+					<ul class="data__container">
+
+						<li class="data__item" data-emoji="💬">
+							<h5>
+								Comments
+							</h5>
+							<?= $user_points['added-comment']['num_points'] ?: 0; ?>
+						</li>
+
+						<li class="data__item" data-emoji="👍">
+							<h5>
+								Likes received
+							</h5>
+							<?= $user_points['comment-liked']['num_points'] ?: 0; ?>
+						</li>
+
+						<li class="data__item" data-emoji="🤝">
+							<h5>
+								Likes given
+							</h5>
+							<?= $user_points['liked-comment']['num_points'] ?: 0; ?>
+						</li>
+
+						<li class="data__item" data-emoji="✍🏻">
+							<h5>
+								Posts added
+							</h5>
+							<?= $user_points['added-blog']['num_points'] ?: 0; ?>
+						</li>
+
+						<li class="data__item" data-emoji="🎤">
+							<h5>
+								Artists added
+							</h5>
+							<?= $user_points['added-artist']['num_points'] ?: 0; ?>
+						</li>
+
+						<li class="data__item" data-emoji="💿">
+							<h5>
+								Releases added
+							</h5>
+							<?= $user_points['added-release']['num_points'] ?: 0; ?>
+						</li>
+
+						<li class="data__item" data-emoji="📼">
+							<h5>
+								Other additions
+							</h5>
+							<?= $user_points['added-release']['num_points'] ?: 0; ?>
+						</li>
+
+						<li class="data__item" data-emoji="📝">
+							<h5>
+								Database edits
+							</h5>
+							<?= $user_points['edits']['num_points'] ?: 0; ?>
+						</li>
+
+						<li class="data__item" data-emoji="⭐">
+							<h5>
+								Items rated
+							</h5>
+							<?= $user_points['rated']['num_points'] ?: 0; ?>
+						</li>
+
+						<li class="data__item" data-emoji="🏷️">
+							<h5>
+								Items tagged
+							</h5>
+							<?= $user_points['tagged']['num_points'] ?: 0; ?>
+						</li>
+
+					</ul>
+				</div>
 				
 			</div>
 			
@@ -575,19 +625,35 @@ if(strlen($next_users['rand1'])) {
 
 	<!-- User activity -->
 	<div class="user__activity">
-		<div class="text text--outlined activity__wrapper">
-			<input class="obscure__input" id="obscure-comments" type="checkbox" checked />
-			<ul class="ul--compact obscure__container obscure--faint activity__container">
+		<div class="any--margin text--outlined activity__wrapper">
+			<ul class="ul--compact obscure--faint activity__container">
 				<?php
 					$activity_limit = 15;
 					$activity_offset = 0;
 					include('partial-activity.php');
 				?>
-				<a class="a--padded a--outlined obscure__button" href="<?= '/users/'.$user['username'].'/activity/'; ?>" style="background:hsl(var(--background--secondary));"><?= lang('View activity', '活動を表示する', 'hidden'); ?></a>
+				<div class="activity__bottom <?= is_array($rslt_activity) && count($rslt_activity) > 4 ? null : 'any--hidden'; ?> ">
+					<a class="a--padded a--outlined obscure__button activity__more" href="<?= '/users/'.$user['username'].'/activity/'; ?>" style="background:hsl(var(--background--secondary));"><?= lang('All activity', '活動を表示する', 'hidden'); ?></a>
+				</div>
 			</ul>
 		</div>
 	</div>
 </div>
+
+<style>
+	.activity__bottom {
+		bottom: 0;
+		box-shadow: inset 0 -5.5rem 2rem -4rem hsl(var(--background--secondary));
+		height: 4rem;
+		pointer-events: none;
+		position: sticky;
+		z-index: 2;
+	}
+	.activity__more {
+		display: inline-block;
+		pointer-events: auto;
+	}
+</style>
 
 <!-- Collection -->
 <div class="col <?php echo $num_wants ? 'c3-AAB' : 'c1'; ?>">
@@ -604,42 +670,42 @@ if(strlen($next_users['rand1'])) {
 		
 		<div style="clear:both;"></div>
 		
-		<div class="text text--outlined" style="margin-bottom:1rem;">
+		<div class="text text--outlined collection__stats">
 			<ul class="data__container">
 				
 				<li class="data__item" data-emoji="🎧">
 					<h5>
 						Items owned
 					</h5>
-					<?= $user_points['tagged']['num_points'] ?: 0; ?>
+					<?= $stats['collection']['value'] ?: 0; ?>
 				</li>
 				
 				<li class="data__item" data-emoji="💸">
 					<h5>
 						Estimated worth
 					</h5>
-					<?= $user_points['tagged']['num_points'] ?: 0; ?>
+					<?= ($stats['worth']['value'] ? $stats['worth']['value'].sanitize('￥') : '?'); ?>
 				</li>
 				
 				<li class="data__item" data-emoji="👴">
 					<h5>
 						Oldest item
 					</h5>
-					<?= $user_points['tagged']['num_points'] ?: 0; ?>
+					<?= $stats['oldest']['value'] ?: '?'; ?>
 				</li>
 				
 				<li class="data__item" data-emoji="👶">
 					<h5>
 						Newest item
 					</h5>
-					<?= $user_points['tagged']['num_points'] ?: 0; ?>
+					<?= $stats['newest']['value'] ?: '?'; ?>
 				</li>
 				
 				<li class="data__item" data-emoji="🆕">
 					<h5>
 						Last updated
 					</h5>
-					<?= $user_points['tagged']['num_points'] ?: 0; ?>
+					<?= $stats['latest']['value'] ?: '?'; ?>
 				</li>
 				
 			</ul>
