@@ -1,9 +1,5 @@
 <?php
 	include_once("../php/include.php");
-if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit-inartistic.php'); 
-} else { } ?>
-
-<?php
 	include_once("../php/class-auto_blogger.php");
 	$markdown_parser = new parse_markdown($pdo);
 	
@@ -106,6 +102,9 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 				$output["status"] = "success";
 				$output["artist_quick_name"] = $update_values["romaji"] ?: $update_values["name"];
 				$output["artist_url"] = "/artists/".$update_values["friendly"]."/";
+				
+				// Set up point awarder
+				$access_points = new access_points($pdo);
 				
 				if(is_array($_POST["musicians"])) {
 					foreach($_POST["musicians"] as $musician) {
@@ -250,6 +249,11 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 									}
 									
 									$output["status"] = "success";
+									
+									
+									
+									// Award point
+									$access_points->award_points([ 'point_type' => 'edited-musician', 'allow_multiple' => false, 'item_id' => sanitize($musician['id']) ]);
 								}
 								else {
 									$output["status"] = "error";
@@ -263,6 +267,9 @@ if($_SESSION['username'] === 'inartistic') { //include('../artists/function-edit
 						}
 					}
 				}
+				
+				// Award point
+				$access_points->award_points([ 'point_type' => 'edited-artist', 'allow_multiple' => false, 'item_id' => sanitize($_POST['id']) ]);
 			}
 			else {
 				$output["status"] = "error";

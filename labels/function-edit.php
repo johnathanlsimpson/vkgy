@@ -46,6 +46,10 @@
 							$output["result"] = '<a class="symbol__company" href="/labels/'.$sql_values["friendly"].'/">'.($sql_values["romaji"] ?: $sql_values["name"]).'</a> successfully edited.';
 							$output["edit_url"] = "/labels/".$sql_values["friendly"]."/edit/";
 							$output["quick_name"] = $sql_values["romaji"] ?: $sql_values["name"];
+							
+							// Award point
+							$access_points = new access_points($pdo);
+							$access_points->award_points([ 'point_type' => 'edited-label', 'allow_multiple' => false, 'item_id' => $id ]);
 						}
 						else {
 							$output["result"] = "Sorry, the label couldn't be updated.";

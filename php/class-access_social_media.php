@@ -130,9 +130,9 @@
 					if($item_type === 'blog_post' && strlen($input['title']) && strlen($input['url'])) {
 						$output['url'] = $input['url'];
 						$output['content'] = '
-							📰 News // ニュース 📰
+							📰 News ∙ ニュース
 							
-							'.$input['title'].'
+							'.$input['title'].($input['content_ja'] ? "\n\n".'[日本語] '.$input['content_ja'] : null).'
 							
 							'.($user['twitter'] && $user['twitter'] != '@vkgy_' ? '✍️ '.($user['twitter'] ?: $user['username']) : null).'
 							'.(is_array($input['twitter_authors']) && !empty($input['twitter_authors']) ? '✍️ '.implode("\n✍️ ", $input['twitter_authors']) : null).'

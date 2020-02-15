@@ -1,12 +1,12 @@
 /* Badge: comments */
-.badge--comments .badge__deco-a::before {
+.badge--psycho-letter .badge__deco-a::before {
 	content: "";
 	height: 40px;
 	left: calc((100px - 88px) / 2);
 	top: calc((100px - 40px) / 2);
 	width: 88px;
 }
-.badge--comments .badge__deco-b::before {
+.badge--psycho-letter .badge__deco-b::before {
 	border-radius: 50%;
 	content: "";
 	height: 70px;
@@ -14,7 +14,7 @@
 	top: calc((100px - 70px) / 2);
 	width: 70px;
 }
-.badge--comments .badge__deco-b::after {
+.badge--psycho-letter .badge__deco-b::after {
 	border-radius: 50%;
 	content: "";
 	height: 40px;
@@ -25,7 +25,7 @@
 
 
 /* Badge: avatar */
-.badge--avatar .badge__deco-a::before {
+.badge--mascade-face .badge__deco-a::before {
 	border-width: 2px 0 0 0;
 	content: "";
 	height: 0;
@@ -33,7 +33,7 @@
 	top: calc(100px / 2);
 	width: 100px;
 }
-.badge--avatar .badge__deco-b::before {
+.badge--mascade-face .badge__deco-b::before {
 	border-radius: 50% 46% 35% 46%;
 	content: "";
 	height: 66px;
@@ -45,7 +45,7 @@
 
 
 /* Badge: collector */
-.badge--collector .badge__deco-a::before, .badge--collector .badge__deco-a::after {
+.badge--mad-collector .badge__deco-a::before, .badge--mad-collector .badge__deco-a::after {
 	border-radius: 50%;
 	bottom: 15px;
 	content: "";
@@ -53,7 +53,7 @@
 	height: 50%;
 	width: 50%;
 }
-.badge--collector .badge__deco-a::after {
+.badge--mad-collector .badge__deco-a::after {
 	bottom: auto;
 	left: auto;
 	right: 15px;
@@ -62,18 +62,18 @@
 
 
 /* Badge: additions */
-.badge--additions .badge__deco-a::before, .badge--additions .badge__deco-a::after, .badge--additions .badge__deco-b::before {
+.badge--kokuhaku-page .badge__deco-a::before, .badge--kokuhaku-page .badge__deco-a::after, .badge--kokuhaku-page .badge__deco-b::before {
 	content: "";
 	height: 50px;
 	left: 15px;
 	top: 15px;
 	width: 40px;
 }
-.badge--additions .badge__deco-a::after {
+.badge--kokuhaku-page .badge__deco-a::after {
 	left: calc((100px - 40px) / 2);
 	top: calc((100px - 50px) / 2);
 }
-.badge--additions .badge__deco-b::before {
+.badge--kokuhaku-page .badge__deco-b::before {
 	bottom: 15px;
 	left: auto;
 	right: 15px;
@@ -82,7 +82,7 @@
 
 
 /* Badge: patron */
-.badge--patron .badge__deco-a::before, .badge--patron .badge__deco-a::after {
+.badge--love-parade .badge__deco-a::before, .badge--love-parade .badge__deco-a::after {
 	border-bottom: none;
 	border-radius: 25px 25px 0 0;
 	content: "";
@@ -92,7 +92,7 @@
 	transform: rotate(45deg);
 	width: 50px;
 }
-.badge--patron .badge__deco-a::after {
+.badge--love-parade .badge__deco-a::after {
 	left: 14px;
 	right: auto;
 	transform: rotate(-45deg);

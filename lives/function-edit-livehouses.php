@@ -54,6 +54,10 @@
 						if($stmt_update->execute($values_update)) {
 							if(!is_numeric($id)) {
 								$id = $pdo->lastInsertId();
+								
+								// Award point
+								$access_points = new access_points($pdo);
+								$access_points->award_points([ 'point_type' => 'added-livehouse' ]);
 							}
 							
 							if(strlen($nicknames) > 0) {

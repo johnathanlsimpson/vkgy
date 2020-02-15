@@ -22,6 +22,17 @@ if(is_array($rslt_queued) && !empty($rslt_queued)) {
 		$stmt_update = $pdo->prepare($sql_update);
 		if($stmt_update->execute([ 0, $current_date, $entry['id'] ])) {
 			
+			// Make images visible
+			$images = $access_image->access_image([ 'blog_id' => $entry['id'], 'get' => 'name', 'show_queued' => true ]);
+			
+			if(is_array($images) && !empty($images)) {
+				foreach($images as $image) {
+					$sql_image = 'UPDATE images SET is_queued=?, date_added=? WHERE id=?';
+					$stmt_image = $pdo->prepare($sql_image);
+					$stmt_image->execute([ 0, $current_date, $image['id'] ]);
+				}
+			}
+			
 			// Format sources
 			if($entry['sources']) {
 				preg_match_all('/'.'^(@([A-z0-9-_]+))(?:\s|$)'.'/m', $entry['sources'], $twitter_matches);
@@ -35,19 +46,14 @@ if(is_array($rslt_queued) && !empty($rslt_queued)) {
 			
 			// Immediately post to socials
 			if(strlen($entry['title']) && strlen($entry['friendly'])) {
-				$social_post = $access_social_media->build_post([ 'title' => $entry['title'], 'url' => 'https://vk.gy/blog/'.$entry['friendly'].'/', 'id' => $entry['id'], 'twitter_authors' => $twitter_authors ], 'blog_post');
+				$social_post = $access_social_media->build_post([
+					'title' => $entry['title'],
+					'url' => 'https://vk.gy/blog/'.$entry['friendly'].'/',
+					'content_ja' => $entry['content_ja'],
+					'id' => $entry['id'],
+					'twitter_authors' => $twitter_authors
+				], 'blog_post');
 				$access_social_media->post_to_social($social_post, 'both');
-			}
-			
-			// Update images
-			$images = $access_image->access_image([ 'blog_id' => $entry['id'], 'get' => 'name', 'show_queued' => true ]);
-			
-			if(is_array($images) && !empty($images)) {
-				foreach($images as $image) {
-					$sql_image = 'UPDATE images SET is_queued=?, date_added=? WHERE id=?';
-					$stmt_image = $pdo->prepare($sql_image);
-					$stmt_image->execute([ 0, $current_date, $image['id'] ]);
-				}
 			}
 		}
 	}

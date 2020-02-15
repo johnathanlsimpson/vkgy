@@ -8,6 +8,16 @@
 		"/account/style-page-users.css"
 	]);
 	
+	subnav([
+		lang('Member list', 'メンバー一覧', 'hidden') => '/users/',
+	]);
+	
+	if(!$_SESSION['is_signed_in']) {
+		subnav([
+			lang('Register/Sign in', '登録・サインイン', 'hidden') => '/account/',
+		]);
+	}
+	
 	$page_header = lang('Member list', 'メンバー一覧', ['container' => 'div']);
 ?>
 
@@ -49,7 +59,7 @@
 							$letter = preg_match("/"."[^a-z]"."/", $letter) ? "#" : $letter;
 							
 							?>
-								<tr class="user__container" <?php echo $user["is_admin"] ? "data-admin" : null; ?> <?php echo $user["is_vip"] ? "data-vip" : null; ?> data-date="<?php echo substr($user["date_added"], 0, 10); ?>" data-username="<?php echo $user["username"]; ?>">
+								<tr class="user__container" <?= $user["is_admin"] ? "data-admin" : null; ?> <?= $user["is_vip"] ? "data-vip" : null; ?> data-date="<?= $user['id']; ?>" data-username="<?= $user["username"]; ?>">
 									<td class="any--weaken-color any--no-wrap">
 										<?php echo substr($user["date_added"], 0, 10); ?>
 									</td>

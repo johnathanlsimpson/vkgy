@@ -96,15 +96,79 @@ if(in_array($template, [ 'activity', 'edit-avatar', 'user' ])) {
 		include("page-download-collection.php");
 	}
 	
-	// User profile: top
-	// =======================================================
-	if($template === "user") {
-		$pageTitle = $user["username"]." member profile";
+// User profile: top
+// =======================================================
+if($template === "user") {
+	$page_title = $user['username'].' profile (プロフィール)';
+	
+	breadcrumbs([ "Member list" => "/users/", $user["username"] => "/users/".$user["username"]."/" ]);
+	
+	// Get points
+	$access_points = new access_points($pdo);
+	$user_points = $access_points->access_points([ 'associative' => true, 'user_id' => $user['id'], 'get' => 'basics', 'order_by' => 'point_type' ]);
+	
+	// For certain point types, merge points
+	$points_to_merge = [
+		'added-other' => ['added-label', 'added-livehouse', 'added-image', 'added-video'],
+		'edits' => ['edited-artist', 'edited-blog', 'edited-label', 'edited-live', 'edited-musician', 'edited-release'],
+		'rated' => ['rated-artist', 'rated-release'],
+		'tagged' => ['tagged-artist', 'tagged-release'],
+	];
+	foreach($points_to_merge as $merged_key => $merge_arrays) {
 		
-		breadcrumbs([ "Member list" => "/users/", $user["username"] => "/users/".$user["username"]."/" ]);
+		// Set up merged array with default values
+		$user_points[$merged_key] = [ 'num_points' => 0, 'points_value' => 0, 'point_type' => $merged_key, 'date_occurred' => '0000-00-00 00:00:00' ];
 		
-		include('page-user.php');
+		// Cycle through arrays that will be merged, and apply their values to merged array
+		foreach($merge_arrays as $individual_key) {
+			if($user_points[$individual_key]['date_occurred'] > $user_points[$merged_key]['date_occurred']) {
+				$user_points[$merged_key]['date_occurred'] = $user_points[$individual_key]['date_occurred'];
+			}
+			
+			if(is_numeric($user_points[$individual_key]['num_points'])) {
+				$user_points[$merged_key]['num_points'] += $user_points[$individual_key]['num_points'];
+			}
+			
+			if(is_numeric($user_points[$individual_key]['points_value'])) {
+				$user_points[$merged_key]['points_value'] += $user_points[$individual_key]['points_value'];
+			}
+		}
+		
 	}
+	
+	// Get total points of all users
+	/*$sql_rank = '
+		SELECT SUM(users_points.point_value) AS point_sum, users_points.user_id, users.username
+		FROM users_points
+		LEFT JOIN users ON users.id=users_points.user_id
+		GROUP BY users_points.user_id
+		ORDER BY point_sum DESC';
+	$stmt_rank = $pdo->prepare($sql_rank);
+	$stmt_rank->execute();
+	$rslt_rank = $stmt_rank->fetchAll();
+	$num_ranked = count($rslt_rank);
+	
+	// Get ranking among other users, based on points
+	for($i=0; $i<$num_ranked; $i++) {
+		if($rslt_rank[$i]['user_id'] === $user['id']) {
+			
+			$user_points['meta']['rank'] = $i + 1;
+			
+			if($i>0) {
+				$rank['above'] = $rslt_rank[$i - 1];
+				$rank['above']['rank'] = $i;
+			}
+			if($i+1<$num_ranked) {
+				$rank['below'] = $rslt_rank[$i + 1];
+				$rank['below']['rank'] = $i + 2; 
+			}
+			break;
+			
+		}
+	}*/
+	
+	include('page-user.php');
+}
 	
 	// User profile: activity
 	// =======================================================
