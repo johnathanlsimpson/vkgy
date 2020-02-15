@@ -630,6 +630,7 @@ if(strlen($next_users['rand1'])) {
 				<?php
 					$activity_limit = 15;
 					$activity_offset = 0;
+					$show_symbols = false;
 					include('partial-activity.php');
 				?>
 				<div class="activity__bottom <?= is_array($rslt_activity) && count($rslt_activity) > 4 ? null : 'any--hidden'; ?> ">
