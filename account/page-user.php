@@ -405,7 +405,7 @@ if(strlen($next_users['rand1'])) {
 		<!-- User card -->
 		<?php include('partial-card.php'); ?>
 		
-		<?php include('partial-badges.php'); ?>
+		<?php //include('partial-badges.php'); ?>
 		
 		<!-- New stats -->
 		<div class="any--margin">
@@ -417,7 +417,7 @@ if(strlen($next_users['rand1'])) {
 					
 					<!-- Current level -->
 					<div class="text level__container">
-						<h5>Level 9</h5>
+						<?php if($_SESSION['username'] === 'inartistic') { ?><h5>Level 9</h5><?php } ?>
 						<span class="level__points">
 							<span class="level__point-num"><?= number_format( $user_points['meta']['point_value'] ); ?></span>
 							<?= lang('pt', '点', 'hidden'); ?>
@@ -426,6 +426,7 @@ if(strlen($next_users['rand1'])) {
 					</div>
 					
 					<!-- Next level progress -->
+					<?php if($_SESSION['username'] === 'inartistic') { ?>
 					<div class="text meter__container" style="--progress-percent: 20%;">
 						<h5>Next level</h5>
 						<div class="meter__current any--weaken-size">
@@ -435,6 +436,7 @@ if(strlen($next_users['rand1'])) {
 						<div class="meter__bar"></div>
 						<div class="meter__goal any--weaken">1,599</div>
 					</div>
+					<?php } ?>
 					
 				</div>
 				
@@ -626,7 +628,7 @@ if(strlen($next_users['rand1'])) {
 	<!-- User activity -->
 	<div class="user__activity">
 		<div class="any--margin text--outlined activity__wrapper">
-			<ul class="ul--compact obscure--faint activity__container">
+			<ul class="ul--compact obscure--faint activity__container any--weaken-color">
 				<?php
 					$activity_limit = 15;
 					$activity_offset = 0;
