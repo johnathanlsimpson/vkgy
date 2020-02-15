@@ -93,6 +93,10 @@
 									}
 								}
 							}
+							
+							// Award point
+							$access_points = new access_points($pdo);
+							$access_points->award_points([ 'point_type' => 'added-musician' ]);
 						}
 						else {
 							$output["result"][] = ($romaji ?: $name)." could not be added.";

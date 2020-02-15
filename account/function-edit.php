@@ -151,6 +151,10 @@ if($_SESSION['is_signed_in']) {
 			// Note that username was changed, redirect to new profile
 			$output['result'] = 'Username changed; redirecting to <a href="/users/'.$sql_values['useranme'].'/">new profile</a>. <meta http-equiv="refresh" content="3;url=/users/'.$sql_values['username'].'/" />';
 		}
+		
+		// Award point
+		$access_points = new access_points($pdo);
+		$access_points->award_points([ 'point_type' => 'edited-profile', 'allow_multiple' => false ]);
 	}
 	else {
 		$output['result'] = 'Couldn\'t update profile.';

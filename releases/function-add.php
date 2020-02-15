@@ -313,6 +313,15 @@
 											'<a class="a--padded symbol__news" href="'.$auto_post_url.'">View blog entry</a>';
 									}
 								}
+								
+								// Award point
+								$access_points = new access_points($pdo);
+								if($is_edit) {
+									$access_points->award_points([ 'point_type' => 'edited-release', 'allow_multiple' => false, 'item_id' => $release['id'] ]);
+								}
+								else {
+									$access_points->award_points([ 'point_type' => 'added-release' ]);
+								}
 							}
 							else {
 								$output["status"] = "error";

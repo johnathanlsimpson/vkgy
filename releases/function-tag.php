@@ -46,6 +46,10 @@
 						$sql_update = "INSERT INTO releases_tags (user_id, release_id, tag_id) VALUES (?, ?, ?)";
 						$sql_values = [$user_id, $release_id, $tag_id];
 						$output["is_checked"] = "1";
+						
+						// Award point
+						$access_points = new access_points($pdo);
+						$access_points->award_points([ 'point_type' => 'tagged-release', 'allow_multiple' => false, 'item_id' => $release_id ]);
 					}
 					
 					$stmt_update = $pdo->prepare($sql_update);

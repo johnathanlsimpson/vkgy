@@ -29,7 +29,7 @@
 					<!-- User details -->
 					<ul class="user__data data__container">
 						<?php
-							foreach(['birthday', 'pronouns', 'website', 'twitter', 'tumblr', 'facebook', 'lastfm', 'mh'] as $field) {
+							foreach(['birthday', 'pronouns', 'website', 'twitter', 'facebook', 'lastfm', 'mh'] as $field) {
 								if(strlen($user[$field]) && !in_array($user[$field], ['0000-00-00', 'prefer not to say', 'custom'])) {
 									?>
 										<li class="data__item">
@@ -52,9 +52,6 @@
 														break;
 													case "twitter":
 														echo '<a class="a--inherit" href="https://twitter.com/'.$user[$field].'">@'.$user[$field].'</a>';
-														break;
-													case "tumblr":
-														echo '<a class="a--inherit" href="https://'.$user[$field].'.tumblr.com">'.$user[$field].'</a>';
 														break;
 													case "facebook":
 														echo '<a class="a--inherit" href="https://facebook.com/'.$user[$field].'">'.$user[$field].'</a>';
@@ -80,9 +77,6 @@
 						<div class="user__motto"><?php echo $user['motto']; ?></div>
 					<?php
 				}
-			}
-			else {
-				echo '<div class="user__empty symbol__error any--weaken-color">This user\'s profile is empty.</div>';
 			}
 		?>
 	</div>

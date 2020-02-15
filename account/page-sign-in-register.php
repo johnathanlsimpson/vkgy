@@ -8,7 +8,14 @@
 		"/account/style-page-sign-in-register.css"
 	]);
 	
-	$page_header = lang('Register', '登録', ['container' => 'div']);
+	$page_header = lang('Register/Sign in', '登録・サインイン', 'div');
+	
+	if(!$_SESSION['is_signed_in']) {
+		subnav([
+			lang('Member list', 'メンバー一覧', 'hidden') => '/users/',
+			lang('Register/Sign in', '登録・サインイン', 'hidden') => '/account/',
+		]);
+	}
 ?>
 
 <div class="col c2 any--signed-out-only">

@@ -109,6 +109,10 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 				if($stmt_add->execute([ $user_id, $anonymous_id, $thread_id, $content, $name, $item_id, $item_type, $is_approved ])) {
 					$output['status'] = 'success';
 					$comment_id = $pdo->lastInsertId();
+					
+					// Award point
+					$access_points = new access_points($pdo);
+					$access_points->award_points([ 'point_type' => 'added-comment' ]);
 				}
 				else {
 					$output['result'][] = 'The comment couldn\'t be added.';

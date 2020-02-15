@@ -1,5 +1,8 @@
 <?php
 	
+	$user['username'] = $_SESSION['username'];
+	include('head-user.php');
+	
 	$page_header = lang('Edit avatar', 'アバター変更', 'div');
 	
 	$avatar = new avatar(null, $rslt_avatar, [ 'is_vip' => $_SESSION['is_vip'] ]);
