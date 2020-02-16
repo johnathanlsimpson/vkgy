@@ -78,6 +78,19 @@ class access_points {
 			$meta_array['date_occurred'] = $meta_array['date_occurred'] > $points[$i]['date_occurred'] ? $meta_array['date_occurred'] : $points[$i]['date_occurred'];
 		}
 		
+		// Additional data: get user level
+		foreach($this->point_levels as $level => $minimum) {
+			if($meta_array['point_value'] >= $minimum) {
+				$meta_array['level'] = $level;
+			}
+		}
+		
+		// Additional data: get next level req
+		if( $meta_array['level'] < end(array_keys($this->point_levels)) ) {
+			$meta_array['next_level_at'] = $this->point_levels[ $meta_array['level'] + 1 ];
+			$meta_array['next_level_progress'] = ( $meta_array['point_value'] / $meta_array['next_level_at'] ) * 100;
+		}
+		
 		// Format data: get point type name
 		for($i=0; $i<$num_points; $i++) {
 			$points[$i]['point_type'] = $this->point_types[$points[$i]['point_type']];
@@ -106,6 +119,30 @@ class access_points {
 	// Set point values
 	// ======================================================
 	function set_point_values() {
+		
+		// Point levels
+		$this->point_levels = [
+			 1 => 0,
+			 2 => 10,
+			 3 => 20,
+			 4 => 50,
+			 5 => 100,
+			 6 => 200,
+			 7 => 300,
+			 8 => 500,
+			 9 => 1000,
+			10 => 2000,
+			11 => 3000,
+			12 => 4000,
+			13 => 5000,
+			14 => 7500,
+			15 => 10000,
+			16 => 15000,
+			17 => 20000,
+			18 => 30000,
+			19 => 40000,
+			20 => 50000,
+		];
 		
 		// All possible point types
 		foreach([
