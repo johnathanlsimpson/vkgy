@@ -192,7 +192,9 @@ if(strlen($next_users['rand1'])) {
 					
 					<!-- Current level -->
 					<div class="text level__container">
-						<?php /*if($_SESSION['username'] === 'inartistic') { ?><h5>Level 9</h5><?php }*/ ?>
+						<h5 class="level__level">
+							Level <span class="level__num"><?= $user_points['meta']['level']; ?></span>
+						</h5>
 						<span class="level__points">
 							<span class="level__point-num"><?= number_format( $user_points['meta']['point_value'] ); ?></span>
 							<?= lang('pt', '点', 'hidden'); ?>
@@ -201,17 +203,15 @@ if(strlen($next_users['rand1'])) {
 					</div>
 					
 					<!-- Next level progress -->
-					<?php /*if($_SESSION['username'] === 'inartistic') { ?>
-					<div class="text meter__container" style="--progress-percent: 20%;">
+					<div class="text meter__container" style="--progress-percent: <?= $user_points['meta']['next_level_at'] ? min(98, max(2, $user_points['meta']['next_level_progress'])) : 100; ?>%;">
 						<h5>Next level</h5>
 						<div class="meter__current any--weaken-size">
 							<span class="meter__spacer"></span>
-							<span class="meter__current-num"><?= $user_points['meta']['point_value']; ?> pt</span>
+							<span class="meter__current-num"><?= number_format($user_points['meta']['point_value']); ?> pt</span>
 						</div>
 						<div class="meter__bar"></div>
-						<div class="meter__goal any--weaken">1,599</div>
+						<div class="meter__goal any--weaken "><?= $user_points['meta']['next_level_at'] ? number_format($user_points['meta']['next_level_at']) : '✨'; ?></div>
 					</div>
-					<?php }*/ ?>
 					
 				</div>
 				
@@ -236,6 +236,13 @@ if(strlen($next_users['rand1'])) {
 						text-align: center;
 						white-space: nowrap;
 					}
+					.level__level {
+						color: hsl(var(--accent));
+					}
+					.level__num {
+						font-size: 1rem;
+						font-style: italic;
+					}
 					.level__points {
 						color: hsl(var(--attention--secondary));
 					}
@@ -246,7 +253,7 @@ if(strlen($next_users['rand1'])) {
 					
 					/* Next level */
 					.meter__container {
-						--stem-height: 0.75rem;
+						--stem-height: calc(0.75rem + 3px);
 						display: flex;
 						flex-direction: column;
 					}
@@ -260,6 +267,7 @@ if(strlen($next_users['rand1'])) {
 					.meter__current {
 						background-image: linear-gradient(to left, hsl(var(--attention--secondary)) 2px, transparent 0);
 						background-position: left bottom;
+						bottom: -3px;
 						color: hsl(var(--attention--secondary));
 						display: flex;
 						font-weight: bold;
@@ -278,12 +286,14 @@ if(strlen($next_users['rand1'])) {
 						background-repeat: no-repeat;
 						border-radius: 0.25rem;
 						height: 0.5rem;
+						z-index: 1;
 					}
 					.meter__goal {
 						background-image: linear-gradient(to left, hsl(var(--background--bold)) 2px, transparent 0);
-						background-position: right 5px top;
+						background-position: right top;
 						padding-top: var(--stem-height);
 						text-align: right;
+						top: -3px;
 					}
 					.meter__goal::after {
 						content: " pt";
@@ -326,70 +336,70 @@ if(strlen($next_users['rand1'])) {
 							<h5>
 								Comments
 							</h5>
-							<?= $user_points['added-comment']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['added-comment']['num_points']) ?: 0; ?>
 						</li>
 						
 						<li class="data__item" data-emoji="👍">
 							<h5>
 								Likes received
 							</h5>
-							<?= $user_points['comment-liked']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['comment-liked']['num_points']) ?: 0; ?>
 						</li>
 						
 						<li class="data__item" data-emoji="🤝">
 							<h5>
 								Likes given
 							</h5>
-							<?= $user_points['liked-comment']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['liked-comment']['num_points']) ?: 0; ?>
 						</li>
 						
 						<li class="data__item" data-emoji="✍🏻">
 							<h5>
 								Posts added
 							</h5>
-							<?= $user_points['added-blog']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['added-blog']['num_points']) ?: 0; ?>
 						</li>
 						
 						<li class="data__item" data-emoji="🎤">
 							<h5>
 								Artists added
 							</h5>
-							<?= $user_points['added-artist']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['added-artist']['num_points']) ?: 0; ?>
 						</li>
 						
 						<li class="data__item" data-emoji="💿">
 							<h5>
 								Releases added
 							</h5>
-							<?= $user_points['added-release']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['added-release']['num_points']) ?: 0; ?>
 						</li>
 						
 						<li class="data__item" data-emoji="📼">
 							<h5>
 								Other additions
 							</h5>
-							<?= $user_points['added-release']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['added-other']['num_points']) ?: 0; ?>
 						</li>
 						
 						<li class="data__item" data-emoji="📝">
 							<h5>
 								Database edits
 							</h5>
-							<?= $user_points['edits']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['edits']['num_points']) ?: 0; ?>
 						</li>
 						
 						<li class="data__item" data-emoji="⭐">
 							<h5>
 								Items rated
 							</h5>
-							<?= $user_points['rated']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['rated']['num_points']) ?: 0; ?>
 						</li>
 						
 						<li class="data__item" data-emoji="🏷️">
 							<h5>
 								Items tagged
 							</h5>
-							<?= $user_points['tagged']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['tagged']['num_points']) ?: 0; ?>
 						</li>
 						
 					</ul>
