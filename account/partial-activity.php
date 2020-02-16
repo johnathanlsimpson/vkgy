@@ -294,15 +294,24 @@ if(is_array($rslt_activity) && !empty($rslt_activity)) {
 		?>
 			<li class="flex activity__item" data-type="<?= $activity['type']; ?>">
 				<a class="any--weaken-color activity__symbol <?= $activity['image'] ? 'activity--has-image' : null; ?> <?= 'symbol__'.$symbol; ?> <?= $show_symbols === false ? 'any--hidden' : null; ?>" href="<?= $activity['url']; ?>"><?= $activity['image'] ? '<img class="activity__image lazy" src="'.$activity['image'].'" />' : null; ?></a>
-
+				
 				<span>
 					<span class="any--weaken-size activity__subtitle">
 						<?= $supertitle; ?>
 						<span class="any--weaken-color activity__date"><?= $date_occurred; ?></span>
 					</span>
-					<div class="activity__content"><?= $content; ?></div>
+					<div class="activity__content">
+						<?php
+							if($activity['type'] === 'comments') {
+								echo explode("\n", $content)[0];
+							}
+							else {
+								echo $content;
+							}
+						?>
+					</div>
 				</span>
-
+				
 				<?php
 					unset($supertitle, $content, $image);
 				?>
