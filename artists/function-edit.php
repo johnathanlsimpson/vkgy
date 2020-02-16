@@ -67,7 +67,7 @@
 								if(preg_match('/'.'^musicians\[(\d+)\]\[(\w+)\]$'.'/', $change, $change_match)) {
 									$musician_id = $change_match[1];
 									
-									if(is_array($_POST['musicians']) && is_array($_POST['musicians'][$musician_id])) {
+									if(is_array($_POST['musicians']) && is_array($_POST['musicians'][$musician_id]) && strlen($change_match[2])) {
 										if($stmt_musician_edits->execute([ $musician_id, $_SESSION['userID'], sanitize($change_match[2]) ])) {
 										}
 										

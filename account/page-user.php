@@ -31,8 +31,10 @@ for($i=0; $i<$num_wants; $i++) {
 }
 
 // Wants: Get
-$wants = $access_release->access_release([ 'ids' => $wants_ids, 'get' => 'quick_name' ]);
-$wants = is_array($wants) ? array_values($wants) : null;
+if($num_wants) {
+	$wants = $access_release->access_release([ 'ids' => $wants_ids, 'get' => 'quick_name' ]);
+	$wants = is_array($wants) ? array_values($wants) : null;
+}
 
 // Collection: Get
 $collection = $access_release->access_release([ 'user_id' => $user['id'], 'get' => 'quick_name' ]);
@@ -70,103 +72,12 @@ if(is_array($wants) && !empty($wants)) {
 	});
 }
 
-// Check VIP
-/*if($_SESSION["loggedIn"] && is_numeric($_SESSION["userID"])) {
-	$sql_check = "SELECT 1 FROM users WHERE id=? AND is_vip=1 LIMIT 1";
-	$stmt_check = $pdo->prepare($sql_check);
-	$stmt_check->execute([ $_SESSION["userID"] ]);
-	$is_vip = $stmt_check->fetchColumn();
-}*/
-
-// Stats: Setup
-/*$stats = [
-	'fan_since' => ['emoji' => '🕒'],
-	'member_for' => ['emoji' => '💝'],
-	'comments' => ['emoji' => '💬'],
-	'posts' => ['emoji' => '✍🏻'],
-	'artists' => ['emoji' => '🎸'],
-	'musicians' => ['emoji' => '🎤'],
-	'releases' => ['emoji' => '💿'],
-	'edits' => ['emoji' => '📑', 'title' => 'database edits'],
-	'collection' => ['emoji' => '🎧'],
-	'oldest' => ['emoji' => '⌛', 'title' => 'oldest release'],
-	'newest' => ['emoji' => '⏳', 'title' => 'newest release'],
-	'worth' => ['emoji' => '💸', 'title' => 'estimated worth'],
-	'ratings' => ['emoji' => '📊'],
-	'tagged' => ['emoji' => '🔖'],
-];
-$current_year = date('Y');*/
-
 // Stat: Fan since
 $stats['fan_since']['value'] = is_numeric($user['fan_since']) ? $user['fan_since'] : substr($user['date_added'], 0, 4);
 $fan_since_level_base = $stats['fan_since']['value'] - (date('Y') - $stats['fan_since']['value']);
 
 // Stat: Member since
 $stats['member_for']['value'] = ($current_year - substr($user['date_added'], 0, 4));
-
-// Stat: Comments
-/*$sql_num_comments = 'SELECT COUNT(1) FROM comments WHERE user_id=?';
-$stmt_num_comments = $pdo->prepare($sql_num_comments);
-$stmt_num_comments->execute([ $user['id'] ]);
-$stats['comments']['value'] = $stmt_num_comments->fetchColumn();
-
-// Stat: Posts
-$sql_num_posts = 'SELECT COUNT(1) FROM blog WHERE user_id=?';
-$stmt_num_posts = $pdo->prepare($sql_num_posts);
-$stmt_num_posts->execute([ $user['id'] ]);
-$stats['posts']['value'] = $stmt_num_posts->fetchColumn();
-
-// Stat: Artists
-$sql_artists = '
-	SELECT COUNT(1) AS num_added
-	FROM (SELECT artist_id, MIN(date_occurred) as min_date_occurred FROM edits_artists GROUP BY artist_id) AS grouped_edits
-	INNER JOIN edits_artists AS user_edits
-	ON user_edits.artist_id=grouped_edits.artist_id AND user_edits.date_occurred=grouped_edits.min_date_occurred AND user_edits.user_id=?
-';
-$stmt_artists = $pdo->prepare($sql_artists);
-$stmt_artists->execute([ $user['id'] ]);
-$stats['artists']['value'] = $stmt_artists->fetchColumn();
-
-// Stat: Musicians
-$sql_musicians = '
-	SELECT COUNT(1) AS num_added
-	FROM
-		(SELECT musician_id, MIN(date_occurred) as min_date_occurred FROM edits_musicians GROUP BY musician_id)
-		AS grouped_edits
-	INNER JOIN edits_musicians AS user_edits
-	ON user_edits.musician_id=grouped_edits.musician_id AND user_edits.date_occurred=grouped_edits.min_date_occurred AND user_edits.user_id=?
-';
-$stmt_musicians = $pdo->prepare($sql_musicians);
-$stmt_musicians->execute([ $user['id'] ]);
-$stats['musicians']['value'] = $stmt_musicians->fetchColumn();
-
-// Stat: Releases added
-$sql_releases = '
-	SELECT COUNT(1) AS num_added
-	FROM
-		(SELECT release_id, MIN(date_occurred) as min_date_occurred FROM edits_releases GROUP BY release_id)
-		AS grouped_edits
-	INNER JOIN edits_releases AS user_edits
-	ON user_edits.release_id=grouped_edits.release_id AND user_edits.date_occurred=grouped_edits.min_date_occurred AND user_edits.user_id=?
-';
-$stmt_releases = $pdo->prepare($sql_releases);
-$stmt_releases->execute([ $user['id'] ]);
-$stats['releases']['value'] = $stmt_releases->fetchColumn();
-
-// Stat: Edits
-$sql_db_edits = '
-SELECT COUNT(1) AS num_edits FROM
-	(
-		SELECT id FROM edits_artists WHERE user_id=?
-		UNION ALL
-		SELECT id FROM edits_musicians WHERE user_id=?
-		UNION ALL
-		SELECT id FROM edits_releases WHERE user_id=?
-	) AS edits
-';
-$stmt_db_edits = $pdo->prepare($sql_db_edits);
-$stmt_db_edits->execute([ $user['id'], $user['id'], $user['id'] ]);
-$stats['edits']['value'] = $stmt_db_edits->fetchColumn();*/
 
 // Stat: Collection
 $sql_num_collection = 'SELECT COUNT(1) FROM releases_collections WHERE user_id=?';
@@ -215,142 +126,6 @@ for($i=0; $i<$num_collection_price; $i++) {
 	$tmp_price = preg_replace('/'.'[^0-9]'.'/', '', $tmp_price);
 	$stats['worth']['value'] = $stats['worth']['value'] + (is_numeric($tmp_price) ? $tmp_price : 0);
 }
-
-// Stat: Ratings
-/*$sql_ratings = 'SELECT COUNT(1) FROM releases_ratings WHERE user_id=?';
-$stmt_ratings = $pdo->prepare($sql_ratings);
-$stmt_ratings->execute([ $user['id'] ]);
-$stats['ratings']['value'] = $stmt_ratings->fetchColumn();
-
-// Stat: Tags
-$sql_tags = '
-SELECT COUNT(1) AS num_tags FROM
-	(
-		SELECT id FROM artists_tags WHERE user_id=?
-		UNION ALL
-		SELECT id FROM releases_tags WHERE user_id=?
-	) AS tags
-';
-$stmt_tags = $pdo->prepare($sql_tags);
-$stmt_tags->execute([ $user['id'], $user['id'] ]);
-$stats['tagged']['value'] = $stmt_tags->fetchColumn();*/
-
-// Stats: determine level
-/*$levels = [
-	'default' => [
-		1,
-		5,
-		10,
-		20,
-		30,
-		40,
-		50,
-		100,
-		500,
-		1000
-	],
-	'member_for' => [
-		1,
-		2,
-		3,
-		4,
-		5,
-		6,
-		7,
-		8,
-		9,
-		10
-	],
-	'fan_since' => [
-		$fan_since_level_base + 0,
-		$fan_since_level_base + 1,
-		$fan_since_level_base + 2,
-		$fan_since_level_base + 3,
-		$fan_since_level_base + 4,
-		$fan_since_level_base + 5,
-		$fan_since_level_base + 6,
-		$fan_since_level_base + 7,
-		$fan_since_level_base + 8,
-		$fan_since_level_base + 9,
-	],
-	'worth' => [
-		100,
-		500,
-		1000,
-		5000,
-		10000,
-		20000,
-		50000,
-		100000,
-		500000,
-		1000000,
-	],
-	'oldest' => [
-		0,
-		1,
-		2,
-		3,
-		4,
-		5,
-		6,
-		7,
-		8,
-		9
-	],
-	'newest' => [
-		-9,
-		-8,
-		-7,
-		-6,
-		-5,
-		-4,
-		-3,
-		-2,
-		-1,
-		0
-	],
-];
-
-// Stats: Remove
-if($stats['collection']['value'] == 0) {
-	unset($stats['oldest'], $stats['newest'], $stats['worth']);
-}
-
-// Stats: Overall level
-foreach($stats as $key => $stat) {
-	$tmp_key = $levels[$key] ? $key : 'default';
-
-	foreach($levels[$tmp_key] as $level => $min) {
-		if(is_numeric($stat['value']) && $stat['value'] >= $min) {
-			$stats[$key]['level'] = $level + 1;
-
-			if($level + 1 === 10) {
-				$level_num++;
-			}
-		}
-	}
-}
-if($level_num < 1) {
-	$level_num = ($stats['comments']['value'] || $stats['collection']['value']) ? 1 : 0;
-}
-// Stats: format
-foreach($stats as $key => $stat) {
-	$stats[$key]['value'] = $key != 'fan_since' && $key != 'oldest' ? number_format($stat['value']) : $stat['value'];
-
-	if($key === 'member_for') {
-		$stats[$key]['value'] .= ' years';
-	}
-	elseif($key === 'worth') {
-		$stats[$key]['value'] .= ' yen';
-	}
-	elseif($key === 'oldest') {
-		$stats[$key]['value'] = $current_year - $stat['value'];
-	}
-	elseif($key === 'newest') {
-		$stats[$key]['value'] = $stat['value'] + $current_year;
-	}
-	$stats[$key]['title'] = $stats[$key]['title'] ?: str_replace('_', ' ', $key);
-}*/
 
 // User links
 $sql_next = "
@@ -417,7 +192,9 @@ if(strlen($next_users['rand1'])) {
 					
 					<!-- Current level -->
 					<div class="text level__container">
-						<?php if($_SESSION['username'] === 'inartistic') { ?><h5>Level 9</h5><?php } ?>
+						<h5 class="level__level">
+							Level <span class="level__num"><?= $user_points['meta']['level']; ?></span>
+						</h5>
 						<span class="level__points">
 							<span class="level__point-num"><?= number_format( $user_points['meta']['point_value'] ); ?></span>
 							<?= lang('pt', '点', 'hidden'); ?>
@@ -426,17 +203,15 @@ if(strlen($next_users['rand1'])) {
 					</div>
 					
 					<!-- Next level progress -->
-					<?php if($_SESSION['username'] === 'inartistic') { ?>
-					<div class="text meter__container" style="--progress-percent: 20%;">
+					<div class="text meter__container" style="--progress-percent: <?= $user_points['meta']['next_level_at'] ? min(98, max(2, $user_points['meta']['next_level_progress'])) : 100; ?>%;">
 						<h5>Next level</h5>
 						<div class="meter__current any--weaken-size">
 							<span class="meter__spacer"></span>
-							<span class="meter__current-num"><?= $user_points['meta']['point_value']; ?> pt</span>
+							<span class="meter__current-num"><?= number_format($user_points['meta']['point_value']); ?> pt</span>
 						</div>
 						<div class="meter__bar"></div>
-						<div class="meter__goal any--weaken">1,599</div>
+						<div class="meter__goal any--weaken "><?= $user_points['meta']['next_level_at'] ? number_format($user_points['meta']['next_level_at']) : '✨'; ?></div>
 					</div>
-					<?php } ?>
 					
 				</div>
 				
@@ -461,6 +236,13 @@ if(strlen($next_users['rand1'])) {
 						text-align: center;
 						white-space: nowrap;
 					}
+					.level__level {
+						color: hsl(var(--accent));
+					}
+					.level__num {
+						font-size: 1rem;
+						font-style: italic;
+					}
 					.level__points {
 						color: hsl(var(--attention--secondary));
 					}
@@ -471,7 +253,7 @@ if(strlen($next_users['rand1'])) {
 					
 					/* Next level */
 					.meter__container {
-						--stem-height: 0.75rem;
+						--stem-height: calc(0.75rem + 3px);
 						display: flex;
 						flex-direction: column;
 					}
@@ -485,6 +267,7 @@ if(strlen($next_users['rand1'])) {
 					.meter__current {
 						background-image: linear-gradient(to left, hsl(var(--attention--secondary)) 2px, transparent 0);
 						background-position: left bottom;
+						bottom: -3px;
 						color: hsl(var(--attention--secondary));
 						display: flex;
 						font-weight: bold;
@@ -503,12 +286,14 @@ if(strlen($next_users['rand1'])) {
 						background-repeat: no-repeat;
 						border-radius: 0.25rem;
 						height: 0.5rem;
+						z-index: 1;
 					}
 					.meter__goal {
 						background-image: linear-gradient(to left, hsl(var(--background--bold)) 2px, transparent 0);
-						background-position: right 5px top;
+						background-position: right top;
 						padding-top: var(--stem-height);
 						text-align: right;
+						top: -3px;
 					}
 					.meter__goal::after {
 						content: " pt";
@@ -546,77 +331,77 @@ if(strlen($next_users['rand1'])) {
 				
 				<div class="stats__container">
 					<ul class="data__container">
-
+						
 						<li class="data__item" data-emoji="💬">
 							<h5>
 								Comments
 							</h5>
-							<?= $user_points['added-comment']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['added-comment']['num_points']) ?: 0; ?>
 						</li>
-
+						
 						<li class="data__item" data-emoji="👍">
 							<h5>
 								Likes received
 							</h5>
-							<?= $user_points['comment-liked']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['comment-liked']['num_points']) ?: 0; ?>
 						</li>
-
+						
 						<li class="data__item" data-emoji="🤝">
 							<h5>
 								Likes given
 							</h5>
-							<?= $user_points['liked-comment']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['liked-comment']['num_points']) ?: 0; ?>
 						</li>
-
+						
 						<li class="data__item" data-emoji="✍🏻">
 							<h5>
 								Posts added
 							</h5>
-							<?= $user_points['added-blog']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['added-blog']['num_points']) ?: 0; ?>
 						</li>
-
+						
 						<li class="data__item" data-emoji="🎤">
 							<h5>
 								Artists added
 							</h5>
-							<?= $user_points['added-artist']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['added-artist']['num_points']) ?: 0; ?>
 						</li>
-
+						
 						<li class="data__item" data-emoji="💿">
 							<h5>
 								Releases added
 							</h5>
-							<?= $user_points['added-release']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['added-release']['num_points']) ?: 0; ?>
 						</li>
-
+						
 						<li class="data__item" data-emoji="📼">
 							<h5>
 								Other additions
 							</h5>
-							<?= $user_points['added-release']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['added-other']['num_points']) ?: 0; ?>
 						</li>
-
+						
 						<li class="data__item" data-emoji="📝">
 							<h5>
 								Database edits
 							</h5>
-							<?= $user_points['edits']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['edits']['num_points']) ?: 0; ?>
 						</li>
-
+						
 						<li class="data__item" data-emoji="⭐">
 							<h5>
 								Items rated
 							</h5>
-							<?= $user_points['rated']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['rated']['num_points']) ?: 0; ?>
 						</li>
-
+						
 						<li class="data__item" data-emoji="🏷️">
 							<h5>
 								Items tagged
 							</h5>
-							<?= $user_points['tagged']['num_points'] ?: 0; ?>
+							<?= number_format($user_points['tagged']['num_points']) ?: 0; ?>
 						</li>
-
+						
 					</ul>
 				</div>
 				
