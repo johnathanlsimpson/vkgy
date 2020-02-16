@@ -67,15 +67,17 @@ RewriteRule  ^(.*)$             https://vk.gy/%{REQUEST_URI} [R=permanent,L]
 #RewriteCond  %{SERVER_NAME}  (occult-proposal.net|occult-proposal.vk.gy)$
 #RewriteRule  ^(.*)$          /occult-proposal.net/$1
 
-RewriteRule  ^accounts(.*)$                 /account$1 [R=301,L]
-RewriteRule  ^account/edit-avatar/?$        /?account/&page=edit-avatar
-RewriteRule  ^user(?:/(.*))?$               /users/$1 [R=301,L]
-RewriteRule  ^users/?$                      /?account/&page=users
-RewriteRule  ^users/([\w-\ \%\.]+)/?$       /?account/&username=$1
-RewriteRule  ^users/([\w-\ \%\.]+)/\&(.*)$  /account/page-download-collection.php?username=$1&$2
-RewriteRule  ^sign-out/?(.*)$               /?account/&action=sign-out$1
-RewriteRule  ^sig.jpg$                      /account/page-sig.php
-RewriteRule  ^av.jpg$                       /account/page-av.php
+RewriteRule  ^accounts(.*)$                     /account$1 [R=301,L]
+RewriteRule  ^account/?$                        /?account/&page=account
+RewriteRule  ^account/edit-avatar/?$            /?account/&page=edit-avatar
+RewriteRule  ^user(?:/(.*))?$                   /users/$1 [R=301,L]
+RewriteRule  ^users/?$                          /?account/&page=users
+RewriteRule  ^users/([\w-\ \%\.]+)/?$           /?account/&username=$1&page=user
+RewriteRule  ^users/([\w-\ \%\.]+)/activity.*$  /?account/&username=$1&page=activity
+RewriteRule  ^users/([\w-\ \%\.]+)/\&(.*)$      /account/page-download-collection.php?username=$1&$2
+RewriteRule  ^sign-out/?(.*)$                   /?account/&action=sign-out$1
+RewriteRule  ^sig.jpg$                          /account/page-sig.php
+RewriteRule  ^av.jpg$                           /account/page-av.php
 
 RewriteRule  ^artists/add/?$                                                     /?artists/&action=add
 RewriteRule  ^artists/([-\w]+)/?$                                                /?artists/&artist=$1

@@ -346,7 +346,7 @@
 						}
 						
 						
-						$blogs[$row_key]["comments"] = $this->access_comment->access_comment(["id" => $row["id"], 'user_id' => $_SESSION['userID'], "type" => "blog", "get" => "all"]);
+						$blogs[$row_key]["comments"] = $this->access_comment->access_comment(["id" => $row["id"], 'get_user_likes' => true, "type" => "blog", "get" => "all"]);
 					}
 				}
 			}

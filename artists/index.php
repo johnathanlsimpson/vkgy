@@ -138,7 +138,7 @@
 		
 		// Get comments
 		$access_comment = new access_comment($pdo);
-		$artist["comments"] = $access_comment->access_comment(["id" => $artist["id"], 'user_id' => $_SESSION['userID'], "type" => "artist", "get" => "all"]);
+		$artist["comments"] = $access_comment->access_comment(["id" => $artist["id"], 'get_user_likes' => true, "type" => "artist", "get" => "all"]);
 		
 		// Get prev/next artist
 		$sql_next = "

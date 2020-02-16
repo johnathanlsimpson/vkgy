@@ -44,7 +44,7 @@
 					$sql_select = ["COUNT(comments.id) AS count"];
 					break;
 			}
-			if(is_numeric($args['id']) && is_numeric($args['user_id'])) {
+			if(is_numeric($args['id']) && $args['get_user_likes']) {
 				$sql_select[] = 'comments_likes.user_id AS liked_by_user_id';
 			}
 			
@@ -53,9 +53,9 @@
 			if($args['get'] === 'all') {
 				$sql_from[] = 'LEFT JOIN (SELECT comment_id, COUNT(*) AS num_likes FROM comments_likes GROUP BY comment_id) num_likes ON num_likes.comment_id=comments.id';
 			}
-			if(is_numeric($args['id']) && is_numeric($args['user_id'])) {
+			if(is_numeric($args['id']) && $args['get_user_likes']) {
 				$sql_from[] = 'LEFT JOIN comments_likes ON comments_likes.comment_id=comments.id AND comments_likes.user_id=?';
-				$sql_values[] = $args['user_id'];
+				$sql_values[] = $_SESSION['user_id'];
 			}
 			
 			// WHERE
@@ -81,6 +81,10 @@
 			}
 			if($args['limit_threads']) {
 				$sql_where[] = 'comments.thread_id IS NULL';
+			}
+			if(is_numeric($args['user_id'])) {
+				$sql_where[] = 'comments.user_id=?';
+				$sql_values[] = $args['user_id'];
 			}
 			
 			// GROUP
