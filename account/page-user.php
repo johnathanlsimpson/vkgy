@@ -465,14 +465,14 @@ if(strlen($next_users['rand1'])) {
 					<h5>
 						Items owned
 					</h5>
-					<?= $stats['collection']['value'] ?: 0; ?>
+					<?= number_format($stats['collection']['value']) ?: 0; ?>
 				</li>
 				
 				<li class="data__item" data-emoji="💸">
 					<h5>
 						Estimated worth
 					</h5>
-					<?= ($stats['worth']['value'] ? $stats['worth']['value'].sanitize('￥') : '?'); ?>
+					<?= ($stats['worth']['value'] ? number_format($stats['worth']['value']).sanitize('￥') : '?'); ?>
 				</li>
 				
 				<li class="data__item" data-emoji="👴">
