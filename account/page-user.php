@@ -339,23 +339,23 @@ if(strlen($next_users['rand1'])) {
 							<?= number_format($user_points['added-comment']['num_points']) ?: 0; ?>
 						</li>
 						
-						<li class="data__item" data-emoji="👍">
+						<li class="data__item" data-emoji="🥰">
 							<h5>
 								Likes received
 							</h5>
 							<?= number_format($user_points['comment-liked']['num_points']) ?: 0; ?>
 						</li>
 						
-						<li class="data__item" data-emoji="🤝">
+						<li class="data__item" data-emoji="👍">
 							<h5>
 								Likes given
 							</h5>
 							<?= number_format($user_points['liked-comment']['num_points']) ?: 0; ?>
 						</li>
 						
-						<li class="data__item" data-emoji="✍🏻">
+						<li class="data__item" data-emoji="📰">
 							<h5>
-								Posts added
+								News added
 							</h5>
 							<?= number_format($user_points['added-blog']['num_points']) ?: 0; ?>
 						</li>
@@ -381,7 +381,7 @@ if(strlen($next_users['rand1'])) {
 							<?= number_format($user_points['added-other']['num_points']) ?: 0; ?>
 						</li>
 						
-						<li class="data__item" data-emoji="📝">
+						<li class="data__item" data-emoji="📊">
 							<h5>
 								Database edits
 							</h5>
@@ -465,14 +465,14 @@ if(strlen($next_users['rand1'])) {
 					<h5>
 						Items owned
 					</h5>
-					<?= $stats['collection']['value'] ?: 0; ?>
+					<?= number_format($stats['collection']['value']) ?: 0; ?>
 				</li>
 				
 				<li class="data__item" data-emoji="💸">
 					<h5>
 						Estimated worth
 					</h5>
-					<?= ($stats['worth']['value'] ? $stats['worth']['value'].sanitize('￥') : '?'); ?>
+					<?= ($stats['worth']['value'] ? number_format($stats['worth']['value']).sanitize('￥') : '?'); ?>
 				</li>
 				
 				<li class="data__item" data-emoji="👴">
