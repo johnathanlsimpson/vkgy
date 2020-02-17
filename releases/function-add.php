@@ -176,6 +176,12 @@
 							if($stmt->execute($sql_values)) {
 								$release["id"] = is_numeric($release["id"]) ? $release["id"] : $pdo->lastInsertId();
 								
+								// Update edits table
+								$sql_edit_history = 'INSERT INTO edits_releases (release_id, user_id, content) VALUES (?, ?, ?)';
+								$stmt_edit_history = $pdo->prepare($sql_edit_history);
+								if($stmt_edit_history->execute([ $release_id, $_SESSION['user_id'], 'created' ])) {
+								}
+								
 								// Update medium/format/venue/pressing type
 								// For venue, set a default of 'available everywhere'
 								if(!is_array($_POST['venue_limitation']) || empty($_POST['venue_limitation'])) {
