@@ -127,6 +127,10 @@ if(is_array($_POST) && !empty($_POST)) {
 					$output['url'] = '/lives/&id='.$id;
 					$output['edit-url'] = '/lives/'.$id.'/edit/';
 					$output['status'] = 'success';
+					
+					// Award point
+					$access_points = new access_points($pdo);
+					$access_points->award_points([ 'point_type' => 'edited-live', 'allow_multiple' => false, 'item_id' => $id ]);
 				}
 				else {
 					$output['result'][] = 'Couldn\'t update live.';

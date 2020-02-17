@@ -41,6 +41,24 @@ if(is_numeric($_POST['comment_id'])) {
 			if($stmt_add->execute([ $comment_id, ($user_type === 'user' ? $user_id : $anonymous_id) ])) {
 				$output['status'] = 'success';
 				$output['result'] = 'Comment liked.';
+				
+				// Get user who made liked comment
+				$sql_op = 'SELECT user_id FROM comments WHERE id=? LIMIT 1';
+				$stmt_op = $pdo->prepare($sql_op);
+				$stmt_op->execute([ $comment_id ]);
+				$op_id = $stmt_op->fetchColumn();
+				
+				// Award point
+				$access_points = new access_points($pdo);
+				if(is_numeric($_SESSION['user_id']) && $op_id != $_SESSION['user_id']) {
+					
+					// Award point to person who liked comment
+					$access_points->award_points([ 'point_type' => 'liked-comment', 'allow_multiple' => false, 'item_id' => $comment_id ]);
+					
+					// Award point to person who received like
+					$access_points->award_points([ 'point_type' => 'comment-liked', 'allow_multiple' => false, 'item_id' => $comment_id, 'user_id' => $op_id ]);
+					
+				}
 			}
 		}
 		

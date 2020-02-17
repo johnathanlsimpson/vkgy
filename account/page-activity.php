@@ -1,3 +1,14 @@
+<?php
+
+	$page_header = lang(
+		$user['username'].'\''.(substr($user['username'], -1) == 's' ? null : 's').' activity',
+		$user['username'].'の活動',
+		'div'
+	);
+	
+	include('head-user.php');
+?>
+
 <div class="col c1">
 	<div>
 		<?php include('partial-card.php'); ?>

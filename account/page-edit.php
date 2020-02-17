@@ -1,4 +1,8 @@
 <?php
+
+	$user['username'] = $_SESSION['username'];
+	include('head-user.php');
+	
 	script([
 		"/scripts/external/script-selectize.js",
 		"/scripts/script-initSelectize.js",

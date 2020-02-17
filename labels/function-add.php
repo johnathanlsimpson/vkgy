@@ -41,6 +41,10 @@
 							
 							$output["status"] = "success";
 							$output["result"][] = '<a class="symbol__company" href="/labels/'.$friendly.'/">'.($romaji ?: $name).'</a> added.';
+							
+							// Award point
+							$access_points = new access_points($pdo);
+							$access_points->award_points([ 'point_type' => 'added-label' ]);
 						}
 						else {
 							$output["status"] = "error";

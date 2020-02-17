@@ -95,6 +95,10 @@
 									$output[$item_type.'_id'] = $item_id;
 									//$output['description'] = $default_description;
 									$output['image_status'] = 'new';
+									
+									// Award point
+									$access_points = new access_points($pdo);
+									$access_points->award_points([ 'point_type' => 'added-image' ]);
 								}
 								else {
 									$output['result'][] = 'Couldn\'t rename file.';
