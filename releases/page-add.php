@@ -708,49 +708,6 @@
 			</div>
 		</div>
 		
-		<?php
-			if(is_array($release["prev_next"]) && !empty($release["prev_next"])) {
-				?>
-					<div class="col c2 any--margin">
-						<div class="release__prev-next">
-							<?php
-								foreach($release["prev_next"] as $link) {
-									if($link["type"] === "prev") {
-										?>
-											<h5>
-												Previous release
-											</h5>
-											<a href="<?php echo $link["url"].'edit/'; ?>">
-												<span class="symbol__previous"></span>
-												<?php echo $link["quick_name"]; ?>
-											</a>
-										<?php
-									}
-								}
-							?>
-						</div>
-						<div style="text-align: right;">
-							<?php
-								foreach($release["prev_next"] as $link) {
-									if($link["type"] === "next") {
-										?>
-											<h5>
-												Next release
-											</h5>
-											<a href="<?php echo $link["url"].'edit/'; ?>">
-												<?php echo $link["quick_name"]; ?>
-												<span class="symbol__next"></span>
-											</a>
-										<?php
-									}
-								}
-							?>
-						</div>
-					</div>
-				<?php
-			}
-		?>
-		
 		<div class="text text--docked">
 			<div class="any--flex input__row" data-role="submit-container">
 				<div class="input__group any--flex-grow">

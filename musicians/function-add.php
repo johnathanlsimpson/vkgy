@@ -34,6 +34,12 @@
 						if($stmt_musician->execute([$name, $romaji, $friendly, $position, $history])) {
 							$musician_id = $pdo->lastInsertId();
 							
+							// Update edits table
+							$sql_edit_history = 'INSERT INTO edits_musicians (musician_id, user_id, content) VALUES (?, ?, ?)';
+							$stmt_edit_history = $pdo->prepare($sql_edit_history);
+							if($stmt_edit_history->execute([ $musician_id, $_SESSION['user_id'], 'created' ])) {
+							}
+							
 							$output["result"]["artists"][] = '<a class="artist" href="/musicians/'.$musician_id.'/'.$friendly.'/">'.($romaji ?: $name).'</a>';
 							
 							if(is_array($history_lines)) {

@@ -21,7 +21,7 @@ breadcrumbs([
 $access_image = $access_image ?: new access_image($pdo);
 
 /* Get VIP news */
-if($is_vip) {
+if($_SESSION['is_vip']) {
 	$sql_vip = "SELECT vip.title, vip.friendly, vip.date_occurred, vip_views.id AS is_viewed FROM vip LEFT JOIN vip_views ON vip_views.post_id=vip.id AND vip_views.user_id=? ORDER BY vip.date_occurred DESC LIMIT 1";
 	$stmt_vip = $pdo->prepare($sql_vip);
 	$stmt_vip->execute([ $_SESSION["userID"] ]);
@@ -72,7 +72,7 @@ foreach($comments as $key => $comment) {
 	$content = $markdown_parser->parse_markdown($content);
 	$content = str_replace(["<p>", "</p>"], "", $content);
 	$content = trim($content);
-	$comments[$key]["content"] = ($comment["item_type"] === "vip" && !$is_vip ? '<span class="symbol__error"></span> Only VIP members can view this content.' : $content);
+	$comments[$key]["content"] = ($comment["item_type"] === 'vip' && !$_SESSION['is_vip'] ? '<span class="symbol__error"></span> Only VIP members can view this content.' : $content);
 
 	unset($sql_comment);
 }

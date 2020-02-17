@@ -4,8 +4,38 @@
 		$stmt_view = $pdo->prepare($sql_view);
 		
 		if($stmt_view->execute([ $entry["id"], $_SESSION["userID"] ])) {
-			
 		}
+		
+		// Previous entry
+		$sql_prev = "SELECT friendly, title FROM vip WHERE id < ? ORDER BY id DESC LIMIT 1";
+		$stmt_prev = $pdo->prepare($sql_prev);
+		$stmt_prev->execute([$entry["id"]]);
+		$prev = $stmt_prev->fetch();
+		if(is_array($prev) && !empty($prev)) {
+			subnav([
+				[
+					'text' => $prev['title'],
+					'url' => '/vip/'.$prev['friendly'].'/',
+					'position' => 'left',
+				],
+			], 'directional');
+		}
+		
+		// Next entry
+		$sql_next = "SELECT friendly, title FROM vip WHERE id > ? ORDER BY id ASC LIMIT 1";
+		$stmt_next = $pdo->prepare($sql_next);
+		$stmt_next->execute([$entry["id"]]);
+		$next = $stmt_next->fetch();
+		if(is_array($next) && !empty($next)) {
+			subnav([
+				[
+					'text' => $next['title'],
+					'url' => '/vip/'.$next['friendly'].'/',
+					'position' => 'right',
+				],
+			], 'directional');
+		}
+		
 		?>
 			<div class="col c1">
 				<div>
@@ -71,43 +101,6 @@
 							}
 						?>
 					</div>
-				</div>
-			</div>
-			
-			<div class="col c2 any--margin">
-				<div>
-					<?php
-						$sql_prev = "SELECT friendly, title FROM vip WHERE id < ? ORDER BY id DESC LIMIT 1";
-						$stmt_prev = $pdo->prepare($sql_prev);
-						$stmt_prev->execute([$entry["id"]]);
-						$prev = $stmt_prev->fetch();
-						
-						if(is_array($prev) && !empty($prev)) {
-							?>
-								<a href="/vip/<?php echo $prev["friendly"]; ?>/">
-									<span class="symbol__previous"></span>
-									<?php echo $prev["title"]; ?>
-								</a>
-							<?php
-						}
-					?>
-				</div>
-				<div class="any--align-right">
-					<?php
-						$sql_next = "SELECT friendly, title FROM vip WHERE id > ? ORDER BY id ASC LIMIT 1";
-						$stmt_next = $pdo->prepare($sql_next);
-						$stmt_next->execute([$entry["id"]]);
-						$next = $stmt_next->fetch();
-						
-						if(is_array($next) && !empty($next)) {
-							?>
-								<a class="any--align-right" href="/vip/<?php echo $next["friendly"]; ?>/">
-									<?php echo $next["title"]; ?>
-									<span class="symbol__next"></span>
-								</a>
-							<?php
-						}
-					?>
 				</div>
 			</div>
 		<?php
