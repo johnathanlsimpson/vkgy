@@ -44,16 +44,18 @@ if(is_array($rslt_queued) && !empty($rslt_queued)) {
 				}
 			}
 			
-			// Immediately post to socials
-			if(strlen($entry['title']) && strlen($entry['friendly'])) {
-				$social_post = $access_social_media->build_post([
-					'title' => $entry['title'],
-					'url' => 'https://vk.gy/blog/'.$entry['friendly'].'/',
-					'content_ja' => $entry['content_ja'],
-					'id' => $entry['id'],
-					'twitter_authors' => $twitter_authors
-				], 'blog_post');
-				$access_social_media->post_to_social($social_post, 'both');
+			// Immediately post to socials, if not just translated ver
+			if( strpos($entry['title'], '[&#26085;&#26412;&#35486;]') === false ) {
+				if(strlen($entry['title']) && strlen($entry['friendly'])) {
+					$social_post = $access_social_media->build_post([
+						'title' => $entry['title'],
+						'url' => 'https://vk.gy/blog/'.$entry['friendly'].'/',
+						'content_ja' => $entry['content_ja'],
+						'id' => $entry['id'],
+						'twitter_authors' => $twitter_authors
+					], 'blog_post');
+					$access_social_media->post_to_social($social_post, 'both');
+				}
 			}
 		}
 	}
