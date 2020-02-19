@@ -35,6 +35,39 @@
 		
 		
 		// ======================================================
+		// Clean artist websites
+		// ======================================================
+		function clean_websites($website_urls) {
+			
+			// Make sure we're working with array
+			$website_urls = is_array($website_urls) ? $website_urls : explode("\n", $website_urls);
+			$num_new_websites = count($website_urls);
+			
+			// Loop through new URLs, trim, add http, remove if blank
+			if($num_new_websites) {
+				for($i=0; $i<$num_new_websites; $i++) {
+					$website_urls[$i] = trim($website_urls[$i]);
+					
+					if(!$website_urls[$i]) {
+						unset($website_urls[$i]);
+					}
+					else {
+						$website_urls[$i] = preg_replace('/'.'^(?!http)'.'/m', 'http://', $website_urls[$i]);
+					}
+				}
+			}
+			
+			// If still have URLs, implode for output
+			if(is_array($website_urls) && !empty($website_urls)) {
+				$output = implode("\n", $website_urls);
+			}
+			
+			return $output ?: null;
+		}
+		
+		
+		
+		// ======================================================
 		// Add artist website
 		// ======================================================
 		function add_website($artist_id, $website_urls) {
@@ -42,10 +75,9 @@
 			// Artist ID must be provided
 			if(is_numeric($artist_id)) {
 				
-				// If string (one URL) given, convert to array
-				if(!is_array($website_urls) && strlen($website_urls)) {
-					$website_urls = [ $website_urls ];
-				}
+				// Make sure we're working with array
+				$website_urls = is_array($website_urls) ? $website_urls : explode("\n", $website_urls);
+				$website_urls = array_filter($website_urls);
 				
 				// If new URLs provided
 				if(is_array($website_urls) && !empty($website_urls)) {
@@ -59,7 +91,6 @@
 					$rslt_extant = array_filter($rslt_extant);
 					
 					// Loop through new URLs, check if in extant list
-					// Want to add URL filtering functions here too
 					$num_new_websites = count($website_urls);
 					for($i=0; $i<$num_new_websites; $i++) {
 						if(in_array($website_urls, $rslt_extant)) {
