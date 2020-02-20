@@ -10,6 +10,12 @@
 	]);
 ?>
 
+<?php
+if($_SESSION['username'] === 'inartistic') {
+	$access_points = new access_points($pdo);
+}
+?>
+
 <div class="col c4-ABBC section__main">
 	<div class="main__left">
 		<div class="main__aod">
@@ -79,6 +85,29 @@
 				?>
 			</ol>
 		</div>
+		
+		<div class="main__ranking">
+			<h3>
+				<div class="h5">
+					<?= date('n/j', strtotime("-2 weeks sunday", time())).'~'.date('n/j', strtotime("-1 weeks sunday", time())); ?>
+				</div>
+				<?php echo lang('User points ranking', 'ユーザーランキング', 'div'); ?>
+			</h3>
+			<ol class="text text--outlined text--compact ul--compact">
+				<?php
+					foreach($point_ranking as $ranking_num => $user_points) {
+						?>
+							<li class="ranking__item">
+								<span class="ranking__number symbol__user"></span>
+								<span class="any__note" style="float:right;"><?= $user_points['points_value'].' '.lang('pt', '点', 'hidden'); ?></span>
+								<a href="<?= '/users/'.$user_points['username'].'/'; ?>"><?= $user_points['username']; ?></a>
+								<span class="any--weaken" style=""><?= 'LV '.$user_points['level']; ?></span>
+							</li>
+						<?php
+					}
+				?>
+			</ol>
+		</div>
 	</div>
 
 	<div class="main__middle">
@@ -86,7 +115,7 @@
 			<h2>
 				<?php echo lang('Visual kei news', 'ビジュアル系ニュース', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
 			</h2>
-
+			
 			<div class="text any--flex news__container">
 				<div class="news__main lazy any__obscure" data-src="<?php echo !empty($news[0]['image']) ? $news[0]['image']['url'] : null; ?>">
 					<h2>
@@ -101,7 +130,7 @@
 					</div>
 					<a class="any--weaken-color a--padded a--outlined" href="/blog/<?php echo $news[0]["friendly"]; ?>/"><?php echo $news[0]["comment_text"]; ?></a>
 				</div>
-
+				
 				<ul class="news__additional">
 					<?php
 						for($i=1; $i<=5; $i++) {
@@ -115,29 +144,115 @@
 						}
 					?>
 				</ul>
-
-				<div class="any__obscure news__entry news__vip any--flex">
+				
+				<div class="news__features any--flex" style="padding-bottom:0;">
 					<?php
-						if($_SESSION['is_vip']) {
-							$sql_vip = 'SELECT vip.title, vip.friendly, vip_views.user_id AS is_viewed FROM vip LEFT JOIN vip_views ON (vip_views.post_id=vip.id AND vip_views.user_id=?) ORDER BY date_occurred DESC LIMIT 1';
-							$stmt_vip = $pdo->prepare($sql_vip);
-							$stmt_vip->execute([ $_SESSION['user_id'] ]);
-							$rslt_vip = $stmt_vip->fetch();
-							
+						$featured_articles = $access_blog->access_blog([ 'tag' => 'feature', 'get' => 'basics', 'limit' => 4 ]);
+						foreach($featured_articles as $article) {
+							$image = '/images/'.$article['image_id'].'-'.$article['friendly'].'.medium.';
+							$image = file_exists('../images/image_files/'.$article['image_id'].'.jpg') ? $image.'jpg' : $image.'png';
 							?>
-								<p>
-									<a class="symbol__vip" href="<?php echo '/vip/'.$rslt_vip["friendly"].'/'; ?>">[VIP] <?php echo $rslt_vip["title"]; ?></a>
-									<?php echo !$rslt_vip["is_viewed"] ? '<span class="news__new any--weaken-size">NEW</span>' : null; ?>
-								</p>
-								<a class="a--padded a--outlined" href="/vip/" style="margin-left: auto;">VIP section</a>
+								<a class="news__entry news__feature lazy" data-src="<?= $image; ?>" href="<?= '/blog/'.$article['friendly'].'/'; ?>">
+									<div>
+										<?= $article['title']; ?>
+									</div>
+								</a>
 							<?php
 						}
-						else {
-							?>
-								<span class="symbol__vip"><?php echo lang('This content is <a href="https://patreon.com/vkgy/" target="_blank">VIP</a>-limited.', 'このコンテンツは<a href="https://patreon.com/vkgy/" target="_blank">VIP</a>限定です。', ['secondary_class' => 'any--hidden']); ?></span>
-								<a class="symbol__next" href="https://www.patreon.com/vkgy/" target="_blank" style="margin-left: auto; white-space: nowrap;"><?php echo lang('Support vk.gy', 'パトレオン', ['secondary_class' => 'any--hidden']); ?></a>
-							<?php
+					?>
+				</div>
+				
+				<style>
+					.news__features {
+						width: 100%;
+					}
+					.news__feature {
+						/*box-shadow: 0 0 2rem hsl(var(--background--bold));*/
+						flex: 1;
+					}
+					/*.news__feature:nth-of-type(1) div::before {
+						content: "✨";
+						color: hsl(var(--text));
+						font-size: 1.5rem;
+						float: left;
+					}*/
+					.news__feature:nth-of-type(3),
+					.news__feature:nth-of-type(4) {
+						display: none;
+					}
+					@media(min-width: 700px) {
+						.news__feature:nth-of-type(3) {
+							display: block;
 						}
+					}
+					@media(min-width: 1400px) {
+						.news__feature:nth-of-type(4) {
+							display: block;
+						}
+					}
+					.news__feature:not(:hover) {
+						color: transparent;
+					}
+					.news__feature:hover {
+						opacity: 1;
+						z-index: 2;
+					}
+					.news__feature::after {
+						content: "";
+						display: block;
+						padding-top: 52%;
+						width: 1px;
+					}
+					.news__feature div {
+						background: linear-gradient(to right, hsla(var(--background), 0.75), hsla(var(--background), 0) 2rem);
+						bottom: 0;
+						left: 0;
+						overflow: hidden;
+						padding: 1rem;
+						position: absolute;
+						right: 0;
+						top: 0;
+					}
+					.news__feature:hover div {
+						background: hsla(var(--background), 0.9);
+					}
+				</style>
+				
+				<div class="any__obscure news__entry news__vip any--flex">
+					<div>
+						<h5>VIP-limited update</h5>
+						<?php
+							if($_SESSION['is_vip']) {
+								$sql_vip = 'SELECT vip.title, vip.friendly, vip_views.user_id AS is_viewed FROM vip LEFT JOIN vip_views ON (vip_views.post_id=vip.id AND vip_views.user_id=?) ORDER BY date_occurred DESC LIMIT 1';
+								$stmt_vip = $pdo->prepare($sql_vip);
+								$stmt_vip->execute([ $_SESSION['user_id'] ]);
+								$rslt_vip = $stmt_vip->fetch();
+								
+								?>
+									<p>
+										<a class="symbol__vip" href="<?php echo '/vip/'.$rslt_vip["friendly"].'/'; ?>">[VIP] <?php echo $rslt_vip["title"]; ?></a>
+										<?php echo !$rslt_vip["is_viewed"] ? '<span class="news__new any--weaken-size">NEW</span>' : null; ?>
+									</p>
+								<?php
+							}
+							else {
+								?>
+									<span class="symbol__vip"><?php echo lang('This content is <a href="https://patreon.com/vkgy/" target="_blank">VIP-limited</a>.', 'このコンテンツは<a href="https://patreon.com/vkgy/" target="_blank">VIP限定</a>です。', ['secondary_class' => 'any--hidden']); ?></span>
+								<?php
+							}
+						?>
+					</div>
+					<?php
+							if($_SESSION['is_vip']) {
+								?>
+									<a class="a--padded a--outlined" href="/vip/" style="margin-left: auto;">VIP section</a>
+								<?php
+							}
+							else {
+								?>
+									<a class="a--padded a--outlined" href="https://www.patreon.com/vkgy/" target="_blank" style="margin-left: auto; white-space: nowrap;"><?php echo lang('Support us', 'パトレオン', ['secondary_class' => 'any--hidden']); ?></a>
+								<?php
+							}
 					?>
 				</div>
 			</div>

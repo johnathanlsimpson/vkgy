@@ -100,7 +100,7 @@
 								$this->access_artist = new access_artist($this->pdo);
 							}
 							
-							$this->access_artist->add_website($artist_id, 'youtube.com/channel/'.$video_data['channel_id']);
+							$this->access_artist->add_website($artist_id, 'https://youtube.com/channel/'.$video_data['channel_id']);
 						}
 						
 						$values_video = [

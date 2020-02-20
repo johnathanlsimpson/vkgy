@@ -39,6 +39,15 @@ class access_points {
 				$select[] = 'users_points.point_type';
 				$select[] = 'MAX(users_points.date_occurred) AS date_occurred';
 				break;
+			case 'ranking':
+				$select[] = 'SUM(users_points.point_value) AS points_value';
+				$select[] = 'users_points.user_id';
+				$select[] = 'users.username';
+				break;
+			case 'level':
+				$select[] = 'SUM(users_points.point_value) AS points_value';
+				$select[] = 'users_points.user_id';
+				break;
 		}
 		
 		// From
@@ -49,67 +58,149 @@ class access_points {
 				$from = 'users_points';
 		}
 		
+		// Join
+		switch(true) {
+			case $args['get'] === 'ranking':
+				$join[] = 'LEFT JOIN users ON users.id=users_points.user_id';
+				break;
+		}
+		
 		// Where
 		switch(true) {
 			case is_numeric($args['user_id']):
 				$where[] = 'users_points.user_id=?';
 				$values[] = $args['user_id'];
 				break;
+				
+			case is_array($args['user_ids']) && !empty($args['user_ids']):
+				$where[] = substr( str_repeat( 'users_points.user_id=? OR ', count($args['user_ids']) ), 0, -4 );
+				foreach($args['user_ids'] as $user_id) { $values[] = $user_id; }
+				break;
+				
+			case preg_match('/'.'^\d{4}-\d{2}-\d{2}$'.'/', $args['start_date']) && preg_match('/'.'^\d{4}-\d{2}-\d{2}$'.'/', $args['end_date']):
+				$where[] = 'users_points.date_occurred>=?';
+				$where[] = 'users_points.date_occurred<=?';
+				$values[] = $args['start_date'];
+				$values[] = $args['end_date'];
+				break;
 		}
 		
 		// Group
 		switch(true) {
-			case $args['get'] === 'basics':
+			case is_numeric($args['user_id']):
 				$group_by[] = 'users_points.point_type';
+				break;
+				
+			default:
+				$group_by[] = 'users_points.user_id';
+				break;
+		}
+		
+		// Order
+		switch(true) {
+			case strlen($args['order_by']):
+				$order_by[] = sanitize( $args['order_by'] );
+				break;
+			case $args['get'] === 'ranking':
+				$order_by[] = 'points_value DESC';
 				break;
 		}
 		
 		// Query
-		$sql_access = 'SELECT '.implode(', ', $select).' FROM '.$from.' WHERE '.implode(' AND ', $where).($group_by ? ' GROUP BY '.implode(', ', $group_by) : null);
+		$sql_access =
+			'SELECT '.implode(', ', $select).' '.
+			'FROM '.$from.' '.
+			($join ? ' '.implode(', ', $join) : null).' '.
+			($where ? 'WHERE '.implode(' AND ', $where) : null).' '.
+			($group_by ?      'GROUP BY '.implode(', ', $group_by) : null).' '.
+			($order_by ?      'ORDER BY '.implode(', ', $order_by) : null).' '.
+			($args['limit'] ? 'LIMIT '.$args['limit'] : null);
 		$stmt_access = $this->pdo->prepare($sql_access);
 		$stmt_access->execute( $values );
 		$points = $stmt_access->fetchAll();
 		$num_points = count($points);
 		
-		// Additional data: get total count
-		$meta_array = [ 'points_value' => 0, 'point_type' => 'meta' ];
-		for($i=0; $i<$num_points; $i++) {
-			$meta_array['point_value'] += $points[$i]['points_value'];
-			$meta_array['date_occurred'] = $meta_array['date_occurred'] > $points[$i]['date_occurred'] ? $meta_array['date_occurred'] : $points[$i]['date_occurred'];
-		}
-		
-		// Additional data: get user level
-		foreach($this->point_levels as $level => $minimum) {
-			if($meta_array['point_value'] >= $minimum) {
-				$meta_array['level'] = $level;
+		// Additional data: level
+		if($args['get'] === 'level') {
+			for($i=0; $i<$num_points; $i++) {
+				foreach($this->point_levels as $level => $minimum) {
+					if($points[$i]['points_value'] >= $minimum) {
+						$points[$i]['level'] = $level;
+					}
+				}
 			}
 		}
 		
-		// Additional data: get next level req
-		if( $meta_array['level'] < end(array_keys($this->point_levels)) ) {
-			$meta_array['next_level_at'] = $this->point_levels[ $meta_array['level'] + 1 ];
-			$meta_array['next_level_progress'] = ( $meta_array['point_value'] / $meta_array['next_level_at'] ) * 100;
+		// Additional data: level
+		if($args['get'] === 'ranking') {
+			for($i=0; $i<$num_points; $i++) {
+				$user_ids[] = $points[$i]['user_id'];
+			}
+			
+			$user_levels = $this->access_points([ 'user_ids' => $user_ids, 'get' => 'level', 'associative' => true ]);
+			
+			for($i=0; $i<$num_points; $i++) {
+				$points[$i]['level'] = $user_levels[$points[$i]['user_id']]['level'];
+			}
+		}
+		
+		// Additional data: meta values
+		if(is_numeric($args['user_id'])) {
+			
+			// Additional data: total num points
+			$meta_array = [ 'points_value' => 0, 'point_type' => 'meta' ];
+			for($i=0; $i<$num_points; $i++) {
+				$meta_array['point_value'] += $points[$i]['points_value'];
+				$meta_array['date_occurred'] = $meta_array['date_occurred'] > $points[$i]['date_occurred'] ? $meta_array['date_occurred'] : $points[$i]['date_occurred'];
+			}
+			
+			// Additional data: get user level
+			foreach($this->point_levels as $level => $minimum) {
+				if($meta_array['point_value'] >= $minimum) {
+					$meta_array['level'] = $level;
+				}
+			}
+			
+			// Additional data: get next level req
+			if( $meta_array['level'] < end(array_keys($this->point_levels)) ) {
+				$meta_array['next_level_at'] = $this->point_levels[ $meta_array['level'] + 1 ];
+				$meta_array['next_level_progress'] = ( $meta_array['point_value'] / $meta_array['next_level_at'] ) * 100;
+			}
+			
 		}
 		
 		// Format data: get point type name
-		for($i=0; $i<$num_points; $i++) {
-			$points[$i]['point_type'] = $this->point_types[$points[$i]['point_type']];
+		if($args['get'] === 'basics') {
+			for($i=0; $i<$num_points; $i++) {
+				$points[$i]['point_type'] = $this->point_types[$points[$i]['point_type']];
+			}
 		}
 		
 		// Format data: make associative if necessary
 		if($args['associative']) {
 			for($i=0; $i<$num_points; $i++) {
-				$points[$points[$i]['point_type']] = $points[$i];
-				unset($points[$i]);
+				
+				if($args['get'] === 'basics') {
+					$tmp_points[$points[$i]['point_type']] = $points[$i];
+				}
+				elseif($args['get'] === 'level') {
+					$tmp_points[$points[$i]['user_id']] = $points[$i];
+				}
+				
 			}
+			
+			$points = $tmp_points;
 		}
 		
 		// Format data: add meta array
-		if($args['associative']) {
-			$points['meta'] = $meta_array;
-		}
-		else {
-			array_unshift($points, $meta_array);
+		if(is_numeric($args['user_id'])) {
+			if($args['associative']) {
+				$points['meta'] = $meta_array;
+			}
+			else {
+				array_unshift($points, $meta_array);
+				$num_points++;
+			}
 		}
 		
 		return $points;
