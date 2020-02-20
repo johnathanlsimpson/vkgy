@@ -1,4 +1,7 @@
 <?php
+
+$start = microtime(true);
+
 $access_blog = new access_blog($pdo);
 $access_artist = new access_artist($pdo);
 $access_comment = new access_comment($pdo);
@@ -24,7 +27,7 @@ $access_image = $access_image ?: new access_image($pdo);
 if($_SESSION['is_vip']) {
 	$sql_vip = "SELECT vip.title, vip.friendly, vip.date_occurred, vip_views.id AS is_viewed FROM vip LEFT JOIN vip_views ON vip_views.post_id=vip.id AND vip_views.user_id=? ORDER BY vip.date_occurred DESC LIMIT 1";
 	$stmt_vip = $pdo->prepare($sql_vip);
-	$stmt_vip->execute([ $_SESSION["userID"] ]);
+	$stmt_vip->execute([ $_SESSION['user_id'] ]);
 	$rslt_vip = $stmt_vip->fetch();
 }
 
@@ -45,36 +48,65 @@ for($i=0; $i<$num_news; $i++) {
 $comments = $access_comment->access_comment(['is_deleted' => 0, "get" => "list", "limit" => 20]);
 $num_comments = count($comments);
 
-foreach($comments as $key => $comment) {
-	if($comment["item_type"] === "blog") {
-		$sql_comment = "SELECT CONCAT_WS('/', '', 'blog', friendly, '') AS url FROM blog WHERE id=?";
+// Comments: Loop through comments and set up query to get their URLs
+$num_comments = count($comments);
+for($i=0; $i<$num_comments; $i++) {
+	switch($comments[$i]['item_type']) {
+		case('blog'):
+			$sql_comment[] = "SELECT id AS item_id, CONCAT_WS('/', '', 'blog', friendly, '') AS url FROM blog WHERE id=?";
+			break;
+		case('release'):
+			$sql_comment[] = "SELECT releases.id AS item_id, CONCAT_WS('/', '', 'releases', artists.friendly, releases.id, releases.friendly, '') AS url FROM releases LEFT JOIN artists ON artists.id=releases.artist_id WHERE releases.id=?";
+			break;
+		case('artist'):
+			$sql_comment[] = "SELECT id AS item_id, CONCAT_WS('/', '', 'artists', friendly, '') AS url FROM artists WHERE id=?";
+			break;
+		case('vip'):
+			$sql_comment[] = "SELECT id AS item_id, CONCAT_WS('/', '', 'vip', friendly, '') AS url FROM vip WHERE id=?";
+			break;
 	}
-	elseif($comment["item_type"] === "release") {
-		$sql_comment = "SELECT CONCAT_WS('/', '', 'releases', artists.friendly, releases.id, releases.friendly, '') AS url FROM releases LEFT JOIN artists ON artists.id=releases.artist_id WHERE releases.id=?";
-	}
-	elseif($comment["item_type"] === "artist") {
-		$sql_comment = "SELECT CONCAT_WS('/', '', 'artists', friendly, '') AS url FROM artists WHERE id=?";
-	}
-	elseif($comment["item_type"] === "vip") {
-		$sql_comment = "SELECT CONCAT_WS('/', '', 'vip', friendly, '') AS url FROM vip WHERE id=?";
-	}
+	
+	$values_comment[] = $comments[$i]['item_id'];
+}
 
-	if($sql_comment) {
-		$stmt_comment = $pdo->prepare($sql_comment);
-		$stmt_comment->execute([$comment["item_id"]]);
-		$comments[$key]["url"] = $stmt_comment->fetchColumn();
+// Comments: If we have SQL and values for each comment, query the DB
+if( is_array($sql_comment) && !empty($sql_comment) && count($sql_comment) === count($values_comment) ) {
+	$sql_comment = 'SELECT * FROM ( ('.implode(') UNION (', $sql_comment).') ) urls';
+	$stmt_comment = $pdo->prepare($sql_comment);
+	$stmt_comment->execute( $values_comment );
+	$rslt_comments = $stmt_comment->fetchAll();
+	$num_rslt_comments = is_array($rslt_comments) ? count($rslt_comments) : 0;
+}
+
+// Comments: If got comment URLs, loop through and apply them
+if($num_rslt_comments) {
+	
+	// Change comment URLs to associative array
+	for($i=0; $i<$num_rslt_comments; $i++) {
+		$comments_urls[ $rslt_comments[$i]['item_id'] ] = $rslt_comments[$i]['url'];
 	}
+	
+	// Grab appropriate URL for each comment
+	for($i=0; $i<$num_comments; $i++) {
+		$comments[$i]['url'] = $comments_urls[$comments[$i]['item_id']];
+	}
+	
+}
 
-	$comments[$key]["date_occurred"] = substr($comments[$key]["date_occurred"], 0, 10);
-
-	$content = trim($comment["content"]);
+// Comments: Format comment data
+for($i=0; $i<$num_comments; $i++) {
+	
+	// Comment date
+	$comments[$i]["date_occurred"] = substr($comments[$i]["date_occurred"], 0, 10);
+	
+	// Parse comment content
+	$content = trim($comments[$i]["content"]);
 	$content = explode("\n", $content)[0];
 	$content = $markdown_parser->parse_markdown($content);
 	$content = str_replace(["<p>", "</p>"], "", $content);
 	$content = trim($content);
-	$comments[$key]["content"] = ($comment["item_type"] === 'vip' && !$_SESSION['is_vip'] ? '<span class="symbol__error"></span> Only VIP members can view this content.' : $content);
-
-	unset($sql_comment);
+	$comments[$i]["content"] = ($comments[$i]["item_type"] === 'vip' && !$_SESSION['is_vip'] ? '<span class="symbol__error"></span> Only VIP members can view this content.' : $content);
+	
 }
 
 /* Updates */
@@ -152,6 +184,15 @@ $stmt_rankings->execute([
 	date("Y-m-d", strtotime("-1 weeks sunday", time()))
 ]);
 $rslt_rankings = $stmt_rankings->fetchAll();
+
+/* Points ranks */
+$access_points = new access_points($pdo);
+$point_ranking = $access_points->access_points([
+	'get' => 'ranking',
+	'start_date' => date("Y-m-d", strtotime("-2 weeks sunday", time())),
+	'end_date' => date("Y-m-d", strtotime("-1 weeks sunday", time())),
+	'limit' => 3,
+]);
 
 /* VIP users */
 $sql_vip_users = "SELECT username FROM users WHERE is_vip=? ORDER BY username";
