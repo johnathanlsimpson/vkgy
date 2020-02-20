@@ -10,6 +10,12 @@
 	]);
 ?>
 
+<?php
+if($_SESSION['username'] === 'inartistic') {
+	$access_points = new access_points($pdo);
+}
+?>
+
 <div class="col c4-ABBC section__main">
 	<div class="main__left">
 		<div class="main__aod">
@@ -73,6 +79,29 @@
 							<li class="ranking__item">
 								<span class="ranking__number symbol__user"></span>
 								<a class="artist artist--no-symbol" href="/artists/<?php echo $ranking["friendly"]; ?>/"><?= lang($ranking['quick_name'], $ranking['name'], 'hidden'); ?></a>
+							</li>
+						<?php
+					}
+				?>
+			</ol>
+		</div>
+		
+		<div class="main__ranking">
+			<h3>
+				<div class="h5">
+					<?= date('n/j', strtotime("-2 weeks sunday", time())).'~'.date('n/j', strtotime("-1 weeks sunday", time())); ?>
+				</div>
+				<?php echo lang('User points ranking', 'ユーザーランキング', 'div'); ?>
+			</h3>
+			<ol class="text text--outlined text--compact ul--compact">
+				<?php
+					foreach($point_ranking as $ranking_num => $user_points) {
+						?>
+							<li class="ranking__item">
+								<span class="ranking__number symbol__user"></span>
+								<span class="any__note" style="float:right;"><?= $user_points['points_value'].' '.lang('pt', '点', 'hidden'); ?></span>
+								<a href="<?= '/users/'.$user_points['username'].'/'; ?>"><?= $user_points['username']; ?></a>
+								<span class="any--weaken" style=""><?= 'LV '.$user_points['level']; ?></span>
 							</li>
 						<?php
 					}
