@@ -147,7 +147,23 @@ if($_SESSION['username'] === 'inartistic') {
 				
 				<div class="news__features any--flex" style="padding-bottom:0;">
 					<?php
-						$featured_articles = $access_blog->access_blog([ 'tag' => 'feature', 'get' => 'basics', 'limit' => 4 ]);
+						$featured_articles = $access_blog->access_blog([ 'tag' => 'feature', 'get' => 'basics', 'limit' => 5 ]);
+						
+						// Shuffle featured interviews
+						if($featured_articles[0]['id'] / 4 === 969) {
+							unset($featured_articles[4]);
+							shuffle($featured_articles);
+						}
+						elseif($featured_articles[4]['id'] / 4 === 969) {
+							unset($featured_articles[4]);
+						}
+						else {
+							$latest_article = array_shift($featured_articles);
+							shuffle($featured_articles);
+							array_unshift($featured_articles, $latest_article);
+							unset($featured_articles[4]);
+						}
+						
 						foreach($featured_articles as $article) {
 							$image = '/images/'.$article['image_id'].'-'.$article['friendly'].'.medium.';
 							$image = file_exists('../images/image_files/'.$article['image_id'].'.jpg') ? $image.'jpg' : $image.'png';
