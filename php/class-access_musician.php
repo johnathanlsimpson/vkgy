@@ -66,6 +66,7 @@
 										$regex_band_in_database = "(^\((\d+)\)(?:\/[^\/\[\]\(\)]+\/)?(?:\[([^\(]+?)(?: \((.+?)\))?\])?)(?:.*)?";
 										$regex_not_in_database = "^((?:(?! \().)+)(?: \((?!as )([^\(\)]*(?=&)[^\(\)]+(?=;)[^\(\)]+)\))?";
 										$regex_notes = " \((.+?)(?=(?:(?<!\?)\) \(|\)$))\)";
+										$regex_simple_note = '^\((.+)\)$';
 										
 										// If group is band in DB
 										if(preg_match_all("/".$regex_band_in_database."/", $band, $matches, PREG_SET_ORDER)) {
@@ -104,12 +105,15 @@
 											}
 										}
 										
-										// Else if group is really simple note
-										elseif(preg_match_all("/"."^\((.+)\)$"."/", $band, $matches, PREG_SET_ORDER)) {
-											$matches = $matches[0];
-											if(!empty($matches[1])) {
+										// If group is a note (or several notes)
+										elseif(preg_match_all('/'.$regex_simple_note.'/', $band, $matches, PREG_SET_ORDER)) {
+											
+											// Above, once a band is parsed, it's removed from the string and the leftover notes are passed on to be parsed later
+											// Take advantage of that here: create a false "band" string that starts with a space, and includes the note(s) found here
+											// It will be dealt with after this if/else series
+											if(!empty($matches[0][0])) {
+												$band = ' '.$matches[0][0];
 												$tmp_band_history[$period_key][$band_key]['type'] = $band_type;
-												$tmp_band_history[$period_key][$band_key]["notes"][] = $matches[1];
 											}
 										}
 										
@@ -150,8 +154,6 @@
 						}
 					}
 				}
-											
-											//echo $_SESSION['username'] === 'inartistic' ? print_r($matches, true).'|||||' : null;
 				
 				return $tmp_band_history;
 			}
@@ -355,6 +357,7 @@
 					}
 				}
 			}
+			
 			if($args["get"] === "list") {
 				if(is_array($musicians)) {
 					foreach($musicians as $musician_id => $musician) {

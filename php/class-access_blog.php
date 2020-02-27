@@ -262,6 +262,9 @@
 					$sql_limit = "LIMIT ".($total_num_entries["remainder"] > 5 ? $total_num_entries["remainder"] : 5);
 				}
 			}
+			if(is_numeric($args['limit'])) {
+				$sql_limit = 'LIMIT '.$args['limit'];
+			}
 			
 			
 			// Execute query

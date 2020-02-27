@@ -1,7 +1,5 @@
 <?php
 
-$start = microtime(true);
-
 $access_blog = new access_blog($pdo);
 $access_artist = new access_artist($pdo);
 $access_comment = new access_comment($pdo);
@@ -110,6 +108,45 @@ for($i=0; $i<$num_comments; $i++) {
 }
 
 /* Updates */
+if($_SESSION['username'] === 'inartistic') {
+$sql_recent = "
+	SELECT recent.*, users.username
+	FROM (
+		(
+			SELECT 'artist' AS type, artist_id AS item_id, user_id, date_occurred AS date_edited
+			FROM edits_artists
+			GROUP BY edits_artists.artist_id
+			ORDER BY edits_artists.date_occurred DESC LIMIT 20
+		)
+		UNION
+		(
+			SELECT 'company' AS type, label_id AS item_id, user_id, date_occurred AS date_edited
+			FROM edits_labels
+			GROUP BY edits_labels.label_id
+			ORDER BY edits_labels.date_occurred DESC LIMIT 7
+		)
+		UNION
+		(
+			SELECT 'release' AS type, release_id AS item_id, user_id, date_occurred AS date_edited
+			FROM edits_releases
+			GROUP BY edits_releases.release_id
+			ORDER BY edits_releases.date_occurred DESC LIMIT 20
+		)
+	) AS recent
+	LEFT JOIN users ON users.id=recent.user_id
+	ORDER BY recent.date_edited DESC
+";
+
+$stmt_recent = $pdo->prepare($sql_recent);
+$stmt_recent->execute();
+$rslt_recent = $stmt_recent->fetchAll();
+	
+	
+//$num_updates = count($updates);
+	
+	print_r($updates);
+}
+else {
 $sql_recent = "
 	SELECT recent.*, users.username
 	FROM (
@@ -146,6 +183,7 @@ $stmt_recent = $pdo->prepare($sql_recent);
 $stmt_recent->execute();
 $updates = $stmt_recent->fetchAll();
 $num_updates = count($updates);
+}
 
 /* Artist of day */
 $sql_aod = "SELECT artists.id, artists.description FROM queued_aod LEFT JOIN artists ON artists.id=queued_aod.artist_id ORDER BY queued_aod.date_occurred DESC LIMIT 1";
