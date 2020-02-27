@@ -108,82 +108,105 @@ for($i=0; $i<$num_comments; $i++) {
 }
 
 /* Updates */
-if($_SESSION['username'] === 'inartistic') {
+// Have to grab update data in several passes to increase speed
+// First, do simple grab of XXX edit records, ordered by id DESC
+// Then, join edit table back to self, group by item_id, and pare down to XX records
+// Then, join appropriate item based on item_id
+// And finally, union it all together
 $sql_recent = "
-	SELECT recent.*, users.username
+	SELECT *
 	FROM (
+		
 		(
-			SELECT 'artist' AS type, artist_id AS item_id, user_id, date_occurred AS date_edited
-			FROM edits_artists
-			GROUP BY edits_artists.artist_id
-			ORDER BY edits_artists.date_occurred DESC LIMIT 20
+			SELECT
+				aaa.user_id,
+				aaa.date_edited,
+				COALESCE(artists.romaji, artists.name) AS quick_name,
+				CONCAT_WS('/', '', 'artists', artists.friendly, '') AS url,
+				'artist' AS type,
+				'' AS artist_quick_name,
+				'' AS artist_url
+			FROM
+				(
+					SELECT artist_id, user_id, date_occurred AS date_edited
+					FROM
+						(
+							SELECT id
+							FROM edits_artists
+							ORDER BY id DESC
+							LIMIT 30
+						) aa
+					LEFT JOIN edits_artists ON edits_artists.id=aa.id
+					GROUP BY edits_artists.artist_id
+					LIMIT 20
+				) aaa
+			LEFT JOIN artists ON artists.id=aaa.artist_id
 		)
+		
 		UNION
+		
 		(
-			SELECT 'company' AS type, label_id AS item_id, user_id, date_occurred AS date_edited
-			FROM edits_labels
-			GROUP BY edits_labels.label_id
-			ORDER BY edits_labels.date_occurred DESC LIMIT 7
+			SELECT
+				bbb.user_id,
+				bbb.date_edited,
+				COALESCE(labels.romaji, labels.name) AS quick_name,
+				CONCAT_WS('/', '', 'labels', labels.friendly, '') AS url,
+				'company' AS type,
+				'' AS artist_quick_name,
+				'' AS artist_url
+			FROM
+				(
+					SELECT label_id, user_id, date_occurred AS date_edited
+					FROM
+						(
+							SELECT id
+							FROM edits_labels
+							ORDER BY id DESC
+							LIMIT 10
+						) bb
+					LEFT JOIN edits_labels ON edits_labels.id=bb.id
+					GROUP BY edits_labels.label_id
+					LIMIT 10
+				) bbb
+			LEFT JOIN labels ON labels.id=bbb.label_id
 		)
+		
 		UNION
+		
 		(
-			SELECT 'release' AS type, release_id AS item_id, user_id, date_occurred AS date_edited
-			FROM edits_releases
-			GROUP BY edits_releases.release_id
-			ORDER BY edits_releases.date_occurred DESC LIMIT 20
-		)
-	) AS recent
-	LEFT JOIN users ON users.id=recent.user_id
-	ORDER BY recent.date_edited DESC
-";
-
-$stmt_recent = $pdo->prepare($sql_recent);
-$stmt_recent->execute();
-$rslt_recent = $stmt_recent->fetchAll();
-	
-	
-//$num_updates = count($updates);
-	
-	print_r($updates);
-}
-else {
-$sql_recent = "
-	SELECT recent.*, users.username
-	FROM (
-		(
-			SELECT 'artist' AS type, edits_artists.user_id, CONCAT_WS('/', '', 'artists', friendly, '') AS url, COALESCE(romaji, name) AS quick_name, edits_artists.date_occurred AS date_edited, '' AS artist_quick_name, '' AS artist_url
-			FROM edits_artists
-			LEFT JOIN artists ON artists.id=edits_artists.artist_id
-			GROUP BY edits_artists.artist_id
-			ORDER BY edits_artists.date_occurred DESC LIMIT 20
-		)
-		UNION
-		(
-			SELECT 'company' AS type, edits_labels.user_id, CONCAT_WS('/', '', 'labels', friendly, '') AS url, COALESCE(romaji, name) AS quick_name, edits_labels.date_occurred AS date_edited, '' AS artist_quick_name, '' AS artist_url
-			FROM edits_labels
-			LEFT JOIN labels ON labels.id=edits_labels.label_id
-			GROUP BY edits_labels.label_id
-			ORDER BY edits_labels.date_occurred DESC LIMIT 7
-		)
-		UNION
-		(
-			SELECT 'release' AS type, edits_releases.user_id, CONCAT_WS('/', '', 'releases', artists.friendly, releases.id, releases.friendly, '') AS url, CONCAT_WS(' ', COALESCE(releases.romaji, releases.name, ''), COALESCE(press_romaji, press_name, ''), COALESCE(type_romaji, type_name, '')) AS quick_name, edits_releases.date_occurred AS date_edited, COALESCE(artists.romaji, artists.name) AS artist_quick_name, CONCAT_WS('/', '', 'artists', artists.friendly, '') AS artist_url
-			FROM edits_releases
-			LEFT JOIN releases ON releases.id=edits_releases.release_id
+			SELECT
+				ccc.user_id,
+				ccc.date_edited,
+				CONCAT_WS(' ', COALESCE(releases.romaji, releases.name, ''), COALESCE(releases.press_romaji, releases.press_name, ''), COALESCE(releases.type_romaji, releases.type_name, '')) AS quick_name,
+				CONCAT_WS('/', '', 'releases', artists.friendly, releases.id, releases.friendly, '') AS url,
+				'release' AS type,
+				COALESCE(artists.romaji, artists.name) AS artist_quick_name,
+				CONCAT_WS('/', '', 'artists', artists.friendly, '') AS artist_url
+			FROM
+				(
+					SELECT release_id, user_id, date_occurred AS date_edited
+					FROM
+						(
+							SELECT id
+							FROM edits_releases
+							ORDER BY id DESC
+							LIMIT 30
+						) cc
+					LEFT JOIN edits_releases ON edits_releases.id=cc.id
+					GROUP BY edits_releases.release_id
+					LIMIT 20
+				) ccc
+			LEFT JOIN releases ON releases.id=ccc.release_id
 			LEFT JOIN artists ON artists.id=releases.artist_id
-			GROUP BY edits_releases.release_id
-			ORDER BY edits_releases.date_occurred DESC LIMIT 20
 		)
+		
 	) AS recent
-	LEFT JOIN users ON users.id=recent.user_id
-	ORDER BY recent.date_edited DESC
+	ORDER BY date_edited DESC
 ";
-
 $stmt_recent = $pdo->prepare($sql_recent);
 $stmt_recent->execute();
 $updates = $stmt_recent->fetchAll();
 $num_updates = count($updates);
-}
 
 /* Artist of day */
 $sql_aod = "SELECT artists.id, artists.description FROM queued_aod LEFT JOIN artists ON artists.id=queued_aod.artist_id ORDER BY queued_aod.date_occurred DESC LIMIT 1";
