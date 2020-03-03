@@ -3,6 +3,16 @@
 		'/blog/style-page-entry.css',
 	]);
 	
+	// Auto-style translation button
+	$entry['content'] = str_replace(
+		'>&#9888; &#26085;&#26412;&#35486;&#29256;&#12408;&#12371;&#12385;&#12425;&#12290;</a>',
+		' class="symbol__error a--outlined a--padded">&#26085;&#26412;&#35486;&#29256;&#12408;&#12371;&#12385;&#12425;&#12290;</a>',
+		$entry['content']);
+	$entry['content'] = str_replace(
+		'>&#9888; The English version is here.</a>',
+		' class="symbol__error a--outlined a--padded">The English version is here.</a>',
+		$entry['content']);
+	
 	if(is_array($entry) && !empty($entry)) {
 
 		$entry['images'] = is_array($entry['images']) ? $entry['images'] : [];
@@ -25,7 +35,7 @@
 		}
 
 		$page_description = preg_replace("/"."<.*?>"."/", "", strtok($entry["content"], "\n"))." (Continued…)";
-
+		
 		// Related: entries with same tag
 		if(is_array($entry['tags']) && !empty($entry['tags'])) {
 			foreach($entry['tags'] as $tag) {
@@ -285,35 +295,59 @@
 
 					<div class="entry__content entry__main-column">
 						<a class="entry__image-link lazy" data-src="<?php echo str_replace('.', '.thumbnail.', $entry['image']['url']); ?>" href="<?php echo $entry['image']['url']; ?>">
-							<img class="entry__image lazy webfeedsFeaturedVisual" data-src="<?php echo str_replace('.', '.large.', $entry['image']['url']); ?>" />
+							<img class="entry__image webfeedsFeaturedVisual" src="<?= str_replace('.', '.large.', $entry['image']['url']); ?>" />
 						</a>
-
+						
 						<div class="text text--centered">
 							<?php
 								echo $entry['content'];
-
+								
 								if($entry['sources']) {
 									preg_match_all('/'.'^(@([A-z0-9-_]+))(?:\s|$)'.'/m', $entry['sources'], $twitter_matches);
-
+									
 									if(is_array($twitter_matches) && !empty($twitter_matches)) {
 										for($i=0; $i<count($twitter_matches[0]); $i++) {
 											$entry['sources'] = str_replace($twitter_matches[1][$i], '['.$twitter_matches[1][$i].'](https://twitter.com/'.$twitter_matches[2][$i].'/)', $entry['sources']);
 										}
 									}
-
+									
 									$sources = $entry['sources'];
 									$sources = explode("\n", $sources);
 									$sources = array_filter($sources);
 									$sources = (count($sources) > 1 ? '* ' : null).implode("\n* ", $sources);
 									$sources = $markdown_parser->parse_markdown($sources);
-
+									$sources = str_replace('<ul class="ul--bulleted">', '<ul class="text text--outlined text--notice entry__sources">', $sources);
+									
 									?>
 										<h5 style="margin-top: 3rem;">
 											Sources
 										</h5>
-										<div class="text text--outlined text--compact text--notice" style="margin-top: 1rem; margin-bottom: 0;">
-											<?php echo $sources; ?>
-										</div>
+										<?= $sources; ?>
+									<?php
+								}
+								
+								if($entry['supplemental']) {
+									preg_match_all('/'.'^(@([A-z0-9-_]+))(?:\s|$)'.'/m', $entry['supplemental'], $twitter_matches);
+									
+									if(is_array($twitter_matches) && !empty($twitter_matches)) {
+										for($i=0; $i<count($twitter_matches[0]); $i++) {
+											$entry['supplemental'] = str_replace($twitter_matches[1][$i], '['.$twitter_matches[1][$i].'](https://twitter.com/'.$twitter_matches[2][$i].'/)', $entry['supplemental']);
+										}
+									}
+									
+									$supplemental = $entry['supplemental'];
+									$supplemental = explode("\n", $supplemental);
+									$supplemental = array_filter($supplemental);
+									$supplemental = implode("\n", $supplemental);
+									$supplemental = preg_replace('/'.'^([^*])'.'/m', '* $1', $supplemental);
+									$supplemental = $markdown_parser->parse_markdown($supplemental);
+									$supplemental = str_replace('<ul class="ul--bulleted">', '<ul class="text text--outlined text--notice entry__sources">', $supplemental);
+									
+									?>
+										<h5 style="margin-top: 3rem;">
+											Links 
+										</h5>
+										<?= $supplemental; ?>
 									<?php
 								}
 							?>
