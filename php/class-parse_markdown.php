@@ -531,6 +531,9 @@
 			$input_content = str_replace("&#92;&#42;", "*", $input_content);
 			$input_content = str_replace('<ul>', '<ul class="ul--bulleted">', $input_content);
 			
+			// Allow manual breaks on lines that end in ' \'
+			$input_content = str_replace(" &#92;\n", "<br />\n", $input_content);
+			
 			return $input_content;
 		}
 		
