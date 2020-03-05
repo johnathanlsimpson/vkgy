@@ -170,16 +170,19 @@
 						}
 						$stmt = $pdo->prepare($sql_release);
 						
-						// Run query
+						// Run main query
 						if($stmt) {
-							
 							if($stmt->execute($sql_values)) {
 								$release["id"] = is_numeric($release["id"]) ? $release["id"] : $pdo->lastInsertId();
 								
 								// Update edits table
 								$sql_edit_history = 'INSERT INTO edits_releases (release_id, user_id, content) VALUES (?, ?, ?)';
 								$stmt_edit_history = $pdo->prepare($sql_edit_history);
-								if($stmt_edit_history->execute([ $release_id, $_SESSION['user_id'], 'created' ])) {
+								if($stmt_edit_history->execute([
+									$release['id'], 
+									$_SESSION['user_id'], 
+									($is_edit ? null : 'created') 
+								])) {
 								}
 								
 								// Update medium/format/venue/pressing type
@@ -252,12 +255,6 @@
 									$stmt_new_attributes = $pdo->prepare($sql_new_attributes);
 									$stmt_new_attributes->execute($values_new_attributes);
 								}
-								
-								
-								
-								$sql_edit_history = 'INSERT INTO edits_releases(release_id, user_id) VALUES (?, ?)';
-								$stmt_edit_history = $pdo->prepare($sql_edit_history);
-								$stmt_edit_history->execute([ $release['id'], $_SESSION['userID'] ]);
 								
 								$sql_extant_tracks = "SELECT id FROM releases_tracklists WHERE release_id=?";
 								$stmt = $pdo->prepare($sql_extant_tracks);

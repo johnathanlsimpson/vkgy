@@ -38,17 +38,19 @@ foreach($activity_tables as $activity_table) {
 	$sql_activity[] = '
 	(
 		SELECT
-			id, 
-			'.(in_array($activity_table, [ 'images', 'lives_livehouses', 'releases_ratings' ]) ? 'date_added AS date_occurred' : 'date_occurred').', 
+			'.( strpos($activity_table, 'edits_') === 0 ? 'MAX(id) AS id' : 'id' ).', 
+			'.( strpos($activity_table, 'edits_') === 0 ? 'MAX(date_occurred) AS date_occurred' : (in_array($activity_table, [ 'images', 'lives_livehouses', 'releases_ratings' ]) ? 'date_added AS date_occurred' : 'date_occurred') ).',
 			"'.$activity_table.'" AS type 
 		FROM 
-			'.$activity_table.' 
+			'.($activity_table === 'releases' ? 'edits_releases' : $activity_table).' 
 		WHERE
 			user_id=?
+			'.($activity_table === 'releases' ? 'AND content="created"' : null).'
 			'.($activity_table === 'blog' ? 'AND is_queued=0' : null).'
+			'.( strpos($activity_table, 'edits_') === 0 ? ' AND content != "created"' : null ).'
 		'.($group_activity_by[$activity_table] ? 'GROUP BY '.$activity_table.'.'.$group_activity_by[$activity_table] : null).'
 		ORDER BY 
-			id DESC 
+			'.(1 ? ( in_array($activity_table, [ 'images', 'lives_livehouses', 'releases_ratings' ]) ? 'date_added' : 'date_occurred' ) : 'id').' DESC
 		LIMIT
 		'.$activity_limit.'
 	)';
@@ -82,7 +84,7 @@ if(is_array($rslt_activity) && !empty($rslt_activity)) {
 				$activity_name = 'blog.title';
 				$activity_url = 'CONCAT_WS("/", "", "blog", blog.friendly, "")';
 				$activity_join = 'images ON images.id=blog.image_id';
-				$activity_join = null;
+				//$activity_join = null;
 				break;
 			case('comments'):
 				$activity_name = 'comments.content';
@@ -143,7 +145,8 @@ if(is_array($rslt_activity) && !empty($rslt_activity)) {
 				$activity_name = 'CONCAT_WS(" ", releases.name, COALESCE(releases.press_name, ""), COALESCE(releases.type_name, ""))';
 				$activity_romaji = 'CONCAT_WS(" ", COALESCE(releases.romaji, releases.name), COALESCE(releases.press_romaji, releases.press_name, ""), COALESCE(releases.type_romaji, releases.type_name, ""))';
 				$activity_url = 'CONCAT_WS("/", "", "releases", artists.friendly, releases.id, releases.friendly, "")';
-				$activity_join = 'artists ON artists.id=releases.artist_id LEFT JOIN images ON images.id=releases.image_id';
+				$activity_from = 'edits_releases';
+				$activity_join = 'releases ON releases.id=edits_releases.release_id LEFT JOIN artists ON artists.id=releases.artist_id LEFT JOIN images ON images.id=releases.image_id';
 				break;
 			case('releases_collections'):
 				$activity_name = 'releases.name';
@@ -177,10 +180,12 @@ if(is_array($rslt_activity) && !empty($rslt_activity)) {
 				$activity_url = 'id';
 				$activity_join = null;
 		}
-
+		
 		$sql_activity_urls[] = '
 			SELECT 
 				"'.$activity['id'].'" AS id, 
+				"'.$activity['type'].'" AS type, 
+				"'.$activity['date_occurred'].'" AS date_occurred, 
 				'.( $activity_url ?: 'NULL' ).' AS url, 
 				'.( $activity_name ?: 'NULL' ).' AS name, 
 				'.( $activity_romaji ?: 'NULL' ).' AS romaji,
@@ -191,19 +196,15 @@ if(is_array($rslt_activity) && !empty($rslt_activity)) {
 			WHERE
 				'.($activity_from ?: $activity['type']).'.id=?';
 		$values_activity_urls[] = $activity['id'];
-
+		
 		unset($activity_name, $activity_romaji, $activity_url, $activity_from, $activity_join, $singular);
 	}
 	
 	$sql_activity_urls = 'SELECT * FROM ( ('.implode(') UNION (', $sql_activity_urls).') ) activity_urls';
 	$stmt_activity_urls = $pdo->prepare($sql_activity_urls);
 	$stmt_activity_urls->execute( $values_activity_urls );
-	$rslt_activity_urls = $stmt_activity_urls->fetchAll();
-	
-	foreach($rslt_activity_urls as $activity_key => $activity_url) {
-		$rslt_activity[$activity_key] = $rslt_activity[$activity_key] + $activity_url;
-	}
-	
+	$rslt_activity = $stmt_activity_urls->fetchAll();
+		
 	foreach($rslt_activity as $activity) {
 		switch($activity['type']) {
 			case('artists_tags'):
