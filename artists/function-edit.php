@@ -355,9 +355,43 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 				$area_ids[] = $history[$i]['area_id'];
 			}
 			
-			// Loop through, look for pronunciation, save for later (use final pronunciation, for now)
+			// Look for pronunciation, save for later (last pronunciation should be the only on relevant to current artist name)
 			if(strlen($history[$i]['pronunciation'])) {
 				$pronunciation = $history[$i]['pronunciation'];
+			}
+			
+			// Look for artist alternate name, add to DB if necessary
+			if(is_array($history[$i]['display_name']) && !empty($history[$i]['display_name']) && strlen($history[$i]['display_name']['name'])) {
+				
+				// Make sure that display name != current name & not already in DB
+				// Since MySQL can't handle =null, we'll have to check if romaji is null and change query/values accordingly
+				if($history[$i]['display_name']['romaji'] === null) {
+					$sql_check = 'SELECT 1 FROM ( (SELECT 1 FROM artists WHERE id=? AND name=? AND romaji IS NULL) UNION (SELECT 1 FROM artists_names WHERE artist_id=? AND name=? AND romaji IS NULL) ) current_names';
+					$values_check = [
+						$artist_id, $history[$i]['display_name']['name'],
+						$artist_id, $history[$i]['display_name']['name']
+					];
+				}
+				else {
+					$sql_check = 'SELECT 1 FROM ( (SELECT 1 FROM artists WHERE id=? AND name=? AND romaji=?) UNION (SELECT 1 FROM artists_names WHERE artist_id=? AND name=? AND romaji=?) ) current_names';
+					$values_check = [
+						$artist_id, $history[$i]['display_name']['name'], $history[$i]['display_name']['romaji'],
+						$artist_id, $history[$i]['display_name']['name'], $history[$i]['display_name']['romaji']
+					];
+				}
+				$stmt_check = $pdo->prepare($sql_check);
+				$stmt_check->execute($values_check);
+				$rslt_check = $stmt_check->fetchColumn();
+				
+				if(!$rslt_check) {
+					
+					// Add this to the table of artists' display names
+					$sql_display_name = 'INSERT INTO artists_names (artist_id, name, romaji, friendly, pronunciation, date_occurred, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)';
+					$stmt_display_name = $pdo->prepare($sql_display_name);
+					$stmt_display_name->execute([ $artist_id, $history[$i]['display_name']['name'], $history[$i]['display_name']['romaji'], $history[$i]['display_name']['friendly'], $history[$i]['display_name']['pronunciation'], $history[$i]['date_occurred'], $_SESSION['user_id'] ]);
+					
+				}
+				
 			}
 			
 		}
@@ -410,7 +444,7 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 		
 		$sql_history = "SELECT id FROM artists_bio WHERE artist_id=?";
 		$stmt_history = $pdo->prepare($sql_history);
-		$stmt_history->execute([$artist_id]);
+		$stmt_history->execute([ $artist_id ]);
 		$extant_history = $stmt_history->fetchAll();
 		$sql_history = [];
 		

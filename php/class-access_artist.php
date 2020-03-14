@@ -510,43 +510,11 @@
 									}
 									$display_friendly = friendly( $display_romaji ?: $display_name );
 									
-									// Make sure that display name != current name & not already in DB
-									// Since MySQL can't handle =null, we'll have to check if romaji is null and change query/values accordingly
-									if($display_romaji === null) {
-										$sql_check = 'SELECT 1 FROM ( (SELECT 1 FROM artists WHERE id=? AND name=? AND romaji IS NULL) UNION (SELECT 1 FROM artists_names WHERE artist_id=? AND name=? AND romaji IS NULL) ) current_names';
-										$values_check = [
-											$artist_id, $display_name,
-											$artist_id, $display_name
-										];
-									}
-									else {
-										$sql_check = 'SELECT 1 FROM ( (SELECT 1 FROM artists WHERE id=? AND name=? AND romaji=?) UNION (SELECT 1 FROM artists_names WHERE artist_id=? AND name=? AND romaji=?) ) current_names';
-										$values_check = [
-											$artist_id, $display_name, $display_romaji,
-											$artist_id, $display_name, $display_romaji
-										];
-									}
-									$stmt_check = $this->pdo->prepare($sql_check);
-									$stmt_check->execute($values_check);
-									$rslt_check = $stmt_check->fetchColumn();
-									
-									if(!$rslt_check) {
-										
-										// Add this to the table of artists' display names
-										$sql_display_name = 'INSERT INTO artists_names (artist_id, name, romaji, friendly, pronunciation, date_occurred, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)';
-										$stmt_display_name = $this->pdo->prepare($sql_display_name);
-										$stmt_display_name->execute([ $artist_id, $display_name, $display_romaji, $display_friendly, $display_pronunciation, $date, $_SESSION['user_id'] ]);
-										
-									}
-									
 								}
 								
 							}
 							
 						}
-						
-						// Unset display name stuff
-						unset($possible_display_name, $display_name, $display_romaji, $display_friendly, $display_pronunciation, $tmp_line);
 						
 						// Set up live parser
 						if(!is_object($this->live_parser)) {
@@ -734,10 +702,15 @@
 							'area_id' => $area_id,
 							"parsed_live" => $parsed_live,
 							"note" => $note ? '<div class="any--weaken symbol__help">'.$note.'</div>' : null,
-							'pronunciation' => $pronunciation
+							'pronunciation' => $pronunciation,
+							'display_name' => strlen($display_name) ? [ 'name' => $display_name, 'romaji' => $display_romaji, 'friendly' => $display_friendly, 'pronunciation' => $display_pronunciation ] : null
 						];
 						
+						// Unset some stuff
 						unset($parsed_live, $note, $area_id, $area_name, $area_romaji, $pronunciation);
+						
+						// Unset display name stuff
+						unset($possible_display_name, $display_name, $display_romaji, $display_friendly, $display_pronunciation, $tmp_line);
 					}
 				}
 			}
