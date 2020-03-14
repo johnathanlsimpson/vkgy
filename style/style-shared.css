@@ -629,6 +629,12 @@ table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
 	padding: 0.5rem;
 	transition: flex 0.1s ease-in-out, background-position 0.1s ease-in-out;
 }
+/* Fix overflow problems for iOS */
+input {
+	height: auto;
+	line-height: 2rem;
+	padding: 0 0.5rem;
+}
 .input:active, .input:focus, .input--secondary:active, .input--secondary:focus, .input__button:active, .input__button:focus, .input__select:active, .input__select:focus, .input__textarea:active, .input__textarea:focus, button:active, button:focus, input:active, input:focus, select:active, select:focus, textarea:active, textarea:focus {
 	background-position: bottom left;
 }
