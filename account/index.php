@@ -8,25 +8,25 @@ include('../account/head.php');
 
 // Switch controller
 switch(true) {
-	case($_GET['page'] === 'users'):
+	case($_GET['template'] === 'users'):
 		$template = 'users'; break;
 		
-	case($_GET['page'] === 'account' && $_SESSION['is_signed_in']):
+	case($_GET['template'] === 'account' && $_SESSION['is_signed_in']):
 		$template = 'account'; break;
 		
-	case($_GET['page'] === 'user' && strlen($_GET['username'])):
+	case($_GET['template'] === 'user' && strlen($_GET['username'])):
 		$template = 'user'; break;
 		
-	case($_GET['page'] === 'activity' && strlen($_GET['username'])):
+	case($_GET['template'] === 'activity' && strlen($_GET['username'])):
 		$template = 'activity'; break;
 		
 	case($_GET['action'] === 'download' && strlen($_GET['username']) && $_GET['username'] === $_SESSION['username']):
 		$template = 'download-collection'; break;
 		
-	case($_GET['page'] === 'edit-avatar' && $_SESSION['is_signed_in']):
+	case($_GET['template'] === 'edit-avatar' && $_SESSION['is_signed_in']):
 		$template = 'edit-avatar'; break;
 		
-	case($_GET['page'] === 'account' && !$_SESSION['is_signed_in']):
+	case($_GET['template'] === 'account' && !$_SESSION['is_signed_in']):
 		$template = 'sign-in'; break;
 		
 	case($_GET['action'] === 'sign-out'):

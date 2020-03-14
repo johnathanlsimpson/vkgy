@@ -4,6 +4,7 @@
 .activity__symbol {
 	background: hsla(var(--background--secondary), 1);
 	border-radius: 3px;
+	flex: none;
 	height: 50px;
 	line-height: 1;
 	overflow: hidden;

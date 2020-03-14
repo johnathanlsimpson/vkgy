@@ -5,25 +5,56 @@ style([
 ]);
 
 // For specified tables, cycle through and start setting up query to get user's activity
-$activity_tables = [
-	'artists_tags',
-	'blog',
-	'comments',
-	'comments_likes',
-	'edits_artists',
-	'edits_labels',
-	'edits_musicians',
-	'edits_releases',
-	'images',
-	'lives',
-	'lives_livehouses',
-	'releases',
-	'releases_collections',
-	'releases_ratings',
-	'releases_tags',
-	'releases_wants',
-	'videos'
-];
+if($activity_filter === 'discussion') {
+	$activity_tables = [
+		'blog',
+		'comments',
+	];
+}
+elseif($activity_filter === 'edits') {
+	$activity_tables = [
+		'edits_artists',
+		'edits_labels',
+		'edits_musicians',
+		'edits_releases',
+	];
+}
+elseif($activity_tables === 'other') {
+	$activity_tables = [
+		'artists_tags',
+		'comments_likes',
+		'images',
+		'lives',
+		'lives_livehouses',
+		'releases_collections',
+		'releases_ratings',
+		'releases_tags',
+		'releases_wants',
+		'videos'
+	];
+}
+else {
+	$activity_tables = [
+		'artists',
+		'artists_tags',
+		'blog',
+		'comments',
+		'comments_likes',
+		'edits_artists',
+		'edits_labels',
+		'edits_musicians',
+		'edits_releases',
+		'images',
+		'lives',
+		'lives_livehouses',
+		'releases',
+		'releases_collections',
+		'releases_ratings',
+		'releases_tags',
+		'releases_wants',
+		'videos'
+	];
+}
 
 $group_activity_by = [
 	'artists_tags' => 'artist_id',
@@ -42,15 +73,16 @@ foreach($activity_tables as $activity_table) {
 			'.( strpos($activity_table, 'edits_') === 0 ? 'MAX(date_occurred) AS date_occurred' : (in_array($activity_table, [ 'images', 'lives_livehouses', 'releases_ratings' ]) ? 'date_added AS date_occurred' : 'date_occurred') ).',
 			"'.$activity_table.'" AS type 
 		FROM 
-			'.($activity_table === 'releases' ? 'edits_releases' : $activity_table).' 
+			'.($activity_table === 'releases' ? 'edits_releases' : ($activity_table === 'artists' ? 'edits_artists' : $activity_table)).'
 		WHERE
 			user_id=?
-			'.($activity_table === 'releases' ? 'AND content="created"' : null).'
-			'.($activity_table === 'blog' ? 'AND is_queued=0' : null).'
+			'.($activity_table === 'artists'            ? 'AND content="created"' : null).'
+			'.($activity_table === 'releases'           ? 'AND content="created"' : null).'
+			'.($activity_table === 'blog'               ? 'AND is_queued=0' : null).'
 			'.( strpos($activity_table, 'edits_') === 0 ? ' AND content != "created"' : null ).'
 		'.($group_activity_by[$activity_table] ? 'GROUP BY '.$activity_table.'.'.$group_activity_by[$activity_table] : null).'
 		ORDER BY 
-			'.(1 ? ( in_array($activity_table, [ 'images', 'lives_livehouses', 'releases_ratings' ]) ? 'date_added' : 'date_occurred' ) : 'id').' DESC
+			'.(1 ? ( in_array($activity_table, [ 'images', 'lives_livehouses', 'releases_ratings' ]) ? 'date_added' : 'date_occurred' ) : 'id').' '.($activity_order ?: 'DESC').'
 		LIMIT
 		'.$activity_limit.'
 	)';
@@ -58,11 +90,13 @@ foreach($activity_tables as $activity_table) {
 }
 
 // Get activity from other users regarding current user
-$sql_activity[] = '(SELECT comments_likes.id, comments_likes.date_occurred, "external_comments_likes" AS type FROM comments LEFT JOIN comments_likes ON comments_likes.comment_id=comments.id WHERE comments.user_id=? ORDER BY comments_likes.date_occurred DESC LIMIT '.$activity_limit.')';
-$values_activity[] = $user['id'];
+if($activity_filter === 'other' || $activity_filter === 'all' || !$activity_filter) {
+	$sql_activity[] = '(SELECT comments_likes.id, comments_likes.date_occurred, "external_comments_likes" AS type FROM comments LEFT JOIN comments_likes ON comments_likes.comment_id=comments.id WHERE comments.user_id=? ORDER BY comments_likes.date_occurred '.($activity_order ?: 'DESC').' LIMIT '.$activity_limit.')';
+	$values_activity[] = $user['id'];
+}
 
 // First activity query
-$sql_activity = 'SELECT * FROM ( '.implode(' UNION ', $sql_activity).' ) activity ORDER BY date_occurred DESC LIMIT '.$activity_offset.', '.$activity_limit;
+$sql_activity = 'SELECT * FROM ( '.implode(' UNION ', $sql_activity).' ) activity ORDER BY date_occurred '.($activity_order ?: 'DESC').' LIMIT '.$activity_offset.', '.$activity_limit;
 $stmt_activity = $pdo->prepare($sql_activity);
 $stmt_activity->execute( $values_activity );
 $rslt_activity = $stmt_activity->fetchAll();
@@ -209,7 +243,7 @@ if(is_array($rslt_activity) && !empty($rslt_activity)) {
 		switch($activity['type']) {
 			case('artists_tags'):
 				$symbol = 'tag';
-				$supertitle = $user['username'].'tagged <a class="a--inherit symbol__artist" href="'.$activity['url'].'">'.lang($activity['romaji'] ?: $activity['name'], $activity['name'], 'hidden').'</a>.';
+				$supertitle = $user['username'].' tagged <a class="a--inherit symbol__artist" href="'.$activity['url'].'">'.lang($activity['romaji'] ?: $activity['name'], $activity['name'], 'hidden').'</a>.';
 				break;
 			case('blog'):
 				$symbol = 'news';
