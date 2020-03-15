@@ -4,31 +4,35 @@
 	include_once("../php/database-connect.php");
 
 	class login {
-			private $newHash;
-			private $hashInsertID;
-			private $pdo;
-			private $domain;
-			private $secret_key;
-			public  $status;
-			
-			
-			
-			// Get database connection
-			function __construct($pdo) {
-				$this->pdo = $pdo;
-				if(!$this->pdo) {
-					$this->status = 1;
-				}
-				
-				$this->domain = "vk.gy";
-				
-				include_once('../php/class-login-key.php');
-				$this->secret_key = $secret_key;
+		private $newHash;
+		private $hashInsertID;
+		private $pdo;
+		private $domain;
+		private $secret_key;
+		public  $status;
+		
+		
+		
+		// ======================================================
+		// Construct DB connection
+		// ======================================================
+		function __construct($pdo) {
+			$this->pdo = $pdo;
+			if(!$this->pdo) {
+				$this->status = 1;
 			}
 			
+			$this->domain = "vk.gy";
 			
-			
-			// Set 'hash' cookie to enable persistent login: create new hash -> set in database -> update cookie
+			include_once('../php/class-login-key.php');
+			$this->secret_key = $secret_key;
+		}
+		
+		
+		
+		// ======================================================
+		// Set hash cookie to enable persistent login
+		// ======================================================
 			private function hashSet($user_id) {
 				if(is_numeric($user_id)) {
 					$sql_clear_tokens = "DELETE FROM users_tokens WHERE user_id=? AND (remote_addr=? OR date_occurred <= CURRENT_DATE() - INTERVAL 1 MONTH)";
@@ -94,67 +98,116 @@
 					return false;
 				}
 			}
+		
+		
+		
+		// ======================================================
+		// Get user's role/status
+		// ======================================================
+		public function check_roles($user_id, $rank_num = null, $is_vip = null) {
 			
+			// If not provided rank number, grab it
+			if($rank_num === null) {
+				$sql_check_status = 'SELECT rank, is_vip FROM users WHERE id=? LIMIT 1';
+				$stmt_check_status = $this->pdo->prepare($sql_check_status);
+				$stmt_check_status->execute([ $user_id ]);
+				$rslt_check_status = $stmt_check_status->fetch();
+				
+				$rank_num = $rslt_check_status['rank'];
+				$is_vip = $rslt_check_status['is_vip'];
+			}
 			
+			// Re-set session variables
+			$user_status['is_editor']  = $rank_num  >= 1;
+			$user_status['is_admin']   = $rank_num  >= 2;
+			$user_status['is_boss']    = $rank_num === 28;
+			$user_status['is_vip']     = $is_vip;
 			
-			// Check if signed in via session -> else check cookie -> if signed in, create new hash cookie, update session
-			public function check_login() {
-				if($_SESSION["loggedIn"]) {
-					if(!strlen($_SESSION['site_lang']) || !strlen($_SESSION['site_theme'])) {
-						$sql_prefs = 'SELECT site_lang, site_theme FROM users WHERE id=? LIMIT 1';
-						$stmt_prefs = $this->pdo->prepare($sql_prefs);
-						$stmt_prefs->execute([ $_SESSION['userID'] ]);
-						$rslt_prefs = $stmt_prefs->fetch();
-						
-						if(is_array($rslt_prefs) && !empty($rslt_prefs)) {
-							$_SESSION['site_lang'] = $rslt_prefs['site_lang'];
-							$_SESSION['site_theme'] = $rslt_prefs['site_theme'];
+			return $user_status;
+			
+		}
+		
+		
+		
+		// ======================================================
+		// Set user's role/status
+		// ======================================================
+		public function set_roles($user_status) {
+			
+			if(is_array($user_status) && !empty($user_status)) {
+				foreach($user_status as $status_type => $status) {
+					$_SESSION[$status_type] = $status;
+				}
+			}
+			
+		}
+		
+		
+		
+		// ======================================================
+		// Check if signed in via session -> check cookie ->
+		// create new has cookie, update session
+		// ======================================================
+		public function check_login() {
+			if($_SESSION["loggedIn"]) {
+				if(!strlen($_SESSION['site_lang']) || !strlen($_SESSION['site_theme'])) {
+					$sql_prefs = 'SELECT site_lang, site_theme FROM users WHERE id=? LIMIT 1';
+					$stmt_prefs = $this->pdo->prepare($sql_prefs);
+					$stmt_prefs->execute([ $_SESSION['userID'] ]);
+					$rslt_prefs = $stmt_prefs->fetch();
+
+					if(is_array($rslt_prefs) && !empty($rslt_prefs)) {
+						$_SESSION['site_lang'] = $rslt_prefs['site_lang'];
+						$_SESSION['site_theme'] = $rslt_prefs['site_theme'];
+					}
+				}
+
+				return true;
+				$this->status = 5;
+			}
+			else {
+				if($_COOKIE["remember_me"] && $this->hashCheck($_COOKIE["remember_me"])) {
+					list($user_id, $remote_addr, $token, $mac) = explode(":", $_COOKIE["remember_me"]);
+
+					if(is_numeric($user_id)) {
+						$sql_user = "SELECT id, username, rank, is_vip, site_theme, site_lang FROM users WHERE id=? LIMIT 1";
+						$stmt_user = $this->pdo->prepare($sql_user);
+						$stmt_user->execute([$user_id]);
+						$row = $stmt_user->fetch();
+
+						if(is_array($row) && !empty($row)) {
+
+							$session_data = [
+								'userID' => $row['id'],
+								'site_theme' => $row['site_theme'],
+								//'admin' => $row['rank'],
+								'loggedIn' => 1,
+
+								'user_id' => $row['id'],
+								'username' => $row['username'],
+								'site_theme' => $row['site_theme'],
+								'site_lang' => $row['site_lang'],
+								//'is_admin' => $row['rank'],
+								//'is_vip' => $row['is_vip'],
+								'is_signed_in' => 1,
+							];
+							
+							// Set user role/VIP status
+							$this->set_roles( $this->check_roles( $row['id'], $row['rank'], $row['is_vip'] ) );
+							
+							$this->set_login_data($session_data);
 						}
 					}
-					
+
 					return true;
 					$this->status = 5;
 				}
 				else {
-					if($_COOKIE["remember_me"] && $this->hashCheck($_COOKIE["remember_me"])) {
-						list($user_id, $remote_addr, $token, $mac) = explode(":", $_COOKIE["remember_me"]);
-						
-						if(is_numeric($user_id)) {
-							$sql_user = "SELECT id, username, rank, is_vip, site_theme, site_lang FROM users WHERE id=? LIMIT 1";
-							$stmt_user = $this->pdo->prepare($sql_user);
-							$stmt_user->execute([$user_id]);
-							$row = $stmt_user->fetch();
-							
-							if(is_array($row) && !empty($row)) {
-								
-								$session_data = [
-									'userID' => $row['id'],
-									'site_theme' => $row['site_theme'],
-									'admin' => $row['rank'],
-									'loggedIn' => 1,
-									
-									'user_id' => $row['id'],
-									'username' => $row['username'],
-									'site_theme' => $row['site_theme'],
-									'site_lang' => $row['site_lang'],
-									'is_admin' => $row['rank'],
-									'is_vip' => $row['is_vip'],
-									'is_signed_in' => 1,
-								];
-
-								$this->set_login_data($session_data);
-							}
-						}
-						
-						return true;
-						$this->status = 5;
-					}
-					else {
-						return false;
-						$this->status = 6;
-					}
+					return false;
+					$this->status = 6;
 				}
 			}
+		}
 			
 			
 			
@@ -185,17 +238,20 @@
 						$session_data = [
 							'userID' => $row['id'],
 							'site_theme' => $row['site_theme'],
-							'admin' => $row['rank'],
+							//'admin' => $row['rank'],
 							'loggedIn' => 1,
 							
 							'user_id' => $row['id'],
 							'username' => $row['username'],
 							'site_theme' => $row['site_theme'],
 							'site_lang' => $row['site_lang'],
-							'is_admin' => $row['rank'],
-							'is_vip' => $row['is_vip'],
+							//'is_admin' => $row['rank'],
+							//'is_vip' => $row['is_vip'],
 							'is_signed_in' => 1,
 						];
+						
+						// Set user role/VIP status
+						$this->check_role( $row['id'], $row['rank'], $row['is_vip'] );
 						
 						// If using old password
 						if(strlen($row["password_old"]) > 0 && empty($row["password"])) {
