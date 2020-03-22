@@ -104,7 +104,7 @@
 							
 							$is_vip = $rslt_verify ? true : false;
 						}
-						elseif($_SESSION["loggedIn"] && !$is_vip) {
+						elseif($_SESSION["is_signed_in"] && !$is_vip) {
 							$sql_check_vip = "SELECT 1 FROM users WHERE id=? AND is_vip=? LIMIT 1";
 							$stmt_check_vip = $pdo->prepare($sql_check_vip);
 							$stmt_check_vip->execute([sanitize($_SESSION["userID"]), 1]);

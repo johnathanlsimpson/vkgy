@@ -9,7 +9,7 @@
 	
 	if(!empty($_POST)) {
 		if(is_numeric($_POST["id"])) {
-			if($_SESSION["loggedIn"]) {
+			if($_SESSION["is_signed_in"]) {
 				$sql_check = "SELECT user_id FROM releases WHERE id=? LIMIT 1";
 				$stmt = $pdo->prepare($sql_check);
 				$stmt->execute([$_POST["id"]]);

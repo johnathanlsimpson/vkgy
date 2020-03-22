@@ -1,7 +1,7 @@
 <?php
 include_once("../php/include.php");
 
-if($_SESSION["loggedIn"]) {
+if($_SESSION["is_signed_in"]) {
 	$id = strlen($_POST["id"]) > 0 ? sanitize($_POST["id"]) : null;
 	$id = strlen($id) > 0 && is_numeric($id) ? $id : null;
 	

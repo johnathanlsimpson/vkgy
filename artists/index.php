@@ -182,7 +182,7 @@
 			}
 		}
 		
-		if($_SESSION["loggedIn"]) {
+		if($_SESSION["is_signed_in"]) {
 			$sql_user_tags = "SELECT tag_id FROM artists_tags WHERE artist_id=? AND user_id=?";
 			$stmt_user_tags = $pdo->prepare($sql_user_tags);
 			$stmt_user_tags->execute([ $artist["id"], $_SESSION["userID"] ]);

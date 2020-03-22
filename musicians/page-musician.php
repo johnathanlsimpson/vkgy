@@ -198,7 +198,7 @@
 								}
 
 								echo '<h5>'.lang('Add tags', 'タグする', ['secondary_class' => 'any--hidden']).'</h5>';
-								if($_SESSION["loggedIn"]) {
+								if($_SESSION["is_signed_in"]) {
 									if(is_array($rslt_tags) && !empty($rslt_tags)) {
 										foreach($rslt_tags as $tag) {
 											$is_selected = is_array($rslt_user_tags) && !empty($rslt_user_tags) && in_array($tag["id"], $rslt_user_tags);

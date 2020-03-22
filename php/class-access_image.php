@@ -44,7 +44,7 @@
 			set_time_limit(50);
 			
 			// Set max memory usage in MB
-			if($_SESSION['loggedIn']) {
+			if($_SESSION['is_signed_in']) {
 				$max_memory_size = 400;
 			}
 			else {

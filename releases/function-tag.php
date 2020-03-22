@@ -1,7 +1,7 @@
 <?php
 	include("../php/include.php");
 	
-	if($_SESSION["loggedIn"]) {
+	if($_SESSION["is_signed_in"]) {
 		$release_id = is_numeric($_POST["id"]) ? $_POST["id"] : null;
 		$user_id = $_SESSION["userID"];
 		$tag_id = is_numeric($_POST["tag_id"]) ? $_POST["tag_id"] : null;

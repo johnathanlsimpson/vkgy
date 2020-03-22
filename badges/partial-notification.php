@@ -1,6 +1,6 @@
 <?php
 
-if($_SESSION['loggedIn'] && strlen($rendered_badge)) {
+if($_SESSION['is_signed_in'] && strlen($rendered_badge)) {
 	style('../badges/style-partial-notice.css');
 	
 	?>

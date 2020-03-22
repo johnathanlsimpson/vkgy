@@ -69,7 +69,7 @@ elseif($is_edit && !$date_scheduled && !$is_queued && $current_entry['is_queued'
 }
 
 // Check if allowed
-if($_SESSION['loggedIn']) {
+if($_SESSION['is_signed_in']) {
 	$sql_vip_check = 'SELECT 1 FROM users WHERE id=? AND is_vip=? LIMIT 1';
 	$stmt_vip_check = $pdo->prepare($sql_vip_check);
 	$stmt_vip_check->execute([ $_SESSION['userID'], 1 ]);

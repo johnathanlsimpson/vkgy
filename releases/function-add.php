@@ -12,7 +12,7 @@
 		$output["result"] = "Submission empty.";
 	}
 	else {
-		if(!$_SESSION["loggedIn"]) {
+		if(!$_SESSION["is_signed_in"]) {
 			$output["result"] = "Sorry, you must be signed in.";
 		}
 		else {

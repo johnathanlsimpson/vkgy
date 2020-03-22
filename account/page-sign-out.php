@@ -3,7 +3,7 @@
 	
 	$page_header = lang('Sign out', 'サインアウト', ['container' => 'div']);
 	
-	if(!$_SESSION["loggedIn"]) {
+	if(!$_SESSION["is_signed_in"]) {
 		?>
 			<div class="col c1">
 				<div>

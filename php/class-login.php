@@ -149,7 +149,7 @@
 		// create new has cookie, update session
 		// ======================================================
 		public function check_login() {
-			if($_SESSION["loggedIn"]) {
+			if($_SESSION["is_signed_in"]) {
 				if(!strlen($_SESSION['site_lang']) || !strlen($_SESSION['site_theme'])) {
 					$sql_prefs = 'SELECT site_lang, site_theme FROM users WHERE id=? LIMIT 1';
 					$stmt_prefs = $this->pdo->prepare($sql_prefs);
@@ -181,7 +181,7 @@
 								'userID' => $row['id'],
 								'site_theme' => $row['site_theme'],
 								//'admin' => $row['rank'],
-								'loggedIn' => 1,
+								'is_signed_in' => 1,
 
 								'user_id' => $row['id'],
 								'username' => $row['username'],
@@ -239,7 +239,7 @@
 							'userID' => $row['id'],
 							'site_theme' => $row['site_theme'],
 							//'admin' => $row['rank'],
-							'loggedIn' => 1,
+							'is_signed_in' => 1,
 							
 							'user_id' => $row['id'],
 							'username' => $row['username'],
@@ -301,7 +301,7 @@
 			
 			// Sign out: destroy session and cookie
 			public function sign_out() {
-				foreach(["userID", 'user_id', "username", "admin", 'is_admin', "icon", "hash", "loggedIn", 'is_signed_in', 'is_vip', 'site_theme', 'site_theme', 'site_lang', "remember_me"] as $key) {
+				foreach(["userID", 'user_id', "username", "admin", 'is_admin', "icon", "hash", "is_signed_in", 'loggedIn', 'is_vip', 'site_theme', 'site_theme', 'site_lang', "remember_me"] as $key) {
 					unset($_SESSION[$key]);
 					setcookie($key, "", time() - 60 * 60 * 24 * 40, "/", $this->domain, true, true);
 				}

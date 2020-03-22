@@ -77,7 +77,7 @@ if($_GET["action"] === "update") {
 	}
 	
 	// Check if allowed
-	if($_SESSION['loggedIn']) {
+	if($_SESSION['is_signed_in']) {
 		if(
 			empty($entry)
 			||

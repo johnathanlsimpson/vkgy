@@ -1,7 +1,7 @@
 <?php
 	include("../php/include.php");
 	
-	if($_SESSION["loggedIn"]) {
+	if($_SESSION["is_signed_in"]) {
 		$action = sanitize($_POST["action"]);
 		$release_id = is_numeric($_POST["id"]) ? $_POST["id"] : null;
 		$user_id = $_SESSION["userID"];

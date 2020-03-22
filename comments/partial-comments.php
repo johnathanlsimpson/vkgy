@@ -89,7 +89,7 @@
 										'username' => $comment['user']['username'] ?: 'anonymous',
 										'date_occurred' => $comment['date_occurred'],
 										'markdown' => !$comment['is_deleted'] ? base64_encode($comment['content']) : null,
-										'is_user' => ($comment['anonymous_id'] && $_COOKIE['anonymous_id'] === $comment['anonymous_id']) || ($_SESSION['loggedIn'] && $_SESSION['userID'] === $comment['user']['id']) ? '1' : '0',
+										'is_user' => ($comment['anonymous_id'] && $_COOKIE['anonymous_id'] === $comment['anonymous_id']) || ($_SESSION['is_signed_in'] && $_SESSION['userID'] === $comment['user']['id']) ? '1' : '0',
 										'is_admin' => $_SESSION['is_admin'] ? '1' : '0',
 										'num_likes' => $comment['num_likes'] ?: '0',
 										'is_liked' => is_numeric($_SESSION['userID']) && $comment['liked_by_user_id'] === $_SESSION['userID'] ? '1' : '0',

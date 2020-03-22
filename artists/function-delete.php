@@ -1,7 +1,7 @@
 <?php
 	include_once("../php/include.php");
 	
-	if(!$_SESSION["loggedIn"]) {
+	if(!$_SESSION["is_signed_in"]) {
 		$login = new login($pdo);
 		$login->check_login();
 	}

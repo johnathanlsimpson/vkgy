@@ -273,7 +273,7 @@
 												</li>
 											</ul>
 											<?php
-												if($_SESSION["loggedIn"]) {
+												if($_SESSION["is_signed_in"]) {
 													?>
 														<div class="a--padded collect__container">
 															<a class="collect collect__item any--flex any--flex-space-between <?= $release["is_owned"] ? "symbol__checked" : "symbol__unchecked"; ?>" data-action="own" data-id="<?= $release["id"]; ?>">Owned</a>

@@ -1,7 +1,7 @@
 <?php
 	include_once("../php/include.php");
 	
-	if($_SESSION["loggedIn"]) {
+	if($_SESSION["is_signed_in"]) {
 		if(is_numeric($_POST["id"])) {
 			$id = sanitize($_POST["id"]);
 			
