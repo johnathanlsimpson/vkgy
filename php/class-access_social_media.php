@@ -130,13 +130,13 @@
 					if($item_type === 'blog_post' && strlen($input['title']) && strlen($input['url'])) {
 						$output['url'] = $input['url'];
 						$output['content'] = '
-							📰 News ∙ ニュース
+							'.(strpos($input['title'], 'interview') === false ? '📰 News ∙ ニュース' : '💬 Interview ∙ インタビュー').'
 							
-							'.$input['title'].($input['content_ja'] ? "\n\n".'[日本語] '.$input['content_ja'] : null).'
+							'.$input['title'].($input['content_ja'] ? "\n\n".'[日本語版] '.$input['content_ja'] : null).'
 							
 							'.($user['twitter'] && $user['twitter'] != '@vkgy_' ? '✍️ '.($user['twitter'] ?: $user['username']) : null).'
-							'.(is_array($input['twitter_authors']) && !empty($input['twitter_authors']) ? '✍️ '.implode("\n✍️ ", $input['twitter_authors']) : null).'
-							👑 '.$this->patreon_url.'
+							'.(is_array($input['twitter_authors']) && !empty($input['twitter_authors']) ? '✍️ '.implode(", ", $input['twitter_authors']) : null).'
+							'.(true ? null : '👑 '.$this->patreon_url).'
 						';
 					}
 					
