@@ -37,7 +37,7 @@
 		<li><a class="symbol__release" href="<?= '/releases/'.$friendly.'/'; ?>"><?= lang('Music', 'リリース', 'hidden'); ?></a></li>
 		<li><a class="symbol__news" href="<?= '/blog/artist/'.$friendly.'/'; ?>"><?= lang('News', 'ニュース', 'hidden'); ?></a></li>
 		<?php
-			if($_SESSION['is_admin']) {
+			if($_SESSION['is_editor']) {
 				?>
 					<li><a class="symbol__edit" href="<?= '/artists/'.$friendly.'/edit/'; ?>"><?= lang('Edit', '編集', 'hidden'); ?></a></li>
 				<?php

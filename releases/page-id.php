@@ -629,7 +629,7 @@
 											echo '<span class="symbol__error"><a class="a--inherit" href="/account/">Sign in</a> to add tags.';
 										}
 
-										if($_SESSION["admin"] > 0 && $needs_admin_tags) {
+										if($_SESSION["is_editor"] > 0 && $needs_admin_tags) {
 											echo '<hr />';
 											echo '<h5>Remove admin tags</h5>';
 

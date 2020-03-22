@@ -1,5 +1,5 @@
 <?php
-if($_SESSION['admin']) {
+if($_SESSION['is_admin']) {
 	$a = 'http://web.archive.org/web/1/';
 	$b = 'http://mykit.jp/nikki/nikkimiru.php3?';
 	

@@ -14,11 +14,11 @@
 			$stmt_is_admin_tag->execute([ $tag_id ]);
 			$rslt_is_admin_tag = $stmt_is_admin_tag->fetchColumn();
 			
-			$user_is_allowed = $rslt_is_admin_tag <= $_SESSION['is_admin'];
+			$user_is_allowed = $rslt_is_admin_tag <= $_SESSION['is_editor'];
 			
 			if($user_is_allowed) {
 				
-				if($_POST["action"] === "delete" && $_SESSION["is_admin"] > 0 && is_numeric($artist_id) && is_numeric($tag_id)) {
+				if($_POST["action"] === "delete" && $_SESSION["is_editor"] > 0 && is_numeric($artist_id) && is_numeric($tag_id)) {
 					
 					// Perform delete
 					$sql_delete = "DELETE FROM artists_tags WHERE artist_id=? AND tag_id=?";

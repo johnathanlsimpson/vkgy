@@ -307,7 +307,7 @@ if($_SESSION['username'] === 'inartistic') {
 						$comments[$i]['user']['avatar_url'] = '/usericons/avatar-'.(file_exists('../usericons/avatar-'.$comments[$i]['user']['username'].'.png') ? $comments[$i]['user']['username'] : 'anonymous').'.png?'.date('YmdH');
 						
 						if(!$comments[$i]['is_approved']) {
-							$comment_class .= ($_SESSION['admin'] ? 'comment--unapproved' : 'any--hidden');
+							$comment_class .= ($_SESSION['is_admin'] ? 'comment--unapproved' : 'any--hidden');
 						}
 						
 						?>

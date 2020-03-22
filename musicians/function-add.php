@@ -4,7 +4,7 @@
 	
 	$markdown_parser = new parse_markdown($pdo);
 	
-	if($_SESSION["admin"]) {
+	if($_SESSION["is_editor"]) {
 		if(!empty(array_filter($_POST["name"])) && is_array($_POST["name"])) {
 			foreach($_POST["name"] as $key => $name) {
 				$name = sanitize($name) ?: null;

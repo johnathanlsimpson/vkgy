@@ -45,7 +45,7 @@
 					$sql_select = [
 						"users.id",
 						"users.username",
-						"users.rank AS is_admin",
+						"users.rank AS is_editor",
 						"users.is_vip",
 						"users.name",
 						"users.email",
@@ -69,7 +69,7 @@
 					$sql_select = [
 						"users.id",
 						"users.is_vip",
-						"users.rank AS is_admin",
+						"users.rank AS is_editor",
 						"users.date_added",
 						"users.username",
 					];

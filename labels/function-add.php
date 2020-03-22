@@ -4,7 +4,7 @@
 	
 	$access_label = new access_label($pdo);
 	
-	if($_SESSION["admin"]) {
+	if($_SESSION["is_editor"]) {
 		if(is_array($_POST["name"])) {
 			foreach($_POST["name"] as $key => $name) {
 				$name = sanitize($name);

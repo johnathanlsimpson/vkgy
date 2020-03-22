@@ -227,7 +227,7 @@
 																	}
 																?>
 															<?php
-																if($_SESSION['is_admin']) {
+																if($_SESSION['is_editor']) {
 																	?>
 																		<a class="symbol__edit a--inherit any--weaken-size" href="/lives/<?= $live['id']; ?>/edit/" style="margin-left:1ch;">Edit</a>
 																	<?php

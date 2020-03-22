@@ -71,7 +71,7 @@
 		return is_array($output) && !empty($output) ? $output : null;
 	}
 	
-	if($_SESSION["admin"] && !empty($_POST)) {
+	if($_SESSION["is_editor"] && !empty($_POST)) {
 		if(!empty($_POST["name"])) {
 			foreach($_POST["name"] as $key => $name) {
 				$name         = sanitize($name);

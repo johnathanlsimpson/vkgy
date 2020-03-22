@@ -355,7 +355,7 @@
 				<div class="any--flex">
 					<a class="releases symbol__release">Discog<div class="any--jp any--weaken">音源</div></a>
 					<a class="profile symbol__artist">Profile<div class="any--jp any--weaken">プロフ</div></a>
-					<a class="edit symbol__edit <?php echo !$_SESSION["admin"] ? "any--hidden" : null; ?>">Edit<div class="any--jp any--weaken">編集</div></a>
+					<a class="edit symbol__edit <?php echo !$_SESSION["is_editor"] ? "any--hidden" : null; ?>">Edit<div class="any--jp any--weaken">編集</div></a>
 					<a class="news symbol__news">News<div class="any--jp any--weaken">ニュース</div></a>
 				</div>
 			</div>

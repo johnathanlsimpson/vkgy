@@ -15,7 +15,7 @@ $image_id = sanitize($_POST['id']);
 $item_type = sanitize($_POST['item_type']);
 $item_id = sanitize($_POST['item_id']);
 
-if(is_numeric($image_id) && $_SESSION["admin"]) {
+if(is_numeric($image_id) && $_SESSION["is_editor"]) {
 	// Check if > 1 existing link
 	$check_sql = [
 		'artist' => 'SELECT 1 FROM images_artists WHERE image_id=? LIMIT 1',

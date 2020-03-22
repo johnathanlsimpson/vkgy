@@ -80,9 +80,9 @@ if($_SESSION['loggedIn']) {
 		||
 		($is_edit && $_SESSION['userID'] === $current_entry['user_id'])
 		||
-		($is_edit && !$is_queued && $_SESSION['admin'])
+		($is_edit && !$is_queued && $_SESSION['is_admin'])
 		||
-		($is_edit && $is_queued && $_SESSION['admin'] && $is_vip)
+		($is_edit && $is_queued && $_SESSION['is_admin'] && $is_vip)
 		||
 		($is_edit && in_array(277, $_POST['tags']))
 	) {

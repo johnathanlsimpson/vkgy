@@ -3,7 +3,7 @@ include_once('../php/include.php');
 $comments_table = 'comments';
 
 if(is_numeric($_POST['comment_id'])) {
-	if($_SESSION['loggedIn'] && $_SESSION['admin']) {
+	if($_SESSION['loggedIn'] && $_SESSION['is_admin']) {
 		$sql_approve = 'UPDATE '.$comments_table.' SET is_approved=? WHERE id=? LIMIT 1';
 		$stmt_approve = $pdo->prepare($sql_approve);
 		

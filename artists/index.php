@@ -29,7 +29,7 @@
 		
 		if(is_array($artist) && !empty($artist)) {
 			if($_GET["action"] === "edit") {
-				if($_SESSION["admin"]) {
+				if($_SESSION["is_editor"]) {
 					$show_edit_page = true;
 				}
 				else {
@@ -50,7 +50,7 @@
 		}
 	}
 	if($_GET["action"] === "add") {
-		if($_SESSION["admin"]) {
+		if($_SESSION["is_editor"]) {
 			$show_add_page = true;
 		}
 		else {

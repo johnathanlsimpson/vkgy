@@ -59,7 +59,7 @@
 							$letter = preg_match("/"."[^a-z]"."/", $letter) ? "#" : $letter;
 							
 							?>
-								<tr class="user__container" <?= $user["is_admin"] ? "data-admin" : null; ?> <?= $user["is_vip"] ? "data-vip" : null; ?> data-date="<?= $user['id']; ?>" data-username="<?= $user["username"]; ?>">
+								<tr class="user__container" <?= $user["is_editor"] ? "data-admin" : null; ?> <?= $user["is_vip"] ? "data-vip" : null; ?> data-date="<?= $user['id']; ?>" data-username="<?= $user["username"]; ?>">
 									<td class="any--weaken-color any--no-wrap">
 										<?php echo substr($user["date_added"], 0, 10); ?>
 									</td>
@@ -71,7 +71,7 @@
 													<span class="any__note symbol__star--full">Founder</span>
 												<?php
 											}
-											if($user["is_admin"]) {
+											if($user["is_editor"]) {
 												?>
 													<span class="any__note symbol__star--full">Admin</span>
 												<?php
