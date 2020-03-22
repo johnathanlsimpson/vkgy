@@ -9,7 +9,7 @@
 			$stmt_check = $pdo->prepare($sql_check);
 			$stmt_check->execute([$id]);
 			
-			if($_SESSION["is_editor"] || $stmt_check->fetchColumn() === $_SESSION["userID"]) {
+			if($_SESSION["is_editor"] || $stmt_check->fetchColumn() === $_SESSION["user_id"]) {
 				$sql_delete = "DELETE FROM comments WHERE id=? LIMIT 1";
 				$stmt_delete = $pdo->prepare($sql_delete);
 				if($stmt_delete->execute([$id])) {

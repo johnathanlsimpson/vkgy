@@ -299,10 +299,10 @@
 			$rslt_image = $stmt_image->fetch();
 			
 			// Check user VIP status
-			if(is_numeric($_SESSION['userID'])) {
+			if(is_numeric($_SESSION['user_id'])) {
 				$sql_user = "SELECT 1 FROM users WHERE id=? AND is_vip=? LIMIT 1";
 				$stmt_user = $this->pdo->prepare($sql_user);
-				$stmt_user->execute([ $_SESSION["userID"], 1]);
+				$stmt_user->execute([ $_SESSION["user_id"], 1]);
 				$user_is_vip = $stmt_user->fetchColumn() === "1";
 			}
 			
@@ -317,7 +317,7 @@
 			// If image was found in DB
 			if(is_array($rslt_image) && !empty($rslt_image)) {
 				$image_is_exclusive = $rslt_image['is_exclusive'] ? true : false;
-				$user_is_uploader = $_SESSION['userID'] === $rslt_image['user_id'];
+				$user_is_uploader = $_SESSION['user_id'] === $rslt_image['user_id'];
 				
 				// If image exclusive
 				if($image_is_exclusive) {

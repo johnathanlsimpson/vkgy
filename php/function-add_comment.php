@@ -11,7 +11,7 @@
 					$item_type = array_flip(["blog", "release", "vip", "artist"])[$_POST["item_type"]];
 					$comment_id = is_numeric($_POST["comment_id"]) ? $_POST["comment_id"] : null;
 					$thread_id = is_numeric($_POST["thread_id"]) ? $_POST["thread_id"] : null;
-					$user_id = sanitize($_SESSION["userID"]);
+					$user_id = sanitize($_SESSION["user_id"]);
 					
 					$content = $_POST["content"];
 					$content = str_replace(["\r\n", "\r"], "\n", $content);

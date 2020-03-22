@@ -23,7 +23,7 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 			$item_type    = array_search($_POST['item_type'], $access_comment->comment_types);
 			$comment_id   = is_numeric($_POST['comment_id']) ? sanitize($_POST['comment_id']) : null;
 			$thread_id    = is_numeric($_POST['thread_id']) ? sanitize($_POST['thread_id']) : null;
-			$user_id      = $_SESSION['is_signed_in'] ? $_SESSION['userID'] : null;
+			$user_id      = $_SESSION['is_signed_in'] ? $_SESSION['user_id'] : null;
 			$is_signed_in = is_numeric($user_id);
 			$is_admin     = $_SESSION['is_admin'];
 			$is_approved  = 1;
@@ -41,7 +41,7 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 					$sign_in->sign_in($_POST);
 					
 					if($sign_in->check_login()) {
-						$user_id = $_SESSION['userID'];
+						$user_id = $_SESSION['user_id'];
 						$is_signed_in = true;
 					}
 					else {

@@ -66,7 +66,7 @@
 		// Get user's username and Twitter username
 		// ======================================================
 		function get_user($user_id) {
-			$user_id = is_numeric($user_id) ? $user_id : $_SESSION['userID'];
+			$user_id = is_numeric($user_id) ? $user_id : $_SESSION['user_id'];
 			
 			$sql_user = 'SELECT id, username, twitter FROM users WHERE id=? LIMIT 1';
 			$stmt_user = $this->pdo->prepare($sql_user);

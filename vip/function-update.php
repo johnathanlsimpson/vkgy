@@ -14,7 +14,7 @@
 				$stmt_check = $pdo->prepare($sql_check);
 				$stmt_check->execute([$id]);
 				
-				if($stmt_check->fetchColumn() === $_SESSION["userID"] || $_SESSION["is_editor"]) {
+				if($stmt_check->fetchColumn() === $_SESSION["user_id"] || $_SESSION["is_editor"]) {
 					$sql_update = "UPDATE vip SET title=?, content=?, friendly=? WHERE id=?";
 					$stmt_update = $pdo->prepare($sql_update);
 					if($stmt_update->execute([$title, $content, $friendly, $id])) {
@@ -35,7 +35,7 @@
 			else {
 				$sql_add = "INSERT INTO vip (title, content, friendly, user_id) VALUES (?, ?, ?, ?)";
 				$stmt_add = $pdo->prepare($sql_add);
-				if($stmt_add->execute([$title, $content, $friendly, $_SESSION["userID"]])) {
+				if($stmt_add->execute([$title, $content, $friendly, $_SESSION["user_id"]])) {
 					$output["status"] = "success";
 					$output["friendly"] = $friendly;
 					$output["title"] = $title;

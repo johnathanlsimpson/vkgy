@@ -11,7 +11,7 @@ if($_SESSION["is_signed_in"]) {
 		$stmt_check->execute([$id]);
 		$user_id = $stmt_check->fetchColumn();
 		
-		if($user_id === $_SESSION["userID"] || $_SESSION["is_editor"]) {
+		if($user_id === $_SESSION["user_id"] || $_SESSION["is_editor"]) {
 			$sql_delete = "DELETE FROM blog WHERE id=? LIMIT 1";
 			$stmt_delete = $pdo->prepare($sql_delete);
 			if($stmt_delete->execute([$id])) {

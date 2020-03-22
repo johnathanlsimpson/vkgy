@@ -3,7 +3,7 @@
 	
 	if($_SESSION["is_signed_in"]) {
 		$musician_id = is_numeric($_POST["id"]) ? $_POST["id"] : null;
-		$user_id = $_SESSION["userID"];
+		$user_id = $_SESSION["user_id"];
 		$tag_id = is_numeric($_POST["tag_id"]) ? $_POST["tag_id"] : null;
 		
 		if(is_numeric($musician_id)) {

@@ -15,7 +15,7 @@
 				$stmt->execute([$_POST["id"]]);
 				$user_id = $stmt->fetchColumn();
 				
-				if($_SESSION["userID"] === $user_id || $_SESSION["is_editor"]) {
+				if($_SESSION["user_id"] === $user_id || $_SESSION["is_editor"]) {
 					$sql_delete = "DELETE FROM releases WHERE id=? LIMIT 1";
 					$stmt = $pdo->prepare($sql_delete);
 					if($stmt->execute([$_POST["id"]])) {

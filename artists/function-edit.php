@@ -253,7 +253,7 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 							$musician_id = $change_match[1];
 							
 							if(is_array($_POST['musicians']) && is_array($_POST['musicians'][$musician_id]) && strlen($change_match[2])) {
-								if($stmt_musician_edits->execute([ $musician_id, $_SESSION['userID'], sanitize($change_match[2]) ])) {
+								if($stmt_musician_edits->execute([ $musician_id, $_SESSION['user_id'], sanitize($change_match[2]) ])) {
 								}
 								
 								$musician_name = 
@@ -276,7 +276,7 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 						
 						// Insert change into edits DB
 						if(strlen($change)) {
-							if($stmt_artist_edits->execute([ $_POST['id'], $_SESSION['userID'], $change ])) {
+							if($stmt_artist_edits->execute([ $_POST['id'], $_SESSION['user_id'], $change ])) {
 							}
 						}
 					}

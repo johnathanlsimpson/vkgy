@@ -698,7 +698,7 @@
 							"date_occurred" => $date,
 							"type" => "(".implode(")(", $line_type).")",
 							"artist_id" => $artist_id,
-							"user_id" => $_SESSION["userID"],
+							"user_id" => $_SESSION["user_id"],
 							'area_id' => $area_id,
 							"parsed_live" => $parsed_live,
 							"note" => $note ? '<div class="any--weaken symbol__help">'.$note.'</div>' : null,

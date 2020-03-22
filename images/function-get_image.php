@@ -107,7 +107,7 @@
 						elseif($_SESSION["is_signed_in"] && !$is_vip) {
 							$sql_check_vip = "SELECT 1 FROM users WHERE id=? AND is_vip=? LIMIT 1";
 							$stmt_check_vip = $pdo->prepare($sql_check_vip);
-							$stmt_check_vip->execute([sanitize($_SESSION["userID"]), 1]);
+							$stmt_check_vip->execute([sanitize($_SESSION["user_id"]), 1]);
 							
 							if($stmt_check_vip->fetchColumn() === "1") {
 								$is_vip = true;
@@ -117,7 +117,7 @@
 							$is_vip = false;
 						}
 						
-						if(!$is_vip && $_SESSION["userID"] !== $rslt_image["user_id"] || $input["not_vip"]) {
+						if(!$is_vip && $_SESSION["user_id"] !== $rslt_image["user_id"] || $input["not_vip"]) {
 							$new_image = new \Eventviva\ImageResize($source_image_path);
 							$new_image->resizeToBestFit(800, 800);
 							$new_image->save($watermarked_image_path);

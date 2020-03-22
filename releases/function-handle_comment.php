@@ -9,7 +9,7 @@
 	$comment_content = sanitize($_POST["comment"]);
 	$release_id      = sanitize($_POST["release_id"]);
 	$comment_id      = sanitize($_POST["comment_id"]);
-	$user_id         = $_SESSION["userID"];
+	$user_id         = $_SESSION["user_id"];
 	$ip_address      = inet_pton($_SERVER["REMOTE_ADDR"]);
 	$like_action     = $_POST["action"] === "remove" ? "remove" : "add";
 	
@@ -107,7 +107,7 @@
 			$markdown_parser = new parse_markdown($pdo);
 			
 			$sql_fields = [
-				$_SESSION["userID"],
+				$_SESSION["user_id"],
 				$_POST["release_id"],
 				sanitize($_POST["comment"])
 			];

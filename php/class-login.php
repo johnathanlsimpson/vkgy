@@ -153,7 +153,7 @@
 				if(!strlen($_SESSION['site_lang']) || !strlen($_SESSION['site_theme'])) {
 					$sql_prefs = 'SELECT site_lang, site_theme FROM users WHERE id=? LIMIT 1';
 					$stmt_prefs = $this->pdo->prepare($sql_prefs);
-					$stmt_prefs->execute([ $_SESSION['userID'] ]);
+					$stmt_prefs->execute([ $_SESSION['user_id'] ]);
 					$rslt_prefs = $stmt_prefs->fetch();
 
 					if(is_array($rslt_prefs) && !empty($rslt_prefs)) {
@@ -178,7 +178,7 @@
 						if(is_array($row) && !empty($row)) {
 
 							$session_data = [
-								'userID' => $row['id'],
+								'user_id' => $row['id'],
 								'site_theme' => $row['site_theme'],
 								//'admin' => $row['rank'],
 								'is_signed_in' => 1,
@@ -215,12 +215,12 @@
 			public function set_login_data($user_data) {
 				$sql_set_ip = 'UPDATE users SET ip_address=? WHERE id=? LIMIT 1';
 				$stmt_set_ip = $this->pdo->prepare($sql_set_ip);
-				$stmt_set_ip->execute([ ip2long($_SERVER['REMOTE_ADDR']), $user_data['userID'] ]);
+				$stmt_set_ip->execute([ ip2long($_SERVER['REMOTE_ADDR']), $user_data['user_id'] ]);
 				
 				$_SESSION = is_array($_SESSION) ? $_SESSION : [];
 				$_SESSION = array_merge($_SESSION, $user_data);
 				
-				$this->hashSet($user_data["userID"]);
+				$this->hashSet($user_data["user_id"]);
 			}
 			
 			
@@ -236,7 +236,7 @@
 					
 					if($row) {
 						$session_data = [
-							'userID' => $row['id'],
+							'user_id' => $row['id'],
 							'site_theme' => $row['site_theme'],
 							//'admin' => $row['rank'],
 							'is_signed_in' => 1,
@@ -301,7 +301,7 @@
 			
 			// Sign out: destroy session and cookie
 			public function sign_out() {
-				foreach(["userID", 'user_id', "username", "admin", 'is_admin', "icon", "hash", "is_signed_in", 'loggedIn', 'is_vip', 'site_theme', 'site_theme', 'site_lang', "remember_me"] as $key) {
+				foreach(["user_id", 'user_id', "username", "admin", 'is_admin', "icon", "hash", "is_signed_in", 'loggedIn', 'is_vip', 'site_theme', 'site_theme', 'site_lang', "remember_me"] as $key) {
 					unset($_SESSION[$key]);
 					setcookie($key, "", time() - 60 * 60 * 24 * 40, "/", $this->domain, true, true);
 				}
