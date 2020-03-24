@@ -18,9 +18,9 @@ if(is_array($rslt_queued) && !empty($rslt_queued)) {
 	foreach($rslt_queued as $entry) {
 		
 		// Update post date and unqueue
-		$sql_update = 'UPDATE blog SET is_queued=?, date_occurred=? WHERE id=? LIMIT 1';
+		$sql_update = 'UPDATE blog SET is_queued=?, date_occurred=?, date_scheduled=? WHERE id=? LIMIT 1';
 		$stmt_update = $pdo->prepare($sql_update);
-		if($stmt_update->execute([ 0, $current_date, $entry['id'] ])) {
+		if($stmt_update->execute([ 0, $current_date, null, $entry['id'] ])) {
 			
 			// Make images visible
 			$images = $access_image->access_image([ 'blog_id' => $entry['id'], 'get' => 'name', 'show_queued' => true ]);
