@@ -60,9 +60,15 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 				}
 			}
 			
-			// Format comment content
+			// Clean up comment content
 			$content = $_POST['content'];
 			$content = str_replace(["\r\n", "\r"], "\n", $content);
+			// Allow single line breaks for JP users. To do this, add a space+space
+			// at the end of each line--Markdown will decide which cases to put <br />
+			// and which to leave alone. Note that we should strip these when editing comment
+			// Also make sure advanced users can still do manual space+backslash
+			$content = str_replace("\n", "  \n", $content);
+			$content = str_replace("\\  \n", "\\\n", $content);
 			$content = trim($content);
 			$content = $markdown_parser->validate_markdown($content);
 			$content = sanitize($content);
@@ -127,12 +133,18 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 				$output['comment_id'] = $comment_id;
 				$output['date_occurred'] = date('Y-m-d H:i:s');
 				$output['content'] = $markdown_parser->parse_markdown($content);
-				$output['markdown'] = $content;
 				$output['is_admin'] = $_SESSION['admin'] ? '1' : '0';
 				$output['is_user'] = '1';
 				$output['is_approved'] = $is_approved ? '1' : '0';
 				$output['username'] = $_SESSION['username'] ?: 'anonymous';
 				$output['name'] = $name;
+				
+				// Trim trailing spaces from Markdown, which we put there to allow single linebreaks
+				$output['markdown'] = explode("\n", $content);
+				foreach($output['markdown'] as $line_key => $line) {
+					$output['markdown'][$line_key] = trim($line);
+				}
+				$output['markdown'] = implode("\n", $output['markdown']);
 			}
 		}
 		else {
