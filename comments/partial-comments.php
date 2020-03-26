@@ -88,7 +88,7 @@
 										'user_url' => '/users/'.($comment['user']['username'] ?: 'anonymous').'/',
 										'username' => $comment['user']['username'] ?: 'anonymous',
 										'date_occurred' => $comment['date_occurred'],
-										'markdown' => !$comment['is_deleted'] ? base64_encode($comment['content']) : null,
+										'markdown' => !$comment['is_deleted'] ? base64_encode(str_replace("  \n", "\n", $comment['content'])) : null, // Replace space+space linebreak with normal linebreak; this is added automatically to allow single linebreaks
 										'is_user' => ($comment['anonymous_id'] && $_COOKIE['anonymous_id'] === $comment['anonymous_id']) || ($_SESSION['loggedIn'] && $_SESSION['userID'] === $comment['user']['id']) ? '1' : '0',
 										'is_admin' => $_SESSION['admin'] ? '1' : '0',
 										'num_likes' => $comment['num_likes'] ?: '0',
