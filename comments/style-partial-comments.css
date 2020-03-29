@@ -96,16 +96,16 @@
 	margin-top: 1rem;
 	padding-top: 1rem;
 }
-.commentate__name, .commentate__sign-in {
+.commentate__name/*, .commentate__sign-in*/ {
 	flex: 1;
 }
 .commentate__notice {
 	margin: 0 0.5rem 1.5rem 0.5rem;
 	width: 100%;
 }
-.commentate__password {
+/*.commentate__password {
 	margin-left: 0.5rem;
-}
+}*/
 .comment__content + .commentate__container {
 	margin-top: 1.5rem;
 }
@@ -232,4 +232,17 @@
 		opacity: 1;
 		transform: scale(1);
 	}
+}
+
+.input__checkbox-label .input__checkbox {
+	display: none;
+}
+.input__checkbox-label .input__checkbox:checked + .symbol__unchecked {
+	color: hsl(var(--text));
+}
+.input__checkbox-label .input__checkbox:checked + .symbol__unchecked::before {
+	-moz-clip-path: url(#symbol__checked);
+	-webkit-clip-path: url(#symbol__checked);
+	clip-path: url(#symbol__checked);
+	color: hsl(var(--text));
 }
