@@ -33,19 +33,58 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 			if(!$is_signed_in) {
 				
 				// Set anonymous ID
-				$anonymous_id = $_COOKIE['anonymous_id'] ?: uniqid();
+				$anonymous_id = $_SESSION['anonymous_id'] ?: ($_COOKIE['anonymous_id'] ?: uniqid());
 				
 				// Try to sign in
-				if(strlen($_POST["username"]) && strlen($_POST["password"])) {
-					$sign_in = new login($pdo);
-					$sign_in->sign_in($_POST);
+				if(strlen($_POST['username']) && strlen($_POST['password'])) {
 					
-					if($sign_in->check_login()) {
-						$user_id = $_SESSION['userID'];
-						$is_signed_in = true;
+					if($_POST['sign_in_type'] === 'sign-in') {
+					
+						$sign_in = new login($pdo);
+						$sign_in->sign_in($_POST);
+						
+						if($sign_in->check_login()) {
+							$user_id = $_SESSION['userID'];
+							$is_signed_in = true;
+						}
+						else {
+							$output['result'][] = $sign_in->get_status_message();
+						}
+						
 					}
-					else {
-						$output['result'][] = $sign_in->get_status_message();
+					
+					// Register new account while commenting
+					elseif($_POST['sign_in_type'] === 'register') {
+						
+						ob_start();
+						$_POST['register_username'] = $_POST['username'];
+						$_POST['register_password'] = $_POST['password'];
+						include('../account/function-register.php');
+						ob_end_clean();
+						
+						// Sign in new account
+						if(is_numeric($user_id)) {
+							
+							$sign_in = new login($pdo);
+							$sign_in->sign_in($_POST);
+							
+							if($sign_in->check_login()) {
+								$is_signed_in = true;
+								$output['redirect_url'] = '/account/';
+							}
+							else {
+								$output['result'] = $sign_in->get_status_message();
+							}
+							
+							// Technically this is running as a comment edit, but since it's the user's first comment, let's make sure they get a point
+							$access_points = new access_points($pdo);
+							$access_points->award_points([ 'point_type' => 'added-comment' ]);
+							
+						}
+						else {
+							$output['result'] = is_array($output['result']) ? $output['result'] : [ $output['result'] ];
+						}
+						
 					}
 				}
 				
@@ -54,21 +93,31 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 					$is_approved = 0;
 					$name = sanitize($_POST['name']) ?: null;
 					
+					if(!$_SESSION['anonymous_id']) {
+						$_SESSION['anonymous_id'] = $anonymous_id;
+					}
+					
 					if(!$_COOKIE['anonymous_id']) {
 						setcookie('anonymous_id', $anonymous_id, time() + (60 * 60 * 24 * 7), '/', 'vk.gy');
 					}
 				}
 			}
 			
+			// This is kinda messy, but when newly registering after making a comment, it sets $name, so undo
+			$name = $_SESSION['is_signed_in'] ? null : $name;
+			
 			// Clean up comment content
 			$content = $_POST['content'];
 			$content = str_replace(["\r\n", "\r"], "\n", $content);
+			
 			// Allow single line breaks for JP users. To do this, add a space+space
 			// at the end of each line--Markdown will decide which cases to put <br />
 			// and which to leave alone. Note that we should strip these when editing comment
 			// Also make sure advanced users can still do manual space+backslash
 			$content = str_replace("\n", "  \n", $content);
 			$content = str_replace("\\  \n", "\\\n", $content);
+			
+			// Clean comment more and validate
 			$content = trim($content);
 			$content = $markdown_parser->validate_markdown($content);
 			$content = sanitize($content);

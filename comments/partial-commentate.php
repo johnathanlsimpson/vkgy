@@ -26,7 +26,7 @@
 				<div class="input__row commentate__anonymous">
 					<div class="text text--compact text--outlined text--notice commentate__notice">
 						<span class="symbol__error" style="float: left;"></span>
-						<?php echo lang('Commented anonymously. Add a handle name? (To edit your VK avatar, sign in or <a href="/account/" target="_blank">register</a>.)', 'コメントは匿名で投稿されます。ハンドル名を追加しますか？ (V系アバターをカスタマイズように、サインイン・<a href="/account/" target="_blank">登録</a>する。)', 'div'); ?>
+						<?= lang('Commented anonymously. Add a handle name, or register, below.', 'コメントは匿名で投稿されました。以下、ハンドルネームを追加するか、登録してください。', 'div'); ?>
 					</div>
 					
 					<!-- Set your handlename -->
@@ -34,13 +34,24 @@
 						<label class="input__label"><?php echo lang('Handle name', 'ハンドル名', 'hidden'); ?></label>
 						<input class="any--flex-grow" name="name" placeholder="your name <?php echo sanitize('(ハンドル名)'); ?>" value="{name}" />
 					</div>
+				</div>
+				
+				<!-- This section shows when you're not signed in -->
+				<div class="input__row commentate__anonymous">
 					
 					<!-- Sign in -->
-					<div class="input__group commentate__sign-in">
-						<label class="input__label"><?php echo lang('Username', 'ユーザ名', 'hidden'); ?></label>
-						<input class="any--flex-grow" name="username" placeholder="username <?php echo sanitize('(ユーザ名)'); ?>" value="{name}" />
-						<input class="commentate__password any--flex-grow input--secondary" name="password" placeholder="password <?php echo sanitize('(パスワード)'); ?>" type="password" value="{name}" />
+					<div class="input__group commentate__sign-in any--flex-grow">
+						<label class="input__label"><?= lang('Sign in/Register', 'サインイン・登録', 'hidden'); ?></label>
+						<input class="any--flex-grow" name="username" placeholder="username <?= sanitize('(ユーザ名)'); ?>" value="" />
 					</div>
+					<div class="input__group commentate__sign-in any--flex-grow">
+						<input class="commentate__password any--flex-grow" name="password" placeholder="password <?= sanitize('(パスワード)'); ?>" type="password" value="" />
+					</div>
+					<div class="input__group commentate__sign-in">
+						<label class="input__checkbox-label"><input class="input__checkbox" name="sign_in_type" type="radio" value="register" checked /><span class="symbol__unchecked">Register</span></label>
+						<label class="input__checkbox-label"><input class="input__checkbox" name="sign_in_type" type="radio" value="sign-in" /><span class="symbol__unchecked">Sign In</span></label>
+					</div>
+					
 				</div>
 				
 				<!-- Submit area -->
