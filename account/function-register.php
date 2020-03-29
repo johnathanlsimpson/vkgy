@@ -21,6 +21,13 @@ if($username && $password) {
 				
 				$login->sign_in(["username" => $username, "password" => $password]);
 				
+				// Grab any anonymous comments and assign to this user
+				if(strlen($_SESSION['anonymous_id'])) {
+					$sql_comments = 'UPDATE comments SET user_id=? WHERE user_id IS NULL AND anonymous_id=?';
+					$stmt_comments = $pdo->prepare($sql_comments);
+					$stmt_comments->execute([ $user_id, $_SESSION['anonymous_id'] ]);
+				}
+				
 				// Set default avatar
 				ob_start();
 				include_once('../avatar/function-generate_default.php');
