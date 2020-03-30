@@ -293,8 +293,22 @@
 											</ul>
 											
 											<div class="input__row">
-												<div class="input__group">
-													<a class="a--outlined a--padded any--weaken-size" href="http://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/searches?term.media_format=&f=all&q=<?php echo $release["upc"] ? str_replace(["-000", "-00", "-0"], "-", $release["upc"]) : str_replace(" ", "+", $release["quick_name"]); ?>" target="_blank"><?php echo $release["upc"] ? "Buy at CDJapan" : "Search at CDJapan"; ?></a>
+												<div class="data__item">
+													<h5>
+														Buy
+													</h5>
+													<a class="release__buy" href="<?= 'https://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/searches?term.media_format=&f=all&q='.($release["upc"] ? str_replace(["-000", "-00", "-0"], "-", $release["upc"]) : str_replace(" ", "+", $release["quick_name"])); ?>" target="_blank">
+														<img src="/releases/cdj.gif" style="height:1rem;" /> <?= $release["upc"] ? 'Buy at' : 'Search'; ?> CDJapan
+													</a>
+													&nbsp;
+													<a class="release__buy" href="<?= 'https://magento.rarezhut.net/catalogsearch/result/?q='.html_entity_decode($release['artist']['name']); ?>" target="_blank">
+														<img src="/releases/rh.gif" style="height:1rem;" /> Search RarezHut
+													</a>
+													<style>
+														.release__buy:not(:hover) img {
+															filter:grayscale(1);
+														}
+													</style>
 												</div>
 											</div>
 										</div>
