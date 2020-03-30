@@ -384,46 +384,6 @@
 				margin-left: 3px;
 				padding: 0 2px;
 			}
-			.input__group {
-				padding-left: 0.5rem !important;
-			}
-			.input__group::before {
-				display: none;
-			}
-			.easy-autocomplete + .input--secondary,
-			.easy-autocomplete .input--secondary {
-				border-top-left-radius: 0 !important;
-				border-bottom-left-radius: 0 !important;
-			}
-			@media(max-width:399.99px) {
-				.input__row  input,
-				.input__row .input,
-				.input__row .input--secondary {
-					flex: none;
-					flex-shrink: 1;
-					margin-left: 0;
-					margin-right: 0;
-					width: calc(100% - 1rem);
-				}
-			}
-			@media(max-width:599.99px) {
-				.input__group.any--flex-grow {
-					flex: none;
-					width: 100%;
-				}
-			}
-			/*@media(max-width:600.00px) {
-				.input__group {
-					width: 100%;
-				}
-				.input__row  input,
-				.input__row .input,
-				.input__row .input--secondary {
-					flex: none;
-					margin-bottom: 0.5rem;
-					width: 100%;
-				}
-			}*/
 		</style>
 		
 		<script language="javascript" type="text/javascript">
