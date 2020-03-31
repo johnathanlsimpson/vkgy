@@ -45,7 +45,7 @@ if(is_array($rslt_queued) && !empty($rslt_queued)) {
 			}
 			
 			// Immediately post to socials, if not just translated ver
-			if( strpos($entry['title'], '[&#26085;&#26412;&#35486;]') === false ) {
+			if( strpos($entry['title'], sanitize('日本語')) === false ) {
 				if(strlen($entry['title']) && strlen($entry['friendly'])) {
 					$social_post = $access_social_media->build_post([
 						'title' => $entry['title'],
