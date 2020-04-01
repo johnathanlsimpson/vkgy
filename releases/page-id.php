@@ -301,12 +301,12 @@
 														<img src="/releases/cdj.gif" style="height:1rem;" /> <?= $release["upc"] ? 'Buy at' : 'Search'; ?> CDJapan
 													</a>
 													&nbsp;
-													<a class="release__buy" href="<?= 'https://magento.rarezhut.net/catalogsearch/result/?q='.html_entity_decode($release['artist']['name']); ?>" target="_blank">
+													<a class="release__buy" href="<?= 'https://magento.rarezhut.net/catalogsearch/result/?q='.html_entity_decode($release['artist']['name'].' '.$release['name']); ?>" target="_blank">
 														<img src="/releases/rh.gif" style="height:1rem;" /> Search RarezHut
 													</a>
 													<style>
 														.release__buy:not(:hover) img {
-															filter:grayscale(1);
+															opacity: 0.5;
 														}
 													</style>
 												</div>
