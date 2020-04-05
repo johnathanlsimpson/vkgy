@@ -64,6 +64,11 @@
 		<?php display_styles(); ?>
 	</head>
 	<body class="<?php echo $body_class; ?>">
+		
+		<?php
+			include_once("../style/symbols.php");
+		?>
+		
 		<input class="any--hidden" id="language-en" name="language" type="radio" value="en" <?php echo !isset($_SESSION['site_lang']) || $_SESSION['site_lang'] == 0 ? 'checked' : null; ?> />
 		<input class="any--hidden" id="language-ja" name="language" type="radio" value="ja" <?php echo $_SESSION['site_lang'] == 1 ? 'checked' : null; ?> />
 		<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5KZPGP8" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -391,9 +396,7 @@
 			var sc_invisible=1;
 			var sc_security="59674422";
 		</script>
-		<script language="javascript" src="//www.statcounter.com/counter/counter.js" type="text/javascript"></script>
-		<?php
-			include_once("../style/symbols.php");
-		?>
+		<script language="javascript" src="https://www.statcounter.com/counter/counter.js" type="text/javascript" async></script>
+		
 	</body>
 </html>

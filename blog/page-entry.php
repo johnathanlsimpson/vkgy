@@ -117,7 +117,7 @@
 				}
 				$related_entry_ids = array_values(array_unique($related_entry_ids));
 
-				$sql_related_entries = 'SELECT blog.title, blog.friendly, blog.image_id, images.extension FROM blog LEFT JOIN images ON images.id=blog.image_id WHERE '.substr(str_repeat('blog.id=? OR ', count($related_entry_ids)), 0, -4).' ORDER BY RAND() LIMIT 6';
+				$sql_related_entries = 'SELECT blog.title, blog.friendly, blog.image_id, images.extension FROM blog LEFT JOIN images ON images.id=blog.image_id WHERE ('.substr(str_repeat('blog.id=? OR ', count($related_entry_ids)), 0, -4).') AND blog.is_queued=0 ORDER BY RAND() LIMIT 6';
 				$stmt_related_entries = $pdo->prepare($sql_related_entries);
 				$stmt_related_entries->execute($related_entry_ids);
 				$entry['related'] = $stmt_related_entries->fetchAll();

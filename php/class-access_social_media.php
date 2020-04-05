@@ -96,15 +96,14 @@
 						$output['url'] = 'https://vk.gy/';
 						$output['image'] = $input['filepath'];
 						$output['content'] = '
-							🕵️ Mystery artist // 今日のアーティスト 🕵️
+							🕵️ Today\'s artist ∙ 今日のアーティスト
 							
-							Do you know who this artist is?
-							これは...?
+							Do you recognize them? これは...?
 							
-							The answer is at vk.gy.
+							Learn more at https://vk.gy.
 							
-							🙋 https://vk.gy/
-							👑 '.$this->patreon_url.'
+							'.(true ? null : '🙋 https://vk.gy/').'
+							'.(true ? null : '👑 '.$this->patreon_url).'
 						';
 					}
 					
@@ -113,16 +112,16 @@
 						$output['image'] = $input['filepath'];
 						$output['url'] = $input['url'];
 						$output['content'] = '
-							🖼️ Today\'s flyer // 今日のフライヤー 🖼️
+							🖼️ Today\'s random flyer ∙ 今日のフライヤー
 							
-							═══ '.($input['artist']['romaji'] ? $input['artist']['romaji'].' ('.$input['artist']['name'].')' : $input['artist']['name']).' ═══
+							'.($input['artist']['romaji'] ? $input['artist']['romaji'].' ('.$input['artist']['name'].')' : $input['artist']['name']).'
 							
 							Do you know them?
 							👨‍👨‍👦‍👦 https://vk.gy/artists/'.$input['artist']['friendly'].'/
 							
 							'.($user['twitter'] && $user['twitter'] != '@vkgy_' ? '✍️ '.($user['twitter'] ?: $user['username']) : null).'
-							🔎 '.$input['url'].'
-							👑 '.$this->patreon_url.'
+							'.(true ? null : '🔎 '.$input['url']).'
+							'.(true ? null : '👑 '.$this->patreon_url).'
 						';
 					}
 					
@@ -130,13 +129,13 @@
 					if($item_type === 'blog_post' && strlen($input['title']) && strlen($input['url'])) {
 						$output['url'] = $input['url'];
 						$output['content'] = '
-							📰 News ∙ ニュース
+							'.(strpos($input['title'], 'interview') === false ? '📰 News ∙ ニュース' : '💬 Interview ∙ インタビュー').'
 							
-							'.$input['title'].($input['content_ja'] ? "\n\n".'[日本語] '.$input['content_ja'] : null).'
+							'.$input['title'].($input['content_ja'] ? "\n\n".'[日本語版] '.$input['content_ja'] : null).'
 							
 							'.($user['twitter'] && $user['twitter'] != '@vkgy_' ? '✍️ '.($user['twitter'] ?: $user['username']) : null).'
-							'.(is_array($input['twitter_authors']) && !empty($input['twitter_authors']) ? '✍️ '.implode("\n✍️ ", $input['twitter_authors']) : null).'
-							👑 '.$this->patreon_url.'
+							'.(is_array($input['twitter_authors']) && !empty($input['twitter_authors']) ? '✍️ '.implode(", ", $input['twitter_authors']) : null).'
+							'.(true ? null : '👑 '.$this->patreon_url).'
 						';
 					}
 					
@@ -217,6 +216,7 @@
 				// Post to Twitter
 				if($social_type === 'twitter' || $social_type === 'both') {
 					
+					// Tweet with image
 					if(strlen($input['image'])) {
 						if($this->twitter->send($input['content'], $input['image'])) {
 							$output['status'] = 'success';
@@ -225,6 +225,8 @@
 							$output['result'] = 'Couldn\'t tweet with image.';
 						}
 					}
+					
+					// Plain tweet
 					else {
 						// Add URL to bottom of tweet
 						$input['content'] .= "\n\n".$input['url'];
@@ -240,19 +242,33 @@
 				
 				// Post to Facebook
 				if($social_type === 'facebook' || $social_type === 'both') {
-					// Add URL to bottom of tweet
-					$input['content'] .= "\n\n".$input['url'];
 					
-					if($this->fb->post($this->fb_page_id."/feed/", [
+					// Prepare post with image
+					if(strlen($input['image'])) {
+						
+						// Covertly upload image to FB, get response, decoded & grab FB image ID
+						$fb_image = str_replace('../images/image_files/', 'https://vk.gy/images/', $input['image']);
+						$fb_response = $this->fb->post('/'.$this->fb_page_id.'/photos', [ 'url' => $fb_image, 'published' => false ]);
+						$fb_photo_id = $fb_response->getDecodedBody();
+						$fb_photo_param = [ '{"media_fbid":"'.$fb_photo_id['id'].'"}' ];
+						
+					}
+					
+					// Post
+					if($this->fb->post(
+						$this->fb_page_id.'/feed/', [
 						'message' => $input['content'],
-						'link' => $input['url']
+						'link' => $fb_photo_param ? null : ($input['url'] ?: null),
+						'attached_media' => $fb_photo_param ?: null
 					])) {
 						$output['status'] = 'success';
 					}
 					else {
 						$output['result'] = 'Couldn\'t post to Facebook.';
 					}
+					
 				}
+				
 			}
 			
 			$output['status'] = $output['status'] ?: 'error';

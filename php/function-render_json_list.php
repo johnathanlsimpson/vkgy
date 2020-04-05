@@ -136,7 +136,9 @@ function render_json_list($input_type, $input = null, $input_id_type = null, $in
 			
 			// Song
 			elseif($input_type === 'song') {
-				$input_chunk['name'] = clean_song_title($input[$i]['name']);
+				$input_chunk['name'] = clean_song_title( $input[$i]['name'] );
+				$input_chunk['romaji'] = clean_song_title( $input[$i]['romaji'] );
+				$input_chunk['friendly'] = strtolower( preg_replace( '/'.'[^A-z0-9]'.'/', '', html_entity_decode($input_chunk['romaji'] ?: $input_chunk['name'], ENT_QUOTES, 'UTF-8') ) );
 				$input_chunk['quick_name'] = $input[$i]['romaji'] ? clean_song_title($input[$i]['romaji']).' ('.clean_song_title($input[$i]['name']).')' : clean_song_title($input[$i]['name']);
 			}
 			
@@ -147,8 +149,41 @@ function render_json_list($input_type, $input = null, $input_id_type = null, $in
 			}
 			
 			// Output chunk
-			$output_list[$input[$i]['id']] = $input_chunk;
+			$output_list[ $input[$i]['id'] ] = $input_chunk;
 			unset($input_chunk);
+		}
+		
+		// If getting song list, do some additional cleaning to remove duplicates (but allow different JP names with same romaji)
+		if($input_type === 'song') {
+			$new_output = [];
+			
+			// Loop through and remove blanks and dupes
+			foreach($output_list as $output_key => $output_chunk) {
+				
+				// Skip if no name provided
+				if(strlen($output_chunk['name'])) {
+					
+					// If already have one song with same romaji, ignore if duplicate name
+					if(isset( $new_output[$output_chunk['friendly']] )) {
+						
+						$prev_name = strtolower( str_replace( ' ', '', html_entity_decode( $new_output[$output_chunk['friendly']]['name'], ENT_QUOTES, 'UTF-8' ) ) );
+						$this_name = strtolower( str_replace( ' ', '', html_entity_decode( $output_chunk['name'], ENT_QUOTES, 'UTF-8' ) ) );
+						
+						if($prev_name != $this_name) {
+							$new_output[ $output_chunk['friendly'].$output_chunk['name'] ] = $output_chunk;
+						}
+						
+					}
+					else {
+						$new_output[ $output_chunk['friendly'] ] = $output_chunk;
+					}
+					
+				}
+				
+			}
+			
+			// Undo associative keys
+			$output_list = array_values($new_output);
 		}
 		
 		// Clean output and save associative version to external variable

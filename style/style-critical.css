@@ -88,6 +88,9 @@
 	img[src=""] {
 		display: none;
 	}
+	body {
+		overflow: scroll;
+	}
 
 /**
 	* =======================================================
@@ -742,6 +745,10 @@
 			display: initial;
 		}
 	}
+	.primary-nav__home {
+		text-align: center;
+		width: 46px;
+	}
 	.primary-nav__cage {
 		fill: none;
 		height: 2rem;
@@ -749,7 +756,7 @@
 		opacity: 1;
 		width: 1.29rem;
 	}
-	.primary-nav__cage:hover {
+	.primary-nav__home:hover .primary-nav__cage {
 		stroke: hsl(var(--interactive));
 	}
 

@@ -312,6 +312,11 @@ class CommentHandler {
 					newHash = '#' + 'comment-' + data.commentId;
 				}
 				
+				let redirectUrl;
+				if(data.redirectUrl && data.redirectUrl.length) {
+					redirectUrl = data.redirect;
+				}
+				
 				// Re-set username if signed in during comment
 				self.dummyUsername = data.username ? data.username : self.dummyUsername;
 				
@@ -361,9 +366,13 @@ class CommentHandler {
 				}
 				
 				// If new hash was set (= newly signed in), let's refresh (we can also go to new hash, but normal refresh seems enough)
-				if(newHash) {
+				if(redirectUrl) {
+					window.location.href = redirectUrl;
+				}
+				else if(newHash) {
 					window.location.reload();
 				}
+				
 			}
 		});
 	}

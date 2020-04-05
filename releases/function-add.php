@@ -20,17 +20,13 @@
 				$output["result"] = "Please fill in the artist field.";
 			}
 			else {
-				if(empty($_POST["name"])) {
+				if(!strlen($_POST["name"])) {
 					$output["result"] = "Please fill in the release's name field.";
 				}
 				else {
 					$release = $_POST;
 					unset($release["post"], $release['medium'], $release['format'], $release['venue_limitation'], $release['press_limitation_name']);
 					$is_edit = is_numeric($release["id"]) ? true : false;
-					
-					
-					
-					
 					
 					// Format certain fields
 					$release['romaji']        = match_japanese($release['name'], $release['romaji']);
@@ -79,15 +75,11 @@
 						$release['price'] = $tmp_price;
 					}
 					
-					
-					
 					// Companies
 					foreach(["label", "publisher", "distributor", "marketer", "manufacturer", "organizer"] as $company_type) {
 						$company_type .= "_id";
 						$release[$company_type] = (!empty($release[$company_type][0]) ? "(".implode(")(", $release[$company_type]).")" : null);
 					}
-					
-					
 					
 					// Build tracklist
 					foreach(["disc_name", "disc_romaji", "section_name", "section_romaji", "name", "romaji", "artist_id", "artist_display_name", "artist_display_romaji"] as $key) {
@@ -95,8 +87,6 @@
 							$tmp_tracklist[$i][$key] = $release["tracklist"][$key][$i];
 						}
 					}
-					
-					
 					
 					// Loop through tracklist, fill in missing info
 					if(is_array($tmp_tracklist)) {
@@ -168,171 +158,192 @@
 						else {
 							$sql_release = "INSERT INTO releases (".implode(", ", $sql_keys).") VALUES(".implode(", ", array_fill(0, count($sql_values), "?")).")";
 						}
-						$stmt = $pdo->prepare($sql_release);
 						
-						// Run main query
-						if($stmt) {
-							if($stmt->execute($sql_values)) {
-								$release["id"] = is_numeric($release["id"]) ? $release["id"] : $pdo->lastInsertId();
-								
-								// Update edits table
-								$sql_edit_history = 'INSERT INTO edits_releases (release_id, user_id, content) VALUES (?, ?, ?)';
-								$stmt_edit_history = $pdo->prepare($sql_edit_history);
-								if($stmt_edit_history->execute([
-									$release['id'], 
-									$_SESSION['user_id'], 
-									($is_edit ? null : 'created') 
-								])) {
-								}
-								
-								// Update medium/format/venue/pressing type
-								// For venue, set a default of 'available everywhere'
-								if(!is_array($_POST['venue_limitation']) || empty($_POST['venue_limitation'])) {
-									$_POST['venue_limitation'][] = 34;
-								}
-								if(!is_numeric($_POST['press_limitation_name'])) {
-									$_POST['press_limitation_name'] = 42;
-								}
-								
-								// Since all are 'release attributes', combine arrays, then update releases_releases_attributes
-								$release_attributes = [];
-								foreach(['medium', 'format', 'venue_limitation', 'press_limitation_name'] as $key) {
-									if(is_array($_POST[$key]) && !empty($_POST[$key])) {
-										$release_attributes = array_merge($release_attributes, $_POST[$key]);
+						if($stmt = $pdo->prepare($sql_release)) {
+							
+							// Run main query
+							if($stmt) {
+								if($stmt->execute($sql_values)) {
+									$release["id"] = is_numeric($release["id"]) ? $release["id"] : $pdo->lastInsertId();
+									
+									// Update edits table
+									$sql_edit_history = 'INSERT INTO edits_releases (release_id, user_id, content) VALUES (?, ?, ?)';
+									$stmt_edit_history = $pdo->prepare($sql_edit_history);
+									if($stmt_edit_history->execute([
+										$release['id'], 
+										$_SESSION['user_id'], 
+										($is_edit ? null : 'created') 
+									])) {
 									}
-									elseif(!is_array($_POST[$key]) && is_numeric($_POST[$key])) {
-										$release_attributes[] = $_POST[$key];
+									else {
+										$output['result'] = 'Couldn\'t update edits table.';
 									}
-								}
-								
-								// Loop through release attributes and clean
-								if(is_array($release_attributes) && !empty($release_attributes)) {
-									foreach($release_attributes as $release_attribute_key => $release_attribute) {
-										if(!is_numeric($release_attribute)) {
-											unset($release_attributes[$release_attribute_key]);
+									
+									// Update medium/format/venue/pressing type
+									// For venue, set a default of 'available everywhere'
+									if(!is_array($_POST['venue_limitation']) || empty($_POST['venue_limitation'])) {
+										$_POST['venue_limitation'][] = 34;
+									}
+									if(!is_numeric($_POST['press_limitation_name'])) {
+										$_POST['press_limitation_name'] = 42;
+									}
+									
+									// Since all are 'release attributes', combine arrays, then update releases_releases_attributes
+									$release_attributes = [];
+									foreach(['medium', 'format', 'venue_limitation', 'press_limitation_name'] as $key) {
+										if(is_array($_POST[$key]) && !empty($_POST[$key])) {
+											$release_attributes = array_merge($release_attributes, $_POST[$key]);
+										}
+										elseif(!is_array($_POST[$key]) && is_numeric($_POST[$key])) {
+											$release_attributes[] = $_POST[$key];
 										}
 									}
-								}
-								
-								// Check current release/attribute connections
-								$values_del_attributes = [];
-								$sql_extant_attributes = 'SELECT * FROM releases_releases_attributes WHERE release_id=?';
-								$stmt_extant_attributes = $pdo->prepare($sql_extant_attributes);
-								$stmt_extant_attributes->execute([ $release['id'] ]);
-								$rslt_extant_attributes = $stmt_extant_attributes->fetchAll();
-								
-								foreach($rslt_extant_attributes as $extant_attribute_key => $extant_attribute) {
 									
-									// If already set, remove from query
-									if(in_array($extant_attribute['attribute_id'], $release_attributes)) {
-										$duplicate_key = array_search($extant_attribute['attribute_id'], $release_attributes);
-										unset($release_attributes[$duplicate_key]);
+									// Loop through release attributes and clean
+									if(is_array($release_attributes) && !empty($release_attributes)) {
+										foreach($release_attributes as $release_attribute_key => $release_attribute) {
+											if(!is_numeric($release_attribute)) {
+												unset($release_attributes[$release_attribute_key]);
+											}
+										}
 									}
 									
-									// If was set but now isn't, remove from DB
-									else {
-										$values_del_attributes[] = $extant_attribute['id'];
-									}
-								}
-								
-								// Remove old attributes
-								if(is_array($values_del_attributes) && !empty($values_del_attributes)) {
-									$sql_del_attributes = 'DELETE FROM releases_releases_attributes WHERE '.substr(str_repeat('id=? OR ', count($values_del_attributes)), 0, -4);
-									$stmt_del_attributes = $pdo->prepare($sql_del_attributes);
-									$stmt_del_attributes->execute($values_del_attributes);
-								}
-								
-								// Add new attributes
-								if(is_array($release_attributes) && !empty($release_attributes)) {
-									$sql_new_attributes = 'INSERT INTO releases_releases_attributes (attribute_id, release_id) VALUES '.substr(str_repeat('(?, ?), ', count($release_attributes)), 0, -2);
-									$values_new_attributes = [];
+									// Check current release/attribute connections
+									$values_del_attributes = [];
+									$sql_extant_attributes = 'SELECT * FROM releases_releases_attributes WHERE release_id=?';
+									$stmt_extant_attributes = $pdo->prepare($sql_extant_attributes);
+									$stmt_extant_attributes->execute([ $release['id'] ]);
+									$rslt_extant_attributes = $stmt_extant_attributes->fetchAll();
 									
-									foreach($release_attributes as $release_attribute) {
-										$values_new_attributes[] = $release_attribute;
-										$values_new_attributes[] = $release['id'];
-									}
-									
-									$stmt_new_attributes = $pdo->prepare($sql_new_attributes);
-									$stmt_new_attributes->execute($values_new_attributes);
-								}
-								
-								$sql_extant_tracks = "SELECT id FROM releases_tracklists WHERE release_id=?";
-								$stmt = $pdo->prepare($sql_extant_tracks);
-								$stmt->execute([$release["id"]]);
-								
-								foreach($stmt->fetchAll() as $key => $extant_id) {
-									if(!empty($release["tracklist"][$key])) {
-										$sql_new_tracks[] = "UPDATE releases_tracklists SET ".implode("=?, ", array_keys($release["tracklist"][$key]))."=? WHERE id=? LIMIT 1";
-										$sql_new_track_values[] = array_values(array_merge($release["tracklist"][$key], $extant_id));
+									foreach($rslt_extant_attributes as $extant_attribute_key => $extant_attribute) {
 										
-										unset($release["tracklist"][$key]);
+										// If already set, remove from query
+										if(in_array($extant_attribute['attribute_id'], $release_attributes)) {
+											$duplicate_key = array_search($extant_attribute['attribute_id'], $release_attributes);
+											unset($release_attributes[$duplicate_key]);
+										}
+										
+										// If was set but now isn't, remove from DB
+										else {
+											$values_del_attributes[] = $extant_attribute['id'];
+										}
+										
+									}
+									
+									// Remove old attributes
+									if(is_array($values_del_attributes) && !empty($values_del_attributes)) {
+										$sql_del_attributes = 'DELETE FROM releases_releases_attributes WHERE '.substr(str_repeat('id=? OR ', count($values_del_attributes)), 0, -4);
+										$stmt_del_attributes = $pdo->prepare($sql_del_attributes);
+										if($stmt_del_attributes->execute($values_del_attributes)) {
+										}
+										else {
+											$output['result'] = 'Couldn\'t remove attributes.';
+										}
+									}
+									
+									// Add new attributes
+									if(is_array($release_attributes) && !empty($release_attributes)) {
+										$sql_new_attributes = 'INSERT INTO releases_releases_attributes (attribute_id, release_id) VALUES '.substr(str_repeat('(?, ?), ', count($release_attributes)), 0, -2);
+										$values_new_attributes = [];
+										
+										foreach($release_attributes as $release_attribute) {
+											$values_new_attributes[] = $release_attribute;
+											$values_new_attributes[] = $release['id'];
+										}
+										
+										$stmt_new_attributes = $pdo->prepare($sql_new_attributes);
+										if(!$stmt_new_attributes->execute($values_new_attributes)) {
+											$output['result'] = 'Couldn\'t add new attributes.';
+										}
+									}
+									
+									$sql_extant_tracks = "SELECT id FROM releases_tracklists WHERE release_id=?";
+									$stmt = $pdo->prepare($sql_extant_tracks);
+									if(!$stmt->execute([ $release["id"] ])) {
+										$output['result'] = 'Couldn\'t get extant tracks.';
+									}
+									
+									foreach($stmt->fetchAll() as $key => $extant_id) {
+										if(!empty($release["tracklist"][$key])) {
+											$sql_new_tracks[] = "UPDATE releases_tracklists SET ".implode("=?, ", array_keys($release["tracklist"][$key]))."=? WHERE id=? LIMIT 1";
+											$sql_new_track_values[] = array_values(array_merge($release["tracklist"][$key], $extant_id));
+											
+											unset($release["tracklist"][$key]);
+										}
+										else {
+											$sql_new_tracks[] = "DELETE FROM releases_tracklists WHERE id=? LIMIT 1";
+											$sql_new_track_values[] = [$extant_id["id"]];
+										}
+									}
+									
+									if(is_array($release["tracklist"]) && !empty($release["tracklist"])) {
+										foreach($release["tracklist"] as $key => $track) {
+											$sql_new_tracks[] = "INSERT INTO releases_tracklists (".implode(", ", array_keys($release["tracklist"][$key])).", release_id) VALUES (".implode(", ", array_fill(0, count($release["tracklist"][$key]), "?")).", ?)";
+											$sql_new_track_values[] = array_values(array_merge($release["tracklist"][$key], [$release["id"]]));
+										}
+									}
+									
+									if(is_array($sql_new_tracks) && !empty($sql_new_tracks) && is_array($sql_new_track_values) && count($sql_new_tracks) === count($sql_new_track_values)) {
+										foreach($sql_new_tracks as $key => $sql) {
+											$stmt = $pdo->prepare($sql);
+											if($stmt->execute($sql_new_track_values[$key])) {
+												$output["status"] = "success";
+												
+												$access_artist = new access_artist($pdo);
+												$artist = $access_artist->access_artist(["id" => $release["artist_id"], "get" => "name"]);
+												
+												$output["url"] = "/releases/".$artist["friendly"]."/".$release["id"]."/".$release["friendly"]."/";
+												$output["quick_name"] = ($release["romaji"] ?: $release["name"])." ".($release["press_romaji"] ?: $release["press_name"])." ".($release["type_romaji"] ?: $release["type_name"]);
+												$output["artist_url"] = "/releases/".$artist["friendly"]."/";
+												$output["artist_quick_name"] = $artist["quick_name"];
+												$output["id"] = $release["id"];
+												$output["artist_id"] = $artist["id"];
+											}
+											else {
+												$output['result'] = 'Couldn\'t update tracklist.';
+											}
+										}
 									}
 									else {
-										$sql_new_tracks[] = "DELETE FROM releases_tracklists WHERE id=? LIMIT 1";
-										$sql_new_track_values[] = [$extant_id["id"]];
+										$output["status"] = "error";
+										$output["result"] = "There was an error preparing the tracklist query.";
 									}
-								}
-								
-								if(is_array($release["tracklist"]) && !empty($release["tracklist"])) {
-									foreach($release["tracklist"] as $key => $track) {
-										$sql_new_tracks[] = "INSERT INTO releases_tracklists (".implode(", ", array_keys($release["tracklist"][$key])).", release_id) VALUES (".implode(", ", array_fill(0, count($release["tracklist"][$key]), "?")).", ?)";
-										$sql_new_track_values[] = array_values(array_merge($release["tracklist"][$key], [$release["id"]]));
-									}
-								}
-								
-								if(is_array($sql_new_tracks) && !empty($sql_new_tracks) && is_array($sql_new_track_values) && count($sql_new_tracks) === count($sql_new_track_values)) {
-									foreach($sql_new_tracks as $key => $sql) {
-										$stmt = $pdo->prepare($sql);
-										if($stmt->execute($sql_new_track_values[$key])) {
+									
+									// Send to auto poster, if newly-added release
+									if(!$is_edit) {
+										$auto_post_url = $auto_blogger->auto_post('release', array_merge($release, ['attributes' => $release_attributes]));
+										
+										if($auto_post_url) {
 											$output["status"] = "success";
-											
-											$access_artist = new access_artist($pdo);
-											$artist = $access_artist->access_artist(["id" => $release["artist_id"], "get" => "name"]);
-											
-											$output["url"] = "/releases/".$artist["friendly"]."/".$release["id"]."/".$release["friendly"]."/";
-											$output["quick_name"] = ($release["romaji"] ?: $release["name"])." ".($release["press_romaji"] ?: $release["press_name"])." ".($release["type_romaji"] ?: $release["type_name"]);
-											$output["artist_url"] = "/releases/".$artist["friendly"]."/";
-											$output["artist_quick_name"] = $artist["quick_name"];
-											$output["id"] = $release["id"];
-											$output["artist_id"] = $artist["id"];
+											$output["result"] =
+												'The blog has been updated with this information. Feel free to edit the post.'.
+												'<br /><br/ >'.
+												'<a class="a--outlined a--padded symbol__edit" href="'.$auto_post_url.'edit/">Edit blog entry</a>'.
+												'<a class="a--padded symbol__news" href="'.$auto_post_url.'">View blog entry</a>';
 										}
+									}
+									
+									// Award point
+									$access_points = new access_points($pdo);
+									if($is_edit) {
+										$access_points->award_points([ 'point_type' => 'edited-release', 'allow_multiple' => false, 'item_id' => $release['id'] ]);
+									}
+									else {
+										$access_points->award_points([ 'point_type' => 'added-release' ]);
 									}
 								}
 								else {
 									$output["status"] = "error";
-									$output["result"] = "There was an error preparing the tracklist query.";
-								}
-								
-								// Send to auto poster, if newly-added release
-								if(!$is_edit) {
-									$auto_post_url = $auto_blogger->auto_post('release', array_merge($release, ['attributes' => $release_attributes]));
-									
-									if($auto_post_url) {
-										$output["status"] = "success";
-										$output["result"] =
-											'The blog has been updated with this information. Feel free to edit the post.'.
-											'<br /><br/ >'.
-											'<a class="a--outlined a--padded symbol__edit" href="'.$auto_post_url.'edit/">Edit blog entry</a>'.
-											'<a class="a--padded symbol__news" href="'.$auto_post_url.'">View blog entry</a>';
-									}
-								}
-								
-								// Award point
-								$access_points = new access_points($pdo);
-								if($is_edit) {
-									$access_points->award_points([ 'point_type' => 'edited-release', 'allow_multiple' => false, 'item_id' => $release['id'] ]);
-								}
-								else {
-									$access_points->award_points([ 'point_type' => 'added-release' ]);
+									$output["result"] = "Sorry, the release could not be added.";
 								}
 							}
 							else {
-								$output["status"] = "error";
-								$output["result"] = "Sorry, the release could not be added.";
+								$output["result"] = "There was an error preparing the statement.";
 							}
+							
 						}
 						else {
-							$output["result"] = "There was an error preparing the statement.";
+							$output['result'] = 'Couldn\'t prepare query.';
 						}
 					}
 					else {

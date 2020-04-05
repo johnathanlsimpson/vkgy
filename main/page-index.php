@@ -150,89 +150,28 @@ if($_SESSION['username'] === 'inartistic') {
 						$featured_articles = $access_blog->access_blog([ 'tag' => 'feature', 'get' => 'basics', 'limit' => 5 ]);
 						
 						// Shuffle featured interviews
-						if($featured_articles[0]['id'] / 4 === 969) {
-							unset($featured_articles[4]);
-							shuffle($featured_articles);
-						}
-						elseif($featured_articles[4]['id'] / 4 === 969) {
-							unset($featured_articles[4]);
-						}
-						else {
-							$latest_article = array_shift($featured_articles);
-							shuffle($featured_articles);
-							array_unshift($featured_articles, $latest_article);
-							unset($featured_articles[4]);
-						}
+						$latest_article = array_shift($featured_articles);
+						shuffle($featured_articles);
+						array_unshift($featured_articles, $latest_article);
 						
 						foreach($featured_articles as $article) {
-							$image = '/images/'.$article['image_id'].'-'.$article['friendly'].'.medium.';
-							$image = file_exists('../images/image_files/'.$article['image_id'].'.jpg') ? $image.'jpg' : $image.'png';
-							?>
-								<a class="news__entry news__feature lazy" data-src="<?= $image; ?>" href="<?= '/blog/'.$article['friendly'].'/'; ?>">
-									<div>
-										<?= $article['title']; ?>
-									</div>
-								</a>
-							<?php
+							if($article['id'] != (969 * 4)) {
+								$image = '/images/'.$article['image_id'].'-'.$article['friendly'].'.medium.';
+								$image = file_exists('../images/image_files/'.$article['image_id'].'.jpg') ? $image.'jpg' : $image.'png';
+								?>
+									<a class="news__entry news__feature" href="<?= '/blog/'.$article['friendly'].'/'; ?>" style="<?= 'background-image:url('.$image.');'; ?>">
+										<div>
+											<?= $article['title']; ?>
+										</div>
+									</a>
+								<?php
+							}
 						}
 					?>
+					<a class="h5 news__title" href="/blog/tag/feature/">
+						<?= lang('Interviews', 'インタビュー', 'hidden'); ?>
+					</a>
 				</div>
-				
-				<style>
-					.news__features {
-						width: 100%;
-					}
-					.news__feature {
-						/*box-shadow: 0 0 2rem hsl(var(--background--bold));*/
-						flex: 1;
-					}
-					/*.news__feature:nth-of-type(1) div::before {
-						content: "✨";
-						color: hsl(var(--text));
-						font-size: 1.5rem;
-						float: left;
-					}*/
-					.news__feature:nth-of-type(3),
-					.news__feature:nth-of-type(4) {
-						display: none;
-					}
-					@media(min-width: 700px) {
-						.news__feature:nth-of-type(3) {
-							display: block;
-						}
-					}
-					@media(min-width: 1400px) {
-						.news__feature:nth-of-type(4) {
-							display: block;
-						}
-					}
-					.news__feature:not(:hover) {
-						color: transparent;
-					}
-					.news__feature:hover {
-						opacity: 1;
-						z-index: 2;
-					}
-					.news__feature::after {
-						content: "";
-						display: block;
-						padding-top: 52%;
-						width: 1px;
-					}
-					.news__feature div {
-						background: linear-gradient(to right, hsla(var(--background), 0.75), hsla(var(--background), 0) 2rem);
-						bottom: 0;
-						left: 0;
-						overflow: hidden;
-						padding: 1rem;
-						position: absolute;
-						right: 0;
-						top: 0;
-					}
-					.news__feature:hover div {
-						background: hsla(var(--background), 0.9);
-					}
-				</style>
 				
 				<div class="any__obscure news__entry news__vip any--flex">
 					<div>
