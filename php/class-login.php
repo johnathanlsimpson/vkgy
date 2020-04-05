@@ -1,7 +1,4 @@
 <?php
-	session_start();
-
-	include_once("../php/database-connect.php");
 
 	class login {
 		private $newHash;
@@ -251,7 +248,7 @@
 						];
 						
 						// Set user role/VIP status
-						$this->check_role( $row['id'], $row['rank'], $row['is_vip'] );
+						$this->check_roles( $row['id'], $row['rank'], $row['is_vip'] );
 						
 						// If using old password
 						if(strlen($row["password_old"]) > 0 && empty($row["password"])) {
