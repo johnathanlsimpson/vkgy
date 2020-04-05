@@ -799,13 +799,13 @@
 	.primary-nav__search:active,
 	.primary-nav__search:focus {
 		grid-column: 1 / -1;
-		margin-left: calc(1rem + 1ch);
+		margin-left: 46px;
 	}
 	.primary-nav--searching .primary-nav__search-symbol,
 	.primary-nav__search:active + .primary-nav__search-symbol,
 	.primary-nav__search:focus + .primary-nav__search-symbol {
 		grid-column: 1 / -1;
-		margin-left: calc(1rem + 1ch + 0.5rem);
+		margin-left: calc(46px + 0.5rem);
 	}
 	.primary-nav--searching .primary-nav__search,
 	.primary-nav--searching .primary-nav__search-symbol,

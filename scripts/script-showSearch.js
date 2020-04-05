@@ -2,6 +2,7 @@
 
 var searchLink = document.querySelector('.primary-nav__container [href="/search/"]');
 var searchElem = document.querySelector('.primary-nav__search');
+var stickyNavContainer = document.querySelector('.primary-nav__container');
 
 searchLink.addEventListener('click', function(event) {
 	event.preventDefault();
