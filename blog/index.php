@@ -83,7 +83,7 @@ if($_GET["action"] === "update") {
 			||
 			$_SESSION['user_id'] === $entry['user_id']
 			||
-			!$entry['is_queued'] && $_SESSION['is_admin']
+			!$entry['is_queued'] && $_SESSION['is_editor']
 			||
 			$entry['is_queued'] && $is_vip
 		) {

@@ -21,7 +21,7 @@ if(is_numeric($id)) {
 		
 		if($rslt_video) {
 			// Approve
-			if($method === 'approve' && $_SESSION['is_admin']) {
+			if($method === 'approve' && $_SESSION['is_editor']) {
 				$sql_approve = 'UPDATE videos SET is_flagged=? WHERE id=? LIMIT 1';
 				$stmt_approve = $pdo->prepare($sql_approve);
 				if($stmt_approve->execute([ 0, $id ])) {
@@ -63,7 +63,7 @@ if(is_numeric($id)) {
 			}
 			
 			// Delete
-			if($method === 'delete' && $_SESSION['is_admin']) {
+			if($method === 'delete' && $_SESSION['is_editor']) {
 				$sql_delete = 'DELETE FROM videos WHERE id=? LIMIT 1';
 				$stmt_delete = $pdo->prepare($sql_delete);
 				if($stmt_delete->execute([ $id ])) {

@@ -1,7 +1,7 @@
 <?php
 	include_once("../php/include.php");
 	
-	if($_SESSION['is_admin']) {
+	if($_SESSION['is_editor']) {
 		if(is_numeric($_POST["id"])) {
 			$id = sanitize($_POST["id"]);
 			
