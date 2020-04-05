@@ -1,6 +1,6 @@
 <?php
 
-if($_SESSION["admin"]) {
+if($_SESSION["is_editor"]) {
 	script([
 		"/artists/script-page-add.js"
 	]);

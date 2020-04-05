@@ -1,5 +1,5 @@
 <?php
-	if($_SESSION["loggedIn"]) {
+	if($_SESSION["is_signed_in"]) {
 		script([
 			'/scripts/external/script-autosize.js',
 			'/scripts/external/script-inputmask.js',

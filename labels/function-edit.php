@@ -4,7 +4,7 @@
 	
 	$access_label = new access_label($pdo);
 	
-	if($_SESSION["admin"]) {
+	if($_SESSION["is_editor"]) {
 		if(is_numeric($_POST["id"])) {
 			if(!empty($_POST["name"])) {
 				
@@ -40,7 +40,7 @@
 							
 							$sql_edit_history = 'INSERT INTO edits_labels (label_id, user_id) VALUES (?, ?)';
 							$stmt_edit_history = $pdo->prepare($sql_edit_history);
-							$stmt_edit_history->execute([ $id, $_SESSION['userID'] ]);
+							$stmt_edit_history->execute([ $id, $_SESSION['user_id'] ]);
 							
 							$output["status"] = "success";
 							$output["result"] = '<a class="symbol__company" href="/labels/'.$sql_values["friendly"].'/">'.($sql_values["romaji"] ?: $sql_values["name"]).'</a> successfully edited.';

@@ -3,7 +3,7 @@
 		$sql_view = "INSERT INTO vip_views (post_id, user_id) VALUES (?, ?)";
 		$stmt_view = $pdo->prepare($sql_view);
 		
-		if($stmt_view->execute([ $entry["id"], $_SESSION["userID"] ])) {
+		if($stmt_view->execute([ $entry["id"], $_SESSION["user_id"] ])) {
 		}
 		
 		// Previous entry

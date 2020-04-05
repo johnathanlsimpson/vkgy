@@ -91,7 +91,7 @@
 					if(is_numeric($artist_id)) {
 						
 						// If user is an admin (who can approve channel anyway), approve and add channel to artist's links
-						if($is_flagged && $_SESSION['is_admin']) {
+						if($is_flagged && $_SESSION['is_editor']) {
 							$is_flagged = false;
 							
 							// Get artist class

@@ -1,5 +1,5 @@
 <?php
-	if($_SESSION["admin"] > 1) {
+	if($_SESSION["is_editor"] > 1) {
 		$queue_directory = "../images/queue";
 		
 		$suppress_auto_upload_image = true;

@@ -33,7 +33,7 @@
 			$release["quick_name"] => "/releases/".$release["artist"]["friendly"]."/".$release["id"]."/".$release["friendly"]."/"
 		]);
 		
-		if($_SESSION["loggedIn"]) {
+		if($_SESSION["is_signed_in"]) {
 			subnav([
 				"Edit" => "/releases/".$release["artist"]["friendly"]."/".$release["id"]."/".$release["friendly"]."/edit/"
 			]);
@@ -608,10 +608,10 @@
 								</table>
 
 								<?php
-									if($_SESSION["loggedIn"] && is_numeric($_SESSION["userID"])) {
+									if($_SESSION["is_signed_in"] && is_numeric($_SESSION["user_id"])) {
 										$sql_check = "SELECT 1 FROM users WHERE id=? AND is_vip=1 LIMIT 1";
 										$stmt_check = $pdo->prepare($sql_check);
-										$stmt_check->execute([ $_SESSION["userID"] ]);
+										$stmt_check->execute([ $_SESSION["user_id"] ]);
 										$is_vip = $stmt_check->fetchColumn();
 									}
 
@@ -631,7 +631,7 @@
 
 										echo '<h5>Add tags</h5>';
 
-										if($_SESSION["loggedIn"]) {
+										if($_SESSION["is_signed_in"]) {
 											if(is_array($rslt_tags) && !empty($rslt_tags)) {
 												foreach($rslt_tags as $tag) {
 													$is_selected = is_array($rslt_user_tags) && !empty($rslt_user_tags) && in_array($tag["id"], $rslt_user_tags);
@@ -643,7 +643,7 @@
 											echo '<span class="symbol__error"><a class="a--inherit" href="/account/">Sign in</a> to add tags.';
 										}
 
-										if($_SESSION["admin"] > 0 && $needs_admin_tags) {
+										if($_SESSION["is_editor"] > 0 && $needs_admin_tags) {
 											echo '<hr />';
 											echo '<h5>Remove admin tags</h5>';
 
@@ -856,7 +856,7 @@
 								</h3>
 								<div class="text text--outlined">
 									<?php
-										if($_SESSION["loggedIn"]) {
+										if($_SESSION["is_signed_in"]) {
 											?>
 												<div class="input__row">
 													<div class="input__group any--flex-grow">

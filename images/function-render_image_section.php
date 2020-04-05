@@ -74,7 +74,7 @@ function render_image_section($images, $args = []) {
 				'musician_ids'   => render_options(($image['label_ids'] ?: $default['label']), $label_list),
 				'musician_ids'   => render_options(($image['musician_ids'] ?: $default['musician']), $musician_list),
 				'release_ids'    => render_options(($image['release_ids'] ?: $default['release']), $release_list),
-				'scanned_by'     => $image['user_id'] == $_SESSION['userID'] ? '1' : '0',
+				'scanned_by'     => $image['user_id'] == $_SESSION['user_id'] ? '1' : '0',
 				'background_url' => '/images/'.$image['id'].'.thumbnail.'.$image['extension'],
 				'image_markdown' => '![](/images/'.$image['id'].'.'.$image['extension'].')',
 			]);

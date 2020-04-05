@@ -1,5 +1,5 @@
 <?php
-	if($_SESSION["admin"]) {
+	if($_SESSION["is_editor"]) {
 		script([
 			"/scripts/external/script-selectize.js",
 			"/scripts/external/script-inputmask.js",

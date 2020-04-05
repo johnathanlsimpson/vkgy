@@ -198,7 +198,7 @@
 								}
 
 								echo '<h5>'.lang('Add tags', 'タグする', ['secondary_class' => 'any--hidden']).'</h5>';
-								if($_SESSION["loggedIn"]) {
+								if($_SESSION["is_signed_in"]) {
 									if(is_array($rslt_tags) && !empty($rslt_tags)) {
 										foreach($rslt_tags as $tag) {
 											$is_selected = is_array($rslt_user_tags) && !empty($rslt_user_tags) && in_array($tag["id"], $rslt_user_tags);
@@ -210,7 +210,7 @@
 									echo '<span class="symbol__error"><a class="a--inherit" href="/account/">Sign in</a> to add tags.';
 								}
 
-								if($_SESSION["admin"] > 0 && $needs_admin_tags) {
+								if($_SESSION["is_editor"] > 0 && $needs_admin_tags) {
 									echo '<hr />';
 									echo '<h5>Remove admin tags</h5>';
 

@@ -1,7 +1,7 @@
 <?php
 include_once("../php/include.php");
 
-if($_SESSION["loggedIn"]) {
+if($_SESSION["is_signed_in"]) {
 	$id = strlen($_POST["id"]) > 0 ? sanitize($_POST["id"]) : null;
 	$id = strlen($id) > 0 && is_numeric($id) ? $id : null;
 	
@@ -11,7 +11,7 @@ if($_SESSION["loggedIn"]) {
 		$stmt_check->execute([$id]);
 		$user_id = $stmt_check->fetchColumn();
 		
-		if($user_id === $_SESSION["userID"] || $_SESSION["admin"]) {
+		if($user_id === $_SESSION["user_id"] || $_SESSION["is_editor"]) {
 			$sql_delete = "DELETE FROM blog WHERE id=? LIMIT 1";
 			$stmt_delete = $pdo->prepare($sql_delete);
 			if($stmt_delete->execute([$id])) {

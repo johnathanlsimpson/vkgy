@@ -30,7 +30,7 @@
 					
 					// Format certain fields
 					$release['romaji']        = match_japanese($release['name'], $release['romaji']);
-					$release["user_id"]       = $_SESSION["userID"];
+					$release["user_id"]       = $_SESSION["user_id"];
 					$release["friendly"]      = friendly($release["friendly"] ?: ($release["romaji"] ?: $release["name"])." ".($release["press_romaji"] ?: $release["press_name"])." ".($release["type_romaji"] ?: $release["type_name"]));
 					$release["date_occurred"] = str_replace(["y", "m", "d"], "0", $release["date_occurred"]) ?: "0000-00-00";
 					$release["notes"]         = sanitize($markdown_parser->validate_markdown($release["notes"])) ?: null;

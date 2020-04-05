@@ -3,7 +3,7 @@
 	
 	function auto_link_musicians($pdo, $artist_id, $artist_name, $artist_romaji = null) {
 		if(is_numeric($artist_id) && !empty($artist_name)) {
-			$timestamp = date("Y-m-d H:i:s")." (".$_SESSION["userID"].")";
+			$timestamp = date("Y-m-d H:i:s")." (".$_SESSION["user_id"].")";
 			$access_musician = new access_musician($pdo);
 			
 			$sql_musicians = "SELECT * FROM musicians WHERE history REGEXP CONCAT('(^|\n|, )', ?, '($|\n|,| [{\\\[(])')";
@@ -71,7 +71,7 @@
 		return is_array($output) && !empty($output) ? $output : null;
 	}
 	
-	if($_SESSION["admin"] && !empty($_POST)) {
+	if($_SESSION["is_editor"] && !empty($_POST)) {
 		if(!empty($_POST["name"])) {
 			foreach($_POST["name"] as $key => $name) {
 				$name         = sanitize($name);
@@ -112,7 +112,7 @@
 							
 							$sql_edit_history = 'INSERT INTO edits_artists (artist_id, user_id, content) VALUES (?, ?, ?)';
 							$stmt_edit_history = $pdo->prepare($sql_edit_history);
-							if($stmt_edit_history->execute([ $artist_id, $_SESSION['userID'], 'created' ])) {
+							if($stmt_edit_history->execute([ $artist_id, $_SESSION['user_id'], 'created' ])) {
 							}
 							
 							if(is_array($linked_musicians) && !empty($linked_musicians)) {

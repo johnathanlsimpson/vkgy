@@ -9,7 +9,7 @@
 	}
 
 	// Verify VIP
-	if($_SESSION["loggedIn"]) {
+	if($_SESSION["is_signed_in"]) {
 		$sql_verify = "SELECT tag_hash FROM users WHERE username=? AND is_vip=? LIMIT 1";
 		$stmt_verify = $pdo->prepare($sql_verify);
 		$stmt_verify->execute([ sanitize($_SESSION["username"]), "1" ]);
@@ -30,7 +30,7 @@
 		$is_vip = $rslt_verify ? true : false;
 	}
 	
-	if(!$is_mp3tag && !$debug_on && $_SESSION["loggedIn"]) {
+	if(!$is_mp3tag && !$debug_on && $_SESSION["is_signed_in"]) {
 		if(is_numeric($_GET["release_id"])) {
 			$sql_url = "SELECT releases.id, releases.friendly, artists.friendly AS artist_friendly FROM releases LEFT JOIN artists ON artists.id=releases.artist_id WHERE releases.id=? LIMIT 1";
 			$stmt_url = $pdo->prepare($sql_url);
@@ -55,7 +55,7 @@
 		}
 	}
 	
-	elseif($is_mp3tag || ($debug_on && $_SESSION["admin"] > 1)) {
+	elseif($is_mp3tag || ($debug_on && $_SESSION["is_editor"] > 1)) {
 		
 		// Clean input: artist_album
 		if(strlen($_GET['artist_album'])) {

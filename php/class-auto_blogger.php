@@ -311,7 +311,7 @@
 						if(strlen($title) && is_array($post) && !empty($post) && strlen($tag)) {
 							$friendly = friendly($title);
 							$post = sanitize(implode("\n\n", $post));
-							$user_id = is_numeric($_SESSION["userID"]) ? $_SESSION["userID"] : '0';
+							$user_id = is_numeric($_SESSION["user_id"]) ? $_SESSION["user_id"] : '0';
 							$edit_history = date('Y-m-d H:i:s').' ('.$user_id.')'."\n";
 							
 							// Create post
@@ -330,12 +330,12 @@
 								// Tag entry
 								$sql_tags = 'INSERT INTO blog_tags (blog_id, tag_id, user_id) VALUES (?, ?, ?), (?, ?, ?)';
 								$stmt_tags = $this->pdo->prepare($sql_tags);
-								$stmt_tags->execute([ $blog_id, $this->blog_tags['auto-generated'], $_SESSION['userID'], $blog_id, $this->blog_tags[$tag], $_SESSION['userID'] ]);
+								$stmt_tags->execute([ $blog_id, $this->blog_tags['auto-generated'], $_SESSION['user_id'], $blog_id, $this->blog_tags[$tag], $_SESSION['user_id'] ]);
 								
 								// Tag artists in entry
 								$sql_artist_tags = 'INSERT INTO blog_artists (blog_id, artist_id, user_id) VALUES (?, ?, ?)';
 								$stmt_artist_tags = $this->pdo->prepare($sql_artist_tags);
-								$stmt_artist_tags->execute([ $blog_id, $artist_id, $_SESSION['userID'] ]);
+								$stmt_artist_tags->execute([ $blog_id, $artist_id, $_SESSION['user_id'] ]);
 								
 								// Return URL if successful
 								return [ 'title' => $title, 'url' => 'https://vk.gy/blog/'.$friendly.'/', 'id' => $blog_id, 'entry_is_new' => true ];
@@ -494,7 +494,7 @@
 									if(is_array($post) && !empty($post) && is_numeric($post["id"]) && is_array($new_content) && !empty($new_content)) {
 										$title = $title ?: $post["title"];
 										$new_content = sanitize(implode("\n\n", $new_content));
-										$user_id = $post["user_id"] === 0 && is_numeric($_SESSION["userID"]) ? $_SESSION["userID"] : $post["user_id"];
+										$user_id = $post["user_id"] === 0 && is_numeric($_SESSION["user_id"]) ? $_SESSION["user_id"] : $post["user_id"];
 										
 										// Edit post
 										$sql_edit = "UPDATE blog SET title=?, content=?, user_id=? WHERE id=? LIMIT 1";
@@ -505,7 +505,7 @@
 											if(!in_array($tag, $post['tags'])) {
 												$sql_tags = 'INSERT INTO blog_tags (blog_id, tag_id, user_id) VALUES (?, ?, ?)';
 												$stmt_tag = $this->pdo->prepare($sql_tags);
-												$stmt_tag->execute([ $post['id'], $this->blog_tags[$tag], $_SESSION['userID'] ]);
+												$stmt_tag->execute([ $post['id'], $this->blog_tags[$tag], $_SESSION['user_id'] ]);
 											}
 											
 											// Return URL if successful

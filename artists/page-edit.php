@@ -27,7 +27,7 @@
 		'Edit artist' => '/artists/'.$artist['friendly'].'/edit/',
 	]);
 	
-	if($_SESSION["admin"] > 0) { 
+	if($_SESSION["is_editor"] > 0) { 
 			if(!empty($artist)) {
 				$artist['images'] = is_array($artist['images']) ? array_values($artist['images']) : [];
 				?>
@@ -421,7 +421,7 @@
 									</a>
 								</div>
 								<?php
-									if($_SESSION["admin"]) {
+									if($_SESSION["is_editor"]) {
 										?>
 											<div class="input__group">
 												<label class="input__checkbox-label symbol__trash symbol--standalone" name="delete"></label>

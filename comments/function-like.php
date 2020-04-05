@@ -3,7 +3,7 @@ include_once('../php/include.php');
 
 if(is_numeric($_POST['comment_id'])) {
 	$comment_id = sanitize($_POST['comment_id']);
-	$user_id = $_SESSION['userID'] ?: null;
+	$user_id = $_SESSION['user_id'] ?: null;
 	$action = $_POST['action'] === 'add' ? 'add' : 'remove';
 	
 	if(!is_numeric($user_id)) {

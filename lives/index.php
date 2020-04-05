@@ -10,7 +10,7 @@
 		lang('Livehouses', 'ライブハウス', ['secondary_class' => 'any--hidden']) => '/lives/livehouses/',
 	]);
 	
-	if($_SESSION['admin'] > 1) {
+	if($_SESSION['is_editor'] > 1) {
 		subnav([
 			'Edit areas' => '/lives/areas/edit/',
 		], 'interact', true);
@@ -35,7 +35,7 @@
 	$pageTitle = "Lives";
 	
 	// Select page type
-	if($_SESSION["admin"]) {
+	if($_SESSION["is_editor"]) {
 		if($_GET["method"] === "livehouses") {
 			if($_GET["action"] === "edit") {
 				$edit_livehouses = true;

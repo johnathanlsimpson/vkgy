@@ -1,9 +1,9 @@
 <?php
 	include("../php/include.php");
 	
-	if($_SESSION["loggedIn"]) {
+	if($_SESSION["is_signed_in"]) {
 		$musician_id = is_numeric($_POST["id"]) ? $_POST["id"] : null;
-		$user_id = $_SESSION["userID"];
+		$user_id = $_SESSION["user_id"];
 		$tag_id = is_numeric($_POST["tag_id"]) ? $_POST["tag_id"] : null;
 		
 		if(is_numeric($musician_id)) {
@@ -14,11 +14,11 @@
 			$stmt_is_admin_tag->execute([ $tag_id ]);
 			$rslt_is_admin_tag = $stmt_is_admin_tag->fetchColumn();
 			
-			$user_is_allowed = $rslt_is_admin_tag <= $_SESSION['is_admin'];
+			$user_is_allowed = $rslt_is_admin_tag <= $_SESSION['is_editor'];
 			
 			if($user_is_allowed) {
 				
-				if($_POST["action"] === "delete" && $_SESSION["is_admin"] > 0 && is_numeric($musician_id) && is_numeric($tag_id)) {
+				if($_POST["action"] === "delete" && $_SESSION["is_editor"] > 0 && is_numeric($musician_id) && is_numeric($tag_id)) {
 					
 					// Perform delete
 					$sql_delete = "DELETE FROM musicians_tags WHERE musician_id=? AND tag_id=?";

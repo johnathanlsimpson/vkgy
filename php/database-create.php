@@ -606,9 +606,9 @@ CREATE TABLE IF NOT EXISTS `releases_tracklists` (
 
 CREATE TABLE IF NOT EXISTS `releases_views` (
 	`id` int(11) NOT NULL,
-	`releaseid` int(11) NOT NULL,
-	`userid` int(11) DEFAULT NULL,
-	`dateviewed` datetime NOT NULL
+	`release_id` int(11) NOT NULL,
+	`user_id` int(11) DEFAULT NULL,
+	`date_viewed` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=".$pdo_config['db_charset']." COLLATE=".$pdo_config['db_collation'].";
 
 CREATE TABLE IF NOT EXISTS `releases_wants` (

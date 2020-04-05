@@ -23,9 +23,9 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 			$item_type    = array_search($_POST['item_type'], $access_comment->comment_types);
 			$comment_id   = is_numeric($_POST['comment_id']) ? sanitize($_POST['comment_id']) : null;
 			$thread_id    = is_numeric($_POST['thread_id']) ? sanitize($_POST['thread_id']) : null;
-			$user_id      = $_SESSION['loggedIn'] ? $_SESSION['userID'] : null;
+			$user_id      = $_SESSION['is_signed_in'] ? $_SESSION['user_id'] : null;
 			$is_signed_in = is_numeric($user_id);
-			$is_admin     = $_SESSION['admin'];
+			$is_admin     = $_SESSION['is_editor'];
 			$is_approved  = 1;
 			$is_deleted   = 0;
 			
@@ -182,7 +182,7 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 				$output['comment_id'] = $comment_id;
 				$output['date_occurred'] = date('Y-m-d H:i:s');
 				$output['content'] = $markdown_parser->parse_markdown($content);
-				$output['is_admin'] = $_SESSION['admin'] ? '1' : '0';
+				$output['is_admin'] = $_SESSION['is_editor'] ? '1' : '0';
 				$output['is_user'] = '1';
 				$output['is_approved'] = $is_approved ? '1' : '0';
 				$output['username'] = $_SESSION['username'] ?: 'anonymous';

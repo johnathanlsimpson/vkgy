@@ -27,7 +27,7 @@
 		'Edit live' => '/lives/'.sanitize($_GET['id']).'/',
 	]);
 	
-	if($_SESSION['is_admin']) {
+	if($_SESSION['is_editor']) {
 		if(is_array($live) && !empty($live)) {
 			$edit_is_allowed = true;
 		}

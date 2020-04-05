@@ -2,7 +2,7 @@
 	include_once("../php/include.php");
 	$markdown_parser = new parse_markdown($pdo);
 	
-	if($_SESSION["loggedIn"]) {
+	if($_SESSION["is_signed_in"]) {
 		$id = sanitize($_POST["id"]) ?: null;
 		$id = is_numeric($id) ? $id : null;
 		$image_id = sanitize($_POST["image_is_entry_default"]);

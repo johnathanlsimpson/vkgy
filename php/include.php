@@ -26,18 +26,17 @@
 	include_once('../php/function-image_exists.php');
 	include_once('../php/function-lang.php');
 	
+	//echo 'before login class <pre>'.print_r($_SESSION, true).'</pre>';
+	
+	// Init login class, and check status/roles
+	$login = new login($pdo);
+	
 	if($_SESSION['is_signed_in']) {
-		$sql_check_status = 'SELECT rank, is_vip FROM users WHERE id=? LIMIT 1';
-		$stmt_check_status = $pdo->prepare($sql_check_status);
-		$stmt_check_status->execute([ $_SESSION['user_id'] ]);
-		$rslt_check_status = $stmt_check_status->fetch();
-		
-		$_SESSION['admin'] = $rslt_check_status['rank'];
-		$_SESSION['is_admin'] = $rslt_check_status['rank'];
-		$_SESSION['is_vip'] = $rslt_check_status['is_vip'];
+		$login->set_roles( $login->check_roles( $_SESSION['user_id'] ) );
 	}
 	else {
-		$login = new login($pdo);
 		$login->check_login();
 	}
+	
+	//echo 'after login class <pre>'.print_r($_SESSION, true).'</pre>';
 ?>

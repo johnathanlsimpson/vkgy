@@ -16,8 +16,8 @@
 		<h1 class="user__username">
 			<a class="a--inherit <?= 'symbol__user-'.$user['icon']; ?>" href="/users/<?php echo $user["username"]; ?>/"><?php echo $user["username"]; ?></a>
 			<?php
-				echo $user['is_admin'] === 28 ? '<span class="any__note symbol__star--full user__flair">Boss</span>' : null;
-				echo $user['is_admin'] ? '<span class="any__note symbol__star--full user__flair">Editor</span>' : null;
+				echo $user['is_boss'] === 28 ? '<span class="any__note symbol__star--full user__flair">Boss</span>' : null;
+				echo $user['is_editor'] ? '<span class="any__note symbol__star--full user__flair">Editor</span>' : null;
 				echo $user['is_vip'] ? '<span class="any__note symbol__star--full user__flair">VIP</span>' : null;
 				echo $_SESSION['username'] == $user['username'] ? '<a class="symbol__edit" href="/account/" style="font-size:1rem;font-weight:normal;line-height:1;vertical-align:middle;">'.lang('Edit', '情報変更', 'hidden').'</a>' : null;
 			?>
@@ -29,7 +29,7 @@
 					<!-- User details -->
 					<ul class="user__data data__container">
 						<?php
-							echo $_SESSION['is_admin'] ? '<li class="data__item"><h5>ID</h5>'.$user['id'].'</li>' : null;
+							echo $_SESSION['is_editor'] ? '<li class="data__item"><h5>ID</h5>'.$user['id'].'</li>' : null;
 							foreach(['birthday', 'pronouns', 'website', 'twitter', 'facebook', 'lastfm', 'mh'] as $field) {
 								if(strlen($user[$field]) && !in_array($user[$field], ['0000-00-00', 'prefer not to say', 'custom'])) {
 									?>

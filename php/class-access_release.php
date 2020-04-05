@@ -412,7 +412,7 @@
 						'releases.image_id',
 					];
 				}
-				if(($args["get"] === "all" || $args["get"] === "basics") && $_SESSION["loggedIn"]) {
+				if(($args["get"] === "all" || $args["get"] === "basics") && $_SESSION["is_signed_in"]) {
 					$sql_select[] = "user_rating.rating AS user_rating";
 					$sql_select[] = "IF(releases_collections.id, 1, 0) AS is_owned";
 					$sql_select[] = "IF(releases_wants.id, 1, 0) AS is_wanted";

@@ -4,7 +4,7 @@
 	
 	$access_label = new access_label($pdo);
 	
-	if($_SESSION["admin"]) {
+	if($_SESSION["is_editor"]) {
 		if(is_array($_POST["name"])) {
 			foreach($_POST["name"] as $key => $name) {
 				$name = sanitize($name);
@@ -37,7 +37,7 @@
 							
 							$sql_edit_history = 'INSERT INTO edits_labels (label_id, user_id, content) VALUES (?, ?, ?)';
 							$stmt_edit_history = $pdo->prepare($sql_edit_history);
-							$stmt_edit_history->execute([ $label_id, $_SESSION['userID'], 'Created.' ]);
+							$stmt_edit_history->execute([ $label_id, $_SESSION['user_id'], 'Created.' ]);
 							
 							$output["status"] = "success";
 							$output["result"][] = '<a class="symbol__company" href="/labels/'.$friendly.'/">'.($romaji ?: $name).'</a> added.';

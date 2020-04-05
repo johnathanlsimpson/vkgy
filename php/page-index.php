@@ -1,5 +1,5 @@
 <?php
-	$body_class = $_SESSION["loggedIn"] ? "body--signed-in" : "body--signed-out";
+	$body_class = $_SESSION["is_signed_in"] ? "body--signed-in" : "body--signed-out";
 	$page_description = $page_description ? $page_description." | vkgy (ブイケージ)" : "vkgy is a visual kei library maintained by overseas fans. vkgy（ブイケージ）はビジュアル系のファンサイトとライブラリです。関連するアーティストのメンバープロフィールや活動やリリース情報などがあります。";
 	$page_title = $page_title ?: $pageTitle;
 	$page_title = $page_title ? $page_title.' | vkgy (ブイケージ)' : 'vkgy (ブイケージ) | visual kei library (V系ライブラリ)';
@@ -160,7 +160,7 @@
 				<div class="quaternary-nav__container any--weaken-size"><?php
 					if(is_array($interact_nav) && !empty($interact_nav)) {
 						foreach($interact_nav as $nav) {
-							if(!$nav['signed_in_only'] || ($nav['signed_in_only'] && $_SESSION['loggedIn'])) {
+							if(!$nav['signed_in_only'] || ($nav['signed_in_only'] && $_SESSION['is_signed_in'])) {
 								$nav['class'] = ($_SERVER['REQUEST_URI'] === $nav['url'] ? 'quaternary-nav--active' : null);
 								?>
 									<a class="quaternary-nav__link  a--inherit a--padded <?php echo $nav['class']; ?>" href="<?php echo $nav['url']; ?>"><?php echo $nav['text']; ?></a>
@@ -177,7 +177,7 @@
 			<div class="tertiary-nav__container  any--flex"><?php
 				if(is_array($section_nav) && !empty($section_nav)) {
 					foreach($section_nav as $nav) {
-						if(!$nav['signed_in_only'] || ($nav['signed_in_only'] && $_SESSION['loggedIn'])) {
+						if(!$nav['signed_in_only'] || ($nav['signed_in_only'] && $_SESSION['is_signed_in'])) {
 							$nav['class'] = explode('&', $_SERVER['REQUEST_URI'])[0] === $nav['url'] || $active_page === $nav['url'] ? 'tertiary-nav--active' : null;
 							?>
 								<a class="tertiary-nav__link  a--inherit a--padded <?php echo $nav['class']; ?>" href="<?php echo $nav['url']; ?>"><?php echo $nav['text']; ?></a>
@@ -360,7 +360,7 @@
 				<div class="any--flex">
 					<a class="releases symbol__release">Discog<div class="any--jp any--weaken">音源</div></a>
 					<a class="profile symbol__artist">Profile<div class="any--jp any--weaken">プロフ</div></a>
-					<a class="edit symbol__edit <?php echo !$_SESSION["admin"] ? "any--hidden" : null; ?>">Edit<div class="any--jp any--weaken">編集</div></a>
+					<a class="edit symbol__edit <?php echo !$_SESSION["is_editor"] ? "any--hidden" : null; ?>">Edit<div class="any--jp any--weaken">編集</div></a>
 					<a class="news symbol__news">News<div class="any--jp any--weaken">ニュース</div></a>
 				</div>
 			</div>

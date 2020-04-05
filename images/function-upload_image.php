@@ -20,7 +20,7 @@
 			$type                = $image['type'];
 			$tmp_name            = $image['tmp_name'];
 			$error               = $image['error'];
-			$user_id             = $_SESSION['userID'] ?: 0;
+			$user_id             = $_SESSION['user_id'] ?: 0;
 			$needs_compression   = isset($image['needs_compression']) ? $image['needs_compression'] : true;
 			$item_type           = sanitize($_POST['item_type']);
 			$item_id             = sanitize($_POST['item_id']);
@@ -75,7 +75,7 @@
 										$image_thumb->resizeToWidth(100);
 										$image_thumb->save('../images/image_files_queued_thumbnail/'.$file_name);
 										
-										update_development($pdo, [ 'type' => 'flyer', 'user_id' => $_SESSION['userID'] ]);
+										update_development($pdo, [ 'type' => 'flyer', 'user_id' => $_SESSION['user_id'] ]);
 									}
 									
 									// Set data for update_image function

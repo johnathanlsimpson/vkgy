@@ -69,20 +69,20 @@ elseif($is_edit && !$date_scheduled && !$is_queued && $current_entry['is_queued'
 }
 
 // Check if allowed
-if($_SESSION['loggedIn']) {
+if($_SESSION['is_signed_in']) {
 	$sql_vip_check = 'SELECT 1 FROM users WHERE id=? AND is_vip=? LIMIT 1';
 	$stmt_vip_check = $pdo->prepare($sql_vip_check);
-	$stmt_vip_check->execute([ $_SESSION['userID'], 1 ]);
+	$stmt_vip_check->execute([ $_SESSION['user_id'], 1 ]);
 	$is_vip = $stmt_vip_check->fetchColumn();
 
 	if(
 		(!$is_edit)
 		||
-		($is_edit && $_SESSION['userID'] === $current_entry['user_id'])
+		($is_edit && $_SESSION['user_id'] === $current_entry['user_id'])
 		||
-		($is_edit && !$is_queued && $_SESSION['admin'])
+		($is_edit && !$is_queued && $_SESSION['is_editor'])
 		||
-		($is_edit && $is_queued && $_SESSION['admin'] && $is_vip)
+		($is_edit && $is_queued && $_SESSION['is_editor'] && $is_vip)
 		||
 		($is_edit && in_array(277, $_POST['tags']))
 	) {
@@ -144,7 +144,7 @@ function update_tags($tag_table, $id_column, $entry_id, $tag_column, $new_tag_ar
 		foreach($new_tag_array as $tag_id) {
 			$sql_values[] = $tag_id;
 			$sql_values[] = $entry_id;
-			$sql_values[] = $_SESSION['userID'];
+			$sql_values[] = $_SESSION['user_id'];
 		}
 		
 		$sql_add = 'INSERT INTO '.$tag_table.' ('.$tag_column.', '.$id_column.', user_id) VALUES '.substr(str_repeat('(?, ?, ?), ', count($new_tag_array)), 0, -2);
@@ -199,7 +199,7 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 				}
 				
 				$keys_blog[] = 'user_id';
-				$values_blog[] = $_SESSION['userID'];
+				$values_blog[] = $_SESSION['user_id'];
 				$sql_blog = 'INSERT INTO blog ('.implode(', ', $keys_blog).') VALUES ('.substr(str_repeat('?, ', count($values_blog)), 0, -2).')';
 			}
 			
@@ -258,7 +258,7 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 				// Update edit history
 				$sql_edit_history = 'INSERT INTO edits_blog (blog_id, user_id, content) VALUES (?, ?, ?)';
 				$stmt_edit_history = $pdo->prepare($sql_edit_history);
-				$stmt_edit_history->execute([ $id, $_SESSION['userID'], ($is_edit ? null : 'Created.') ]);
+				$stmt_edit_history->execute([ $id, $_SESSION['user_id'], ($is_edit ? null : 'Created.') ]);
 				
 				// Get queued, extant social media post, if exists
 				$extant_social_post = $access_social_media->get_post( $id, 'blog_post' );

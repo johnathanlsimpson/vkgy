@@ -21,7 +21,7 @@ subnav([
 // Check VIP status
 $sql_vip_check = 'SELECT 1 FROM users WHERE id=? AND is_vip=? LIMIT 1';
 $stmt_vip_check = $pdo->prepare($sql_vip_check);
-$stmt_vip_check->execute([ $_SESSION['userID'], 1 ]);
+$stmt_vip_check->execute([ $_SESSION['user_id'], 1 ]);
 $is_vip = $stmt_vip_check->fetchColumn();
 
 // View: entry
@@ -31,7 +31,7 @@ if(!empty($_GET["entry"]) && !$_GET["action"]) {
 	if(
 		!$entry['is_queued']
 		||
-		$_SESSION['userID'] === $entry['user_id']
+		$_SESSION['user_id'] === $entry['user_id']
 		||
 		$is_vip
 	) {
@@ -77,13 +77,13 @@ if($_GET["action"] === "update") {
 	}
 	
 	// Check if allowed
-	if($_SESSION['loggedIn']) {
+	if($_SESSION['is_signed_in']) {
 		if(
 			empty($entry)
 			||
-			$_SESSION['userID'] === $entry['user_id']
+			$_SESSION['user_id'] === $entry['user_id']
 			||
-			!$entry['is_queued'] && $_SESSION['admin']
+			!$entry['is_queued'] && $_SESSION['is_editor']
 			||
 			$entry['is_queued'] && $is_vip
 		) {
@@ -166,7 +166,7 @@ if(!$_GET['entry'] && !$_GET['action']) {
 	
 	// Allow user to see only appropriate queued entries
 	for($i=0; $i<$num_queued_entries; $i++) {
-		if($queued_entries[$i]['user_id'] != $_SESSION['userID'] && !$is_vip) {
+		if($queued_entries[$i]['user_id'] != $_SESSION['user_id'] && !$is_vip) {
 			unset($queued_entries[$i]);
 		}
 	}

@@ -5,24 +5,24 @@ include_once("../php/include.php");
 include_once("../avatar/class-avatar.php");
 include_once("../avatar/avatar-definitions.php");
 
-if($_SESSION["loggedIn"] && is_numeric($_SESSION["userID"])) {
+if($_SESSION["is_signed_in"] && is_numeric($_SESSION["user_id"])) {
 	$sql_check = "SELECT 1 FROM users WHERE id=? AND is_vip=1 LIMIT 1";
 	$stmt_check = $pdo->prepare($sql_check);
-	$stmt_check->execute([ $_SESSION["userID"] ]);
+	$stmt_check->execute([ $_SESSION["user_id"] ]);
 	$is_vip = $stmt_check->fetchColumn();
 
 	$avatar_options = $avatar_options ?: json_encode($_POST);
 
 	$sql_update = "INSERT INTO users_avatars (user_id, content) VALUES (?, ?) ON DUPLICATE KEY UPDATE content=?";
 	$stmt_update = $pdo->prepare($sql_update);
-	if($stmt_update->execute([ $_SESSION["userID"], $avatar_options, $avatar_options ])) {
+	if($stmt_update->execute([ $_SESSION["user_id"], $avatar_options, $avatar_options ])) {
 		$output["status"] = "success";
 		
 		// Save avatar as thumbnail
 		if(extension_loaded('imagick')) {
 			$sql_avatar = "SELECT content FROM users_avatars WHERE user_id=? LIMIT 1";
 			$stmt_avatar = $pdo->prepare($sql_avatar);
-			$stmt_avatar->execute([ $_SESSION["userID"] ]);
+			$stmt_avatar->execute([ $_SESSION["user_id"] ]);
 			$rslt_avatar = $stmt_avatar->fetchColumn();
 			$rslt_avatar = $rslt_avatar ?: '{"head__base":"default","head__base-color":"i"}';
 			
