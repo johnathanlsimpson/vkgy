@@ -39,7 +39,7 @@ $news[0]["comment_text"] = ($news[0]["comment_count"] ? 'read '.$news[0]["commen
 
 for($i=0; $i<$num_news; $i++) {
 	$news[$i]["date_occurred"] = substr($news[$i]["date_occurred"], 0, 10);
-	$news[$i]["image"] = str_replace(".", ".medium.", $news[$i]["image"]);
+	$news[$i]["image"] = str_replace(".", ".thumbnail.", $news[$i]["image"]);
 }
 
 /* Get comments */
