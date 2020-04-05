@@ -1,8 +1,6 @@
 <?php
-	session_start();
 	
-	include_once("../php/database-connect.php");
-	include_once("../php/class-login.php");
+	include_once('../php/include.php');
 
 	$login = new login($pdo);
 	$login->check_login();

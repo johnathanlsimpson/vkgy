@@ -1,9 +1,5 @@
 <?php
-	session_start();
-
-	include_once("../php/database-connect.php");
-	include_once("../php/function-sanitize.php");
-	include_once("../php/class-parse_markdown.php");
+	include_once('../php/include.php');
 	
 	$method          = sanitize($_POST["method"]);
 	$comment_content = sanitize($_POST["comment"]);
