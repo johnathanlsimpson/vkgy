@@ -42,7 +42,7 @@
 		"/scripts/script-tooltips.js",
 		"/scripts/script-topButton.js",
 		'/scripts/script-showObscured.js',
-		'/scripts/script-watchNav.js',
+		//'/scripts/script-watchNav.js',
 		'/scripts/script-showSearch.js',
 		'/scripts/script-switchLang.js',
 	]);
