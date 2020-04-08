@@ -76,6 +76,7 @@
 				
 				default:
 					$sql_select = [
+						'users.id',
 						'users.username',
 						'users.icon',
 						'users.is_vip',
