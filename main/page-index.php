@@ -256,7 +256,7 @@ if($_SESSION['username'] === 'inartistic') {
 									
 									<div class="comment__comment">
 										<h5 class="any--flex">
-											<a class="user a--inherit comment__user symbol__user-<?= $comments[$i]['user']['icon']; ?>" href="/users/<?php echo $comments[$i]["user"]["username"]; ?>/"><?php echo $comments[$i]["user"]["username"]; ?></a>
+											<a class="user a--inherit comment__user" data-icon="<?= $comments[$i]['user']['icon']; ?>" data-is-vip="<?= $comments[$i]['user']['is_vip']; ?>" href="<?= $comments[$i]['user']['url']; ?>"><?= $comments[$i]['user']['username']; ?></a>
 											<?php echo substr($comments[$i]["date_occurred"], 5); ?>
 										</h5>
 										
