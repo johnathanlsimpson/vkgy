@@ -93,7 +93,7 @@
 										'date_occurred' => $comment['date_occurred'],
 										'markdown' => !$comment['is_deleted'] ? base64_encode(str_replace("  \n", "\n", $comment['content'])) : null, // Replace space+space linebreak with normal linebreak; this is added automatically to allow single linebreaks
 										'is_user' => ($comment['anonymous_id'] && $_SESSION['anonymous_id'] === $comment['anonymous_id']) || ($_SESSION['is_signed_in'] && $_SESSION['user_id'] === $comment['user']['id']) ? '1' : '0',
-										'is_admin' => $_SESSION['admin'] ? '1' : '0',
+										'is_admin' => $_SESSION['is_editor'] ? '1' : '0',
 										'num_likes' => $comment['num_likes'] ?: '0',
 										'is_liked' => is_numeric($_SESSION['user_id']) && $comment['liked_by_user_id'] === $_SESSION['user_id'] ? '1' : '0',
 										'item_type' => $comment['item_type'],
