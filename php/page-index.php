@@ -370,7 +370,7 @@
 		
 		<style>
 			/*<?php
-				$sql_vip_users = "SELECT username FROM users WHERE is_vip=? ORDER BY username";
+				/*$sql_vip_users = "SELECT username FROM users WHERE is_vip=? ORDER BY username";
 				$stmt_vip_users = $pdo->prepare($sql_vip_users);
 				$stmt_vip_users->execute([ "1" ]);
 				$rslt_vip_users = $stmt_vip_users->fetchAll();
@@ -379,7 +379,7 @@
 					foreach($rslt_vip_users as $vip_user) {
 						echo 'a.user[href="/users/'.$vip_user["username"].'/"]::after,'."\n";
 					}
-				}
+				}*/
 			?>
 			.user--vip,*/ .user[data-is-vip="1"]::after {
 				border-radius: 3px;
