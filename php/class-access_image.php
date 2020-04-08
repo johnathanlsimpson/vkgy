@@ -21,6 +21,8 @@
 			
 			$this->pdo = $pdo;
 			
+			$this->access_user = new access_user($this->pdo);
+			
 			$this->resize_methods = ['thumbnail' => 100, 'small' => 150, 'medium' => 300, 'large' => 400, 'watermark' => 800, 'full' => 0];
 			
 			$this->allowed_resize_methods = array_keys($this->resize_methods);
@@ -476,7 +478,7 @@
 				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_labels.label_id) AS label_ids';
 				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_musicians.musician_id) AS musician_ids';
 				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_releases.release_id) AS release_ids';
-				$sql_select[] = 'users.username';
+				//$sql_select[] = 'users.username';
 			}
 			if($args['get'] === 'name') {
 				$sql_select[] = 'images.id';
@@ -526,7 +528,7 @@
 				$sql_join[] = 'LEFT JOIN images_labels ON images_labels.image_id=images.id';
 				$sql_join[] = 'LEFT JOIN images_musicians ON images_musicians.image_id=images.id';
 				$sql_join[] = 'LEFT JOIN images_releases ON images_releases.image_id=images.id';
-				$sql_join[] = 'LEFT JOIN users ON users.id=images.user_id';
+				//$sql_join[] = 'LEFT JOIN users ON users.id=images.user_id';
 			}
 			
 			// Where
@@ -577,6 +579,12 @@
 					
 					// Get artists etc
 					if($args['get'] === 'all') {
+						
+						// Get user info
+						for($i=0; $i<$num_images; $i++) {
+							$images[$i]['user'] = $this->access_user->access_user([ 'id' => $images[$i]['user_id'], 'get' => 'name' ]);
+						}
+						
 						foreach(['artists', 'blog', 'labels', 'musicians', 'releases'] as $link_table) {
 							$singular_link_table = $link_table === 'blog' ? $link_table : substr($link_table, 0, -1);
 							$link_column = $singular_link_table.'_id'.($link_table != 'blog' ? 's' : null);

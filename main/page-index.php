@@ -121,7 +121,7 @@ if($_SESSION['username'] === 'inartistic') {
 					<h2>
 						<div class="h5 any--flex">
 							<?php echo $news[0]["date_occurred"]; ?>
-							<a class="user a--inherit news__user" href="/users/<?php echo $news[0]["username"]; ?>/"><?php echo $news[0]["username"]; ?></a>
+							<a class="user a--inherit news__user" data-icon="<?= $news[0]['user']['icon']; ?>" data-is-vip="<?= $news[0]['user']['is_vip']; ?>" href="<?= $news[0]['user']['url']; ?>"><?= $news[0]['user']['username']; ?></a>
 						</div>
 						<a href="/blog/<?php echo $news[0]["friendly"]; ?>/"><?php echo $news[0]["title"]; ?></a>
 					</h2>
@@ -238,9 +238,7 @@ if($_SESSION['username'] === 'inartistic') {
 		<div class="text obscure__container obscure--long comments__container">
 			<ul>
 				<?php
-					$access_user = new access_user($pdo);
 					for($i=0; $i<count($comments); $i++) {
-						$comments[$i]['user'] = array_merge($comments[$i]['user'], $access_user->access_user([ 'username' => $comments[$i]['user']['username'], 'get' => 'name' ]));
 						
 						$comment_class = null;
 						$comments[$i]['user']['avatar_url'] = '/usericons/avatar-'.(file_exists('../usericons/avatar-'.$comments[$i]['user']['username'].'.png') ? $comments[$i]['user']['username'] : 'anonymous').'.png?'.date('YmdH');
@@ -252,7 +250,7 @@ if($_SESSION['username'] === 'inartistic') {
 						?>
 							<li class="obscure__item <?php echo $comment_class; ?>">
 								<div class="any--flex">
-									<a class="comment__avatar-container <?php echo $comments[$i]["user"]["avatar_class"]; ?>" href="/users/<?php echo $comments[$i]['user']['username']; ?>/">
+									<a class="comment__avatar-container" data-icon="<?= $comments[$i]['user']['icon']; ?>" data-is-vip="<?= $comments[$i]['user']['is_vip']; ?>" href="<?= $comments[$i]['user']['url']; ?>">
 										<img alt="<?php echo $comments[$i]['user']['username']; ?>'s avatar" class="comment__avatar" src="<?php echo $comments[$i]['user']['avatar_url']; ?>" />
 									</a>
 									

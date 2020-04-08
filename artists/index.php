@@ -109,7 +109,7 @@
 	if($show_videos || $show_artist_page) {
 		
 		// Format edit history
-		$sql_edit_history = 'SELECT edits_artists.*, users.username FROM edits_artists LEFT JOIN users ON users.id=edits_artists.user_id WHERE edits_artists.artist_id=? ORDER BY date_occurred DESC';
+		$sql_edit_history = 'SELECT edits_artists.* FROM edits_artists LEFT JOIN users ON users.id=edits_artists.user_id WHERE edits_artists.artist_id=? ORDER BY date_occurred DESC';
 		$stmt_edit_history = $pdo->prepare($sql_edit_history);
 		$stmt_edit_history->execute([ $artist['id'] ]);
 		$rslt_edit_history = $stmt_edit_history->fetchAll();
@@ -121,7 +121,7 @@
 			for($i=0; $i<$num_edit_history; $i++) {
 				$e = $rslt_edit_history[$i];
 				
-				$artist['edit_history'][$e['date_occurred']]['username'] = $e['username'];
+				$artist['edit_history'][$e['date_occurred']]['user'] = $access_user->access_user([ 'id' => $e['user_id'], 'get' => 'name' ]);
 				$artist['edit_history'][$e['date_occurred']]['date_occurred'] = $e['date_occurred'];
 				$artist['edit_history'][$e['date_occurred']]['content'][] = $e['content'];
 			}

@@ -14,6 +14,9 @@
 			}
 			
 			$this->pdo = $pdo;
+			
+			// Access user
+			$this->access_user = new access_user($this->pdo);
 		}
 		
 		
@@ -208,7 +211,8 @@
 				$sql_select[] = 'videos.date_added';
 				$sql_select[] = 'videos.artist_id';
 				$sql_select[] = 'videos.release_id';
-				$sql_select[] = 'users.username';
+				$sql_select[] = 'videos.user_id';
+				//$sql_select[] = 'users.username';
 			}
 			if($args['get'] === 'count') {
 				$sql_select[] = 'COUNT(*) AS num_videos';
@@ -217,7 +221,7 @@
 			// FROM ------------------------------------------------
 			$sql_from = 'videos';
 			if($args['get'] === 'all') {
-				$sql_join[] = 'LEFT JOIN users ON users.id=videos.user_id';
+				//$sql_join[] = 'LEFT JOIN users ON users.id=videos.user_id';
 			}
 			
 			// WHERE -----------------------------------------------
@@ -264,6 +268,7 @@
 					
 					// FORMAT DATA -------------------------------------
 					if($args['get'] === 'all') {
+						
 							// Get artist class
 							if(!$this->access_artist) {
 								include_once('../php/class-access_artist.php');
@@ -297,6 +302,10 @@
 							}
 							
 							for($i=0; $i<$num_videos; $i++) {
+								
+								// Get user data
+								$rslt_videos[$i]['user'] = $this->access_user->access_user([ 'id' => $rslt_videos[$i]['user_id'], 'get' => 'name' ]);
+								
 								// Save video IDs to get YT data later
 								$video_youtube_ids[] = $rslt_videos[$i]['youtube_id'];
 								

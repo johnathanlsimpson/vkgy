@@ -479,7 +479,7 @@
 							$output = $user;
 							$output["inline"] = substr($input_content, ($offset - 2), 2) === "](" ? true : false;
 							$output["id"] = $user['id'];
-							$output['username'] = $user['username'];
+							$output['user'] = $user;
 							$output["offset"] = $offset;
 							$output["length"] = $length;
 							$output["type"] = "user";
@@ -583,7 +583,7 @@
 					
 					// User
 					elseif($reference_datum['type'] === 'user') {
-						$output = '<a class="user" href="/users/'.$reference_datum['username'].'/">'.$reference_datum['username'].'</a>';
+						$output = '<a class="user" data-icon="'.$reference_datum['user']['icon'].'" data-is-vip="'.$reference_datum['user']['is_vip'].'" href="'.$reference_datum['user']['url'].'">'.$reference_datum['user']['username'].'</a>';
 					}
 					
 					// Live

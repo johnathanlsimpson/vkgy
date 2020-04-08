@@ -1,10 +1,12 @@
 <?php
-	
+
+$access_user = new access_user($pdo);
+
 // ======================================================
 // Database front page
 // ======================================================
 $sql_recent = "
-	SELECT recent.*, users.username
+	SELECT recent.*
 	FROM (
 		(
 			SELECT
@@ -59,12 +61,16 @@ $sql_recent = "
 			LEFT JOIN artists ON artists.id=releases.artist_id
 		)
 	) AS recent
-	LEFT JOIN users ON users.id=recent.user_id
 	ORDER BY recent.type ASC, recent.date_edited DESC
 ";
 $stmt_recent = $pdo->prepare($sql_recent);
 $stmt_recent->execute();
 $database = $stmt_recent->fetchAll();
+$num_database = count($database);
+
+for($i=0; $i<$num_database; $i++) {
+	$database[$i]['user'] = $access_user->access_user([ 'id' => $database[$i]['user_id'], 'get' => 'name' ]);
+}
 
 $page_title = 'Database';
 $page_header = 'Database';

@@ -369,7 +369,7 @@
 		<?php display_scripts("bottom"); ?>
 		
 		<style>
-			<?php
+			/*<?php
 				$sql_vip_users = "SELECT username FROM users WHERE is_vip=? ORDER BY username";
 				$stmt_vip_users = $pdo->prepare($sql_vip_users);
 				$stmt_vip_users->execute([ "1" ]);
@@ -381,13 +381,25 @@
 					}
 				}
 			?>
-			.user--vip {
+			.user--vip,*/ .user[data-is-vip="1"]::after {
 				border-radius: 3px;
 				box-shadow: inset 0 0 0 1px;
 				content: "VIP";
 				font-weight: normal;
 				margin-left: 3px;
 				padding: 0 2px;
+			}
+			.user[data-icon="crown"]::before {
+				clip-path: url(#symbol__user-crown); -webkit-clip-path: url(#symbol__user-crown);
+			}
+			.user[data-icon="flower"]::before {
+				clip-path: url(#symbol__user-flower); -webkit-clip-path: url(#symbol__user-flower);
+			}
+			.user[data-icon="heart"]::before {
+				clip-path: url(#symbol__user-heart); -webkit-clip-path: url(#symbol__user-heart);
+			}
+			.user[data-icon="star"]::before {
+				clip-path: url(#symbol__user-star); -webkit-clip-path: url(#symbol__user-star);
 			}
 		</style>
 		

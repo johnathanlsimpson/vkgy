@@ -38,10 +38,9 @@ switch(true) {
 
 // Check if requested user exists, change template if necessary
 if(in_array($template, [ 'account', 'activity', 'user' ])) {
-	$user_check = $access_user->access_user([ 'username' => sanitize($_GET['username']) ?: $_SESSION['username'], 'get' => 'name' ]);
+	$user = $access_user->access_user([ 'username' => sanitize($_GET['username']) ?: $_SESSION['username'], 'get' => 'all' ]);
 	
-	if(is_array($user_check) && !empty($user_check)) {
-		$user = $access_user->access_user([ 'username' => sanitize($_GET['username']) ?: $_SESSION['username'], 'get' => 'all' ]);
+	if(is_array($user) && !empty($user)) {
 	}
 	else {
 		$error = 'Couldn\'t find the requested user. Showing all users instead.';

@@ -17,7 +17,7 @@
 								?>
 									<li class="obscure__item">
 										<span class="h4"><?= substr($artist["edit_history"][$i]["date_occurred"], 0, 10); ?></span>
-										<a class="user" href="<?php echo '/users/'.$artist["edit_history"][$i]["username"].'/'; ?>"><?= $artist["edit_history"][$i]["username"]; ?></a>
+										<a class="user" data-icon="<?= $artist["edit_history"][$i]['user']['icon']; ?>" data-is-vip="<?= $artist["edit_history"][$i]['user']['is_vip']; ?>" href="<?= $artist["edit_history"][$i]['user']['url']; ?>"><?= $artist["edit_history"][$i]['user']['username']; ?></a>
 										<?php
 											foreach($artist['edit_history'][$i]['content'] as $change) {
 												echo strlen($change) ? '<span class="symbol__edit any--weaken">'.$change.'</span> ' : null;

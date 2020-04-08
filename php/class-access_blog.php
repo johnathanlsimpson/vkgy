@@ -283,7 +283,7 @@
 			if($args["get"] === "basics" || $args["get"] === "all" || $args["get"] === "list") {
 				if(is_array($blogs)) {
 					foreach($blogs as $row_key => $row) {
-						$blogs[$row_key]["username"] = $this->access_user->access_user(["id" => $row["user_id"], "get" => "name"])["username"];
+						$blogs[$row_key]['user'] = $this->access_user->access_user( [ 'id' => $row['user_id'], 'get' => 'name' ] );
 					}
 				}
 			}
@@ -305,10 +305,14 @@
 			// Get edit history
 			if($args['get'] === 'all') {
 				for($i=0; $i<$num_blogs; $i++) {
-					$sql_edit_history = 'SELECT edits_blog.date_occurred, users.username FROM edits_blog LEFT JOIN users ON users.id=edits_blog.user_id WHERE edits_blog.blog_id=? ORDER BY edits_blog.date_occurred DESC';
+					$sql_edit_history = 'SELECT edits_blog.date_occurred, edits_blog.user_id FROM edits_blog WHERE edits_blog.blog_id=? ORDER BY edits_blog.date_occurred DESC';
 					$stmt_edit_history = $this->pdo->prepare($sql_edit_history);
 					$stmt_edit_history->execute([ $blogs[$i]['id'] ]);
 					$blogs[$i]['edit_history'] = $stmt_edit_history->fetchAll();
+					
+					foreach($blogs[$i]['edit_history'] as $edit_key => $edit) {
+						$blogs[$i]['edit_history'][$edit_key]['user'] = $this->access_user->access_user([ 'id' => $blogs[$i]['edit_history'][$edit_key]['user_id'], 'get' => 'name' ]);
+					}
 				}
 			}
 			

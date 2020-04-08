@@ -38,7 +38,7 @@
 														
 														<div class="h5 any--no-wrap">
 															<?php echo $database[$i]["date_edited"]; ?> by 
-															<a class="a--inherit symbol__user" href="/users/<?php echo $database[$i]["username"]; ?>/"><?php echo $database[$i]["username"]; ?></a>
+															<a class="user a--inherit" data-icon="<?= $database[$i]['user']['icon']; ?>" data-is-vip="<?= $database[$i]['user']['is_vip']; ?>" href="<?= $database[$i]['user']['url']; ?>"><?= $database[$i]['user']['username']; ?></a>
 														</div>
 													</li>
 												<?php
