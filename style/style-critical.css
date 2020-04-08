@@ -89,7 +89,7 @@
 		display: none;
 	}
 	body {
-		overflow: scroll;
+		overflow-y: scroll;
 	}
 
 /**
@@ -581,6 +581,10 @@
 
 
 	/* 2° (TOP NAV): LANGUAGE */
+	.secondary-nav__en, .secondary-nav__ja {
+		color: hsl(var(--accent)) !important;
+		font-weight: bold;
+	}
 	.secondary-nav__en::before, .secondary-nav__ja::before {
 		display: none;
 	}
