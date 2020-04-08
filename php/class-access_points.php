@@ -42,7 +42,6 @@ class access_points {
 			case 'ranking':
 				$select[] = 'SUM(users_points.point_value) AS points_value';
 				$select[] = 'users_points.user_id';
-				$select[] = 'users.username';
 				break;
 			case 'level':
 				$select[] = 'SUM(users_points.point_value) AS points_value';
@@ -59,11 +58,6 @@ class access_points {
 		}
 		
 		// Join
-		switch(true) {
-			case $args['get'] === 'ranking':
-				$join[] = 'LEFT JOIN users ON users.id=users_points.user_id';
-				break;
-		}
 		
 		// Where
 		switch(true) {
@@ -141,6 +135,15 @@ class access_points {
 			
 			for($i=0; $i<$num_points; $i++) {
 				$points[$i]['level'] = $user_levels[$points[$i]['user_id']]['level'];
+			}
+		}
+		
+		// Additional data: user info
+		if($args['get'] === 'ranking') {
+			$this->access_user = new access_user($this->pdo);
+			
+			for($i=0; $i<$num_points; $i++) {
+				$points[$i] = array_merge($points[$i], $this->access_user->access_user([ 'id' => $points[$i]['user_id'], 'get' => 'name', ]));
 			}
 		}
 		

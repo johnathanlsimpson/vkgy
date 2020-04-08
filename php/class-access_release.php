@@ -18,6 +18,8 @@
 			else {
 				$this->pdo = $pdo;
 			}
+			
+			$this->access_user = new access_user($this->pdo);
 			$this->access_comment = new access_comment($this->pdo);
 			$this->access_artist = new access_artist($this->pdo);
 		}
@@ -450,7 +452,7 @@
 					$sql_select[] = 'releases.type_name';
 					$sql_select[] = 'releases.type_romaji';
 					if($args['edit_ids']) {
-						$sql_select[] = 'users.username';
+						$sql_select[] = 'edits_releases.user_id';
 						$sql_select[] = 'edits_releases.date_occurred AS date_edited';
 					}
 					
@@ -505,7 +507,7 @@
 			if(is_array($args['edit_ids']) && !empty($args['edit_ids'])) {
 				$sql_from = 'edits_releases';
 				$sql_join[] = 'LEFT JOIN releases ON releases.id=edits_releases.release_id';
-				$sql_join[] = 'LEFT JOIN users ON users.id=edits_releases.user_id';
+				//$sql_join[] = 'LEFT JOIN users ON users.id=edits_releases.user_id';
 			}
 			// If returning list view
 			if($args['get'] === 'list') {
@@ -747,12 +749,24 @@
 						$release_artists = $this->access_artist->access_artist([ 'get' => 'name', 'id' => $artist_ids, 'associative' => true ]);
 					}
 					
+					// Get user info
+					if($args['edit_ids'] && $args['get'] === 'list') {
+						for($i=0; $i<$num_rslt_releases; $i++) {
+							
+							// Array is associative so refer to separate array of IDs
+							$release_id = $release_ids[$i];
+							$releases[$release_id]['user'] = $this->access_user->access_user([ 'id' => $releases[$release_id]['user_id'], 'get' => 'name' ]);
+							
+						}
+					}
+					
 					for($i = 0; $i < $num_rslt_releases; $i++) {
 						$release_id = $release_ids[$i];
 						
-						if(is_array($usernames) && !empty($usernames)) {
+						// Not sure what this does
+						/*if(is_array($usernames) && !empty($usernames)) {
 							$releases[$release_id]['username'] = $usernames[$release_id];
-						}
+						}*/
 						
 						// Add artist info to releases
 						if(in_array($args["get"], ["all", "basics", "list", 'calendar'])) {

@@ -90,7 +90,7 @@
 										<h5>
 											Uploaded by
 										</h5>
-										<a class="user" href="<?php echo '/users/'.$image['username'].'/'; ?>"><?php echo $image['username']; ?></a>
+										<a class="user" data-icon="<?= $image['user']['icon']; ?>" data-is-vip="<?= $image['user']['is_vip']; ?>" href="<?= $image['user']['url']; ?>"><?= $image['user']['username']; ?></a>
 									</div>
 									
 									<?php

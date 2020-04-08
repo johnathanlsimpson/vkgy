@@ -30,7 +30,7 @@
 					<div class="any--flex comment__head">
 						<div class="comment__authored any--weaken-color">
 							<h5 class="comment__date">{date_occurred}</h5>
-							<a class="user comment__user a--inherit" href="{user_url}">{username}</a>
+							<a class="user comment__user a--inherit" data-icon="{user_icon}" data-is-vip="{user_is_vip}" data-is-moderator="{user_is_moderator}" href="{user_url}">{username}</a>
 							<span class="comment__name any--weaken-color">{name}</span>
 						</div>
 						

@@ -64,19 +64,24 @@
 										<?php echo substr($user["date_added"], 0, 10); ?>
 									</td>
 									<td class="td--width-100">
-										<a class="user" href="/users/<?php echo $user["username"]; ?>"><?php echo $user["username"]; ?></a>
+										<a class="user" data-icon="<?= $user['icon']; ?>" href="<?= $user['url']; ?>"><?= $user['username']; ?></a>
 										<?php
-											if($user["id"] === "1") {
+											if($user['is_boss']) {
 												?>
-													<span class="any__note symbol__star--full">Founder</span>
+													<span class="any__note symbol__star--full">Boss</span>
 												<?php
 											}
-											if($user["is_editor"]) {
+											if($user['is_editor']) {
 												?>
-													<span class="any__note symbol__star--full">Admin</span>
+													<span class="any__note symbol__star--full">Editor</span>
 												<?php
 											}
-											if($user["is_vip"]) {
+											if($user['is_moderator']) {
+												?>
+													<span class="any__note symbol__star--full">Moderator</span>
+												<?php
+											}
+											if($user['is_vip']) {
 												?>
 													<span class="any__note symbol__star--full">VIP</span>
 												<?php

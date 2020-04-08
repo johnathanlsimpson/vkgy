@@ -2,6 +2,8 @@
 	include_once("../php/class-parse_markdown.php");
 	$markdown_parser = new parse_markdown($pdo);
 
+$access_user = new access_user($pdo);
+
 
 	if(!empty($release)) {
 		include_once("../releases/head.php");
@@ -672,17 +674,24 @@
 
 									<ul>
 										<?php
-											$sql_editors = 'SELECT users.username FROM edits_releases LEFT JOIN users ON users.id=edits_releases.user_id WHERE edits_releases.release_id=? GROUP BY users.username ORDER BY edits_releases.date_occurred DESC';
+											
+											// Grab user IDs of latest updates
+											$sql_editors = 'SELECT user_id, MAX(date_occurred) AS date_occurred FROM edits_releases WHERE release_id=? GROUP BY user_id ORDER BY date_occurred DESC';
 											$stmt_editors = $pdo->prepare($sql_editors);
 											$stmt_editors->execute([ $release['id'] ]);
 											$rslt_editors = $stmt_editors->fetchAll();
-											$num_editors = count($rslt_editors);
+					
+											$num_editors = is_array($rslt_editors) ? count($rslt_editors) : 0;
 
-											if(is_array($rslt_editors) && !empty($rslt_editors)) {
+											if($rslt_editors) {
 												for($i=0; $i<$num_editors; $i++) {
+													
+													// Get user info
+													$rslt_editors[$i]['user'] = $access_user->access_user([ 'id' => $rslt_editors[$i]['user_id'], 'get' => 'name' ]);
+													
 													?>
 														<li>
-															<a class="user" href="<?php echo '/users/'.$rslt_editors[$i]['username'].'/'; ?>"><?php echo $rslt_editors[$i]['username']; ?></a>
+															<a class="user" data-icon="<?= $rslt_editors[$i]['user']['icon']; ?>" data-is-vip="<?= $rslt_editors[$i]['user']['is_vip']; ?>" href="<?= $rslt_editors[$i]['user']['username']; ?>"><?= $rslt_editors[$i]['user']['username']; ?></a>
 														</li>
 													<?php
 												}

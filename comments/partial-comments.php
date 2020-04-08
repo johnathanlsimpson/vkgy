@@ -85,7 +85,10 @@
 									$rendered_comments[] = render_comment_component($comment_template, [
 										'comment_id' => $comment['id'],
 										'avatar_url' => '/usericons/avatar-'.($comment['user']['username'] ?: 'anonymous').'.png',
-										'user_url' => '/users/'.($comment['user']['username'] ?: 'anonymous').'/',
+										'user_icon' => $comment['user']['icon'],
+										'user_url' => $comment['user']['url'],
+										'user_is_vip' => $comment['user']['is_vip'],
+										'user_is_moderator' => $comment['user']['is_editor'],
 										'username' => $comment['user']['username'] ?: 'anonymous',
 										'date_occurred' => $comment['date_occurred'],
 										'markdown' => !$comment['is_deleted'] ? base64_encode(str_replace("  \n", "\n", $comment['content'])) : null, // Replace space+space linebreak with normal linebreak; this is added automatically to allow single linebreaks

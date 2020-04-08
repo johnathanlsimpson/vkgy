@@ -76,7 +76,7 @@ style([
 									</div>
 									<div class="data__item">
 										<h5>Added</h5>
-										<a class="user" href="/users/{username}/">{username}</a>
+										<a class="user" data-icon="{user_icon}" data-is-vip="{user_is_vip}" href="{user_url}">{username}</a>
 									</div>
 									<div class="data__item {release_class}">
 										<h5>Release</h5>
@@ -109,7 +109,9 @@ style([
 							'num_views' => $video['data']['num_views'],
 							'num_likes' => $video['data']['num_likes'],
 							'date_occurred' => substr($video['data']['date_occurred'], 0, 10),
-							'username' => $video['username'],
+							'username' => $video['user']['username'],
+							'user_icon' => $video['user']['icon'],
+							'user_is_vip' => $video['user']['is_vip'],
 							'release_url' => '/release/'.$artist['friendly'].'/'.$video['release']['id'].'/'.$video['release']['friendly'].'/',
 							'release_name' => lang($video['release']['quick_name'], $video['release']['name'], 'hidden'),
 						];

@@ -111,7 +111,7 @@
 						<h2>
 							<div class="h5">
 								<?php echo $entries[$i]['date_occurred']; ?>
-								<a class="user" href="<?php echo '/users/'.$entries[$i]['username'].'/'; ?>"><?php echo $entries[$i]['username']; ?></a>
+								<a class="user" data-icon="<?= $entries[$i]['user']['icon']; ?>" data-is-vip="<?= $entries[$i]['user']['is_vip']; ?>" href="<?= $entries[$i]['user']['url']; ?>"><?= $entries[$i]['user']['username']; ?></a>
 							</div>
 							<a href="/blog/<?php echo $entries[$i]["friendly"]; ?>/"><?php echo $entries[$i]["title"]; ?></a>
 						</h2>

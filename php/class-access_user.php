@@ -1,26 +1,36 @@
 <?php
-	include_once("../php/include.php");
+	include_once('../php/include.php');
 	
 	class access_user {
 		public  $pdo;
-		private $user_list = ["by_id" => [], "by_username" => []];
+		public  $allowed_icons;
+		private $user_list;
 		
 		
 		
 		// ======================================================
-		// Construct DB connection
+		// Construct
 		// ======================================================
 		function __construct($pdo) {
+			
+			// Set up connection
 			if(!isset($pdo) || !$pdo->getAttribute(PDO::ATTR_CONNECTION_STATUS)) {
-				include_once("../php/database-connect.php");
+				include_once('../php/database-connect.php');
 			}
 			$this->pdo = $pdo;
 			
+			// Set icon choices
 			$this->allowed_icons = [
 				'crown',
 				'heart',
 				'star',
 				'flower',
+			];
+			
+			// Setup empty user list array
+			$this->user_list = [
+				'by_id' => [],
+				'by_username' => []
 			];
 		}
 		
@@ -37,46 +47,50 @@
 			}
 			
 			// SELECT
-			switch($args["get"]) {
-				case "name" :
-					$sql_select = ['id', 'username', 'rank', 'is_vip', 'icon'];
-					break;
-				case "all" :
+			switch($args['get']) {
+				
+				case 'all' :
 					$sql_select = [
-						"users.id",
-						"users.username",
-						"users.rank AS is_editor",
-						"users.is_vip",
-						"users.name",
-						"users.email",
-						"users.motto",
-						"users.website",
-						"users.twitter",
-						"users.tumblr",
-						"users.facebook",
-						"users.lastfm",
+						'users.id',
+						'users.username',
+						'users.icon',
+						'users.is_vip',
+						'users.is_editor',
+						'users.is_moderator',
+						'users.is_boss',
+						'users.is_staff',
+						'users.name',
+						'users.motto',
+						'users.website',
+						'users.twitter',
+						'users.facebook',
+						'users.lastfm',
 						'users.mh',
-						"users.icon",
-						"users.birthday",
-						"users.pronouns",
-						"users.date_added",
-						"users.artist_id",
+						'users.birthday',
+						'users.pronouns',
+						'users.date_added',
 						'users.fan_since',
 						'users.site_theme'
 					];
 					break;
-				case "list":
+				
+				default:
 					$sql_select = [
-						"users.id",
-						"users.is_vip",
-						"users.rank AS is_editor",
-						"users.date_added",
-						"users.username",
+						'users.username',
+						'users.icon',
+						'users.is_vip',
+						'users.is_editor',
+						'users.is_moderator',
+						'users.is_boss',
+						'users.is_staff',
+						'users.date_added',
+						'CONCAT_WS("/", "", "users", users.username, "") AS url'
 					];
+				
 			}
 			
 			// FROM
-			$sql_from = is_array($sql_from) ? $sql_from : ["users"];
+			$sql_from = is_array($sql_from) ? $sql_from : [ 'users' ];
 			
 			// WHERE
 			switch(true) {
@@ -99,7 +113,7 @@
 			
 			if($sql_select && $sql_from) {
 				
-			// CHECK IF NECESSARY
+				// CHECK IF NECESSARY
 				if(is_numeric($args["id"]) && in_array($args["id"], $this->user_list["by_id"])) {
 					if(count($this->user_list["by_id"][$args["id"]]) === count($sql_select)) {
 						$users = [$this->user_list["by_id"][$args["id"]]];
@@ -108,7 +122,7 @@
 				
 				if(empty($users)) {
 					
-			// QUERY
+					// QUERY
 					$sql_user = "SELECT ".implode(", ", $sql_select)." FROM ".implode(" ", $sql_from)." ".($sql_where ? "WHERE (".implode(") AND (", $sql_where).")" : null)." ORDER BY ".implode(", ", $sql_order)." ".$sql_limit;
 					$stmt_user = $this->pdo->prepare($sql_user);
 					$stmt_user->execute($sql_values);
@@ -124,11 +138,7 @@
 						}
 					}
 					
-					//echo $_SESSION['username'] === 'inartistic' ? '***'.print_r($sql_user, true).print_r($sql_values, true) : null;
-					
-					// ADD'L
-					
-			// UPDATE USER LIST
+					// UPDATE USER LIST
 					if(is_array($users)) {
 						foreach($users as $user) {
 							foreach($user as $key => $value) {
@@ -139,7 +149,7 @@
 					}
 				}
 				
-			// RETURN
+				// RETURN
 				$users = is_array($users) ? $users : [];
 				$users = is_numeric($args["id"]) || $args["username"] ? reset($users) : $users;
 				

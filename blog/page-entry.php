@@ -27,7 +27,7 @@
 
 		$sql_twitter = "SELECT twitter FROM users WHERE username=? LIMIT 1";
 		$stmt_twitter = $pdo->prepare($sql_twitter);
-		$stmt_twitter->execute([$entry["username"]]);
+		$stmt_twitter->execute([ $entry['user']['username'] ]);
 		$rslt_twitter = $stmt_twitter->fetchColumn();
 
 		if(!empty($rslt_twitter) && preg_match("/"."^[A-z0-9_]+$"."/", $rslt_twitter)) {
@@ -170,18 +170,19 @@
 						<div class="text text--outlined">
 							<ul>
 								<li class="any--flex">
-									<a class="entry__avatar lazy" data-src="<?php echo '/usericons/avatar-'.$entry['username'].'.png'; ?>" href="/users/<?php echo $entry['username']; ?>/"></a>
+									<a class="entry__avatar lazy" data-src="<?= '/usericons/avatar-'.$entry['user']['username'].'.png'; ?>" href="<?= $entry['user']['url']; ?>"></a>
 									<div>
 										<h5>
 											Written by
 										</h5>
-										<a class="user" href="/users/<?php echo $entry['username']; ?>/"><?php echo $entry['username']; ?></a>
+										<a class="user" data-icon="<?= $entry['user']['icon']; ?>" data-is-vip="<?= $entry['user']['is_vip']; ?>" href="<?= $entry['user']['url']; ?>"><?= $entry['user']['username']; ?></a>
 									</div>
 								</li>
 								<?php
 									if(is_array($entry['edit_history']) && !empty($entry['edit_history'])) {
 										foreach($entry['edit_history'] as $edit) {
-											if($edit['username'] != $entry['username']) {
+											
+											if($edit['user']['username'] != $entry['user']['username']) {
 												$show_edits = true;
 												break;
 											}
@@ -197,15 +198,15 @@
 														$shown_users = [];
 
 														foreach($entry['edit_history'] as $edit) {
-															if(!in_array($edit['username'], $shown_users)) {
+															if(!in_array($edit['user']['username'], $shown_users)) {
 																?>
 																	<span>
-																		<a class="entry__avatar lazy" data-src="<?php echo '/usericons/avatar-'.$edit['username'].'.png'; ?>" href="/users/<?php echo $edit['username']; ?>/"></a>
+																		<a class="entry__avatar lazy" data-src="<?= '/usericons/avatar-'.$edit['user']['username'].'.png'; ?>" href="<?= $edit['user']['url']; ?>"></a>
 																	</span>
 																<?php
 															}
 
-															$shown_users[] = $edit['username'];
+															$shown_users[] = $edit['user']['username'];
 														}
 													?>
 												</li>
@@ -269,25 +270,6 @@
 											?>
 										</ul>
 									</div>
-								<?php
-							}
-
-							if($_SESSION['username'] === 'inartistic') {
-								?>
-									<!--<div>
-										<div class="fb-page" data-href="https://www.facebook.com/vkgy.official/" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"><blockquote cite="https://www.facebook.com/vkgy.official/" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/vkgy.official/">vk.gy - visual kei library</a></blockquote></div>
-										<div id="fb-root"></div>
-										<script>(function(d, s, id) {
-											var js, fjs = d.getElementsByTagName(s)[0];
-											if (d.getElementById(id)) return;
-											js = d.createElement(s); js.id = id;
-											js.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2&appId=947845311963607&autoLogAppEvents=1';
-											fjs.parentNode.insertBefore(js, fjs);
-										}(document, 'script', 'facebook-jssdk'));</script>
-									</div>
-									<div>
-										<iframe src="https://discordapp.com/widget?id=473742524926918667&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0"></iframe>
-									</div>-->
 								<?php
 							}
 						?>

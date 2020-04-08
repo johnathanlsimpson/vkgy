@@ -172,13 +172,13 @@
 											$edited_release_ids = array_keys($edited_releases);
 											$num_edited_releases = count($edited_releases);
 											$edited_releases = array_values($edited_releases);
-
+											
 											for($i=0; $i<$num_edited_releases; $i++) {
 												?>
 													<li>
 														<div class="h5">
 															<?php
-																echo $edited_releases[$i]['date_edited'].' by '.'<a class="user a--inherit" href="/users/'.$edited_releases[$i]['username'].'/">'.$edited_releases[$i]['username'].'</a>';
+																echo $edited_releases[$i]['date_edited'].' by '.'<a class="user a--inherit" data-icon="'.$edited_releases[$i]['user']['icon'].'" data-is-vip="'.$edited_releases[$i]['user']['is_vip'].'" href="'.$edited_releases[$i]['url'].'">'.$edited_releases[$i]['user']['username'].'</a>';
 															?>
 														</div>
 														<div>
