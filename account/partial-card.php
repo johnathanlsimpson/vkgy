@@ -20,6 +20,7 @@
 				echo $user['is_editor'] ? '<span class="any__note symbol__star--full user__flair">Editor</span>' : null;
 				echo $user['is_vip'] ? '<span class="any__note symbol__star--full user__flair">VIP</span>' : null;
 				echo $_SESSION['username'] == $user['username'] ? '<a class="symbol__edit" href="/account/" style="font-size:1rem;font-weight:normal;line-height:1;vertical-align:middle;">'.lang('Edit', '情報変更', 'hidden').'</a>' : null;
+				echo $_SESSION['can_edit_roles'] && $_SESSION['username'] != $user['username'] && $_GET['template'] != 'account' ? '<a class="symbol__edit" href="'.$user['url'].'edit/" style="font-size:1rem;font-weight:normal;line-height:1;vertical-align:middle;">'.lang('Edit roles', '役割変更', 'hidden').'</a>' : null;
 			?>
 		</h1>
 		

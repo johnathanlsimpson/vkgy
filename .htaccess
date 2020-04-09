@@ -73,6 +73,7 @@ RewriteRule  ^account/edit-avatar/?$            /?account/&template=edit-avatar
 RewriteRule  ^user(?:/(.*))?$                   /users/$1 [R=301,L]
 RewriteRule  ^users/?$                          /?account/&template=users
 RewriteRule  ^users/([\w-\ \%\.]+)/?$           /?account/&username=$1&template=user
+RewriteRule  ^users/([\w-\ \%\.]+)/edit/?$      /?account/&username=$1&template=account
 RewriteRule  ^users/([\w-\ \%\.]+)/activity.*$  /?account/&username=$1&template=activity
 RewriteRule  ^users/([\w-\ \%\.]+)/\&(.*)$      /account/page-download-collection.php?username=$1&$2
 RewriteRule  ^sign-out/?(.*)$                   /?account/&action=sign-out$1

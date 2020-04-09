@@ -1,6 +1,6 @@
 <?php
 
-	$user['username'] = $_SESSION['username'];
+	//$user['username'] = strlen($_GET['username']) ?  : $_SESSION['username'];
 	include('head-user.php');
 	
 	script([
@@ -33,9 +33,133 @@
 		$mid_fan_since = $max_fan_since - 15;
 		$min_fan_since = $max_fan_since - 30;
 		?>
-			<span class="any--hidden" data-contains="artists" hidden><?php echo json_encode($artist_list); unset($artist_list); ?></span>
+			<template class="any--hidden" data-contains="artists" hidden><?php echo json_encode($artist_list); unset($artist_list); ?></template>
 			
 			<form action="/accounts/function-edit.php" class="col c1 any--margin" enctype="multipart/form-data" method="post" name="form__edit">
+				
+				<?php if($_SESSION['can_edit_roles'] && $_SESSION['user_id'] != $user['id']) { ?>
+				
+				<!-- User card -->
+				<?php include('partial-card.php'); ?>
+				
+				<!-- Moderation -->
+				<div class="col <?= $_SESSION['can_edit_permissions'] ? 'c3-AAB' : 'c1'; ?>">
+					
+					<!-- User roles -->
+					<div>
+						
+						<input name="id" value="<?= $user['id']; ?>" hidden />
+						
+						<h2>
+							<?= lang('User roles', 'ユーザーの役割', 'div'); ?>
+						</h2>
+						
+						<ul class="text">
+							<li>
+								<label class="input__checkbox-label"><input class="input__checkbox" name="is_vip"       type="checkbox" value="1" <?= $user['is_vip']       ? 'checked' : null; ?> /><span class="symbol__unchecked">VIP</span></label>
+								Can access VIP-limited content.
+							</li>
+							<li>
+								<label class="input__checkbox-label"><input class="input__checkbox" name="is_editor"    type="checkbox" value="1" <?= $user['is_editor']    ? 'checked' : null; ?> /><span class="symbol__unchecked">Editor</span></label>
+								Can add/edit data.
+							</li>
+							<li>
+								<label class="input__checkbox-label"><input class="input__checkbox" name="is_moderator" type="checkbox" value="1" <?= $user['is_moderator'] ? 'checked' : null; ?> /><span class="symbol__unchecked">Moderator</span></label>
+								Can approve/delete data and assign user roles.
+							</li>
+						</ul>
+					</div>
+					
+					<?php if($_SESSION['can_edit_permissions']) { ?>
+					
+					<!-- User permissions -->
+					<div>
+						
+						<h3>
+							<?= lang('Individual permissions', '各パーミッション', 'div'); ?>
+						</h3>
+						<div class="text text--outlined user__permissions">
+							<div class="input__row">
+								
+								<div class="input__group">
+									<h5 class="input__label">
+										General
+									</h5>
+									<label class="input__checkbox-label"><input class="input__checkbox" name="can_comment" type="checkbox" value="1" <?= $user['can_comment'] ? 'checked' : null; ?> /><span class="symbol__unchecked">Leave comments</span></label>
+								</div>
+								
+								<div class="input__group">
+									<h5 class="input__label">
+										Editing
+									</h5>
+									<label class="input__checkbox-label"><input class="input__checkbox" name="can_add_data"       type="checkbox" value="1" <?= $user['can_add_data'] ?       'checked' : null; ?> /><span class="symbol__unchecked">Add data</span></label>
+									<label class="input__checkbox-label"><input class="input__checkbox" name="can_access_drafts"  type="checkbox" value="1" <?= $user['can_access_drafts'] ?  'checked' : null; ?> /><span class="symbol__unchecked">Access drafts</span></label>
+									<label class="input__checkbox-label"><input class="input__checkbox" name="can_add_livehouses" type="checkbox" value="1" <?= $user['can_add_livehouses'] ? 'checked' : null; ?> /><span class="symbol__unchecked">Add livehouses</span></label>
+								</div>
+								
+								<div class="input__group">
+									<h5 class="input__label">
+										Moderating
+									</h5>
+									<label class="input__checkbox-label"><input class="input__checkbox" name="can_approve_data" type="checkbox" value="1" <?= $user['can_approve_data'] ? 'checked' : null; ?> /><span class="symbol__unchecked">Approve data</span></label>
+									<label class="input__checkbox-label"><input class="input__checkbox" name="can_delete_data"  type="checkbox" value="1" <?= $user['can_delete_data'] ?  'checked' : null; ?> /><span class="symbol__unchecked">Delete data</span></label>
+									<label class="input__checkbox-label"><input class="input__checkbox" name="can_edit_roles"   type="checkbox" value="1" <?= $user['can_edit_roles'] ?   'checked' : null; ?> /><span class="symbol__unchecked">Edit roles</span></label>
+								</div>
+								
+							</div>
+						</div>
+						
+					</div>
+					
+					<?php } ?>
+					
+				</div>
+				
+				<?php } ?>
+				
+				<style>
+					.user__permissions .input__checkbox-label {
+						margin-left: 0 !important;
+						margin-right: 0.5rem;
+					}
+				</style>
+				
+				<script>
+					
+					// Check if there's a permission field on page (meaning we're allowed to set permissions)
+					if(document.querySelector('[name^="can_"]')) {
+						
+						let isPairings = {
+							'is_vip' : [ 'can_access_drafts' ],
+							'is_editor' : [ 'can_add_data' ],
+							'is_moderator' : [ 'can_approve_data', 'can_delete_data', 'can_edit_roles' ]
+						};
+						let isElems = document.querySelectorAll('[name^="is_"]');
+						let isName, isChecked;
+						
+						// Every time role input is changed, get name and status
+						isElems.forEach(function(elem) {
+							elem.addEventListener('change', function() {
+								
+								isName = elem.name;
+								isChecked = elem.checked;
+								
+								// Check/unchecked associated permission inputs
+								if(isPairings[isName]) {
+									isPairings[isName].forEach(function(canName) {
+										document.querySelector('[name="' + canName + '"]').checked = isChecked;
+									});
+								}
+								
+							});
+						});
+						
+					}
+				</script>
+				
+				<?php if($_SESSION['user_id'] === $user['id']) { ?>
+				
+				<!-- Edit profile -->
 				<div class="col c3-AAB">
 					<div>
 						
@@ -269,6 +393,8 @@
 					</div>
 				</div>
 				
+				<?php } ?>
+				
 				<div class="text text--docked">
 					
 					<div class="any--flex" data-role="submit-container">
@@ -279,14 +405,17 @@
 					</div>
 					
 					<div class="any--flex any--hidden" data-role="edit-container">
-						<a class="any--align-center a--outlined a--padded any--flex-grow symbol__user" href="<?= '/users/'.$_SESSION['username'].'/'; ?>">View profile</a>
-						<a class="add__edit any--weaken-color a--outlined a--padded symbol__edit" data-role="edit" href="/account/" style="margin-left:1rem;">Edit again</a>
+						<a class="any--align-center a--outlined a--padded any--flex-grow symbol__user" href="<?= $user['url']; ?>">View profile</a>
+						<a class="add__edit any--weaken-color a--outlined a--padded symbol__edit" data-role="edit" href="<?= $_SESSION['can_edit_roles'] && $_SESSION['username'] != $user['username'] ? $user['url'].'edit/' : '/account/'; ?>" style="margin-left:1rem;">Edit again</a>
 					</div>
 					
 					<div class="edit__result text text--outlined text--notice" data-role="result"></div>
 				</div>
 			</form>
 			
+			<?php if($_SESSION['user_id'] === $user['id']) { ?>
+			
+			<!-- Tools -->
 			<div class="col c1">
 				<div>
 					<h2>
@@ -374,6 +503,8 @@
 					</div>
 				</div>
 			</div>
+			
+			<?php } ?>
 		<?php
 	}
 ?>

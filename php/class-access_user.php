@@ -58,7 +58,6 @@
 						'users.is_editor',
 						'users.is_moderator',
 						'users.is_boss',
-						'users.is_staff',
 						'users.name',
 						'users.motto',
 						'users.website',
@@ -70,7 +69,8 @@
 						'users.pronouns',
 						'users.date_added',
 						'users.fan_since',
-						'users.site_theme'
+						'users.site_theme',
+						'CONCAT_WS("/", "", "users", users.username, "") AS url'
 					];
 					break;
 				
@@ -83,7 +83,6 @@
 						'users.is_editor',
 						'users.is_moderator',
 						'users.is_boss',
-						'users.is_staff',
 						'users.date_added',
 						'CONCAT_WS("/", "", "users", users.username, "") AS url'
 					];
@@ -107,7 +106,8 @@
 			}
 			
 			// ORDER
-			$sql_order = is_array($sql_order) ? $sql_order : ["username ASC"];
+			$sql_order = is_array($args['order']) ? $args['order'] : ( strlen($args['order']) ? [ $args['order'] ] : null);
+			$sql_order = is_array($sql_order) ? $sql_order : [ 'username ASC' ];
 			
 			// LIMIT
 			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : $sql_limit ?: null;

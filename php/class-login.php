@@ -103,24 +103,13 @@
 		// ======================================================
 		public function check_roles($user_id, $rank_num = null, $is_vip = null) {
 			
-			// If not provided rank number, grab it
-			if($rank_num === null) {
-				$sql_check_status = 'SELECT rank, is_vip FROM users WHERE id=? LIMIT 1';
-				$stmt_check_status = $this->pdo->prepare($sql_check_status);
-				$stmt_check_status->execute([ $user_id ]);
-				$rslt_check_status = $stmt_check_status->fetch();
-				
-				$rank_num = $rslt_check_status['rank'];
-				$is_vip = $rslt_check_status['is_vip'];
-			}
+			// Grab roles and permissions
+			$sql_check_status = 'SELECT is_vip, is_editor, is_moderator, is_boss, can_add_data, can_add_livehouses, can_delete_data, can_approve_data, can_comment, can_access_drafts, can_edit_roles FROM users WHERE id=? LIMIT 1';
+			$stmt_check_status = $this->pdo->prepare($sql_check_status);
+			$stmt_check_status->execute([ $user_id ]);
+			$rslt_check_status = $stmt_check_status->fetch();
 			
-			// Re-set session variables
-			$user_status['is_editor']  = $rank_num  >= 1;
-			$user_status['is_admin']   = $rank_num  >= 2;
-			$user_status['is_boss']    = $rank_num === 28;
-			$user_status['is_vip']     = $is_vip;
-			
-			return $user_status;
+			return $rslt_check_status;
 			
 		}
 		
@@ -167,7 +156,7 @@
 					list($user_id, $remote_addr, $token, $mac) = explode(":", $_COOKIE["remember_me"]);
 
 					if(is_numeric($user_id)) {
-						$sql_user = "SELECT id, username, rank, is_vip, site_theme, site_lang FROM users WHERE id=? LIMIT 1";
+						$sql_user = "SELECT id, username, site_theme, site_lang FROM users WHERE id=? LIMIT 1";
 						$stmt_user = $this->pdo->prepare($sql_user);
 						$stmt_user->execute([$user_id]);
 						$row = $stmt_user->fetch();
@@ -176,21 +165,14 @@
 
 							$session_data = [
 								'user_id' => $row['id'],
-								'site_theme' => $row['site_theme'],
-								//'admin' => $row['rank'],
-								'is_signed_in' => 1,
-
-								'user_id' => $row['id'],
 								'username' => $row['username'],
 								'site_theme' => $row['site_theme'],
 								'site_lang' => $row['site_lang'],
-								//'is_admin' => $row['rank'],
-								//'is_vip' => $row['is_vip'],
 								'is_signed_in' => 1,
 							];
 							
 							// Set user role/VIP status
-							$this->set_roles( $this->check_roles( $row['id'], $row['rank'], $row['is_vip'] ) );
+							$this->set_roles( $this->check_roles( $row['id'] ) );
 							
 							$this->set_login_data($session_data);
 						}

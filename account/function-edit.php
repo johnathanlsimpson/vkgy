@@ -2,7 +2,50 @@
 
 include_once('../php/include.php');
 
-if($_SESSION['is_signed_in']) {
+// Edit user's role
+if($_SESSION['can_edit_roles'] && is_numeric($_POST['id']) && $_SESSION['user_id'] != $_POST['id']) {
+	
+	$sql_check_boss = 'SELECT is_boss FROM users WHERE id=? LIMIT 1';
+	$stmt_check_boss = $pdo->prepare($sql_check_boss);
+	$stmt_check_boss->execute([ sanitize($_POST['id']) ]);
+	$rslt_check_boss = $stmt_check_boss->fetchColumn();
+	
+	// Make sure no one can edit permissions of user with boss role
+	if(!$rslt_check_boss) {
+		
+		// Set roles
+		$roles = [ 'vip', 'editor', 'moderator' ];
+		foreach($roles as $key) {
+			$values_user[] = $_POST[ 'is_'.$key ] == 1 ? 1 : 0;
+		}
+		
+		// Set permissions
+		$permissions = [ 'add_data', 'add_livehouses', 'delete_data', 'approve_data', 'comment', 'access_drafts', 'edit_roles', 'edit_permissions' ];
+		foreach($permissions as $key) {
+			$values_user[] = $_POST[ 'can_'.$key ] == 1 ? 1 : 0;
+		}
+		
+		// Set user ID
+		$values_user[] = sanitize($_POST['id']);
+		
+		$sql_user = 'UPDATE users SET is_'.implode('=?, is_', $roles).'=?, can_'.implode('=?, can_', $permissions).'=? WHERE id=? LIMIT 1';
+		$stmt_user = $pdo->prepare($sql_user);
+		if($stmt_user->execute($values_user)) {
+			$output['status'] = 'success';
+		}
+		else {
+			$output['result'] = 'Couldn\'t update user permissions.';
+		}
+		
+	}
+	else {
+		$output['result'] = 'Can\'t edit permissions for the requested user.';
+	}
+	
+}
+
+// Edit own profile
+elseif($_SESSION['is_signed_in']) {
 	
 	// Clean socials
 	foreach(['facebook', 'lastfm', 'twitter', 'mh'] as $key) {
