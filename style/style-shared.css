@@ -738,6 +738,18 @@ input {
 .input__checkbox:checked + .input__checkbox-label::before {
 	clip-path: url(#symbol__checked);
 }
+.input__checkbox-label .input__checkbox {
+	display: none;
+}
+.input__checkbox-label .input__checkbox:checked + .symbol__unchecked {
+	color: hsl(var(--text));
+}
+.input__checkbox-label .input__checkbox:checked + .symbol__unchecked::before {
+	-moz-clip-path: url(#symbol__checked);
+	-webkit-clip-path: url(#symbol__checked);
+	clip-path: url(#symbol__checked);
+	color: hsl(var(--text));
+}
 .input__textarea, textarea {
 	height: 4rem;
 	line-height: 1.5;
