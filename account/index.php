@@ -11,7 +11,13 @@ switch(true) {
 	case($_GET['template'] === 'users'):
 		$template = 'users'; break;
 		
-	case($_GET['template'] === 'account' && $_SESSION['is_signed_in']):
+	case($_GET['template'] === 'account' && $_SESSION['is_signed_in'] && $_SESSION['username'] == $_GET['username']):
+		$template = 'account'; break;
+		
+	case($_GET['template'] === 'account' && $_SESSION['is_signed_in'] && !isset($_GET['username'])):
+		$template = 'account'; break;
+		
+	case($_GET['template'] === 'account' && strlen($_GET['username']) && $_SESSION['username'] != $_GET['username'] && $_SESSION['can_edit_roles']):
 		$template = 'account'; break;
 		
 	case($_GET['template'] === 'user' && strlen($_GET['username'])):
@@ -41,6 +47,14 @@ if(in_array($template, [ 'account', 'activity', 'user' ])) {
 	$user = $access_user->access_user([ 'username' => sanitize($_GET['username']) ?: $_SESSION['username'], 'get' => 'all' ]);
 	
 	if(is_array($user) && !empty($user)) {
+		
+		// Make sure moderators can't set roles for bosses
+		if($template === 'account' && $user['is_boss'] && $_SESSION['username'] != $user['username']) {
+			unset($user);
+			$error = 'Can\'t edit permissions for requested user. Showing all users instead.';
+			$template = 'users';
+		}
+		
 	}
 	else {
 		$error = 'Couldn\'t find the requested user. Showing all users instead.';
@@ -49,7 +63,7 @@ if(in_array($template, [ 'account', 'activity', 'user' ])) {
 }
 
 // Get avatar if necessary
-if(in_array($template, [ 'activity', 'edit-avatar', 'user' ])) {
+if(in_array($template, [ 'activity', 'account', 'edit-avatar', 'user' ])) {
 	include_once('../avatar/class-avatar.php');
 	include_once('../avatar/avatar-definitions.php');
 	
@@ -66,11 +80,21 @@ if(in_array($template, [ 'activity', 'edit-avatar', 'user' ])) {
 	
 	unset($avatar);
 }
+
+// Get individual permissions if necessary
+if($template === 'account') {
+	$sql_permissions = 'SELECT can_add_data, can_delete_data, can_approve_data, can_comment, can_access_drafts, can_add_livehouses, can_edit_roles, can_edit_permissions FROM users WHERE id=? LIMIT 1';
+	$stmt_permissions = $pdo->prepare($sql_permissions);
+	$stmt_permissions->execute([ $user['id'] ]);
+	$rslt_permissions = $stmt_permissions->fetch();
+	
+	$user = array_merge($user, $rslt_permissions);
+}
 	
 	// User list
 	// =======================================================
 	if($template === "users") {
-		$users = $access_user->access_user(["get" => "list"]);
+		$users = $access_user->access_user([ 'get' => 'list', 'order' => 'date_added DESC' ]);
 		
 		$pageTitle = "Member list";
 		
@@ -182,6 +206,7 @@ if($template === "user") {
 	// Edit profile
 	// =======================================================
 	if($template === "account") {
+		
 		$pageTitle = "Edit account";
 		
 		breadcrumbs([ "Member list" => "/users/", $user["username"] => "/users/".$user["username"]."/", "Edit" => "/account/edit/" ]);
