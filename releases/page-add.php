@@ -715,9 +715,11 @@
 						Submit
 					</button>
 				</div>
+				<?php if($_SESSION['can_delete_data']) { ?>
 				<div class="input__group">
 					<span class="<?php echo !is_numeric($release["id"]) ? "any--hidden" : ""; ?> input__checkbox-label symbol__trash" data-role="delete"></span>
 				</div>
+				<?php } ?>
 				<span data-role="status"></span>
 			</div>
 			

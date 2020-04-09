@@ -33,7 +33,7 @@ style([
 							<div class="video__flag-notice text text--compact text--outlined text--error symbol__error any--flex {approval_notice_class}">
 								<?= lang('This video is awaiting approval.', 'この動画は承認待ちです。', 'hidden'); ?>
 								<?php
-									if($_SESSION['is_editor']) {
+									if($_SESSION['can_approve_data']) {
 										?>
 											<a class="video__delete a--padded" data-id="{video_id}" href="/artists/function-update_video.php?id={video_id}&amp;method=deny" rel="nofollow">Deny</a>
 											<a class="video__approve a--padded a--outlined" href="/artists/function-update_video.php?id={video_id}&amp;artist_id={artist_id}&amp;channel_id={channel_id}&amp;method=approve" rel="nofollow">Approve</a>
@@ -48,7 +48,7 @@ style([
 								<div class="any--weaken-color">
 									<a class="video__report symbol__error any--weaken-size a--inherit" href="/artists/function-update_video.php?id={video_id}&amp;method=report" rel="nofollow"><?= lang('Report unofficial video', '非公式の動画を報告して', 'hidden'); ?></a>
 									<?php
-										if($_SESSION['is_editor']) {
+										if($_SESSION['can_delete_data']) {
 											?>
 												<button class="video__delete input__checkbox-label symbol__trash symbol--standalone any--no-wrap" data-id="{video_id}"></button>
 											<?php
@@ -97,8 +97,8 @@ style([
 					foreach($artist['videos'] as $video) {
 						$replacements = [
 							'approval_notice_class' => $video['is_flagged'] ? null : 'any--hidden',
-							'admin_class' => $_SESSION['is_editor'] ? null : 'any--hidden',
-							'video_class' => $video['is_flagged'] && !$_SESSION['is_editor'] ? 'any--hidden' : null,
+							'admin_class' => $_SESSION['is_moderator'] ? null : 'any--hidden',
+							'video_class' => $video['is_flagged'] && !$_SESSION['is_moderator'] ? 'any--hidden' : null,
 							'release_class' => $video['release'] ? null : 'any--hidden',
 							'video_id' => $video['id'],
 							'artist_id' => $artist['id'],

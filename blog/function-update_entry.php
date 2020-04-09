@@ -80,9 +80,9 @@ if($_SESSION['is_signed_in']) {
 		||
 		($is_edit && $_SESSION['user_id'] === $current_entry['user_id'])
 		||
-		($is_edit && !$is_queued && $_SESSION['is_editor'])
+		($is_edit && !$is_queued && $_SESSION['can_add_data'])
 		||
-		($is_edit && $is_queued && $_SESSION['is_editor'] && $is_vip)
+		($is_edit && $is_queued && $_SESSION['can_view_drafts'])
 		||
 		($is_edit && in_array(277, $_POST['tags']))
 	) {

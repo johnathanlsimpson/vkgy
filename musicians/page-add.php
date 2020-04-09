@@ -21,7 +21,7 @@
 		lang('Add musician', 'ミュージシャン追加', ['secondary_class' => 'any--hidden']) => '/musicians/add/',
 	]);
 	
-	if($_SESSION["is_editor"]) {
+	if($_SESSION["can_add_data"]) {
 		?>
 			<div class="col c1 any--margin">
 				<form action="/musicians/function-add.php" enctype="multipart/form-data" method="post" name="form__add">

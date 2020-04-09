@@ -222,9 +222,12 @@
 								
 								<span data-role="status"></span>
 							</div>
+							
+							<?php if($_SESSION['can_delete_data']) { ?>
 							<div class="input__group">
 								<label class="input__checkbox-label symbol__trash symbol--standalone" data-get="id" data-get-into="data-id" data-id="<?php echo $entry["id"]; ?>" name="delete"></label>
 							</div>
+							<?php } ?>
 						</div>
 						
 						<div class="any--flex any--hidden" data-role="edit-container">

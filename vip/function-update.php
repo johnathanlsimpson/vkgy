@@ -14,7 +14,7 @@
 				$stmt_check = $pdo->prepare($sql_check);
 				$stmt_check->execute([$id]);
 				
-				if($stmt_check->fetchColumn() === $_SESSION["user_id"] || $_SESSION["is_editor"]) {
+				if($stmt_check->fetchColumn() === $_SESSION["user_id"] || $_SESSION["is_moderator"]) {
 					$sql_update = "UPDATE vip SET title=?, content=?, friendly=? WHERE id=?";
 					$stmt_update = $pdo->prepare($sql_update);
 					if($stmt_update->execute([$title, $content, $friendly, $id])) {

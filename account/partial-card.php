@@ -30,7 +30,7 @@
 					<!-- User details -->
 					<ul class="user__data data__container">
 						<?php
-							echo $_SESSION['is_editor'] ? '<li class="data__item"><h5>ID</h5>'.$user['id'].'</li>' : null;
+							echo $_SESSION['is_moderator'] ? '<li class="data__item"><h5>ID</h5>'.$user['id'].'</li>' : null;
 							foreach(['birthday', 'pronouns', 'website', 'twitter', 'facebook', 'lastfm', 'mh'] as $field) {
 								if(strlen($user[$field]) && !in_array($user[$field], ['0000-00-00', 'prefer not to say', 'custom'])) {
 									?>

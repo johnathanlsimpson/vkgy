@@ -1,6 +1,6 @@
 <?php
 
-if($_SESSION["is_editor"]) {
+if($_SESSION["can_add_data"]) {
 	script([
 		"/artists/script-page-add.js"
 	]);

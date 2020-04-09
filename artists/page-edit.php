@@ -27,7 +27,7 @@
 		'Edit artist' => '/artists/'.$artist['friendly'].'/edit/',
 	]);
 	
-	if($_SESSION["is_editor"] > 0) { 
+	if($_SESSION["can_add_data"]) { 
 			if(!empty($artist)) {
 				$artist['images'] = is_array($artist['images']) ? array_values($artist['images']) : [];
 				?>
@@ -329,9 +329,11 @@
 																		<label class="input__label">Friendly</label>
 																		<input name="musicians[<?php echo $m; ?>][friendly]" placeholder="friendly name" value="<?php echo $musician["friendly"]; ?>" />
 																	</div>
+																	<?php if($_SESSION['can_delete_data']) { ?>
 																	<div class="input__group">
 																		<label class="input__checkbox-label symbol__trash symbol--standalone edit__delete-musician" data-id="<?php echo $musician["id"]; ?>"></label>
 																	</div>
+																	<?php } ?>
 																</div>
 															</li>
 															
@@ -421,7 +423,7 @@
 									</a>
 								</div>
 								<?php
-									if($_SESSION["is_editor"]) {
+									if($_SESSION["can_delete_data"]) {
 										?>
 											<div class="input__group">
 												<label class="input__checkbox-label symbol__trash symbol--standalone" name="delete"></label>

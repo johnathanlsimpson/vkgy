@@ -41,13 +41,15 @@
 			</div>
 			<div>
 				<label class="release__control input__checkbox-label input__checkbox-label--selected" data-filter for="all">All</label>
-				<label class="release__control input__checkbox-label" data-filter for="admin">Admin</label>
+				<label class="release__control input__checkbox-label" data-filter for="editor">Editor</label>
+				<label class="release__control input__checkbox-label" data-filter for="moderator">Moderator</label>
 				<label class="release__control input__checkbox-label" data-filter for="vip">VIP</label>
 			</div>
 		</div>
 		
 		<input class="input__checkbox" name="filter" id="all" type="radio" />
-		<input class="input__checkbox" name="filter" id="admin" type="radio" />
+		<input class="input__checkbox" name="filter" id="editor" type="radio" />
+		<input class="input__checkbox" name="filter" id="moderator" type="radio" />
 		<input class="input__checkbox" name="filter" id="vip" type="radio" />
 		
 		<style>
@@ -102,7 +104,7 @@
 							$letter = preg_match("/"."[^a-z]"."/", $letter) ? "#" : $letter;
 							
 							?>
-								<tr class="user__container" <?= $user["is_editor"] ? "data-admin" : null; ?> <?= $user["is_vip"] ? "data-vip" : null; ?> data-date="<?= $user['id']; ?>" data-username="<?= $user["username"]; ?>">
+								<tr class="user__container" data-is-editor="<?= $user["is_editor"]; ?>" data-is-moderator="<?= $user['is_moderator']; ?>" data-is-vip="<?= $user["is_vip"]; ?>" data-date="<?= $user['id']; ?>" data-username="<?= $user["username"]; ?>">
 									<td class="any--weaken-color user__date">
 										<?= substr($user["date_added"], 0, 10); ?>
 									</td>

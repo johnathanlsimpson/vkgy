@@ -1,5 +1,5 @@
 <?php
-	if($_SESSION["is_editor"] > 1) {
+	if($_SESSION["is_boss"]) {
 		$queue_directory = "../images/queue";
 		
 		$suppress_auto_upload_image = true;

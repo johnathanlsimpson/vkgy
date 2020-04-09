@@ -1,6 +1,9 @@
-[id="admin"]:checked ~ .text tr:not([data-admin]) {
-	display: none;
-}
-[id="vip"]:checked ~ .text tr:not([data-vip]) {
-	display: none;
+[id="editor"]:checked ~ .text [data-is-editor]:not([data-is-editor="1"]) {
+	display: none;
+}
+[id="moderator"]:checked ~ .text [data-is-moderator]:not([data-is-moderator="1"]) {
+	display: none;
+}
+[id="vip"]:checked ~ .text [data-is-vip]:not([data-is-vip="1"]) {
+	display: none;
 }

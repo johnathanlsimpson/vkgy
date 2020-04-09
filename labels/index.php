@@ -22,7 +22,7 @@
 		
 		if(is_array($label)) {
 			if($_GET["action"] === "edit") {
-				if($_SESSION["is_editor"]) {
+				if($_SESSION["can_add_data"]) {
 					$pageTitle = "Edit ".$label["quick_name"];
 					
 					breadcrumbs([
@@ -55,7 +55,7 @@
 	
 	
 	if(!is_array($label) || empty($label)) {
-		if($_GET["action"] === "add" && $_SESSION["is_editor"]) {
+		if($_GET["action"] === "add" && $_SESSION["can_add_data"]) {
 			$pageTitle = "Add label";
 			
 			breadcrumbs([

@@ -5,7 +5,7 @@
 		"Musicians" => "/musicians/"
 	]);
 	
-	if($_SESSION["is_editor"]) {
+	if($_SESSION["can_add_data"]) {
 		subnav([
 			"Add" => "/musicians/add/"
 		]);

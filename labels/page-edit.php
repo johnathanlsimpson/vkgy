@@ -1,5 +1,5 @@
 <?php
-	if($_SESSION["is_editor"]) {
+	if($_SESSION["can_add_data"]) {
 		script([
 			"/scripts/external/script-selectize.js",
 			"/scripts/external/script-inputmask.js",
@@ -102,9 +102,11 @@
 								</button>
 								<span data-role="status"></span>
 							</div>
+							<?php if($_SESSION['can_delete_data']) { ?>
 							<div class="input__group">
 								<label class="input__checkbox-label symbol__trash symbol--standalone" name="delete"></label>
 							</div>
+							<?php } ?>
 						</div>
 						<div class="any--hidden text text--outlined text--notice edit__result" data-role="result"></div>
 					</div>

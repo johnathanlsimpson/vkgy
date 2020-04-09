@@ -11,7 +11,7 @@ if(is_numeric($_POST['comment_id'])) {
 	$rslt_check = $stmt_check->fetch();
 	
 	if(isset($rslt_check) && !empty($rslt_check)) {
-		if($_SESSION['user_id'] === $rslt_check['user_id'] || $_SESSION['is_editor']) {
+		if($_SESSION['user_id'] === $rslt_check['user_id'] || $_SESSION['can_delete_data']) {
 			
 			// For approved comments, just mark them as deleted
 			if($rslt_check['is_approved']) {

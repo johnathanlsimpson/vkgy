@@ -10,16 +10,16 @@
 		lang('Livehouses', 'ライブハウス', ['secondary_class' => 'any--hidden']) => '/lives/livehouses/',
 	]);
 	
-	if($_SESSION['is_editor'] > 1) {
+	if($_SESSION['can_add_livehouses']) {
 		subnav([
 			'Edit areas' => '/lives/areas/edit/',
 		], 'interact', true);
+		
+		subnav([
+			"Edit livehouses" => "/lives/livehouses/edit/",
+			"Add livehouses" => "/lives/livehouses/add/",
+		], 'interact', true);
 	}
-	
-	subnav([
-		"Edit livehouses" => "/lives/livehouses/edit/",
-		"Add livehouses" => "/lives/livehouses/add/",
-	], 'interact', true);
 	
 	script([
 		"/scripts/external/script-selectize.js",
@@ -35,7 +35,7 @@
 	$pageTitle = "Lives";
 	
 	// Select page type
-	if($_SESSION["is_editor"]) {
+	if($_SESSION["can_add_livehouses"]) {
 		if($_GET["method"] === "livehouses") {
 			if($_GET["action"] === "edit") {
 				$edit_livehouses = true;
