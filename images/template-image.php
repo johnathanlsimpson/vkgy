@@ -41,7 +41,7 @@
 									<input class="input__checkbox" data-get="is_default_for" data-get-into="id" id="is-default-{id}" name="image_is_default" type="checkbox" value="1" {is_default} />
 									<label class="input__checkbox-label symbol__unchecked" data-get="is_default_for" data-get-into="for" for="is-default-{id}">Default <?php echo $item_type; ?> image?</label>
 								</div>
-								<div class="input__group">
+								<div class="input__group {delete_class}">
 									<label class="input__checkbox-label symbol__trash symbol--standalone image__delete"></label>
 								</div>
 							</div>

@@ -83,9 +83,9 @@ if($_GET["action"] === "update") {
 			||
 			$_SESSION['user_id'] === $entry['user_id']
 			||
-			!$entry['is_queued'] && $_SESSION['is_editor']
+			!$entry['is_queued'] && $_SESSION['can_add_data']
 			||
-			$entry['is_queued'] && $is_vip
+			$entry['is_queued'] && $_SESSION['can_view_drafts']
 		) {
 			$is_allowed = true;
 		}

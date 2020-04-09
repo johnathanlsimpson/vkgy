@@ -55,7 +55,7 @@
 		}
 	}
 	
-	elseif($is_mp3tag || ($debug_on && $_SESSION["is_editor"] > 1)) {
+	elseif($is_mp3tag || ($debug_on && $_SESSION["is_moderator"])) {
 		
 		// Clean input: artist_album
 		if(strlen($_GET['artist_album'])) {

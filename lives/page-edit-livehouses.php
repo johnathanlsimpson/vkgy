@@ -24,7 +24,7 @@
 		], 'directional');
 	}
 	
-	if($_SESSION["is_editor"]) {
+	if($_SESSION["can_add_livehouses"]) {
 		?>
 			<form action="/lives/function-edit-livehouses.php" class="col c1 any--margin" enctype="multipart/form-data" method="post" name="form__update">
 				<span data-contains="areas" hidden><?php echo json_encode($area_list); ?></span>

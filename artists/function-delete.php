@@ -6,7 +6,7 @@
 		$login->check_login();
 	}
 	
-	if($_SESSION["is_editor"]) {
+	if($_SESSION["can_delete_data"]) {
 		if(is_numeric($_POST["id"])) {
 			$id = sanitize($_POST["id"]);
 			

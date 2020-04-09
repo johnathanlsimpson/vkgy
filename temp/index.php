@@ -1,4 +1,4 @@
-<?php if($_SESSION["is_editor"]) { ?>
+<?php if($_SESSION["is_moderator"]) { ?>
 
 <?php
 include_once('../php/include.php');

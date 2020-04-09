@@ -4,7 +4,7 @@
 	
 	$access_label = new access_label($pdo);
 	
-	if($_SESSION["is_editor"]) {
+	if($_SESSION["can_add_data"]) {
 		if(is_numeric($_POST["id"])) {
 			if(!empty($_POST["name"])) {
 				

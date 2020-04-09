@@ -2,7 +2,7 @@
 	include_once("../php/include.php");
 	include_once("../php/class-access_label.php");
 	
-	if($_SESSION["is_editor"]) {
+	if($_SESSION["can_delete_data"]) {
 		$id = sanitize($_POST["id"]);
 		
 		if(is_numeric($id)) {

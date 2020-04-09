@@ -1,7 +1,7 @@
 <?php
 	include_once("../php/include.php");
 	
-	if($_SESSION["is_editor"] && !empty($_POST)) {
+	if($_SESSION["can_add_data"] && !empty($_POST)) {
 		if(is_array($_POST["name"]) && !empty($_POST["name"])) {
 			foreach($_POST["name"] as $key => $name) {
 				if(strlen($name) > 0) {

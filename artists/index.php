@@ -29,11 +29,11 @@
 		
 		if(is_array($artist) && !empty($artist)) {
 			if($_GET["action"] === "edit") {
-				if($_SESSION["is_editor"]) {
+				if($_SESSION["can_add_data"]) {
 					$show_edit_page = true;
 				}
 				else {
-					$error = 'Sorry, only admin users may access the edit artist page. Showing artist list instead.';
+					$error = 'Sorry, only editors may edit artists. Showing artist list instead.';
 				}
 			}
 			else {
@@ -50,11 +50,11 @@
 		}
 	}
 	if($_GET["action"] === "add") {
-		if($_SESSION["is_editor"]) {
+		if($_SESSION["can_add_data"]) {
 			$show_add_page = true;
 		}
 		else {
-			$error = 'Sorry, only admin users may add artists. Showing artist list instead.';
+			$error = 'Sorry, only editors can add artists. Showing artist list instead.';
 		}
 	}
 	$_GET["letter"] = preg_match('/'.'^[A-z0\-]$'.'/', $_GET["letter"]) ? $_GET["letter"] : 'a';

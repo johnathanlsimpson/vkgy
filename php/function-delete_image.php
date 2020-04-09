@@ -3,7 +3,7 @@
 	
 	$image_id = $_POST["id"];
 	
-	if(is_numeric($image_id) && $_SESSION["is_editor"]) {
+	if(is_numeric($image_id) && $_SESSION["can_delete_data"]) {
 		$sql_get = "SELECT extension FROM images WHERE id=? LIMIT 1";
 		$stmt_get = $pdo->prepare($sql_get);
 		$stmt_get->execute([$image_id]);
