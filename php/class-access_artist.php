@@ -759,10 +759,20 @@
 			
 			// Sort by date ascending, then friendly name ascending
 			usort($history, function($a, $b) {
-				if($a['content']['friendly'] === $b['content']['friendly']) {
+				
+				// If both parts being compared are on same date and have medium (are releases), then sort by friendly
+				if(
+					$a['date_occurred'] === $b['date_occurred'] &&
+					is_array($a['content']) && is_array($b['content']) &&
+					$a['content']['medium'] && $b['content']['medium']
+				) {
+					return $a['content']['friendly'] <=> $b['content']['friendly'];
+				}
+				
+				// For everything else, sort by date occurred
+				else {
 					return $a['date_occurred'] <=> $b['date_occurred'];
 				}
-				return $a['content']['friendly'] <=> $b['content']['friendly'];
 			});
 			
 			return $history;
