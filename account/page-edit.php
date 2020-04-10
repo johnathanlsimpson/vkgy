@@ -124,39 +124,6 @@
 					}
 				</style>
 				
-				<script>
-					
-					// Check if there's a permission field on page (meaning we're allowed to set permissions)
-					if(document.querySelector('[name^="can_"]')) {
-						
-						let isPairings = {
-							'is_vip' : [ 'can_access_drafts' ],
-							'is_editor' : [ 'can_add_data' ],
-							'is_moderator' : [ 'can_approve_data', 'can_delete_data', 'can_edit_roles' ]
-						};
-						let isElems = document.querySelectorAll('[name^="is_"]');
-						let isName, isChecked;
-						
-						// Every time role input is changed, get name and status
-						isElems.forEach(function(elem) {
-							elem.addEventListener('change', function() {
-								
-								isName = elem.name;
-								isChecked = elem.checked;
-								
-								// Check/unchecked associated permission inputs
-								if(isPairings[isName]) {
-									isPairings[isName].forEach(function(canName) {
-										document.querySelector('[name="' + canName + '"]').checked = isChecked;
-									});
-								}
-								
-							});
-						});
-						
-					}
-				</script>
-				
 				<?php if($_SESSION['user_id'] === $user['id']) { ?>
 				
 				<!-- Edit profile -->

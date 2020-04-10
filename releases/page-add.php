@@ -340,7 +340,7 @@
 					<div class="input__label">
 						Physical medium
 					</div>
-					<select class="input" name="medium[]" placeholder="medium" data-multiple="true" multiple>
+					<select class="input" id="medium" name="medium[]" placeholder="medium" data-multiple="true" multiple>
 						<option></option>
 						<?php
 							foreach($release_attributes as $attribute) {
@@ -352,12 +352,13 @@
 							}
 						?>
 					</select>
+					<label class="input__select-placeholder" for="medium" tabindex="-1">medium</label>
 				</div>
 				<div class="input__group any--flex-grow">
 					<div class="input__label">
 						Format
 					</div>
-					<select class="input" name="format[]" placeholder="format" data-multiple="true" multiple>
+					<select class="input" id="format" name="format[]" placeholder="format" data-multiple="true" multiple>
 						<option></option>
 						<?php
 							foreach($release_attributes as $attribute) {
@@ -369,6 +370,7 @@
 							}
 						?>
 					</select>
+					<label class="input__select-placeholder" for="format" tabindex="-1">format</label>
 				</div>
 				<div class="input__group">
 					<button class="<?php echo $release["format_name"] ? "any--hidden" : ""; ?>" data-show="add__custom-format" type="button">
@@ -396,10 +398,8 @@
 					<div class="input__label">
 						Venue
 					</div>
-					<select class="input" data-multiple="true" name="venue_limitation[]" placeholder="venue(s)" multiple>
+					<select class="input" data-multiple="true" id="venue" name="venue_limitation[]" placeholder="venue(s)" multiple>
 						<?php
-							//$release['venue_limitation'] = is_array($release['venue_limitation']) ? $release['venue_limitation'] : [];
-							
 							foreach($release_attributes as $attribute) {
 								if($attribute['type'] === 'venue_limitation') {
 									?>
@@ -409,6 +409,7 @@
 							}
 						?>
 					</select>
+					<label class="input__select-placeholder" for="venue" tabindex="-1">venue(s)</label>
 				</div>
 				<div class="input__group any--flex-grow">
 					<div class="input__label">
@@ -449,7 +450,7 @@
 										echo $company_type;
 									?>
 								</div>
-								<select class="input" data-populate-on-click="true" data-source="labels" name="<?php echo $company_type; ?>_id[]" multiple data-multiple="true">
+								<select class="input" data-populate-on-click="true" data-source="labels" id="<?= $company_type; ?>" name="<?php echo $company_type; ?>_id[]" placeholder="<?= $company_type; ?>" multiple data-multiple="true">
 									<?php
 										if(is_array($release[$company_type])) {
 											foreach($release[$company_type] as $company) {
@@ -465,11 +466,41 @@
 										}
 									?>
 								</select>
+								<label class="input__select-placeholder" for="<?= $company_type; ?>" tabindex="-1"><?= $company_type; ?></label>
 							</div>
 						<?php
 					}
 				?>
 			</div>
+			<style>
+				.input__select-placeholder {
+					background: hsl(var(--background--bold));
+					background-clip: content-box;
+					color: transparent;
+					left: 0.5rem;
+					line-height: 1.5rem;
+					padding: 0.25rem 0.5rem;
+					pointer-events: none;
+					position: absolute;
+					right: 0;
+				}
+				.input__select-placeholder::after {
+					border: 5px solid transparent;
+					border-top-color: hsl(var(--text--secondary));
+					content: "";
+					display: block;
+					height: 0;
+					margin-top: -3px;
+					pointer-events: none;
+					position: absolute;
+					right: 0.5rem;
+					top: 50%;
+					width: 0;
+				}
+				select[multiple] + .input__select-placeholder {
+					color: hsl(var(--text--secondary));
+				}
+			</style>
 
 
 		</div>
@@ -617,6 +648,33 @@
 					]);
 				}
 			?>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			
 			<hr />
 			

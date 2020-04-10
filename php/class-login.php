@@ -104,7 +104,7 @@
 		public function check_roles($user_id, $rank_num = null, $is_vip = null) {
 			
 			// Grab roles and permissions
-			$sql_check_status = 'SELECT is_vip, is_editor, is_moderator, is_boss, can_add_data, can_add_livehouses, can_delete_data, can_approve_data, can_comment, can_access_drafts, can_edit_roles FROM users WHERE id=? LIMIT 1';
+			$sql_check_status = 'SELECT is_vip, is_editor, is_moderator, is_boss, can_add_data, can_add_livehouses, can_delete_data, can_approve_data, can_comment, can_access_drafts, can_edit_roles, can_edit_permissions FROM users WHERE id=? LIMIT 1';
 			$stmt_check_status = $this->pdo->prepare($sql_check_status);
 			$stmt_check_status->execute([ $user_id ]);
 			$rslt_check_status = $stmt_check_status->fetch();

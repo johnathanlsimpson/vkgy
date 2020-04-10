@@ -37,6 +37,29 @@
 		
 		
 		// ======================================================
+		// Render default username link
+		// ======================================================
+		public function render_username($user_data, $class = null) {
+			if(is_array($user_data) && !empty($user_data) && strlen($user_data['username'])) {
+				
+				$output =
+					'<a '.
+					'class="user'.($class ? ' '.$class : null).'" '.
+					'data-icon="'.$user_data['icon'].'" data-is-editor="'.$user_data['is_editor'].'" data-is-moderator="'.$user_data['is_moderator'].'" data-is-vip="'.$user_data['is_vip'].'" '.
+					'href="'.($user_data['url'] ?: '/users/'.$user_data['username'].'/').'">'.
+					$user_data['username'].
+					'<span class="user__moderator"></span>'.
+					'<span class="user__editor"></span>'.
+					'<span class="user__vip"></span>'.
+					'</a>';
+				
+				return $output;
+			}
+		}
+		
+		
+		
+		// ======================================================
 		// User data object
 		// ======================================================
 		function access_user($args = []) {
