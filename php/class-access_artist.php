@@ -757,8 +757,12 @@
 				}
 			}
 			
+			// Sort by date ascending, then friendly name ascending
 			usort($history, function($a, $b) {
-				return $a["date_occurred"] <=> $b["date_occurred"];
+				if($a['content']['friendly'] === $b['content']['friendly']) {
+					return $a['date_occurred'] <=> $b['date_occurred'];
+				}
+				return $a['content']['friendly'] <=> $b['content']['friendly'];
 			});
 			
 			return $history;
