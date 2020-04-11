@@ -25,19 +25,82 @@ if(idElem.value.length) {
 				}
 			}
 		}
+		
 	});
 }
 
+// Show/hide certain elements if artist is omnibus or magazine
+let bodyElem = document.querySelector('body');
+let formElem = document.querySelector('[name=add]');
+let artistElem = document.querySelector('[name=artist_id]');
+let omnibusId = 0;
+let magazineId = 48;
+let mediumId = 14;
+let formatId = 53;
+
+function swapTemplate(formElem, artistId) {
+	if(artistId == omnibusId) {
+		showElem({
+			'data_show': 'track--show-artist'
+		});
+	}
+	
+	// Changing *to* magazine
+	if(artistId == magazineId) {
+		if(formElem.classList.contains('release--release')) {
+			
+			bodyElem.classList.remove('any--pulse');
+			setTimeout(function() {
+				bodyElem.classList.add('any--pulse');
+			}, 0);
+			
+			formElem.classList.add('release--magazine');
+			formElem.classList.remove('release--release');
+			
+			// Auto-set format and medium
+			var mediumElem = document.querySelector('[name="medium[]"]').selectize;
+			mediumElem.setValue(mediumId);
+			
+			var formatElem = document.querySelector('[name="format[]"]').selectize;
+			formatElem.setValue(formatId);
+			
+			// Auto-select magazine name elem
+			document.querySelector('[name="magazine_name"]').selectize.focus();
+		}
+	}
+	
+	// Changing back to normal release
+	else {
+		if(formElem.classList.contains('release--magazine')) {
+			
+			bodyElem.classList.remove('any--pulse');
+			setTimeout(function() {
+				bodyElem.classList.add('any--pulse');
+			}, 0);
+			
+			formElem.classList.remove('release--magazine');
+			formElem.classList.add('release--release');
+		}
+	}
+}
+
+swapTemplate(formElem, artistElem.value);
+
+$(artistElem).on('change', function() {
+	let artistId = $(this).val();
+	swapTemplate(formElem, artistId);
+});
+
 
 // Set showElem() to fire on artist options if release artist is omnibus
-if($("[name=artist_id]").val() === "0") {
+/*if($("[name=artist_id]").val() === "0") {
 	showElem({ "data_show" : "track--show-artist" });
 }
 $("[name=artist_id]").on("change", function(event) {
 	if($(this).val() === "0") {
 		showElem({ "data_show" : "track--show-artist" });
 	}
-});
+});*/
 
 // Look for dropdowns, apply selectize() when appropriate
 lookForSelectize();
