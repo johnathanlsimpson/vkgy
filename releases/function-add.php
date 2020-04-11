@@ -64,8 +64,8 @@
 								$release['tracklist']['name'][] = $content_name;
 								$release['tracklist']['romaji'][] = null;
 								$release['tracklist']['artist_id'][] = $reference['id'];
-								$release['tracklist']['artist_display_name'][] = $reference['artist_display_name'];
-								$release['tracklist']['artist_display_romaji'][] = $reference['artist_display_romaji'];
+								$release['tracklist']['artist_display_name'][] = $reference['display_name'];
+								$release['tracklist']['artist_display_romaji'][] = $reference['display_romaji'];
 								
 								// Remove the referenced artist from the textarea
 								$contents = substr_replace($contents, "\n", $reference['offset'], $reference['length']);
