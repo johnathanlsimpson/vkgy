@@ -90,7 +90,7 @@ $in_page_navs = array_filter($in_page_navs);
 						// Non-visual notice
 						if($artist_is_non_visual) {
 							?>
-								<div class="text text--outlined symbol__error"><?= lang('This is artist is non-VK. Information may be truncated or inaccurate, and is provided only to give context to related artists/musicians.', 'このアーティストは非V系です。情報は、切り捨てられたり不正確になったりする場合があります。', 'hidden'); ?></div>
+								<div class="text text--outlined symbol__error"><?= lang('This artist is non-VK. Information may be truncated or inaccurate, and is provided only to give context to related artists/musicians.', 'このアーティストは非V系です。情報は、切り捨てられたり不正確になったりする場合があります。', 'hidden'); ?></div>
 							<?php
 						}
 						
