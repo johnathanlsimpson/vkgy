@@ -238,11 +238,8 @@
 						
 						if(is_array($artist)) {
 							if(preg_match("/"."(.+?) \((.+?)\)"."/", $display_name, $match)) {
-								$display_name = $match[2] ?: $match[1];
-								$name = $display_name;
-								
-								$display_romaji = $match[2] ? $match[1] : null;
-								$romaji = $display_romaji;
+								$name = $match[2] ?: $match[1];
+								$romaji = $match[2] ? $match[1] : null;
 							}
 							elseif($display_name) {
 								$name = $display_name;
