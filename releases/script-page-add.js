@@ -34,7 +34,7 @@ let bodyElem = document.querySelector('body');
 let formElem = document.querySelector('[name=add]');
 let artistElem = document.querySelector('[name=artist_id]');
 let omnibusId = 0;
-let magazineId = 48;
+let magazineId = 8767;
 let mediumId = 14;
 let formatId = 53;
 

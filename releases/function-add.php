@@ -5,7 +5,7 @@
 	include_once("../releases/function-clean_values.php");
 	$auto_blogger = new auto_blogger($pdo);
 	$markdown_parser = new parse_markdown($pdo);
-	$magazine_id = 48;
+	$magazine_id = 8767;
 	
 	unset($_POST["submit"]);
 	
