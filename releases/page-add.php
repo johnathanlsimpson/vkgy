@@ -25,6 +25,8 @@
 	]);
 	
 	$active_page = '/releases/add/';
+
+	$magazine_id = 8767;
 	
 	script([
 		"/scripts/external/script-autosize.js",
@@ -251,11 +253,21 @@
 		render_json_list('label');
 		render_json_list('song', []);
 		
-		echo '<template data-contains="magazines">'.sanitize(json_encode([
-			[ 'Cure', '', 'Cure (キュア)' ],
-			[ 'leisserfaire', '', 'leisserfaire' ],
-			[ 'S∞balance∞', '', 'S∞balance∞' ]
-		])).'</template>';
+		// Grab possible magazine names
+		$sql_magazine_names = 'SELECT name, romaji FROM releases WHERE artist_id=? GROUP BY name ORDER BY friendly ASC';
+		$stmt_magazine_names = $pdo->prepare($sql_magazine_names);
+		$stmt_magazine_names->execute([ $magazine_id ]);
+		$rslt_magazine_names = $stmt_magazine_names->fetchAll();
+		
+		foreach($rslt_magazine_names as $magazine) {
+			$magazine_names[] = [
+				$magazine['romaji'] ?: $magazine['name'],
+				'',
+				$magazine['romaji'] ? $magazine['romaji'].' ('.$magazine['name'].')' : $magazine['name']
+			];
+		}
+		
+		echo '<template data-contains="magazines">'.sanitize(json_encode($magazine_names)).'</template>';
 	?>
 
 	<form action="" class="<?= $release['artist']['friendly'] === 'magazine' ? 'release--magazine' : 'release--release'; ?>" enctype="multipart/form-data" method="post" name="add">
