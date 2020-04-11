@@ -48,7 +48,7 @@
 						$release['press_romaji'] = $release['magazine_volume_romaji'];
 						
 						// Loop through textareas and grab the bands that belong to each feature type within the mag
-						$content_types = [ 'magazine_normal' => '(small feature)', 'magazine_large' => '(large feature)', 'magazine_cover' => '(cover)', 'magazine_flyer' => '(flyer)' ];
+						$content_types = [ 'magazine_cover' => '(cover)', 'magazine_flyer' => '(flyer)', 'magazine_large' => '(large feature)', 'magazine_normal' => '(small feature)' ];
 						foreach($content_types as $content_type => $content_name) {
 							
 							// Grab references to artists in the DB
