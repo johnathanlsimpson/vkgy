@@ -82,7 +82,7 @@ if($_SESSION['is_signed_in']) {
 		||
 		($is_edit && !$is_queued && $_SESSION['can_add_data'])
 		||
-		($is_edit && $is_queued && $_SESSION['can_view_drafts'])
+		($is_edit && $is_queued && $_SESSION['can_access_drafts'])
 		||
 		($is_edit && in_array(277, $_POST['tags']))
 	) {
