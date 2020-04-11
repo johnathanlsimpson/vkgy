@@ -416,7 +416,7 @@ $access_user = new access_user($pdo);
 																		'artist_official_name' => $artist_official_name,
 																		'artist_name' => $artist_name,
 																		'artist_quick_name' => $track['artist']['display_name'] ? ($track['artist']['display_romaji'] ?: $track['artist']['display_name']) : $track['artist']['romaji'] ?: $track['artist']['name'],
-																		'artist_friendly' => $track['artist']['friendly'],
+																		'artist_friendly' => strlen($track['artist']['friendly']) ? $track['artist']['friendly'] : $release['artist']['friendly'],
 																		'artist_class' => !strlen($artist_name) ? 'track--no-artist' : null,
 																		'track_official_name' => $track_official_name,
 																		'track_name' => lang($track['romaji'], $track['name'], 'conditional_div')
@@ -691,7 +691,7 @@ $access_user = new access_user($pdo);
 													
 													?>
 														<li>
-															<a class="user" data-icon="<?= $rslt_editors[$i]['user']['icon']; ?>" data-is-vip="<?= $rslt_editors[$i]['user']['is_vip']; ?>" href="<?= $rslt_editors[$i]['user']['username']; ?>"><?= $rslt_editors[$i]['user']['username']; ?></a>
+															<a class="user" data-icon="<?= $rslt_editors[$i]['user']['icon']; ?>" data-is-vip="<?= $rslt_editors[$i]['user']['is_vip']; ?>" href="<?= $rslt_editors[$i]['user']['url']; ?>"><?= $rslt_editors[$i]['user']['username']; ?></a>
 														</li>
 													<?php
 												}
@@ -710,12 +710,12 @@ $access_user = new access_user($pdo);
 										$stmt_is_for_sale->execute([ $release['id'], 1 ]);
 										$is_for_sale = $stmt_is_for_sale->fetchColumn();
 
-										$sql_collections = "SELECT users.username, releases_collections.is_for_sale FROM releases_collections LEFT JOIN users ON users.id=releases_collections.user_id WHERE releases_collections.release_id=? ORDER BY users.username ASC";
+										$sql_collections = "SELECT user_id, users.username, releases_collections.is_for_sale FROM releases_collections LEFT JOIN users ON users.id=releases_collections.user_id WHERE releases_collections.release_id=? ORDER BY users.username ASC";
 										$stmt_collections = $pdo->prepare($sql_collections);
 										$stmt_collections->execute([ $release["id"] ]);
 										$rslt_collections = $stmt_collections->fetchAll();
 
-										$sql_wants = "SELECT users.username FROM releases_wants LEFT JOIN users ON users.id=releases_wants.user_id WHERE releases_wants.release_id=? ORDER BY users.username ASC";
+										$sql_wants = "SELECT user_id, users.username FROM releases_wants LEFT JOIN users ON users.id=releases_wants.user_id WHERE releases_wants.release_id=? ORDER BY users.username ASC";
 										$stmt_wants = $pdo->prepare($sql_wants);
 										$stmt_wants->execute([$release["id"]]);
 										$rslt_wants = $stmt_wants->fetchAll();
@@ -731,9 +731,10 @@ $access_user = new access_user($pdo);
 														</li>
 														<?php
 															foreach($rslt_collections as $collection) {
+																$collection['user'] = $access_user->access_user([ 'id' => $collection['user_id'], 'get' => 'name' ]);
 																?>
 																	<li>
-																		<a class="user" href="/users/<?php echo $collection["username"]; ?>/"><?php echo $collection["username"]; ?></a>
+																		<a class="user" data-icon="<?= $collection['user']['icon']; ?>" data-is-vip="<?= $collection['user']['is_vip']; ?>" href="<?= $collection['user']['url']; ?>"><?= $collection['user']['username']; ?></a>
 																	</li>
 																<?php
 															}
@@ -752,9 +753,10 @@ $access_user = new access_user($pdo);
 														</li>
 														<?php
 															foreach($rslt_wants as $want) {
+																$want['user'] = $access_user->access_user([ 'id' => $want['user_id'], 'get' => 'name' ]);
 																?>
 																	<li>
-																		<a class="user" href="/users/<?php echo $want["username"]; ?>/"><?php echo $want["username"]; ?></a>
+																		<a class="user" data-icon="<?= $want['user']['icon']; ?>" data-is-vip="<?= $want['user']['is_vip']; ?>" href="<?= $want['user']['url']; ?>"><?= $want['user']['username']; ?></a>
 																	</li>
 																<?php
 															}
@@ -782,7 +784,7 @@ $access_user = new access_user($pdo);
 													if($collection["is_for_sale"]) {
 														?>
 															<li>
-																<a class="user" href="/users/<?php echo $collection["username"]; ?>/"><?php echo $collection["username"]; ?></a>
+																<a class="user" data-icon="<?= $collection['user']['icon']; ?>" data-is-vip="<?= $collection['user']['is_vip']; ?>" href="<?= $collection['user']['url']; ?>"><?= $collection['user']['username']; ?></a>
 															</li>
 														<?php
 													}

@@ -329,11 +329,9 @@
 																		<label class="input__label">Friendly</label>
 																		<input name="musicians[<?php echo $m; ?>][friendly]" placeholder="friendly name" value="<?php echo $musician["friendly"]; ?>" />
 																	</div>
-																	<?php if($_SESSION['can_delete_data']) { ?>
-																	<div class="input__group">
-																		<label class="input__checkbox-label symbol__trash symbol--standalone edit__delete-musician" data-id="<?php echo $musician["id"]; ?>"></label>
+																	<div class="input__group <?= $_SESSION['can_delete_data'] ? null : 'any--hidden'; ?>">
+																		<label class="input__checkbox-label symbol__trash symbol--standalone edit__delete-musician" data-id="<?= $musician["id"]; ?>"></label>
 																	</div>
-																	<?php } ?>
 																</div>
 															</li>
 															
@@ -422,15 +420,9 @@
 										<span data-get="artist_quick_name"><?php echo $artist["quick_name"]; ?></span>
 									</a>
 								</div>
-								<?php
-									if($_SESSION["can_delete_data"]) {
-										?>
-											<div class="input__group">
-												<label class="input__checkbox-label symbol__trash symbol--standalone" name="delete"></label>
-											</div>
-										<?php
-									}
-								?>
+								<div class="input__group <?= $_SESSION['can_delete_data'] ? null : 'any--hidden'; ?>">
+									<label class="input__checkbox-label symbol__trash symbol--standalone" name="delete"></label>
+								</div>
 								<span data-role="status"></span>
 							</div>
 							

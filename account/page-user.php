@@ -339,7 +339,7 @@ if(strlen($next_users['rand1'])) {
 							<?= number_format($user_points['added-comment']['num_points']) ?: 0; ?>
 						</li>
 						
-						<li class="data__item" data-emoji="🥰">
+						<li class="data__item" data-emoji="💖">
 							<h5>
 								Likes received
 							</h5>

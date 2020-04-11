@@ -5,6 +5,7 @@
 	include_once("../releases/function-clean_values.php");
 	$auto_blogger = new auto_blogger($pdo);
 	$markdown_parser = new parse_markdown($pdo);
+	$magazine_id = 8767;
 	
 	unset($_POST["submit"]);
 	
@@ -20,13 +21,89 @@
 				$output["result"] = "Please fill in the artist field.";
 			}
 			else {
-				if(!strlen($_POST["name"])) {
+				if( ($_POST['artist_id'] == $magazine_id && !strlen($_POST['magazine_name'])) || ($_POST['artist_id'] != $magazine_id && !strlen($_POST["name"])) ) {
 					$output["result"] = "Please fill in the release's name field.";
 				}
 				else {
+					
 					$release = $_POST;
 					unset($release["post"], $release['medium'], $release['format'], $release['venue_limitation'], $release['press_limitation_name']);
 					$is_edit = is_numeric($release["id"]) ? true : false;
+					
+					// If magazine, we'll do a bunch of separate processing
+					if($release['artist_id'] == $magazine_id) {
+						
+						// Magazine name is chosen from a dropdown of preset names (for now), with romaji in parentheses; grab and separate
+						$magazine_name = $release['magazine_name'];
+						if(preg_match('/'.'^(.+?) \((.+?)\)$'.'/', $magazine_name, $magazine_name_match)) {
+							$release['name'] = $magazine_name_match[1];
+							$release['romaji'] = $magazine_name_match[2];
+						}
+						else {
+							$release['name'] = $magazine_name;
+						}
+						
+						// Volume name is just press name
+						$release['press_name'] = $release['magazine_volume_name'];
+						$release['press_romaji'] = $release['magazine_volume_romaji'];
+						
+						// Loop through textareas and grab the bands that belong to each feature type within the mag
+						$content_types = [ 'magazine_normal' => '(small feature)', 'magazine_large' => '(large feature)', 'magazine_cover' => '(cover)', 'magazine_flyer' => '(flyer)' ];
+						foreach($content_types as $content_type => $content_name) {
+							
+							// Grab references to artists in the DB
+							$contents = $_POST[$content_type];
+							$references = $markdown_parser->get_reference_data( $contents );
+							
+							// For reach artist reference, build it as a tracklist item with the feature type as track name
+							foreach($references as $reference) {
+								$release['tracklist']['disc_name'][] = null;
+								$release['tracklist']['disc_romaji'][] = null;
+								$release['tracklist']['section_name'][] = null;
+								$release['tracklist']['section_romaji'][] = null;
+								$release['tracklist']['name'][] = $content_name;
+								$release['tracklist']['romaji'][] = null;
+								$release['tracklist']['artist_id'][] = $reference['id'];
+								$release['tracklist']['artist_display_name'][] = $reference['artist_display_name'];
+								$release['tracklist']['artist_display_romaji'][] = $reference['artist_display_romaji'];
+								
+								// Remove the referenced artist from the textarea
+								$contents = substr_replace($contents, "\n", $reference['offset'], $reference['length']);
+							}
+							
+							// Clean up any remaining artists which were in the textarea but aren't in the DB
+							$contents = explode("\n", $contents);
+							foreach($contents as $content_line => $content) {
+								$contents[$content_line] = trim($content);
+							}
+							$contents = array_filter($contents);
+							
+							// For any remaining non-DB artists, build a track for them using a display name
+							foreach($contents as $content) {
+								
+								// Grab name/romaji
+								preg_match('/'.'^(.+?) \((.+?)\)$'.'/', $content, $non_db_artist_name_match);
+								
+								$release['tracklist']['disc_name'][] = null;
+								$release['tracklist']['disc_romaji'][] = null;
+								$release['tracklist']['section_name'][] = null;
+								$release['tracklist']['section_romaji'][] = null;
+								$release['tracklist']['name'][] = $content_name;
+								$release['tracklist']['romaji'][] = null;
+								$release['tracklist']['artist_id'][] = $magazine_id;
+								$release['tracklist']['artist_display_name'][] = $non_db_artist_name_match[2] ?: $content;
+								$release['tracklist']['artist_display_romaji'][] = $non_db_artist_name_match[1];
+							}
+							
+							// Unset the magazine field so as to not mess up the actual query later
+							unset($release[$content_type]);
+							
+						}
+						
+						// Unset magazine-specific fields so as to not mess up later query
+						unset( $release['magazine_name'], $release['magazine_volume_name'], $release['magazine_volume_romaji'] );
+						
+					}
 					
 					// Format certain fields
 					$release['romaji']        = match_japanese($release['name'], $release['romaji']);
