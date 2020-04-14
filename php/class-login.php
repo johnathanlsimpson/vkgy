@@ -280,10 +280,17 @@
 			
 			// Sign out: destroy session and cookie
 			public function sign_out() {
+				session_start();
+				
+				$_SESSION = [];
+				
 				foreach(["user_id", 'user_id', "username", "admin", 'is_admin', "icon", "hash", "is_signed_in", 'loggedIn', 'is_vip', 'site_theme', 'site_theme', 'site_lang', "remember_me"] as $key) {
-					unset($_SESSION[$key]);
+					//unset($_SESSION[$key]);
 					setcookie($key, "", time() - 60 * 60 * 24 * 40, "/", $this->domain, true, true);
 				}
+				
+				session_destroy();
+				
 				$this->status = 8;
 			}
 			
