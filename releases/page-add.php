@@ -254,9 +254,9 @@
 		render_json_list('song', []);
 		
 		// Grab possible magazine names
-		$sql_magazine_names = 'SELECT name, romaji FROM releases WHERE artist_id=? GROUP BY name ORDER BY friendly ASC';
+		$sql_magazine_names = 'SELECT name, romaji FROM magazines ORDER BY friendly ASC';
 		$stmt_magazine_names = $pdo->prepare($sql_magazine_names);
-		$stmt_magazine_names->execute([ $magazine_id ]);
+		$stmt_magazine_names->execute();
 		$rslt_magazine_names = $stmt_magazine_names->fetchAll();
 		
 		foreach($rslt_magazine_names as $magazine) {

@@ -126,6 +126,8 @@ RewriteRule  ^lives/livehouses/(\d+)/edit/?$               /?lives/&action=edit&
 RewriteRule  ^lives/livehouses/add/?$                      /?lives/&action=add&method=livehouses
 RewriteRule  ^lives/livehouses/?$                          /?lives/&page=livehouses
 
+RewriteRule  ^magazines/add/?$  /?magazines/&action=add
+
 RewriteRule  ^musicians/add/?$           /?musicians/&action=add
 RewriteRule  ^musicians/(\d+)/[\w-]+/?$  /?musicians/&musician=$1
 

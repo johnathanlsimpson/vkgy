@@ -105,6 +105,13 @@
 						
 					}
 					
+					// Make sure all magazine-specific fields are unset so they don't break the query
+					foreach($release as $release_key => $release_value) {
+						if(strpos($release_key, 'magazine_') === 0) {
+							unset($release[$release_key]);
+						}
+					}
+					
 					// Format certain fields
 					$release['romaji']        = match_japanese($release['name'], $release['romaji']);
 					$release["user_id"]       = $_SESSION["user_id"];

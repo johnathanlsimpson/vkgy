@@ -632,11 +632,11 @@ $access_user = new access_user($pdo);
 										}
 
 										echo '<h5>Add tags</h5>';
-
+					
 										if($_SESSION["is_signed_in"]) {
 											if(is_array($rslt_tags) && !empty($rslt_tags)) {
 												foreach($rslt_tags as $tag) {
-													$is_selected = is_array($rslt_user_tags) && !empty($rslt_user_tags) && in_array($tag["id"], $rslt_user_tags);
+													$is_selected = $user_tags[ $tag['id'] ];
 													echo '<label data-id="'.$release["id"].'" data-tag_id="'.$tag["id"].'" class="release__tag symbol__tag any__tag '.($is_selected ? "any__tag--selected" : null).'" style="display: inline-block;">'.$tag["name"].'</label> ';
 												}
 											}
@@ -644,7 +644,6 @@ $access_user = new access_user($pdo);
 										else {
 											echo '<span class="symbol__error"><a class="a--inherit" href="/account/">Sign in</a> to add tags.';
 										}
-
 										if($_SESSION["is_moderator"] && $needs_admin_tags) {
 											echo '<hr />';
 											echo '<h5>Remove admin tags</h5>';

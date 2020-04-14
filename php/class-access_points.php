@@ -288,6 +288,9 @@ class access_points {
 			'wanted-release'          =>  1,
 			'sold-release'            =>  1,
 			
+			// New
+			'added-magazine'  => 1,
+			
 		] as $point_type => $point_value) {
 			$this->point_types[] = $point_type;
 			$this->point_values[$point_type] = $point_value;
