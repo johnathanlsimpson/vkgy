@@ -729,11 +729,11 @@ $access_user = new access_user($pdo);
 															</h5>
 														</li>
 														<?php
-															foreach($rslt_collections as $collection) {
-																$collection['user'] = $access_user->access_user([ 'id' => $collection['user_id'], 'get' => 'name' ]);
+															foreach($rslt_collections as $collection_key => $collection) {
+																$rslt_collections[$collection_key]['user'] = $access_user->access_user([ 'id' => $collection['user_id'], 'get' => 'name' ]);
 																?>
 																	<li>
-																		<a class="user" data-icon="<?= $collection['user']['icon']; ?>" data-is-vip="<?= $collection['user']['is_vip']; ?>" href="<?= $collection['user']['url']; ?>"><?= $collection['user']['username']; ?></a>
+																		<a class="user" data-icon="<?= $rslt_collections[$collection_key]['user']['icon']; ?>" data-is-vip="<?= $rslt_collections[$collection_key]['user']['is_vip']; ?>" href="<?= $rslt_collections[$collection_key]['user']['url']; ?>"><?= $rslt_collections[$collection_key]['user']['username']; ?></a>
 																	</li>
 																<?php
 															}
