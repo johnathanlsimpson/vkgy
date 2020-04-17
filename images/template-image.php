@@ -38,7 +38,7 @@
 									<input class="any--flex-grow" data-get="description" data-get-into="value" name="image_description" placeholder="description" value="{description}" />
 								</div>
 								<div class="input__group">
-									<input class="input__checkbox" data-get="is_default_for" data-get-into="id" id="is-default-{id}" name="image_is_default" type="checkbox" value="1" {is_default} />
+									<input class="input__checkbox" data-get="is_default_for" data-get-into="id" id="is-default-{id}" name="image_is_default" type="radio" value="1" {is_default} />
 									<label class="input__checkbox-label symbol__unchecked" data-get="is_default_for" data-get-into="for" for="is-default-{id}">Default <?php echo $item_type; ?> image?</label>
 								</div>
 								<div class="input__group {delete_class}">
