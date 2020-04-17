@@ -66,6 +66,9 @@ function getParent(childElem, parentClass) {
 
 // Update image data
 function updateImageData(changedElem) {
+	
+	console.log('updating image data');
+	
 	var parentElem = getParent(changedElem, 'image__template');
 	var statusElem = parentElem.querySelector('.image__status');
 	var resultElem = parentElem.querySelector('.image__result');
@@ -91,6 +94,8 @@ function updateImageData(changedElem) {
 		}
 	});
 	
+	console.log(preparedFormData);
+	
 	initializeInlineSubmit($(parentElem), '/images/function-update_image.php', {
 		'statusContainer' : $(statusElem),
 		'preparedFormData' : preparedFormData,
@@ -106,9 +111,6 @@ function updateImageData(changedElem) {
 
 
 // Set image template elements, some variables
-var imageUploadElem = document.querySelector('[name=images]');
-var imagesElem = document.querySelector('.image__results');
-var imageTemplate = document.querySelector('#image-template');
 var droppedFiles;
 var isAdvancedUpload = true;
 
@@ -165,49 +167,11 @@ if(isAdvancedUpload) {
 			let dropHTML = e.dataTransfer.getData('text/html');
 			let match = dropHTML && /\ssrc="?([^"\s]+)"?\s*/.exec(dropHTML);
 			let dropURL = match && match[1];
+			dropURL = cleanDroppedURL(dropURL);
 			
-			// If an <img> src was specified, grab it
-			if(dropURL) {
-				
-				// Clean up dropped URL
-				dropURL = cleanDroppedURL(dropURL);
-				
-				// Create an invisible Image canvas
-				var img = new Image();
-				var c = document.createElement("canvas");
-				var ctx = c.getContext("2d");
-				
-				// This is for "if from different origin" but no clue what it does
-				img.crossOrigin = '';
-				
-				// Set the fake <img>'s src to the URL that we grabbed earlier; this loads the image
-				img.src = dropURL;
-				
-				// After loading the <img> src
-				img.onload = function() {
-					
-					// Make canvas match size of <img>
-					c.width = this.naturalWidth;
-					c.height = this.naturalHeight;
-					
-					// Draw image into canvas
-					ctx.drawImage(this, 0, 0);
-					
-					// Grab the canvas content as a PNG blob
-					c.toBlob(function(blob) {
-						
-						// Transform the blob into a pseudo fileList and pass along to main uploader
-						handleFiles( blobToFiles(blob, dropURL) );
-						
-					}, "image/png");
-				};
-				
-				// In case of error loading the image
-				img.onerror = function() {
-					// Need something here to pass along error
-				}
-				
-			}
+			// Grab data from URL and transform to blob (this function also sends blob to uploader, since can't pass blob back)
+			//urlToBlob(dropURL);
+			handleFiles(dropURL, 'url');
 			
 		}
 		
@@ -216,11 +180,80 @@ if(isAdvancedUpload) {
 }
 
 
+// Given a URL, try to grab as blob image
+function urlToBlob(inputURL, tryProxy = true) {
+	
+	// If an <img> src was specified, grab it
+	if(inputURL) {
+		
+		// If inputURL seems to be jpeg, use that for MIME type; otherwise default to png
+		let extPattern = /\.[jpeg|jpg]/;
+		let extMatch = inputURL.match(extPattern);
+		let mimeType;
+		if(extMatch && extMatch[0]) {
+			mimeType = 'image/jpeg';
+		}
+		else {
+			mimeType = 'image/png';
+		}
+		
+		// Create an invisible Image canvas
+		var img = new Image();
+		var c = document.createElement("canvas");
+		var ctx = c.getContext("2d");
+		
+		// This is for "if from different origin" but no clue what it does
+		img.crossOrigin = '';
+		
+		// Set the fake <img>'s src to the URL that we grabbed earlier; this loads the image
+		img.src = tryProxy ? proxyURL(inputURL) : inputURL;
+		
+		// After loading the <img> src
+		img.onload = function() {
+			
+			// Make canvas match size of <img>
+			c.width = this.naturalWidth;
+			c.height = this.naturalHeight;
+			
+			// Draw image into canvas
+			ctx.drawImage(this, 0, 0);
+			
+			//console.log('canvas');
+			//console.log(c);
+			
+			// Grab the canvas content as a PNG blob
+			c.toBlob(function(blob) {
+				
+				// If blob successful, turn into pseudo fileList and pass to uploader
+				handleFiles( blobToFiles(blob, inputURL) );
+				
+			}, mimeType);
+		};
+		
+		// In case of error loading the image
+		img.onerror = function(x) {
+			
+			// If failure came while trying proxy (a.k.a. probably got 403 forbidden), try without
+			if(tryProxy) {
+				urlToBlob(inputURL, false);
+			}
+			
+			// If already tried uploading w/out proxy, ...well....
+			else {
+				// Need something here to pass along error
+			}
+			
+		}
+		
+	}
+}
+
+
 // Given a pasted blob image, transform it into a pseudo fileList
 function blobToFiles(inputBlob, dropURL) {
 	
 	// Set a file name based on URL; req'd for file
-	let blobFileName = dropURL.split(/[\/]+/).pop();
+	let blobFileName = urlToFileName(inputBlob.type, dropURL);
 	
 	// Set a date modified; req'd for file
 	let blobModified = new Date();
@@ -232,6 +265,36 @@ function blobToFiles(inputBlob, dropURL) {
 	
 	// Return as array so we can pretend it's a fileList
 	return [ outputFile ];
+	
+}
+
+
+// Given an image's URL, attempt to get a pretty file name
+function urlToFileName(inputBlobType, inputURL) {
+	
+	// Grab canonical extension from blob
+	let fileType = inputBlobType.split('/');
+	let fileExt = fileType[1];
+	
+	// Using the extension, grab a possible file name
+	let fileNamePattern = new RegExp('\\/([^\\/]+?)\\.' + (fileExt === 'jpeg' ? '(jpg|jpeg)' : fileExt) + '');
+	let fileNameMatch = inputURL.match(fileNamePattern);
+	let fileName = (fileNameMatch && fileNameMatch[1] ? fileNameMatch[1] : 'upload') + '.' + (fileExt ? fileExt : 'png');
+	
+	console.log(fileName);
+	
+	return fileName;
+	
+}
+
+
+function proxyURL(inputURL) {
+	
+	// Use proxy prefix to allow grabbing CORS-protected resources
+	// Will need to change whenever the proxy inevitably self-immolates
+	let proxyPrefix = 'https://cors-anywhere.herokuapp.com/';
+	return proxyPrefix + inputURL;
+	
 }
 
 
@@ -239,7 +302,6 @@ function blobToFiles(inputBlob, dropURL) {
 function cleanDroppedURL(inputURL) {
 	
 	let outputURL = inputURL;
-	let proxyPrefix = 'https://cors-anywhere.herokuapp.com/';
 	let wixPattern = /\/v\d\/fill\/[A-z0-9_,\.\/]+/;
 	let wpPattern = /-\d+x\d+\./;
 	let twitterPatternA = /:[thumb|small|medium|large]$/;
@@ -249,7 +311,7 @@ function cleanDroppedURL(inputURL) {
 	let amebaOwndPattern = /\?width=\d+/;
 	
 	// Remove HTML-encoded ampersands; may need broader solution
-	outputURL = outputURL.replace('&amp;', '&');
+	outputURL = outputURL.replace(/&amp;/g, '&');
 	
 	// If from WordPress site, attempt to get biggest ver
 	if(outputURL.includes('wp-content')) {
@@ -278,23 +340,87 @@ function cleanDroppedURL(inputURL) {
 		outputURL = outputURL.replace(amebaOwndPattern, '?');
 	}
 	
-	// Use proxy prefix to allow grabbing CORS-protected resources
-	// Will need to change whenever the proxy inevitably self-immolates
-	outputURL = proxyPrefix + outputURL;
-	
 	// Return cleaned URL
 	return outputURL;
 	
 }
 
 
-// Core upload handler
-function handleFiles(files) {
+var imageUploadElem = document.querySelector('[name=images]');
+var imagesElem = document.querySelector('.image__results');
+var imageTemplate = document.querySelector('#image-template');
+
+function showImageSection() {
 	
 	// Get default variables for newly uploaded images
+	let imageUploadParent = imageUploadElem.parentNode;
+	var itemType = imageUploadParent.querySelector('[name=image_item_type]').value;
+	var itemId   = imageUploadParent.querySelector('[name=image_item_id]').value;
+	var itemName = imageUploadParent.querySelector('[name=image_item_name]').value;
+	
+	// Gather template parts for this image section
+	var newImageElem  = document.importNode(imageTemplate.content, true);
+	let imageIdElem   = newImageElem.querySelector('[name="image_id"]');
+	var itemIdElem    = newImageElem.querySelector('[name^=image_' + itemType + '_id]');
+	var newOptionElem = document.createElement('option');
+	var thumbnailElem = newImageElem.querySelector('.image__image');
+	
+	// Set certain image fields to defaults specified before loop
+	newImageElem.querySelector('[name=image_item_type]').value = itemType;
+	newImageElem.querySelector('[name=image_item_id]').value = itemId;
+	
+	// This selects the appropriate ID for whatever item type this is (e.g. artist, release)
+	newOptionElem.value     = itemId;
+	newOptionElem.innerHTML = itemName;
+	newOptionElem.selected  = true;
+	itemIdElem.prepend(newOptionElem);
+	
+	// (Before ajax done,) append new image, add loading symbol
+	newImageElem.querySelector('.image__status').classList.add('loading');
+	imagesElem.prepend(newImageElem);
+	
+	// Init buttons in new image element
+	lookForSelectize();
+	initImageEditElems();
+	initImageDeleteButtons();
+	
+	// Return template and a few vars
+	return {
+		newImageElem: newImageElem,
+		thisImageElem: imagesElem.querySelector('.image__template:first-of-type'),
+		thumbnailElem: thumbnailElem,
+		imageIdElem: imageIdElem,
+		itemType: itemType,
+		itemId: itemId
+	};
+}
+
+//showImageSection();
+
+
+
+// Core upload handler
+function handleFiles(input, inputType = 'files') {
+	
+	let files;
+	
+	if(inputType === 'url') {
+		
+			// Grab data from URL and transform to blob (this function also sends blob to uploader, since can't pass blob back)
+			urlToBlob(input);
+	}
+	
+	else if(inputType === 'files') {
+		
+		files = input;
+	}
+	
+	console.log(inputType);
+	
+	/*// Get default variables for newly uploaded images
 	var itemType = imageUploadElem.parentNode.querySelector('[name=image_item_type]').value;
 	var itemId = imageUploadElem.parentNode.querySelector('[name=image_item_id]').value;
-	var itemName = imageUploadElem.parentNode.querySelector('[name=image_item_name]').value;
+	var itemName = imageUploadElem.parentNode.querySelector('[name=image_item_name]').value;*/
 	
 	// Loop through files and upload each one
 	if(files && files.length) {
@@ -307,13 +433,16 @@ function handleFiles(files) {
 			// Make sure we're actually working with an image
 			if(!!thisImage.type.match(/image.*/)) {
 				
-				// Create template parts for this image
+				// Let's grab template
+				let newImageTemplateArgs = showImageSection();
+				
+				/*// Create template parts for this image
 				var newImageElem  = document.importNode(imageTemplate.content, true);
 				var itemIdElem    = newImageElem.querySelector('[name^=image_' + itemType + '_id]');
 				var newOptionElem = document.createElement('option');
-				var thumbnailElem = newImageElem.querySelector('.image__image');
+				var thumbnailElem = newImageElem.querySelector('.image__image');*/
 				
-				// Set certain image fields to defaults specified before loop
+				/*// Set certain image fields to defaults specified before loop
 				newImageElem.querySelector('[name=image_item_type]').value = itemType;
 				newImageElem.querySelector('[name=image_item_id]').value = itemId;
 				
@@ -321,41 +450,51 @@ function handleFiles(files) {
 				newOptionElem.value     = itemId;
 				newOptionElem.innerHTML = itemName;
 				newOptionElem.selected  = true;
-				itemIdElem.prepend(newOptionElem);
+				itemIdElem.prepend(newOptionElem);*/
 				
 				// Set thumbnail preview while uploading
-				thumbnailElem.style.backgroundImage = 'url(' + window.URL.createObjectURL(thisImage) + ')';
+				newImageTemplateArgs.thumbnailElem.style.backgroundImage = 'url(' + window.URL.createObjectURL(thisImage) + ')';
 				
 				// Using core submit function, actually upload the image
-				initializeInlineSubmit( $(newImageElem), '/images/function-upload_image.php', {
+				initializeInlineSubmit( $(newImageTemplateArgs.newImageElem), '/images/function-upload_image.php', {
 					
-					'preparedFormData' : { 'image' : thisImage, 'item_type' : itemType, 'item_id' : itemId },
+					'preparedFormData' : { 'image' : thisImage, 'item_type' : newImageTemplateArgs.itemType, 'item_id' : newImageTemplateArgs.itemId },
 					'callbackOnSuccess': function(event, returnedData) {
 						
-						// Get image that was just added
+						/*// Get actual new image section from document, as opposed to just the object
+						// Previously did this with another call, but now just passing it from the templateargs; may have to revisit
 						var thisImageElem = document.querySelector('[name="image_id"][value="' + returnedData.image_id + '"]');
-						thisImageElem = getParent(thisImageElem, 'image__template');
+						thisImageElem = getParent(thisImageElem, 'image__template');*/
 						
 						// When image finished uploading, remove loading symbol
-						thisImageElem.querySelector('.image__status').classList.remove('loading');
-						thisImageElem.querySelector('.image__status').classList.add('symbol__' + returnedData.status);
+						//newImageTemplateArgs.thisImageElem.querySelector('.image__status').classList.remove('loading');
+						//newImageTemplateArgs.thisImageElem.querySelector('.image__status').classList.add('symbol__' + returnedData.status);
+						let statusElem = newImageTemplateArgs.thisImageElem.querySelector('.image__status');
+						statusElem.classList.remove('loading');
+						statusElem.classList.add('symbol__' + returnedData.status);
+						//statusElem.classList.add('test' + returnedData.status);
 						
 						// Notify page of new image, and trigger new image to update data (to set defaults)
-						thisImageElem.querySelector('[name=image_id]').dispatchEvent(new Event('change'));
-						document.dispatchEvent(new Event('image-added'));
+						//newImageTemplateArgs.thisImageElem.querySelector('[name=image_id]').dispatchEvent(new Event('change'));
+						let idElem = newImageTemplateArgs.thisImageElem.querySelector('[name="image_id"]');
+						idElem.value = returnedData.image_id;
+						idElem.dispatchEvent(new Event('change'));
+						
+						// This doesn't seem to be used for anything anymore?
+						//document.dispatchEvent(new Event('image-added'));
 						
 					}
 					
 				});
 				
-				// (Before ajax done,) append new image, add loading symbol
+				/*// (Before ajax done,) append new image, add loading symbol
 				newImageElem.querySelector('.image__status').classList.add('loading');
 				imagesElem.prepend(newImageElem);
 				
 				// Init buttons in new image element
 				lookForSelectize();
 				initImageEditElems();
-				initImageDeleteButtons();
+				initImageDeleteButtons();*/
 				
 			}
 			
@@ -364,6 +503,13 @@ function handleFiles(files) {
 	}
 	
 }
+
+
+// Upload images via paste
+let imagePasteElem = document.querySelector('[name="image-url"]');
+imagePasteElem.addEventListener('paste', function(event) {
+	console.log(event);
+});
 
 
 // Manually upload images via <file> input
@@ -380,7 +526,7 @@ imageUploadElem.addEventListener('change', function() {
 });
 
 
-// Handle item ID change
+// If *item* ID changes (e.g. adding release or blog), update all images' item IDs to match
 document.addEventListener('item-id-updated', function(event) {
 	var imageItemIdElems = document.querySelectorAll('[name=image_item_id]');
 	var imageIsQueuedElems = document.querySelectorAll('[name=image_is_queued]');
