@@ -488,7 +488,7 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 
 
 // Upload images via paste
-let imagePasteElem = document.querySelector('[name="image-url"]');
+let imagePasteElem = document.querySelector('[name="image_url"]');
 imagePasteElem.addEventListener('paste', function(event) {
 	
 	// Loop through pasted items
