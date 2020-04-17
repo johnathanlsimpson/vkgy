@@ -17,10 +17,10 @@
 							<?= lang('Drop images here', 'ここに画像をドロップ', 'div'); ?>
 						</label>
 						
-						<!--<div style="margin-top:1rem;text-align:center;">
+						<div style="margin-top:1rem;text-align:center;">
 							<span class="any--weaken-color">Or paste or image here:</span>
 							<input placeholder="paste image or URL" name="image-url" />
-						</div>-->
+						</div>
 						
 						<style>
 							.dragover, .image__drop:hover {
@@ -28,13 +28,6 @@
 								border-color: hsl(var(--attention)) !important;
 							}
 						</style>
-						
-						<!--<script>
-							let imagePasteElem = document.querySelector('[name="image-url"]');
-							imagePasteElem.addEventListener('paste', function(event) {
-								console.log(event);
-							});
-						</script>-->
 						
 						<div class="input__row">
 							<div class="input__group any--flex-grow">

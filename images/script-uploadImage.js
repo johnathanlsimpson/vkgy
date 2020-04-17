@@ -24,6 +24,7 @@ function initImageEditElems() {
 	});
 }
 
+
 // Init delete buttons
 function initImageDeleteButtons() {
 	var imageDeleteButtons = document.querySelectorAll('.image__delete');
@@ -45,6 +46,7 @@ function initImageDeleteButtons() {
 	});
 }
 
+
 // Function get specified parent
 function getParent(childElem, parentClass) {
 	var currentElem = childElem;
@@ -64,10 +66,9 @@ function getParent(childElem, parentClass) {
 	return parentElem;
 }
 
+
 // Update image data
 function updateImageData(changedElem) {
-	
-	console.log('updating image data');
 	
 	var parentElem = getParent(changedElem, 'image__template');
 	var statusElem = parentElem.querySelector('.image__status');
@@ -93,8 +94,6 @@ function updateImageData(changedElem) {
 			preparedFormData[inputElem.name] = inputElem.value;
 		}
 	});
-	
-	console.log(preparedFormData);
 	
 	initializeInlineSubmit($(parentElem), '/images/function-update_image.php', {
 		'statusContainer' : $(statusElem),
@@ -154,10 +153,14 @@ if(isAdvancedUpload) {
 	dropElem.addEventListener('drop', function(e) {
 		
 		// For files from system, pass directly along to uploader
-		if(e.dataTransfer.files.length) {
-			
-			handleFiles(e.dataTransfer.files);
-			
+		let files = e.dataTransfer.files ? e.dataTransfer.files : null;
+		let newImageSection;
+		
+		// Loop through each file and separately make new image section + send file to uploader
+		if(files && files.length) {
+			for(let i=0; i<files.length; i++) {
+				handleFiles(files[i], showImageSection());
+			}
 		}
 		
 		// If <img> elements from another website, have to create fake file and upload that
@@ -166,12 +169,26 @@ if(isAdvancedUpload) {
 			// Since the drop will be a string of HTML, grab the src from the <img> element
 			let dropHTML = e.dataTransfer.getData('text/html');
 			let match = dropHTML && /\ssrc="?([^"\s]+)"?\s*/.exec(dropHTML);
-			let dropURL = match && match[1];
-			dropURL = cleanDroppedURL(dropURL);
 			
-			// Grab data from URL and transform to blob (this function also sends blob to uploader, since can't pass blob back)
-			//urlToBlob(dropURL);
-			handleFiles(dropURL, 'url');
+			// If dragged element is actually <img>
+			if(match && match[1]) {
+				
+				// Clean URL before sending it through
+				let dropURL = match && match[1];
+				dropURL = cleanDroppedURL(dropURL);
+				
+				// If URL not empty after being cleaned
+				if(dropURL) {
+					
+					// Grab data from URL and transform to blob (this function also sends blob to uploader, since can't pass blob back)
+					handleFiles(dropURL, showImageSection(), 'url');
+					
+				}
+				
+			}
+			else {
+				// Dragged element is not <img>
+			}
 			
 		}
 		
@@ -181,15 +198,15 @@ if(isAdvancedUpload) {
 
 
 // Given a URL, try to grab as blob image
-function urlToBlob(inputURL, tryProxy = true) {
+function urlToBlob(inputURL, newImageTemplateArgs, tryProxy = true) {
 	
 	// If an <img> src was specified, grab it
 	if(inputURL) {
 		
 		// If inputURL seems to be jpeg, use that for MIME type; otherwise default to png
 		let extPattern = /\.[jpeg|jpg]/;
-		let extMatch = inputURL.match(extPattern);
 		let mimeType;
+		let extMatch = inputURL.match(extPattern);
 		if(extMatch && extMatch[0]) {
 			mimeType = 'image/jpeg';
 		}
@@ -218,14 +235,11 @@ function urlToBlob(inputURL, tryProxy = true) {
 			// Draw image into canvas
 			ctx.drawImage(this, 0, 0);
 			
-			//console.log('canvas');
-			//console.log(c);
-			
 			// Grab the canvas content as a PNG blob
 			c.toBlob(function(blob) {
 				
 				// If blob successful, turn into pseudo fileList and pass to uploader
-				handleFiles( blobToFiles(blob, inputURL) );
+				handleFiles( blobToFiles(blob, inputURL), newImageTemplateArgs );
 				
 			}, mimeType);
 		};
@@ -235,12 +249,14 @@ function urlToBlob(inputURL, tryProxy = true) {
 			
 			// If failure came while trying proxy (a.k.a. probably got 403 forbidden), try without
 			if(tryProxy) {
-				urlToBlob(inputURL, false);
+				urlToBlob(inputURL, newImageTemplateArgs, false);
 			}
 			
 			// If already tried uploading w/out proxy, ...well....
 			else {
+				
 				// Need something here to pass along error
+				
 			}
 			
 		}
@@ -264,7 +280,7 @@ function blobToFiles(inputBlob, dropURL) {
 	});
 	
 	// Return as array so we can pretend it's a fileList
-	return [ outputFile ];
+	return outputFile;
 	
 }
 
@@ -281,13 +297,12 @@ function urlToFileName(inputBlobType, inputURL) {
 	let fileNameMatch = inputURL.match(fileNamePattern);
 	let fileName = (fileNameMatch && fileNameMatch[1] ? fileNameMatch[1] : 'upload') + '.' + (fileExt ? fileExt : 'png');
 	
-	console.log(fileName);
-	
 	return fileName;
 	
 }
 
 
+// Prepend URL with proxy to avoid CORS issues
 function proxyURL(inputURL) {
 	
 	// Use proxy prefix to allow grabbing CORS-protected resources
@@ -301,55 +316,76 @@ function proxyURL(inputURL) {
 // Given a pasted image source, try to get the best version of the image and apply proxy
 function cleanDroppedURL(inputURL) {
 	
-	let outputURL = inputURL;
-	let wixPattern = /\/v\d\/fill\/[A-z0-9_,\.\/]+/;
-	let wpPattern = /-\d+x\d+\./;
-	let twitterPatternA = /:[thumb|small|medium|large]$/;
-	let twitterPatternB = /name=[A-z0-9]+/;
-	let twitterPatternC = /_\d+x\d+\./;
-	let iTunesPattern = /\d+x\d+[A-z]*\./;
-	let amebaOwndPattern = /\?width=\d+/;
-	
-	// Remove HTML-encoded ampersands; may need broader solution
-	outputURL = outputURL.replace(/&amp;/g, '&');
-	
-	// If from WordPress site, attempt to get biggest ver
-	if(outputURL.includes('wp-content')) {
-		outputURL = outputURL.replace(wpPattern, '.');
+	// Do super crazy basic check that "URL" seems like a URL
+	if(inputURL.length && inputURL.includes('/') && inputURL.includes('.')) {
+		
+		// Set up output and patterns
+		let outputURL = inputURL;
+		let wixPattern = /\/v\d\/fill\/[A-z0-9_,\.\/]+/;
+		let wpPattern = /-\d+x\d+\./;
+		let twitterPatternA = /:[thumb|small|medium|large]$/;
+		let twitterPatternB = /name=[A-z0-9]+/;
+		let twitterPatternC = /_\d+x\d+\./;
+		let iTunesPattern = /\d+x\d+[A-z]*\./;
+		let amebaOwndPattern = /\?width=\d+/;
+		let lastfmPattern = /\/u\/\d+x\d+\//;
+		
+		// Make sure starts with protocol
+		if(outputURL.indexOf('http') != 0) {
+			outputURL = 'http://' + outputURL;
+		}
+		
+		// Remove HTML-encoded ampersands; may need broader solution
+		outputURL = outputURL.replace(/&amp;/g, '&');
+		
+		// If from WordPress site, attempt to get biggest ver
+		if(outputURL.includes('wp-content')) {
+			outputURL = outputURL.replace(wpPattern, '.');
+		}
+		
+		// If from Wix, "
+		if(outputURL.includes('wixstatic.com')) {
+			outputURL = outputURL.replace(wixPattern, '');
+		}
+		
+		// If from Twitter, "
+		if(outputURL.includes('twimg.com')) {
+			outputURL = outputURL.replace(twitterPatternA, 'orig');
+			outputURL = outputURL.replace(twitterPatternB, 'name=orig');
+			outputURL = outputURL.replace(twitterPatternC, '.');
+		}
+		
+		// If from iTunes, "
+		if(outputURL.includes('mzstatic.com')) {
+			outputURL = outputURL.replace(iTunesPattern, '9999x9999.');
+		}
+		
+		// If from Ameba Ownd, "
+		if(outputURL.includes('amebaowndme.com')) {
+			outputURL = outputURL.replace(amebaOwndPattern, '?');
+		}
+		
+		// If from last.fm, "
+		if(outputURL.includes('lastfm.freetls.fastly.net')) {
+			outputURL = outputURL.replace(lastfmPattern, '/u/');
+			outputURL = outputURL.replace('.webp', '.jpg');
+		}
+		
+		// Return cleaned URL (or nothing)
+		return outputURL;
+		
 	}
-	
-	// If from Wix, "
-	if(outputURL.includes('wixstatic.com')) {
-		outputURL = outputURL.replace(wixPattern, '');
-	}
-	
-	// If from Twitter, "
-	if(outputURL.includes('twimg.com')) {
-		outputURL = outputURL.replace(twitterPatternA, 'orig');
-		outputURL = outputURL.replace(twitterPatternB, 'name=orig');
-		outputURL = outputURL.replace(twitterPatternC, '.');
-	}
-	
-	// If from iTunes, "
-	if(outputURL.includes('mzstatic.com')) {
-		outputURL = outputURL.replace(iTunesPattern, '9999x9999.');
-	}
-	
-	// If from Ameba Ownd, "
-	if(outputURL.includes('amebaowndme.com')) {
-		outputURL = outputURL.replace(amebaOwndPattern, '?');
-	}
-	
-	// Return cleaned URL
-	return outputURL;
 	
 }
 
 
+// Set template elements for showImageSection()
 var imageUploadElem = document.querySelector('[name=images]');
 var imagesElem = document.querySelector('.image__results');
 var imageTemplate = document.querySelector('#image-template');
 
+
+// Grab image template, clone, prepend to images area, then pass the clone so we can update it later
 function showImageSection() {
 	
 	// Get default variables for newly uploaded images
@@ -395,109 +431,55 @@ function showImageSection() {
 	};
 }
 
-//showImageSection();
 
-
-
-// Core upload handler
-function handleFiles(input, inputType = 'files') {
+// Takes file, uploads, then updates image template
+function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 	
-	let files;
+	// Define this so we don't have an error later
+	let file;
 	
+	// If input is URL, grab blob from it (below function sends back to handleFiles, since blob doesn't pass around well)
 	if(inputType === 'url') {
-		
-			// Grab data from URL and transform to blob (this function also sends blob to uploader, since can't pass blob back)
-			urlToBlob(input);
+		urlToBlob(input, newImageTemplateArgs);
 	}
 	
+	// If input is single file, go ahead
 	else if(inputType === 'files') {
-		
-		files = input;
+		file = input;
 	}
 	
-	console.log(inputType);
-	
-	/*// Get default variables for newly uploaded images
-	var itemType = imageUploadElem.parentNode.querySelector('[name=image_item_type]').value;
-	var itemId = imageUploadElem.parentNode.querySelector('[name=image_item_id]').value;
-	var itemName = imageUploadElem.parentNode.querySelector('[name=image_item_name]').value;*/
-	
-	// Loop through files and upload each one
-	if(files && files.length) {
+	// Upload file
+	if(file) {
 		
-		for(var i=0; i<files.length; i++) {
+		// Set current image in loop
+		let thisImage = file;
+		
+		// Make sure we're actually working with an image
+		if(!!thisImage.type.match(/image.*/)) {
 			
-			// Set current image in loop
-			var thisImage = files[i];
+			// Set thumbnail preview while uploading
+			newImageTemplateArgs.thumbnailElem.style.backgroundImage = 'url(' + window.URL.createObjectURL(thisImage) + ')';
 			
-			// Make sure we're actually working with an image
-			if(!!thisImage.type.match(/image.*/)) {
+			// Using core submit function, actually upload the image
+			initializeInlineSubmit( $(newImageTemplateArgs.newImageElem), '/images/function-upload_image.php', {
 				
-				// Let's grab template
-				let newImageTemplateArgs = showImageSection();
-				
-				/*// Create template parts for this image
-				var newImageElem  = document.importNode(imageTemplate.content, true);
-				var itemIdElem    = newImageElem.querySelector('[name^=image_' + itemType + '_id]');
-				var newOptionElem = document.createElement('option');
-				var thumbnailElem = newImageElem.querySelector('.image__image');*/
-				
-				/*// Set certain image fields to defaults specified before loop
-				newImageElem.querySelector('[name=image_item_type]').value = itemType;
-				newImageElem.querySelector('[name=image_item_id]').value = itemId;
-				
-				// This selects the appropriate ID for whatever item type this is (e.g. artist, release)
-				newOptionElem.value     = itemId;
-				newOptionElem.innerHTML = itemName;
-				newOptionElem.selected  = true;
-				itemIdElem.prepend(newOptionElem);*/
-				
-				// Set thumbnail preview while uploading
-				newImageTemplateArgs.thumbnailElem.style.backgroundImage = 'url(' + window.URL.createObjectURL(thisImage) + ')';
-				
-				// Using core submit function, actually upload the image
-				initializeInlineSubmit( $(newImageTemplateArgs.newImageElem), '/images/function-upload_image.php', {
+				'preparedFormData' : { 'image' : thisImage, 'item_type' : newImageTemplateArgs.itemType, 'item_id' : newImageTemplateArgs.itemId },
+				'callbackOnSuccess': function(event, returnedData) {
 					
-					'preparedFormData' : { 'image' : thisImage, 'item_type' : newImageTemplateArgs.itemType, 'item_id' : newImageTemplateArgs.itemId },
-					'callbackOnSuccess': function(event, returnedData) {
-						
-						/*// Get actual new image section from document, as opposed to just the object
-						// Previously did this with another call, but now just passing it from the templateargs; may have to revisit
-						var thisImageElem = document.querySelector('[name="image_id"][value="' + returnedData.image_id + '"]');
-						thisImageElem = getParent(thisImageElem, 'image__template');*/
-						
-						// When image finished uploading, remove loading symbol
-						//newImageTemplateArgs.thisImageElem.querySelector('.image__status').classList.remove('loading');
-						//newImageTemplateArgs.thisImageElem.querySelector('.image__status').classList.add('symbol__' + returnedData.status);
-						let statusElem = newImageTemplateArgs.thisImageElem.querySelector('.image__status');
-						statusElem.classList.remove('loading');
-						statusElem.classList.add('symbol__' + returnedData.status);
-						//statusElem.classList.add('test' + returnedData.status);
-						
-						// Notify page of new image, and trigger new image to update data (to set defaults)
-						//newImageTemplateArgs.thisImageElem.querySelector('[name=image_id]').dispatchEvent(new Event('change'));
-						let idElem = newImageTemplateArgs.thisImageElem.querySelector('[name="image_id"]');
-						idElem.value = returnedData.image_id;
-						idElem.dispatchEvent(new Event('change'));
-						
-						// This doesn't seem to be used for anything anymore?
-						//document.dispatchEvent(new Event('image-added'));
-						
-					}
+					// When image finished uploading, remove loading symbol and add status symbol
+					let statusElem = newImageTemplateArgs.thisImageElem.querySelector('.image__status');
+					statusElem.classList.remove('loading');
+					statusElem.classList.add('symbol__' + returnedData.status);
 					
-				});
+					// After image is actually updated, grab the ID and insert it into the image_id elem, then trigger change so it's saved in DB
+					let idElem = newImageTemplateArgs.thisImageElem.querySelector('[name="image_id"]');
+					idElem.value = returnedData.image_id;
+					idElem.dispatchEvent(new Event('change'));
+					
+				}
 				
-				/*// (Before ajax done,) append new image, add loading symbol
-				newImageElem.querySelector('.image__status').classList.add('loading');
-				imagesElem.prepend(newImageElem);
-				
-				// Init buttons in new image element
-				lookForSelectize();
-				initImageEditElems();
-				initImageDeleteButtons();*/
-				
-			}
-			
+			});
+
 		}
 		
 	}
@@ -508,7 +490,50 @@ function handleFiles(input, inputType = 'files') {
 // Upload images via paste
 let imagePasteElem = document.querySelector('[name="image-url"]');
 imagePasteElem.addEventListener('paste', function(event) {
-	console.log(event);
+	
+	// Loop through pasted items
+	let items = event.clipboardData.items;
+	if(items && items.length) {
+		
+		for(let i=0; i<items.length; i++) {
+			
+			// If pasted item is plain text (i.e. URL)
+			if(items[i].type.includes('text/plain')) {
+				
+				// Get text object as string
+				items[i].getAsString(function(pastedString) {
+					
+					pastedString = cleanDroppedURL(pastedString);
+					
+					// If URL not empty after being cleaned
+					if(pastedString) {
+						
+						// Grab data from URL and transform to blob (this function also sends blob to uploader, since can't pass blob back)
+						handleFiles(pastedString, showImageSection(), 'url');
+						
+					}
+					
+				});
+				
+			}
+			
+			// Or if pasted item is an image
+			else if(items[i].type.includes('image')) {
+				
+				// Retrieve image on clipboard as blob, then transform it into URL
+				let imageBlob = items[i].getAsFile();
+				let urlObj = window.URL || window.webkitURL;
+				let imageSrc = urlObj.createObjectURL(imageBlob);
+				
+				// Pass blob URL directly to be urlToBlob; will remake blob into an <img> and then upload it
+				urlToBlob(imageSrc, showImageSection(), false);
+				
+			}
+			
+		}
+		
+	}
+	
 });
 
 
@@ -517,7 +542,12 @@ imageUploadElem.addEventListener('change', function() {
 	
 	// Send files for upload
 	if(imageUploadElem.files.length) {
-		handleFiles(imageUploadElem.files);
+		
+		for(let i=0; i<imageUploadElem.files.length; i++) {
+		
+			handleFiles(imageUploadElem.files[i], showImageSection());
+			
+		}
 	}
 	
 	// Make sure <file> input is empty after files are accepted; otherwise you'll get dupes
