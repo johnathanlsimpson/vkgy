@@ -204,7 +204,7 @@ function urlToBlob(inputURL, newImageTemplateArgs, tryProxy = true) {
 	if(inputURL) {
 		
 		// If inputURL seems to be jpeg, use that for MIME type; otherwise default to png
-		let extPattern = /\.[jpeg|jpg]/;
+		let extPattern = /(\.|format=)[jpeg|jpg]/;
 		let mimeType;
 		let extMatch = inputURL.match(extPattern);
 		if(extMatch && extMatch[0]) {
