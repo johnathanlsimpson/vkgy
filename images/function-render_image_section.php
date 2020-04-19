@@ -68,7 +68,7 @@ function render_image_section($images, $args = []) {
 				'description'    => $image['description'],
 				'credit'         => $image['credit'],
 				'is_exclusive'   => $image['is_exclusive'] ? 'checked' : null,
-				'is_default'     => $image['id'] === $args['id'] ? 'checked' : null,
+				'is_default'     => $image['id'] == $args['default_id'] ? 'checked' : null,
 				'artist_ids'     => render_options(($image['artist_ids'] ?: $default['artist']), $artist_list),
 				'blog_id'        => render_options(($image['blog_id'] ?: $default['blog']), $blog_list),
 				'musician_ids'   => render_options(($image['label_ids'] ?: $default['label']), $label_list),
@@ -77,6 +77,7 @@ function render_image_section($images, $args = []) {
 				'scanned_by'     => $image['user_id'] == $_SESSION['user_id'] ? '1' : '0',
 				'background_url' => '/images/'.$image['id'].'.thumbnail.'.$image['extension'],
 				'image_markdown' => '![](/images/'.$image['id'].'.'.$image['extension'].')',
+				'image_url'      => '/images/'.$image['id'].'.'.$image['extension'],
 				'delete_class'   => $_SESSION['can_delete_data'] ? null : 'any--hidden',
 			]);
 		}
