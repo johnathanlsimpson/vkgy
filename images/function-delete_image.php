@@ -15,7 +15,18 @@ $image_id = sanitize($_POST['id']);
 $item_type = sanitize($_POST['item_type']);
 $item_id = sanitize($_POST['item_id']);
 
-if(is_numeric($image_id) && $_SESSION["can_delete_data"]) {
+// Check whether user can delete images
+if($_SESSION['can_delete_data']) {
+	$can_delete_image = true;
+}
+else {
+	$sql_check_uploader = 'SELECT 1 FROM images WHERE id=? AND user_id=? LIMIT 1';
+	$stmt_check_uploader = $pdo->prepare($sql_check_uploader);
+	$stmt_check_uploader->execute([ $image_id, $_SESSION['user_id'] ]);
+	$can_delete_image = $stmt_check_uploader->fetchColumn();
+}
+
+if(is_numeric($image_id) && $can_delete_image) {
 	
 	// Check if > 1 existing link
 	$check_sql = [
