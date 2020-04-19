@@ -1,4 +1,5 @@
 // Set default arguments for submit()
+
 function setArguments(formElement, inputArgs) {
 	var outputArgs = {};
 	
@@ -25,6 +26,7 @@ function setArguments(formElement, inputArgs) {
 		preparedFormData       : null,
 		submitOnEvent          : "submit",
 		callbackOnSuccess      : null,
+		callbackOnError        : null,
 		showEditLink           : false
 	}
 	
@@ -179,6 +181,13 @@ function submit(formElement, processorUrl, inputArgs) {
 					
 					if(typeof args.callbackOnSuccess === "function") {
 						args.callbackOnSuccess(formElement, returnedData);
+					}
+				}
+				
+				// If error, run supplied callback
+				else {
+					if(typeof args.callbackOnError === "function") {
+						args.callbackOnError(formElement, returnedData);
 					}
 				}
 			}

@@ -87,7 +87,7 @@ function updateImageData(changedElem) {
 		if(inputElem.nodeName === 'SELECT') {
 			preparedFormData[inputElem.name] = Array.prototype.map.call(inputElem.selectedOptions, function(x){ return x.value });
 		}
-		else if(inputElem.type === 'checkbox') {
+		else if(inputElem.type === 'checkbox' || inputElem.type === 'radio') {
 			preparedFormData[inputElem.name] = inputElem.checked ? 1 : 0;
 		}
 		else {
@@ -222,6 +222,37 @@ function urlToBlob(inputURL, newImageTemplateArgs, tryProxy = true) {
 		// This is for "if from different origin" but no clue what it does
 		img.crossOrigin = '';
 		
+		// In case of error loading the image
+		img.onerror = function(x) {
+			
+			// If failure came while trying proxy (a.k.a. probably got 403 forbidden), try without
+			if(tryProxy) {
+				urlToBlob(inputURL, newImageTemplateArgs, false);
+			}
+			
+			// If already tried uploading w/out proxy, ...well....
+			else {
+				
+				// Presumably there will be no bg since we're getting 403'd, so hide the symbol so it doesn't look weird/ugly by itself
+				let thumbnailStatusElem = newImageTemplateArgs.thumbnailElem.querySelector('.image__status');
+				thumbnailStatusElem.classList.add('any--hidden');
+				
+				// Display error message
+				let imageResultElem = newImageTemplateArgs.thisImageElem.querySelector('.image__result');
+				imageResultElem.innerHTML = 'This source has disabled image copying. Please save the image and upload it manually.';
+				
+				// If couldn't upload, fade out after 4 seconds, then remove element as soon as animation is done
+				setTimeout(function() {
+					newImageTemplateArgs.thisImageElem.classList.add('any--fade-out');
+					setTimeout(function() {
+						newImageTemplateArgs.thisImageElem.remove();
+					}, 300);
+				}, 5000);
+				
+			}
+			
+		}
+		
 		// Set the fake <img>'s src to the URL that we grabbed earlier; this loads the image
 		img.src = tryProxy ? proxyURL(inputURL) : inputURL;
 		
@@ -243,23 +274,6 @@ function urlToBlob(inputURL, newImageTemplateArgs, tryProxy = true) {
 				
 			}, mimeType);
 		};
-		
-		// In case of error loading the image
-		img.onerror = function(x) {
-			
-			// If failure came while trying proxy (a.k.a. probably got 403 forbidden), try without
-			if(tryProxy) {
-				urlToBlob(inputURL, newImageTemplateArgs, false);
-			}
-			
-			// If already tried uploading w/out proxy, ...well....
-			else {
-				
-				// Need something here to pass along error
-				
-			}
-			
-		}
 		
 	}
 }
@@ -308,6 +322,7 @@ function proxyURL(inputURL) {
 	// Use proxy prefix to allow grabbing CORS-protected resources
 	// Will need to change whenever the proxy inevitably self-immolates
 	let proxyPrefix = 'https://cors-anywhere.herokuapp.com/';
+	proxyPrefix = 'https://pacific-hollows-34727.herokuapp.com/';
 	return proxyPrefix + inputURL;
 	
 }
@@ -415,10 +430,11 @@ function showImageSection() {
 	newImageElem.querySelector('.image__status').classList.add('loading');
 	imagesElem.prepend(newImageElem);
 	
-	// Init buttons in new image element
-	lookForSelectize();
-	initImageEditElems();
-	initImageDeleteButtons();
+	// If this is the first image for the item, automatically make it the default image
+	let isDefaultElems = document.querySelectorAll('[name="image_is_default"]');
+	if(isDefaultElems.length === 1) {
+		isDefaultElems[0].checked = true;
+	}
 	
 	// Return template and a few vars
 	return {
@@ -461,7 +477,8 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 			newImageTemplateArgs.thumbnailElem.style.backgroundImage = 'url(' + window.URL.createObjectURL(thisImage) + ')';
 			
 			// Using core submit function, actually upload the image
-			initializeInlineSubmit( $(newImageTemplateArgs.newImageElem), '/images/function-upload_image.php', {
+			//initializeInlineSubmit( $(newImageTemplateArgs.newImageElem), '/images/function-upload_image.php', {
+			initializeInlineSubmit( $(newImageTemplateArgs.thisImageElem), '/images/function-upload_image.php', {
 				
 				'preparedFormData' : { 'image' : thisImage, 'item_type' : newImageTemplateArgs.itemType, 'item_id' : newImageTemplateArgs.itemId },
 				'callbackOnSuccess': function(event, returnedData) {
@@ -471,15 +488,38 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 					statusElem.classList.remove('loading');
 					statusElem.classList.add('symbol__' + returnedData.status);
 					
-					// After image is actually updated, grab the ID and insert it into the image_id elem, then trigger change so it's saved in DB
+					// After image is actually updated, grab the ID and insert it into the image_id elem
 					let idElem = newImageTemplateArgs.thisImageElem.querySelector('[name="image_id"]');
 					idElem.value = returnedData.image_id;
+					
+					// After ID is set init buttons in new image element
+					lookForSelectize();
+					initImageEditElems();
+					initImageDeleteButtons();
+					
+					// Trigger change on ID elem so that new ID (and description, etc) is saved in DB
 					idElem.dispatchEvent(new Event('change'));
+					
+				},
+				'callbackOnError': function(event, returnedData) {
+					
+					// Make sure status elem isn't stuck on loading animation forever
+					let statusElem = newImageTemplateArgs.thisImageElem.querySelector('.image__status');
+					statusElem.classList.remove('loading');
+					statusElem.classList.add('symbol__error');
+					
+					// If couldn't upload, fade out after 4 seconds, then remove element as soon as animation is done
+					setTimeout(function() {
+						newImageTemplateArgs.thisImageElem.classList.add('any--fade-out');
+						setTimeout(function() {
+							newImageTemplateArgs.thisImageElem.remove();
+						}, 300);
+					}, 4000);
 					
 				}
 				
 			});
-
+			
 		}
 		
 	}
