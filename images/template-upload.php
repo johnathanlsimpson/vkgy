@@ -18,7 +18,7 @@
 						</label>
 						
 						<div style="margin-top:1rem;text-align:center;">
-							<span class="any--weaken-color">Or paste or image here:</span>
+							<span class="any--weaken-color">Or paste image here:</span>
 							<input placeholder="paste image or URL" name="image_url" />
 						</div>
 						
