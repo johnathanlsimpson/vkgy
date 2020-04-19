@@ -233,14 +233,21 @@ function urlToBlob(inputURL, newImageTemplateArgs, tryProxy = true) {
 			// If already tried uploading w/out proxy, ...well....
 			else {
 				
-				// Replace loading symbol with error symbol
+				// Presumably there will be no bg since we're getting 403'd, so hide the symbol so it doesn't look weird/ugly by itself
 				let thumbnailStatusElem = newImageTemplateArgs.thumbnailElem.querySelector('.image__status');
-				thumbnailStatusElem.classList.remove('loading');
-				thumbnailStatusElem.classList.add('symbol__error');
+				thumbnailStatusElem.classList.add('any--hidden');
 				
 				// Display error message
 				let imageResultElem = newImageTemplateArgs.thisImageElem.querySelector('.image__result');
 				imageResultElem.innerHTML = 'This source has disabled image copying. Please save the image and upload it manually.';
+				
+				// If couldn't upload, fade out after 4 seconds, then remove element as soon as animation is done
+				setTimeout(function() {
+					newImageTemplateArgs.thisImageElem.classList.add('any--fade-out');
+					setTimeout(function() {
+						newImageTemplateArgs.thisImageElem.remove();
+					}, 300);
+				}, 5000);
 				
 			}
 			
@@ -492,6 +499,22 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 					
 					// Trigger change on ID elem so that new ID (and description, etc) is saved in DB
 					idElem.dispatchEvent(new Event('change'));
+					
+				},
+				'callbackOnError': function(event, returnedData) {
+					
+					// Make sure status elem isn't stuck on loading animation forever
+					let statusElem = newImageTemplateArgs.thisImageElem.querySelector('.image__status');
+					statusElem.classList.remove('loading');
+					statusElem.classList.add('symbol__error');
+					
+					// If couldn't upload, fade out after 4 seconds, then remove element as soon as animation is done
+					setTimeout(function() {
+						newImageTemplateArgs.thisImageElem.classList.add('any--fade-out');
+						setTimeout(function() {
+							newImageTemplateArgs.thisImageElem.remove();
+						}, 300);
+					}, 4000);
 					
 				}
 				
