@@ -86,8 +86,7 @@
 .image__template [name="image_id"][value=""] ~ .input__row:not(.image__message) {
 	opacity: 0;
 }
-.image__template [name="image_id"][value=""] ~ .image__message .image__loading,
-.image__template [name="image_id"]:not([value]) ~ .image__message .image__loading {
+.image__template [name="image_id"][value=""] ~ .image__message .image__result:empty + .image__loading {
 	display: block;
 }
 .image__message {
@@ -95,9 +94,6 @@
 }
 .image__result:not(:empty) {
 	margin-top: 0.5rem;
-}
-.image__result:not(:empty) + .image__loading {
-	display: none;
 }
 .image__loading {
 	display: none;
