@@ -24,7 +24,7 @@ if(is_numeric($_POST['id'])) {
 	$friendly     = friendly($description) ?: null;
 	$credit       = sanitize($_POST['credit']) ?: null;
 	
-	$is_exclusive = $_POST['is_exclusive'] ? 1 : 0;
+	$is_exclusive = is_array($_POST['is_exclusive']) && reset($_POST['is_exclusive']) ? 1 : 0;
 	$is_default   = $_POST['is_default'] ? 1 : 0;
 	$is_queued    = $_POST['is_queued'] ? 1 : 0;
 	
