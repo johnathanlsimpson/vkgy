@@ -16,13 +16,14 @@ $item_type = sanitize($_POST['item_type']);
 $item_id = sanitize($_POST['item_id']);
 
 if(is_numeric($image_id) && $_SESSION["can_delete_data"]) {
+	
 	// Check if > 1 existing link
 	$check_sql = [
-		'artist' => 'SELECT 1 FROM images_artists WHERE image_id=? LIMIT 1',
-		'blog' => 'SELECT 1 FROM images_blog WHERE image_id=? LIMIT 1',
-		'labels' => 'SELECT 1 FROM images_labels WHERE image_id=? LIMIT 1',
-		'musician' => 'SELECT 1 FROM images_musicians WHERE image_id=? LIMIT 1',
-		'release' => 'SELECT 1 FROM images_releases WHERE image_id=? LIMIT 1',
+		'artist' => 'SELECT COUNT(*) FROM images_artists WHERE image_id=? GROUP BY image_id',
+		'blog' => 'SELECT COUNT(*) FROM images_blog WHERE image_id=? GROUP BY image_id',
+		'labels' => 'SELECT COUNT(*) FROM images_labels WHERE image_id=? GROUP BY image_id',
+		'musician' => 'SELECT COUNT(*) FROM images_musicians WHERE image_id=? GROUP BY image_id',
+		'release' => 'SELECT COUNT(*) FROM images_releases WHERE image_id=? GROUP BY image_id',
 	];
 	
 	$check_values = [
@@ -32,16 +33,15 @@ if(is_numeric($image_id) && $_SESSION["can_delete_data"]) {
 		'musician' => $image_id,
 		'release' => $image_id,
 	];
-	unset($check_sql[$item_type], $check_values[$item_type]);
 	
 	foreach($check_sql as $key => $sql_check) {
 		$stmt_check = $pdo->prepare($sql_check);
 		$stmt_check->execute([ $check_values[$key] ]);
-		$rslt_check .= $stmt_check->fetchColumn();
+		$rslt_check += $stmt_check->fetchColumn();
 	}
 	
 	// Fake delete
-	if($rslt_check) {
+	if($rslt_check > 1) {
 		$values_delete = [ $image_id ];
 		if(is_numeric($item_id)) {
 			$values_delete[] = $item_id;
@@ -86,7 +86,7 @@ if(is_numeric($image_id) && $_SESSION["can_delete_data"]) {
 	}
 }
 else {
-	$output["result"] = 'Only editors can delete images. Please comment and ask an editor to help.';
+	$output["result"] = 'Only moderators can delete images. Please comment and ask <a href="/users/">a moderator</a> to help.';
 }
 
 $output["status"] = $output["status"] ?: "error";
