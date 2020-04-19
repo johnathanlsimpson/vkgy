@@ -36,7 +36,7 @@
 								<div class="input__group any--flex-grow">
 									
 									<!-- Result -->
-									<div class="image__result text text--error symbol__error" data-role="result">{result}</div>
+									<div class="image__result text text--error symbol__error">{result}</div>
 									
 									<!-- Loading -->
 									<div class="image__loading">

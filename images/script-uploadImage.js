@@ -503,6 +503,10 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 				},
 				'callbackOnError': function(event, returnedData) {
 					
+					// Get error result
+					let imageResultElem = newImageTemplateArgs.thisImageElem.querySelector('.image__result');
+					imageResultElem.innerHTML = returnedData.result;
+					
 					// Make sure status elem isn't stuck on loading animation forever
 					let statusElem = newImageTemplateArgs.thisImageElem.querySelector('.image__status');
 					statusElem.classList.remove('loading');
