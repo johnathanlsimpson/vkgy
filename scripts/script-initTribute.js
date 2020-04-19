@@ -147,11 +147,11 @@ function getTributeToken(input, tributeType, returnType = 'rich') {
 	if(returnType === 'rich') {
 		return '' +
 			'﻿' +
-			'<span class="tribute__wrapper" contenteditable="false">' +
+			'<span class="tribute__wrapper" contenteditable="false" tabindex="-1">' +
 				'&VeryThinSpace;' +
-				'<' + (url ? 'a' : 'span') + ' class="tribute__container" ' + (url ? ' href="' + url + '" target="_blank"' : '') + '>' +
-					'<span class="tribute__display ' + symbol + '" data-text="' + dataText + '"></span>' + 
-					'<span class="tribute__text">' + innerText + '</span>' +
+				'<' + (url ? 'a' : 'span') + ' class="tribute__container" ' + (url ? ' href="' + url + '" target="_blank"' : '') + ' tabindex="-1">' +
+					'<span class="tribute__display ' + symbol + '" data-text="' + dataText + '" tabindex="-1"></span>' + 
+					'<span class="tribute__text" tabindex="-1">' + innerText + '</span>' +
 				'</' + (url ? 'a' : 'span') + '>' +
 				'&VeryThinSpace;' +
 			'</span>' +

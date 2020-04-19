@@ -78,7 +78,7 @@ function render_image_section($images, $args = []) {
 				'background_url' => '/images/'.$image['id'].'.thumbnail.'.$image['extension'],
 				'image_markdown' => '![](/images/'.$image['id'].'.'.$image['extension'].')',
 				'image_url'      => '/images/'.$image['id'].'.'.$image['extension'],
-				'delete_class'   => $_SESSION['can_delete_data'] ? null : 'any--hidden',
+				'delete_class'   => $_SESSION['can_delete_data'] || $_SESSION['user_id'] === $image['user_id'] ? null : 'any--hidden',
 			]);
 		}
 	}

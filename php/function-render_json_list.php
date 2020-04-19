@@ -158,28 +158,30 @@ function render_json_list($input_type, $input = null, $input_id_type = null, $in
 			$new_output = [];
 			
 			// Loop through and remove blanks and dupes
-			foreach($output_list as $output_key => $output_chunk) {
-				
-				// Skip if no name provided
-				if(strlen($output_chunk['name'])) {
+			if(is_array($output_list)) {
+				foreach($output_list as $output_key => $output_chunk) {
 					
-					// If already have one song with same romaji, ignore if duplicate name
-					if(isset( $new_output[$output_chunk['friendly']] )) {
+					// Skip if no name provided
+					if(strlen($output_chunk['name'])) {
 						
-						$prev_name = strtolower( str_replace( ' ', '', html_entity_decode( $new_output[$output_chunk['friendly']]['name'], ENT_QUOTES, 'UTF-8' ) ) );
-						$this_name = strtolower( str_replace( ' ', '', html_entity_decode( $output_chunk['name'], ENT_QUOTES, 'UTF-8' ) ) );
-						
-						if($prev_name != $this_name) {
-							$new_output[ $output_chunk['friendly'].$output_chunk['name'] ] = $output_chunk;
+						// If already have one song with same romaji, ignore if duplicate name
+						if(isset( $new_output[$output_chunk['friendly']] )) {
+							
+							$prev_name = strtolower( str_replace( ' ', '', html_entity_decode( $new_output[$output_chunk['friendly']]['name'], ENT_QUOTES, 'UTF-8' ) ) );
+							$this_name = strtolower( str_replace( ' ', '', html_entity_decode( $output_chunk['name'], ENT_QUOTES, 'UTF-8' ) ) );
+							
+							if($prev_name != $this_name) {
+								$new_output[ $output_chunk['friendly'].$output_chunk['name'] ] = $output_chunk;
+							}
+							
+						}
+						else {
+							$new_output[ $output_chunk['friendly'] ] = $output_chunk;
 						}
 						
 					}
-					else {
-						$new_output[ $output_chunk['friendly'] ] = $output_chunk;
-					}
 					
 				}
-				
 			}
 			
 			// Undo associative keys

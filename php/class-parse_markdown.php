@@ -252,6 +252,8 @@
 							
 							$output["name"] = $name;
 							$output["romaji"] = $romaji;
+							$output['display_name'] = $display_name;
+							$output['display_romaji'] = $display_romaji;
 							$output["quick_name"] = $romaji ?: $name;
 							$output["friendly"] = $artist["friendly"];
 							$output["id"] = $id;

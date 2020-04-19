@@ -223,11 +223,10 @@
 								<span data-role="status"></span>
 							</div>
 							
-							<?php if($_SESSION['can_delete_data']) { ?>
 							<div class="input__group">
-								<label class="input__checkbox-label symbol__trash symbol--standalone" data-get="id" data-get-into="data-id" data-id="<?php echo $entry["id"]; ?>" name="delete"></label>
+								<?php $delete_button_class = $_SESSION['can_delete_data'] || $_SESSION['user_id'] === $entry['user_id'] ? null : 'any--hidden'; ?>
+								<label class="input__checkbox-label symbol__trash symbol--standalone <?= $delete_button_class; ?>" data-get="id" data-get-into="data-id" data-id="<?= $entry["id"]; ?>" name="delete"></label>
 							</div>
-							<?php } ?>
 						</div>
 						
 						<div class="any--flex any--hidden" data-role="edit-container">

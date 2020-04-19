@@ -5,6 +5,7 @@ include_once('../php/include.php');
 // Edit user's role
 if($_SESSION['can_edit_roles'] && is_numeric($_POST['id']) && $_SESSION['user_id'] != $_POST['id']) {
 	
+	$user_id = sanitize($_POST['id']);
 	$sql_check_boss = 'SELECT is_boss FROM users WHERE id=? LIMIT 1';
 	$stmt_check_boss = $pdo->prepare($sql_check_boss);
 	$stmt_check_boss->execute([ sanitize($_POST['id']) ]);
@@ -13,24 +14,41 @@ if($_SESSION['can_edit_roles'] && is_numeric($_POST['id']) && $_SESSION['user_id
 	// Make sure no one can edit permissions of user with boss role
 	if(!$rslt_check_boss) {
 		
+		// Get current roles and permissions, so we can compare
+		$sql_current = 'SELECT * FROM users WHERE id=?';
+		$stmt_current = $pdo->prepare($sql_current);
+		$stmt_current->execute([ $user_id ]);
+		$rslt_current = $stmt_current->fetch();
+		
 		// Set roles
-		$roles = [ 'vip', 'editor', 'moderator' ];
-		foreach($roles as $key) {
-			$values_user[] = $_POST[ 'is_'.$key ] == 1 ? 1 : 0;
+		$roles = [ 'vip' => ['access_drafts'], 'editor' => ['add_data'], 'moderator' => ['approve_data', 'delete_data', 'edit_roles'] ];
+		foreach($roles as $role_key => $permissions) {
+			$values_user[ 'is_'.$role_key ] = $_POST[ 'is_'.$role_key ] == 1 ? 1 : 0;
+			
+			// Auto-set permissions based on roles, if user is unable to set permissions individually
+			if(!$_SESSION['can_edit_permissions']) {
+				foreach($permissions as $permission_key) {
+					$values_user[ 'can_'.$permission_key ] = $_POST[ 'is_'.$role_key ] == 1 ? 1 : 0;
+				}
+			}
 		}
 		
-		// Set permissions
-		$permissions = [ 'add_data', 'add_livehouses', 'delete_data', 'approve_data', 'comment', 'access_drafts', 'edit_roles', 'edit_permissions' ];
-		foreach($permissions as $key) {
-			$values_user[] = $_POST[ 'can_'.$key ] == 1 ? 1 : 0;
+		// If user can set permissions individually, get those
+		if($_SESSION['can_edit_permissions']) {
+			$permissions = [ 'add_data', 'add_livehouses', 'delete_data', 'approve_data', 'comment', 'access_drafts', 'edit_roles', 'edit_permissions' ];
+			foreach($permissions as $permission_key) {
+				$values_user[ 'can_'.$permission_key ] = $_POST[ 'can_'.$permission_key ] == 1 ? 1 : 0;
+			}
 		}
 		
-		// Set user ID
-		$values_user[] = sanitize($_POST['id']);
+		// Separate keys and values, add value for id=?
+		$keys_user = array_keys($values_user);
+		$values_user = array_values($values_user);
+		$values_user[] = $user_id;
 		
-		$sql_user = 'UPDATE users SET is_'.implode('=?, is_', $roles).'=?, can_'.implode('=?, can_', $permissions).'=? WHERE id=? LIMIT 1';
+		$sql_user = 'UPDATE users SET '.implode('=?, ', $keys_user).'=? WHERE id=? LIMIT 1';
 		$stmt_user = $pdo->prepare($sql_user);
-		if($stmt_user->execute($values_user)) {
+		if($stmt_user->execute( $values_user )) {
 			$output['status'] = 'success';
 		}
 		else {
