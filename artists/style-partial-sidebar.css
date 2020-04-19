@@ -34,21 +34,21 @@
 }
 
 .images__container {
-	justify-content: space-between;
-	flex-wrap: wrap;
-	margin: -0.5rem;
+	display: grid;
+	grid-gap: 0.5rem;
+	grid-template-columns: repeat(3, 1fr);
 }
 .images__item.images__item {
 	display: block;
-	height: 4rem;
-	margin: 0.5rem;
-	padding: 0;
-	width: 4rem;
+	padding-top: 100%;
 }
 .images__link {
 	background-size: cover;
-	display: block;
-	height: 100%;
+	bottom: 0;
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
 }
 .images__link:hover {
 	opacity: 0.75;
