@@ -34,6 +34,18 @@
 		$stmt_curr_tags->execute([ $release["id"] ]);
 		$rslt_curr_tags = $stmt_curr_tags->fetchAll();
 		
+		if($_SESSION['is_signed_in']) {
+			$sql_user_tags = 'SELECT tag_id FROM releases_tags WHERE release_id=? AND user_id=?';
+			$stmt_user_tags = $pdo->prepare($sql_user_tags);
+			$stmt_user_tags->execute([ $release['id'], $_SESSION['user_id'] ]);
+			$rslt_user_tags = $stmt_user_tags->fetchAll();
+			$num_user_tags = count($rslt_user_tags);
+			
+			for($i=0; $i<$num_user_tags; $i++) {
+				$user_tags[ $rslt_user_tags[$i]['tag_id'] ] = true;
+			}
+		}
+		
 		if(is_array($rslt_curr_tags) && !empty($rslt_curr_tags)) {
 			foreach($rslt_curr_tags as $tag) {
 				$needs_admin_tags = $needs_admin_tags ?: ($tag["is_admin_tag"] ?: false);

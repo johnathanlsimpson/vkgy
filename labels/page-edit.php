@@ -102,11 +102,9 @@
 								</button>
 								<span data-role="status"></span>
 							</div>
-							<?php if($_SESSION['can_delete_data']) { ?>
-							<div class="input__group">
+							<div class="input__group <?= $_SESSION['can_delete_data'] ? null : 'any--hidden'; ?>">
 								<label class="input__checkbox-label symbol__trash symbol--standalone" name="delete"></label>
 							</div>
-							<?php } ?>
 						</div>
 						<div class="any--hidden text text--outlined text--notice edit__result" data-role="result"></div>
 					</div>

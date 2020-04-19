@@ -44,10 +44,13 @@ function initSelectize(selectElement, populatedOnClick = false) {
 	var selectizedElement = selectElement.selectize(selectizeOptions);
 	var selectizedObject  = selectizedElement[0].selectize;
 	
-	selectizedObject.on('change', function() { selectElement[0].dispatchEvent(new Event('change')); });
+	selectizedObject.on('change', function() {
+		selectElement[0].dispatchEvent(new Event('change'));
+	});
 	
 	if(populatedOnClick) {
-		selectizedObject.open();
+		selectizedObject.focus();
+		//selectizedObject.open();
 	}
 }
 

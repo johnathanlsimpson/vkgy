@@ -33,7 +33,7 @@ if(!empty($_GET["entry"]) && !$_GET["action"]) {
 		||
 		$_SESSION['user_id'] === $entry['user_id']
 		||
-		$is_vip
+		$_SESSION['can_access_drafts']
 	) {
 		$is_allowed = true;
 	}
@@ -85,7 +85,7 @@ if($_GET["action"] === "update") {
 			||
 			!$entry['is_queued'] && $_SESSION['can_add_data']
 			||
-			$entry['is_queued'] && $_SESSION['can_view_drafts']
+			$entry['is_queued'] && $_SESSION['can_access_drafts']
 		) {
 			$is_allowed = true;
 		}
