@@ -35,7 +35,7 @@ if($artist_is_viewable) {
 			?>
 				<div>
 					<h3><?= lang('Images', '画像', 'div'); ?></h3>
-					<input class="obscure__input" id="obscure-images" type="checkbox" <?= count($artist['images']) > 4 ? 'checked' : null; ?> >
+					<input class="obscure__input" id="obscure-images" type="checkbox" <?= count($artist['images']) > 12 ? 'checked' : null; ?> >
 					<div class="text text--outlined obscure__container obscure--faint">
 						<ul class="ul--inline any--flex images__container">
 							<?php
