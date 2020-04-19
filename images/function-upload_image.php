@@ -86,6 +86,7 @@
 									
 									$output['status'] = 'success';
 									$output['image_id'] = $id;
+									$output['image_url'] = '/images/'.$id.'.'.$extension;
 									$output['image_style'] = 'background-image: url(/images/'.$id.'.thumbnail.jpg);';
 									$output['image_markdown'] = '![](/images/'.$file_name.')';
 									$output['is_exclusive_for'] = 'is-exclusive-'.$id;
@@ -109,7 +110,7 @@
 							}
 						}
 						else {
-							$output['result'][] = 'Extension not allowed.';
+							$output['result'][] = 'Only jpg, jpeg, gif, or png accepted.';
 						}
 					}
 					else {

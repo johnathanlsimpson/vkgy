@@ -232,7 +232,7 @@
 										'item_id' => $artist['id'],
 										'item_name' => $artist['quick_name'],
 										'description' => $artist['quick_name'].' group photo',
-										'id' => $artist['image_id'],
+										'default_id' => $artist['image_id'],
 										'hide_blog' => true,
 										'hide_labels' => true,
 										'hide_markdown' => true,

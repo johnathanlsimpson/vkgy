@@ -148,7 +148,7 @@
 							'item_id' => $entry['id'],
 							'item_name' => 'blog entry',
 							'description' => '',
-							'id' => $entry['image_id'],
+							'default_id' => $entry['image_id'],
 							'hide_blog' => '1',
 							'hide_labels' => '1',
 							'hide_musicians' => '1',

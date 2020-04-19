@@ -13,6 +13,15 @@
 					<div class="text obscure__container obscure--height" data-hide-selects="{hide_selects}" data-hide-markdown="{hide_markdown}" data-hide-blog="{hide_blog}" data-hide-artists="{hide_artists}" data-hide-labels="{hide_labels}" data-hide-musicians="{hide_musicians}" data-hide-releases="{hide_releases}">
 						
 						<!-- Upload area -->
+						<label class="text h2 image__drop" for="image-upload">
+							<?= lang('Drop images here', 'ここに画像をドロップ', 'div'); ?>
+						</label>
+						
+						<div class="image__paste">
+							<span class="any--weaken-color">Or paste image here:</span>
+							<input placeholder="paste image or URL" name="image_url" />
+						</div>
+						
 						<div class="input__row">
 							<div class="input__group any--flex-grow">
 								<input class="any--hidden" name="image_item_type" value="{item_type}" hidden disabled />
@@ -20,12 +29,7 @@
 								<input class="any--hidden" name="image_item_name" value="{item_name}" hidden disabled />
 								<input class="any--hidden" name="image_is_queued" value="{is_queued}" hidden disabled />
 								<input class="any--hidden" name="image_description" value="{description}" hidden disabled />
-								<input class="any--flex-grow" name="images" type="file" multiple />
-							</div>
-						</div>
-						<div class="input__row">
-							<div class="input__group any--flex-grow">
-								<span class="any--weaken symbol__help">If “scanned by” is selected, the image will be watermarked with the user's username; full-res, unwatermarked version can be viewed by original uploader, and by all VIP users.</span>
+								<input class="any--flex-grow" accept="image/*" id="image-upload" name="images" type="file" multiple hidden />
 							</div>
 						</div>
 						

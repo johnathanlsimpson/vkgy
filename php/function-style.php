@@ -22,7 +22,7 @@
 			$GLOBALS['styles'] = array_unique($GLOBALS['styles']);
 			
 			foreach($GLOBALS["styles"] as $style) {
-				$style = $style."?".date("Ymd", filemtime("..".$style));
+				$style = $style."?".date("YmdHis", filemtime("..".$style));
 				echo str_replace("*", ($minimized ? $minimizer_stem : "").$style, $style_wrapper)."\n";
 			}
 		}

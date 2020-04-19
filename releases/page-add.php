@@ -885,10 +885,9 @@
 					'item_id'       => $release['id'],
 					'item_name'     => $release['quick_name'],
 					'description'   => $release['quick_name'].' cover',
-					'id'            => $release['image_id'],
+					'default_id'    => $release['image_id'],
 					'hide_selects'  => true,
 					'hide_markdown' => true,
-					'is_default'    => 'checked',
 				]);
 			?>
 		</div>

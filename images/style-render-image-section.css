@@ -2,16 +2,59 @@
 	flex-wrap: wrap;
 }
 .image__image {
+	background-position: center;
 	background-repeat: no-repeat;
-	background-size: contain;
-	margin-right: 0.5rem;
-	margin-top: 1rem;
-	padding-top: 1rem;
-	text-align: center;
+	background-size: cover;
+	height: 100px;
+	line-height: 1rem;
+	margin-right: 1rem;
+	margin-top: 0.5rem;
+	text-align: right;
 	width: 100px;
 }
+@media(max-width: 599.99px) {
+	.image__image {
+		background-position: left center;
+		background-size: contain;
+		margin-bottom: 1rem;
+		margin-right: 0;
+		text-align: left;
+		width: 100%;
+	}
+}
+.image__status {
+	display: inline-block;
+	height: 1rem;
+}
+.image__status:not(.loading):not(.symbol__loading):not(.symbol__error):not(.symbol__success) {
+	opacity: 0;
+}
+.image__status::after {
+	background: hsl(var(--background));
+	border-radius: 0 0 0 5px;
+	content: "";
+	display: block;
+	height: 1rem;
+	padding: 0 0 0.25rem 0.25rem;
+	position: absolute;
+	right: 0;
+	top: 0;
+	transition: opacity 0.2s linear;
+	width: 1rem;
+	z-index: -1;
+}
+@media(max-width: 599.99px) {
+	.image__image::after {
+		border-radius: 0 0 5px 0;
+		left: 0;
+		right: auto;
+	}
+}
+.image__status {
+	z-index: 1;
+}
 .image__data {
-	max-width: calc(100% - 100px - 1rem);
+	flex: 1;
 }
 .image__result {
 	margin-bottom: 0;
@@ -20,15 +63,36 @@
 .image__result:empty {
 	display: none;
 }
-.image__results:not(:empty) {
+.image__results li:first-of-type {
 	border-top: 1px solid hsl(var(--background--bold));
 	margin-top: 1rem;
 	padding-top: 1rem;
 }
-[name="image_is_exclusive"] + label::after {
+.image__template .input__row {
+	transition: opacity 0.2s linear;
+}
+.image__template [name="image_id"][value=""] ~ .input__row:not(.image__message) {
+	opacity: 0;
+}
+.image__template [name="image_id"][value=""] ~ .image__message .image__result:empty + .image__loading {
+	display: block;
+}
+.image__message {
+	margin-top: 0 !important;
+}
+.image__result:not(:empty) {
+	margin-top: 0.5rem;
+}
+.image__loading {
+	display: none;
+	line-height: 1;
+	position: absolute;
+	top: 1rem;
+}
+[name="image_is_exclusive[]"] + ::after {
 	content: "vkgy user?";
 }
-[data-image-status="new"] [name="image_is_exclusive"] + label::after {
+[data-image-status="new"] [name="image_is_exclusive[]"] + ::after {
 	content: "you?";
 }
 [data-hide-selects="1"] .image__selects,
@@ -43,4 +107,19 @@
 	margin-bottom: -0.5rem;
 	overflow: hidden;
 	width: 0;
+}
+.image__drop {
+	border: 3px dashed hsl(var(--background--bold));
+	cursor: pointer;
+	display: block;
+	margin: 0;
+	text-align: center;
+}
+.image__drop--hover, .image__drop:hover {
+	background: hsl(var(--background--bold));
+	border-color: hsl(var(--attention));
+}
+.image__paste {
+	margin-top: 1rem;
+	text-align: center;
 }

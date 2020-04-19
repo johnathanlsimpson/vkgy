@@ -10,9 +10,9 @@
 				?>
 					<li class="image__template any--flex" data-get="image_status" data-get-into="data-image-status">
 						<!-- Thumbnail -->
-						<div class="image__image" style="background-image:url({background_url});">
-							<span class="image__status"></span>
-						</div>
+						<a class="image__image" data-get="image_url" data-get-into="href" href="{image_url}" style="background-image:url({background_url});" target="_blank">
+							<span class="image__status symbol--standalone"></span>
+						</a>
 						
 						<!-- Data -->
 						<div class="image__data any--flex-grow">
@@ -32,14 +32,33 @@
 							</div>
 							
 							<!-- Description, default, delete -->
+							<div class="input__row image__message">
+								<div class="input__group any--flex-grow">
+									
+									<!-- Result -->
+									<div class="image__result text text--error symbol__error">{result}</div>
+									
+									<!-- Loading -->
+									<div class="image__loading">
+										Uploading...
+									</div>
+									
+								</div>
+							</div>
+							
+							<!-- Description, default, delete -->
 							<div class="input__row">
 								<div class="input__group any--flex-grow">
 									<label class="input__label">Description</label>
 									<input class="any--flex-grow" data-get="description" data-get-into="value" name="image_description" placeholder="description" value="{description}" />
 								</div>
 								<div class="input__group">
-									<input class="input__checkbox" data-get="is_default_for" data-get-into="id" id="is-default-{id}" name="image_is_default" type="checkbox" value="1" {is_default} />
-									<label class="input__checkbox-label symbol__unchecked" data-get="is_default_for" data-get-into="for" for="is-default-{id}">Default <?php echo $item_type; ?> image?</label>
+									
+									<label class="input__checkbox-label">
+										<input class="input__checkbox" name="image_is_default" type="radio" value="1" {is_default} />
+										<span class="symbol__unchecked"><?= 'Default '.$item_type.' image?'; ?></span>
+									</label>
+									
 								</div>
 								<div class="input__group {delete_class}">
 									<label class="input__checkbox-label symbol__trash symbol--standalone image__delete"></label>
@@ -74,8 +93,12 @@
 							<div class="input__row">
 								<div class="input__group">
 									<label class="input__label">Credit</label>
-									<input class="input__checkbox" data-get="is_exclusive_for" data-get-into="id" id="is-exclusive-{id}" name="image_is_exclusive" type="checkbox" value="1" {is_exclusive} />
-									<label class="input__checkbox-label symbol__unchecked" data-get="is_exclusive_for" data-get-into="for" for="is-exclusive-{id}">Scanned by </label>
+									
+									<label class="input__checkbox-label">
+										<input class="input__checkbox" name="image_is_exclusive[]" type="checkbox" value="1" {is_exclusive} />
+										<span class="symbol__unchecked">Scanned by </span>
+									</label>
+									
 								</div>
 								<div class="input__group any--flex-grow">
 									<label class="input__label">Other credit</label>
@@ -84,9 +107,6 @@
 							</div>
 							
 						</div>
-						
-						<!-- Result -->
-						<div class="image__result text text--notice">{result}</div>
 					</li>
 				<?php
 				
