@@ -120,3 +120,18 @@
 	overflow: hidden;
 	width: 0;
 }
+.image__drop {
+	border: 3px dashed hsl(var(--background--bold));
+	cursor: pointer;
+	display: block;
+	margin: 0;
+	text-align: center;
+}
+.image__drop--hover, .image__drop:hover {
+	background: hsl(var(--background--bold));
+	border-color: hsl(var(--attention));
+}
+.image__paste {
+	margin-top: 1rem;
+	text-align: center;
+}
