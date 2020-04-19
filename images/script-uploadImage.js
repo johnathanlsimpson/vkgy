@@ -138,14 +138,14 @@ if(isAdvancedUpload) {
 	// When dragging over drop elem, add active class
 	['dragover', 'dragenter'].forEach(function(event) {
 		dropElem.addEventListener(event, function() {
-			dropElem.classList.add('dragover');
+			dropElem.classList.add('image__drop--hover');
 		});
 	});
 
 	// When leave drop elem, remove active class
 	['dragleave', 'dragend', 'drop'].forEach(function(event) {
 		dropElem.addEventListener(event, function() {
-			dropElem.classList.remove('dragover');
+			dropElem.classList.remove('image__drop--hover');
 		});
 	});
 
