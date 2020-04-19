@@ -19,7 +19,7 @@ if(is_numeric($_POST['id'])) {
 	// Clean data about image itself
 	$id           = sanitize($_POST['id']);
 	$item_type    = in_array($_POST['item_type'], $allowed_item_types) ? $_POST['item_type'] : 'other';
-	$item_id      = is_numeric($_POST['item_id']) ? $_POST['item_id'] : 0;
+	$item_id      = is_numeric($_POST['item_id']) ? $_POST['item_id'] : null;
 	
 	$description  = sanitize($_POST['description']) ?: (sanitize($_POST['default_description']) ?: null);
 	$friendly     = friendly($description) ?: null;
@@ -106,7 +106,7 @@ if(is_numeric($_POST['id'])) {
 						if($stmt_add_link->execute([ $id, $new_item_ids_value ])) {
 						}
 						else {
-							$output['result'][] = 'Couldn\'t add image-'.$new_link_table.' link.';
+							$output['result'][] = 'Couldn\'t link image to '.$new_link_table.'.';
 						}
 						
 					}
