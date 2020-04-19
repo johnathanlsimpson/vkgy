@@ -110,7 +110,7 @@
 							}
 						}
 						else {
-							$output['result'][] = 'Extension not allowed.';
+							$output['result'][] = 'Only jpg, jpeg, gif, or png accepted.';
 						}
 					}
 					else {
