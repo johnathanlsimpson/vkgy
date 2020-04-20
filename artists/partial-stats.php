@@ -94,7 +94,7 @@
 					$num_subgenres = count($current_tags['subgenres']);
 					
 					foreach($current_tags['subgenres'] as $tag_key => $tag) {
-						echo '<a href="/search/artist/?tags[]='.$tag['friendly'].'">'.str_replace( [' kei', '&#31995;' ], '', lang($tag['romaji'] ?: $tag['name'], $tag['name'], 'hidden') ).'</a>';
+						echo '<a href="/search/artists/?tags[]='.$tag['friendly'].'">'.str_replace( [' kei', '&#31995;' ], '', lang($tag['romaji'] ?: $tag['name'], $tag['name'], 'hidden') ).'</a>';
 						echo $tag_key + 1 < $num_subgenres ? '<span class="any--weaken">,</span> ' : null;
 					}
 					

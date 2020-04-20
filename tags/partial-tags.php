@@ -24,7 +24,7 @@
 								foreach($current_tags[$tag_type] as $tag_key => $tag) {
 									if($tag_type === 'subgenres') {
 										?>
-											<a class="text tag__container tag--subgenre <?= 'tag--'.$tag['friendly']; ?>" href="<?= '/search/'.$item_type.'/?tags[]='.$tag['friendly']; ?>">
+											<a class="text tag__container tag--subgenre <?= 'tag--'.$tag['friendly']; ?>" href="<?= '/search/'.$item_type.'s/?tags[]='.$tag['friendly']; ?>">
 												<span class="tag__thumbnail lazy"></span>
 												<span class="tag__name">
 													<?= $tag['romaji'] ? lang($tag['romaji'], $tag['name'], 'div') : $tag['name']; ?>
@@ -35,7 +35,7 @@
 									}
 									else {
 										?>
-											<a class="tag__container symbol__tag" href="<?= '/search/'.$item_type.'/?tags[]='.$tag['friendly']; ?>">
+											<a class="tag__container symbol__tag" href="<?= '/search/'.$item_type.'s/?tags[]='.$tag['friendly']; ?>">
 												<?= lang($tag['romaji'] ?: $tag['name'], $tag['name'], 'hidden'); ?>
 												<span class="any__note tag__num"><?= lang('×'.$tag['num_times_tagged'], $tag['num_times_tagged'].'回', 'hidden'); ?></span>
 												<?= $tag_key + 1 < $num_of_type ? '<span class="any--weaken">,</span> ' : null; ?>
