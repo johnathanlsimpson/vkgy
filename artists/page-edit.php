@@ -11,6 +11,7 @@
 		"/scripts/script-initSelectize.js",
 		'/scripts/script-initTribute.js',
 		
+		'/artists/script-partial-sidebar.js',
 		"/artists/script-previewBio.js",
 		"/artists/script-exclusive.js",
 		"/artists/script-page-edit.js",
@@ -41,7 +42,7 @@
 						
 						<input id="form__changes" name="changes" type="hidden" />
 						
-						<div class="col c1">
+						<div class="col <?= $_SESSION['can_approve_data'] ? 'c4-AAAB' : 'c1'; ?>">
 							<div>
 								<h2>Edit basic information</h2>
 								<div class="text">
@@ -147,6 +148,28 @@
 									</ul>
 								</div>
 							</div>
+							
+							<?php
+								if($_SESSION['can_approve_data']) {
+									
+									// Get tags
+									$item_type = 'artist';
+									$item_id = $artist['id'];
+									include_once('../tags/function-get_tags.php');
+									$tags = get_tags($pdo, $item_type, $item_id);
+									
+									// Grab only current tags
+									if(is_array($tags) && !empty($tags)) {
+										$current_tags = $tags['current_tags'];
+									}
+									
+									?>
+										<div>
+											<?php include('../tags/partial-delete.php'); ?>
+										</div>
+									<?php
+								}
+							?>
 						</div>
 						
 						<div class="col c2">

@@ -72,10 +72,12 @@ function submit(formElement, processorUrl, inputArgs) {
 	var args = setArguments(formElement, inputArgs);
 	
 	// Temporarily disable submit button to disable doubleclicks
-	args.submitButton[0].setAttribute('disabled', true);
-	setTimeout(function() {
-		args.submitButton[0].removeAttribute('disabled');
-	}, 1000);
+	if(args.submitButton && args.submitButton[0]) {
+		args.submitButton[0].setAttribute('disabled', true);
+		setTimeout(function() {
+			args.submitButton[0].removeAttribute('disabled');
+		}, 1000);
+	}
 	
 	// Reset result container
 	args.resultContainer.html("");
