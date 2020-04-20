@@ -42,3 +42,8 @@
 .any__tag::before {
 	margin-right: 0;
 }
+.tag--kote-kei .tag__thumbnail {
+	background-image: url('/images/36720-kote-kei.medium.png');
+	background-position: 44% 35%;
+	background-size: 280% auto;
+}
