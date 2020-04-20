@@ -616,111 +616,25 @@ $access_user = new access_user($pdo);
 										$stmt_check->execute([ $_SESSION["user_id"] ]);
 										$is_vip = $stmt_check->fetchColumn();
 									}
-
+									
+									// Get tags
+									$item_type = 'release';
+									$item_id = $release['id'];
+									include_once('../tags/function-get_tags.php');
+									$tags = get_tags($pdo, $item_type, $item_id);
+									
+									// Loop through tags and do some stuff
+									if(is_array($tags) && !empty($tags)) {
+										
+										$all_tags = $tags['all_tags'];
+										$current_tags = $tags['current_tags'];
+										$user_tags = $tags['user_tags'];
+										$tag_types = $tags['tag_types'];
+										
+									}
+									include('../tags/partial-tags.php');
+									
 								?>
-								
-								
-								
-								
-					<?php
-						
-					
-		
-		// Get tags
-		$item_type = 'release';
-		$item_id = $release['id'];
-		
-		include_once('../tags/function-get_tags.php');
-		$tags = get_tags($pdo, $item_type, $item_id);
-		
-		// Loop through tags and do some stuff
-		if(is_array($tags) && !empty($tags)) {
-			
-			$all_tags = $tags['all_tags'];
-			$current_tags = $tags['current_tags'];
-			$user_tags = $tags['user_tags'];
-			$tag_types = $tags['tag_types'];
-			
-			// Loop through current tags and set some flags for artist
-			/*if(is_array($current_tags) && !empty($current_tags)) {
-				foreach($current_tags as $numeric_key => $tag) {
-					
-					// Set flags
-					if($tag['friendly'] === 'exclusive') {
-						$artist_is_exclusive = true;
-					}
-					if($tag['friendly'] === 'non-visual') {
-						$artist_is_non_visual = true;
-					}
-					if($tag['friendly'] === 'removed') {
-						$artist_is_removed = true;
-					}
-					
-				}
-			}*/
-			
-		}
-					
-					
-					
-					
-					
-					
-						include('../tags/partial-tags.php');
-					?>
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								<h3>
-									Tags <sup class="any--weaken">&beta;</sup>
-								</h3>
-								<div class="text text--outlined">
-									<?php
-										if(is_array($rslt_curr_tags) && !empty($rslt_curr_tags)) {
-											foreach($rslt_curr_tags as $tag) {
-												echo '<a class="any__tag any__tag--selected" href="/search/releases/?tag='.$tag["friendly"].'#result" style="display: inline-block;">'.$tag["name"].' ('.$tag["num_times_tagged"].')'.'</a> ';
-											}
-
-											echo '<hr />';
-										}
-
-										echo '<h5>Add tags</h5>';
-					
-										if($_SESSION["is_signed_in"]) {
-											if(is_array($rslt_tags) && !empty($rslt_tags)) {
-												foreach($rslt_tags as $tag) {
-													$is_selected = $user_tags[ $tag['id'] ];
-													echo '<label data-id="'.$release["id"].'" data-tag_id="'.$tag["id"].'" class="release__tag symbol__tag any__tag '.($is_selected ? "any__tag--selected" : null).'" style="display: inline-block;">'.$tag["name"].'</label> ';
-												}
-											}
-										}
-										else {
-											echo '<span class="symbol__error"><a class="a--inherit" href="/account/">Sign in</a> to add tags.';
-										}
-										if($_SESSION["is_moderator"] && $needs_admin_tags) {
-											echo '<hr />';
-											echo '<h5>Remove admin tags</h5>';
-
-											if(is_array($rslt_tags) && !empty($rslt_tags)) {
-												foreach($rslt_tags as $tag) {
-													if($tag["is_admin_tag"] && in_array($tag["id"], $rslt_curr_tag_ids)) {
-														echo '<label data-action="delete" data-id="'.$release["id"].'" data-tag_id="'.$tag["id"].'" class="release__tag symbol__tag any__tag any__tag--selected" style="display: inline-block;">'.$tag["name"].'</label> ';
-													}
-												}
-											}
-										}
-									?>
-								</div>
 
 								<h3>
 									Contributors and updates
