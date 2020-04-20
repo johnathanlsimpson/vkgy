@@ -1,5 +1,5 @@
 // Tag items
-$('.any__tag').on("click", function() {
+$('.tag__wrapper .any__tag').on("click", function() {
 	$(this).removeClass("symbol__tag symbol__loading symbol__error");
 });
 
