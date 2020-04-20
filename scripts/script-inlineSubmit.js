@@ -71,7 +71,16 @@ function initializeInlineSubmit(formElement, processorUrl, inputArgs = {}) {
 function submit(formElement, processorUrl, inputArgs) {
 	var args = setArguments(formElement, inputArgs);
 	
-	//args.resultContainer.html("");
+	// Temporarily disable submit button to disable doubleclicks
+	if(args.submitButton && args.submitButton[0]) {
+		args.submitButton[0].setAttribute('disabled', true);
+		setTimeout(function() {
+			args.submitButton[0].removeAttribute('disabled');
+		}, 1000);
+	}
+	
+	// Reset result container
+	args.resultContainer.html("");
 	args.statusContainer.removeClass(args.removeClasses);
 	args.statusContainer.addClass(args.loadingClass);
 	
@@ -192,5 +201,8 @@ function submit(formElement, processorUrl, inputArgs) {
 				}
 			}
 		}
+		
+		// Re-enable submit button
+		args.submitButton[0].removeAttribute('disabled');
 	});
 }

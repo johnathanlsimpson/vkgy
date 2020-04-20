@@ -1,0 +1,44 @@
+.tag__wrapper {
+	padding-bottom: 0;
+}
+.tag__wrapper:last-of-type {
+	margin-bottom: -1rem;
+}
+.tag__container {
+	display: inline-block;
+	margin-bottom: 1rem;
+	vertical-align: middle;
+}
+.tag__container,
+.tag__name,
+.tag__name * {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.tag--subgenre {
+	align-items: center;
+	display: flex;
+}
+.tag__thumbnail {
+	align-self: stretch;
+	background: hsl(var(--background--secondary));
+	background-position: center;
+	background-size: cover;
+	box-sizing: border-box;
+	margin: -1rem;
+	margin-right: 1ch;
+	min-width: 25px;
+	padding: 25% 25% 0 0;
+}
+.any__tag {
+	display: inline-block;
+	margin: 0 0.25rem 0.5rem 0;
+}
+.any__tag:last-of-type {
+	margin-bottom: 1rem;
+}
+.any__tag::before {
+	margin-right: 0;
+}

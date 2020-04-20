@@ -179,7 +179,7 @@ if($artist_is_viewable) {
 	}
 	
 	// Tags
-	include("../artists/page-tags.php");
+	include('../tags/partial-tags.php');
 	
 	// Popularity
 	include("../artists/partial-ranking.php");

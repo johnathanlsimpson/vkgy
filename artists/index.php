@@ -152,47 +152,39 @@
 		$stmt_next->execute([ $artist["friendly"], $artist["friendly"] ]);
 		$rslt_next = $stmt_next->fetchAll();
 		
-		// Tags
-		$sql_tags = "SELECT * FROM tags_artists ORDER BY friendly ASC";
-		$stmt_tags = $pdo->prepare($sql_tags);
-		$stmt_tags->execute();
-		$rslt_tags = $stmt_tags->fetchAll();
+		// Get tags
+		$item_type = 'artist';
+		$item_id = $artist['id'];
 		
-		$sql_curr_tags = "SELECT tags_artists.*, COUNT(artists_tags.id) AS num_times_tagged FROM artists_tags LEFT JOIN tags_artists ON tags_artists.id=artists_tags.tag_id WHERE artists_tags.artist_id=? GROUP BY artists_tags.tag_id";
-		$stmt_curr_tags = $pdo->prepare($sql_curr_tags);
-		$stmt_curr_tags->execute([ $artist["id"] ]);
-		$rslt_curr_tags = $stmt_curr_tags->fetchAll();
+		include_once('../tags/function-get_tags.php');
+		$tags = get_tags($pdo, $item_type, $item_id);
 		
-		if(is_array($rslt_curr_tags) && !empty($rslt_curr_tags)) {
-			foreach($rslt_curr_tags as $tag) {
-				$needs_admin_tags = $needs_admin_tags ?: ($tag["is_admin_tag"] ?: false);
-				$rslt_curr_tag_ids[] = $tag["id"];
-				
-				if($tag['friendly'] === 'exclusive') {
-					$artist_is_exclusive = true;
-				}
-				
-				if($tag['friendly'] === 'non-visual') {
-					$artist_is_non_visual = true;
-				}
-				
-				if($tag['friendly'] === 'removed') {
-					$artist_is_removed = true;
-				}
-			}
-		}
-		
-		if($_SESSION["is_signed_in"]) {
-			$sql_user_tags = "SELECT tag_id FROM artists_tags WHERE artist_id=? AND user_id=?";
-			$stmt_user_tags = $pdo->prepare($sql_user_tags);
-			$stmt_user_tags->execute([ $artist["id"], $_SESSION["user_id"] ]);
-			$rslt_user_tags = $stmt_user_tags->fetchAll();
+		// Loop through tags and do some stuff
+		if(is_array($tags) && !empty($tags)) {
 			
-			if(is_array($rslt_user_tags) && !empty($rslt_user_tags)) {
-				foreach($rslt_user_tags as $key => $tag) {
-					$rslt_user_tags[$key] = $tag["tag_id"];
+			$all_tags = $tags['all_tags'];
+			$current_tags = $tags['current_tags'];
+			$user_tags = $tags['user_tags'];
+			$tag_types = $tags['tag_types'];
+			
+			// Loop through current tags and set some flags for artist
+			if(is_array($current_tags) && !empty($current_tags)) {
+				foreach($current_tags as $numeric_key => $tag) {
+					
+					// Set flags
+					if($tag['friendly'] === 'exclusive') {
+						$artist_is_exclusive = true;
+					}
+					if($tag['friendly'] === 'non-visual') {
+						$artist_is_non_visual = true;
+					}
+					if($tag['friendly'] === 'removed') {
+						$artist_is_removed = true;
+					}
+					
 				}
 			}
+			
 		}
 		
 		// History
