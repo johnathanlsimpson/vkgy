@@ -24,6 +24,14 @@ function initImageEditElems() {
 	});
 }
 
+let x = document.querySelector('.image__no-default:last-of-type [name="image_is_default"]');
+x.addEventListener('change', function() {
+	let y = document.querySelectorAll('.image__results .image__template [name="image_is_default"]');
+	y.forEach(function(z) {
+		z.dispatchEvent(new Event('change'));
+	});
+});
+
 
 // Init delete buttons
 function initImageDeleteButtons() {
