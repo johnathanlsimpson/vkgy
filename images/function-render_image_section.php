@@ -89,4 +89,6 @@ function render_image_section($images, $args = []) {
 	$args['extant_images'] = implode("\n", $rendered_images);
 	
 	echo render_component($image_upload_template, $args);
+	echo '	<style>.input__checkbox-label { white-space:nowrap; max-width: 100%; overflow:hidden; text-overflow:ellipsis; width:auto; } </style>
+		';
 }

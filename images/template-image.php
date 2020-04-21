@@ -109,6 +109,14 @@
 						</div>
 					</li>
 				<?php
+	
+	echo '
+		<li class="image__no-default any--flex">
+			<label class="input__checkbox-label">
+				<input class="input__checkbox" name="image_is_default" type="radio" value="0"  />
+				<span class="symbol__unchecked">No default image</span>
+			</label>
+		</li>';
 				
 				$image_template = ob_get_clean();
 				echo $image_template;
