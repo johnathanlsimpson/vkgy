@@ -201,8 +201,5 @@ function submit(formElement, processorUrl, inputArgs) {
 				}
 			}
 		}
-		
-		// Re-enable submit button
-		args.submitButton[0].removeAttribute('disabled');
 	});
 }
