@@ -10,12 +10,6 @@
 	]);
 ?>
 
-<?php
-if($_SESSION['username'] === 'inartistic') {
-	$access_points = new access_points($pdo);
-}
-?>
-
 <div class="col c4-ABBC section__main">
 	<div class="main__left">
 		<div class="main__aod">
