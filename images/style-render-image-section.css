@@ -8,7 +8,7 @@
 	height: 100px;
 	line-height: 1rem;
 	margin-right: 1rem;
-	margin-top: 0.5rem;
+	margin-top: 0;
 	text-align: right;
 	width: 100px;
 }
@@ -78,7 +78,13 @@
 	display: block;
 }
 .image__message {
+	margin-top: -1rem !important;
+}
+.image__markdown {
 	margin-top: 0 !important;
+}
+.image__markdown [data-get="image_markdown"] {
+	margin-bottom: 0.5rem;
 }
 .image__result:not(:empty) {
 	margin-top: 0.5rem;
@@ -87,7 +93,10 @@
 	display: none;
 	line-height: 1;
 	position: absolute;
-	top: 1rem;
+	top: 0.5rem;
+}
+.image__details {
+	margin-top: 0 !important;
 }
 [name="image_is_exclusive[]"] + ::after {
 	content: "vkgy user?";
@@ -102,11 +111,14 @@
 [data-hide-labels="1"] .image__labels,
 [data-hide-musicians="1"] .image__musicians,
 [data-hide-releases="1"] .image__releases {
+	/* Not sure why I had these invisible rather than display: none; guess we'll find out
 	flex: none;
 	height: 0;
 	margin-bottom: -0.5rem;
 	overflow: hidden;
-	width: 0;
+	white-space: nowrap;
+	width: 0;*/
+	display: none;
 }
 .image__drop {
 	border: 3px dashed hsl(var(--background--bold));

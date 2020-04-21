@@ -492,6 +492,10 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 					let idElem = newImageTemplateArgs.thisImageElem.querySelector('[name="image_id"]');
 					idElem.value = returnedData.image_id;
 					
+					// While uploading, thumbnail may be a huge blob of image data, so replace with actual thumbnail after
+					let thumbnailElem = newImageTemplateArgs.thisImageElem.querySelector('.image__image');
+					thumbnailElem.setAttribute('style', returnedData.image_style);
+					
 					// After ID is set init buttons in new image element
 					lookForSelectize();
 					initImageEditElems();

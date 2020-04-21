@@ -23,14 +23,6 @@
 							<input name="image_item_id" value="{item_id}" hidden />
 							<input name="image_is_queued" value="{is_queued}" hidden />
 							
-							<!-- Markdown code -->
-							<div class="input__row image__markdown">
-								<div class="input__group any--flex-grow">
-									<label class="input__label">Markdown code</label>
-									<span data-get="image_markdown">{image_markdown}</span>
-								</div>
-							</div>
-							
 							<!-- Description, default, delete -->
 							<div class="input__row image__message">
 								<div class="input__group any--flex-grow">
@@ -46,8 +38,16 @@
 								</div>
 							</div>
 							
+							<!-- Markdown code -->
+							<div class="input__row image__markdown">
+								<div class="input__group any--flex-grow">
+									<label class="input__label">Markdown code</label>
+									<span data-get="image_markdown">{image_markdown}</span>
+								</div>
+							</div>
+							
 							<!-- Description, default, delete -->
-							<div class="input__row">
+							<div class="input__row image__details">
 								<div class="input__group any--flex-grow">
 									<label class="input__label">Description</label>
 									<input class="any--flex-grow" data-get="description" data-get-into="value" name="image_description" placeholder="description" value="{description}" />
