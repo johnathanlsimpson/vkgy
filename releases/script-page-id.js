@@ -14,10 +14,10 @@ for(var i = 0; i < $(".collect").length; i++) {
 		preparedFormData: { "id" : releaseId, "action" : $(thisCollectButton).attr("data-action") },
 		callbackOnSuccess: function(formElement, returnedData) {
 				if(returnedData.is_checked) {
-					$(formElement).addClass("input__checkbox-label--selected");
+					$(formElement).addClass("input__radio--selected");
 				}
 				else {
-					$(formElement).removeClass("symbol__success symbol__checked input__checkbox-label--selected").addClass("symbol__unchecked");
+					$(formElement).removeClass("symbol__success symbol__checked input__radio--selected").addClass("symbol__unchecked");
 				}
 		}
 	});

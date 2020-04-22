@@ -253,10 +253,10 @@ $access_user = new access_user($pdo);
 											
 											<div class="input__row">
 												<div class="input__group">
-													<label class="collect input__checkbox-label <?php echo $release["is_owned"] ? "input__checkbox-label--selected symbol__checked" : "symbol__unchecked"; ?>" data-action="own" data-id="<?php echo $release["id"]; ?>">I own this</label>
+													<label class="collect input__radio <?php echo $release["is_owned"] ? "input__radio--selected symbol__checked" : "symbol__unchecked"; ?>" data-action="own" data-id="<?php echo $release["id"]; ?>">I own this</label>
 												</div>
 												<div class="input__group">
-													<label class="collect input__checkbox-label <?php echo $release["is_wanted"] ? "input__checkbox-label--selected symbol__checked" : "symbol__unchecked"; ?>" data-action="want" data-id="<?php echo $release["id"]; ?>">I want this</label>
+													<label class="collect input__radio <?php echo $release["is_wanted"] ? "input__radio--selected symbol__checked" : "symbol__unchecked"; ?>" data-action="want" data-id="<?php echo $release["id"]; ?>">I want this</label>
 												</div>
 												
 												<div class="collect__result text text--outlined text--notice symbol__help"></div>

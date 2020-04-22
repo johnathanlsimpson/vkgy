@@ -25,7 +25,7 @@
 						$checked = (isset($current_avatar[$group_name][$layer_name]["shapes"][$shape_name]) ? "checked" : (!$current_avatar[$group_name][$layer_name]["shapes"] && $shape_name === array_keys($layer["shapes"])[0] ? "checked" : null));
 						
 						?>
-							<input class="input__checkbox any--hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" type="radio" value="<?php echo $value; ?>" <?php echo $checked; ?> />
+							<input class="input__choice any--hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" type="radio" value="<?php echo $value; ?>" <?php echo $checked; ?> />
 						<?php
 					}
 				}
@@ -38,7 +38,7 @@
 						$checked = (isset($current_avatar[$group_name][$layer_name]["colors"][$color_name]) ? "checked" : (!$current_avatar[$group_name][$layer_name]["colors"] && $color_name === array_keys($layer["colors"])[0] ? "checked" : null));
 						
 						?>
-							<input class="input__checkbox any--hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" type="radio" value="<?php echo $value; ?>" <?php echo $checked; ?> />
+							<input class="input__choice any--hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" type="radio" value="<?php echo $value; ?>" <?php echo $checked; ?> />
 						<?php
 					}
 				}
@@ -51,7 +51,7 @@
 						$checked = (isset($current_avatar[$group_name][$layer_name]['positions'][$position_name]) ? 'checked' : (!$current_avatar[$group_name][$layer_name]['positions'] && $position_name === array_keys($layer['positions'])[0] ? 'checked' : null));
 						
 						?>
-							<input class="input__checkbox any--hidden" id="<?= $id; ?>" name="<?= $name; ?>" type="radio" value="<?= $value; ?>" <?= $checked; ?> />
+							<input class="input__choice any--hidden" id="<?= $id; ?>" name="<?= $name; ?>" type="radio" value="<?= $value; ?>" <?= $checked; ?> />
 						<?php
 					}
 				}
@@ -131,7 +131,7 @@
 															
 															foreach($layer["shapes"] as $shape_name => $shape) {
 																$is_checked = (isset($current_avatar[$group_name][$layer_name]["shapes"][$shape_name]) ? true : (!$current_avatar[$group_name][$layer_name]["shapes"] && $shape_name === array_keys($layer["shapes"])[0] ? true : false));
-																$class = "input__checkbox-label symbol__unchecked ".(is_array($shape) && $shape["is_vip"] ? "avatar--vip" : null);
+																$class = "input__radio symbol__unchecked ".(is_array($shape) && $shape["is_vip"] ? "avatar--vip" : null);
 																$for = "{$group_name}__{$layer_name}--{$shape_name}";
 																
 																$image_url = '/avatar/images/'.$group_name.'-'.$layer_name.'-'.$shape_name.'.gif';
@@ -161,7 +161,7 @@
 															foreach($layer["colors"] as $color_name => $color) {
 																if($color) {
 																	$is_checked = (isset($current_avatar[$group_name][$layer_name]["colors"][$color_name]) ? true : (!$current_avatar[$group_name][$layer_name]["colors"] && $color_name === array_keys($layer["colors"])[0] ? true : false));
-																	$class = "input__checkbox-label avatar__color-label symbol__unchecked ".(is_array($color) && $color["is_vip"] ? "avatar--vip" : null);
+																	$class = "input__radio avatar__color-label symbol__unchecked ".(is_array($color) && $color["is_vip"] ? "avatar--vip" : null);
 																	$for = "{$group_name}__{$layer_name}--{$color_name}";
 																	$background_css = is_array($color) ? ($color['form_background'] ? 'background: '.$color['form_background'].';' : 'background-color: '.$color['color'].';') : 'background-color: '.$color.';';
 																	?>
@@ -191,7 +191,7 @@
 															}
 															
 															foreach($layer['positions'] as $position_name => $position) {
-																$class = 'input__checkbox-label avatar__position-label symbol__unchecked '.(is_array($position) && $position['is_vip'] ? 'avatar--vip' : null);
+																$class = 'input__radio avatar__position-label symbol__unchecked '.(is_array($position) && $position['is_vip'] ? 'avatar--vip' : null);
 																$for = "{$group_name}__{$layer_name}--{$position_name}";
 																echo '<label class="'.$class.'" for="'.$for.'">'.$position_name.'</label>';
 															}

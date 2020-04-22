@@ -208,32 +208,32 @@
 				</div>
 				<div class="input__row">
 					<div class="input__group">
-						<input class="input__checkbox" id="any" name="label_involvement" type="radio" value="" <?php echo (empty($search["label_involvement"]) || $search["label_involvement"] === "" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="any">Any involvement</label>
+						<input class="input__choice" id="any" name="label_involvement" type="radio" value="" <?php echo (empty($search["label_involvement"]) || $search["label_involvement"] === "" ? "checked" : null); ?> />
+						<label class="symbol__unchecked input__radio" for="any">Any involvement</label>
 					</div>
 					<div class="input__group">
-						<input class="input__checkbox" id="label" name="label_involvement" type="radio" value="label" <?php echo ($search["label_involvement"] === "label" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="label">Management</label>
+						<input class="input__choice" id="label" name="label_involvement" type="radio" value="label" <?php echo ($search["label_involvement"] === "label" ? "checked" : null); ?> />
+						<label class="symbol__unchecked input__radio" for="label">Management</label>
 					</div>
 					<div class="input__group">
-						<input class="input__checkbox" id="publisher" name="label_involvement" type="radio" value="publisher" <?php echo ($search["label_involvement"] === "publisher" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="publisher">Publisher</label>
+						<input class="input__choice" id="publisher" name="label_involvement" type="radio" value="publisher" <?php echo ($search["label_involvement"] === "publisher" ? "checked" : null); ?> />
+						<label class="symbol__unchecked input__radio" for="publisher">Publisher</label>
 					</div>
 					<div class="input__group">
-						<input class="input__checkbox" id="distributor" name="label_involvement" type="radio" value="distributor" <?php echo ($search["label_involvement"] === "distributor" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="distributor">Distributor</label>
+						<input class="input__choice" id="distributor" name="label_involvement" type="radio" value="distributor" <?php echo ($search["label_involvement"] === "distributor" ? "checked" : null); ?> />
+						<label class="symbol__unchecked input__radio" for="distributor">Distributor</label>
 					</div>
 					<div class="input__group">
-						<input class="input__checkbox" id="marketer" name="label_involvement" type="radio" value="marketer" <?php echo ($search["label_involvement"] === "marketer" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="marketer">Marketer</label>
+						<input class="input__choice" id="marketer" name="label_involvement" type="radio" value="marketer" <?php echo ($search["label_involvement"] === "marketer" ? "checked" : null); ?> />
+						<label class="symbol__unchecked input__radio" for="marketer">Marketer</label>
 					</div>
 					<div class="input__group">
-						<input class="input__checkbox" id="manufacturer" name="label_involvement" type="radio" value="manufacturer" <?php echo ($search["label_involvement"] === "manufacturer" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="manufacturer">Manufacturer</label>
+						<input class="input__choice" id="manufacturer" name="label_involvement" type="radio" value="manufacturer" <?php echo ($search["label_involvement"] === "manufacturer" ? "checked" : null); ?> />
+						<label class="symbol__unchecked input__radio" for="manufacturer">Manufacturer</label>
 					</div>
 					<div class="input__group">
-						<input class="input__checkbox" id="organizer" name="label_involvement" type="radio" value="organizer" <?php echo ($search["label_involvement"] === "organizer" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="organizer">Organizer</label>
+						<input class="input__choice" id="organizer" name="label_involvement" type="radio" value="organizer" <?php echo ($search["label_involvement"] === "organizer" ? "checked" : null); ?> />
+						<label class="symbol__unchecked input__radio" for="organizer">Organizer</label>
 					</div>
 				</div>
 				<div class="any--weaken-color symbol__help search__note">
@@ -368,8 +368,8 @@
 							<label class="input__label">
 								Search releases by tag
 							</label>
-							<input class="input__checkbox" id="tag[0]" name="tag" type="radio" value="" <?php echo (empty($search["tag"]) || $search["tag"] === "" ? "checked" : null); ?> />
-							<label class="symbol__unchecked input__checkbox-label" for="tag[0]">any tag</label>
+							<input class="input__choice" id="tag[0]" name="tag" type="radio" value="" <?php echo (empty($search["tag"]) || $search["tag"] === "" ? "checked" : null); ?> />
+							<label class="symbol__unchecked input__radio" for="tag[0]">any tag</label>
 						</div>
 						<?php
 							$sql_tags = "SELECT * FROM tags_releases ORDER BY friendly ASC";
@@ -381,8 +381,8 @@
 								foreach($rslt_tags as $i => $tag) {
 									?>
 										<div class="input__group">
-											<input class="input__checkbox" id="tag[<?php echo $i+1; ?>]" name="tag" type="radio" value="<?php echo $tag["friendly"]; ?>" <?php echo ($search["tag"] === $tag["friendly"] ? "checked" : null); ?> />
-											<label class="symbol__unchecked input__checkbox-label" for="tag[<?php echo $i+1; ?>]"><?php echo $tag["name"]; ?></label>
+											<input class="input__choice" id="tag[<?php echo $i+1; ?>]" name="tag" type="radio" value="<?php echo $tag["friendly"]; ?>" <?php echo ($search["tag"] === $tag["friendly"] ? "checked" : null); ?> />
+											<label class="symbol__unchecked input__radio" for="tag[<?php echo $i+1; ?>]"><?php echo $tag["name"]; ?></label>
 										</div>
 									<?php
 								}
@@ -437,26 +437,26 @@
 				
 				<div>
 					<a href="?order=<?php echo ($search['order'] === 'date_occurred_desc' ? 'date_occurred_asc' : 'date_occurred_desc').$base_url; ?>">
-						<label class="search__sort input__checkbox-label <?php echo substr($search['order'], 0, 4) === 'date' || !$search['order'] ? 'input__checkbox-label--selected' : null; ?> <?php echo $search['order'] === 'date_occurred_asc' ? 'symbol__up-caret' : 'symbol__down-caret'; ?>">Date</label>
+						<label class="search__sort input__radio <?php echo substr($search['order'], 0, 4) === 'date' || !$search['order'] ? 'input__radio--selected' : null; ?> <?php echo $search['order'] === 'date_occurred_asc' ? 'symbol__up-caret' : 'symbol__down-caret'; ?>">Date</label>
 					</a>
 					<a href="?order=<?php echo ($search['order'] === 'name_asc' ? 'name_desc' : 'name_asc').$base_url; ?>">
-						<label class="search__sort input__checkbox-label <?php echo substr($search['order'], 0, 4) === 'name' ? 'input__checkbox-label--selected' : null; ?> <?php echo $search['order'] === 'name_desc' ? 'symbol__down-caret' : 'symbol__up-caret'; ?>">A-Z</label>
+						<label class="search__sort input__radio <?php echo substr($search['order'], 0, 4) === 'name' ? 'input__radio--selected' : null; ?> <?php echo $search['order'] === 'name_desc' ? 'symbol__down-caret' : 'symbol__up-caret'; ?>">A-Z</label>
 					</a>
 					<a href="?order=<?php echo ($search['order'] === 'upc_asc' ? 'upc_desc' : 'upc_asc').$base_url; ?>">
-						<label class="search__sort input__checkbox-label <?php echo substr($search['order'], 0, 3) === 'upc' ? 'input__checkbox-label--selected' : null; ?> <?php echo $search['order'] === 'upc_desc' ? 'symbol__down-caret' : 'symbol__up-caret'; ?>">UPC</label>
+						<label class="search__sort input__radio <?php echo substr($search['order'], 0, 3) === 'upc' ? 'input__radio--selected' : null; ?> <?php echo $search['order'] === 'upc_desc' ? 'symbol__down-caret' : 'symbol__up-caret'; ?>">UPC</label>
 					</a>
 					
-					<input class="input__checkbox" id="filter--all" name="filter" type="radio" checked />
-					<label class="search__filter input__checkbox-label symbol__unchecked" data-filter="" data-target="" for="filter--all"><?= lang('all', '全て', 'hidden'); ?></label>
+					<input class="input__choice" id="filter--all" name="filter" type="radio" checked />
+					<label class="search__filter input__radio symbol__unchecked" data-filter="" data-target="" for="filter--all"><?= lang('all', '全て', 'hidden'); ?></label>
 					
-					<input class="input__checkbox" id="filter--cd" name="filter" type="radio" />
-					<label class="search__filter input__checkbox-label symbol__unchecked" data-filter="cd" data-target="" for="filter--cd">CD</label>
+					<input class="input__choice" id="filter--cd" name="filter" type="radio" />
+					<label class="search__filter input__radio symbol__unchecked" data-filter="cd" data-target="" for="filter--cd">CD</label>
 					
-					<input class="input__checkbox" id="filter--dvd" name="filter" type="radio" />
-					<label class="search__filter input__checkbox-label symbol__unchecked" data-filter="dvd" data-target="" for="filter--dvd"><?= lang('video', '映像', 'hidden'); ?></label>
+					<input class="input__choice" id="filter--dvd" name="filter" type="radio" />
+					<label class="search__filter input__radio symbol__unchecked" data-filter="dvd" data-target="" for="filter--dvd"><?= lang('video', '映像', 'hidden'); ?></label>
 					
-					<input class="input__checkbox" id="filter--other" name="filter" type="radio" />
-					<label class="search__filter input__checkbox-label symbol__unchecked" data-filter="other" data-target="" for="filter--other"><?= lang('other', 'その他', 'hidden'); ?></label>
+					<input class="input__choice" id="filter--other" name="filter" type="radio" />
+					<label class="search__filter input__radio symbol__unchecked" data-filter="other" data-target="" for="filter--other"><?= lang('other', 'その他', 'hidden'); ?></label>
 					
 					<div class="search__clear"></div>
 					

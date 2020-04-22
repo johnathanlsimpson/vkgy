@@ -29,7 +29,7 @@ resetButton.addEventListener('click', function(event) {
 
 // Randomize/reset avatar parts (loop through and hide all but one layer)
 function chooseAvatarParts(method) {
-	var radioElems = document.querySelectorAll('[name=form__avatar] .input__checkbox');
+	var radioElems = document.querySelectorAll('[name=form__avatar] .input__choice');
 	var elemName, prevName, selectedNum;
 	
 	for(var i=0; i<radioElems.length; i++) {

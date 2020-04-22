@@ -149,7 +149,7 @@
 				?>
 					<div class="senary-nav__container any--margin">
 						<div class="senary-nav__left">
-							<a class="input__checkbox-label input__checkbox-label--selected <?php echo $_GET['order'] === 'asc' ? 'symbol__up-caret' : 'symbol__down-caret'; ?>" href="<?php echo '&order='.($_GET['order'] === 'asc' ? 'desc' : 'asc').'&'.http_build_query($q); ?>">Date</a>
+							<a class="input__radio input__radio--selected <?php echo $_GET['order'] === 'asc' ? 'symbol__up-caret' : 'symbol__down-caret'; ?>" href="<?php echo '&order='.($_GET['order'] === 'asc' ? 'desc' : 'asc').'&'.http_build_query($q); ?>">Date</a>
 						</div>
 						
 						<div class="senary-nav__center">
