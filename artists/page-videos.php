@@ -50,7 +50,7 @@ style([
 									<?php
 										if($_SESSION['can_delete_data']) {
 											?>
-												<button class="video__delete input__checkbox-label symbol__trash symbol--standalone any--no-wrap" data-id="{video_id}"></button>
+												<button class="video__delete input__radio symbol__trash symbol--standalone any--no-wrap" data-id="{video_id}"></button>
 											<?php
 										}
 									?>

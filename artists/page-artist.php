@@ -114,12 +114,12 @@ $in_page_navs = array_filter($in_page_navs);
 										<?= lang('History', '活動', 'div'); ?>
 									</h2>
 									<div>
-										<label class="input__checkbox-label symbol__unchecked" for="history__all"><?= lang('all', '全て', 'hidden'); ?></label>
-										<label class="input__checkbox-label symbol__unchecked" for="history__activity"><?= lang('activity', '活動', 'hidden'); ?></label>
-										<label class="input__checkbox-label symbol__unchecked" for="history__release"><?= lang('release', 'リリース', 'hidden'); ?></label>
-										<label class="input__checkbox-label symbol__unchecked" for="history__member"><?= lang('member change', 'メンバーチェンジ', 'hidden'); ?></label>
-										<label class="input__checkbox-label symbol__unchecked" for="history__live"><?= lang('live', 'イベント', 'hidden'); ?></label>
-										<label class="input__checkbox-label symbol__unchecked" for="history__other"><?= lang('other', 'その他', 'hidden'); ?></label>
+										<label class="input__radio symbol__unchecked" for="history__all"><?= lang('all', '全て', 'hidden'); ?></label>
+										<label class="input__radio symbol__unchecked" for="history__activity"><?= lang('activity', '活動', 'hidden'); ?></label>
+										<label class="input__radio symbol__unchecked" for="history__release"><?= lang('release', 'リリース', 'hidden'); ?></label>
+										<label class="input__radio symbol__unchecked" for="history__member"><?= lang('member change', 'メンバーチェンジ', 'hidden'); ?></label>
+										<label class="input__radio symbol__unchecked" for="history__live"><?= lang('live', 'イベント', 'hidden'); ?></label>
+										<label class="input__radio symbol__unchecked" for="history__other"><?= lang('other', 'その他', 'hidden'); ?></label>
 									</div>
 								</div>
 								<div class="text bio__container">

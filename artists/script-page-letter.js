@@ -1,6 +1,6 @@
 $(document).on("click", "[data-filter]", function() {
-	$("[data-filter]").removeClass("input__checkbox-label--selected");
-	$(this).addClass("input__checkbox-label--selected");
+	$("[data-filter]").removeClass("input__radio--selected");
+	$(this).addClass("input__radio--selected");
 });
 
 // Look for dropdowns, apply selectize() when appropriate

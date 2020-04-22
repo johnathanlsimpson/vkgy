@@ -24,13 +24,17 @@ function initImageEditElems() {
 	});
 }
 
-let x = document.querySelector('.image__no-default:last-of-type [name="image_is_default"]');
-x.addEventListener('change', function() {
-	let y = document.querySelectorAll('.image__results .image__template [name="image_is_default"]');
-	y.forEach(function(z) {
-		z.dispatchEvent(new Event('change'));
+let noDefaultElem = document.querySelector('.image__no-default:last-of-type [name="image_is_default"]');
+if(noDefaultElem) {
+	noDefaultElem.addEventListener('change', function() {
+		let otherDefaultElems = document.querySelectorAll('.image__results .image__template [name="image_is_default"]');
+		if(otherDefaultElems && otherDefaultElems.length) {
+			otherDefaultElems.forEach(function(otherDefaultElem) {
+				otherDefaultElem.dispatchEvent(new Event('change'));
+			});
+		}
 	});
-});
+}
 
 
 // Init delete buttons
@@ -439,7 +443,7 @@ function showImageSection() {
 	imagesElem.prepend(newImageElem);
 	
 	// If this is the first image for the item, automatically make it the default image
-	let isDefaultElems = document.querySelectorAll('[name="image_is_default"]');
+	let isDefaultElems = document.querySelectorAll('.image__template [name="image_is_default"]');
 	if(isDefaultElems.length === 1) {
 		isDefaultElems[0].checked = true;
 	}

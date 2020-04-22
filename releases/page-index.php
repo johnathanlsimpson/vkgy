@@ -95,15 +95,15 @@
 
 					<div class="calendar__controls any--flex any--flex-space-between">
 						<div>
-							<label class="input__checkbox-label" for="order-by--date-asc">date <span class="symbol__up-caret"></span></label>
-							<label class="input__checkbox-label" for="order-by--date-desc">date <span class="symbol__down-caret"></span></label>
-							<label class="input__checkbox-label" for="order-by--name">A-Z</label>
+							<label class="input__radio" for="order-by--date-asc">date <span class="symbol__up-caret"></span></label>
+							<label class="input__radio" for="order-by--date-desc">date <span class="symbol__down-caret"></span></label>
+							<label class="input__radio" for="order-by--name">A-Z</label>
 						</div>
 						<div>
-							<label class="input__checkbox-label" for="filter--all">all</label>
-							<label class="input__checkbox-label" for="filter--cd">CD</label>
-							<label class="input__checkbox-label" for="filter--dvd"><?= lang('video', '映像', 'hidden'); ?></label>
-							<label class="input__checkbox-label" for="filter--other">other</label>
+							<label class="input__radio" for="filter--all">all</label>
+							<label class="input__radio" for="filter--cd">CD</label>
+							<label class="input__radio" for="filter--dvd"><?= lang('video', '映像', 'hidden'); ?></label>
+							<label class="input__radio" for="filter--other">other</label>
 						</div>
 					</div>
 

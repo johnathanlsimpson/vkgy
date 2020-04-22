@@ -56,15 +56,15 @@
 						
 						<ul class="text">
 							<li>
-								<label class="input__checkbox-label"><input class="input__checkbox" name="is_vip"       type="checkbox" value="1" <?= $user['is_vip']       ? 'checked' : null; ?> /><span class="symbol__unchecked">VIP</span></label>
+								<label class="input__radio"><input class="input__choice" name="is_vip"       type="checkbox" value="1" <?= $user['is_vip']       ? 'checked' : null; ?> /><span class="symbol__unchecked">VIP</span></label>
 								Can access VIP-limited content.
 							</li>
 							<li>
-								<label class="input__checkbox-label"><input class="input__checkbox" name="is_editor"    type="checkbox" value="1" <?= $user['is_editor']    ? 'checked' : null; ?> /><span class="symbol__unchecked">Editor</span></label>
+								<label class="input__radio"><input class="input__choice" name="is_editor"    type="checkbox" value="1" <?= $user['is_editor']    ? 'checked' : null; ?> /><span class="symbol__unchecked">Editor</span></label>
 								Can add/edit data.
 							</li>
 							<li>
-								<label class="input__checkbox-label"><input class="input__checkbox" name="is_moderator" type="checkbox" value="1" <?= $user['is_moderator'] ? 'checked' : null; ?> /><span class="symbol__unchecked">Moderator</span></label>
+								<label class="input__radio"><input class="input__choice" name="is_moderator" type="checkbox" value="1" <?= $user['is_moderator'] ? 'checked' : null; ?> /><span class="symbol__unchecked">Moderator</span></label>
 								Can approve/delete data and assign user roles.
 							</li>
 						</ul>
@@ -85,25 +85,25 @@
 									<h5 class="input__label">
 										General
 									</h5>
-									<label class="input__checkbox-label"><input class="input__checkbox" name="can_comment" type="checkbox" value="1" <?= $user['can_comment'] ? 'checked' : null; ?> /><span class="symbol__unchecked">Leave comments</span></label>
+									<label class="input__radio"><input class="input__choice" name="can_comment" type="checkbox" value="1" <?= $user['can_comment'] ? 'checked' : null; ?> /><span class="symbol__unchecked">Leave comments</span></label>
 								</div>
 								
 								<div class="input__group">
 									<h5 class="input__label">
 										Editing
 									</h5>
-									<label class="input__checkbox-label"><input class="input__checkbox" name="can_add_data"       type="checkbox" value="1" <?= $user['can_add_data'] ?       'checked' : null; ?> /><span class="symbol__unchecked">Add data</span></label>
-									<label class="input__checkbox-label"><input class="input__checkbox" name="can_access_drafts"  type="checkbox" value="1" <?= $user['can_access_drafts'] ?  'checked' : null; ?> /><span class="symbol__unchecked">Access drafts</span></label>
-									<label class="input__checkbox-label"><input class="input__checkbox" name="can_add_livehouses" type="checkbox" value="1" <?= $user['can_add_livehouses'] ? 'checked' : null; ?> /><span class="symbol__unchecked">Add livehouses</span></label>
+									<label class="input__radio"><input class="input__choice" name="can_add_data"       type="checkbox" value="1" <?= $user['can_add_data'] ?       'checked' : null; ?> /><span class="symbol__unchecked">Add data</span></label>
+									<label class="input__radio"><input class="input__choice" name="can_access_drafts"  type="checkbox" value="1" <?= $user['can_access_drafts'] ?  'checked' : null; ?> /><span class="symbol__unchecked">Access drafts</span></label>
+									<label class="input__radio"><input class="input__choice" name="can_add_livehouses" type="checkbox" value="1" <?= $user['can_add_livehouses'] ? 'checked' : null; ?> /><span class="symbol__unchecked">Add livehouses</span></label>
 								</div>
 								
 								<div class="input__group">
 									<h5 class="input__label">
 										Moderating
 									</h5>
-									<label class="input__checkbox-label"><input class="input__checkbox" name="can_approve_data" type="checkbox" value="1" <?= $user['can_approve_data'] ? 'checked' : null; ?> /><span class="symbol__unchecked">Approve data</span></label>
-									<label class="input__checkbox-label"><input class="input__checkbox" name="can_delete_data"  type="checkbox" value="1" <?= $user['can_delete_data'] ?  'checked' : null; ?> /><span class="symbol__unchecked">Delete data</span></label>
-									<label class="input__checkbox-label"><input class="input__checkbox" name="can_edit_roles"   type="checkbox" value="1" <?= $user['can_edit_roles'] ?   'checked' : null; ?> /><span class="symbol__unchecked">Edit roles</span></label>
+									<label class="input__radio"><input class="input__choice" name="can_approve_data" type="checkbox" value="1" <?= $user['can_approve_data'] ? 'checked' : null; ?> /><span class="symbol__unchecked">Approve data</span></label>
+									<label class="input__radio"><input class="input__choice" name="can_delete_data"  type="checkbox" value="1" <?= $user['can_delete_data'] ?  'checked' : null; ?> /><span class="symbol__unchecked">Delete data</span></label>
+									<label class="input__radio"><input class="input__choice" name="can_edit_roles"   type="checkbox" value="1" <?= $user['can_edit_roles'] ?   'checked' : null; ?> /><span class="symbol__unchecked">Edit roles</span></label>
 								</div>
 								
 							</div>
@@ -118,7 +118,7 @@
 				<?php } ?>
 				
 				<style>
-					.user__permissions .input__checkbox-label {
+					.user__permissions .input__radio {
 						margin-left: 0 !important;
 						margin-right: 0.5rem;
 					}
@@ -261,11 +261,11 @@
 										<div class="input__group">
 											<label class="input__label"><?= lang('Site theme', '背景画像', 'hidden'); ?></label>
 											
-											<input class="input__checkbox any--hidden" id="site_theme_0" name="site_theme" type="radio" value="0" <?php echo $user['site_theme'] == 0 ? 'checked' : null; ?> />
-											<label class="input__checkbox-label symbol__unchecked " for="site_theme_0">default</label>
+											<input class="input__choice any--hidden" id="site_theme_0" name="site_theme" type="radio" value="0" <?php echo $user['site_theme'] == 0 ? 'checked' : null; ?> />
+											<label class="input__radio symbol__unchecked " for="site_theme_0">default</label>
 											
-											<input class="input__checkbox any--hidden" id="site_theme_1" name="site_theme" type="radio" value="1" <?php echo $user['site_theme'] == 1 ? 'checked' : null; ?> />
-											<label class="input__checkbox-label symbol__unchecked " for="site_theme_1">dark</label>
+											<input class="input__choice any--hidden" id="site_theme_1" name="site_theme" type="radio" value="1" <?php echo $user['site_theme'] == 1 ? 'checked' : null; ?> />
+											<label class="input__radio symbol__unchecked " for="site_theme_1">dark</label>
 										</div>
 									</div>
 								</li>
@@ -275,34 +275,63 @@
 											<label class="input__label"><?= lang('Username style', 'アイコン', 'hidden'); ?></label>
 											
 											<?php
-												if($user['is_vip']) {
+												foreach([ 'crown', 'heart', 'star', 'flower' ] as $icon_key => $icon_name) {
+													
+													if( $user['icon'] === $icon_name || $_SESSION['is_vip'] ) {
+														?>
+															<label class="input__radio" style="font-family:inherit;margin-right:0.5rem;">
+															<input class="input__choice" name="icon" type="radio" value="<?= $icon_key; ?>" <?= $user['icon'] === $icon_name ? 'checked' : null; ?> />
+															<span class="symbol__unchecked" style="align-items:center;display:flex;">
+														<?php
+													}
+													else {
+														echo '<span style="line-height:2rem;margin-right:0.5rem;">';
+													}
+													
+													echo '<span class="symbol__user-'.$icon_name.' symbol--standalone" style="margin-right:5px;"></span>'.$user['username'];
+													
+													if( $user['icon'] === $icon_name || $_SESSION['is_vip'] ) {
+														?>
+															</span>
+															</label>
+														<?php
+													}
+													else {
+														echo '</span>';
+													}
+													
+												}
+											?>
+											
+											<?php
+												/*if($user['is_vip']) {
 													?>
-														<input class="input__checkbox any--hidden" id="icon_0" name="icon" type="radio" value="0" <?= $user['icon'] === 'crown' ? 'checked' : null; ?> />
-														<label class="input__checkbox-label symbol__unchecked " for="icon_0"><span class="symbol__user-crown symbol--standalone" style="margin: 0 0.25ch 0 0.5ch;"></span><?= $user['username']; ?></label>
+														<input class="input__choice any--hidden" id="icon_0" name="icon" type="radio" value="0" <?= $user['icon'] === 'crown' ? 'checked' : null; ?> />
+														<label class="input__radio symbol__unchecked " for="icon_0"><span class="symbol__user-crown symbol--standalone" style="margin: 0 0.25ch 0 0.5ch;"></span><a href=""><?= $user['username']; ?></a></label>
 														
-														<input class="input__checkbox any--hidden" id="icon_1" name="icon" type="radio" value="1" <?= $user['icon'] === 'heart' ? 'checked' : null; ?> />
-														<label class="input__checkbox-label symbol__unchecked " for="icon_1"><span class="symbol__user-heart symbol--standalone" style="margin: 0 0.25ch 0 0.5ch;"></span><?= $user['username']; ?></label>
+														<input class="input__choice any--hidden" id="icon_1" name="icon" type="radio" value="1" <?= $user['icon'] === 'heart' ? 'checked' : null; ?> />
+														<label class="input__radio symbol__unchecked " for="icon_1" style="font-family:inherit;"><span class="symbol__user-heart symbol--standalone" style="margin: 0 0.25ch 0 0.5ch;"></span><?= $user['username']; ?></label>
 														
-														<input class="input__checkbox any--hidden" id="icon_2" name="icon" type="radio" value="2" <?= $user['icon'] === 'star' ? 'checked' : null; ?> />
-														<label class="input__checkbox-label symbol__unchecked " for="icon_2"><span class="symbol__user-star symbol--standalone" style="margin: 0 0.25ch 0 0.5ch;"></span><?= $user['username']; ?></label>
+														<input class="input__choice any--hidden" id="icon_2" name="icon" type="radio" value="2" <?= $user['icon'] === 'star' ? 'checked' : null; ?> />
+														<label class="input__radio symbol__unchecked " for="icon_2"><span class="symbol__user-star symbol--standalone" style="margin: 0 0.25ch 0 0.5ch;"></span><?= $user['username']; ?></label>
 														
-														<input class="input__checkbox any--hidden" id="icon_3" name="icon" type="radio" value="3" <?= $user['icon'] === 'flower' ? 'checked' : null; ?> />
-														<label class="input__checkbox-label symbol__unchecked " for="icon_3"><span class="symbol__user-flower symbol--standalone" style="margin: 0 0.25ch 0 0.5ch;"></span><?= $user['username']; ?></label>
+														<input class="input__choice any--hidden" id="icon_3" name="icon" type="radio" value="3" <?= $user['icon'] === 'flower' ? 'checked' : null; ?> />
+														<label class="input__radio symbol__unchecked " for="icon_3"><span class="symbol__user-flower symbol--standalone" style="margin: 0 0.25ch 0 0.5ch;"></span><?= $user['username']; ?></label>
 													<?php
 												}
 												else {
 													?>
-														<label class="input__checkbox-label symbol__checked input__checkbox-label--selected" for="icon_0"><span class="symbol__user-crown symbol--standalone" style="margin: 0 0.25ch 0 0.5ch;"></span><?= $user['username']; ?></label>
-														<label class="input__checkbox-label" style="background:none;"><span class="symbol__user-heart symbol--standalone" style="margin: 0 0.25ch 0 0;"></span><?= $user['username']; ?></label>
-														<label class="input__checkbox-label" style="background:none;"><span class="symbol__user-star symbol--standalone" style="margin: 0 0.25ch 0 0;"></span><?= $user['username']; ?></label>
-														<label class="input__checkbox-label" style="background:none;"><span class="symbol__user-flower symbol--standalone" style="margin: 0 0.25ch 0 0;"></span><?= $user['username']; ?></label>
+														<label class="input__radio symbol__checked input__radio--selected" for="icon_0"><span class="symbol__user-crown symbol--standalone" style="margin: 0 0.25ch 0 0.5ch;"></span><?= $user['username']; ?></label>
+														<label class="input__radio" style="background:none;"><span class="symbol__user-heart symbol--standalone" style="margin: 0 0.25ch 0 0;"></span><?= $user['username']; ?></label>
+														<label class="input__radio" style="background:none;"><span class="symbol__user-star symbol--standalone" style="margin: 0 0.25ch 0 0;"></span><?= $user['username']; ?></label>
+														<label class="input__radio" style="background:none;"><span class="symbol__user-flower symbol--standalone" style="margin: 0 0.25ch 0 0;"></span><?= $user['username']; ?></label>
 													<?php
-												}
+												}*/
 											?>
 										</div>
 									</div>
 									
-									<?= $user['is_vip'] ? '<span class="symbol__vip">This feature can be accessed after becoming a <a href="https://patreon.com/vkgy" target="_blank">VIP member</a>.</span>' : null; ?>
+									<?= !$_SESSION['is_vip'] ? '<span class="symbol__vip" style="display:block;margin-top:1rem;">This feature can be accessed after becoming a <a href="https://patreon.com/vkgy" target="_blank">VIP member</a>.</span>' : null; ?>
 								</li>
 						</ul>
 					</div>

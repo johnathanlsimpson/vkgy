@@ -83,8 +83,8 @@
 			<div class="flex any--weaken-color">
 				<a class="secondary-nav__home" href="/"></a>
 				
-				<label class="secondary-nav__en input__checkbox-label symbol__unchecked" for="language-en">EN</label>
-				<label class="secondary-nav__ja input__checkbox-label symbol__unchecked" for="language-ja">日本語</label>
+				<label class="secondary-nav__en input__radio symbol__unchecked" for="language-en">EN</label>
+				<label class="secondary-nav__ja input__radio symbol__unchecked" for="language-ja">日本語</label>
 				
 				<a class="secondary-nav__social secondary-nav__twitter  a--inherit symbol__twitter" href="https://twitter.com/vkgy_/" target="_blank"></a>
 				<a class="secondary-nav__social secondary-nav__facebook a--inherit symbol__facebook" href="https://facebook.com/vkgy.official/" target="_blank"></a>

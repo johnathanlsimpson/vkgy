@@ -38,14 +38,14 @@ if($_SESSION["can_add_data"]) {
 											Affiliation
 										</label>
 										
-										<input class="input__checkbox" id="<?php $y++; echo $y; ?>" name="affiliation[<?php echo $i; ?>]" type="radio" value="1" />
-										<label class="input__checkbox-label symbol__unchecked" for="<?php echo $y; ?>">signed</label>
+										<input class="input__choice" id="<?php $y++; echo $y; ?>" name="affiliation[<?php echo $i; ?>]" type="radio" value="1" />
+										<label class="input__radio symbol__unchecked" for="<?php echo $y; ?>">signed</label>
 										
-										<input class="input__checkbox" id="<?php $y++; echo $y; ?>" name="affiliation[<?php echo $i; ?>]" type="radio" value="2" />
-										<label class="input__checkbox-label symbol__unchecked" for="<?php echo $y; ?>">related</label>
+										<input class="input__choice" id="<?php $y++; echo $y; ?>" name="affiliation[<?php echo $i; ?>]" type="radio" value="2" />
+										<label class="input__radio symbol__unchecked" for="<?php echo $y; ?>">related</label>
 										
-										<input class="input__checkbox" id="<?php $y++; echo $y; ?>" name="affiliation[<?php echo $i; ?>]" type="radio" value="3" checked />
-										<label class="input__checkbox-label symbol__unchecked" for="<?php echo $y; ?>">unrelated</label>
+										<input class="input__choice" id="<?php $y++; echo $y; ?>" name="affiliation[<?php echo $i; ?>]" type="radio" value="3" checked />
+										<label class="input__radio symbol__unchecked" for="<?php echo $y; ?>">unrelated</label>
 									</div>
 								</div>
 							</div>

@@ -175,7 +175,7 @@
 									}
 									
 									?>
-										<input class="input__checkbox" id="<?php echo "tag".$tag_key; ?>" name="tags[]" value="<?php echo $tag["id"]; ?>" type="checkbox" <?php echo $tag["checked"] ? 'checked' : null; ?> />
+										<input class="input__choice" id="<?php echo "tag".$tag_key; ?>" name="tags[]" value="<?php echo $tag["id"]; ?>" type="checkbox" <?php echo $tag["checked"] ? 'checked' : null; ?> />
 										<label class="symbol__tag any__tag" for="<?php echo "tag".$tag_key; ?>"><?php echo $tag["tag"]; ?></label>
 									<?php
 								}
@@ -217,15 +217,15 @@
 								</button>
 								
 								&nbsp;
-								<input class="input__checkbox" id="is_queued" name="is_queued" type="checkbox" value="1" <?php echo $entry['is_queued'] ? 'checked' : null; ?> />
-								<label class="input__checkbox-label symbol__unchecked" for="is_queued">Save as draft?</label>
+								<input class="input__choice" id="is_queued" name="is_queued" type="checkbox" value="1" <?php echo $entry['is_queued'] ? 'checked' : null; ?> />
+								<label class="input__radio symbol__unchecked" for="is_queued">Save as draft?</label>
 								
 								<span data-role="status"></span>
 							</div>
 							
 							<div class="input__group">
 								<?php $delete_button_class = $_SESSION['can_delete_data'] || $_SESSION['user_id'] === $entry['user_id'] ? null : 'any--hidden'; ?>
-								<label class="input__checkbox-label symbol__trash symbol--standalone <?= $delete_button_class; ?>" data-get="id" data-get-into="data-id" data-id="<?= $entry["id"]; ?>" name="delete"></label>
+								<label class="input__radio symbol__trash symbol--standalone <?= $delete_button_class; ?>" data-get="id" data-get-into="data-id" data-id="<?= $entry["id"]; ?>" name="delete"></label>
 							</div>
 						</div>
 						

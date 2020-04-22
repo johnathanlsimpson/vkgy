@@ -83,23 +83,23 @@
 							Activity status
 						</label>
 						
-						<input class="input__checkbox" id="active-none" name="active" type="radio" value="" <?php echo !is_numeric($search['active']) ? "checked" : null; ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="active-none">any status</label>
+						<input class="input__choice" id="active-none" name="active" type="radio" value="" <?php echo !is_numeric($search['active']) ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__radio" for="active-none">any status</label>
 						
-						<input class="input__checkbox" id="active-0" name="active" type="radio" value="0" <?php echo $search['active'] === '0' ? "checked" : null; ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="active-0">unknown</label>
+						<input class="input__choice" id="active-0" name="active" type="radio" value="0" <?php echo $search['active'] === '0' ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__radio" for="active-0">unknown</label>
 						
-						<input class="input__checkbox" id="active-1" name="active" type="radio" value="1" <?php echo $search['active'] === '1' ? "checked" : null; ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="active-1">active</label>
+						<input class="input__choice" id="active-1" name="active" type="radio" value="1" <?php echo $search['active'] === '1' ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__radio" for="active-1">active</label>
 						
-						<input class="input__checkbox" id="active-2" name="active" type="radio" value="2" <?php echo $search['active'] === '2' ? "checked" : null; ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="active-2">disbanded</label>
+						<input class="input__choice" id="active-2" name="active" type="radio" value="2" <?php echo $search['active'] === '2' ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__radio" for="active-2">disbanded</label>
 						
-						<input class="input__checkbox" id="active-3" name="active" type="radio" value="3" <?php echo $search['active'] === '3' ? "checked" : null; ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="active-3">paused</label>
+						<input class="input__choice" id="active-3" name="active" type="radio" value="3" <?php echo $search['active'] === '3' ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__radio" for="active-3">paused</label>
 						
-						<input class="input__checkbox" id="active-4" name="active" type="radio" value="4" <?php echo $search['active'] === '4' ? "checked" : null; ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="active-4">semi-active</label>
+						<input class="input__choice" id="active-4" name="active" type="radio" value="4" <?php echo $search['active'] === '4' ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__radio" for="active-4">semi-active</label>
 					</div>
 					
 					<div class="input__group any--flex-grow">
@@ -134,26 +134,26 @@
 				</h3>
 				<div class="input__row">
 					<div class="input__group">
-						<input class="input__checkbox" id="type-none" name="type" type="radio" value="" <?php echo !is_numeric($search['type']) ? "checked" : null; ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="type-none">any type</label>
+						<input class="input__choice" id="type-none" name="type" type="radio" value="" <?php echo !is_numeric($search['type']) ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__radio" for="type-none">any type</label>
 						
-						<input class="input__checkbox" id="type-0" name="type" type="radio" value="0" <?php echo $search['type'] === '0' ? "checked" : null; ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="type-0"><?php echo lang('unknown', '不明', ['secondary_class' => 'any--hidden']); ?></label>
+						<input class="input__choice" id="type-0" name="type" type="radio" value="0" <?php echo $search['type'] === '0' ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__radio" for="type-0"><?php echo lang('unknown', '不明', ['secondary_class' => 'any--hidden']); ?></label>
 						
-						<input class="input__checkbox" id="type-1" name="type" type="radio" value="1" <?php echo $search['type'] === '1' ? "checked" : null; ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="type-1"><?php echo lang('band', 'バンド', ['secondary_class' => 'any--hidden']); ?></label>
+						<input class="input__choice" id="type-1" name="type" type="radio" value="1" <?php echo $search['type'] === '1' ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__radio" for="type-1"><?php echo lang('band', 'バンド', ['secondary_class' => 'any--hidden']); ?></label>
 						
-						<input class="input__checkbox" id="type-2" name="type" type="radio" value="2" <?php echo $search['type'] === '2' ? "checked" : null; ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="type-2"><?php echo lang('session', 'セッション', ['secondary_class' => 'any--hidden']); ?></label>
+						<input class="input__choice" id="type-2" name="type" type="radio" value="2" <?php echo $search['type'] === '2' ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__radio" for="type-2"><?php echo lang('session', 'セッション', ['secondary_class' => 'any--hidden']); ?></label>
 						
-						<input class="input__checkbox" id="type-3" name="type" type="radio" value="3" <?php echo $search['type'] === '3' ? "checked" : null; ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="type-3"><?php echo lang('alter-ego', '別名義バンド', ['secondary_class' => 'any--hidden']); ?></label>
+						<input class="input__choice" id="type-3" name="type" type="radio" value="3" <?php echo $search['type'] === '3' ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__radio" for="type-3"><?php echo lang('alter-ego', '別名義バンド', ['secondary_class' => 'any--hidden']); ?></label>
 						
-						<input class="input__checkbox" id="type-4" name="type" type="radio" value="4" <?php echo $search['type'] === '4' ? "checked" : null; ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="type-4"><?php echo lang('solo', 'ソロ', ['secondary_class' => 'any--hidden']); ?></label>
+						<input class="input__choice" id="type-4" name="type" type="radio" value="4" <?php echo $search['type'] === '4' ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__radio" for="type-4"><?php echo lang('solo', 'ソロ', ['secondary_class' => 'any--hidden']); ?></label>
 						
-						<input class="input__checkbox" id="type-5" name="type" type="radio" value="5" <?php echo $search['type'] === '5' ? "checked" : null; ?> />
-						<label class="symbol__unchecked input__checkbox-label" for="type-5"><?php echo lang('special', '限定', ['secondary_class' => 'any--hidden']); ?></label>
+						<input class="input__choice" id="type-5" name="type" type="radio" value="5" <?php echo $search['type'] === '5' ? "checked" : null; ?> />
+						<label class="symbol__unchecked input__radio" for="type-5"><?php echo lang('special', '限定', ['secondary_class' => 'any--hidden']); ?></label>
 					</div>
 				</div>
 				
@@ -202,8 +202,8 @@
 							if(is_array($rslt_tags) && !empty($rslt_tags)) {
 								foreach($rslt_tags as $i => $tag) {
 									?>
-										<input class="input__checkbox" id="tags[<?php echo $i+1; ?>]" name="tags[]" type="checkbox" value="<?php echo $tag["friendly"]; ?>" <?php echo (is_array($search["tags"]) && in_array($tag["friendly"], $search["tags"]) ? "checked" : null); ?> />
-										<label class="symbol__unchecked input__checkbox-label" for="tags[<?php echo $i+1; ?>]"><?php echo $tag["romaji"] ?: $tag["name"]; ?></label>
+										<input class="input__choice" id="tags[<?php echo $i+1; ?>]" name="tags[]" type="checkbox" value="<?php echo $tag["friendly"]; ?>" <?php echo (is_array($search["tags"]) && in_array($tag["friendly"], $search["tags"]) ? "checked" : null); ?> />
+										<label class="symbol__unchecked input__radio" for="tags[<?php echo $i+1; ?>]"><?php echo $tag["romaji"] ?: $tag["name"]; ?></label>
 									<?php
 								}
 							}

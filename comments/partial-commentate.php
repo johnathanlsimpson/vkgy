@@ -48,8 +48,8 @@
 						<input class="commentate__password any--flex-grow" name="password" placeholder="password <?= sanitize('(パスワード)'); ?>" type="password" value="" />
 					</div>
 					<div class="input__group commentate__sign-in">
-						<label class="input__checkbox-label"><input class="input__checkbox" name="sign_in_type" type="radio" value="register" checked /><span class="symbol__unchecked">Register</span></label>
-						<label class="input__checkbox-label"><input class="input__checkbox" name="sign_in_type" type="radio" value="sign-in" /><span class="symbol__unchecked">Sign In</span></label>
+						<label class="input__radio"><input class="input__choice" name="sign_in_type" type="radio" value="register" checked /><span class="symbol__unchecked">Register</span></label>
+						<label class="input__radio"><input class="input__choice" name="sign_in_type" type="radio" value="sign-in" /><span class="symbol__unchecked">Sign In</span></label>
 					</div>
 					
 				</div>

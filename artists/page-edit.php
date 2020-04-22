@@ -75,8 +75,8 @@
 														foreach(["unknown", "band", "session", "alter-ego", "solo", "special project"] as $key) {
 															$n++;
 															?>
-																<input class="input__checkbox" id="type<?php echo $key; ?>" name="type" type="radio" value="<?php echo $n; ?>" <?php echo $artist["type"] === "".$n ? "checked" : null; ?> />
-																<label class="input__checkbox-label symbol__unchecked" for="type<?php echo $key; ?>"><?php echo $key; ?></label>
+																<input class="input__choice" id="type<?php echo $key; ?>" name="type" type="radio" value="<?php echo $n; ?>" <?php echo $artist["type"] === "".$n ? "checked" : null; ?> />
+																<label class="input__radio symbol__unchecked" for="type<?php echo $key; ?>"><?php echo $key; ?></label>
 															<?php
 														}
 													?>
@@ -91,8 +91,8 @@
 														foreach(["unknown", "active", "disbanded", "paused", "semi-active"] as $key) {
 															$n++;
 															?>
-																<input class="input__checkbox" id="status<?php echo $key; ?>" name="active" type="radio" value="<?php echo $n; ?>" <?php echo $artist["active"] === "".$n ? "checked" : null; ?> />
-																<label class="input__checkbox-label symbol__unchecked" for="status<?php echo $key; ?>"><?php echo $key; ?></label>
+																<input class="input__choice" id="status<?php echo $key; ?>" name="active" type="radio" value="<?php echo $n; ?>" <?php echo $artist["active"] === "".$n ? "checked" : null; ?> />
+																<label class="input__radio symbol__unchecked" for="status<?php echo $key; ?>"><?php echo $key; ?></label>
 															<?php
 														}
 													?>
@@ -309,8 +309,8 @@
 																			foreach($access_artist->positions as $pos_num => $pos_name) {
 																				$y++;
 																				?>
-																					<input class="input__checkbox" id="<?php echo $y; ?>" name="musicians[<?php echo $m; ?>][position]" type="radio" value="<?php echo $pos_num; ?>" <?php echo $musician["position"] == $pos_num ? "checked" : null; ?> />
-																					<label class="input__checkbox-label symbol__unchecked" for="<?php echo $y; ?>"><?php echo strtolower($pos_name); ?></label>
+																					<input class="input__choice" id="<?php echo $y; ?>" name="musicians[<?php echo $m; ?>][position]" type="radio" value="<?php echo $pos_num; ?>" <?php echo $musician["position"] == $pos_num ? "checked" : null; ?> />
+																					<label class="input__radio symbol__unchecked" for="<?php echo $y; ?>"><?php echo strtolower($pos_name); ?></label>
 																				<?php
 																			}
 																		?>
@@ -326,8 +326,8 @@
 																	</div>
 																	
 																	<div class="input__group">
-																		<input class="input__checkbox" id="<?php $y++; echo $y; ?>" name="musicians[<?php echo $musician["id"]; ?>][to_end]" type="checkbox" value="1" <?php echo $musician["to_end"] ? "checked" : null; ?> />
-																		<label class="input__checkbox-label symbol__unchecked" for="<?php echo $y; ?>">Part of final lineup?</label>
+																		<input class="input__choice" id="<?php $y++; echo $y; ?>" name="musicians[<?php echo $musician["id"]; ?>][to_end]" type="checkbox" value="1" <?php echo $musician["to_end"] ? "checked" : null; ?> />
+																		<label class="input__radio symbol__unchecked" for="<?php echo $y; ?>">Part of final lineup?</label>
 																	</div>
 																</div>
 															</li>
@@ -353,7 +353,7 @@
 																		<input name="musicians[<?php echo $m; ?>][friendly]" placeholder="friendly name" value="<?php echo $musician["friendly"]; ?>" />
 																	</div>
 																	<div class="input__group <?= $_SESSION['can_delete_data'] ? null : 'any--hidden'; ?>">
-																		<label class="input__checkbox-label symbol__trash symbol--standalone edit__delete-musician" data-id="<?= $musician["id"]; ?>"></label>
+																		<label class="input__radio symbol__trash symbol--standalone edit__delete-musician" data-id="<?= $musician["id"]; ?>"></label>
 																	</div>
 																</div>
 															</li>
@@ -366,8 +366,8 @@
 																			foreach($access_artist->positions as $pos_num => $pos_name) {
 																				$y++;
 																				?>
-																					<input class="input__checkbox" id="<?php echo $y; ?>" name="musicians[<?php echo $m; ?>][usual_position]" type="radio" value="<?php echo $pos_num; ?>" <?php echo $musician["usual_position"] == $pos_num ? "checked" : null; ?> />
-																					<label class="input__checkbox-label symbol__unchecked" for="<?php echo $y; ?>"><?php echo strtolower($pos_name); ?></label>
+																					<input class="input__choice" id="<?php echo $y; ?>" name="musicians[<?php echo $m; ?>][usual_position]" type="radio" value="<?php echo $pos_num; ?>" <?php echo $musician["usual_position"] == $pos_num ? "checked" : null; ?> />
+																					<label class="input__radio symbol__unchecked" for="<?php echo $y; ?>"><?php echo strtolower($pos_name); ?></label>
 																				<?php
 																			}
 																		?>
@@ -384,8 +384,8 @@
 																				$n++;
 																				$y++;
 																				?>
-																					<input class="input__checkbox" id="<?php echo $y; ?>" name="musicians[<?php echo $m; ?>][gender]" type="radio" value="<?php echo $n; ?>" <?php echo $musician["gender"] === "".$n ? "checked" : null; ?> />
-																					<label class="input__checkbox-label symbol__unchecked" for="<?php echo $y; ?>"><?php echo $key; ?></label>
+																					<input class="input__choice" id="<?php echo $y; ?>" name="musicians[<?php echo $m; ?>][gender]" type="radio" value="<?php echo $n; ?>" <?php echo $musician["gender"] === "".$n ? "checked" : null; ?> />
+																					<label class="input__radio symbol__unchecked" for="<?php echo $y; ?>"><?php echo $key; ?></label>
 																				<?php
 																			}
 																		?>
@@ -444,7 +444,7 @@
 									</a>
 								</div>
 								<div class="input__group <?= $_SESSION['can_delete_data'] ? null : 'any--hidden'; ?>">
-									<label class="input__checkbox-label symbol__trash symbol--standalone" name="delete"></label>
+									<label class="input__radio symbol__trash symbol--standalone" name="delete"></label>
 								</div>
 								<span data-role="status"></span>
 							</div>

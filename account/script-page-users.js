@@ -7,7 +7,7 @@ $(document).on("click", "[data-sort]", function(event) {
 	var oppDir = sortDir === "asc" ? "desc" : "asc";
 	var direction = sortDir === "asc" ? "up" : "down";
 	var oppDirection = direction === "down" ? "up" : "down";
-	var selected = $(this).hasClass("input__checkbox-label--selected");
+	var selected = $(this).hasClass("input__radio--selected");
 	
 	if(selected) {
 		sortDir = oppDir;
@@ -16,8 +16,8 @@ $(document).on("click", "[data-sort]", function(event) {
 		$(this).removeClass("symbol__" + direction + "-caret").addClass("symbol__" + oppDirection + "-caret");
 	}
 	
-	$("[data-sort]").removeClass("input__checkbox-label--selected");
-	$(this).addClass("input__checkbox-label--selected");
+	$("[data-sort]").removeClass("input__radio--selected");
+	$(this).addClass("input__radio--selected");
 	
 	tinysort($(".user__container"), {
 		attr : "data-" + sortType,
@@ -29,6 +29,6 @@ $(document).on("click", "[data-sort]", function(event) {
 
 // Filter
 $(document).on("click", "[data-filter]", function() {
-	$("[data-filter]").removeClass("input__checkbox-label--selected");
-	$(this).addClass("input__checkbox-label--selected");
+	$("[data-filter]").removeClass("input__radio--selected");
+	$(this).addClass("input__radio--selected");
 });

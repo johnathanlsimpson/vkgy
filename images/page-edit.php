@@ -75,7 +75,7 @@
 													<input class="any--flex-grow" name="image_description" value="<?php $n++; echo $input[$n]; ?>" />
 												</div>
 												<div class="input__group">
-													<label class="input__checkbox-label symbol__trash symbol--standalone image__delete" data-get="image_id" data-get-into="data-id" data-id="<?php $n++; echo $input[$n]; ?>"></label>
+													<label class="input__radio symbol__trash symbol--standalone image__delete" data-get="image_id" data-get-into="data-id" data-id="<?php $n++; echo $input[$n]; ?>"></label>
 												</div>
 											</div>
 											

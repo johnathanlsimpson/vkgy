@@ -44,14 +44,14 @@
 		?>
 		
 		<div class="filter__container">
-			<a class="input__checkbox-label input__checkbox-label--selected <?= ($url_query['order'] === 'asc' ? 'symbol__up-caret' : 'symbol__down-caret'); ?>" href="<?= $canon_url.$canon_filter.'&order='.($url_query['order'] === 'asc' ? 'desc' : 'asc').'#activity'; ?>"><?= lang('date', '年月日', 'hidden'); ?></a>
+			<a class="input__radio input__radio--selected <?= ($url_query['order'] === 'asc' ? 'symbol__up-caret' : 'symbol__down-caret'); ?>" href="<?= $canon_url.$canon_filter.'&order='.($url_query['order'] === 'asc' ? 'desc' : 'asc').'#activity'; ?>"><?= lang('date', '年月日', 'hidden'); ?></a>
 			<div>
 				<span class="symbol__filter symbol--standalone"></span>
-				<a href="<?= $canon_url.$canon_order.'#activity'; ?>"                   class="label search__filter input__checkbox-label <?= !in_array($url_query['filter'], ['discussion', 'additions', 'edits', 'other']) ? 'symbol__checked input__checkbox-label--selected' : 'symbol__unchecked'; ?>"><?= lang('all', '全て', 'hidden'); ?></a>
-				<a href="<?= $canon_url.$canon_order.'&filter=discussion#activity'; ?>" class="label search__filter input__checkbox-label <?= $url_query['filter'] === 'discussion'                                          ? 'symbol__checked input__checkbox-label--selected' : 'symbol__unchecked'; ?>"><?= lang('discussion', '会話', 'hidden'); ?></a>
-				<!--<a href="<?= $canon_url.$canon_order.'&filter=additions#activity'; ?>"  class="label search__filter input__checkbox-label <?= $url_query['filter'] === 'additions'                                           ? 'symbol__checked input__checkbox-label--selected' : 'symbol__unchecked'; ?>"><?= lang('additions', '新規作成', 'hidden'); ?></a>-->
-				<a href="<?= $canon_url.$canon_order.'&filter=edits#activity'; ?>"      class="label search__filter input__checkbox-label <?= $url_query['filter'] === 'edits'                                               ? 'symbol__checked input__checkbox-label--selected' : 'symbol__unchecked'; ?>"><?= lang('edits', '編集', 'hidden'); ?></a>
-				<a href="<?= $canon_url.$canon_order.'&filter=other#activity'; ?>"      class="label search__filter input__checkbox-label <?= $url_query['filter'] === 'other'                                               ? 'symbol__checked input__checkbox-label--selected' : 'symbol__unchecked'; ?>"><?= lang('other', 'その他', 'hidden'); ?></a>
+				<a href="<?= $canon_url.$canon_order.'#activity'; ?>"                   class="label search__filter input__radio <?= !in_array($url_query['filter'], ['discussion', 'additions', 'edits', 'other']) ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>"><?= lang('all', '全て', 'hidden'); ?></a>
+				<a href="<?= $canon_url.$canon_order.'&filter=discussion#activity'; ?>" class="label search__filter input__radio <?= $url_query['filter'] === 'discussion'                                          ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>"><?= lang('discussion', '会話', 'hidden'); ?></a>
+				<!--<a href="<?= $canon_url.$canon_order.'&filter=additions#activity'; ?>"  class="label search__filter input__radio <?= $url_query['filter'] === 'additions'                                           ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>"><?= lang('additions', '新規作成', 'hidden'); ?></a>-->
+				<a href="<?= $canon_url.$canon_order.'&filter=edits#activity'; ?>"      class="label search__filter input__radio <?= $url_query['filter'] === 'edits'                                               ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>"><?= lang('edits', '編集', 'hidden'); ?></a>
+				<a href="<?= $canon_url.$canon_order.'&filter=other#activity'; ?>"      class="label search__filter input__radio <?= $url_query['filter'] === 'other'                                               ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>"><?= lang('other', 'その他', 'hidden'); ?></a>
 			</div>
 		</div>
 		

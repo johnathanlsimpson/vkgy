@@ -36,21 +36,21 @@
 		
 		<div class="any--flex any--flex-space-between any--margin">
 			<div>
-				<a class="release__control input__checkbox-label input__checkbox-label--selected symbol__down-caret" data-sort="date" data-dir="desc" href="">Join date</a>
-				<a class="release__control input__checkbox-label symbol__up-caret" data-sort="username" data-dir="asc" href="">A-Z</a>
+				<a class="release__control input__radio input__radio--selected symbol__down-caret" data-sort="date" data-dir="desc" href="">Join date</a>
+				<a class="release__control input__radio symbol__up-caret" data-sort="username" data-dir="asc" href="">A-Z</a>
 			</div>
 			<div>
-				<label class="release__control input__checkbox-label input__checkbox-label--selected" data-filter for="all">All</label>
-				<label class="release__control input__checkbox-label" data-filter for="editor">Editor</label>
-				<label class="release__control input__checkbox-label" data-filter for="moderator">Moderator</label>
-				<label class="release__control input__checkbox-label" data-filter for="vip">VIP</label>
+				<label class="release__control input__radio input__radio--selected" data-filter for="all">All</label>
+				<label class="release__control input__radio" data-filter for="editor">Editor</label>
+				<label class="release__control input__radio" data-filter for="moderator">Moderator</label>
+				<label class="release__control input__radio" data-filter for="vip">VIP</label>
 			</div>
 		</div>
 		
-		<input class="input__checkbox" name="filter" id="all" type="radio" />
-		<input class="input__checkbox" name="filter" id="editor" type="radio" />
-		<input class="input__checkbox" name="filter" id="moderator" type="radio" />
-		<input class="input__checkbox" name="filter" id="vip" type="radio" />
+		<input class="input__choice" name="filter" id="all" type="radio" />
+		<input class="input__choice" name="filter" id="editor" type="radio" />
+		<input class="input__choice" name="filter" id="moderator" type="radio" />
+		<input class="input__choice" name="filter" id="vip" type="radio" />
 		
 		<style>
 			.users__container {

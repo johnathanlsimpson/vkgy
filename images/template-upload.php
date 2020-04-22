@@ -34,7 +34,22 @@
 						</div>
 						
 						<!-- Images/results area -->
-						<ul class="image__results">{extant_images}</ul>
+						<ul class="image__results">
+							{extant_images}
+							
+							<li class="image__no-default any--flex">
+								<div class="input__row">
+									<div class="input__group">
+										<label class="input__label">Unset default image</label>
+										
+										<label class="input__radio">
+											<input class="input__choice" name="image_is_default" type="radio" value="0" {no_default}  />
+											<span class="symbol__unchecked">No default image</span>
+										</label>
+									</div>
+								</div>
+							</li>
+						</ul>
 						
 						<label class="input__button obscure__button" for="obscure-images">Show section</label>
 					</div>

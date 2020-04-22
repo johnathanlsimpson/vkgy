@@ -63,12 +63,12 @@ if(is_array($artist_ids)) {
 // Collection/Wants: Sort
 if(is_array($collection) && !empty($collection)) {
 	usort($collection, function($a, $b) use($artists) {
-		return $artists[$a['artist_id']]['friendly'].$a["friendly"] <=> $artists[$b['artist_id']]['friendly'].$b["friendly"];
+		return $artists[$a['artist_id']]['friendly'].'+'.$a["friendly"] <=> $artists[$b['artist_id']]['friendly'].'+'.$b["friendly"];
 	});
 }
 if(is_array($wants) && !empty($wants)) {
 	usort($wants, function($a, $b) use($artists) {
-		return $artists[$a['artist_id']]['friendly'].$a["friendly"] <=> $artists[$b['artist_id']]['friendly'].$b["friendly"];
+		return $artists[$a['artist_id']]['friendly'].'+'.$a["friendly"] <=> $artists[$b['artist_id']]['friendly'].'+'.$b["friendly"];
 	});
 }
 

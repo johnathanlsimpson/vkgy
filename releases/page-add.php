@@ -955,7 +955,7 @@
 					</button>
 				</div>
 				<div class="input__group <?= $_SESSION['can_delete_data'] ? null : 'any--hidden'; ?>">
-					<span class="<?= !is_numeric($release["id"]) ? "any--hidden" : ""; ?> input__checkbox-label symbol__trash" data-role="delete"></span>
+					<span class="<?= !is_numeric($release["id"]) ? "any--hidden" : ""; ?> input__radio symbol__trash" data-role="delete"></span>
 				</div>
 				<span data-role="status"></span>
 			</div>
