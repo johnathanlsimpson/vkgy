@@ -63,12 +63,12 @@ if(is_array($artist_ids)) {
 // Collection/Wants: Sort
 if(is_array($collection) && !empty($collection)) {
 	usort($collection, function($a, $b) use($artists) {
-		return $artists[$a['artist_id']]['friendly'].$a["friendly"] <=> $artists[$b['artist_id']]['friendly'].$b["friendly"];
+		return $artists[$a['artist_id']]['friendly'].'+'.$a["friendly"] <=> $artists[$b['artist_id']]['friendly'].'+'.$b["friendly"];
 	});
 }
 if(is_array($wants) && !empty($wants)) {
 	usort($wants, function($a, $b) use($artists) {
-		return $artists[$a['artist_id']]['friendly'].$a["friendly"] <=> $artists[$b['artist_id']]['friendly'].$b["friendly"];
+		return $artists[$a['artist_id']]['friendly'].'+'.$a["friendly"] <=> $artists[$b['artist_id']]['friendly'].'+'.$b["friendly"];
 	});
 }
 
@@ -501,9 +501,9 @@ if(strlen($next_users['rand1'])) {
 		
 		
 		<input class="any--hidden" id="filter-for-sale" name="filter-for-sale" type="radio" value="1" />
-		<label class="collection__control input__radio symbol__unchecked" data-filter="for-sale" for="filter-for-sale">for sale</label>
+		<label class="collection__control input__checkbox-label symbol__unchecked" data-filter="for-sale" for="filter-for-sale">for sale</label>
 		<input class="any--hidden" id="filter-all" name="filter-for-sale" type="radio" value="0" checked />
-		<label class="collection__control input__radio symbol__unchecked" data-filter="all" for="filter-all">all</label>
+		<label class="collection__control input__checkbox-label symbol__unchecked" data-filter="all" for="filter-all">all</label>
 		<span class="collection__control symbol__filter"></span>
 		
 		<ul class="any--weaken-color collection__container text" id="collection-container">
@@ -554,7 +554,7 @@ if(strlen($next_users['rand1'])) {
 								<?php
 									if($_SESSION["username"] === $user["username"]) {
 										?>
-											<label class="collection__sell input__radio <?php echo $collection[$i]["is_for_sale"] ? "input__radio--selected symbol__checked" : "symbol__unchecked"; ?> collect" data-action="sell" data-id="<?php echo $collection[$i]["id"]; ?>">sell?</label>
+											<label class="collection__sell input__checkbox-label <?php echo $collection[$i]["is_for_sale"] ? "input__checkbox-label--selected symbol__checked" : "symbol__unchecked"; ?> collect" data-action="sell" data-id="<?php echo $collection[$i]["id"]; ?>">sell?</label>
 										<?php
 									}
 								?>
