@@ -55,15 +55,15 @@
 	
 	<div class="col c2 images__controls">
 		<div>
-			<a href="/images/&type=<?php echo $search_type; ?>&order=desc" class="input__checkbox-label symbol__down-caret <?php echo strtolower($search_order) === 'desc' ? 'input__checkbox-label--selected' : null; ?>">Date uploaded</a>
-			<a href="/images/&type=<?php echo $search_type; ?>&order=asc" class="input__checkbox-label symbol__up-caret <?php echo strtolower($search_order) === 'asc' ? 'input__checkbox-label--selected' : null; ?>">Date uploaded</a>
+			<a href="/images/&type=<?php echo $search_type; ?>&order=desc" class="input__radio symbol__down-caret <?php echo strtolower($search_order) === 'desc' ? 'input__radio--selected' : null; ?>">Date uploaded</a>
+			<a href="/images/&type=<?php echo $search_type; ?>&order=asc" class="input__radio symbol__up-caret <?php echo strtolower($search_order) === 'asc' ? 'input__radio--selected' : null; ?>">Date uploaded</a>
 		</div>
 		<div>
-			<a href="/images/&type=all&order=<?php echo strtolower($search_order); ?>" class="input__checkbox-label <?php echo $_GET['type'] === 'all' ? 'symbol__checked input__checkbox-label--selected' : 'symbol__unchecked'; ?>">All</a>
-			<a href="/images/&type=flyer&order=<?php echo strtolower($search_order); ?>" class="input__checkbox-label <?php echo $_GET['type'] === 'flyer' ? 'symbol__checked input__checkbox-label--selected' : 'symbol__unchecked'; ?>">Flyer</a>
-			<a href="/images/&type=artist&order=<?php echo strtolower($search_order); ?>" class="input__checkbox-label <?php echo $_GET['type'] === 'artist' ? 'symbol__checked input__checkbox-label--selected' : 'symbol__unchecked'; ?>">Artist</a>
-			<a href="/images/&type=release&order=<?php echo strtolower($search_order); ?>" class="input__checkbox-label <?php echo $_GET['type'] === 'release' ? 'symbol__checked input__checkbox-label--selected' : 'symbol__unchecked'; ?>">Release</a>
-			<a href="/images/&type=vip&order=<?php echo strtolower($search_order); ?>" class="input__checkbox-label <?php echo $_GET['type'] === 'vip' ? 'symbol__checked input__checkbox-label--selected' : 'symbol__unchecked'; ?>">VIP</a>
+			<a href="/images/&type=all&order=<?php echo strtolower($search_order); ?>" class="input__radio <?php echo $_GET['type'] === 'all' ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>">All</a>
+			<a href="/images/&type=flyer&order=<?php echo strtolower($search_order); ?>" class="input__radio <?php echo $_GET['type'] === 'flyer' ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>">Flyer</a>
+			<a href="/images/&type=artist&order=<?php echo strtolower($search_order); ?>" class="input__radio <?php echo $_GET['type'] === 'artist' ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>">Artist</a>
+			<a href="/images/&type=release&order=<?php echo strtolower($search_order); ?>" class="input__radio <?php echo $_GET['type'] === 'release' ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>">Release</a>
+			<a href="/images/&type=vip&order=<?php echo strtolower($search_order); ?>" class="input__radio <?php echo $_GET['type'] === 'vip' ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>">VIP</a>
 		</div>
 	</div>
 	
