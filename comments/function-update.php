@@ -46,6 +46,7 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 						if($sign_in->check_login()) {
 							$user_id = $_SESSION['userID'];
 							$is_signed_in = true;
+							$new_sign_in = true;
 						}
 						else {
 							$output['result'][] = $sign_in->get_status_message();
@@ -70,6 +71,7 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 							
 							if($sign_in->check_login()) {
 								$is_signed_in = true;
+								$new_sign_in = true;
 								$output['redirect_url'] = '/account/';
 							}
 							else {
@@ -194,6 +196,14 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 					$output['markdown'][$line_key] = trim($line);
 				}
 				$output['markdown'] = implode("\n", $output['markdown']);
+				
+				// If newly signed in (i.e. commented anonymously, then signed in), attribute comment to user
+				if($new_sign_in) {
+					$sql_attribute = 'UPDATE comments SET user_id=? WHERE id=? LIMIT 1';
+					$stmt_attribute = $pdo->prepare($sql_attribute);
+					$stmt_attribute->execute([ $_SESSION['user_id'], $comment_id ]);
+				}
+				
 			}
 		}
 		else {
