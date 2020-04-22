@@ -603,7 +603,7 @@ table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
 .input__label + .input__textarea, .input__label + .tributable__wrapper .input__textarea {
 	margin-top: 1rem;
 }
-.input, .input--secondary, .input__button, .input__checkbox-label, .input__select, .input__textarea, button, input, select, textarea {
+.input, .input--secondary, .input__button, .input__radio, .input__select, .input__textarea, button, input, select, textarea {
 	background: hsl(var(--background--bold));
 	background-image:
 		linear-gradient(to right, hsl(var(--interactive--secondary)) 50%, transparent 0),
@@ -669,7 +669,7 @@ input {
 	border-bottom-right-radius: 3px;
 	border-top-right-radius: 3px;
 }
-.input__group .input__checkbox-label ~ .input__checkbox-label {
+.input__group .input__radio ~ .input__radio {
 	margin-left: 0.5rem;
 }
 .input--secondary, .input--secondary:active, .input--secondary:focus, .input--secondary:hover {
@@ -708,7 +708,7 @@ input {
 	background-position: top, top, top, bottom left;
 	background-size: 0, 0, 100%, 0;
 }
-.input__checkbox {
+.input__choice {
 	display: inline-block;
 	max-width: 0;
 	min-width: 0 !important;
@@ -716,40 +716,109 @@ input {
 	overflow: hidden;
 	width: 0;
 }
-.input__checkbox-label {
+.input__radio {
 	background-image: none;
 	color: hsl(var(--text--secondary));
 	cursor: pointer;
 	font-family: monospace, "brackets", メイリオ, Meiryo, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "ＭＳ Ｐゴシック", "MS PGothic", serif;
-	margin-bottom: 0.25rem;
+	/*margin-bottom: 0.25rem;
 	margin-top: 0.25rem;
-	padding: 0.25rem 0.5rem;
+	padding: 0.25rem 0.5rem;*/
+	max-width: monospace;
+	overflow: hidden;
+	text-overflow: ellipsis;
 	user-select: none;
+	white-space: nowrap;
 }
-.input__checkbox-label--selected, .input__checkbox:checked + .input__checkbox-label {
+/*2020-04-28*/
+.input__radio,
+.input__checkbox {
+	align-items: center;
+	background-image: linear-gradient(to right, hsla(var(--background),0.3) 1.75rem, transparent 0);
+	background-size: 100%;
+	box-shadow: inset 0 0 0 1px hsl(var(--background--bold));
+	display: flex;
+}
+.input__radio::before,
+.input__radio > [class*="symbol"]:first-of-type::before,
+.input__checkbox::before,
+.input__checkbox > [class*="symbol"]:first-of-type::before {
+	font-size: 1rem;
+	margin-right: 1rem;
+}
+
+.input__radio--selected,
+.input__choice:checked + .input__radio,
+.input__choice:checked + .input__checkbox,
+.input__choice:checked + [class*="symbol"][class*="checked"] {
 	color: hsl(var(--text));
 }
-.input__checkbox-label--selected::before, .input__checkbox:checked + .input__checkbox-label::before, .input__checkbox:checked + .any__tag::before {
+.input__radio--selected::before,
+.input__choice:checked + .input__radio::before,
+.input__choice:checked + .symbol__checked::before,
+.input__choice:checked + .symbol__unchecked::before {
 	opacity: 1;
+	-moz-clip-path:    url(#symbol__checked);
+	-webkit-clip-path: url(#symbol__checked);
+	clip-path:         url(#symbol__checked);
 }
-.input__checkbox:not(:checked) + .input__checkbox-label::before {
+.input__choice:checked + .input__checkbox::before,
+.input__choice:checked + .symbol__checkbox--checked::before,
+.input__choice:checked + .symbol__checkbox--unchecked::before {
+	opacity: 1;
+	-moz-clip-path:    url(#symbol__checkbox--checked);
+	-webkit-clip-path: url(#symbol__checkbox--checked);
+	clip-path:         url(#symbol__checkbox--checked);
+}
+
+
+/*.input__radio--selected,
+.input__choice:checked + .input__radio,
+.input__choice:checked + [class*="symbol__checkbox--"],
+.input__choice:checked + .symbol__unchecked,
+.input__choice:checked + .symbol__checked,
+.input__choice[checked] + .input__radio,
+.input__choice[checked] + [class*="symbol__checkbox--"],
+.input__choice[checked] + .symbol__unchecked,
+.input__choice[checked] + .symbol__checked {
+	color: hsl(var(--text));
+}*/
+/*.input__radio--selected::before, .input__choice:checked + .input__radio::before, .input__choice:checked + .any__tag::before,
+.input__choice:checked + .symbol__unchecked::before,
+.input__choice:checked + [class*="symbol__checkbox--"]::before,
+.input__choice:checked + .symbol__unchecked::before,
+.input__choice:checked + .symbol__checked::before,
+.input__choice[checked] + .symbol__unchecked::before,
+.input__choice[checked] + [class*="symbol__checkbox--"]::before,
+.input__choice[checked] + .symbol__unchecked::before,
+.input__choice[checked] + .symbol__checked::before {
+	opacity: 1;
+}*/
+/*.input__choice:not(:checked) + .input__radio::before {
 	clip-path: url(#symbol__unchecked);
-}
-.input__checkbox:checked + .input__checkbox-label::before {
+}*/
+
+/*.input__choice:checked + .input__radio::before,
+.input__choice:checked + .symbol__unchecked::before,
+.input__choice[checked] + .input__radio::before,
+.input__choice[checked] + .symbol__unchecked::before {
 	clip-path: url(#symbol__checked);
 }
-.input__checkbox-label .input__checkbox {
+.input__choice:checked + [class*="symbol__checkbox--"]::before {
+	clip-path: url(#symbol__checkbox--checked);
+}
+.input__radio .input__choice {
 	display: none;
 }
-.input__checkbox-label .input__checkbox:checked + .symbol__unchecked {
+.input__radio .input__choice:checked + .symbol__unchecked {
 	color: hsl(var(--text));
 }
-.input__checkbox-label .input__checkbox:checked + .symbol__unchecked::before {
+.input__radio .input__choice:checked + .symbol__unchecked::before {
 	-moz-clip-path: url(#symbol__checked);
 	-webkit-clip-path: url(#symbol__checked);
 	clip-path: url(#symbol__checked);
 	color: hsl(var(--text));
-}
+}*/
 .input__textarea, textarea {
 	height: 4rem;
 	line-height: 1.5;
@@ -800,6 +869,7 @@ select[multiple][multiple][multiple] option::after {
 	margin-left: 0.5rem;
 }
 [disabled], [readonly] {
+	cursor: not-allowed;
 	opacity: 0.5;
 }
 /* Below is from 2020-03-29 */
