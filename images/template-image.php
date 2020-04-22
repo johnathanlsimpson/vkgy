@@ -54,14 +54,14 @@
 								</div>
 								<div class="input__group">
 									
-									<label class="input__checkbox-label">
-										<input class="input__checkbox" name="image_is_default" type="radio" value="1" {is_default} />
+									<label class="input__radio">
+										<input class="input__choice" name="image_is_default" type="radio" value="1" {is_default} />
 										<span class="symbol__unchecked"><?= 'Default '.$item_type.' image?'; ?></span>
 									</label>
 									
 								</div>
 								<div class="input__group {delete_class}">
-									<label class="input__checkbox-label symbol__trash symbol--standalone image__delete"></label>
+									<label class="input__radio symbol__trash symbol--standalone image__delete"></label>
 								</div>
 							</div>
 							
@@ -94,9 +94,9 @@
 								<div class="input__group">
 									<label class="input__label">Credit</label>
 									
-									<label class="input__checkbox-label">
-										<input class="input__checkbox" name="image_is_exclusive[]" type="checkbox" value="1" {is_exclusive} />
-										<span class="symbol__unchecked">Scanned by </span>
+									<label class="input__radio">
+										<input class="input__choice" name="image_is_exclusive[]" type="checkbox" value="1" {is_exclusive} />
+										<span class="symbol__checkbox--unchecked">Scanned by </span>
 									</label>
 									
 								</div>
@@ -109,14 +109,6 @@
 						</div>
 					</li>
 				<?php
-	
-	echo '
-		<li class="image__no-default any--flex">
-			<label class="input__checkbox-label">
-				<input class="input__checkbox" name="image_is_default" type="radio" value="0"  />
-				<span class="symbol__unchecked">No default image</span>
-			</label>
-		</li>';
 				
 				$image_template = ob_get_clean();
 				echo $image_template;
