@@ -74,7 +74,7 @@
 							</div>
 							<div class="input__group">
 								<input class="register__show any--hidden" id="register__show" type="checkbox" />
-								<label class="input__checkbox-label symbol__unchecked register__show-label" onclick="togglePassword()" for="register__show">Show?</label>
+								<label class="input__radio symbol__unchecked register__show-label" onclick="togglePassword()" for="register__show">Show?</label>
 							</div>
 						</div>
 					</li>
@@ -83,8 +83,8 @@
 						<div class="input__row">
 							<div class="input__group" style="align-self: center;">
 								<label class="input__label"><?php echo lang('Avatar eyes', 'アバター', ['secondary_class' => 'any--hidden']); ?></label>
-								<label class="input__checkbox-label symbol__unchecked register__bat" for="register__radio--bat"><?php echo lang('bat', 'メークⅠ', ['secondary_class' => 'any--hidden']); ?></label>
-								<label class="input__checkbox-label symbol__unchecked register__gecko" for="register__radio--gecko"><?php echo lang('gecko', 'メークⅡ', ['secondary_class' => 'any--hidden']); ?></label>
+								<label class="input__radio symbol__unchecked register__bat" for="register__radio--bat"><?php echo lang('bat', 'メークⅠ', ['secondary_class' => 'any--hidden']); ?></label>
+								<label class="input__radio symbol__unchecked register__gecko" for="register__radio--gecko"><?php echo lang('gecko', 'メークⅡ', ['secondary_class' => 'any--hidden']); ?></label>
 							</div>
 							<div class="input__group">
 								<div class="register__face"></div>
