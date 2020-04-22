@@ -669,9 +669,9 @@ input {
 	border-bottom-right-radius: 3px;
 	border-top-right-radius: 3px;
 }
-.input__group .input__radio ~ .input__radio {
+/*.input__group .input__radio ~ .input__radio {
 	margin-left: 0.5rem;
-}
+}*/
 .input--secondary, .input--secondary:active, .input--secondary:focus, .input--secondary:hover {
 	box-shadow: inset 2rem 0 2rem -2rem rgba(0,0,0, 0.25);
 }
@@ -691,7 +691,11 @@ input {
 	font-family: monospace, "brackets", メイリオ, Meiryo, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "ＭＳ Ｐゴシック", "MS PGothic", serif;
 	font-weight: normal;
 	height: auto;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
 	text-transform: uppercase;
+	white-space: nowrap;
 }
 .input__button:hover, button:hover {
 	background-size: 0, 100% 2px, 0, 0;
@@ -714,6 +718,7 @@ input {
 	min-width: 0 !important;
 	opacity: 0;
 	overflow: hidden;
+	position: absolute;
 	width: 0;
 }
 .input__radio {
@@ -724,7 +729,7 @@ input {
 	/*margin-bottom: 0.25rem;
 	margin-top: 0.25rem;
 	padding: 0.25rem 0.5rem;*/
-	max-width: monospace;
+	max-width: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	user-select: none;
@@ -738,6 +743,8 @@ input {
 	background-size: 100%;
 	box-shadow: inset 0 0 0 1px hsl(var(--background--bold));
 	display: flex;
+	margin-top: 0.5rem;
+	margin-right: 0.5rem;
 }
 .input__radio::before,
 .input__radio > [class*="symbol"]:first-of-type::before,
@@ -874,6 +881,9 @@ select[multiple][multiple][multiple] option::after {
 }
 /* Below is from 2020-03-29 */
 .input__group {
+	/*background: rgba(255,0,0,0.1);
+	background-clip: content-box;
+	border: 1px solid rgba(0,255,0, 0.5);*/
 	padding-left: 0.5rem !important;
 }
 .input__group::before {
