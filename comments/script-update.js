@@ -306,11 +306,10 @@ class CommentHandler {
 		// Call inline submit function (until that's rewritten w/out jQuery dependency, must wrap commentateElem as a jQuery object)
 		initializeInlineSubmit($(commentateElem), "/comments/function-update.php", {
 			callbackOnSuccess : function(form, data) {
-				// If we signed in during comment (new username =/= old username), set hash for refresh
+				
+				// Set hash to new comment ID
 				let newHash;
-				if(data.username.length && self.dummyUsername != data.username) {
-					newHash = '#' + 'comment-' + data.commentId;
-				}
+				newHash = '#' + 'comment-' + data.comment_id;
 				
 				let redirectUrl;
 				if(data.redirectUrl && data.redirectUrl.length) {
@@ -365,12 +364,20 @@ class CommentHandler {
 					parentThread.replaceWith(newCommentTemplate);
 				}
 				
-				// If new hash was set (= newly signed in), let's refresh (we can also go to new hash, but normal refresh seems enough)
+				// Redirect if necessary
 				if(redirectUrl) {
 					window.location.href = redirectUrl;
 				}
+				
+				// Scroll to new hash if provided
 				else if(newHash) {
-					window.location.reload();
+					
+					// Reset hash if necessary (?)
+					if(window.location.hash) {
+						location.hash = '';
+					}
+					
+					location.hash = newHash;
 				}
 				
 			}
