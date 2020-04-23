@@ -37,7 +37,7 @@ if($num_wants) {
 }
 
 // Collection: Get
-$collection = $access_release->access_release([ 'user_id' => $user['id'], 'get' => 'quick_name' ]);
+$collection = $access_release->access_release([ 'user_id' => $user['id'], 'get' => 'name' ]);
 if(is_array($collection)) {
 	$collection = array_values($collection);
 }
@@ -544,7 +544,9 @@ if(strlen($next_users['rand1'])) {
 						if($curr_artist != $prev_artist) {
 							?>
 								<li class="collection__artist <?= in_array($curr_artist, $for_sale_artists) ? 'collection--for-sale' : null; ?>">
-									<a class="artist" href="<?php echo '/artists/'.$artists[$collection[$i]['artist_id']]['friendly'].'/'; ?>"><?php echo $artists[$collection[$i]['artist_id']]['quick_name']; ?></a>
+									<a class="artist" href="<?php echo '/artists/'.$artists[$collection[$i]['artist_id']]['friendly'].'/'; ?>">
+										<?= $artists[$collection[$i]['artist_id']]['romaji'] ? lang($artists[$collection[$i]['artist_id']]['romaji'], $artists[$collection[$i]['artist_id']]['name'], 'parentheses') : $artists[$collection[$i]['artist_id']]['name']; ?>
+									</a>
 								</li>
 							<?php
 						}
@@ -559,7 +561,9 @@ if(strlen($next_users['rand1'])) {
 									}
 								?>
 								
-								<a class="a--inherit" href="<?php echo '/releases/'.$artists[$collection[$i]['artist_id']]['friendly'].'/'.$collection[$i]['id'].'/'.$collection[$i]['friendly'].'/'; ?>"><?php echo $collection[$i]['quick_name']; ?></a>
+								<a class="a--inherit" href="<?= '/releases/'.$artists[$collection[$i]['artist_id']]['friendly'].'/'.$collection[$i]['id'].'/'.$collection[$i]['friendly'].'/'; ?>">
+									<?= $collection[$i]['quick_name'] != $collection[$i]['name'] ? lang($collection[$i]['quick_name'], $collection[$i]['name'], 'hidden') : $collection[$i]['quick_name']; ?>
+								</a>
 								
 								<?php
 									if($_SESSION["username"] != $user["username"] && $collection[$i]["is_for_sale"]) {
