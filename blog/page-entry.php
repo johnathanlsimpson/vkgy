@@ -24,7 +24,20 @@
 
 			$entry_has_image = true;
 		}
-
+		
+		// Loop through tags and see if featured article; if so, upsize images
+		if(is_array($entry['tags']) && !empty($entry['tags'])) {
+			foreach($entry['tags'] as $tag) {
+				if($tag['friendly'] === 'feature') {
+					
+					$entry['content'] = str_replace('.medium.', '.large.', $entry['content']);
+					$entry_is_feature = true;
+					
+					break;
+				}
+			}
+		}
+		
 		$sql_twitter = "SELECT twitter FROM users WHERE username=? LIMIT 1";
 		$stmt_twitter = $pdo->prepare($sql_twitter);
 		$stmt_twitter->execute([ $entry['user']['username'] ]);
@@ -277,7 +290,7 @@
 
 					<div class="entry__content entry__main-column">
 						<a class="entry__image-link lazy" data-src="<?php echo str_replace('.', '.thumbnail.', $entry['image']['url']); ?>" href="<?php echo $entry['image']['url']; ?>">
-							<img class="entry__image webfeedsFeaturedVisual" src="<?= str_replace('.', '.large.', $entry['image']['url']); ?>" />
+							<img class="entry__image webfeedsFeaturedVisual" src="<?= $entry_is_feature ? $entry['image']['url'] : str_replace('.', '.large.', $entry['image']['url']); ?>" />
 						</a>
 						
 						<div class="text text--centered">
