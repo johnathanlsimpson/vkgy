@@ -46,8 +46,8 @@
 			}
 		}
 		
-		if(is_array($rslt_curr_tags) && !empty($rslt_curr_tags)) {
-			foreach($rslt_curr_tags as $tag) {
+		if(is_array($rslt_curr_tags['admin']) && !empty($rslt_curr_tags['admin'])) {
+			foreach($rslt_curr_tags['admin'] as $tag) {
 				$needs_admin_tags = $needs_admin_tags ?: ($tag["is_admin_tag"] ?: false);
 				$rslt_curr_tag_ids[] = $tag["id"];
 				
