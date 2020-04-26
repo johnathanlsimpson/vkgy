@@ -467,6 +467,8 @@
 	}
 	#language-en:checked ~ .underhead__wrapper [for="language-en"]::before,
 	#language-ja:checked ~ .underhead__wrapper [for="language-ja"]::before {
+		-moz-clip-path:    url(#symbol__checked);
+		-webkit-clip-path: url(#symbol__checked);
 		clip-path: url(#symbol__checked);
 	}
 

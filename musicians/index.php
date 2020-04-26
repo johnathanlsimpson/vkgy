@@ -34,8 +34,8 @@
 			$tag_types = $tags['tag_types'];
 			
 			// Loop through current tags and set some flags for artist
-			if(is_array($current_tags) && !empty($current_tags)) {
-				foreach($current_tags as $numeric_key => $tag) {
+			if(is_array($current_tags['admin']) && !empty($current_tags['admin'])) {
+				foreach($current_tags['admin'] as $numeric_key => $tag) {
 					
 					// Set flags
 					if($tag['friendly'] === 'exclusive') {

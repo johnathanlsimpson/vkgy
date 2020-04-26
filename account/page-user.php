@@ -500,10 +500,10 @@ if(strlen($next_users['rand1'])) {
 		</div>
 		
 		
-		<input class="any--hidden" id="filter-for-sale" name="filter-for-sale" type="radio" value="1" />
-		<label class="collection__control input__checkbox-label symbol__unchecked" data-filter="for-sale" for="filter-for-sale">for sale</label>
-		<input class="any--hidden" id="filter-all" name="filter-for-sale" type="radio" value="0" checked />
-		<label class="collection__control input__checkbox-label symbol__unchecked" data-filter="all" for="filter-all">all</label>
+		<input class="any--hidden input__choice" id="filter-for-sale" name="filter-for-sale" type="radio" value="1" />
+		<label class="collection__control input__radio symbol__unchecked" data-filter="for-sale" for="filter-for-sale">for sale</label>
+		<input class="any--hidden input__choice" id="filter-all" name="filter-for-sale" type="radio" value="0" checked />
+		<label class="collection__control input__radio symbol__unchecked" data-filter="all" for="filter-all">all</label>
 		<span class="collection__control symbol__filter"></span>
 		
 		<ul class="any--weaken-color collection__container text" id="collection-container">
