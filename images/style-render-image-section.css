@@ -47,6 +47,7 @@
 	.image__image::after {
 		border-radius: 0 0 5px 0;
 		left: 0;
+		padding: 0 0.25rem 0.25rem 0;
 		right: auto;
 	}
 }
