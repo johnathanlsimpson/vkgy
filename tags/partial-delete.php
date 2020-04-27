@@ -35,10 +35,12 @@
 												) {
 													
 													// Set tag class and display tag
-													$tag_class  = 'any__tag symbol__trash any__tag--selected';
+													$tag_class  = 'any__tag any__tag--selected';
 													?>
-														<label class="<?= $tag_class; ?>" data-action="permanent_delete" data-id="<?= $item_id; ?>" data-tag-id="<?= $tag['id']; ?>" data-item-type="<?= $item_type; ?>">
-															<?= str_replace( [' kei', '&#31995;' ], '', lang($tag['romaji'] ?: $tag['name'], $tag['name'], 'hidden') ); ?>
+														<label class="<?= $tag_class; ?>" data-action="permanent_delete" data-id="<?= $item_id; ?>" data-tag-id="<?= $tag['id']; ?>" data-item-type="<?= $item_type; ?>" >
+															<span class="symbol__trash" data-role="status" style="margin:0;">
+																<?= str_replace( [' kei', '&#31995;' ], '', lang($tag['romaji'] ?: $tag['name'], $tag['name'], 'hidden') ); ?>
+															</span>
 														</label>
 													<?php
 													
