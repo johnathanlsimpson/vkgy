@@ -1,6 +1,7 @@
 <?php
 	$access_release = new access_release($pdo);
 	$access_artist = new access_artist($pdo);
+	$access_user = new access_user($pdo);
 	
 	breadcrumbs([
 		'Releases' => '/releases/',
@@ -8,6 +9,7 @@
 	
 	$page_header = lang('Releases', 'リリース', ['container' => 'div']);
 	
+	// ID template
 	if(is_numeric($_GET["id"])) {
 		$release = $access_release->access_release(["release_id" => $_GET["id"], "get" => "all"]);
 		
@@ -16,6 +18,36 @@
 		], 'interact', true);
 		
 		$active_page = '/releases/'.$release['artist']['friendly'].'/';
+		
+		// Check collection/wanted/selling status of item
+		$sql_is_for_sale = 'SELECT 1 FROM releases_collections WHERE release_id=? AND is_for_sale=? LIMIT 1';
+		$stmt_is_for_sale = $pdo->prepare($sql_is_for_sale);
+		$stmt_is_for_sale->execute([ $release['id'], 1 ]);
+		$is_for_sale = $stmt_is_for_sale->fetchColumn();
+		
+		$sql_collections = "SELECT user_id, users.username, releases_collections.is_for_sale FROM releases_collections LEFT JOIN users ON users.id=releases_collections.user_id WHERE releases_collections.release_id=? ORDER BY users.username ASC";
+		$stmt_collections = $pdo->prepare($sql_collections);
+		$stmt_collections->execute([ $release["id"] ]);
+		$rslt_collections = $stmt_collections->fetchAll();
+		
+		$sql_wants = "SELECT user_id, users.username FROM releases_wants LEFT JOIN users ON users.id=releases_wants.user_id WHERE releases_wants.release_id=? ORDER BY users.username ASC";
+		$stmt_wants = $pdo->prepare($sql_wants);
+		$stmt_wants->execute([$release["id"]]);
+		$rslt_wants = $stmt_wants->fetchAll();
+		
+		// For collections, get correct usernames and check if being sold by current user
+		if($is_for_sale) {
+			foreach($rslt_collections as $collection_key => $collection) {
+				
+				// Get user info
+				$collection['user'] = $access_user->access_user([ 'id' => $collection['user_id'], 'get' => 'name' ]);
+				$rslt_collections[$collection_key] = $collection;
+				
+				if($collection['is_for_sale'] && $collection['user']['id'] === $_SESSION['user_id']) {
+					$release['is_for_sale'] = true;
+				}
+			}
+		}
 		
 		// If on omnibus release while cycling through artist's disco, make note
 		if(is_numeric($_GET['prev_next_artist']) && $release['artist']['id'] != $_GET['prev_next_artist']) {

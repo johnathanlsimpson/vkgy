@@ -7,4 +7,5 @@
 }
 #obscure-bio:checked + .edit__biography {
 	margin-bottom: 3rem;
+	max-height: 16rem;
 }

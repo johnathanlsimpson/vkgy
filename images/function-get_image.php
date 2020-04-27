@@ -189,6 +189,8 @@
 					($returned_image_path && !$rslt_image['is_queued'])
 					||
 					($returned_image_path && $rslt_image['is_queued'] && !$input['is_hotlinked'])
+					||
+					($returned_image_path && $rslt_image['is_queued'] && $rslt_image['user_id'] === $_SESSION['user_id'])
 				) {
 					if($input["image_path_only"]) {
 						return $returned_image_path;

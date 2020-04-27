@@ -1,4 +1,4 @@
-// Set up "for sale" buttons
+/*// Set up "for sale" buttons
 $(".collect").on("click", function() {
 	$(this).removeClass("symbol__unchecked symbol__checked symbol__success symbol__loading symbol__error");
 });
@@ -21,4 +21,4 @@ for(var i = 0; i < $(".collect").length; i++) {
 			}
 		}
 	});
-}
+}*/

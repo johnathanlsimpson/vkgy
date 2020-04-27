@@ -461,6 +461,12 @@
 	* LANGUAGE SELECTOR
 	* ========================================================
 	*/
+	[for="language-en"], [for="language-ja"] {
+		margin: 0 !important;
+	}
+	[for="language-en"]::before, [for="language-ja"]::before {
+		margin-right: 0.5ch !important;
+	}
 	#language-en:checked ~ .underhead__wrapper [for="language-en"],
 	#language-ja:checked ~ .underhead__wrapper [for="language-ja"] {
 		color: hsl(var(--text));

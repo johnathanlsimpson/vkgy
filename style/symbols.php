@@ -108,7 +108,7 @@
 				-webkit-clip-path: url(#symbol__user);
 				will-change: transform;
 			}
-			.loading::before {
+			.loading.loading.loading.loading.loading.loading.loading.loading::before {
 				clip-path: url(#symbol__loading);
 				-webkit-clip-path: url(#symbol__loading);
 				will-change: transform;

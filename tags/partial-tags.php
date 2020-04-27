@@ -85,14 +85,10 @@
 												($tag['requires_permission'] && $_SESSION[ $tag['requires_permission'] ])
 											) {
 												
-												// Set different classes depending on whether or not user has used this tag
-												//$tag_class  = 'input__checkbox symbol__tag';
-												//$tag_class .= in_array($tag['id'], $user_tags) ? ' any__tag--selected' : null;
-												
 												?>
 													<label class="any__tag input__radio" data-id="<?= $item_id; ?>" data-tag-id="<?= $tag['id']; ?>" data-item-type="<?= $item_type; ?>">
 														<input class="input__choice" type="checkbox" <?= in_array($tag['id'], $user_tags) ? 'checked' : null;?> />
-														<span class="symbol__tag">
+														<span class="symbol__tag" data-role="status">
 															<?= str_replace( [' kei', '&#31995;' ], '', lang($tag['romaji'] ?: $tag['name'], $tag['name'], 'hidden') ); ?>
 														</span>
 													</label>
