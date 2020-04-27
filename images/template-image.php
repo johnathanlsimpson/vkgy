@@ -96,7 +96,7 @@
 									
 									<label class="input__radio">
 										<input class="input__choice" name="image_is_exclusive[]" type="checkbox" value="1" {is_exclusive} />
-										<span class="symbol__checkbox--unchecked">Scanned by </span>
+										<span class="symbol__checkbox--unchecked">Scanned by&nbsp;</span>
 									</label>
 									
 								</div>
