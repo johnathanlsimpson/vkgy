@@ -1,8 +1,10 @@
 <?php
 	include_once("../php/class-parse_markdown.php");
 	$markdown_parser = new parse_markdown($pdo);
-
-$access_user = new access_user($pdo);
+	
+	script([
+		'/releases/script-list.js',
+	]);
 
 
 	if(!empty($release)) {
@@ -252,11 +254,31 @@ $access_user = new access_user($pdo);
 											</div>
 											
 											<div class="input__row">
-												<div class="input__group">
-													<label class="collect input__radio <?php echo $release["is_owned"] ? "input__radio--selected symbol__checked" : "symbol__unchecked"; ?>" data-action="own" data-id="<?php echo $release["id"]; ?>">I own this</label>
-												</div>
-												<div class="input__group">
-													<label class="collect input__radio <?php echo $release["is_wanted"] ? "input__radio--selected symbol__checked" : "symbol__unchecked"; ?>" data-action="want" data-id="<?php echo $release["id"]; ?>">I want this</label>
+												<div class="input__group data__item">
+													<label class="input__label">Lists</label>
+													
+													<style>
+														#release-owned:not(:checked) ~ [for="release-sold"] {
+															display: none;
+														}
+													</style>
+													
+													<input class="input__choice" id="release-owned" type="checkbox" <?= $release['is_owned'] ? 'checked' : null; ?> />
+													<label class="input__checkbox" data-list-id="0" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-owned">
+														<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">own</span>
+													</label>
+													
+													<input class="input__choice" id="release-wanted" type="checkbox" <?= $release['is_wanted'] ? 'checked' : null; ?> />
+													<label class="input__checkbox" data-list-id="1" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-wanted">
+														<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">want</span>
+													</label>
+													
+													<input class="input__choice" id="release-sold" type="checkbox" <?= $release['is_for_sale'] ? 'checked' : null; ?> />
+													<label class="input__checkbox" data-list-id="2" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-sold">
+														<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">sell</span>
+													</label>
+													
+													<!--<label class="input__radio symbol__down-caret" style="transform:scaleX(-1);"><span style="transform:scaleX(-1);">List</span></label>-->
 												</div>
 												
 												<div class="collect__result text text--outlined text--notice symbol__help"></div>
@@ -273,7 +295,7 @@ $access_user = new access_user($pdo);
 															for($i = 1; $i <= 5; $i++) {
 																$class  = "symbol__star--";
 																$class .= $i <= round($release["rating"]) ? "full" : "empty";
-																?><span class="rate__item <?php echo $class; ?>" data-release_id="<?php echo $release["id"]; ?>" data-score="<?php echo $i; ?>"></span><?php
+																?><span class="rate__item <?php echo $class; ?>" data-release_id="<?php echo $release["id"]; ?>" data-score="<?php echo $i; ?>" style="font-size:1.5rem;"></span><?php
 															}
 														?>
 													</div>
@@ -287,7 +309,7 @@ $access_user = new access_user($pdo);
 															for($i = 1; $i <= 5; $i++) {
 																$class  = "symbol__star--";
 																$class .= $i <= round($release["user_rating"]) ? "full" : "empty";
-																?><a class="rate__item rate__link <?php echo $class; ?>" data-release_id="<?php echo $release["id"]; ?>" data-score="<?php echo $i; ?>" href=""></a><?php
+																?><a class="rate__item rate__link <?php echo $class; ?>" data-release_id="<?php echo $release["id"]; ?>" data-score="<?php echo $i; ?>" href="" style="font-size:1.5rem;"></a><?php
 															}
 														?>
 													</div>
@@ -681,21 +703,6 @@ $access_user = new access_user($pdo);
 								</h3>
 								<div class="text text--outlined">
 									<?php
-										$sql_is_for_sale = 'SELECT 1 FROM releases_collections WHERE release_id=? AND is_for_sale=? LIMIT 1';
-										$stmt_is_for_sale = $pdo->prepare($sql_is_for_sale);
-										$stmt_is_for_sale->execute([ $release['id'], 1 ]);
-										$is_for_sale = $stmt_is_for_sale->fetchColumn();
-
-										$sql_collections = "SELECT user_id, users.username, releases_collections.is_for_sale FROM releases_collections LEFT JOIN users ON users.id=releases_collections.user_id WHERE releases_collections.release_id=? ORDER BY users.username ASC";
-										$stmt_collections = $pdo->prepare($sql_collections);
-										$stmt_collections->execute([ $release["id"] ]);
-										$rslt_collections = $stmt_collections->fetchAll();
-
-										$sql_wants = "SELECT user_id, users.username FROM releases_wants LEFT JOIN users ON users.id=releases_wants.user_id WHERE releases_wants.release_id=? ORDER BY users.username ASC";
-										$stmt_wants = $pdo->prepare($sql_wants);
-										$stmt_wants->execute([$release["id"]]);
-										$rslt_wants = $stmt_wants->fetchAll();
-
 										if((is_array($rslt_collections) && !empty($rslt_collections)) || (is_array($rslt_wants) && !empty($rslt_wants))) {
 											if(is_array($rslt_collections) && !empty($rslt_collections)) {
 												?>
@@ -707,7 +714,6 @@ $access_user = new access_user($pdo);
 														</li>
 														<?php
 															foreach($rslt_collections as $collection_key => $collection) {
-																$rslt_collections[$collection_key]['user'] = $access_user->access_user([ 'id' => $collection['user_id'], 'get' => 'name' ]);
 																?>
 																	<li>
 																		<a class="user" data-icon="<?= $rslt_collections[$collection_key]['user']['icon']; ?>" data-is-vip="<?= $rslt_collections[$collection_key]['user']['is_vip']; ?>" href="<?= $rslt_collections[$collection_key]['user']['url']; ?>"><?= $rslt_collections[$collection_key]['user']['username']; ?></a>

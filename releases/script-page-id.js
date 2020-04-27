@@ -1,4 +1,4 @@
-$(".collect").on("click", function() {
+/*$(".collect").on("click", function() {
 	$(this).removeClass("symbol__unchecked symbol__checked symbol__success symbol__loading symbol__error");
 });
 
@@ -21,10 +21,10 @@ for(var i = 0; i < $(".collect").length; i++) {
 				}
 		}
 	});
-}
+}*/
 
 // Tag releases
-$(".release__tag").on("click", function() {
+/*$(".release__tag").on("click", function() {
 	$(this).removeClass("symbol__tag symbol__loading symbol__error");
 });
 
@@ -48,7 +48,7 @@ for(var i = 0; i < $(".release__tag").length; i++) {
 			}
 		}
 	});
-}
+}*/
 
 // Copy info to clipboard
 var shareButton = document.getElementsByClassName("release__share-link")[0];
