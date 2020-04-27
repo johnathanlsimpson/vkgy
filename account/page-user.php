@@ -12,6 +12,7 @@ $access_artist = new access_artist($pdo);
 
 script([
 	"/scripts/external/script-clusterize.js",
+	'/releases/script-list.js',
 	"/account/script-page-user.js",
 ]);
 
@@ -447,12 +448,6 @@ if(strlen($next_users['rand1'])) {
 <div class="col <?php echo $num_wants ? 'c3-AAB' : 'c1'; ?>">
 	<div>
 		<h2 class="collection__title">
-			<?php
-				if($_SESSION['username'] === $user['username']) {
-					echo '<a class="symbol__download collection__download" href="/users/'.$_SESSION['username'].'/&action=download" style="">CSV</a>';
-					echo '<a class="symbol__download collection__download" href="/users/'.$_SESSION['username'].'/&action=download&limit=selling" style="">CSV (for sale)</a>';
-				}
-			?>
 			<?= lang($user['username'].'\'s vkei collection', $user['username'].' V系コレクション', 'div'); ?>
 		</h2>
 		
@@ -499,11 +494,42 @@ if(strlen($next_users['rand1'])) {
 			</ul>
 		</div>
 		
+		<style>
+			.collection__header {
+				background: inherit;
+				position: sticky;
+				top: 3rem;
+				z-index: 1;
+			}
+			.collection__download,
+			.collection__container [data-list-id] {
+				display: none;
+			}
+			#show-management:checked ~ .collection__download,
+			#show-management:checked ~ .collection__container [data-list-id] {
+				align-items: center;
+				display: inline-flex;
+			}
+		</style>
 		
-		<input class="any--hidden input__choice" id="filter-for-sale" name="filter-for-sale" type="radio" value="1" />
+		<?php
+			if($_SESSION['username'] === $user['username']) {
+				?>
+					<input class="input__choice" id="show-management" type="checkbox" />
+					<label class="collection__control input__checkbox symbol__checkbox--unchecked" for="show-management" style="float: none;margin: 0 auto 0.5rem 0;">manage</label>
+					
+					<a class="symbol__download collection__download" href="<?= '/users/'.$_SESSION['username'].'/&action=download'; ?>" style="float:none;margin:0 0.5rem 0 0;top:0.5rem;vertical-align:top;">CSV</a>
+					<a class="symbol__download collection__download" href="<?= '/users/'.$_SESSION['username'].'/&action=download&limit=selling'; ?>" style="float:none;margin:0 0.5rem 0 0;top:0.5rem;vertical-align:top;">CSV (for sale)</a>
+				<?php
+			}
+		?>
+		
+		<input class="any--hidden" id="filter-for-sale" name="filter-for-sale" type="radio" value="1" />
 		<label class="collection__control input__radio symbol__unchecked" data-filter="for-sale" for="filter-for-sale">for sale</label>
-		<input class="any--hidden input__choice" id="filter-all" name="filter-for-sale" type="radio" value="0" checked />
+		
+		<input class="any--hidden" id="filter-all" name="filter-for-sale" type="radio" value="0" checked />
 		<label class="collection__control input__radio symbol__unchecked" data-filter="all" for="filter-all">all</label>
+		
 		<span class="collection__control symbol__filter"></span>
 		
 		<ul class="any--weaken-color collection__container text" id="collection-container">
@@ -533,7 +559,7 @@ if(strlen($next_users['rand1'])) {
 						
 						if($curr_letter != $prev_letter) {
 							?>
-								<li class="collection__header <?= in_array($curr_letter, $for_sale_letters) ? 'collection--for-sale' : null; ?>">
+								<li class="collection__header <?= in_array($curr_letter, $for_sale_letters) ? 'collection--for-sale' : null; ?>" id="collection-<?= $curr_letter; ?>">
 									<h4>
 										<?= $curr_letter; ?>
 									</h4>
@@ -552,18 +578,27 @@ if(strlen($next_users['rand1'])) {
 						}
 						
 						?>
-							<li class="collection__item <?= $collection[$i]['is_for_sale'] ? 'collection--for-sale' : null; ?>">
+							<li class="collection__item <?= $collection[$i]['is_for_sale'] ? 'collection--for-sale' : null; ?> any--flex">
+								
+								<a style="align-self:center;" class="a--inherit" href="<?= '/releases/'.$artists[$collection[$i]['artist_id']]['friendly'].'/'.$collection[$i]['id'].'/'.$collection[$i]['friendly'].'/'; ?>">
+									<?= $collection[$i]['quick_name'] != $collection[$i]['name'] ? lang($collection[$i]['quick_name'], $collection[$i]['name'], 'hidden') : $collection[$i]['quick_name']; ?>
+								</a>
+								
 								<?php
 									if($_SESSION["username"] === $user["username"]) {
 										?>
-											<label class="collection__sell input__checkbox-label <?php echo $collection[$i]["is_for_sale"] ? "input__checkbox-label--selected symbol__checked" : "symbol__unchecked"; ?> collect" data-action="sell" data-id="<?php echo $collection[$i]["id"]; ?>">sell?</label>
+											<label class="input__checkbox" data-item-id="<?= $collection[$i]['id']; ?>" data-item-type="release" data-list-id="0" style="margin:0 0 0 auto;">
+												<input class="input__choice" type="checkbox" checked />
+												<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">own</span>
+											</label>
+											
+											<label class="input__checkbox" data-item-id="<?= $collection[$i]['id']; ?>" data-item-type="release" data-list-id="2" style="margin:0 0 0 0.5rem;">
+												<input class="input__choice" type="checkbox" <?= $collection[$i]['is_for_sale'] ? 'checked' : null; ?> />
+												<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">sell</span>
+											</label>
 										<?php
 									}
 								?>
-								
-								<a class="a--inherit" href="<?= '/releases/'.$artists[$collection[$i]['artist_id']]['friendly'].'/'.$collection[$i]['id'].'/'.$collection[$i]['friendly'].'/'; ?>">
-									<?= $collection[$i]['quick_name'] != $collection[$i]['name'] ? lang($collection[$i]['quick_name'], $collection[$i]['name'], 'hidden') : $collection[$i]['quick_name']; ?>
-								</a>
 								
 								<?php
 									if($_SESSION["username"] != $user["username"] && $collection[$i]["is_for_sale"]) {
