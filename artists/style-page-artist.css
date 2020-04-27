@@ -126,7 +126,10 @@
 	color: hsl(var(--text));
 }
 .lineup--compact:checked ~ .lineup__wrapper .lineup__compact::before {
-	clip-path: url(#symbol__checked);
+	-moz-clip-path:    url(#symbol__checkbox--checked);
+	-webkit-clip-path: url(#symbol__checkbox--checked);
+	clip-path:         url(#symbol__checkbox--checked);
+	opacity: 1;
 }
 .lineup--compact:checked ~ .lineup__wrapper .lineup--duplicate {
 	display: inline-block;
