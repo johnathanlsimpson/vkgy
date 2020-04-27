@@ -16,7 +16,9 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 		</h2>
 		
 		<div class="text lineup__wrapper <?php echo $musicians_type !== 1 ? "text--outlined" : null; ?>">
-			<label class="lineup__compact input__radio symbol__unchecked <?php echo !$compact_button_shown ? '' : 'any--hidden'; $compact_button_shown = true; ?>" for="lineup--compact"><?php echo lang('Make compact?', '縮小する', ['secondary_class' => 'any--hidden']); ?></label>
+			<label class="lineup__compact input__checkbox symbol__unchecked <?= !$compact_button_shown ? '' : 'any--hidden'; $compact_button_shown = true; ?>" for="lineup--compact">
+				<?php echo lang('Make compact?', '縮小する', ['secondary_class' => 'any--hidden']); ?>
+			</label>
 			
 			<?php
 				$num_musicians = count($musicians);
