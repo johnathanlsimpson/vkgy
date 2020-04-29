@@ -369,19 +369,7 @@
 		<?php display_scripts("bottom"); ?>
 		
 		<style>
-			/*<?php
-				/*$sql_vip_users = "SELECT username FROM users WHERE is_vip=? ORDER BY username";
-				$stmt_vip_users = $pdo->prepare($sql_vip_users);
-				$stmt_vip_users->execute([ "1" ]);
-				$rslt_vip_users = $stmt_vip_users->fetchAll();
-				
-				if(is_array($rslt_vip_users) && !empty($rslt_vip_users)) {
-					foreach($rslt_vip_users as $vip_user) {
-						echo 'a.user[href="/users/'.$vip_user["username"].'/"]::after,'."\n";
-					}
-				}*/
-			?>
-			.user--vip,*/ .user[data-is-vip="1"]::after {
+			.user[data-is-vip="1"]::after {
 				border-radius: 3px;
 				box-shadow: inset 0 0 0 1px;
 				content: "VIP";
@@ -390,16 +378,19 @@
 				padding: 0 2px;
 			}
 			.user[data-icon="crown"]::before {
-				clip-path: url(#symbol__user-crown); -webkit-clip-path: url(#symbol__user-crown);
+				clip-path: url(#symbol__user-crown); -webkit-clip-path: url(#symbol__user-crown); -moz-clip-path: url(#symbol__user-crown);
 			}
 			.user[data-icon="flower"]::before {
-				clip-path: url(#symbol__user-flower); -webkit-clip-path: url(#symbol__user-flower);
+				clip-path: url(#symbol__user-flower); -webkit-clip-path: url(#symbol__user-flower); -moz-clip-path: url(#symbol__user-flower);
 			}
 			.user[data-icon="heart"]::before {
-				clip-path: url(#symbol__user-heart); -webkit-clip-path: url(#symbol__user-heart);
+				clip-path: url(#symbol__user-heart); -webkit-clip-path: url(#symbol__user-heart); -moz-clip-path: url(#symbol__user-heart);
 			}
 			.user[data-icon="star"]::before {
-				clip-path: url(#symbol__user-star); -webkit-clip-path: url(#symbol__user-star);
+				clip-path: url(#symbol__user-star); -webkit-clip-path: url(#symbol__user-star); -moz-clip-path: url(#symbol__user-star);
+			}
+			.user[data-icon="moon"]::before {
+				clip-path: url(#symbol__user-moon); -webkit-clip-path: url(#symbol__user-moon); -moz-clip-path: url(#symbol__user-moon);
 			}
 		</style>
 		
