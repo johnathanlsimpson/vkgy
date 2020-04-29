@@ -25,6 +25,7 @@
 				'heart',
 				'star',
 				'flower',
+				'moon',
 			];
 			
 			// Setup empty user list array

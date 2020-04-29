@@ -323,7 +323,7 @@
 											<label class="input__label"><?= lang('Username style', 'アイコン', 'hidden'); ?></label>
 											
 											<?php
-												foreach([ 'crown', 'heart', 'star', 'flower' ] as $icon_key => $icon_name) {
+												foreach([ 'crown', 'heart', 'star', 'flower', 'moon' ] as $icon_key => $icon_name) {
 													
 													if( $user['icon'] === $icon_name || $_SESSION['is_vip'] ) {
 														?>
