@@ -78,7 +78,7 @@
 	</div>
 	
 	<?php
-		if( $artist_is_non_visual || ( is_array($current_tags) && is_array($current_tags['subgenres']) && !empty($current_tags['subgenres']) ) ) {
+		if( !$artist_is_non_visual && ( is_array($current_tags) && is_array($current_tags['subgenres']) && !empty($current_tags['subgenres']) ) ) {
 			?>
 				<div class="data__item">
 					<h5>
