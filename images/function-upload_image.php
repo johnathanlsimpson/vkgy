@@ -97,7 +97,7 @@
 									//$output['description'] = $default_description;
 									$output['image_status'] = 'new';
 									
-									// Award point
+									// Award point here, but don't show it until update_image, since status elem might not exist until that point
 									$access_points = new access_points($pdo);
 									$access_points->award_points([ 'point_type' => 'added-image' ]);
 								}

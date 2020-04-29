@@ -24,6 +24,7 @@ function initImageEditElems() {
 	});
 }
 
+
 let noDefaultElem = document.querySelector('.image__no-default:last-of-type [name="image_is_default"]');
 if(noDefaultElem) {
 	noDefaultElem.addEventListener('change', function() {
@@ -107,9 +108,18 @@ function updateImageData(changedElem) {
 		}
 	});
 	
+	// Grab element that says whether or not image is new, as we'll need to change it
+	let imageIsNewElem = parentElem.querySelector('[name="image_is_new"]');
+	
+	// Update image data
 	initializeInlineSubmit($(parentElem), '/images/function-update_image.php', {
 		'statusContainer' : $(statusElem),
 		'preparedFormData' : preparedFormData,
+		'callbackOnSuccess': function() {
+			
+			// Make sure that image is set as 'not new' after first update
+			imageIsNewElem.value = 0;
+		}
 	});
 	
 	var event = new Event('image-updated');
@@ -422,11 +432,11 @@ function showImageSection() {
 	var itemName = imageUploadParent.querySelector('[name=image_item_name]').value;
 	
 	// Gather template parts for this image section
-	var newImageElem  = document.importNode(imageTemplate.content, true);
-	let imageIdElem   = newImageElem.querySelector('[name="image_id"]');
-	var itemIdElem    = newImageElem.querySelector('[name^=image_' + itemType + '_id]');
-	var newOptionElem = document.createElement('option');
-	var thumbnailElem = newImageElem.querySelector('.image__image');
+	var newImageElem   = document.importNode(imageTemplate.content, true);
+	let imageIdElem    = newImageElem.querySelector('[name="image_id"]');
+	var itemIdElem     = newImageElem.querySelector('[name^=image_' + itemType + '_id]');
+	var newOptionElem  = document.createElement('option');
+	var thumbnailElem  = newImageElem.querySelector('.image__image');
 	
 	// Set certain image fields to defaults specified before loop
 	newImageElem.querySelector('[name=image_item_type]').value = itemType;
@@ -488,8 +498,11 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 			// Set thumbnail preview while uploading
 			newImageTemplateArgs.thumbnailElem.style.backgroundImage = 'url(' + window.URL.createObjectURL(thisImage) + ')';
 			
+			// Flag image as new upload right before updating data
+			let imageIsNewElem = newImageTemplateArgs.thisImageElem.querySelector('[name="image_is_new"]');
+			imageIsNewElem.value = 1;
+			
 			// Using core submit function, actually upload the image
-			//initializeInlineSubmit( $(newImageTemplateArgs.newImageElem), '/images/function-upload_image.php', {
 			initializeInlineSubmit( $(newImageTemplateArgs.thisImageElem), '/images/function-upload_image.php', {
 				
 				'preparedFormData' : { 'image' : thisImage, 'item_type' : newImageTemplateArgs.itemType, 'item_id' : newImageTemplateArgs.itemId },
