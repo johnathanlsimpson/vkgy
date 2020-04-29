@@ -136,7 +136,7 @@
 		// ======================================================
 		public function check_login() {
 			if($_SESSION["is_signed_in"]) {
-				if(!strlen($_SESSION['site_lang']) || !strlen($_SESSION['site_theme'])) {
+				if( !strlen($_SESSION['site_lang']) || !strlen($_SESSION['site_theme']) || !strlen($_SESSION['site_point_animations']) ) {
 					$sql_prefs = 'SELECT site_lang, site_theme, site_point_animations FROM users WHERE id=? LIMIT 1';
 					$stmt_prefs = $this->pdo->prepare($sql_prefs);
 					$stmt_prefs->execute([ $_SESSION['user_id'] ]);
