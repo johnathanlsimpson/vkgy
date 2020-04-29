@@ -137,17 +137,18 @@
 		public function check_login() {
 			if($_SESSION["is_signed_in"]) {
 				if(!strlen($_SESSION['site_lang']) || !strlen($_SESSION['site_theme'])) {
-					$sql_prefs = 'SELECT site_lang, site_theme FROM users WHERE id=? LIMIT 1';
+					$sql_prefs = 'SELECT site_lang, site_theme, site_point_animations FROM users WHERE id=? LIMIT 1';
 					$stmt_prefs = $this->pdo->prepare($sql_prefs);
 					$stmt_prefs->execute([ $_SESSION['user_id'] ]);
 					$rslt_prefs = $stmt_prefs->fetch();
-
+					
 					if(is_array($rslt_prefs) && !empty($rslt_prefs)) {
 						$_SESSION['site_lang'] = $rslt_prefs['site_lang'];
 						$_SESSION['site_theme'] = $rslt_prefs['site_theme'];
+						$_SESSION['site_point_animations'] = $rslt_prefs['site_point_animations'];
 					}
 				}
-
+				
 				return true;
 				$this->status = 5;
 			}
@@ -156,7 +157,7 @@
 					list($user_id, $remote_addr, $token, $mac) = explode(":", $_COOKIE["remember_me"]);
 
 					if(is_numeric($user_id)) {
-						$sql_user = "SELECT id, username, site_theme, site_lang FROM users WHERE id=? LIMIT 1";
+						$sql_user = "SELECT id, username, site_theme, site_lang, site_point_animations FROM users WHERE id=? LIMIT 1";
 						$stmt_user = $this->pdo->prepare($sql_user);
 						$stmt_user->execute([$user_id]);
 						$row = $stmt_user->fetch();
@@ -168,6 +169,7 @@
 								'username' => $row['username'],
 								'site_theme' => $row['site_theme'],
 								'site_lang' => $row['site_lang'],
+								'site_point_animations' => $row['site_point_animations'],
 								'is_signed_in' => 1,
 							];
 							
@@ -177,7 +179,7 @@
 							$this->set_login_data($session_data);
 						}
 					}
-
+					
 					return true;
 					$this->status = 5;
 				}
@@ -208,7 +210,7 @@
 			public function sign_in($input) {
 				$username_pattern = "^[\w\-\.\ ]{3,}$";
 				if(preg_match("/".$username_pattern."/", $input["username"])) {
-					$sql_user = "SELECT id, username, rank, is_vip, icon, password_old, password, site_theme, site_lang FROM users WHERE username=? LIMIT 1";
+					$sql_user = "SELECT id, username, rank, is_vip, icon, password_old, password, site_theme, site_lang, site_point_animations FROM users WHERE username=? LIMIT 1";
 					$stmt = $this->pdo->prepare($sql_user);
 					$stmt->execute(array($input["username"]));
 					$row = $stmt->fetch();
@@ -217,15 +219,12 @@
 						$session_data = [
 							'user_id' => $row['id'],
 							'site_theme' => $row['site_theme'],
-							//'admin' => $row['rank'],
 							'is_signed_in' => 1,
-							
 							'user_id' => $row['id'],
 							'username' => $row['username'],
 							'site_theme' => $row['site_theme'],
 							'site_lang' => $row['site_lang'],
-							//'is_admin' => $row['rank'],
-							//'is_vip' => $row['is_vip'],
+							'site_point_animations' => $row['site_point_animations'],
 							'is_signed_in' => 1,
 						];
 						

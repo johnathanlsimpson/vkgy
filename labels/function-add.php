@@ -44,7 +44,7 @@
 							
 							// Award point
 							$access_points = new access_points($pdo);
-							$access_points->award_points([ 'point_type' => 'added-label' ]);
+							$output['points'] += $access_points->award_points([ 'point_type' => 'added-label' ]);
 						}
 						else {
 							$output["status"] = "error";

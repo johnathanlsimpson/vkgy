@@ -201,13 +201,8 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 									}
 								}
 							}
-
+							
 							$output["status"] = "success";
-
-
-
-							// Award point
-							$access_points->award_points([ 'point_type' => 'edited-musician', 'allow_multiple' => false, 'item_id' => sanitize($musician['id']) ]);
 						}
 						else {
 							$output["status"] = "error";
@@ -268,6 +263,15 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 							else {
 								$change = null;
 							}
+							
+							// Award a point for editing musician
+							$output['points'] += $access_points->award_points([ 'point_type' => 'edited-musician', 'allow_multiple' => false, 'item_id' => sanitize($musician_id) ]);
+							
+						}
+						
+						// Award a point for changing artist
+						else {
+							$output['points'] += $access_points->award_points([ 'point_type' => 'edited-artist', 'allow_multiple' => true, 'item_id' => $artist_id ]);
 						}
 						
 						// Clean change again
@@ -480,11 +484,6 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 				}
 			}
 		}
-	}
-	
-	// Award points
-	if($update_successful) {
-		$access_points->award_points([ 'point_type' => 'edited-artist', 'allow_multiple' => false, 'item_id' => $artist_id ]);
 	}
 	
 	// If *not* successful, send error

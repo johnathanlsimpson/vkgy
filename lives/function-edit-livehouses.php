@@ -57,7 +57,7 @@
 								
 								// Award point
 								$access_points = new access_points($pdo);
-								$access_points->award_points([ 'point_type' => 'added-livehouse' ]);
+								$output['points'] += $access_points->award_points([ 'point_type' => 'added-livehouse' ]);
 							}
 							
 							if(strlen($nicknames) > 0) {

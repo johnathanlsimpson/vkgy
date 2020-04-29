@@ -130,7 +130,7 @@ if(is_array($_POST) && !empty($_POST)) {
 					
 					// Award point
 					$access_points = new access_points($pdo);
-					$access_points->award_points([ 'point_type' => 'edited-live', 'allow_multiple' => false, 'item_id' => $id ]);
+					$output['points'] += $access_points->award_points([ 'point_type' => 'edited-live', 'allow_multiple' => false, 'item_id' => $id ]);
 				}
 				else {
 					$output['result'][] = 'Couldn\'t update live.';

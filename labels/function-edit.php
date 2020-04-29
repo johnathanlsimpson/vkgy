@@ -49,7 +49,7 @@
 							
 							// Award point
 							$access_points = new access_points($pdo);
-							$access_points->award_points([ 'point_type' => 'edited-label', 'allow_multiple' => false, 'item_id' => $id ]);
+							$output['points'] += $access_points->award_points([ 'point_type' => 'edited-label', 'allow_multiple' => false, 'item_id' => $id ]);
 						}
 						else {
 							$output["result"] = "Sorry, the label couldn't be updated.";

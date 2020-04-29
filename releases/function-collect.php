@@ -26,7 +26,7 @@
 					
 					// Award point
 					$access_points = new access_points($pdo);
-					$access_points->award_points([ 'point_type' => 'collected-release', 'allow_multiple' => false, 'item_id' => $release_id ]);
+					$output['points'] += $access_points->award_points([ 'point_type' => 'collected-release', 'allow_multiple' => false, 'item_id' => $release_id ]);
 				}
 			}
 			elseif($action === "want") {
@@ -48,7 +48,7 @@
 					
 					// Award point
 					$access_points = new access_points($pdo);
-					$access_points->award_points([ 'point_type' => 'wanted-release', 'allow_multiple' => false, 'item_id' => $release_id ]);
+					$output['points'] += $access_points->award_points([ 'point_type' => 'wanted-release', 'allow_multiple' => false, 'item_id' => $release_id ]);
 				}
 			}
 			elseif($action === "sell") {
@@ -70,7 +70,7 @@
 					
 					// Award point
 					$access_points = new access_points($pdo);
-					$access_points->award_points([ 'point_type' => 'sold-release', 'allow_multiple' => false, 'item_id' => $release_id ]);
+					$output['points'] += $access_points->award_points([ 'point_type' => 'sold-release', 'allow_multiple' => false, 'item_id' => $release_id ]);
 				}
 			}
 			

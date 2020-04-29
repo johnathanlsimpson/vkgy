@@ -36,7 +36,7 @@ if(is_numeric($_POST["score"]) && is_numeric($_POST["release_id"])) {
 		
 		// Award point
 		$access_points = new access_points($pdo);
-		$access_points->award_points([ 'point_type' => 'rated-release', 'allow_multiple' => false, 'item_id' => $release_id ]);
+		$output['points'] += $access_points->award_points([ 'point_type' => 'rated-release', 'allow_multiple' => false, 'item_id' => $release_id ]);
 	}
 	else {
 		$output["status"] = "error";

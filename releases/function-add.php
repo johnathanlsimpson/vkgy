@@ -410,10 +410,10 @@
 									// Award point
 									$access_points = new access_points($pdo);
 									if($is_edit) {
-										$access_points->award_points([ 'point_type' => 'edited-release', 'allow_multiple' => false, 'item_id' => $release['id'] ]);
+										$output['points'] += $access_points->award_points([ 'point_type' => 'edited-release', 'allow_multiple' => false, 'item_id' => $release['id'] ]);
 									}
 									else {
-										$access_points->award_points([ 'point_type' => 'added-release' ]);
+										$output['points'] += $access_points->award_points([ 'point_type' => 'added-release' ]);
 									}
 								}
 								else {

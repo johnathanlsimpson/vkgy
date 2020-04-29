@@ -93,7 +93,7 @@ if($_SESSION['is_signed_in']) {
 							
 							// Award point
 							$access_points = new access_points($pdo);
-							$access_points->award_points([ 'point_type' => $point_type, 'allow_multiple' => false, 'item_id' => $item_id ]);
+							$output['points'] += $access_points->award_points([ 'point_type' => $point_type, 'allow_multiple' => false, 'item_id' => $item_id ]);
 							
 						}
 						else {

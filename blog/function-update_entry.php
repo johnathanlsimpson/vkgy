@@ -278,10 +278,10 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 				// Award point
 				$access_points = new access_points($pdo);
 				if($is_edit) {
-					$access_points->award_points([ 'point_type' => 'edited-blog', 'allow_multiple' => false, 'item_id' => $id ]);
+					$output['points'] += $access_points->award_points([ 'point_type' => 'edited-blog', 'allow_multiple' => false, 'item_id' => $id ]);
 				}
 				else {
-					$access_points->award_points([ 'point_type' => 'added-blog' ]);
+					$output['points'] += $access_points->award_points([ 'point_type' => 'added-blog' ]);
 				}
 			}
 			else {
