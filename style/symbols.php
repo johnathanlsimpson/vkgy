@@ -68,6 +68,7 @@
 		['filter', 32, '<path d="M16 0c-8.837 0-16 2.239-16 5v3l12 12v10c0 1.105 1.791 2 4 2s4-0.895 4-2v-10l12-12v-3c0-2.761-7.163-5-16-5zM2.95 4.338c0.748-0.427 1.799-0.832 3.040-1.171 2.748-0.752 6.303-1.167 10.011-1.167s7.262 0.414 10.011 1.167c1.241 0.34 2.292 0.745 3.040 1.171 0.494 0.281 0.76 0.519 0.884 0.662-0.124 0.142-0.391 0.38-0.884 0.662-0.748 0.427-1.8 0.832-3.040 1.171-2.748 0.752-6.303 1.167-10.011 1.167s-7.262-0.414-10.011-1.167c-1.24-0.34-2.292-0.745-3.040-1.171-0.494-0.282-0.76-0.519-0.884-0.662 0.124-0.142 0.391-0.38 0.884-0.662z"></path>'],
 		['download', 32, '<path d="M16 18l8-8h-6v-8h-4v8h-6zM23.273 14.727l-2.242 2.242 8.128 3.031-13.158 4.907-13.158-4.907 8.127-3.031-2.242-2.242-8.727 3.273v8l16 6 16-6v-8z"></path>'],
 		['shop', 20, '<path d="M13 17c0 1.104 0.894 2 2 2 1.104 0 2-0.896 2-2 0-1.106-0.896-2-2-2-1.106 0-2 0.894-2 2zM3 17c0 1.104 0.895 2 2 2 1.103 0 2-0.896 2-2 0-1.106-0.897-2-2-2-1.105 0-2 0.894-2 2zM6.547 12.172l11.068-3.162c0.211-0.061 0.385-0.289 0.385-0.51v-5.5h-14v-1.6c0-0.22-0.181-0.4-0.399-0.4h-3.202c-0.219 0-0.399 0.18-0.399 0.4v1.6h2l1.91 8.957 0.090 0.943v1.649c0 0.219 0.18 0.4 0.4 0.4h13.2c0.22 0 0.4-0.182 0.4-0.4v-1.549h-11.248c-1.15 0-1.174-0.551-0.205-0.828z"></path>'],
+		['point', 22, '<path d="M16.219 18l-1.125-4.828 3.75-3.234-4.922-0.422-1.922-4.5-1.922 4.547-4.922 0.375 3.75 3.234-1.125 4.828 4.219-2.531zM12 2.016q4.125 0 7.055 2.93t2.93 7.055-2.93 7.055-7.055 2.93-7.055-2.93-2.93-7.055 2.93-7.055 7.055-2.93z"></path>'],
 	];
 	
 	ob_start();
@@ -136,3 +137,103 @@
 	echo $output;
 	unset($paths, $output);
 ?>
+
+<template id="point-template">
+	<a class="point__container h5" href="<?= '/users/'.$_SESSION['username'].'/'; ?>">
+		<span class="point__value">0</span>
+		<span class="symbol__point point__symbol"></span>
+	</a>
+</template>
+
+<style>
+	.point__container {
+		align-items: center;
+		background: hsla(var(--attention), 0.3);
+		border-radius: 5px;
+		color: hsl(var(--attention--secondary));
+		display: flex;
+		font-size: 1rem;
+		font-weight: bold;
+		line-height: 0;
+		opacity: 0;
+		padding: 0.5rem;
+		pointer-events: none;
+		vertical-align: middle;
+		transform: translateY(30px);
+	}
+	.point__container:hover {
+		animation: none;
+		opacity: 1;
+		pointer-events: initial;
+		transform: translateY(0px);
+	}
+	.point__container::before {
+		content: "+";
+		margin-right: 4px;
+		opacity: 0.5;
+	}
+	.point--animate {
+		animation-name: fadePoint;
+		animation-duration: 2s;
+		animation-timing-function: ease-in-out;
+	}
+	.point__symbol {
+		font-size: 1.75rem;
+		margin-left: 5px;
+		opacity: 1;
+		top: -1px;
+	}
+	.point__symbol::before {
+		opacity: 1;
+	}
+	.point__tippy {
+		background: none;
+		padding: 0;
+	}
+	.point__tippy .tippy-arrow {
+		display: none;
+	}
+	.point--hovered:not(:hover) {
+		animation-name: fadePointFromHalf;
+		animation-duration: 1s;
+		animation-timing-function: ease-out;
+	}
+	@keyframes fadePoint {
+		0% { 
+			display: none;
+			opacity: 0;
+			pointer-events: none;
+			transform: translateY(30px);
+		}
+		10% {
+			display: block;
+			opacity: 1;
+			pointer-events: none;
+			transform: translateY(0px);
+		}
+		50% { 
+			opacity: 1;
+			transform: translateY(0px);
+			display: block;
+			pointer-events: initial;
+		}
+		100% { 
+			opacity: 0;
+			pointer-events: none;
+			transform: translateY(-60px);
+		}
+	}
+	@keyframes fadePointFromHalf {
+		0% { 
+			display: block;
+			opacity: 1;
+			pointer-events: initial;
+			transform: translateY(0px);
+		}
+		100% { 
+			opacity: 0;
+			pointer-events: none;
+			transform: translateY(-60px);
+		}
+	}
+</style>
