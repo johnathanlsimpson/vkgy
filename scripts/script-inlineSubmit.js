@@ -188,6 +188,25 @@ function submit(formElement, processorUrl, inputArgs) {
 						});
 					}
 					
+					console.log('num points: ' + returnedData.points);
+					console.log(args.statusContainer);
+					console.log(args.submitContainer);
+					
+					// Show number of points awarded, if possible
+					if(returnedData.points && typeof pointsTippy === 'function') {
+						
+						// If submit area is hid, attach tippy to edit button
+						if(args.showEditLink === true && args.editContainer) {
+							pointsTippy(args.editContainer, returnedData.points);
+						}
+						
+						// Otherwise attach tippy to status element
+						else if(args.statusContainer) {
+							pointsTippy(args.statusContainer, returnedData.points);
+						}
+						
+					}
+					
 					if(typeof args.callbackOnSuccess === "function") {
 						args.callbackOnSuccess(formElement, returnedData);
 					}
