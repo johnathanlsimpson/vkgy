@@ -87,7 +87,7 @@
 									$output['status'] = 'success';
 									$output['image_id'] = $id;
 									$output['image_url'] = '/images/'.$id.'.'.$extension;
-									$output['image_style'] = 'background-image: url(/images/'.$id.'.thumbnail.jpg);';
+									$output['image_style'] = 'background-image: url(/images/'.$id.'.thumbnail.'.$extension.');';
 									$output['image_markdown'] = '![](/images/'.$file_name.')';
 									$output['is_exclusive_for'] = 'is-exclusive-'.$id;
 									$output['is_default_for'] = 'is-default-'.$id;
