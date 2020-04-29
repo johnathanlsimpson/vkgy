@@ -217,7 +217,7 @@ elseif($_SESSION['is_signed_in']) {
 		
 		// Award point
 		$access_points = new access_points($pdo);
-		$output['points'] += $access_points->award_points([ 'point_type' => 'edited-profile', 'allow_multiple' => true ]);
+		$output['points'] += $access_points->award_points([ 'point_type' => 'edited-profile', 'allow_multiple' => false ]);
 	}
 	else {
 		$output['result'] = 'Couldn\'t update profile.';
