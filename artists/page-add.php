@@ -64,6 +64,7 @@ if($_SESSION["can_add_data"]) {
 				<div class="text text--outlined text--notice add__result any--hidden" data-role="result"></div>
 			</div>
 		</form>
+
 	<?php
 	
 	$documentation_page = 'add-artists';

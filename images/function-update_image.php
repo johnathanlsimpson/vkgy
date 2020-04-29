@@ -159,5 +159,11 @@ if(!$suppress_output) {
 	$output['result'] = is_array($output['result']) ? implode('<br />', $output['result']) : null;
 	$output['status'] = $output['status'] ?: 'error';
 	
+	// If image was just uploaded, show that the user gained one point, even though technically the point was awarded on upload and not on *update*
+	// Will have to change this point value manually, I guess
+	if($_POST['is_new']) {
+		$output['points'] = 1;
+	}
+	
 	echo json_encode($output);
 }

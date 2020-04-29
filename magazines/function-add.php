@@ -48,7 +48,7 @@ if($_SESSION['can_add_livehouses']) {
 							$stmt_edit->execute([ $magazine_id, $_SESSION['user_id'], 'Created.' ]);
 							
 							// Award point
-							$access_points->award_points([ 'point_type' => 'added-magazine' ]);
+							$output['points'] += $access_points->award_points([ 'point_type' => 'added-magazine' ]);
 							$points++;
 							
 						}

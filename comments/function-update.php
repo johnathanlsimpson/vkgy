@@ -80,7 +80,7 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 							
 							// Technically this is running as a comment edit, but since it's the user's first comment, let's make sure they get a point
 							$access_points = new access_points($pdo);
-							$access_points->award_points([ 'point_type' => 'added-comment' ]);
+							$output['points'] += $access_points->award_points([ 'point_type' => 'added-comment' ]);
 							
 						}
 						else {
@@ -169,7 +169,7 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 					
 					// Award point
 					$access_points = new access_points($pdo);
-					$access_points->award_points([ 'point_type' => 'added-comment' ]);
+					$output['points'] += $access_points->award_points([ 'point_type' => 'added-comment' ]);
 				}
 				else {
 					$output['result'][] = 'The comment couldn\'t be added.';

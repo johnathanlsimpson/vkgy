@@ -87,7 +87,7 @@
 									$output['status'] = 'success';
 									$output['image_id'] = $id;
 									$output['image_url'] = '/images/'.$id.'.'.$extension;
-									$output['image_style'] = 'background-image: url(/images/'.$id.'.thumbnail.jpg);';
+									$output['image_style'] = 'background-image: url(/images/'.$id.'.thumbnail.'.$extension.');';
 									$output['image_markdown'] = '![](/images/'.$file_name.')';
 									$output['is_exclusive_for'] = 'is-exclusive-'.$id;
 									$output['is_default_for'] = 'is-default-'.$id;
@@ -97,7 +97,7 @@
 									//$output['description'] = $default_description;
 									$output['image_status'] = 'new';
 									
-									// Award point
+									// Award point here, but don't show it until update_image, since status elem might not exist until that point
 									$access_points = new access_points($pdo);
 									$access_points->award_points([ 'point_type' => 'added-image' ]);
 								}

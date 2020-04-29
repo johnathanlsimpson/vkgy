@@ -197,8 +197,8 @@ if(strlen($next_users['rand1'])) {
 							Level <span class="level__num"><?= $user_points['meta']['level']; ?></span>
 						</h5>
 						<span class="level__points">
-							<span class="level__point-num"><?= number_format( $user_points['meta']['point_value'] ); ?></span>
-							<?= lang('pt', '点', 'hidden'); ?>
+							<span class="level__point-num"><?= number_format( $user_points['meta']['point_value'] ); ?><span class="symbol__point symbol--standalone" style="margin:0 0 0 3px;"></span></span>
+							<!--<?= lang('pt', '点', 'hidden'); ?>-->
 						</span>
 						
 					</div>

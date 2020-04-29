@@ -44,7 +44,7 @@
 	z-index: -1;
 }
 @media(max-width: 599.99px) {
-	.image__image::after {
+	.image__status::after {
 		border-radius: 0 0 5px 0;
 		left: 0;
 		padding: 0 0.25rem 0.25rem 0;

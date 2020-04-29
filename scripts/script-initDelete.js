@@ -13,6 +13,8 @@ Wrapper to handle "delete" buttons and deletion process
 // Attach confirmation, init submit on second click.
 function initDelete(deleteButton, processorUrl, data, callbackFn = function() {}, triggerClick = false) {
 	
+	$(deleteButton).off('click');
+	
 	$(deleteButton).on("click", function(event) {
 		event.preventDefault();
 		

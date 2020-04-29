@@ -36,12 +36,12 @@
 		$rslt_wants = $stmt_wants->fetchAll();
 		
 		// For collections, get correct usernames and check if being sold by current user
-		if($is_for_sale) {
+		if(is_array($rslt_collections) && !empty($rslt_collections)) {
 			foreach($rslt_collections as $collection_key => $collection) {
 				
 				// Get user info
 				$collection['user'] = $access_user->access_user([ 'id' => $collection['user_id'], 'get' => 'name' ]);
-				$rslt_collections[$collection_key] = $collection;
+				$rslt_collections[$collection_key]['user'] = $collection['user'];
 				
 				if($collection['is_for_sale'] && $collection['user']['id'] === $_SESSION['user_id']) {
 					$release['is_for_sale'] = true;

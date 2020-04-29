@@ -22,6 +22,7 @@
 							<input name="image_item_type" value="{item_type}" hidden />
 							<input name="image_item_id" value="{item_id}" hidden />
 							<input name="image_is_queued" value="{is_queued}" hidden />
+							<input class="" data-get="image_is_new" data-get-into="value" name="image_is_new" value="0" disabled />
 							
 							<!-- Description, default, delete -->
 							<div class="input__row image__message">

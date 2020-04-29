@@ -53,7 +53,7 @@ if(is_numeric($_POST['comment_id'])) {
 				if(is_numeric($_SESSION['user_id']) && $op_id != $_SESSION['user_id']) {
 					
 					// Award point to person who liked comment
-					$access_points->award_points([ 'point_type' => 'liked-comment', 'allow_multiple' => false, 'item_id' => $comment_id ]);
+					$output['points'] += $access_points->award_points([ 'point_type' => 'liked-comment', 'allow_multiple' => false, 'item_id' => $comment_id ]);
 					
 					// Award point to person who received like
 					$access_points->award_points([ 'point_type' => 'comment-liked', 'allow_multiple' => false, 'item_id' => $comment_id, 'user_id' => $op_id ]);

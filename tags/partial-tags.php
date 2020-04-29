@@ -88,7 +88,7 @@
 												?>
 													<label class="any__tag input__radio" data-id="<?= $item_id; ?>" data-tag-id="<?= $tag['id']; ?>" data-item-type="<?= $item_type; ?>">
 														<input class="input__choice" type="checkbox" <?= in_array($tag['id'], $user_tags) ? 'checked' : null;?> />
-														<span class="symbol__tag" data-role="status">
+														<span class="symbol__tag tag__status">
 															<?= str_replace( [' kei', '&#31995;' ], '', lang($tag['romaji'] ?: $tag['name'], $tag['name'], 'hidden') ); ?>
 														</span>
 													</label>

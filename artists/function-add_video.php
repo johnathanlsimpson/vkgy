@@ -21,7 +21,7 @@ if(strlen($input_url) && $_SESSION['is_signed_in']) {
 			
 			// Award point
 			$access_points = new access_points($pdo);
-			$access_points->award_points([ 'point_type' => 'added-video' ]);
+			$output['points'] += $access_points->award_points([ 'point_type' => 'added-video' ]);
 		}
 		else {
 			$output['result'] = 'No returned data.';

@@ -1,6 +1,8 @@
 var currentTippyElem;
 var tippyTimeout;
 
+
+// Find artist links and attach Tippy handler
 function attachArtistTooltips(artistLinks) {
 	for(var i = 0, l = artistLinks.length; i < l; i++) {
 		var currentArtistElem = artistLinks[i];
@@ -29,6 +31,60 @@ function attachArtistTooltips(artistLinks) {
 var artistLinks = document.querySelectorAll(".artist[data-name]:not([data-name='']):not([data-hoverable])");
 attachArtistTooltips(artistLinks);
 
+
+// Show tippy when points are awarded
+function pointsTippy(tippedElem, pointNum) {
+	
+	// Get point tippy <template>, then get HTML portion of it
+	var tipTemplate    = document.querySelector('#point-template');
+	var clonedTemplate = tipTemplate.content.cloneNode(true).querySelector('.point__container');
+	
+	// Set the appropriate number of points
+	clonedTemplate.querySelector('.point__value').innerHTML = pointNum ? pointNum : 0;
+	
+	// Trigger the Tippy object
+	if(tippedElem) {
+		var tips = tippy(tippedElem, {
+			arrow: true,
+			delay: [0, 500],
+			dynamicTitle: false,
+			html: clonedTemplate,
+			interactive: true,
+			interactiveBorder: 5,
+			onShow: function() {
+				
+				// Add class to tippy element so we can remove the default styling
+				clonedTemplate.parentNode.parentNode.classList.add('point__tippy');
+				
+				// Trigger the fade up animation
+				clonedTemplate.classList.add('point--animate');
+				
+				// If user mouses over popup, pause animation
+				clonedTemplate.addEventListener('mouseenter', function() {
+					clonedTemplate.classList.add('point--hovered');
+				});
+				
+				// If user mouses out from popup, change to animation that starts from where it was (probably) paused
+				clonedTemplate.addEventListener('mouseleave', function() {
+					setTimeout(function() {
+						clonedTemplate.classList.remove('point--hovered');
+						clonedTemplate.classList.remove('point--animate');
+					}, 1005);
+				});
+				
+			},
+			onHidden: function(tippedEelem, clonedTemplate) {
+				tips.destroyAll();
+			},
+		});
+		
+		// Trigger the tippy popup
+		tippedElem._tippy.show();
+	}
+}
+
+
+// Show Tippy for artists
 function customShowTippy() {
 	var template = document.querySelector("#artistTooltip");
 	var elem = currentTippyElem;
