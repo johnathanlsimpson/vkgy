@@ -82,6 +82,13 @@ if(is_numeric($image_id) && $can_delete_image) {
 			if($stmt_delete->execute([ $image_id ])) {
 				if(file_exists("../images/image_files/".$image_id.".".$extension) && unlink("../images/image_files/".$image_id.".".$extension)) {
 					$output["status"] = "success";
+					
+					// Delete resized versions
+					foreach([ 'thumbnail', 'small', 'medium', 'large', 'watermarked' ] as $method) {
+						if( $method && $extension && is_numeric($image_id) && unlink('../images/image_files_'.$method.'/'.$image_id.'.'.$extension) ) {
+						}
+					}
+					
 				}
 				else {
 					$output["result"] = "Couldn't be deleted.";
