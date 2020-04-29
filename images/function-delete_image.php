@@ -85,7 +85,7 @@ if(is_numeric($image_id) && $can_delete_image) {
 					
 					// Delete resized versions
 					foreach([ 'thumbnail', 'small', 'medium', 'large', 'watermarked' ] as $method) {
-						if( $method && $extension && is_numeric($image_id) && unlink('../images/image_files_'.$method.'/'.$image_id.'.'.$extension) ) {
+						if( $method && $extension && is_numeric($image_id) && file_exists('../images/image_files_'.$method.'/'.$image_id.'.'.$extension) && unlink('../images/image_files_'.$method.'/'.$image_id.'.'.$extension) ) {
 						}
 					}
 					
