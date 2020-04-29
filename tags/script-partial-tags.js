@@ -73,7 +73,7 @@ function handleTag(tagElem, tagChoiceElem, event) {
 	let itemId       = tagElem.dataset.id;
 	let itemType     = tagElem.dataset.itemType;
 	let action       = tagElem.dataset.action;
-	let statusElem   = tagElem.querySelector('[data-role="status"]');
+	let statusElem   = tagElem.querySelector('.tag__status');
 	let itemIsTagged;
 	
 	if(tagChoiceElem) {
