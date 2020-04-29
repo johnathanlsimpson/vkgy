@@ -353,6 +353,9 @@ class access_points {
 						'point_type_name' => $args['point_type'],
 					]);
 					
+					// Return number of points awarded so it can be used
+					return $_SESSION['site_point_animations'] ? $num_points : null;
+					
 				}
 				
 			}

@@ -269,6 +269,54 @@
 										</div>
 									</div>
 								</li>
+								
+								<!-- Points system -->
+								<li>
+									<div class="input__row">
+										<div class="input__group">
+											<label class="input__label"><?= lang('Point animation', 'ポイントをアニメイトします', 'hidden'); ?></label>
+											
+											<label class="input__radio">
+												<input class="input__choice" name="site_point_animations" type="radio" value="1" <?= $_SESSION['site_point_animations'] ? 'checked' : null; ?> />
+												<span class="symbol__unchecked">show</span>
+											</label>
+											
+											<input class="input__choice" id="hide-points" name="site_point_animations" type="radio" value="0" <?= !$_SESSION['site_point_animations'] ? 'checked' : null; ?> />
+											<label class="input__radio symbol__unchecked" for="hide-points">
+												hide
+											</label>
+											
+											<span class="point__container point--example h5" href="/users/inartistic/" style="opacity:1;transform:none;display:inline-flex;align-items:center;height:2rem;">
+												<span class="point__value">1</span>
+												<span class="symbol__point point__symbol"></span>
+											</span>
+											
+											<style>
+												#hide-points:checked ~ .point--example {
+													animation: none;
+												}
+												#hide-points:checked ~ .point--example::after {
+													background-color: hsla(var(--background), 0.5);
+													background-image: linear-gradient(to bottom right, transparent, transparent calc(50% - 3px), hsla(var(--text--secondary), 0.8) calc(50% - 2px), hsla(var(--text--secondary), 0.8) calc(50% + 1px), transparent calc(50% + 2px));
+													bottom: 0;
+													border-radius: inherit;
+													content: "";
+													left: 0;
+													position: absolute;
+													right: 0;
+													top: 0;
+												}
+												.point--example {
+													animation-name: fadePointFromHalf;
+													animation-duration: 1s;
+													animation-timing-function: ease-out;
+												}
+											</style>
+											
+										</div>
+									</div>
+								</li>
+								
 								<li>
 									<div class="input__row">
 										<div class="input__group">

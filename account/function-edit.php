@@ -120,6 +120,7 @@ elseif($_SESSION['is_signed_in']) {
 	// Further clean some values
 	$email_pattern = '/^(?!(?:(?:\x22?\x5C[\x00-\x7E]\x22?)|(?:\x22?[^\x5C\x22]\x22?)){255,})(?!(?:(?:\x22?\x5C[\x00-\x7E]\x22?)|(?:\x22?[^\x5C\x22]\x22?)){65,}@)(?:(?:[\x21\x23-\x27\x2A\x2B\x2D\x2F-\x39\x3D\x3F\x5E-\x7E]+)|(?:\x22(?:[\x01-\x08\x0B\x0C\x0E-\x1F\x21\x23-\x5B\x5D-\x7F]|(?:\x5C[\x00-\x7F]))*\x22))(?:\.(?:(?:[\x21\x23-\x27\x2A\x2B\x2D\x2F-\x39\x3D\x3F\x5E-\x7E]+)|(?:\x22(?:[\x01-\x08\x0B\x0C\x0E-\x1F\x21\x23-\x5B\x5D-\x7F]|(?:\x5C[\x00-\x7F]))*\x22)))*@(?:(?:(?!.*[^.]{64,})(?:(?:(?:xn--)?[a-z0-9]+(?:-[a-z0-9]+)*\.){1,126}){1,}(?:(?:[a-z][a-z0-9]*)|(?:(?:xn--)[a-z0-9]+))(?:-[a-z0-9]+)*)|(?:\[(?:(?:IPv6:(?:(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){7})|(?:(?!(?:.*[a-f0-9][:\]]){7,})(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,5})?::(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,5})?)))|(?:(?:IPv6:(?:(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){5}:)|(?:(?!(?:.*[a-f0-9]:){5,})(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,3})?::(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,3}:)?)))?(?:(?:25[0-5])|(?:2[0-4][0-9])|(?:1[0-9]{2})|(?:[1-9]?[0-9]))(?:\.(?:(?:25[0-5])|(?:2[0-4][0-9])|(?:1[0-9]{2})|(?:[1-9]?[0-9]))){3}))\]))$/iD';
 	$sql_values['site_theme'] = is_numeric($sql_values['site_theme']) ? $sql_values['site_theme'] : 0;
+	$sql_values['site_point_animations'] = $_POST['site_point_animations'] ? 1 : 0;
 	$sql_values['icon'] = is_numeric($sql_values['icon']) ? $sql_values['icon'] : 0;
 	$sql_values['icon'] = $sql_values['icon'] > 0 && !$_SESSION['is_vip'] ? 0 : $sql_values['icon'];
 	$sql_values['email'] = preg_match($email_pattern, $sql_values['email']) ? $sql_values['email'] : null;
@@ -131,6 +132,7 @@ elseif($_SESSION['is_signed_in']) {
 	
 	// Set some session variables based on potential changes
 	$_SESSION['site_theme'] = $sql_values['site_theme'];
+	$_SESSION['site_point_animations'] = $sql_values['site_point_animations'];
 	
 	// Handle username change
 	$new_username = sanitize($_POST['new_username']) ?: null;
@@ -215,7 +217,7 @@ elseif($_SESSION['is_signed_in']) {
 		
 		// Award point
 		$access_points = new access_points($pdo);
-		$access_points->award_points([ 'point_type' => 'edited-profile', 'allow_multiple' => false ]);
+		$output['points'] += $access_points->award_points([ 'point_type' => 'edited-profile', 'allow_multiple' => true ]);
 	}
 	else {
 		$output['result'] = 'Couldn\'t update profile.';
