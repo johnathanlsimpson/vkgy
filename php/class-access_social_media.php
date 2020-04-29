@@ -112,12 +112,12 @@
 						$output['image'] = $input['filepath'];
 						$output['url'] = $input['url'];
 						$output['content'] = '
-							🖼️ Today\'s random flyer ∙ 今日のフライヤー
+							🖼️ Today\'s flyer ∙ 今日のフライヤー
 							
 							'.($input['artist']['romaji'] ? $input['artist']['romaji'].' ('.$input['artist']['name'].')' : $input['artist']['name']).'
 							
-							Do you know them?
-							👨‍👨‍👦‍👦 https://vk.gy/artists/'.$input['artist']['friendly'].'/
+							Info: https://vk.gy/artists/'.$input['artist']['friendly'].'/
+							Past flyers: https://vk.gy/images/&type=flyer&order=desc
 							
 							'.($user['twitter'] && $user['twitter'] != '@vkgy_' ? '✍️ '.($user['twitter'] ?: $user['username']) : null).'
 							'.(true ? null : '🔎 '.$input['url']).'
