@@ -152,6 +152,7 @@ if(!$_GET['entry'] && !$_GET['action']) {
 		'tag' => $_GET['tag'],
 		'page' => $_GET['page'] ?: 'latest',
 		'get' => 'list',
+		'limit' => $_GET['view'] === 'interview' ? 40 : null
 	]);
 	$entries = is_array($entries) ? $entries : [];
 	$num_entries = count($entries);
@@ -196,5 +197,10 @@ if(!$_GET['entry'] && !$_GET['action']) {
 	}
 	
 	// View
-	include("../blog/page-page.php");
+	if($_GET['view'] === 'interview') {
+		include('page-interview.php');
+	}
+	else {
+		include("../blog/page-page.php");
+	}
 }

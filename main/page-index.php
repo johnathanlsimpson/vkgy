@@ -162,7 +162,7 @@
 							}
 						}
 					?>
-					<a class="h5 news__title" href="/blog/tag/feature/">
+					<a class="h5 news__title" href="/interview/">
 						<?= lang('Interviews', 'インタビュー', 'hidden'); ?>
 					</a>
 				</div>

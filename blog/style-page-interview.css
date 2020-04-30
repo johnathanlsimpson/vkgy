@@ -1,0 +1,33 @@
+.interview__wrapper {
+	align-items: end;
+	display: grid;
+	grid-gap: var(--gutter);
+	grid-template-columns: 1fr 1fr;
+}
+@media(max-width: 999.99px) {
+	.interview__wrapper {
+		grid-template-columns: 1fr;
+	}
+}
+.interview__top {
+	align-items: flex-end;
+	margin-bottom: 1rem;
+}
+.interview__title {
+	margin-bottom: 0;
+	margin-right: auto;
+}
+.interview__link {
+	line-height: 1rem;
+	margin-left: 0.5rem;
+	white-space: nowrap;
+}
+.interview__image-link, .interview__image {
+	display: block;
+	width: 100%;
+}
+@media(min-width: 1000px) {
+	.interview__content {
+		margin-bottom: 0;
+	}
+}
