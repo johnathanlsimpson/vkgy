@@ -271,7 +271,7 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 						
 						// Award a point for changing artist
 						else {
-							$output['points'] += $access_points->award_points([ 'point_type' => 'edited-artist', 'allow_multiple' => true, 'item_id' => $artist_id ]);
+							$output['points'] += $access_points->award_points([ 'point_type' => 'edited-artist', 'allow_multiple' => false, 'item_id' => $artist_id ]);
 						}
 						
 						// Clean change again
