@@ -2,11 +2,17 @@
 	align-items: end;
 	display: grid;
 	grid-gap: var(--gutter);
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 @media(max-width: 999.99px) {
 	.interview__wrapper {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
+	}
+	.interview__link span {
+		display: none;
+	}
+	.interview__content {
+		padding: 0;
 	}
 }
 .interview__top {
@@ -14,8 +20,22 @@
 	margin-bottom: 1rem;
 }
 .interview__title {
+	line-height: 2rem;
 	margin-bottom: 0;
 	margin-right: auto;
+	max-width: 100%;
+	overflow: hidden;
+	padding-right: 1rem;
+	white-space: nowrap;
+}
+.interview__title::after {
+	background-image: linear-gradient(to left, hsla(var(--background--secondary), 1), hsla(var(--background--secondary), 0));
+	bottom: 0;
+	content: "";
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 1rem;
 }
 .interview__link {
 	line-height: 1rem;

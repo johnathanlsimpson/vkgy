@@ -65,13 +65,14 @@ style([
 					<div class="interview__top any--flex">
 						
 						<h1 class="interview__title">
-							<a href="">
-							<?= $band_romaji != $band_name ? lang($band_romaji, $band_name, 'div') : $band_name; ?></a>
+							<a href="<?= '/blog/'.$entry['friendly'].'/'; ?>">
+								<?= $band_romaji != $band_name ? lang($band_romaji, $band_name, 'div') : $band_name; ?>
+							</a>
 						</h1>
 						
-						<?= $_SESSION['can_add_data'] ? '<a class="a--padded interview__link symbol__edit" href="/blog/'.$entry['friendly'].'/edit/">Edit</a>' : null; ?>
-						<a class="a--outlined a--padded interview__link" href="<?= '/blog/'.$entry['friendly'].'/'; ?>">English</a>
-						<a class="a--outlined a--padded interview__link" href="<?= '/blog/'.$entry['jp_friendly'].'/'; ?>">日本語版</a>
+						<?= $_SESSION['can_add_data'] ? '<a class="a--padded interview__link symbol__edit" href="/blog/'.$entry['friendly'].'/edit/"><span>Edit</span></a>' : null; ?>
+						<a class="a--outlined a--padded interview__link" href="<?= '/blog/'.$entry['friendly'].'/'; ?>">Eng<span>lish</span></a>
+						<a class="a--outlined a--padded interview__link" href="<?= '/blog/'.$entry['jp_friendly'].'/'; ?>">日本語<span>版</span></a>
 						
 					</div>
 					
