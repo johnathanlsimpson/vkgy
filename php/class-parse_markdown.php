@@ -518,7 +518,7 @@
 			$markdown_parser = new Parsedown();
 			
 			$input_content = sanitize($input_content);
-			$input_content = str_replace(["&#47;", "&#92;/"], ["/", "&#47;"], $input_content);
+			$input_content = str_replace(["&#47;", "&#92;/", '&#62;'], ["/", "&#47;", '>'], $input_content);
 			
 			$reference_data = $this->get_reference_data($input_content);
 			
