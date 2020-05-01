@@ -22,7 +22,7 @@
 		<title><?php echo $page_title; ?></title>
 		
 		<link rel="stylesheet" id="stylesheet_theme" href="<?php echo '/style/style-colors-'.(is_numeric($_SESSION['site_theme']) ? $_SESSION['site_theme'] : 0).'.css'; ?>" />
-		<link rel="stylesheet" href="/style/style-critical.css<?php echo '?'.date('Ymd'); ?>" />
+		<link rel="stylesheet" href="/style/style-critical.css<?php echo '?'.date('YmdHis', filemtime('../style/style-critical.css')); ?>" />
 		<?php
 			if(is_array($GLOBALS["styles"])) {
 				array_unshift($GLOBALS["styles"], "/style/style-shared.css");
