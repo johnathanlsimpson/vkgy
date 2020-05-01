@@ -535,13 +535,20 @@
 		white-space: nowrap;
 	}
 
+	/* In case we decide to play with filters later...
+	to black brightness(0) saturate(100%)
+	to white invert(100%) sepia(100%) saturate(0%) hue-rotate(190deg) brightness(105%) contrast(106%)
+	to red invert(9%) sepia(95%) saturate(2426%) hue-rotate(323deg) brightness(103%) contrast(97%)
+	normal link blue invert(61%) sepia(19%) saturate(524%) hue-rotate(166deg) brightness(88%) contrast(90%)
+	pink invert(41%) sepia(10%) saturate(2936%) hue-rotate(294deg) brightness(90%) contrast(83%)
+	pink blue invert(40%) sepia(9%) saturate(940%) hue-rotate(190deg) brightness(100%) contrast(87%)*/
 
 	/* 2° (TOP NAV): HOME BUTTON */
 	.secondary-nav__home {
 		background-color: hsl(var(--accent));
 		background-image:
-			url('/style/vkgy_cage_hd.gif'),
-			url('/style/vkgy_text_hd.gif');
+			url('/main/vkgy_cage.png'),
+			url('/main/vkgy_text.png');
 		background-position:
 			0 1px,
 			0 bottom;
@@ -554,6 +561,7 @@
 		display: inline-block;
 		height: 5rem;
 		padding: 0.25rem;
+		transform: scale(1);
 		width: 46px;
 		z-index: 101;
 	}
@@ -766,6 +774,8 @@
 		height: 2rem;
 		object-fit: contain;
 		opacity: 1;
+		overflow: visible;
+		stroke-width: 6.5px;
 		width: 1.29rem;
 	}
 	.primary-nav__home:hover .primary-nav__cage {
