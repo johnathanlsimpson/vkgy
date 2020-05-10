@@ -58,7 +58,7 @@ if($artist_is_viewable) {
 	// Get artists with same name or same pronunciation, then combine results (to eliminate duplicates) and remove current artist from result
 	$possible_dupes_by_name = $access_artist->access_artist([ 'name' => $artist['name'], 'get' => 'name', 'associative' => true ]);
 	$possible_dupes_by_pronunciation = strlen($artist['pronunciation']) ? $access_artist->access_artist([ 'name' => $artist['pronunciation'], 'get' => 'name', 'associative' => true ]) : [];
-	$possible_dupes = $possible_dupes_by_name + $possible_dupes_by_pronunciation;
+	$possible_dupes = (is_array($possible_dupes_by_name) ? $possible_dupes_by_name : []) + (is_array($possible_dupes_by_pronunciation) ? $possible_dupes_by_pronunciation : []);
 	unset($possible_dupes[$artist['id']]);
 	
 	if(is_array($possible_dupes) && !empty($possible_dupes)) {

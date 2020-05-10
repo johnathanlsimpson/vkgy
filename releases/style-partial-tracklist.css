@@ -12,6 +12,7 @@
 /* For track num and artist, set width (a.k.a. min-width for cell) */
 .track__num,
 .track__artist {
+	line-height: 1.5rem;
 	max-width: 300px;
 	overflow: hidden;
 	white-space: nowrap;

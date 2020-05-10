@@ -29,14 +29,15 @@
 		if(is_array($entry['tags']) && !empty($entry['tags'])) {
 			foreach($entry['tags'] as $tag) {
 				if($tag['friendly'] === 'feature') {
-					
-					$entry['content'] = str_replace('.medium.', '.large.', $entry['content']);
 					$entry_is_feature = true;
 					
 					break;
 				}
 			}
 		}
+		
+		// Make blog entries show large versions of images
+		$entry['content'] = str_replace('.medium.', '.large.', $entry['content']);
 		
 		$sql_twitter = "SELECT twitter FROM users WHERE username=? LIMIT 1";
 		$stmt_twitter = $pdo->prepare($sql_twitter);

@@ -141,7 +141,7 @@
 				
 				<div class="news__features any--flex" style="padding-bottom:0;">
 					<?php
-						$featured_articles = $access_blog->access_blog([ 'tag' => 'feature', 'get' => 'basics', 'limit' => 5 ]);
+						$featured_articles = $access_blog->access_blog([ 'tag' => 'interview', 'get' => 'basics', 'limit' => 10 ]);
 						
 						// Shuffle featured interviews
 						$latest_article = array_shift($featured_articles);
@@ -149,7 +149,7 @@
 						array_unshift($featured_articles, $latest_article);
 						
 						foreach($featured_articles as $article) {
-							if($article['id'] != (969 * 4)) {
+							if(strpos($article['title'], sanitize('日本語')) === false) {
 								$image = '/images/'.$article['image_id'].'-'.$article['friendly'].'.medium.';
 								$image = file_exists('../images/image_files/'.$article['image_id'].'.jpg') ? $image.'jpg' : $image.'png';
 								?>

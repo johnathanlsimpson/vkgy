@@ -51,3 +51,26 @@
 	display: block;
 	width: 100px;
 }
+
+/* Sidebar */
+.rate__container li {
+	padding: 0;
+}
+.rate__item {
+	font-size: 1rem;
+	line-height: 1;
+}
+[data-list-id] {
+	width: calc(100% - 1rem);
+}
+.release__lists {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 1rem;
+	text-transform: none;
+}
+
+/* Hide 'for sale' option if release isn't marked 'owned' */
+[id^="release-owned"]:not(:checked) ~ [for^="release-sold"] {
+	display: none;
+}

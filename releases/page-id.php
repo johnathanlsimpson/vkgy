@@ -257,28 +257,20 @@
 												<div class="input__group data__item">
 													<label class="input__label">Lists</label>
 													
-													<style>
-														#release-owned:not(:checked) ~ [for="release-sold"] {
-															display: none;
-														}
-													</style>
-													
 													<input class="input__choice" id="release-owned" type="checkbox" <?= $release['is_owned'] ? 'checked' : null; ?> />
 													<label class="input__checkbox" data-list-id="0" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-owned">
-														<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">own</span>
+														<span class="symbol__checkbox--unchecked" data-role="status">own</span>
 													</label>
 													
 													<input class="input__choice" id="release-wanted" type="checkbox" <?= $release['is_wanted'] ? 'checked' : null; ?> />
 													<label class="input__checkbox" data-list-id="1" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-wanted">
-														<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">want</span>
+														<span class="symbol__checkbox--unchecked" data-role="status">want</span>
 													</label>
 													
 													<input class="input__choice" id="release-sold" type="checkbox" <?= $release['is_for_sale'] ? 'checked' : null; ?> />
 													<label class="input__checkbox" data-list-id="2" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-sold">
-														<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">sell</span>
+														<span class="symbol__checkbox--unchecked" data-role="status">sell</span>
 													</label>
-													
-													<!--<label class="input__radio symbol__down-caret" style="transform:scaleX(-1);"><span style="transform:scaleX(-1);">List</span></label>-->
 												</div>
 												
 												<div class="collect__result text text--outlined text--notice symbol__help"></div>
@@ -328,11 +320,6 @@
 													<a class="release__buy" href="<?= 'https://magento.rarezhut.net/catalogsearch/result/?q='.html_entity_decode($release['artist']['name'].' '.$release['name']); ?>" target="_blank">
 														<img src="/releases/rh.gif" style="height:1rem;" /> Search RarezHut
 													</a>
-													<style>
-														.release__buy:not(:hover) img {
-															opacity: 0.5;
-														}
-													</style>
 												</div>
 											</div>
 										</div>

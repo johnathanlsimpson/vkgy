@@ -79,6 +79,8 @@
 			$avatar_url = file_exists('..'.$avatar_url) ? $avatar_url : '/usericons/avatar-anonymous.png';
 		?>
 		
+		<img class="any--hidden" src="/style/sprite-cage.png" />
+		
 		<nav class="col c1 secondary-nav__wrapper">
 			<div class="flex any--weaken-color">
 				<a class="secondary-nav__home" href="/"></a>
@@ -102,9 +104,9 @@
 			<div class="primary-nav__container any--flex">
 				<div class="primary-nav__links any--flex">
 					<a href="/" class="primary-nav__home">
-						<svg x="0px" y="0px" width="0" height="0" viewBox="0 0 105 164" class="primary-nav__cage" fill="none" stroke="hsl(var(--accent))" stroke-width="5">
+						<!--<svg x="0px" y="0px" width="0" height="0" viewBox="0 0 105 164" class="primary-nav__cage" fill="none" stroke="hsl(var(--accent))" stroke-width="5">
 							<path d="M52.5,161.5c-27.6,0-50-8.3-50-16v-88c0-24.4,17.6-44.7,40.8-49c1.5-3.5,5.1-6,9.2-6c4.1,0,7.6,2.5,9.2,6 c23.3,4.3,40.9,24.6,40.9,49v88C102.5,153.2,80.1,161.5,52.5,161.5z" /><path d="M42.5,107.7c0,4.6,0,8.8,0,12.2 M52.5,7.5c-5.5,0-10,13.9-10,41" /><path d="M22.5,101.5c0,16.1,0,56.1,0,56.1 M52.5,7.5c-16.6,0-30,20.9-30,48" /><path d="M62.5,107.9c0,16.3,0,30.5,0,37.7 M52.5,7.5c5.5,0,10,13.9,10,41" /><path d="M82.5,136.5L82.5,136.5 M82.5,100.6c0,8.9,0,17.9,0,26.2 M52.5,7.5c16.6,0,30,20.9,30,48" /><path d="M52.5,108.1c-22.4,0-41.6-12.3-50-30c8.4-17.7,27.6-30,50-30c22.4,0,41.6,12.3,50,30C94.1,95.7,74.8,108.1,52.5,108.1z" /><path d="M82.5,57.5 c0,16.7-13.3,30.3-30,30.3s-30-13.5-30-30.3" />
-						</svg>
+						</svg>-->
 					</a>
 					
 					<?php
@@ -393,6 +395,21 @@
 				clip-path: url(#symbol__user-moon); -webkit-clip-path: url(#symbol__user-moon); -moz-clip-path: url(#symbol__user-moon);
 			}
 		</style>
+		
+		<template id="list-template">
+			<input class="input__choice" id="release-sold" type="checkbox" <?= $release['is_for_sale'] ? 'checked' : null; ?> />
+			<label class="input__checkbox" data-list-id="2" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-sold">
+				<span class="symbol__checkbox--unchecked" data-role="status">my list 1</span>
+			</label>
+			<label class="input__checkbox" data-list-id="2" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-sold">
+				<span class="symbol__checkbox--unchecked" data-role="status">あああああああああああああああああ！！！！</span>
+			</label>
+			
+			<a class="point__container h5" href="<?= '/users/'.$_SESSION['username'].'/'; ?>">
+				<span class="point__value">0</span>
+				<span class="symbol__point point__symbol"></span>
+			</a>
+		</template>
 		
 		<script language="javascript" type="text/javascript">
 			var sc_project=7964501;

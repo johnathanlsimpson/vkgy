@@ -20,6 +20,7 @@ function setArguments(formElement, inputArgs) {
 		resultContainer        : formElement.find("[data-role=result]"),
 		editButton             : formElement.find("[data-role=edit]"),
 		editContainer          : formElement.find("[data-role=edit-container]"),
+		pointContainer         : null,
 		
 		attentionTarget        : $("body"),
 		returnIntoElem         : formElement.find("[data-get]"),
@@ -188,20 +189,21 @@ function submit(formElement, processorUrl, inputArgs) {
 						});
 					}
 					
-					console.log('num points: ' + returnedData.points);
-					console.log(args.statusContainer);
-					console.log(args.submitContainer);
-					
 					// Show number of points awarded, if possible
 					if(returnedData.points && typeof pointsTippy === 'function') {
 						
-						// If submit area is hid, attach tippy to edit button
-						if(args.showEditLink === true && args.editContainer) {
+						// If element to show point is specified, attach tippy there
+						if(args.pointContainer && args.pointContainer.length) {
+							pointsTippy(args.pointContainer, returnedData.points);
+						}
+						
+						// Else if submit area is hidden, attach tippy to edit button
+						else if(args.showEditLink === true && args.editContainer && args.editContainer.length) {
 							pointsTippy(args.editContainer, returnedData.points);
 						}
 						
 						// Otherwise attach tippy to status element
-						else if(args.statusContainer) {
+						else if(args.statusContainer && args.statusContainer.length) {
 							pointsTippy(args.statusContainer, returnedData.points);
 						}
 						

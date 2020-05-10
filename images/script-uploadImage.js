@@ -245,7 +245,7 @@ function urlToBlob(inputURL, newImageTemplateArgs, tryProxy = true) {
 		img.crossOrigin = '';
 		
 		// In case of error loading the image
-		img.onerror = function(x) {
+		img.onerror = function(errorMessage) {
 			
 			// If failure came while trying proxy (a.k.a. probably got 403 forbidden), try without
 			if(tryProxy) {
@@ -358,7 +358,7 @@ function cleanDroppedURL(inputURL) {
 		
 		// Set up output and patterns
 		let outputURL = inputURL;
-		let wixPattern = /\/v\d\/fill\/[A-z0-9_,\.\/]+/;
+		let wixPattern = /\/v\d\/fill\/[A-z0-9_,\.\/\%\-]+/;
 		let wpPattern = /-\d+x\d+\./;
 		let twitterPatternA = /:[thumb|small|medium|large]$/;
 		let twitterPatternB = /name=[A-z0-9]+/;

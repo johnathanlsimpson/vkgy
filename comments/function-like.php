@@ -1,5 +1,6 @@
 <?php
 include_once('../php/include.php');
+$access_points = new access_points($pdo);
 
 if(is_numeric($_POST['comment_id'])) {
 	$comment_id = sanitize($_POST['comment_id']);
@@ -49,7 +50,6 @@ if(is_numeric($_POST['comment_id'])) {
 				$op_id = $stmt_op->fetchColumn();
 				
 				// Award point
-				$access_points = new access_points($pdo);
 				if(is_numeric($_SESSION['user_id']) && $op_id != $_SESSION['user_id']) {
 					
 					// Award point to person who liked comment
