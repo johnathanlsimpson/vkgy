@@ -173,7 +173,7 @@
 				<?php
 			}
 			
-			foreach($lives as $year => $live_year) {
+			if(is_array($lives) && !empty($lives)) { foreach($lives as $year => $live_year) {
 				foreach($live_year as $month => $live_month) {
 					?>
 						<h2 class="lives__month">
@@ -245,7 +245,7 @@
 						</div>
 					<?php
 				}
-			}
+			} }
 		?>
 	</div>
 </div>
