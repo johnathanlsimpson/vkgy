@@ -19,7 +19,7 @@
 				</span>
 				
 				<!-- Left side, avatar -->
-				<div class="comment__avatar" style="background-image: url({avatar_url}?<?php echo date('YmdH'); ?>);">
+				<div class="comment__avatar" style="background-image: url({avatar_url}?<?= date('YmdH'); ?>);">
 					<a class="comment__avatar-link" href="{user_url}"></a>
 				</div>
 				

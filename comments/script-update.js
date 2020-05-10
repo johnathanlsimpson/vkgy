@@ -241,6 +241,7 @@ class CommentHandler {
 		let additionalCommentNum = (action === 'add' ? 1 : -1);
 		
 		initializeInlineSubmit($(likeButton), "/comments/function-like.php", {
+			statusContainer: $(likeButton),
 			preparedFormData : {
 				'comment_id' : commentParent.dataset.commentId,
 				'action' : action,

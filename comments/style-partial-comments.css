@@ -88,6 +88,7 @@
 .comment__container[data-is-deleted="1"] .comment__moderation,
 .comment__container[data-is-approved="1"] .commentate__anonymous,
 .comment__container[data-is-approved="0"] .commentate__comment,
+.comment__container[data-is-user="1"] .comment__like,
 .comment__thread > .commentate__container .commentate__anonymous {
 	display: none;
 }
@@ -160,6 +161,8 @@
 	width: 100%;
 }
 [data-is-liked="1"] .comment__like::before {
+	-moz-clip-path: url(#symbol__star--full);
+	-webkit-clip-path: url(#symbol__star--full);
 	clip-path: url(#symbol__star--full);
 }
 [data-is-liked="1"] .comment__like::after {
