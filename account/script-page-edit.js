@@ -42,12 +42,11 @@ if(pronounsSelector) {
 		pronounsElem.classList.remove('any--hidden');
 	}
 	pronounsSelector.addEventListener('change', function(event) {
-		console.log('a'); console.log(pronounsSelector.value);
-		if(pronounsSelector.value === 'custom') { console.log('b');
+		if(pronounsSelector.value === 'custom') {
 			pronounsElem.classList.remove('any--hidden');
 			pronounsElem.focus();
 		}
-		else { console.log('c');
+		else {
 			pronounsElem.classList.add('any--hidden');
 		}
 	});
