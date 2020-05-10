@@ -169,7 +169,7 @@
 			// Transform data
 			$data = json_decode($data);
 			
-			if(is_object($data) && !empty($data)) {
+			if(is_object($data) && !empty($data) && $data->items && !empty($data->items)) {
 				foreach($data->items as $data_item) {
 					$snippet = (array) $data_item->snippet;
 					$statistics = (array) $data_item->statistics;
