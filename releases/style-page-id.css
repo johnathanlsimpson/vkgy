@@ -141,3 +141,13 @@
 	vertical-align: middle;
 	width: auto;
 }
+
+/* Hide 'for sale' option if release isn't marked 'owned' */
+#release-owned:not(:checked) ~ [for="release-sold"] {
+	display: none;
+}
+
+/* 'Buy' options */
+.release__buy:not(:hover) img {
+	opacity: 0.5;
+}

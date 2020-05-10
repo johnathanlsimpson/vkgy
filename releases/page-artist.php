@@ -111,8 +111,8 @@
 									</a>
 								</div>
 								
-								<div class="text flex <?= $release_is_omnibus ? 'text--outlined' : null; ?>">
-									<table class="release__tracklist any--flex-grow">
+								<div class="text flex <?= $release_is_omnibus ? 'text--outlined' : null; ?>" style="max-width:100%;">
+									<table class="release__tracklist " style="width:calc(100% - 100px - 1rem);">
 										<?php
 											include_once('../php/function-render_component.php');
 											
@@ -276,41 +276,35 @@
 											<?php
 												if($_SESSION["is_signed_in"]) {
 													?>
-														<!--<div class="a--padded collect__container">
-															<a class="collect collect__item any--flex any--flex-space-between <?= $release["is_owned"] ? "symbol__checked" : "symbol__unchecked"; ?>" data-action="own" data-id="<?= $release["id"]; ?>">Owned</a>
-															<a class="collect collect__item any--flex any--flex-space-between <?= $release["is_wanted"] ? "symbol__checked" : "symbol__unchecked"; ?>" data-action="want" data-id="<?= $release["id"]; ?>">Wanted</a>
-														</div>-->
-														<div style="margin-bottom:1.5rem;display:flex;flex-direction:column;">
+														<div class="release__lists">
+															<input class="input__choice" id="<?= 'release-owned-'.$release['id']; ?>" type="checkbox" <?= $release['is_owned'] ? 'checked' : null; ?> />
+															<label class="input__checkbox" data-list-id="0" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="<?= 'release-owned-'.$release['id']; ?>">
+																<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">own</span>
+															</label>
 															
-													<style>
-														#release-owned:not(:checked) ~ [for="release-sold"] {
-															display: none;
-														}
-														[data-list-id] {
-															text-transform: none;
-															width: calc(100% - 1rem)
-														}
-													</style>
-													
-													<input class="input__choice" id="<?= 'release-owned-'.$release['id']; ?>" type="checkbox" <?= $release['is_owned'] ? 'checked' : null; ?> />
-													<label class="input__checkbox" data-list-id="0" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="<?= 'release-owned-'.$release['id']; ?>">
-														<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">Own</span>
-													</label>
-													
-													<input class="input__choice" id="<?= 'release-wanted-'.$release['id']; ?>" type="checkbox" <?= $release['is_wanted'] ? 'checked' : null; ?> />
-													<label class="input__checkbox" data-list-id="1" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="<?= 'release-wanted-'.$release['id']; ?>">
-														<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">Want</span>
-													</label>
-													
-													<input class="input__choice" id="<?= 'release-sold-'.$release['id']; ?>" type="checkbox" <?= $release['is_for_sale'] ? 'checked' : null; ?> />
-													<label class="input__checkbox" data-list-id="2" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="<?= 'release-sold-'.$release['id']; ?>">
-														<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">Sell</span>
-													</label>
+															<input class="input__choice" id="<?= 'release-wanted-'.$release['id']; ?>" type="checkbox" <?= $release['is_wanted'] ? 'checked' : null; ?> />
+															<label class="input__checkbox" data-list-id="1" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="<?= 'release-wanted-'.$release['id']; ?>">
+																<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">want</span>
+															</label>
+															
+															<input class="input__choice" id="<?= 'release-sold-'.$release['id']; ?>" type="checkbox" <?= $release['is_for_sale'] ? 'checked' : null; ?> />
+															<label class="input__checkbox" data-list-id="2" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="<?= 'release-sold-'.$release['id']; ?>">
+																<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">sell</span>
+															</label>
 														</div>
 													<?php
 												}
 											?>
-											<a class="a--outlined a--padded symbol__arrow-right-circled" href="/releases/<?php echo $artist["friendly"]."/".$release["id"]."/".$release["friendly"]; ?>/">Details</a>
+											<div style="text-align:left;">
+												<a class="release__buy" href="<?= 'https://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/searches?term.media_format=&f=all&q='.($release["upc"] ? str_replace(["-000", "-00", "-0"], "-", $release["upc"]) : str_replace(" ", "+", $release["quick_name"])); ?>" target="_blank">
+													<img src="/releases/cdj.gif" style="height:1.25rem;vertical-align:middle;" />
+												</a>
+												&nbsp;
+												<a class="release__buy" href="<?= 'https://magento.rarezhut.net/catalogsearch/result/?q='.html_entity_decode($release['artist']['name'].' '.$release['name']); ?>" target="_blank">
+													<img src="/releases/rh.gif" style="height:1rem;vertical-align:middle;" />
+												</a>
+											</div>
+											<!--<a class="a--outlined a--padded symbol__arrow-right-circled" href="/releases/<?php echo $artist["friendly"]."/".$release["id"]."/".$release["friendly"]; ?>/">Details</a>-->
 										</div>
 								</div>
 							</div>
