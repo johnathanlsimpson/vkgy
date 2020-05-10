@@ -235,7 +235,7 @@
 							echo '} '."\n";
 							
 							echo '#'.$group_name.'__'.$layer_name.'--'.$shape_name.':checked ~ .avatar__controls [for='.$group_name.'__'.$layer_name.'--'.$shape_name.']::before {';
-								echo 'clip-path:url(#symbol__checked);';
+								echo '-moz-clip-path:url(#symbol__checked); -webkit-clip-path:url(#symbol__checked); clip-path:url(#symbol__checked);';
 								echo 'opacity:1;';
 							echo '} '."\n";
 						}
@@ -251,7 +251,7 @@
 							echo '} '."\n";
 							
 							echo '#'.$group_name.'__'.$layer_name.'--'.$shape_name.':checked ~ .avatar__controls [for='.$group_name.'__'.$layer_name.'--'.$shape_name.']::before {';
-								echo 'clip-path:url(#symbol__checked);';
+								echo '-moz-clip-path:url(#symbol__checked); -webkit-clip-path:url(#symbol__checked); clip-path:url(#symbol__checked);';
 								echo 'opacity:1;';
 							echo '} '."\n";
 						}
@@ -270,7 +270,7 @@
 						$clip_path = 'url(#'.$clip_path.'.path)';
 						
 						echo '#'.$clipping_group.'__'.$clipping_layer.'--'.$clipping_shape_option.':checked ~ .avatar__column '.'.'.$group_name.'__'.$layer_name.' {';
-							echo 'clip-path:'.$clip_path.';';
+							echo '-moz-clip-path:'.$clip_path.'; -webkit-clip-path:'.$clip_path.'; clip-path:'.$clip_path.';';
 							echo 'filter:none;';
 						echo '} '."\n";
 					}
@@ -316,7 +316,7 @@
 						echo '} '."\n";
 						
 						echo '#'.$group_name.'__'.$layer_name.'--'.$position_name.':checked ~ .avatar__controls [for='.$group_name.'__'.$layer_name.'--'.$position_name.']::before {';
-							echo 'clip-path:url(#symbol__checked);';
+							echo '-moz-clip-path:url(#symbol__checked); -webkit-clip-path:url(#symbol__checked); clip-path:url(#symbol__checked);';
 							echo 'opacity:1;';
 						echo '} '."\n";
 						
@@ -393,7 +393,7 @@
 						echo '} '."\n";
 						
 						echo '#'.$group_name.'__'.$layer_name.'--'.$color_name.':checked ~ .avatar__controls [for='.$group_name.'__'.$layer_name.'--'.$color_name.']::before {';
-							echo 'clip-path:url(#symbol__checked);';
+							echo '-moz-clip-path:url(#symbol__checked); -webkit-clip-path:url(#symbol__checked); clip-path:url(#symbol__checked);';
 							echo 'opacity:1;';
 						echo '} '."\n";
 						

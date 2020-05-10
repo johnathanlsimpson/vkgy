@@ -295,6 +295,8 @@
 	color: hsl(var(--text));
 }
 .register__show:checked + .register__show-label::before {
+	-moz-clip-path: url(#symbol__checked);
+	-webkit-clip-path: url(#symbol__checked);
 	clip-path: url(#symbol__checked);
 }
 .register__container {
@@ -333,6 +335,8 @@
 }
 #register__radio--bat:checked ~ .register__avatar-container .register__bat::before,
 #register__radio--gecko:checked ~ .register__avatar-container .register__gecko::before {
+	-moz-clip-path: url(#symbol__checked);
+	-webkit-clip-path: url(#symbol__checked);
 	clip-path: url(#symbol__checked);
 }
 .obscure__input:checked + .comments__container .obscure__item:nth-of-type(n+7) {

@@ -38,6 +38,8 @@
 	padding: 0.25rem 0;
 }
 [type="radio"]:checked + .collection__control::before {
+	-moz-clip-path: url(#symbol__checked) !important;
+	-webkit-clip-path: url(#symbol__checked) !important;
 	clip-path: url(#symbol__checked) !important;
 	opacity: 1;
 }
