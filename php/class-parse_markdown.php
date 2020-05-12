@@ -19,6 +19,7 @@
 		private $twitter_pattern = "(?<!\()(?:<blockquote class=\"twitter.+)?(?:(?:https?:\/\/(?:\w+\.)?)?twitter\.com\/(\w+)\/status\/(\d{10,20}))(?:[^\s]+)?(?:.+twitter\.com.+\/script>)?(?!\))";
 		private $image_pattern = "\[?!\[([^\]]*)\]\(([^\)\s]+)\)(?:\]\((.+)?\))?";
 		private $user_pattern = "(?<=^| )(@[A-z0-9-]+)(?=$|[\.,;\/ :\s\']|&#39;)";
+		private $spotify_pattern = '(https:\/\/open\.spotify\.com\/)((?:artist|track|album)\/[A-z0-9]{22})(?:\?si=[\w-]+)?';
 		
 		// ======================================================
 		// Construct DB connection
@@ -184,6 +185,7 @@
 			
 			$input_content = preg_replace("/".$this->youtube_pattern."/", "https://youtu.be/$1", $input_content);
 			$input_content = preg_replace("/".$this->twitter_pattern."/", "https://twitter.com/$1/status/$2", $input_content);
+			$input_content = preg_replace("/".$this->spotify_pattern."/", "$1$2", $input_content);
 			
 			return $input_content;
 		}
@@ -400,8 +402,7 @@
 							$references[] = $output;
 						//}
 						
-						
-		//$returned_data = $access_video->add_video($youtube_id, $artist_id);
+						//$returned_data = $access_video->add_video($youtube_id, $artist_id);
 						
 						/*$release = $access_release->access_release(["release_id" => $id, "get" => "basics"]);
 						
@@ -668,12 +669,10 @@
 													($reference_datum['press_name'] ? (' '.$reference_datum['press_romaji'] ?: $reference_datum['press_name']) : null).
 													($reference_datum['type_name'] ? (' '.$reference_datum['type_romaji'] ?: $reference_datum['type_name']) : null);
 											}
-
 											$name = 
 												($reference_datum['name']).
 												($reference_datum['press_name'] ? ' '.$reference_datum['press_name'] : null).
 												($reference_datum['type_name'] ? ' '.$reference_datum['type_name'] : null);
-
 											if(strlen($reference_datum['romaji']) && $reference_datum['romaji'] != $reference_datum['name']) {
 												echo lang($romaji, $name, 'parentheses');
 											}
@@ -702,7 +701,16 @@
 											}
 										?>
 									</ol>
-									<a class="symbol__arrow-right-circled" href="<?= $cdjapan_link; ?>" target="_blank"><?= ($reference_datum['date_occurred'] > date('Y-m-d') ? 'Preorder' : 'Order').' at CDJapan'; ?></a>
+									<!--<a class="symbol__arrow-right-circled" href="<?= $cdjapan_link; ?>" target="_blank"><?= ($reference_datum['date_occurred'] > date('Y-m-d') ? 'Preorder' : 'Order').' at CDJapan'; ?></a>-->
+									
+									<a class="release__buy" href="<?= $cdjapan_link; ?>" target="_blank">
+										<img src="/releases/cdj.gif" style="height:1rem;" /> CDJapan
+									</a>
+									&nbsp;
+									<a class="release__buy" href="<?= 'https://magento.rarezhut.net/catalogsearch/result/?q='.html_entity_decode($reference_datum['artist']['name'].' '.$reference_datum['name']); ?>" target="_blank">
+										<img src="/releases/rh.gif" style="height:1rem;" /> RarezHut
+									</a>
+									
 								</div>
 							</div>
 						<?php
@@ -733,6 +741,11 @@
 				// Twitter
 				$input_content = preg_replace_callback("/".$this->twitter_pattern."/", function($match) {
 					return '<div class="module module--twitter"><blockquote class="twitter-tweet" data-lang="en"><a href="https://twitter.com/'.$match[1].'/status/'.$match[2].'"></a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>';
+				}, $input_content);
+				
+				// Spotify
+				$input_content = preg_replace_callback("/".$this->spotify_pattern."/", function($match) {
+					return '<div class="module module--spotify"><iframe src="'.$match[1].'embed/'.$match[2].'" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe></div>';
 				}, $input_content);
 				
 				// Image
