@@ -39,6 +39,7 @@ if(!empty($_GET["entry"]) && !$_GET["action"]) {
 	}
 	
 	if($is_allowed && is_array($entry) && !empty($entry)) {
+		$entry['references'] = $markdown_parser->get_reference_data($entry['content']);
 		$entry['content'] = $markdown_parser->parse_markdown($entry['content']);
 		$entry['images'] = is_array($entry['images']) ? $entry['images'] : [];
 		$entry['image'] = $entry['images'][$entry['image_id']];
@@ -60,8 +61,8 @@ if(!empty($_GET["entry"]) && !$_GET["action"]) {
 			}
 		}
 		
-		if($entry_is_feature && $_SESSION['username'] === 'inartistic') {
-			include('../blog/page-interview-inartistic.php');
+		if($entry_is_feature) {
+			include('../blog/page-interview.php');
 		}
 		else {
 			include('../blog/page-entry.php');
@@ -211,8 +212,8 @@ if(!$_GET['entry'] && !$_GET['action']) {
 	}
 	
 	// View
-	if($_GET['view'] === 'interview') {
-		include('page-interview.php');
+	if($_GET['view'] === 'interviews') {
+		include('page-interviews.php');
 	}
 	else {
 		include("../blog/page-page.php");

@@ -94,7 +94,7 @@ RewriteRule  ^blog/page/(\d+)/?$                        /?blog/&page=$1
 RewriteRule  ^blog/add/?$                               /?blog/&action=update
 RewriteRule  ^blog/([\w-]+)/?$                          /?blog/&entry=$1
 RewriteRule  ^blog/([\w-]+)/edit/?$                     /?blog/&action=update&entry=$1
-RewriteRule  ^interview/?$                              /?blog/&tag=interview&view=interview
+RewriteRule  ^interview/?$                              /?blog/&tag=interview&view=interviews
 
 RewriteRule  ^documentation/([A-z\-]+)/?$  /?documentation/&documentation_page=$1
 

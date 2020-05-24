@@ -169,13 +169,13 @@
 			$sql_select = [];
 			if(is_numeric($args["artist_id"])) {
 				//array_push($sql_select, "COALESCE(artists_musicians.as_romaji, artists_musicians.as_name) AS as_quick_name", "artists_musicians.position", "artists_musicians.as_name", "artists_musicians.as_romaji");
-				array_push($sql_select, "COALESCE(artists_musicians.as_romaji, artists_musicians.as_name, musicians.romaji, musicians.name) AS quick_name", "artists_musicians.position", "artists_musicians.as_name", "artists_musicians.as_romaji");
+				array_push($sql_select, "COALESCE(artists_musicians.as_romaji, artists_musicians.as_name, musicians.romaji, musicians.name) AS quick_name", "artists_musicians.position", 'artists_musicians.to_end', "artists_musicians.as_name", "artists_musicians.as_romaji");
 			}
 			if($args["get"] === "name") {
 				array_push($sql_select, "musicians.id", "musicians.name", "musicians.romaji", "COALESCE(musicians.romaji, musicians.name) AS quick_name", "musicians.friendly");
 			}
 			if($args["get"] === "list") {
-				array_push($sql_select, "musicians.id", "musicians.usual_position", "musicians.history", "musicians.name", "musicians.romaji", "COALESCE(musicians.romaji, musicians.name) AS quick_name", "musicians.friendly");
+				array_push($sql_select, "musicians.id", "musicians.usual_position", 'musicians.blood_type', 'musicians.birth_date', "musicians.history", "musicians.name", "musicians.romaji", "COALESCE(musicians.romaji, musicians.name) AS quick_name", "musicians.friendly");
 			}
 			if($args["get"] === "all") {
 				array_push($sql_select, "musicians.*", "COALESCE(musicians.romaji, musicians.name) AS quick_name");

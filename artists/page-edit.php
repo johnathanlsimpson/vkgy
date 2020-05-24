@@ -225,31 +225,6 @@
 									</template>
 									
 									<?php
-										// Get new URLs
-										$sql_urls = 'SELECT * FROM artists_urls WHERE artist_id=?';
-										$stmt_urls = $pdo->prepare($sql_urls);
-										$stmt_urls->execute([ $artist['id'] ]);
-										$artist['urls'] = $stmt_urls->fetchAll();
-										
-										// Old links were stored as string, so may have to transform to array
-										if(!is_array($artist['urls'])) {
-											
-											// If old links in string, transform into array
-											if(strlen($artist['official_links'])) {
-												$artist['urls'] = explode("\n", $artist['official_links']);
-												
-												// Loop through URLs and set up array
-												foreach($artist['urls'] as $url_key => $url) {
-													$artist['urls'][$url_key] = [ 'content' => $url ];
-												}
-											}
-											
-											// If no links extant, just make empty array
-											else {
-												$artist['urls'] = [];
-											}
-											
-										}
 										
 										// Number of URL elements shown should be all extant + 1 empty spot, or the minimum of empty spots
 										$num_websites = is_array($artist['urls']) && count($artist['urls']) ? count($artist['urls']) + 1 : 3;
