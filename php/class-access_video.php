@@ -61,7 +61,7 @@
 					
 					// If artist provided, check if video is from official channel
 					// If artist not provided, try to find artist with that channel listed
-					$sql_artist = 'SELECT id FROM artists WHERE '.(is_numeric($artist_id) ? 'id=? AND ' : null).' official_links LIKE CONCAT("%", ?, "%") LIMIT 1';
+					$sql_artist = 'SELECT artist_id FROM artists_urls WHERE '.(is_numeric($artist_id) ? 'artist_id=? AND ' : null).' content LIKE CONCAT("%", ?, "%") LIMIT 1';
 					$values_artist[] = 'youtube.com/channel/'.$video_data['channel_id'];
 					if(is_numeric($artist_id)) {
 						array_unshift($values_artist, $artist_id);
@@ -103,7 +103,7 @@
 								$this->access_artist = new access_artist($this->pdo);
 							}
 							
-							$this->access_artist->add_website($artist_id, 'https://youtube.com/channel/'.$video_data['channel_id']);
+							$this->access_artist->update_url($artist_id, 'https://youtube.com/channel/'.$video_data['channel_id']);
 						}
 						
 						$values_video = [

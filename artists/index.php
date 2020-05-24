@@ -214,12 +214,24 @@
 			}
 		}
 		
-		// Links
-		include('function-format_artist_links.php');
-		$artist['official_links'] = format_artist_links($artist['official_links']);
+		// If artist hasn't been updated to newer version of URLs, grab from old links field
+		if( (!is_array($artist['urls']) || empty($artist['urls'])) && strlen($artist['official_links']) ) {
+			$artist['urls'] = explode("\n", $artist['official_links']);
+			$artist['urls'] = array_filter($artist['urls']);
+			
+			if(is_array($artist['urls']) && !empty($artist['urls'])) {
+				foreach($artist['urls'] as $url_key => $url) {
+					$artist['urls'][$url_key] = [ 'content' => $url ];
+				}
+			}
+		}
+		
+		// Clean up links for display
+		include('function-format_artist_urls.php');
+		$artist['urls'] = format_artist_urls($artist['urls']);
 		
 		// Remove empty arrays
-		foreach(['musicians', 'history', 'lives', 'images', 'videos', 'labels', 'official_links', 'edit_history'] as $key) {
+		foreach(['musicians', 'history', 'lives', 'images', 'videos', 'labels', 'edit_history'] as $key) {
 			if(is_array($artist[$key]) && !empty($artist[$key])) {
 			}
 			else {

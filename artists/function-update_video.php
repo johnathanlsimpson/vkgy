@@ -2,6 +2,8 @@
 
 include_once('../php/include.php');
 
+$access_artist = new access_artist($pdo);
+
 $allowed_methods = ['approve', 'delete', 'report'];
 
 $id = $_GET['id'] ?: ($_POST['id'] ?: null);
@@ -31,7 +33,7 @@ if(is_numeric($id)) {
 					if(is_numeric($artist_id) && strlen($channel_id)) {
 							
 						// If channel not whitelisted already, add to official artist links
-						$sql_check_artist = 'SELECT 1 FROM artists WHERE id=? AND official_links LIKE CONCAT("%", ?, "%") LIMIT 1';
+						$sql_check_artist = 'SELECT 1 FROM artists_urls WHERE artist_id=? AND content LIKE CONCAT("%", ?, "%") LIMIT 1';
 						$stmt_check_artist = $pdo->prepare($sql_check_artist);
 						$stmt_check_artist->execute([ $artist_id, 'youtube.com/channel/'.sanitize($channel_id) ]);
 						
@@ -42,9 +44,10 @@ if(is_numeric($id)) {
 							$channel_url = 'https://youtube.com/channel/'.sanitize($channel_id).'/';
 							
 							// Add channel link to artist
-							$sql_update_artist = 'UPDATE artists SET official_links=IF(official_links IS NULL, ?, CONCAT_WS("\n", official_links, ?)) WHERE id=? LIMIT 1';
-							$stmt_update_artist = $pdo->prepare($sql_update_artist);
-							if($stmt_update_artist->execute([ $channel_url, $channel_url, $artist_id ])) {
+							//$sql_update_artist = 'UPDATE artists SET official_links=IF(official_links IS NULL, ?, CONCAT_WS("\n", official_links, ?)) WHERE id=? LIMIT 1';
+							//$stmt_update_artist = $pdo->prepare($sql_update_artist);
+							//if($stmt_update_artist->execute([ $channel_url, $channel_url, $artist_id ])) {
+							if($access_artist->update_url($artist_id, $channel_url)) {
 								$output['result'] = 'Added channel to whitelist.';
 							}
 							else {

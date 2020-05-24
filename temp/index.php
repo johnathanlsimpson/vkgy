@@ -855,7 +855,7 @@ if($data) {
 		"concept_romaji" => $rslt_artist_name["concept_romaji"],
 		"description" => $rslt_artist_name["description"],
 		"label_history" => $rslt_artist_name["label_history"],
-		"official_links" => $rslt_artist_name["official_links"],
+		//"official_links" => $rslt_artist_name["official_links"],
 		"is_exclusive" => $rslt_artist_name["is_exclusive"],
 	];
 	
