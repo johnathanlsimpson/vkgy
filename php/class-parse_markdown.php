@@ -20,6 +20,7 @@
 		private $image_pattern = "\[?!\[([^\]]*)\]\(([^\)\s]+)\)(?:\]\((.+)?\))?";
 		private $user_pattern = "(?<=^| )(@[A-z0-9-]+)(?=$|[\.,;\/ :\s\']|&#39;)";
 		private $spotify_pattern = '(https:\/\/open\.spotify\.com\/)((?:artist|track|album)\/[A-z0-9]{22})(?:\?si=[\w-]+)?';
+		private $linkcore_pattern = '(https:\/\/linkco\.re\/)([A-z0-9]{8})(?:\?[A-z0-9\=\&]*)?';
 		
 		// ======================================================
 		// Construct DB connection
@@ -186,6 +187,7 @@
 			$input_content = preg_replace("/".$this->youtube_pattern."/", "https://youtu.be/$1", $input_content);
 			$input_content = preg_replace("/".$this->twitter_pattern."/", "https://twitter.com/$1/status/$2", $input_content);
 			$input_content = preg_replace("/".$this->spotify_pattern."/", "$1$2", $input_content);
+			$input_content = preg_replace("/".$this->linkcore_pattern."/", "$1$2", $input_content);
 			
 			return $input_content;
 		}
@@ -746,6 +748,11 @@
 				// Spotify
 				$input_content = preg_replace_callback("/".$this->spotify_pattern."/", function($match) {
 					return '<div class="module module--spotify"><iframe src="'.$match[1].'embed/'.$match[2].'" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe></div>';
+				}, $input_content);
+				
+				// Linkcore
+				$input_content = preg_replace_callback("/".$this->linkcore_pattern."/", function($match) {
+					return '<div class="module module--linkcore"><iframe src="'.$match[1].'embed/'.$match[2].'" width="300" height="600" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe></div>';
 				}, $input_content);
 				
 				// Image
