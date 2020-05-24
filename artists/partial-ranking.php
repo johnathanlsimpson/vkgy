@@ -68,8 +68,8 @@
 		foreach($avg_capacity as $year => $capacity) {
 			$avg_capacity[$year]["capacity"] = $capacity["capacity"] / $capacity["count"];
 		}
-
-		if(count($oneman_lives) > 0) {
+		
+		if(is_array($oneman_lives) && !empty($oneman_lives) && count($oneman_lives) > 0) {
 			$avg_oneman_capacity = $avg_oneman_capacity / count($oneman_lives);
 		}
 
