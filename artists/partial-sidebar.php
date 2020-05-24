@@ -156,18 +156,31 @@ if($artist_is_viewable) {
 	}
 	
 	// Links
-	if($artist["official_links"]) {
+	if($artist["urls"]) {
 		?>
 			<h3><?= lang('Links', 'リンク', 'div'); ?></h3>
-			<input class="obscure__input" id="obscure-links" type="checkbox" <?= count($artist['official_links']) > 4 ? 'checked' : null; ?> >
+			<input class="obscure__input" id="obscure-links" type="checkbox" <?= count($artist['urls']) > 4 ? 'checked' : null; ?> >
 			<div class="any--weaken text text--outlined obscure__container obscure--faint">
 				<ul>
 					<?php
-						foreach($artist["official_links"] as $link) {
+						foreach($artist["urls"] as $url) {
 							?>
 								<li class="obscure__item">
-									<a href="<?= $link['url']; ?>" target="_blank"><?= $link['domain']; ?></a>
-									<a class="a--inherit" href="http://web.archive.org/web/1/<?= $link['url']; ?>" target="_blank">(saved)</a>
+									<a class="<?= $url['platform'] ? 'symbol__'.$url['platform'] : null; ?>" href="<?= $url['content']; ?>" target="_blank"><?= $url['display_name']; ?></a>
+									<a class="a--inherit" href="http://web.archive.org/web/1/<?= $url['content']; ?>" target="_blank">(saved)</a>
+									<?php
+										if(is_array($url['musician']) && !empty($url['musician'])) {
+											echo '<div>';
+											echo ['?', 'V', 'G', 'B', 'D', 'K', '?', 'S'][$url['musician']['position']].'. ';
+											if($url['musician']['as_name']) {
+												echo $url['musician']['as_romaji'] ? lang($url['musician']['as_romaji'], $url['musician']['as_name'], 'hidden') : $url['musician']['as_name'];
+											}
+											else {
+												echo $url['musician']['romaji'] ? lang($url['musician']['romaji'], $url['musician']['name'], 'hidden') : $url['musician']['name'];
+											}
+											echo '</div>';
+										}
+									?>
 								</li>
 							<?php
 						}
