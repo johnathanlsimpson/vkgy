@@ -51,7 +51,21 @@ if(!empty($_GET["entry"]) && !$_GET["action"]) {
 		
 		update_views("blog", $entry["id"], $pdo);
 		
-		include('../blog/page-entry.php');
+		if(is_array($entry['tags']) && !empty($entry['tags'])) {
+			foreach($entry['tags'] as $tag) {
+				if($tag['friendly'] === 'interview') {
+					$entry_is_feature = true;
+					break;
+				}
+			}
+		}
+		
+		if($entry_is_feature && $_SESSION['username'] === 'inartistic') {
+			include('../blog/page-interview-inartistic.php');
+		}
+		else {
+			include('../blog/page-entry.php');
+		}
 	}
 	else {
 		$error = 'Sorry, the requested entry doesn\'t exist, or is restricted. Showing latest news instead.';

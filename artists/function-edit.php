@@ -25,7 +25,7 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 		'description',
 		'label_history',
 		'is_exclusive',
-		'official_links'
+		//'official_links'
 	];
 	foreach($update_keys as $key) {
 		$value = $_POST[$key];
@@ -40,7 +40,7 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 	$update_values['friendly'] = $update_values["friendly"] ? friendly($update_values["friendly"]) : (friendly($update_values["romaji"] ?: $update_values["name"]));
 	$update_values['description'] = $update_values["description"] ? sanitize($markdown_parser->validate_markdown($update_values["description"])) : null;
 	$update_values['is_exclusive'] = $update_values['is_exclusive'] ? 1 : 0;
-	$update_values['official_links'] = $access_artist->clean_websites( $update_values['official_links'] );
+	//$update_values['official_links'] = $access_artist->clean_websites( $update_values['official_links'] );
 	$update_values['id'] = $artist_id;
 	
 	// Try artist update, if at least name provided
@@ -54,6 +54,23 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 			$output['status'] = "success";
 			$output['artist_quick_name'] = $update_values["romaji"] ?: $update_values["name"];
 			$output['artist_url'] = "/artists/".$update_values["friendly"]."/";
+			
+		}
+	}
+	
+	// Update URLs
+	if($update_successful) {
+		if(is_array($_POST['url_id'])) {
+			
+			foreach($_POST['url_id'] as $url_key => $url_id) {
+				$access_artist->update_url($artist_id, [
+					'id' => $_POST['url_id'][$url_key],
+					'content' => $_POST['url_content'][$url_key],
+					'type' => $_POST['url_type'][$url_key],
+					'musician_id' => $_POST['url_musician_id'][$url_key],
+					'is_retired' => $_POST['url_is_retired'][$url_key]
+				]);
+			}
 			
 		}
 	}

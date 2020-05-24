@@ -9,3 +9,9 @@
 	margin-bottom: 3rem;
 	max-height: 16rem;
 }
+.url__container + .url__container .input__label {
+	display: none;
+}
+.url__add {
+	margin-top: 1rem;
+}

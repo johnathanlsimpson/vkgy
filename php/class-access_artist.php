@@ -48,11 +48,20 @@
 				for($i=0; $i<$num_new_websites; $i++) {
 					$website_urls[$i] = trim($website_urls[$i]);
 					
-					if(!$website_urls[$i]) {
+					// If trimmed URL empty, or doesn't have at least one ., remove it
+					if(!$website_urls[$i] || strpos($website_urls[$i], '.') === false) {
 						unset($website_urls[$i]);
 					}
+					
+					// Otherwise, clean the URL
 					else {
+						
+						// Make sure has protocol
 						$website_urls[$i] = preg_replace('/'.'^(?!http)'.'/m', 'http://', $website_urls[$i]);
+						
+						// Remove archive.org prefix
+						$website_urls[$i] = preg_replace('/'.'^(?:https?:\/\/)?web\.archive\.org\/web\/\d+\/'.'/m', '', $website_urls[$i]);
+						
 					}
 				}
 			}
@@ -70,46 +79,65 @@
 		// ======================================================
 		// Add artist website
 		// ======================================================
-		function add_website($artist_id, $website_urls) {
+		function update_url($artist_id, $url) {
+		//function add_website($artist_id, $website_urls) {
 			
-			// Artist ID must be provided
-			if(is_numeric($artist_id)) {
+			// Check that URL provided, make sure array if so
+			$url = is_array($url) ? $url : (strlen($url) ? [ 'content' => $url ] : null);
+			
+			// Artist ID must be provided and URL must be array
+			if(is_numeric($artist_id) && is_array($url) && !empty($url)) {
 				
-				// Make sure we're working with array
-				$website_urls = is_array($website_urls) ? $website_urls : explode("\n", $website_urls);
-				$website_urls = array_filter($website_urls);
+				// Set vars
+				$url['id'] = is_numeric($url['id']) ? $url['id'] : null;
+				$url['type'] = is_numeric($url['type']) ? sanitize($url['type']) : 0;
+				$url['musician_id'] = is_numeric($url['musician_id']) ? sanitize($url['musician_id']) : null;
+				$url['is_retired'] = $url['is_retired'] ? 1 : 0;
 				
-				// If new URLs provided
-				if(is_array($website_urls) && !empty($website_urls)) {
+				// Do additional cleaning on URL
+				$url['content'] = sanitize($url['content']);
+				$url['content'] = $url['content'] ? $this->clean_websites( $url['content'] ) : null;
+				
+				// If at least URL supplied
+				if(strlen($url['content'])) {
 					
-					// Grab previous URLs
-					$sql_extant = 'SELECT official_links FROM artists WHERE id=? LIMIT 1';
-					$stmt_extant = $this->pdo->prepare($sql_extant);
-					$stmt_extant->execute([ $artist_id ]);
-					$rslt_extant = $stmt_extant->fetchColumn;
-					$rslt_extant = explode("\n", $rslt_extant);
-					$rslt_extant = array_filter($rslt_extant);
-					
-					// Loop through new URLs, check if in extant list
-					$num_new_websites = count($website_urls);
-					for($i=0; $i<$num_new_websites; $i++) {
-						if(in_array($website_urls, $rslt_extant)) {
-							unset($website_urls[$i]);
-						}
+					// If ID not already set, check for it
+					if(!is_numeric($url['id'])) {
+						$sql_check_url = 'SELECT id FROM artists_urls WHERE artist_id=? AND content=? LIMIT 1';
+						$stmt_check_url = $this->pdo->prepare($sql_check_url);
+						$stmt_check_url->execute([ $artist_id, $url['content'] ]);
+						$url['id'] = $stmt_check_url->fetchColumn();
 					}
 					
-					// Combine extant URLs and new URLs, then update DB
-					if(is_array($website_urls) && !empty($website_urls)) {
-						$website_urls = implode("\n", $website_urls);
-						
-						$sql_add = 'UPDATE artists SET official_links=CONCAT(official_links, "\n", ?) WHERE id=? LIMIT 1';
-						$stmt_add = $this->pdo->prepare($sql_add);
-						if($stmt_add->execute([ $website_urls, $artist_id ])) {
+					// Build update query
+					if(is_numeric($url['id'])) {
+						$sql_url = 'UPDATE artists_urls SET content=?, type=?, artist_id=?, musician_id=?, is_retired=? WHERE id=? LIMIT 1';
+						$values_url = [ $url['content'], $url['type'], $artist_id, $url['musician_id'], $url['is_retired'], $url['id'] ];
+					}
+					
+					// Build add query
+					else {
+						$sql_url = 'INSERT INTO artists_urls (content, type, artist_id, musician_id, is_retired, user_id) VALUES (?, ?, ?, ?, ?, ?)';
+						$values_url = [ $url['content'], $url['type'], $artist_id, $url['musician_id'], $url['is_retired'], $_SESSION['user_id'] ];
+					}
+					
+					// Run query
+					if(strlen($sql_url) && is_array($values_url) && count($values_url) === substr_count($sql_url, '?')) {
+						$stmt_url = $this->pdo->prepare($sql_url);
+						if($stmt_url->execute($values_url)) {
 							return true;
 						}
 					}
 					
 				}
+				
+				// If ID supplied but no URL, delete existing record
+				elseif(!strlen($url['content']) && is_numeric($url['id'])) {
+					$sql_delete_url = 'DELETE FROM artists_urls WHERE id=? LIMIT 1';
+					$stmt_delete_url = $this->pdo->prepare($sql_delete_url);
+					if($stmt_delete_url->execute([ $url['id'] ])) {}
+				}
+				
 			}
 		}
 		
@@ -1156,6 +1184,47 @@
 									if($stmt_areas->execute([ $artists[$i]['id'] ])) {
 										$artists[$i]['areas'] = $stmt_areas->fetchAll();
 									}
+								}
+							}
+							
+							// If getting all data, grab URLs
+							if($args['get'] === 'all') {
+								for($i=0; $i<$num_artists; $i++) {
+									$sql_urls = 'SELECT * FROM artists_urls WHERE artist_id=?';
+									$stmt_urls = $this->pdo->prepare($sql_urls);
+									$stmt_urls->execute([ $artists[$i]['id'] ]);
+									$rslt_urls = $stmt_urls->fetchAll();
+									
+									// For resulting URLs, grab musician info if necessary
+									if(is_array($rslt_urls) && !empty($rslt_urls)) {
+										foreach($rslt_urls as $url_key => $url) {
+											if(is_numeric($url['musician_id'])) {
+												
+												// Grab musician info if musician exists
+												if(is_array($artists[$i]['musicians']) && is_array($artists[$i]['musicians'][$url['musician_id']])) {
+													$musician = $artists[$i]['musicians'][$url['musician_id']];
+													
+													$rslt_urls[$url_key]['musician'] = [
+														'name' => $musician['name'],
+														'romaji' => $musician['romaji'],
+														'id' => $musician['id'],
+														'as_name' => $musician['as_name'],
+														'as_romaji' => $musician['as_romaji'],
+														'friendly' => $musician['friendly'],
+														'position' => $musician['position']
+													];
+													
+													unset($musician);
+												}
+												
+											}
+										}
+									}
+									
+									// Attach URLs to artist
+									$artists[$i]['urls'] = $rslt_urls;
+									unset($rslt_urls);
+									
 								}
 							}
 							

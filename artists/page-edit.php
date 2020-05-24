@@ -1,5 +1,6 @@
 <?php
 	include('../artists/head.php');
+	include_once('../php/function-render_component.php');
 	
 	script([
 		"/scripts/external/script-autosize.js",
@@ -131,19 +132,6 @@
 													<textarea class="autoresize any--flex-grow input__textarea any--tributable" data-hint-only="label" name="label_history" placeholder="(1)&#10;(1), (2)&#10;(3) (management only)"><?php echo $artist["label_history"]; ?></textarea>
 												</div>
 											</div>
-											<!--<div class="any--weaken-color" style="padding-top: 1rem;"><span class="symbol__help"></span>
-												This section has been updated with autocomplete: type <code>=</code> to activate. Or type the ID of the label like so: <code>{123}</code>. See the <a href="/documentation/markdown/">documentation</a> for details.
-											</div>-->
-										</li>
-										<li>
-											<div class="input__row">
-												<div class="input__group any--flex-grow">
-													<label class="input__label">
-														Official links
-													</label>
-													<textarea class="autoresize any--flex-grow input__textarea" name="official_links" placeholder="http://officialwebsite.com/&#10;http://twitter.com/official_account/"><?php echo $artist["official_links"]; ?></textarea>
-												</div>
-											</div>
 										</li>
 									</ul>
 								</div>
@@ -172,30 +160,118 @@
 							?>
 						</div>
 						
-						<div class="col c2">
-							<div class="any--margin">
-								<?php
-									if(!empty($artist["prev_artist"])) {
-										?>
-											<a class="" href="/artists/<?php echo $artist["prev_artist"]["friendly"]; ?>/edit/">
-												<span class="symbol__previous"></span>
-												<?php echo $artist["prev_artist"]["quick_name"]; ?>
-											</a>
+						<div class="col c1">
+							<div>
+								<h2>
+									<?= lang('Links', 'リンク', 'div'); ?>
+								</h2>
+								<div class="text text--outlined url__wrapper">
+									
+									<template id="template-url">
 										<?php
-									}
-								?>
-							</div>
-							<div class="any--margin any--align-right">
-								<?php
-									if(!empty($artist["next_artist"])) {
+											$url_types = ['other', 'official website', 'official shop', 'blog', 'fansite', 'SNS'];
+											ob_start();
+											?>
+												<div class="input__row url__container">
+													
+													<div class="input__group any--flex-grow">
+														<label class="input__label">
+															URL
+														</label>
+														<input class="any--hidden" name="url_id[]" type="hidden" value="{id}" hidden />
+														<input class="input any--flex-grow" name="url_content[]" placeholder="https://website.com/" value="{content}" />
+													</div>
+													
+													<div class="input__group" style="width:200px;">
+														<label class="input__label">
+															Type
+														</label>
+														<select class="input" name="url_type[]">
+															{type}
+															<?php
+																foreach($url_types as $type_key => $type) {
+																	echo '<option value="'.$type_key.'">'.$type.'</option>';
+																}
+															?>
+														</select>
+													</div>
+													
+													<div class="input__group" style="width:200px;">
+														<label class="input__label">
+															Member
+														</label>
+														<select class="input" data-source="musicians" name="url_musician_id[]">
+															<option value="">all</option>
+															{musician_id}
+														</select>
+													</div>
+													
+													<div class="input__group">
+														<label class="input__label">
+															Retired?
+														</label>
+														<label class="input__checkbox" {retired}>
+															<input class="input__choice url__retired" type="checkbox" {is_retired_dummy} /><span class="symbol__checkbox--unchecked">retired</span>
+															<input class="any--hidden" name="url_is_retired[]" type="hidden" value="{is_retired}" hidden />
+														</label>
+													</div>
+													
+												</div>
+											<?php
+											
+											$url_template = ob_get_clean();
+											echo preg_replace('/'.'\s+'.'/', ' ', $url_template);
 										?>
-											<a class="" href="/artists/<?php echo $artist["next_artist"]["friendly"]; ?>/edit/">
-												<?php echo $artist["next_artist"]["quick_name"]; ?>
-												<span class="symbol__next"></span>
-											</a>
-										<?php
-									}
-								?>
+									</template>
+									
+									<?php
+										// Get new URLs
+										$sql_urls = 'SELECT * FROM artists_urls WHERE artist_id=?';
+										$stmt_urls = $pdo->prepare($sql_urls);
+										$stmt_urls->execute([ $artist['id'] ]);
+										$artist['urls'] = $stmt_urls->fetchAll();
+										
+										// Old links were stored as string, so may have to transform to array
+										if(!is_array($artist['urls'])) {
+											
+											// If old links in string, transform into array
+											if(strlen($artist['official_links'])) {
+												$artist['urls'] = explode("\n", $artist['official_links']);
+												
+												// Loop through URLs and set up array
+												foreach($artist['urls'] as $url_key => $url) {
+													$artist['urls'][$url_key] = [ 'content' => $url ];
+												}
+											}
+											
+											// If no links extant, just make empty array
+											else {
+												$artist['urls'] = [];
+											}
+											
+										}
+										
+										// Number of URL elements shown should be all extant + 1 empty spot, or the minimum of empty spots
+										$num_websites = is_array($artist['urls']) && count($artist['urls']) ? count($artist['urls']) + 1 : 3;
+										
+										// Render each URL element
+										for($i=0; $i<$num_websites; $i++) {
+											echo render_component($url_template, [
+												'id'               => $artist['urls'][$i]['id'],
+												'content'          => $artist['urls'][$i]['content'],
+												'type'             => is_numeric($artist['urls'][$i]['type']) ? '<option value="'.$artist['urls'][$i]['type'].'" selected>'.$url_types[$artist['urls'][$i]['type']].'</option>' : null,
+												'musician_id'      => is_numeric($artist['urls'][$i]['musician_id']) ? '<option value="'.$artist['urls'][$i]['musician_id'].'" selected></option>' : null,
+												'is_retired'       => $artist['urls'][$i]['is_retired'],
+												'is_retired_dummy' => $artist['urls'][$i]['is_retired'] ? 'checked' : null,
+											]);
+										}
+									?>
+									
+									<button class="symbol__plus url__add" type="button">
+										Add
+									</button>
+									
+								</div>
 							</div>
 						</div>
 						
