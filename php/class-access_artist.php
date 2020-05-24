@@ -824,6 +824,7 @@
 				case "id"          : array_push($sql_select, "artists.id"); break;
 				case "list"        : array_push($sql_select, "artists.id", "artists.name", "artists.romaji", "COALESCE(artists.romaji, artists.name) AS quick_name", "artists.friendly", "artists.label_history"); break;
 				case "artist_list" : array_push($sql_select, "artists.id", "artists.name", "artists.romaji", "COALESCE(artists.romaji, artists.name) AS quick_name", "artists.friendly", "artists.is_exclusive"); break;
+				case 'profile'     : array_push($sql_select, 'artists.id', 'artists.name', 'artists.romaji', 'artists.friendly', 'artists.description', 'artists.pronunciation'); break;
 			}
 			
 			if($args['get'] === 'artist_list') {
@@ -1146,12 +1147,12 @@
 						if(is_array($artists)) {
 							
 							// If getting all artist info or basics, grab musician data, then compile into lineup string
-							if($args["get"] === "all" || $args["get"] === "basics") {
+							if($args["get"] === "all" || $args["get"] === "basics" || $args['get'] === 'profile') {
 								$access_musician = new access_musician($this->pdo);
 								
 								for($i=0; $i<$num_artists; $i++) {
 									$lineup = [];
-									$musicians = $access_musician->access_musician([ 'artist_id' => $artists[$i]['id'], 'get' => 'all' ]);
+									$musicians = $access_musician->access_musician([ 'artist_id' => $artists[$i]['id'], 'get' => ($args['get'] === 'all' ? 'all' : 'list') ]);
 									
 									for($n=0; $n<$num_musicians; $n++) {
 										if($musicians[$n]['to_end'] && $musicians[$n]['position'] != 7 && $musicians[$n]['position_name'] != 'roadie') {
@@ -1188,7 +1189,7 @@
 							}
 							
 							// If getting all data, grab URLs
-							if($args['get'] === 'all') {
+							if($args['get'] === 'all' || $args['get'] === 'profile') {
 								for($i=0; $i<$num_artists; $i++) {
 									$sql_urls = 'SELECT * FROM artists_urls WHERE artist_id=?';
 									$stmt_urls = $this->pdo->prepare($sql_urls);
@@ -1217,6 +1218,18 @@
 													unset($musician);
 												}
 												
+											}
+										}
+									}
+									
+									// If no URLs returned, but artist does have old official_links field, use that instead
+									elseif( strlen($artists[$i]['official_links']) ) {
+										$urls = explode("\n", $artists[$i]['official_links']);
+										$urls = array_filter($urls);
+										
+										if(is_array($urls) && !empty($urls)) {
+											foreach($urls as $url) {
+												$rslt_urls[] = [ 'content' => $url ];
 											}
 										}
 									}
