@@ -7,7 +7,7 @@ function format_artist_urls($urls) {
 		foreach($urls as $url_key => $url) {
 			
 			// Remove protocol
-			$url['display_name'] = preg_replace('/'.'^((?:https?:)?(?:\/\/)?)'.'/', '', $url['content']);
+			$url['display_name'] = preg_replace('/'.'^((?:https?:)?(?:\/\/)?(?:www\.)?)'.'/', '', $url['content']);
 			
 			// Remove trailing slash
 			$url['display_name'] = preg_replace('/'.'(\/)$'.'/', '', $url['display_name']);
