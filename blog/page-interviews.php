@@ -5,7 +5,7 @@ $page_header = '<h1>'.lang('Visual Kei Interviews', 'ヴィジュアル系イン
 $page_title = 'Interview List | インタビュー一覧';
 
 style([
-	'/blog/style-page-interview.css',
+	'/blog/style-page-interviews.css',
 ]);
 
 ?>
