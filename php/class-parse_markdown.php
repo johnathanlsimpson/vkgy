@@ -757,10 +757,19 @@
 				
 				// Image
 				$input_content = preg_replace_callback("/".$this->image_pattern."/", function($match) {
+					
+					// Get height/width (if local image) so we can slap a 'portrait' class on there if necessary
+					if(preg_match('/'.'^(?:https?:)?(?:\/\/)?(?:vk\.gy)?\/images\/(\d+)(?:-[A-z0-9-]*)?(\.[A-z]+)$'.'/', $match[2], $local_image_match)) {
+						list($width, $height) = getimagesize('../images/image_files/'.$local_image_match[1].$local_image_match[2]);
+						$image_class = $width > $height ? 'module--landscape' : 'module--portrait';
+					}
+					
 					$image_src = $match[2];
 					$image_src = preg_replace('/'.'(^(?:https?:)?(?:\/\/)?(?:vk\.gy)?\/images\/\d+(?:-[A-z0-9-]*)?)(\.[A-z]+)$'.'/', '$1.medium$2', $image_src);
 					
-					return '<div class="module module--image any--weaken any--align-center"><a href="'.($match[3] ?: $match[2]).'"><img alt="'.$match[1].'" class="lazy" data-src="'.$image_src.'" /></a><div>'.$match[1].'</div></div>';
+					return '<div class="module module--image '.$image_class.' any--weaken any--align-center"><a href="'.($match[3] ?: $match[2]).'"><img alt="'.$match[1].'" class="lazy" data-src="'.$image_src.'" /></a><div>'.$match[1].'</div></div>';
+					
+					unset($height, $width, $image_class);
 				}, $input_content);
 			}
 			
