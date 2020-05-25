@@ -167,7 +167,7 @@ if(!$_GET['entry'] && !$_GET['action']) {
 		'tag' => $_GET['tag'],
 		'page' => $_GET['page'] ?: 'latest',
 		'get' => 'list',
-		'limit' => $_GET['view'] === 'interview' ? 40 : null
+		'limit' => $_GET['view'] === 'interviews' ? 40 : null
 	]);
 	$entries = is_array($entries) ? $entries : [];
 	$num_entries = count($entries);
