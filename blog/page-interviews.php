@@ -44,11 +44,11 @@ style([
 		}
 		
 		// Pop off first entry so we can highlight it, then shuffle rest
-		$entries = array_values($entries);
-		$first_entry = $entries[0];
-		unset($entries[0]);
-		shuffle($entries);
-		array_unshift($entries, $first_entry);
+		//$entries = array_values($entries);
+		//$first_entry = $entries[0];
+		//unset($entries[0]);
+		//shuffle($entries);
+		//array_unshift($entries, $first_entry);
 		
 		// Loop back through entries and render
 		foreach($entries as $entry_key => $entry) {
@@ -72,7 +72,7 @@ style([
 						
 						<?= $_SESSION['can_add_data'] ? '<a class="a--padded interview__link symbol__edit" href="/blog/'.$entry['friendly'].'/edit/"><span>Edit</span></a>' : null; ?>
 						<a class="a--outlined a--padded interview__link" href="<?= '/blog/'.$entry['friendly'].'/'; ?>">Eng<span>lish</span></a>
-						<a class="a--outlined a--padded interview__link" href="<?= '/blog/'.$entry['jp_friendly'].'/'; ?>">日本語<span>版</span></a>
+						<a class="a--outlined a--padded interview__link <?= $entry['jp_friendly'] ? null : 'any--hidden'; ?>" href="<?= '/blog/'.$entry['jp_friendly'].'/'; ?>">日本語<span>版</span></a>
 						
 					</div>
 					

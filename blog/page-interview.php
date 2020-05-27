@@ -163,6 +163,26 @@ if(is_array($entry) && !empty($entry)) {
 								}
 							}
 	
+	// Format title
+	$entry['title'] = str_replace([' [&#26085;&#26412;&#35486;&#29256;]', ' [&#26085;&#26412;&#35486;]'], '', $entry['title']);
+	
+	if(strpos($entry['title'], 'interview') !== false) {
+		$entry['subtitle'] = lang('interview', 'インタビュー', 'hidden');
+		$entry['title'] = str_replace('An interview with ', '', $entry['title']);
+	}
+	elseif(strpos($entry['title'], '&#12408;&#12398;&#12452;&#12531;&#12479;&#12499;&#12517;&#12540;') !== false) {
+		$entry['subtitle'] = sanitize('インタビュー');
+		$entry['title'] = str_replace('&#12408;&#12398;&#12452;&#12531;&#12479;&#12499;&#12517;&#12540;', '', $entry['title']);
+	}
+	elseif(strpos($entry['title'], 'Liner notes: ') !== false) {
+		$entry['subtitle'] = lang('liner notes', 'ライナーノーツ', 'hidden');
+		$entry['title'] = str_replace('Liner notes: ', '', $entry['title']);
+	}
+	elseif(strpos($entry['title'], sanitize('ライナーノーツ')) !== false) {
+		$entry['subtitle'] = sanitize('ライナーノーツ');
+		$entry['title'] = str_replace(sanitize(' ライナーノーツ'), '', $entry['title']);
+	}
+	
 	?>
 		
 		
@@ -181,14 +201,9 @@ if(is_array($entry) && !empty($entry)) {
 					<h1 class="entry__title">
 						<a class="a--inherit" href="<?= '/blog/'.$entry['friendly'].'/'; ?>">
 							<?php
-								if(strpos($entry['title'], '&#12452;&#12531;&#12479;&#12499;&#12517;&#12540;') !== false) {
-									echo '<span class="entry__subtitle">'.sanitize('インタビュー').'</span>';
-								}
-								elseif(strpos($entry['title'], 'interview') !== false) {
-									echo '<span class="entry__subtitle">Interview</span>';
-								}
+								echo '<div class="entry__subtitle">'.$entry['subtitle'].'</div>';
+								echo $entry['title'];
 							?>
-							<?= preg_replace('/'.'(an interview with|&#12408;&#12398;&#12452;&#12531;&#12479;&#12499;&#12517;&#12540;)(?: \[&#26085;&#26412;&#35486;&#29256;\])?'.'/i', '', $entry['title']); ?>
 						</a>
 					</h1>
 					
