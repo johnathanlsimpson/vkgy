@@ -60,7 +60,7 @@
 									<div class="input__row li obscure__item">
 										<div class="input__group">
 											<label class="input__label">Area</label>
-											<select class="input" data-source="areas" name="area_id[]">
+											<select class="input" data-populate-on-click="true" data-source="areas" name="area_id[]">
 												<option value="<?php echo $rslt_livehouses[$i]["area_id"]; ?>" selected><?php echo $rslt_livehouses[$i]["area_romaji"] ? $rslt_livehouses[$i]["area_romaji"].' ('.$rslt_livehouses[$i]["area_name"].')' : $rslt_livehouses[$i]["area_name"]; ?></option>
 											</select>
 										</div>

@@ -16,7 +16,7 @@
 		], 'interact', true);
 		
 		subnav([
-			"Edit livehouses" => "/lives/livehouses/edit/",
+			//"Edit livehouses" => "/lives/livehouses/edit/",
 			"Add livehouses" => "/lives/livehouses/add/",
 		], 'interact', true);
 	}
@@ -87,7 +87,7 @@
 			];
 		}
 		
-		$limit_num = 10;
+		$limit_num = 3;
 	}
 	// Get add'l data: add livehouses
 	if($add_livehouses) {
@@ -161,7 +161,24 @@
 			'Livehouses' => '/lives/livehouses/'
 		]);
 		
-		$sql_livehouses = 'SELECT lives_livehouses.id, lives_livehouses.name, lives_livehouses.romaji, lives_livehouses.friendly, lives_livehouses.capacity, areas.name AS area_name, areas.romaji AS area_romaji, GROUP_CONCAT(lives_nicknames.nickname) AS nicknames FROM lives_livehouses LEFT JOIN areas ON areas.id=lives_livehouses.area_id LEFT JOIN lives_nicknames ON lives_nicknames.livehouse_id=lives_livehouses.id GROUP BY lives_livehouses.id ORDER BY lives_livehouses.friendly ASC';
+		
+		$sql_livehouses = '
+			SELECT
+				lives_livehouses.id,
+				lives_livehouses.name,
+				lives_livehouses.romaji,
+				lives_livehouses.friendly,
+				lives_livehouses.capacity,
+				COALESCE(areas.name, "?") AS area_name,
+				areas.romaji AS area_romaji,
+				GROUP_CONCAT(lives_nicknames.nickname) AS nicknames
+			FROM lives_livehouses
+			LEFT JOIN areas ON areas.id=lives_livehouses.area_id
+			LEFT JOIN lives_nicknames ON lives_nicknames.livehouse_id=lives_livehouses.id
+			GROUP BY lives_livehouses.id
+			ORDER BY
+				areas.friendly ASC,
+				COALESCE(lives_livehouses.romaji, lives_livehouses.name) ASC';
 		$stmt_livehouses = $pdo->prepare($sql_livehouses);
 		$stmt_livehouses->execute();
 		$rslt_livehouses = $stmt_livehouses->fetchAll();
