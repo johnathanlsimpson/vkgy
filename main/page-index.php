@@ -144,9 +144,9 @@
 						$featured_articles = $access_blog->access_blog([ 'tag' => 'interview', 'get' => 'basics', 'limit' => 10 ]);
 						
 						// Shuffle featured interviews
-						$latest_article = array_shift($featured_articles);
-						shuffle($featured_articles);
-						array_unshift($featured_articles, $latest_article);
+						//$latest_article = array_shift($featured_articles);
+						//shuffle($featured_articles);
+						//array_unshift($featured_articles, $latest_article);
 						
 						foreach($featured_articles as $article) {
 							if(strpos($article['title'], sanitize('日本語')) === false) {
