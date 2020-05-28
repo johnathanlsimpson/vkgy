@@ -21,6 +21,7 @@
 		private $user_pattern = "(?<=^| )(@[A-z0-9-]+)(?=$|[\.,;\/ :\s\']|&#39;)";
 		private $spotify_pattern = '(https:\/\/open\.spotify\.com\/)((?:artist|track|album)\/[A-z0-9]{22})(?:\?si=[\w-]+)?';
 		private $linkcore_pattern = '(https:\/\/linkco\.re\/)([A-z0-9]{8})(?:\?[A-z0-9\=\&]*)?';
+		private $lnkto_pattern = '(https:\/\/lnk\.to\/[A-z0-9]+)';
 		
 		// ======================================================
 		// Construct DB connection
@@ -759,6 +760,11 @@
 				// Linkcore
 				$input_content = preg_replace_callback("/".$this->linkcore_pattern."/", function($match) {
 					return '<div class="module module--linkcore"><iframe src="'.$match[1].'embed/'.$match[2].'" width="300" height="600" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe></div>';
+				}, $input_content);
+				
+				// Lnkto
+				$input_content = preg_replace_callback("/".$this->lnkto_pattern."/", function($match) {
+					return '<div class="module module--lnkto"><iframe src="'.$match[1].'" width="300" height="600" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe></div>';
 				}, $input_content);
 				
 				// Image
