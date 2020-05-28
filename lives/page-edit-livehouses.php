@@ -60,7 +60,7 @@
 									<div class="input__row li obscure__item">
 										<div class="input__group">
 											<label class="input__label">Area</label>
-											<select class="input" data-populate-on-click="true" data-source="areas" name="area_id[]">
+											<select class="input" data-source="areas" name="area_id[]">
 												<option value="<?php echo $rslt_livehouses[$i]["area_id"]; ?>" selected><?php echo $rslt_livehouses[$i]["area_romaji"] ? $rslt_livehouses[$i]["area_romaji"].' ('.$rslt_livehouses[$i]["area_name"].')' : $rslt_livehouses[$i]["area_name"]; ?></option>
 											</select>
 										</div>
@@ -70,7 +70,7 @@
 										</div>
 										<div class="input__group any--flex-grow">
 											<label class="input__label">Parent company</label>
-											<select class="input" data-populate-on-click="true" data-source="companies" name="parent_id[]">
+											<select class="input" data-source="companies" name="parent_id[]">
 												<option value="<?php echo $rslt_livehouses[$i]["parent_id"]; ?>" selected><?php echo $rslt_livehouses[$i]["parent_romaji"] ? $rslt_livehouses[$i]["parent_romaji"].' ('.$rslt_livehouses[$i]["parent_name"].')' : $rslt_livehouses[$i]["parent_name"]; ?></option>
 											</select>
 										</div>
@@ -116,13 +116,13 @@
 									<div class="input__row obscure__item li">
 										<div class="input__group any--flex-grow">
 											<label class="input__label">Changed name to</label>
-											<select class="input" data-populate-on-click="true" data-source="livehouses" name="renamed_to[]">
+											<select class="input" data-source="livehouses" name="renamed_to[]">
 												<option value="<?php echo $rslt_livehouses[$i]["renamed_to"]; ?>" selected><?php echo $rslt_livehouses[$i]["renamed_romaji"] ? $rslt_livehouses[$i]["renamed_romaji"].' ('.$rslt_livehouses[$i]["renamed_name"].')' : $rslt_livehouses[$i]["renamed_name"]; ?></option>
 											</select>
 										</div>
 										<div class="input__group any--flex-grow">
 											<label class="input__label">Merge data from</label>
-											<select class="input" data-populate-on-click="true" data-source="livehouses" name="merge_with[]">
+											<select class="input" data-source="livehouses" name="merge_with[]">
 												<option value="<?php echo $rslt_livehouses[$i]["merge_with"]; ?>" selected></option>
 											</select>
 										</div>
