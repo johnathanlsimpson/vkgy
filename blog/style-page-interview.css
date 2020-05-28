@@ -45,7 +45,7 @@
 	.header__container {
 		background-image: var(--header-image) !important;
 		background-position: center 40%;
-		background-size: 120% auto;
+		background-size: calc(var(--gutter) + 100% + var(--gutter)) auto;
 		border: inherit;
 		border-width: 0 var(--gutter);
 		overflow: visible;
@@ -73,6 +73,7 @@
 	.interview__header {
 		background: transparent;
 		border-color: transparent;
+		padding-top: 0;
 	}
 	.interview__header * {
 		width: auto !important;
@@ -82,18 +83,11 @@
 		line-height: 1;
 	}
 }
-@media(min-width:600px) {
-	.entry__title {
-		font-size: 6rem;
-	}
 	.entry__subtitle {
 		display: block;
 		font-family: var(--font--secondary);
-		font-size: 3rem;
+		font-size: 0.7em;
 		text-transform: uppercase;
-	}
-	.interview__header p {
-		font-size: 1.5rem;
 	}
 .interview__attribution {
 	border: 0 dotted hsl(var(--background--bold));
@@ -105,6 +99,16 @@
 .interview__editor {
 	margin-right: 1ch;
 }
+@media(min-width:600px) {
+	.entry__title {
+		font-size: 6rem;
+	}
+	.entry__subtitle {
+		font-size: 0.5em;
+	}
+	.interview__header p {
+		font-size: 1.5rem;
+	}
 /*.interview__header .text--centered > :first-of-type > li:first-of-type {
 	padding-top: 0;
 }
@@ -170,6 +174,9 @@
 
 /* Sidebar */
 @media(min-width:0px) {
+	.entry--style-shock .interview__aside {
+		display: none;
+	}
 .interview__aside {
 	align-self: stretch;
 	background: transparent;
