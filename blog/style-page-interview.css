@@ -16,6 +16,13 @@
 	padding: 0 2rem 0 1rem;
 	width: calc(600px + 2rem);
 }
+.interview__content h1 {
+  margin-bottom: 0;
+}
+	.interview__content h5 {
+		font-size: 1rem;
+		margin-left: 0;
+	}
 .interview__content h2::before {
 	background: hsl(var(--attention--secondary));
 	background-clip: content-box;
@@ -101,7 +108,7 @@
 }
 @media(min-width:600px) {
 	.entry__title {
-		font-size: 6rem;
+		font-size: 4rem;
 	}
 	.entry__subtitle {
 		font-size: 0.5em;
