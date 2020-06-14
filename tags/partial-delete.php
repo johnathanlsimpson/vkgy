@@ -35,9 +35,9 @@
 												) {
 													
 													// Set tag class and display tag
-													$tag_class  = 'any__tag any__tag--selected';
 													?>
-														<label class="<?= $tag_class; ?>" data-action="permanent_delete" data-id="<?= $item_id; ?>" data-tag-id="<?= $tag['id']; ?>" data-item-type="<?= $item_type; ?>" >
+														<label class="tag__vote input__radio" data-vote="mod_downvote" data-id="<?= $item_id; ?>" data-tag-id="<?= $tag['id']; ?>" data-item-type="<?= $item_type; ?>">
+															<input class="input__choice" type="checkbox" />
 															<span class="symbol__trash tag__status" style="margin:0;">
 																<?= str_replace( [' kei', '&#31995;' ], '', lang($tag['romaji'] ?: $tag['name'], $tag['name'], 'hidden') ); ?>
 															</span>

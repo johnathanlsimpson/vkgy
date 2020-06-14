@@ -5,9 +5,9 @@ function get_tags($pdo, $item_type, $item_id) {
 	// Set up allowed defaults
 	$allowed_item_types = [ 'artist', 'musician', 'release' ];
 	$tag_types = [
-		'artists' => [ 'subgenres', 'styles', 'other', 'admin' ],
-		'musicians' => [ 'admin' ],
-		'releases' => [ 'styles', 'other', 'admin' ]
+		'artists' => [ 'subgenres', 'styles', 'other', 'admin', 'disputed' ],
+		'musicians' => [ 'admin', 'disputed' ],
+		'releases' => [ 'styles', 'other', 'admin', 'disputed' ]
 	];
 	
 	// Set up DB names
@@ -39,20 +39,44 @@ function get_tags($pdo, $item_type, $item_id) {
 		}
 		
 		// Get all *current* tags applied to artist
-		$sql_curr_tags = 'SELECT '.$tags_table.'.*, COUNT('.$tags_items_table.'.id) AS num_times_tagged FROM '.$tags_items_table.' LEFT JOIN '.$tags_table.' ON '.$tags_table.'.id='.$tags_items_table.'.tag_id WHERE '.$tags_items_table.'.'.$item_type.'_id=? GROUP BY '.$tags_items_table.'.tag_id';
+		$sql_curr_tags = '
+		SELECT 
+			'.$tags_table.'.*, 
+			COUNT('.$tags_items_table.'.id) AS num_times_tagged, 
+			SUM('.$tags_items_table.'.mod_agrees) AS mod_upvotes,
+			SUM(IF('.$tags_items_table.'.user_agrees="1", 1, 0)) AS num_upvotes, 
+			SUM(IF('.$tags_items_table.'.user_agrees="-1", 1, 0)) AS num_downvotes
+		FROM '.$tags_items_table.' 
+		LEFT JOIN '.$tags_table.' ON '.$tags_table.'.id='.$tags_items_table.'.tag_id 
+		WHERE '.$tags_items_table.'.'.$item_type.'_id=? 
+		GROUP BY '.$tags_items_table.'.tag_id';
 		$stmt_curr_tags = $pdo->prepare($sql_curr_tags);
 		$stmt_curr_tags->execute([ $item_id ]);
 		$current_tags = $stmt_curr_tags->fetchAll();
 		
-		// Loop through current tags, set flags for artist, and separate by tag type
+		// Loop through current tags, transform and separate
 		if(is_array($current_tags) && !empty($current_tags)) {
 			foreach($current_tags as $numeric_key => $tag) {
+				
+				// Calc upvote:downvote ratio
+				$tag['upvote_ratio'] = $tag['num_downvotes'] ? $tag['num_upvotes'] / $tag['num_downvotes'] : 1;
+				$tag['num_upvotes'] = $tag['num_upvotes'] - $tag['num_downvotes'];
 				
 				// Transform tag's type from number to string
 				$type_key = $tag_types[ $item_type_plural ][ $tag['type'] ];
 				
-				// Move tag back into array with key as its type, then remove it from array where key was its ID
-				$current_tags[$type_key][] = $tag;
+				// Change tag type to disputed if necessary
+				if($tag['upvote_ratio'] < 1) {
+					$type_key = 'disputed';
+				}
+				
+				// If mod reviewed, or upvote ratio is too low (and has a minimum num of votes), don't display
+				// otherwise, add back to array under key type instead of ID
+				if($tag['mod_upvotes'] > -1) {
+					if($tag['num_times_tagged'] < 4 || $tag['upvote_ratio'] > 0.9) {
+						$current_tags[$type_key][] = $tag;
+					}
+				}
 				unset( $current_tags[$numeric_key] );
 				
 			}
@@ -61,7 +85,7 @@ function get_tags($pdo, $item_type, $item_id) {
 		// Grab all tags which have been added by the current user
 		if($_SESSION['is_signed_in']) {
 			
-			$sql_user_tags = 'SELECT tag_id FROM '.$tags_items_table.' WHERE '.$item_type.'_id=? AND user_id=?';
+			$sql_user_tags = 'SELECT tag_id, user_agrees FROM '.$tags_items_table.' WHERE '.$item_type.'_id=? AND user_id=?';
 			$stmt_user_tags = $pdo->prepare($sql_user_tags);
 			$stmt_user_tags->execute([ $item_id, $_SESSION['user_id'] ]);
 			$user_tags = $stmt_user_tags->fetchAll();
@@ -69,7 +93,12 @@ function get_tags($pdo, $item_type, $item_id) {
 			// Save them as an array of just tag IDs, since that's all we need for later checks
 			if(is_array($user_tags) && !empty($user_tags)) {
 				foreach($user_tags as $key => $tag) {
-					$user_tags[$key] = $tag['tag_id'];
+					if($tag['user_agrees'] > 0) {
+						$user_upvotes[$key] = $tag['tag_id'];
+					}
+					else {
+						$user_downvotes[$key] = $tag['tag_id'];
+					}
 				}
 			}
 			
@@ -78,7 +107,8 @@ function get_tags($pdo, $item_type, $item_id) {
 		return [
 			'all_tags' => $all_tags,
 			'current_tags' => $current_tags,
-			'user_tags' => $user_tags,
+			'user_upvotes' => $user_upvotes,
+			'user_downvotes' => $user_downvotes,
 			'tag_types' => $tag_types[ $item_type_plural ],
 		];
 		
