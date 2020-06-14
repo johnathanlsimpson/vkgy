@@ -166,8 +166,8 @@
 <h3>
 	<?= lang('Add tags', 'タグする', 'div'); ?>
 </h3>
-<input class="obscure__input" id="obscure-tags" type="checkbox"  >
-<ul class="text text--outlined obscure__container obscure--height">
+<input class="obscure__input" id="obscure-tags" type="checkbox" <?= $_SESSION['is_signed_in'] && isset($artist) ? 'checked' : null; ?> >
+<ul class="text text--outlined obscure__container obscure--height" <?= $_SESSION['is_signed_in'] && isset($artist) ? 'style="min-height:16rem;"' : null; ?> >
 	<?php
 		if($_SESSION['is_signed_in']) {
 			if(is_array($all_tags) && !empty($all_tags)) {
