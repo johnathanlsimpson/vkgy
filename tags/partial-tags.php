@@ -167,7 +167,7 @@
 	<?= lang('Add tags', 'タグする', 'div'); ?>
 </h3>
 <input class="obscure__input" id="obscure-tags" type="checkbox"  >
-<ul class="text text--outlined obscure__container obscure--height" <?= $_SESSION['is_signed_in'] ? 'style="min-height:16rem;"' : null; ?> >
+<ul class="text text--outlined obscure__container obscure--height">
 	<?php
 		if($_SESSION['is_signed_in']) {
 			if(is_array($all_tags) && !empty($all_tags)) {
@@ -215,7 +215,7 @@
 			}
 		}
 		else {
-			echo lang('<a href="">Sign in</a> to add tags.', 'タグするには<a href="">サインイン</a>してください。', 'hidden');
+			echo lang('<a href="/account/">Sign in</a> to add tags.', 'タグするには<a href="">サインイン</a>してください。', 'hidden');
 		}
 	?>
 	<label class="input__button obscure__button" for="obscure-comments">Show more</label>
