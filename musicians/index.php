@@ -30,7 +30,8 @@
 			
 			$all_tags = $tags['all_tags'];
 			$current_tags = $tags['current_tags'];
-			$user_tags = $tags['user_tags'];
+			$user_upvotes = $tags['user_upvotes'] ?: [];
+			$user_downvotes = $tags['user_downvotes'] ?: [];
 			$tag_types = $tags['tag_types'];
 			
 			// Loop through current tags and set some flags for artist

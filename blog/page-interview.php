@@ -133,35 +133,38 @@ if(is_array($entry) && !empty($entry)) {
 	$entry['intro'] = explode('</p>', $entry['intro'], 2)[1];
 	
 	// Set header image (for features, will differ from page image)
-	echo '<style>:root{--header-image:url(/artists/'.$entry['artist']['friendly'].'/main.jpg)}</style>';
+	echo '<style>:root{--header-image:url('.( $entry['artist'] ? '/artists/'.$entry['artist']['friendly'].'/main.jpg' : $entry['image']['url'] ).')}</style>';
 	
 	style(['/blog/style-page-interview.css']);
-									// Get additional artist info
-									$entry['artist'] = $access_artist->access_artist([ 'id' => $entry['artist']['id'], 'get' => 'profile' ]);
+	
+	if($entry['artist']) {
+		// Get additional artist info
+		$entry['artist'] = $access_artist->access_artist([ 'id' => $entry['artist']['id'], 'get' => 'profile' ]);
 
-									// Clean up URLs
-									include_once('../artists/function-format_artist_urls.php');
-									$entry['artist']['urls'] = format_artist_urls($entry['artist']['urls']);
-							
-							// Get sources
-							if($entry['sources']) {
-								
-								// Transform sources from string into array
-								$sources = $entry['sources'];
-								$sources = explode("\n", $sources);
-								$sources = array_filter($sources);
-								
-								// Loop through sources and hide any that are already mentioned in sidebar
-								if(is_array($entry['artist']['urls']) && !empty($entry['artist']['urls'])) {
-									foreach($sources as $source_key => $source) {
-										foreach($entry['artist']['urls'] as $url) {
-											if(strpos($url['content'], str_replace('@', '', $source)) !== false) {
-												unset($sources[$source_key]);
-											}
-										}
-									}
-								}
-							}
+		// Clean up URLs
+		include_once('../artists/function-format_artist_urls.php');
+		$entry['artist']['urls'] = format_artist_urls($entry['artist']['urls']);
+	}
+
+	// Get sources
+	if($entry['sources']) {
+
+		// Transform sources from string into array
+		$sources = $entry['sources'];
+		$sources = explode("\n", $sources);
+		$sources = array_filter($sources);
+
+		// Loop through sources and hide any that are already mentioned in sidebar
+		if(is_array($entry['artist']['urls']) && !empty($entry['artist']['urls'])) {
+			foreach($sources as $source_key => $source) {
+				foreach($entry['artist']['urls'] as $url) {
+					if(strpos($url['content'], str_replace('@', '', $source)) !== false) {
+						unset($sources[$source_key]);
+					}
+				}
+			}
+		}
+	}
 	
 	// Format title
 	$entry['title'] = str_replace([' [&#26085;&#26412;&#35486;&#29256;]', ' [&#26085;&#26412;&#35486;]'], '', $entry['title']);
@@ -182,11 +185,16 @@ if(is_array($entry) && !empty($entry)) {
 		$entry['subtitle'] = sanitize('ライナーノーツ');
 		$entry['title'] = str_replace(sanitize(' ライナーノーツ'), '', $entry['title']);
 	}
+	elseif(strpos($entry['title'], sanitize('Style Shock')) !== false) {
+		$entry['subtitle'] = 'Style Shock';
+		$entry['title'] = str_replace(sanitize('Style Shock: '), '', $entry['title']);
+		$entry_type = 'style-shock';
+	}
 	
 	?>
 		
 		
-		<article class="row <?= $entry_has_image ? null : 'entry--no-image'; ?> ">
+		<article class="row <?= 'entry--'.$entry_type; ?>">
 			
 			<!-- Top -->
 			<div class="col c4-ABBC entry__header any--margin">
@@ -275,6 +283,65 @@ if(is_array($entry) && !empty($entry)) {
 				
 			</div>
 			
+			<style>
+				.entry--style-shock .interview__content {
+					max-width: 900px;
+				}
+				.entry--style-shock .module--image, .entry--style-shock hr {
+					clear: both;
+				}
+				.entry--style-shock hr {
+					opacity: 0;
+				}
+				.entry--style-shock .module--image {
+					background: hsl(var(--accent));
+					float: left;
+					margin: 0 2rem 2rem 0;
+					width: 50%;
+				}
+				@media(max-width:599.99px) {
+					.entry--style-shock .module--image {
+						width: 100%;
+					}
+				}
+				.entry--style-shock h1, .entry--style-shock h2, .entry--style-shock h3, .entry--style-shock h4, .entry--style-shock h5, .entry--style-shock p, .entry--style-shock ul, .entry--style-shock ol {
+					width: auto !important;
+				}
+				.entry--style-shock h2::before {
+					height: 2rem;
+					left: -0.5rem;
+					position: relative;
+					transform: translateY(25%);
+				}
+				.entry--style-shock .module--image.module--image {
+					padding: 1rem !important;
+				}
+				/*.entry--style-shock .module--image:nth-of-type(odd) {
+					float: right;
+				}
+				.entry--style-shock .module--image:nth-of-type(even) {
+					float: left;
+				}*/
+				.entry--style-shock .module--image:nth-of-type(4n - 1) {
+					transform: rotate(-1deg);
+				}
+				.entry--style-shock .module--image:nth-of-type(1n) img {
+					transform: rotate(-1deg);
+				}
+				.entry--style-shock .module--image:nth-of-type(4n - 1) img {
+					transform: rotate(1deg);
+				}
+				.entry--style-shock .module--image:nth-of-type(3n) {
+					transform: rotate(2deg);
+				}
+				.entry--style-shock .module--image a::after {
+					display: none;
+				}
+				.entry--style-shock .module--image div {
+					display: none;
+				}
+			</style>
+			
 			<!-- Middle -->
 			<div class="col c4-ABBC">
 				
@@ -287,30 +354,30 @@ if(is_array($entry) && !empty($entry)) {
 					<div class="interview__content text text--centered">
 						<?php
 							echo $entry['content'];
-								
-								// If still have sources after removing dupes, continue
-								if(is_array($sources) && !empty($sources)) {
-									
-									// Temporarily turn sources back into string so we can transform it
-									$sources = implode("\n", $sources);
-									
-									// Grab any twitter @users mentioned and transform into links
-									preg_match_all('/'.'^(@([A-z0-9-_]+))(?:\s|$)'.'/m', $sources, $twitter_matches);
-									if(is_array($twitter_matches) && !empty($twitter_matches)) {
-										for($i=0; $i<count($twitter_matches[0]); $i++) {
-											$sources = str_replace($twitter_matches[1][$i], '['.$twitter_matches[1][$i].'](https://twitter.com/'.$twitter_matches[2][$i].'/)', $sources);
-										}
+
+							// If still have sources after removing dupes, continue
+							if(is_array($sources) && !empty($sources)) {
+
+								// Temporarily turn sources back into string so we can transform it
+								$sources = implode("\n", $sources);
+
+								// Grab any twitter @users mentioned and transform into links
+								preg_match_all('/'.'^(@([A-z0-9-_]+))(?:\s|$)'.'/m', $sources, $twitter_matches);
+								if(is_array($twitter_matches) && !empty($twitter_matches)) {
+									for($i=0; $i<count($twitter_matches[0]); $i++) {
+										$sources = str_replace($twitter_matches[1][$i], '['.$twitter_matches[1][$i].'](https://twitter.com/'.$twitter_matches[2][$i].'/)', $sources);
 									}
-									
-									// Transform sources back into array, then turn into ordered list
-									$sources = explode("\n", $sources);
-									$sources = (count($sources) > 1 ? '* ' : null).implode("\n* ", $sources);
-									$sources = $markdown_parser->parse_markdown($sources);
-									$sources = str_replace('<ul class="ul--bulleted">', '<ul class="text text--outlined text--notice entry__sources">', $sources);
-									
-									echo '<h5 style="margin-top: 3rem; width: 100%;">'.lang('Source', '情報源', 'hidden').'</h5>';
-									echo $sources;
 								}
+
+								// Transform sources back into array, then turn into ordered list
+								$sources = explode("\n", $sources);
+								$sources = (count($sources) > 1 ? '* ' : null).implode("\n* ", $sources);
+								$sources = $markdown_parser->parse_markdown($sources);
+								$sources = str_replace('<ul class="ul--bulleted">', '<ul class="text text--outlined text--notice entry__sources">', $sources);
+
+								echo '<h5 style="margin-top: 3rem; width: 100%;">'.lang('Source', '情報源', 'hidden').'</h5>';
+								echo $sources;
+							}
 
 							if($entry['supplemental']) {
 								preg_match_all('/'.'^(@([A-z0-9-_]+))(?:\s|$)'.'/m', $entry['supplemental'], $twitter_matches);
@@ -444,145 +511,149 @@ if(is_array($entry) && !empty($entry)) {
 
 						<div class="interview__supplement-container">
 							<?php
-								// Get artist's upcoming live schedule
-								$access_live = new access_live($pdo);
+								if($entry['artist'] && is_numeric($entry['artist']['id'])) {
+									// Get artist's upcoming live schedule
+									$access_live = new access_live($pdo);
 
-								// Set up empty lives array
-								$lives = [];
+									// Set up empty lives array
+									$lives = [];
 
-								// Loop through each upcoming month, grab lives, and add to array
-								for($i=0; $i<5; $i++) {
-									$month_string = substr($entry['date_occurred'], 0, 7).'-01 +'.$i.' months';
-									$lives_month = $access_live->access_live([ 'artist_id' => $entry['artist']['id'], 'get' => 'name', 'date_occurred' => date('Y-m', strtotime($month_string)) ]);
-									$lives = is_array($lives_month) ? array_merge($lives, $lives_month) : $lives;
-								}
-
-								if(is_array($lives) && !empty($lives)) {
-									?>
-										<h2>
-											<?= lang('Events', 'イベント情報', 'div'); ?>
-										</h2>
-										<ul class="ul--compact any--margin">
-											<?php
-												foreach($lives as $live) {
-													echo '<li>';
-													echo '<div class="h5">';
-													echo str_ireplace(['sun','mon','tue','wed','thu','fri','sat'], ["日","月","火","水","木","金","土"], lang( $live['date_occurred'], date('Y年m月d日（D）', strtotime($live['date_occurred'])), 'hidden' ));
-													echo '</div>';
-													echo '<div>';
-													echo '<span class="any--weaken-size">'.lang( $live['area_romaji'] ?: $live['area_name'], $live['area_name'], 'hidden' ).'</span>';
-													echo ' '.lang( $live['livehouse_romaji'] ?: $live['livehouse_name'], $live['livehouse_name'], 'hidden' );
-													echo '</div>';
-													echo '</li>';
-												}
-											?>
-										</ul>
-									<?php
-								}
-							?>
-
-							<div class="interview__profile">
-								<h2>
-									<?= lang('Profile', 'プロフィール', 'div'); ?>
-								</h2>
-								<?php
-
-									// Render artist card
-									$access_artist->artist_card($entry['artist']);
-
-									// Name, pronunciation, description
-									if($entry['artist']['pronunciation'] || $entry['artist']['description']) {
-										//$markdown_parser = new parse_markdown($pdo);
-										echo '<strong>';
-										echo '<a class="artist a--inherit" href="/artists/'.$entry['artist']['friendly'].'/">'.lang( $entry['artist']['romaji'] ?: $entry['artist']['name'], $entry['artist']['name'], 'hidden' ).'</a>';
-										echo '</strong>';
-										echo $entry['artist']['romaji'] ? lang( ' ('.$entry['artist']['name'].')', null, 'hidden' ) : null;
-										echo $entry['artist']['pronunciation'] ? ' ('.$entry['artist']['pronunciation'].')' : null;
-										echo $entry['artist']['description'] ? ': '.$markdown_parser->parse_markdown($entry['artist']['description']) : null;
+									// Loop through each upcoming month, grab lives, and add to array
+									for($i=0; $i<5; $i++) {
+										$month_string = substr($entry['date_occurred'], 0, 7).'-01 +'.$i.' months';
+										$lives_month = $access_live->access_live([ 'artist_id' => $entry['artist']['id'], 'get' => 'name', 'date_occurred' => date('Y-m', strtotime($month_string)) ]);
+										$lives = is_array($lives_month) ? array_merge($lives, $lives_month) : $lives;
 									}
 
-									// Musicians
-									if(is_array($entry['artist']['musicians']) && !empty($entry['artist']['musicians'])) {
-										echo '<ul class="interview__lineup ul--compact">';
+									if(is_array($lives) && !empty($lives)) {
+										?>
+											<h2>
+												<?= lang('Events', 'イベント情報', 'div'); ?>
+											</h2>
+											<ul class="ul--compact any--margin">
+												<?php
+													foreach($lives as $live) {
+														echo '<li>';
+														echo '<div class="h5">';
+														echo str_ireplace(['sun','mon','tue','wed','thu','fri','sat'], ["日","月","火","水","木","金","土"], lang( $live['date_occurred'], date('Y年m月d日（D）', strtotime($live['date_occurred'])), 'hidden' ));
+														echo '</div>';
+														echo '<div>';
+														echo '<span class="any--weaken-size">'.lang( $live['area_romaji'] ?: $live['area_name'], $live['area_name'], 'hidden' ).'</span>';
+														echo ' '.lang( $live['livehouse_romaji'] ?: $live['livehouse_name'], $live['livehouse_name'], 'hidden' );
+														echo '</div>';
+														echo '</li>';
+													}
+												?>
+											</ul>
+										<?php
+									}
+									?>
 
-										// Loop through musicians still in band
-										foreach($entry['artist']['musicians'] as $musician) {
-											if($musician['to_end']) {
+									<div class="interview__profile">
+										<h2>
+											<?= lang('Profile', 'プロフィール', 'div'); ?>
+										</h2>
+										<?php
 
-												echo '<li class="interview__musician">';
+											// Render artist card
+											$access_artist->artist_card($entry['artist']);
 
-												// Birth/links
-												echo '<div class="interview__musician-stat">';
-												echo strlen($musician['blood_type']) ? '<span class="any--weaken">🩸'.$musician['blood_type'].'</span>' : null;
-												echo strlen($musician['birth_date']) ? '<span class="any--weaken">🎂'.str_replace('-', '/', substr($musician['birth_date'], 5)).'</span>' : null;
+											// Name, pronunciation, description
+											if($entry['artist']['pronunciation'] || $entry['artist']['description']) {
+												//$markdown_parser = new parse_markdown($pdo);
+												echo '<strong>';
+												echo '<a class="artist a--inherit" href="/artists/'.$entry['artist']['friendly'].'/">'.lang( $entry['artist']['romaji'] ?: $entry['artist']['name'], $entry['artist']['name'], 'hidden' ).'</a>';
+												echo '</strong>';
+												echo $entry['artist']['romaji'] ? lang( ' ('.$entry['artist']['name'].')', null, 'hidden' ) : null;
+												echo $entry['artist']['pronunciation'] ? ' ('.$entry['artist']['pronunciation'].')' : null;
+												echo $entry['artist']['description'] ? ': '.$markdown_parser->parse_markdown($entry['artist']['description']) : null;
+											}
 
-												// Musician URLs
-												if(is_array($entry['artist']['urls']) && !empty($entry['artist']['urls'])) {
-													foreach($entry['artist']['urls'] as $url) {
-														if($url['musician_id'] === $musician['id'] && $url['platform']) {
-															echo '<a class="" href="'.$url['content'].'" rel="nofollow" target="_blank">';
+											// Musicians
+											if(is_array($entry['artist']['musicians']) && !empty($entry['artist']['musicians'])) {
+												echo '<ul class="interview__lineup ul--compact">';
+
+												// Loop through musicians still in band
+												foreach($entry['artist']['musicians'] as $musician) {
+													if($musician['to_end']) {
+
+														echo '<li class="interview__musician">';
+
+														// Birth/links
+														echo '<div class="interview__musician-stat">';
+														echo strlen($musician['blood_type']) ? '<span class="any--weaken">🩸'.$musician['blood_type'].'</span>' : null;
+														echo strlen($musician['birth_date']) ? '<span class="any--weaken">🎂'.str_replace('-', '/', substr($musician['birth_date'], 5)).'</span>' : null;
+
+														// Musician URLs
+														if(is_array($entry['artist']['urls']) && !empty($entry['artist']['urls'])) {
+															foreach($entry['artist']['urls'] as $url) {
+																if($url['musician_id'] === $musician['id'] && $url['platform']) {
+																	echo '<a class="" href="'.$url['content'].'" rel="nofollow" target="_blank">';
+																	echo '<span class="symbol--standalone symbol__'.$url['platform'].'"></span>';
+																	echo '</a>';
+																}
+															}
+														}
+														echo '</div>';
+
+														// Position
+														echo '<span class="any--weaken">';
+														echo ['O', 'V', 'G', 'B', 'D', 'K', 'O', 'S'][$musician['position']].'. ';
+														echo '</span>';
+
+														// Name
+														echo '<a class="a--inherit interview__musician-name" href="/musicians/'.$musician['id'].'/'.$musician['friendly'].'/">';
+														if(strlen($musician['as_name'])) {
+															echo lang( $musician['as_romaji'] ?: $musician['as_name'], $musician['as_name'], 'hidden' );
+															echo lang( $musician['as_romaji'] ? '&nbsp;<span class="any--weaken">('.$musician['as_name'].')</span>' : null, null, 'hidden' );
+														}
+														else {
+															echo lang( $musician['romaji'] ?: $musician['name'], $musician['name'], 'hidden' );
+															echo lang( $musician['romaji'] ? '&nbsp;<span class="any--weaken">('.$musician['name'].')</span>' : null, null, 'hidden' );
+														}
+														echo '</a>';
+
+														echo '</li>';
+
+													}
+												}
+
+												echo '</ul>';
+											}
+
+											// Artist URLs
+											if(is_array($entry['artist']['urls']) && !empty($entry['artist']['urls'])) {
+												echo '<div class="interview__urls any--flex">';
+
+												foreach($entry['artist']['urls'] as $url) {
+													if( !is_numeric($url['musician_id']) ) {
+
+														// Official site
+														if( $url['type'] == 1 ) {
+															echo '<a class="a--padded a--outlined" href="'.$url['content'].'" rel="nofollow" style="order:-2;" target="_blank">'.lang('website', 'オフィシャル', 'hidden').'</a>';
+														}
+
+														// Official shop
+														elseif( $url['type'] == 2 ) {
+															echo '<a class="a--padded" href="'.$url['content'].'" rel="nofollow" style="order:-1;" target="_blank">'.lang('shop', 'ショップ', 'hidden').'</a>';
+														}
+
+														// SNS
+														elseif( $url['platform'] ) {
+															echo '<a class="a--padded" href="'.$url['content'].'" rel="nofollow" target="_blank">';
 															echo '<span class="symbol--standalone symbol__'.$url['platform'].'"></span>';
 															echo '</a>';
 														}
 													}
 												}
+
 												echo '</div>';
-
-												// Position
-												echo '<span class="any--weaken">';
-												echo ['O', 'V', 'G', 'B', 'D', 'K', 'O', 'S'][$musician['position']].'. ';
-												echo '</span>';
-
-												// Name
-												echo '<a class="a--inherit interview__musician-name" href="/musicians/'.$musician['id'].'/'.$musician['friendly'].'/">';
-												if(strlen($musician['as_name'])) {
-													echo lang( $musician['as_romaji'] ?: $musician['as_name'], $musician['as_name'], 'hidden' );
-													echo lang( $musician['as_romaji'] ? '&nbsp;<span class="any--weaken">('.$musician['as_name'].')</span>' : null, null, 'hidden' );
-												}
-												else {
-													echo lang( $musician['romaji'] ?: $musician['name'], $musician['name'], 'hidden' );
-													echo lang( $musician['romaji'] ? '&nbsp;<span class="any--weaken">('.$musician['name'].')</span>' : null, null, 'hidden' );
-												}
-												echo '</a>';
-
-												echo '</li>';
-
 											}
-										}
-
-										echo '</ul>';
-									}
-
-									// Artist URLs
-									if(is_array($entry['artist']['urls']) && !empty($entry['artist']['urls'])) {
-										echo '<div class="interview__urls any--flex">';
-										
-										foreach($entry['artist']['urls'] as $url) {
-											if( !is_numeric($url['musician_id']) ) {
-												
-												// Official site
-												if( $url['type'] == 1 ) {
-													echo '<a class="a--padded a--outlined" href="'.$url['content'].'" rel="nofollow" style="order:-2;" target="_blank">'.lang('website', 'オフィシャル', 'hidden').'</a>';
-												}
-												
-												// Official shop
-												elseif( $url['type'] == 2 ) {
-													echo '<a class="a--padded" href="'.$url['content'].'" rel="nofollow" style="order:-1;" target="_blank">'.lang('shop', 'ショップ', 'hidden').'</a>';
-												}
-												
-												// SNS
-												elseif( $url['platform'] ) {
-													echo '<a class="a--padded" href="'.$url['content'].'" rel="nofollow" target="_blank">';
-													echo '<span class="symbol--standalone symbol__'.$url['platform'].'"></span>';
-													echo '</a>';
-												}
-											}
-										}
-										
-										echo '</div>';
-									}
-								?>
-							</div>
+										?>
+									</div>
+									<?php
+								}
+							?>
 						</div>
 					</aside>
 				</div>

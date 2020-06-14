@@ -573,7 +573,7 @@
 									echo '<label class="input__label magazine--hide">'.lang($company_type, $company_type_jp, 'hidden').'</label>';
 									echo $company_type === 'label' ? '<label class="input__label magazine--show">'.lang('publisher', '編集・発行', 'hidden').'</label>' : null;
 								?>
-								<select class="input" data-populate-on-click="true" data-source="labels" id="<?= $company_type; ?>" name="<?php echo $company_type; ?>_id[]" placeholder="<?= $company_type; ?>" multiple data-multiple="true">
+								<select class="input" data-source="labels" id="<?= $company_type; ?>" name="<?php echo $company_type; ?>_id[]" placeholder="<?= $company_type; ?>" multiple data-multiple="true">
 									<?php
 										if(is_array($release[$company_type])) {
 											foreach($release[$company_type] as $company) {
