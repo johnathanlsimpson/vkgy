@@ -182,7 +182,7 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 				
 				// If adding brand new post
 				// Grab default image for first artist mentioned, in case no image is supplied by user
-				if(is_array($references) && !empty($references)) {
+				/*if(is_array($references) && !empty($references)) {
 					$last_ref = end($references);
 					
 					if($last_ref['type'] === 'artist') {
@@ -196,7 +196,7 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 							$values_blog[] = $rslt_default_image;
 						}
 					}
-				}
+				}*/
 				
 				$keys_blog[] = 'user_id';
 				$values_blog[] = $_SESSION['user_id'];
