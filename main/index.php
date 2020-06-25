@@ -30,12 +30,13 @@ if($_SESSION['is_vip']) {
 }
 
 /* Get news */
-$news = $access_blog->access_blog([ "page" => "latest", "get" => "list" ]);
+$news = $access_blog->access_blog([ 'get' => 'list', 'limit' => 7 ]);
 $num_news = count($news);
 
 $news[0]["content"] = $markdown_parser->parse_markdown($news[0]["content"]);
 $news[0]["comment_count"] = $access_comment->access_comment([ "id" => $news[0]["id"], "type" => "blog", "get" => "count" ]);
 $news[0]["comment_text"] = ($news[0]["comment_count"] ? 'read '.$news[0]["comment_count"].' comment'.($news[0]["comment_count"] !== "1" ? 's' : null) : 'comment on this entry');
+
 
 for($i=0; $i<$num_news; $i++) {
 	$news[$i]["date_occurred"] = substr($news[$i]["date_occurred"], 0, 10);
@@ -90,7 +91,6 @@ if($num_rslt_comments) {
 	}
 	
 }
-
 // Comments: Format comment data
 for($i=0; $i<$num_comments; $i++) {
 	
@@ -141,34 +141,6 @@ $sql_recent = "
 					LIMIT 20
 				) aaa
 			LEFT JOIN artists ON artists.id=aaa.artist_id
-		)
-		
-		UNION
-		
-		(
-			SELECT
-				bbb.user_id,
-				bbb.date_edited,
-				COALESCE(labels.romaji, labels.name) AS quick_name,
-				CONCAT_WS('/', '', 'labels', labels.friendly, '') AS url,
-				'company' AS type,
-				'' AS artist_quick_name,
-				'' AS artist_url
-			FROM
-				(
-					SELECT label_id, user_id, date_occurred AS date_edited
-					FROM
-						(
-							SELECT id
-							FROM edits_labels
-							ORDER BY id DESC
-							LIMIT 10
-						) bb
-					LEFT JOIN edits_labels ON edits_labels.id=bb.id
-					GROUP BY edits_labels.label_id
-					LIMIT 10
-				) bbb
-			LEFT JOIN labels ON labels.id=bbb.label_id
 		)
 		
 		UNION
@@ -226,34 +198,59 @@ if(is_array($image) && !empty($image) && file_exists("../images/image_files/".$i
 }
 
 /* Artist rankings */
+$rank_start = date( 'Y-m-d', strtotime('-2 weeks sunday', time()) );
+$rank_end = date( 'Y-m-d', strtotime('-1 weeks sunday', time()) );
 $sql_rankings = "
 	SELECT
-		SUM(artists_views.view_count) AS view_count,
-		COALESCE(artists.romaji, artists.name) AS quick_name,
+		view_count,
 		artists.friendly,
-		artists.name
-	FROM artists_views
-	LEFT JOIN artists ON artists.id=artists_views.artist_id
-	WHERE artists_views.date_occurred > ? AND artists_views.date_occurred < ?
-	GROUP BY artists_views.artist_id
+		artists.name,
+		COALESCE(artists.romaji, artists.name) AS quick_name
+	FROM (
+		SELECT 
+			artists_views.artist_id,
+			SUM(artists_views.view_count) AS view_count
+		FROM artists_views
+		WHERE artists_views.date_occurred > ? AND artists_views.date_occurred < ?
+		GROUP BY artists_views.artist_id
+	) recent_views
+	LEFT JOIN artists ON artists.id=recent_views.artist_id
 	ORDER BY view_count DESC
 	LIMIT 3
 ";
 $stmt_rankings = $pdo->prepare($sql_rankings);
-$stmt_rankings->execute([
-	date("Y-m-d", strtotime("-2 weeks sunday", time())),
-	date("Y-m-d", strtotime("-1 weeks sunday", time()))
-]);
+$stmt_rankings->execute([ $rank_start, $rank_end ]);
 $rslt_rankings = $stmt_rankings->fetchAll();
 
 /* Points ranks */
-$access_points = new access_points($pdo);
+$sql_points = '
+	SELECT weekly_points.user_id, users.username, SUM(weekly_points.point_value) AS points_value
+	FROM (
+		SELECT user_id, point_value
+		FROM users_points
+		WHERE date_occurred>=? AND date_occurred<=?
+	) weekly_points
+	LEFT JOIN users ON users.id=weekly_points.user_id
+	GROUP BY weekly_points.user_id
+	ORDER BY points_value DESC
+	LIMIT 3';
+$stmt_points = $pdo->prepare($sql_points);
+$stmt_points->execute([ $rank_start, $rank_end ]);
+$point_ranking = $stmt_points->fetchAll();
+
+foreach($point_ranking as $point_key => $point) {
+	$access_points = new access_points($pdo);
+	$user_level = $access_points->access_points([ 'user_id' => $point['user_id'], 'get' => 'level' ]);
+	$point_ranking[$point_key]['level'] = $user_level[0]['level'];
+}
+
+/*$access_points = new access_points($pdo);
 $point_ranking = $access_points->access_points([
 	'get' => 'ranking',
 	'start_date' => date("Y-m-d", strtotime("-2 weeks sunday", time())),
 	'end_date' => date("Y-m-d", strtotime("-1 weeks sunday", time())),
-	'limit' => 3,
-]);
+	'limit' => 3
+]);*/
 
 /* VIP users */
 $sql_vip_users = "SELECT username FROM users WHERE is_vip=? ORDER BY username";
