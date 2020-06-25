@@ -416,9 +416,30 @@ function initTribute() {
 		newElem.setAttribute('data-name', tributableElem.getAttribute('name'));
 		newElem.setAttribute('contenteditable', 'false');
 		
-		// Get text of original input, insert into clone
-		var originalText = tributableElem.textContent;
-		newElem.innerHTML = originalText;
+		// Set default (empty) original text
+		var originalText = '';
+		
+		// If user accidentally pressed back, then forward, autofill won't happen
+		// for a split second, and shows as value instead of textcontent
+		// so let's wait a hair, then make sure textcontent is equal to value,
+		// and then set the contenteditable element with the same text
+		setTimeout(function() {
+			
+			// Make sure textcontent is filled if value gets filled
+			if(tributableElem.textContent === '' && tributableElem.value !== '') {
+				tributableElem.textContent = tributableElem.value;
+			}
+			
+			// Get text of original input, insert into clone
+			originalText = tributableElem.textContent;
+			newElem.innerHTML = originalText;
+			
+			// Parse originalText and insert tokens
+			// Then add br; otherwise, Chrome will add a newline, which isn't visible, but affects text
+			newElem.innerHTML = insertTributeTokens(originalText);
+			newElem.appendChild(document.createElement('br'));
+			
+		}, 1);
 		
 		// Hide original input, throw active class on it
 		tributableElem.classList.add('any--hidden');
@@ -431,11 +452,6 @@ function initTribute() {
 		else {
 			tributableElem.parentNode.insertBefore(newElem, tributableElem);
 		}
-		
-		// Parse originalText and insert tokens
-		// Then add br; otherwise, Chrome will add a newline, which isn't visible, but affects text
-		newElem.innerHTML = insertTributeTokens(originalText);
-		newElem.appendChild(document.createElement('br'));
 		
 		// Init tribute.js on clone and orig element
 		richTribute.attach(newElem);
