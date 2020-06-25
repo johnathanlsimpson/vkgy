@@ -35,196 +35,213 @@
 		}
 	?>
 	
-	<?php
-		if($_SESSION['username'] === 'inartistic') {
+	<?php if($_GET['letter'] === 'a') { ?>
+<div class="col c1">
+	<div class="genre__wrapper">
+		
+		<h2>
+			<?= lang('VK subgenres', 'V系ジャンル', 'div'); ?>
+		</h2>
+		<ul class="genre__container any--margin">
 			
-			?>
-				<div class="col c3-AAB">
-					<div>
-						<h2 style="display: block;
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 100%;
-    width: 800px;">
-							<?= lang('What\'s kote kei?', 'コテ系とは', 'div'); ?>
-						</h2>
-						<div class="text--centered">
-							<? $x = 'The term **kote kei** (コテ系), or kotekote kei (コテコテ系), comes from a Japanese onomotopeia which means “over the top” or “thickly.” It gives an impression of excess.
-
-### What do kote kei bands look like?
-
-Kote kei bands typically have a dark air about them, and favor bizareness, decadence, and beauty. Reality is eschewed in favor of otherworldliness. Crosses, chains, and roses may be common themes. Their costumes are excessive and impractical: vinyl, leather, buckles, feathers, lace. Black costumes with unnatural hair colors and makeup.
-
-### What does kote kei sound like?
-
-The music of kote kei is often speedy and agressive. It\'s likely to include distorted screams and unnatural vocal effects--and vocals which are described as “emotional” rather than “pretty.” Lyrics are often about abstract concepts or fictional tales, rather than real world scenarios.
-
-### How did kote kei start?
-
-Kote kei arose in the latter half othe 90s, after visual kei had solidified itself as a unique genre. Visual kei\'s formative years had seen bands naturally divide into <a href="">shiro kei</a> and <a href="">kuro kei</a>; kote kei is the natural progression of the latter. It took the tropes of kuro kei, applied the grotesque images that had been popularized by <a href="">nagoya kei</a>, and then further twisted those themes until they become their own distinct subgenre.
-
-Like all [vkei subgenres](), kote kei is a *loose* musical and visual description of similar bands. Any vkei band can occupy several subgenres, or none.';
-							echo $markdown_parser->parse_markdown($x); ?>
-						</div>
-					</div>
-				</div>
-			<?php
-			
-			style([
-				'/tags/style-partial-tags.css',
-			]);
-			
-			$sql_genres = 'SELECT tags_artists.*, images.extension FROM tags_artists LEFT JOIN images ON images.id=tags_artists.image_id WHERE tags_artists.type=? ORDER BY tags_artists.friendly ASC';
-			$stmt_genres = $pdo->prepare($sql_genres);
-			$stmt_genres->execute([ 0 ]);
-			$genres = $stmt_genres->fetchAll();
-			
-			?>
-				<svg class="any--hidden" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 228.06 61.38" style="enable-background:new 0 0 228.06 61.38;" xml:space="preserve">
-					<defs>
-					<path id="darrylpyon-sig" class="st0" d="M70.38,0.36c1.42,3.45-1.21,8.02-1.98,10.44c-2,6.31-3.77,13.97-5.58,20.16c-0.26,0.88,0.69,1.82,0.72,2.7
-					c4.56-3.63,11.6-7.8,13.68,1.62c0.12,0.06,0.24,0.12,0.36,0.18c3.06-0.45,3.38-3.02,5.4-4.32c0.12-0.06,0.24-0.12,0.36-0.18
-					c1.5-0.71,3.15,0.4,4.68,0.18c2.49-0.36,3.68-1.83,6.3-1.98c0.42,0.24,0.84,0.48,1.26,0.72c0.12,0.96,0.24,1.92,0.36,2.88
-					c1.55-1.06,2.15-2.76,4.32-3.24c6.43-1.42,11.79,2.31,16.56-2.34c2.76-3.74,4.57-15.7,8.28-17.46c0.54,0,1.08,0,1.62,0
-					c0.67,0.51,0.9,0.95,1.26,1.8c-0.59,5.46-7.97,14.19-4.32,19.98c3.74,0.69,6.99-1.37,10.26-0.9c0,0.06,0,0.12,0,0.18
-					c-3.29,4.15-12.61,8.11-14.76,1.26c-0.12,0.06-0.24,0.12-0.36,0.18c-3.08,5.06-10.77,20.53-18.9,19.44
-					c-0.24-0.36-0.48-0.72-0.72-1.08c-1.08-2.33,1.34-4.31,2.7-5.4c3.35-2.7,9.67-6.91,10.8-11.52c-3.94,0.55-7.81-1.31-11.52,0
-					c-1.95,0.69-6.92,7.55-9.18,0.72c-4.04,1.69-6.16-1.01-9,3.24c-1.44,0.57-2.43,1.72-4.14,2.16c-3.41,0.88-4.42-2.43-5.94-1.8
-					c-2.59,4.56-13.28,5.01-9.9-3.06c-0.42-0.12-0.84-0.24-1.26-0.36c-0.51,2.78-2.4,5.77-4.5,7.02c-4.33,2.58-12.95,1.47-14.4-2.7
-					c-1.74-5.01,5.44-10.25,8.82-11.16c2.63-0.71,5.7,0.12,7.56,0.72c0-0.12,0-0.24,0-0.36c1.14-4.32,2.28-8.64,3.42-12.96
-					c0.66-0.72,1.32-1.44,1.98-2.16c0.66-2.34,1.32-4.68,1.98-7.02C67.52,3.62,69,2.14,70.38,0.36z M17.28,17.46
-					c8.42-0.21,16.63,8.52,9.9,16.92c-3.16,3.95-7.03,1.25-7.92,0.36c-1.34,3.08-7,8.05-10.8,5.4c-2.39-5.9,3.64-14.63,7.92-16.38
-					c4.64-1.9,8.36,1.61,8.64,5.76c-0.42,0.74-0.64,0.89-1.44,1.26c-0.6-0.36-1.2-0.72-1.8-1.08c0,0.42,0,0.84,0,1.26
-					c0.09,0.63,0.4,1.17,1.08,1.62c6.4-3.55,0.82-12.26-7.02-10.8C9.35,22.99,0.62,34.41,6.3,41.4c5.02,6.18,19.58-2.18,23.4-4.5
-					c1.33-0.81,4.77-3.52,6.66-2.34c-3.29,6.5-25.11,20.23-33.3,9.72c-6.64-8.52,0.23-21.01,6.84-25.02
-					C12.06,17.95,14.03,17.5,17.28,17.46z M161.46,21.06c4.63-0.22,5.3,3.63,3.78,7.2c0.12-0.06,0.24-0.12,0.36-0.18
-					c0.47-1.41,1.12-1.51,2.34-2.16c0.42,0.12,0.84,0.24,1.26,0.36c1.13,1.56,0.7,3.07,0.54,5.4c2.04-1.65,2.33-4.98,5.58-5.4
-					c1.28,0.8,1.98,1.12,1.98,3.24c1.08-0.83,3.08-2.75,4.86-2.16c1.36,0.14,2.2,0.8,2.52,1.98c1.17-0.83,3.95-0.17,6.3-0.66
-					c2.5-0.52,3.17-1.64,4.86-1.32c1.32,0.9,2.37,2.07,3.96,2.7c3.88,1.23,9.71-0.53,13.5-0.72c2.88-0.14,13.22-0.85,14.58,0.18
-					c-0.12,0-0.24,0-0.36,0c-11.99,3.93-27.84,7.39-32.58,2.16c-1.44,0.42-2.88,0.84-4.32,1.26c-1.32,0.06-2.64,0.12-3.96,0.18
-					c-2.53,1.12-3.61,3.64-7.2,3.78c-0.87-0.54-1.24-0.91-1.44-2.16c-2.63,2.7-2.6,1.4-2.88,2.16c-1.34,3.58-7.68,20.8-14.4,21.06
-					c-0.48-0.3-0.96-0.6-1.44-0.9c-2.02-7.15,7.75-16.46,10.8-20.7c-2.37,0.28-3.14-0.48-4.32-1.8c-2.34,1.62-4.68,3.24-7.02,4.86
-					c-1.36,0.78-4.32,0.92-5.22,2.16c-2.3,3.89-6.94,19.19-11.16,19.62c-0.18-0.06-0.36-0.12-0.54-0.18c-0.71-0.54-1-0.95-1.08-2.16
-					c2.77-7.76,5.38-15.43,8.46-22.68c-2.2,1.13-5.75,2.98-8.46,1.44c0-0.06,0-0.12,0-0.18c0-0.18,0-0.36,0-0.54
-					c0.18-0.12,0.36-0.24,0.54-0.36c3.41,1.08,10.26-5.4,11.88-7.74c0.54-1.14,1.08-2.28,1.62-3.42
-					C157.35,24.87,158.73,21.77,161.46,21.06z M161.46,25.2c-3.04,2.52-4.77,4.34-5.58,9C157.61,33.72,162.82,26.69,161.46,25.2z
-					M18.54,27.18c-2.82,0.8-5.55,5.32-6.66,9.54c0.06,0,0.12,0,0.18,0c6.95-5.49,5-8.65,7.74-9.36C19.38,27.3,18.96,27.24,18.54,27.18z
-					M53.82,31.32c-3.08,1.63-5.32,2.6-6.84,5.76c0.06,0.24,0.12,0.48,0.18,0.72c5.73,2.16,10.24-0.38,10.8-5.76
-					C56.68,31.65,55.65,31.32,53.82,31.32z M71.46,33.12c-2.07,1.16-4.64,1.47-5.04,4.32c0.24,0,0.48,0,0.72,0
-					C68.7,36.85,71.62,34.68,71.46,33.12z" />
-					</defs>
-				</svg>
+			<li class="genre__item text" style="background-image:url(/test/subgenre-kote.png);">
 				
-				<div class="col c4-AAAB">
-					<div class="genres__container">
-						<?php
-							foreach($genres as $tag) {
-								?>
-									<a class="text genre__container <?= 'genre--'.$tag['friendly']; ?>" href="<?= '/search/'.$item_type.'s/?tags[]='.$tag['friendly']; ?>">
-										<div class="genre__image" style="background-image: url(<?= '/images/'.$tag['image_id'].'.medium.'.$tag['extension']; ?>);"></div>
-										<div class="genre__name h2">
-											<?= $tag['romaji'] ? lang($tag['romaji'], $tag['name'], 'div') : $tag['name']; ?>
-										</div>
-										<!--<svg class="genre__sig" x="0px" y="0px" viewBox="0 0 228.06 61.38"><use xlink:href="#darrylpyon-sig" /></svg>-->
-									</a>
-								<?php
-							}
-						?>
+				<a class="genre__link" href="https://vk.gy/search/artists/?tags[]=kote-kei#result">
+					
+					<div class="genre__title h2">
+						<?= lang('kote kei', 'コテ系', 'div'); ?>
 					</div>
+					
+					<div class="genre__description">
+						A classic subgenre unique to vkei, born in the late 90s. Typically speedy and aggressive music coupled with dark, surreal, horror visuals.
+					</div>
+					
+				</a>
+				
+				<div class="genre__examples any--weaken">
+					
+					<a class="genre__example" href="/artists/due-le-quartz/" style="background-image:url(/artists/due-le-quartz/main.small.jpg);">Dué le quartz</a>
+					
+					<a class="genre__example" href="/artists/la-veil-mizeria/" style="background-image:url(/artists/la-veil-mizeria/main.small.jpg);">La'veil MizeriA</a>
+					
+					<a class="genre__example" href="/artists/phantasmagoria/" style="background-image:url(/artists/phantasmagoria/main.small.jpg);">Phantasmagoria</a>
+					
+					<a class="genre__example" href="/artists/verxina/" style="background-image:url(/artists/verxina/main.small.jpg);"><?= lang('VERXINA', 'ヴィルシーナ', 'hidden'); ?></a>
+					
+					<a class="genre__example" href="/artists/virge/" style="background-image:url(/artists/virge/main.small.jpg);"><?= lang('Virge', 'ヴァージュ', 'hidden'); ?></a>
+					
 				</div>
 				
-				<style>
-					.genres__container {
-						display: grid;
-						grid-gap: 1rem;
-						grid-template-columns: repeat(5, minmax(0, 1fr));
-						grid-template-rows: repeat(3, 1fr);
-					}
-					.genre__container {
-						/*background-image: url(https://vk.gy/images/36959.medium.png);*/
-						height: 0;
-						margin: 0;
-						overflow: hidden;
-						padding: 100% 100% 0 0;
-						transition: background 0.2s linear;
-						transform: scale(1);
-						width: 100%;
-					}
-					.genre__container:hover .genre__image {
-						transform: translateY(-10%);
-					}
-					.genre--kote-kei {
-						/*background-image: url(https://vk.gy/images/36959.png);*/
-						grid-column: 1 / 3;
-						grid-row: 1 / 4;
-						height: 100%;
-					}
-					.genre__image {
-						background-position-x: 80%;
-						background-position-y: 38%;
-						background-repeat: no-repeat;
-						background-size: 120% auto;
-						bottom: -15%;
-						left: 0;
-						position: absolute;
-						right: 0;
-						top: -15%;
-						transform: translateY(0%);
-						transition: transform 0.2s linear;
-					}
-					.genre--kirakira-kei .genre__image {
-						background-position-x: 60%;
-						background-position-y: 17%;
-					}
-					.genre--shiro-kei .genre__image {
-						background-position-y: 5%;
-					}
-					.genre--angura .genre__image {
-						background-position-y: 15%;
-					}
-					.genre--art-kei .genre__image {
-						background-position-y: 10%;
-					}
-					.genre--fantasy-kei .genre__image {
-						background-position-y: 5%;
-					}
-					.genre--showa-kayou-kei .genre__image {
-						background-position-x: 50%;
-						background-position-y: 5%;
-					}
-					.genre--wafuu .genre__image {
-						background-position-x: 40%;
-						background-position-y: 5%;
-					}
-					.genre__name {
-						background: radial-gradient(at bottom left, hsla(var(--background), 0.8), transparent 50%), linear-gradient(to top, hsla(var(--background), 0.9), transparent);
-						bottom: 0;
-						margin: 0;
-						left: 0;
-						line-height: 1;
-						padding: 6rem 1rem 1rem 1rem !important;
-						position: absolute;
-						right: 0;
-					}
-					.genre__name :last-of-type {
-						margin-top: 0.5rem; 
-					}
-					.genre__container:hover .genre__name {
-					}
-					.genre__sig {
-						fill: hsl(var(--text--secondary));
-						max-width: 100%;
-						position: absolute;
-						right: 1rem;
-						bottom: 1rem;
-						width: 70px;
-						transform: rotate(-90deg) translate(80%, 0%);
-						transform-origin: right;
-					}
-				</style>
-			<?php
+			</li>
+			
+			<li class="genre__item genre__kira text" style="background-image:url(/test/subgenre-kirakira.png);">
+				<a class="genre__link" href="https://vk.gy/search/artists/?tags[]=kirakira-kei#result">
+					<div class="genre__title h2">
+						<?= lang('kirakira', 'キラキラ系', 'div'); ?>
+					</div>
+				</a>
+			</li>
+			
+			<li class="genre__item genre__menhera text" style="background-image:url(/test/subgenre-menhera.png);">
+				<a class="genre__link" href="https://vk.gy/search/artists/?tags[]=menhera-kei#result">
+					<div class="genre__title h2">
+						<?= lang('menhera', 'メンヘラ系', 'div'); ?>
+					</div>
+				</a>
+			</li>
+			
+			<li class="genre__item genre__sofubi text" style="background-image:url(/test/subgenre-sofubi.png);">
+				<a class="genre__link" href="https://vk.gy/search/artists/?tags[]=soft-visual#result">
+					<div class="genre__title h2">
+						<?= lang('soft visual', 'ソフビ系', 'div'); ?>
+					</div>
+				</a>
+			</li>
+			
+			<li class="genre__item genre__tanbi text" style="background-image:url(/test/subgenre-tanbi.png);">
+				<a class="genre__link" href="https://vk.gy/search/artists/?tags[]=tanbi-kei#result">
+					<div class="genre__title h2">
+						<?= lang('tanbi', '耽美系', 'div'); ?>
+					</div>
+				</a>
+			</li>
+			
+			<li class="genre__item genre__wafuu text" style="background-image:url(/test/subgenre-wafuu.png);">
+				<a class="genre__link" href="https://vk.gy/search/artists/?tags[]=wafuu#result">
+					<div class="genre__title h2">
+						<?= lang('wafuu', '和風系', 'div'); ?>
+					</div>
+				</a>
+			</li>
+			
+			<li class="genre__item">
+				<a class="genre__link genre__more a--outlined a--padded" href="/search/artists/">
+					<div class="genre__title h2">
+						<?= lang('search', 'サーチ', 'div'); ?>
+					</div>
+				</a>
+			</li>
+			
+		</ul>
+		
+		<div class="symbol__help any--weaken-color" style="margin: -2rem 0 3rem 0;">
+			Illustrations by <a href="https://www.instagram.com/darrylpyon/" target="_blank">@darrylpyon</a>
+		</div>
+		
+	</div>
+</div>
+
+<style>
+	.genre__container {
+		display: grid;
+		grid-gap: 1rem;
+		grid-template-columns: repeat(4, minmax(0, 25%));
+		grid-auto-rows: 175px;
+	}
+	@media(max-width:1199.99px) {
+		.genre__container {
+			grid-template-columns: repeat(3, minmax(0, 33%));
 		}
-	?>
+	}
+	@media(max-width:599.99px) {
+		.genre__container {
+			grid-template-columns: repeat(2, minmax(0, 50%));
+		}
+	}
+	
+	.genre__item {
+		background-position: center 35%;
+		background-size: 140% auto;
+		border: none;
+		display: flex;
+		flex-direction: column;
+		margin: 0;
+		padding: 0;
+	}
+	.genre__item:first-of-type {
+		background-color: #8c6cdd;
+		grid-column: 1 / 3;
+		grid-row: 1 / 4;
+	}
+	.genre__wafuu { background-color: #6a8950; }
+	.genre__tanbi { background-color: #3648a2; }
+	.genre__menhera { background-color: #e05a54; }
+	.genre__sofubi { background-color: #b5b3c1; }
+	.genre__kira { background-color: #ffc55c; }
+	.genre__link {
+		align-items: stretch;
+		background: linear-gradient( hsla(var(--background--bold), 0.0) 20%, hsla(var(--background--bold), 0.9) 90% );
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		padding: 1rem 1rem 0 1rem;
+		transition: opacity 0.1s ease-in-out;
+	}
+	.genre__link:not(.genre__more), .genre__link:not(.genre__more):hover, .genre__link:not(.genre__more) .any--weaken {
+		color: hsl(var(--text));
+	}
+	.genre__link:not(.genre__more):hover, .genre__link:hover + .genre__examples {
+		animation: bubble 1.0s forwards;
+		animation-delay: 0.0s;
+	}
+	@keyframes bubble {
+		0% { opacity: 1; }
+		100% { opacity: 0; }
+	}
+	.genre__more {
+		background: none;
+	}
+	.genre__more .genre__title {
+		color: inherit;
+	}
+	
+	.genre__title {
+		line-height: 1;
+		margin: auto 0 1rem 0;
+		padding: 0;
+	}
+	#language-ja:checked~* .genre__title .any--ja {
+		font-weight: bold;
+	}
+	.genre__title::before {
+		display: none;
+	}
+	.genre__examples {
+		background: hsla(var(--background--bold), 0.9);
+		display: flex;
+		justify-content: space-between;
+		padding: 1rem;
+	}
+	.genre__example {
+		background-size: cover;
+		border-radius: 50%;
+		color: transparent;
+		display: inline-flex;
+		height: 100px;
+		overflow: hidden;
+		width: 100px;
+	}
+	.genre__example:hover {
+		color: transparent;
+		opacity: 0.75;
+	}
+	@media(max-width:949.99px) {
+		.genre__example:nth-of-type(n + 5) {
+			display: none;
+		}
+	}
+	@media(max-width:749.99px) {
+		.genre__example:nth-of-type(n + 4) {
+			display: none;
+		}
+	}
+	@media(max-width:349.99px) {
+		.genre__example:nth-of-type(n + 3) {
+			display: none;
+		}
+	}
+</style>
+	<?php } ?>
 	
 	<div class="any--flex any--margin controls__container">
 		<div class="controls__letters">
