@@ -97,3 +97,7 @@
 .tributable__switch:hover {
 	opacity: 1;
 }
+.tributable--empty::before {
+	content: attr(placeholder);
+	opacity: 0.5;
+}
