@@ -415,6 +415,9 @@ function initTribute() {
 		newElem.setAttribute('placeholder', tributableElem.getAttribute('placeholder') || '');
 		newElem.setAttribute('data-name', tributableElem.getAttribute('name'));
 		newElem.setAttribute('contenteditable', 'false');
+		if(tributableElem.dataset.limit) {
+			newElem.setAttribute('data-limit', tributableElem.dataset.limit);
+		}
 		
 		// Set default (empty) original text
 		var originalText = '';
@@ -439,7 +442,24 @@ function initTribute() {
 			newElem.innerHTML = insertTributeTokens(originalText);
 			newElem.appendChild(document.createElement('br'));
 			
+			// Since placeholder text won't show up because of br,
+			// check if the element is otherwise empty, and then slap a class on it
+			if(newElem.innerHTML === '<br>') {
+				newElem.classList.add('tributable--empty');
+			}
+			
 		}, 1);
+		
+		// Since placeholder text won't show up because of br, on blur
+		// check if the element is otherwise empty, and then slap a class on it
+		newElem.addEventListener('focus', function() {
+			newElem.classList.remove('tributable--empty');
+		});
+		newElem.addEventListener('blur', function() {
+			if(newElem.innerHTML === '<br>') {
+				newElem.classList.add('tributable--empty');
+			}
+		});
 		
 		// Hide original input, throw active class on it
 		tributableElem.classList.add('any--hidden');

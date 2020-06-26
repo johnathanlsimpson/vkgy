@@ -32,23 +32,29 @@
 		// ======================================================
 			private function hashSet($user_id) {
 				if(is_numeric($user_id)) {
-					$sql_clear_tokens = "DELETE FROM users_tokens WHERE user_id=? AND (remote_addr=? OR date_occurred <= CURRENT_DATE() - INTERVAL 1 MONTH)";
-					$stmt_clear_tokens = $this->pdo->prepare($sql_clear_tokens);
-					$stmt_clear_tokens->execute([$user_id, $_SERVER["REMOTE_ADDR"]]);
 					
+					$user_agent = substr(sanitize($_SERVER['HTTP_USER_AGENT']), 0, 255);
+					$remote_addr = sanitize($_SERVER['REMOTE_ADDR']);
 					$token = bin2hex(random_bytes(16));
 					
-					$sql_token = "INSERT INTO users_tokens (user_id, token, remote_addr) VALUES (?, ?, ?)";
-					$stmt_token = $this->pdo->prepare($sql_token);
+					// Clear previous token (if it matches this IP/browser) and also clear any really old tokens (regardless of IP/browser)
+					$sql_clear_tokens = "DELETE FROM users_tokens WHERE user_id=? AND ( (remote_addr=? AND user_agent=?) OR date_occurred <= CURRENT_DATE() - INTERVAL 1 MONTH )";
+					$stmt_clear_tokens = $this->pdo->prepare($sql_clear_tokens);
+					$stmt_clear_tokens->execute([ $user_id, $user_agent, $remote_addr ]);
 					
-					if($stmt_token->execute([$user_id, $token, $_SERVER["REMOTE_ADDR"]])) {
-						$cookie = $user_id.":".$_SERVER["REMOTE_ADDR"].":".$token;
+					// Insert new token
+					$sql_token = "INSERT INTO users_tokens (user_id, token, user_agent, remote_addr) VALUES (?, ?, ?, ?)";
+					$stmt_token = $this->pdo->prepare($sql_token);
+					if($stmt_token->execute([ $user_id, $token, $user_agent, $remote_addr ])) {
+						
+						// Create cookie for persistent login
+						$cookie = $user_id.":".$user_agent.':'.$remote_addr.":".$token;
 						$mac = hash_hmac("sha256", $cookie, $this->secret_key);
 						$cookie .= ":".$mac;
-						
 						setcookie("remember_me", $cookie, time() + 60*60*24*30, "/", $this->domain, true, true);
 						
 						return true;
+						
 					}
 					else {
 						$this->status = 2;
