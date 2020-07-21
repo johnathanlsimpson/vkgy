@@ -12,8 +12,16 @@ if(is_array($entry) && !empty($entry)) {
 	
 	$entry['images'] = is_array($entry['images']) ? $entry['images'] : [];
 	
-	if(!empty($entry['images']) && is_numeric($entry['image_id'])) {
-		$entry['image'] = $entry['images'][$entry['image_id']];
+	if( !empty($entry['images']) && ( is_numeric($entry['image_id']) || is_numeric($entry['sns_image_id']) ) ) {
+		
+		// If special image set for SNS, user that
+		if(is_numeric($entry['sns_image_id'])) {
+			$entry['image'] = $entry['images'][$entry['sns_image_id']];
+		}
+		// Otherwise use header image
+		else {
+			$entry['image'] = $entry['images'][$entry['image_id']];
+		}
 		
 		$page_image = "https://vk.gy".str_replace('.', '.large.', $entry['image']['url']);
 		

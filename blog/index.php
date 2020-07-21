@@ -135,9 +135,17 @@ if($_GET["action"] === "update") {
 				$entry["title"] => "/blog/".$entry["friendly"]."/",
 				"Edit" => "/blog/".$entry["friendly"]."/edit/"
 			]);
+			
+			// Set flags
+			$entry['is_published'] = $entry['is_queued'] ? 0 : 1;
+			
 		}
 		else {
 			$page_title = "Add blog entry";
+			
+			// Set flags
+			$entry['is_queued'] = 1;
+			$entry['is_published'] = 0;
 			
 			breadcrumbs(["Add" => "/blog/add/"]);
 		}

@@ -32,3 +32,38 @@
 [name=delete][data-id=""] {
 	display: none;
 }
+
+/* 2020-07-06 */
+.entry__error:empty { display: none; }
+
+/* Format preview section */
+					.update__preview:not(:empty) {
+						margin-top: 1rem;
+					}
+					.update__preview > p:first-of-type {
+						color: hsl(var(--text--secondary));
+						font-size: 0.8em;
+					}
+.update__preview > p:first-of-type + * {
+	border-top: 1px dotted hsl(var(--background--bold));
+	margin-top: 1rem;
+	padding-top: 1rem;
+}
+					.update__preview p + p {
+						margin-top: 1rem;
+					}
+
+/* Choose SNS image */
+				.sns__container {
+					white-space: nowrap;
+				}
+				.sns__label {
+					height: auto;
+					margin-top: 0;
+				}
+				.sns__thumb {
+					height: 50px;
+					margin: -0.5rem;
+					object-fit: cover;
+					width: 50px;
+				}

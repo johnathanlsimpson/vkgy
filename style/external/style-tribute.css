@@ -100,4 +100,8 @@
 .tributable--empty::before {
 	content: attr(placeholder);
 	opacity: 0.5;
+	pointer-events: none;
+}
+.tributable--empty:focus::before {
+	display: none;
 }

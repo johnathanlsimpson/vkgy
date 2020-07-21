@@ -25,12 +25,13 @@ $access_artist = $access_artist ?: new access_artist($pdo);
 $access_label = $access_label ?: new access_label($pdo);
 $access_musician = $access_musician ?: new access_musician($pdo);
 $access_release = $access_release ?: new access_release($pdo);
+$access_user = $access_user ?: new access_user($pdo);
 
 // Grab data of a certain type and output it as a json object
 function render_json_list($input_type, $input = null, $input_id_type = null, $include_friendly = null, $first_option_id = null) {
 	global $pdo;
-	global $access_artist, $access_label, $access_musician, $access_release;
-	global $artist_list, $label_list, $musician_list, $release_list;
+	global $access_artist, $access_label, $access_musician, $access_release, $access_user;
+	global $artist_list, $label_list, $musician_list, $release_list, $user_list;
 	global $list_is_rendered;
 	
 	// Check if list was already generated
@@ -146,6 +147,12 @@ function render_json_list($input_type, $input = null, $input_id_type = null, $in
 			elseif($input_type === 'year') {
 				$input[$i]['id'] = $input[$i]['year'];
 				$input_chunk = [ $input[$i]['year'], null, $input[$i]['year'] ];
+			}
+			
+			// User
+			elseif($input_type === 'user') {
+				$input_chunk[] = $input[$i]['username'];
+				$input_chunk[] = $input[$i]['username'];
 			}
 			
 			// Output chunk

@@ -14,7 +14,7 @@ $current_date = $current_date->format('Y-m-d H:i');
 
 // Set basic content
 $id = is_numeric($_POST['id']) ? $_POST['id'] : null;
-$title = sanitize($_POST['title']);
+$title = sanitize($_POST['name']);
 $content = sanitize($markdown_parser->validate_markdown($_POST['content']));
 $content_ja = sanitize($markdown_parser->validate_markdown($_POST['content_ja'])) ?: null;
 $supplemental = sanitize($markdown_parser->validate_markdown($_POST['supplemental'])) ?: null;
@@ -23,6 +23,11 @@ $friendly = friendly($_POST['friendly'] ?: $title);
 $references = $markdown_parser->get_reference_data($content);
 $is_edit = is_numeric($id);
 $is_queued = $_POST['is_queued'] ? 1 : 0;
+$author_id = is_numeric($_POST['user_id']) ? $_POST['user_id'] : $_SESSION['user_id'];
+$was_published = $_POST['was_published'] ? 1 : 0;
+$sns_image_id = is_numeric($_POST['sns_image_id']) ? $_POST['sns_image_id'] : null;
+$twitter_content = sanitize($_POST['twitter_content']);
+$fb_content = sanitize($_POST['fb_content']);
 
 // Format sources
 if($sources) {
@@ -46,6 +51,11 @@ if($is_edit) {
 	$stmt_curr_entry = $pdo->prepare($sql_curr_entry);
 	$stmt_curr_entry->execute([ $id ]);
 	$current_entry = $stmt_curr_entry->fetch();
+}
+
+// Double check 'was published' flag
+if($is_edit && $current_entry['was_published']) {
+	$was_published = 1;
 }
 
 // Set up date
@@ -166,8 +176,8 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 		if($friendly_is_allowed) {
 			
 			// Build query
-			$keys_blog = [ 'title', 'friendly', 'content', 'content_ja', 'supplemental', 'sources', 'is_queued', 'date_scheduled' ];
-			$values_blog = [ $title, $friendly, $content, $content_ja, $supplemental, $sources, $is_queued, $date_scheduled ];
+			$keys_blog = [ 'title', 'friendly', 'content', 'content_ja', 'supplemental', 'sources', 'sns_image_id', 'is_queued', 'date_scheduled', 'user_id' ];
+			$values_blog = [ $title, $friendly, $content, $content_ja, $supplemental, $sources, $sns_image_id, $is_queued, $date_scheduled, $author_id ];
 			
 			if($date_occurred) {
 				$keys_blog[] = 'date_occurred';
@@ -198,8 +208,8 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 					}
 				}*/
 				
-				$keys_blog[] = 'user_id';
-				$values_blog[] = $_SESSION['user_id'];
+				//$keys_blog[] = 'user_id';
+				//$values_blog[] = $author_id;
 				$sql_blog = 'INSERT INTO blog ('.implode(', ', $keys_blog).') VALUES ('.substr(str_repeat('?, ', count($values_blog)), 0, -2).')';
 			}
 			
@@ -264,24 +274,42 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 				$extant_social_post = $access_social_media->get_post( $id, 'blog_post' );
 				
 				// Delete old social media post (if applicable) and generate new one, if post is live
-				if(!$extant_social_post || (is_array($extant_social_post) && is_numeric($extant_social_post['id']) && !$extant_social_post['is_completed'] )) {
+				if(!$is_edit || ($is_edit && !$extant_social_post) || (is_array($extant_social_post) && is_numeric($extant_social_post['id']) && !$extant_social_post['is_completed'] )) {
 					if($extant_social_post) {
 						$access_social_media->delete_post( $extant_social_post['id'] );
 					}
 					
 					if(!$is_queued && strlen($title) && strlen($friendly)) {
 						$social_post = $access_social_media->build_post([ 'title' => $title, 'url' => 'https://vk.gy'.$output['url'], 'id' => $id, 'twitter_authors' => $twitter_authors ], 'blog_post');
+						
+						$output['result'] .= $twitter_content == $social_post ? 'y' : 'n';
+						$output['result'] .= $twitter_content;
+						$output['result'] .= print_r($social_post, true);
+						
 						$access_social_media->queue_post($social_post, 'both', date('Y-m-d H:i:s', strtotime('+30 minutes')));
 					}
+				}
+				else {
+					$output['result'] = 'yo'.print_r($extant_social_post, true);
 				}
 				
 				// Award point
 				$access_points = new access_points($pdo);
 				if($is_edit) {
-					$output['points'] += $access_points->award_points([ 'point_type' => 'edited-blog', 'allow_multiple' => false, 'item_id' => $id ]);
+					
+					// 1 point for editing someone else's entry
+					if($_SESSION['user_id'] !== $author_id) {
+						$output['points'] += $access_points->award_points([ 'point_type' => 'edited-blog', 'allow_multiple' => false, 'item_id' => $id ]);
+					}
+					
 				}
 				else {
-					$output['points'] += $access_points->award_points([ 'point_type' => 'added-blog' ]);
+					
+					// 10 points for adding a new entry
+					if(!$is_queued && !$was_published) {
+						$output['points'] += $access_points->award_points([ 'point_type' => 'added-blog' ]);
+					}
+					
 				}
 			}
 			else {

@@ -28,6 +28,7 @@
 				'artist_of_day',
 				'flyer_of_day',
 				'blog_post',
+				'interview',
 				'artist_ranking',
 				'database_updates'
 			];
@@ -126,13 +127,14 @@
 					}
 					
 					// Blog post
-					if($item_type === 'blog_post' && strlen($input['title']) && strlen($input['url'])) {
+					if( ($item_type === 'blog_post' || $item_type === 'interview') && strlen($input['title']) && strlen($input['url'])) {
 						$output['url'] = $input['url'];
 						$output['content'] = '
-							'.(strpos($input['title'], 'interview') === false ? '📰 News ∙ ニュース' : '💬 Interview ∙ インタビュー').'
+							'.($item_type === 'interview' ? '💬 Interview ∙ インタビュー' : '📰 News ∙ ニュース').'
 							
 							'.$input['title'].($input['content_ja'] ? "\n\n".'[日本語版] '.$input['content_ja'] : null).'
 							
+							'.($input['twitter_mentions'] ? '📱 '.$input['twitter_mentions'] : null).'
 							'.($user['twitter'] && $user['twitter'] != '@vkgy_' ? '✍️ '.($user['twitter'] ?: $user['username']) : null).'
 							'.(is_array($input['twitter_authors']) && !empty($input['twitter_authors']) ? '✍️ '.implode(", ", $input['twitter_authors']) : null).'
 							'.(true ? null : '👑 '.$this->patreon_url).'
