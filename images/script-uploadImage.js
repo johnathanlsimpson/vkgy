@@ -17,13 +17,31 @@ function initImageEditElems() {
 		var imageElems = document.querySelectorAll('[name^="image_' + imageElemName + '"]');
 		
 		imageElems.forEach(function(imageElem) {
+			
+			// Trigger data update when these elements are changed
 			imageElem.addEventListener('change', function() {
 				updateImageData(imageElem);
 			});
+			
+			// For description specifically, update Markdown while typing
+			if(imageElemName === 'description') {
+				imageElem.addEventListener('keyup', function() {
+					updateMarkdown(imageElem);
+				});
+			}
+			
 		});
 	});
 }
 
+// Update Markdown as description is altered
+function updateMarkdown(descriptionElem) {
+	let parentElem = getParent(descriptionElem, 'image__template');
+	let markdownElem = parentElem.querySelector('[data-get="image_markdown"]');
+	let markdown = markdownElem.textContent.split('](');
+	markdown = '![' + descriptionElem.value + '](' + markdown[1];
+	markdownElem.textContent = markdown;
+}
 
 let noDefaultElem = document.querySelector('.image__no-default:last-of-type [name="image_is_default"]');
 if(noDefaultElem) {
@@ -87,13 +105,6 @@ function updateImageData(changedElem) {
 	var statusElem = parentElem.querySelector('.image__status');
 	var resultElem = parentElem.querySelector('.image__result');
 	var preparedFormData = {};
-	
-	if(changedElem.name === 'image_description') {
-		var markdownElem = parentElem.querySelector('[data-get="image_markdown"]');
-		var markdown = markdownElem.textContent.split('](');
-		markdown = '![' + changedElem.value + '](' + markdown[1];
-		markdownElem.textContent = markdown;
-	}
 	
 	var inputElems = parentElem.querySelectorAll('[name]');
 	inputElems.forEach(function(inputElem) {
