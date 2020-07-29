@@ -12,20 +12,30 @@ $markdown_parser = $markdown_parser ?: new parse_markdown($pdo);
 $twitter_author = sanitize($_POST['twitter_author']);
 $facebook_author = sanitize($_POST['facebook_author']);
 
-// If no FB/Twitter credit specified, and vkgy user is author, credit them
+// Combine author ID and contributor IDs, remove duplicates, remove site owner
 $author_id = sanitize($_POST['author_id']);
-if(is_numeric($author_id) && !$facebook_author && !$twitter_author) {
+$contributor_ids = explode(',', sanitize($_POST['contributor_ids']));
+$contributor_ids = is_array($contributor_ids) ? $contributor_ids : [];
+$contributor_ids[] = $author_id;
+$contributor_ids = array_unique($contributor_ids);
+$contributor_ids = array_filter($contributor_ids, function($x) { return $x != 0 && $x != 1; });
+$contributor_ids = array_values($contributor_ids);
+
+// Get Twitter usernames of remaining contributors (if overrides not set)
+if( !$facebook_author && !$twitter_author && is_array($contributor_ids) && !empty($contributor_ids) ) {
 	
 	// Get user info
-	$sql_author = 'SELECT username, twitter FROM users WHERE id=? LIMIT 1';
+	$sql_author = 'SELECT username, twitter FROM users WHERE '.substr(str_repeat('id=? OR ', count($contributor_ids)), 0, -4).' LIMIT 1';
 	$stmt_author = $pdo->prepare($sql_author);
-	$stmt_author->execute([ $author_id ]);
-	$rslt_author = $stmt_author->fetch();
+	$stmt_author->execute( $contributor_ids );
+	$rslt_author = $stmt_author->fetchAll();
 	
 	// Use username as FB credit, Twitter handle as Twitter credit if possible
 	if(is_array($rslt_author) && !empty($rslt_author)) {
-		$facebook_author = $rslt_author['username'];
-		$twitter_author = $rslt_author['twitter'] ?: $rslt_author['username'];
+		foreach($rslt_author as $author) {
+			$facebook_author = $author['username'];
+			$twitter_author = $author['twitter'] ? '@'.$author['twitter'] : $rslt_author['username'];
+		}
 	}
 	
 }
