@@ -31,6 +31,8 @@ if(!empty($_GET["entry"]) && !$_GET["action"]) {
 	if(
 		!$entry['is_queued']
 		||
+		($entry['is_queued'] && $_GET['preview'] === $entry['token'])
+		||
 		$_SESSION['user_id'] === $entry['user_id']
 		||
 		$_SESSION['can_access_drafts']
@@ -48,7 +50,7 @@ if(!empty($_GET["entry"]) && !$_GET["action"]) {
 		
 		breadcrumbs([$entry["title"] => "/blog/".$entry["friendly"]."/"]);
 		
-		subnav(["Edit entry" => "/blog/".$entry["friendly"]."/edit/"], 'interact', true);
+		subnav(["Edit article" => "/blog/".$entry["friendly"]."/edit/"], 'interact', true);
 		
 		update_views("blog", $entry["id"], $pdo);
 		
@@ -70,6 +72,24 @@ if(!empty($_GET["entry"]) && !$_GET["action"]) {
 	}
 	else {
 		$error = 'Sorry, the requested entry doesn\'t exist, or is restricted. Showing latest news instead.';
+		
+		// If user doesn't have permission to view article, let's still show the title and SNS image so we don't screw up Twitter preview later
+		if( is_array($entry) && is_array($entry['images']) && !empty($entry['images']) && ( is_numeric($entry['image_id']) || is_numeric($entry['sns_image_id']) ) ) {
+			
+			// If special image set for SNS, user that
+			if(is_numeric($entry['sns_image_id'])) {
+				$entry['image'] = $entry['images'][$entry['sns_image_id']];
+			}
+			
+			// Otherwise use header image
+			else {
+				$entry['image'] = $entry['images'][$entry['image_id']];
+			}
+			
+			// Set page image
+			$page_image = "https://vk.gy".str_replace('.', '.large.', $entry['image']['url']);
+			
+		}
 		
 		unset($_GET['entry']);
 	}
@@ -129,11 +149,11 @@ if($_GET["action"] === "update") {
 	
 	if($is_allowed) {
 		if(is_array($entry) && !empty($entry)) {
-			$page_title = "Edit entry: ".$entry["title"];
+			$page_title = 'Edit: '.$entry["title"];
 			
 			breadcrumbs([
 				$entry["title"] => "/blog/".$entry["friendly"]."/",
-				"Edit" => "/blog/".$entry["friendly"]."/edit/"
+				'Edit article' => "/blog/".$entry["friendly"]."/edit/"
 			]);
 			
 			// Set flags
@@ -141,13 +161,13 @@ if($_GET["action"] === "update") {
 			
 		}
 		else {
-			$page_title = "Add blog entry";
+			$page_title = 'Add article';
 			
 			// Set flags
 			$entry['is_queued'] = 1;
 			$entry['is_published'] = 0;
 			
-			breadcrumbs(["Add" => "/blog/add/"]);
+			breadcrumbs([ 'Add article' => '/blog/add/' ]);
 		}
 		
 		include("../blog/page-update.php");
