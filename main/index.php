@@ -198,7 +198,7 @@ if(is_array($image) && !empty($image) && file_exists("../images/image_files/".$i
 }
 
 /* Artist rankings */
-$rank_start = date( 'Y-m-d', strtotime('-2 weeks sunday', time()) );
+/*$rank_start = date( 'Y-m-d', strtotime('-2 weeks sunday', time()) );
 $rank_end = date( 'Y-m-d', strtotime('-1 weeks sunday', time()) );
 $sql_rankings = "
 	SELECT
@@ -220,10 +220,10 @@ $sql_rankings = "
 ";
 $stmt_rankings = $pdo->prepare($sql_rankings);
 $stmt_rankings->execute([ $rank_start, $rank_end ]);
-$rslt_rankings = $stmt_rankings->fetchAll();
+$rslt_rankings = $stmt_rankings->fetchAll();*/
 
 /* Points ranks */
-$sql_points = '
+/*$sql_points = '
 	SELECT weekly_points.user_id, users.username, SUM(weekly_points.point_value) AS points_value
 	FROM (
 		SELECT user_id, point_value
@@ -242,7 +242,7 @@ foreach($point_ranking as $point_key => $point) {
 	$access_points = new access_points($pdo);
 	$user_level = $access_points->access_points([ 'user_id' => $point['user_id'], 'get' => 'level' ]);
 	$point_ranking[$point_key]['level'] = $user_level[0]['level'];
-}
+}*/
 
 /*$access_points = new access_points($pdo);
 $point_ranking = $access_points->access_points([
