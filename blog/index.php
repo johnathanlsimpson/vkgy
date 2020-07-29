@@ -31,7 +31,7 @@ if(!empty($_GET["entry"]) && !$_GET["action"]) {
 	if(
 		!$entry['is_queued']
 		||
-		($entry['is_queued'] && $_GET['preview'] === $entry['token'])
+		($entry['is_queued'] && strlen($entry['token']) && $_GET['preview'] === $entry['token'])
 		||
 		$_SESSION['user_id'] === $entry['user_id']
 		||
