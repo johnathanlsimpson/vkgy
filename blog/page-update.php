@@ -370,63 +370,9 @@
 				<?= lang('Other options', 'その他のオプション', 'div'); ?>
 			</h2>
 			
-			<!-- Sources -->
-			<details class="<?= $is_translation ? 'any--hidden' : null; ?>" id="sources">
-				<summary class="h3 documentation__link">Sources</summary>
-				<div class="text text--outlined">
-					
-					<div class="input__row">
-						<div class="input__group any--flex-grow">
-							
-							<label class="input__label">Sources</label>
-							
-							<textarea class="input__textarea any--flex-grow autosize" name="sources" placeholder="[Mr. Source](https://MrSource.com/)&#13;https://twitter.com/source2"><?= $entry['sources']; ?></textarea>
-							
-							<div class="input__note symbol__help any--weaken">Sources where the information came from (a tweet, the forum post, the band's website) or the name of the person who wrote the original article.</div>
-							<div class="input__note symbol__help any--weaken">Each source should be on its own line. Only plain text, urls, or Markdown links are allowed.</div>
-							<div class="input__note symbol__error any--weaken">Note that sources are no longer automatically mentioned in tweets. Use the <a href="#tweet">edit tweet</a> functionality for that.</div>
-							
-						</div>
-					</div>
-					
-				</div>
-			</details>
-			
-			<!-- Supplemental -->
-			<details class="<?= $is_translation ? 'any--hidden' : null; ?>" id="supplemental">
-				<summary class="h3 documentation__link">Supplemental info</summary>
-				<div class="text text--outlined">
-					<div class="input__row">
-						<div class="input__group any--flex-grow">
-							<label class="input__label">Supplemental</label>
-							<textarea class="input__textarea any--flex-grow autosize" name="supplemental" placeholder="supplemental information"><?= $entry['supplemental']; ?></textarea>
-							<div class="input__note symbol__help any--weaken">This is for any additional that supplements the main post, but is less important (live schedules, links, flyers, etc). Markdown is allowed.</div>
-						</div>
-					</div>
-				</div>
-			</details>
-			
-			<!-- Schedule article -->
-			<details class="<?= $is_translation ? 'any--hidden' : null; ?>" <?= $entry['date_scheduled'] ? 'open' : null; ?> id="scheduling">
-				<summary class="h3 documentation__link">Scheduling</summary>
-				<div class="text text--outlined">
-					<div class="input__row">
-						<span class="input__group">
-							<label class="input__label">Publish date/time</label>
-							<input class="input" data-inputmask="'alias': 'yyyy-mm-dd'" placeholder="yyyy-mm-dd" maxlength="10" name="date_scheduled" size="12" value="<?= substr($entry['date_scheduled'], 0, 10); ?>" />
-							<input class="input--secondary" data-inputmask="'alias': 'hh:mm'" placeholder="hh:mm" maxlength="5" name="time_scheduled" size="7" value="<?= substr($entry['date_scheduled'], 11, 5); ?>" />
-							&nbsp;<strong style="line-height:2rem;" class="any--weaken-color">JST</strong>
-						</span>
-						<div class="input__note symbol__help any--weaken">
-							Scheduled articles will be saved as drafts, and automatically published on the date/time (JST) specified above.
-						</div>
-					</div>
-				</div>
-			</details>
-			
 			<!-- Author and contributors -->
 			<details class="<?= $is_translation ? 'any--hidden' : null; ?>" id="contributors">
-				<summary class="h3 documentation__link">Author and contributors</summary>
+				<summary class="h3 documentation__link">✍ Author and contributors</summary>
 				<ul class="text text--outlined">
 					<?php render_json_list('user'); ?>
 					
@@ -492,9 +438,9 @@
 				</ul>
 			</details>
 			
-			<!-- Main artist -->
+			<!-- Featured artist -->
 			<details class="<?= $is_translation ? 'any--hidden' : null; ?>" id="artist">
-				<summary class="h3 documentation__link">Featured artist</summary>
+				<summary class="h3 documentation__link">👨‍🎤 Featured artist</summary>
 				<div class="text text--outlined" x-data="{open:false}">
 					
 					<?php render_json_list('artist'); ?>
@@ -529,9 +475,84 @@
 				</div>
 			</details>
 			
+			<!-- Public preview link -->
+			<details id="preview-link">
+				<summary class="h3 documentation__link">🔗 Public preview link</summary>
+				<div class="text text--outlined">
+					<div class="input__row">
+						<div class="input__group">
+							
+							<label class="input__label">Preview link</label>
+							
+							<a class="preview__link" href="<?= 'https://vk.gy/blog/'.$entry['friendly'].'/&preview='.$token; ?>"><?= 'https://vk.gy/blog/'.$entry['friendly'].'/&preview='.$token; ?></a>
+							
+							<input name="token" value="<?= $token; ?>" placeholder="token" hidden />
+							
+							<div class="symbol__help any--weaken input__note">Anyone with this link will be able to view the article, even if they're not signed in. It does not affect who can edit the article.</div>
+							<div class="symbol__help any--weaken input__note <?= $is_translation ? 'any--hidden' : null; ?>">If you need to revoke access, <a class="preview__generate-link">generate a new preview link</a>.</div>
+							
+						</div>
+					</div>
+				</div>
+			</details>
+			
+			<!-- Schedule article -->
+			<details class="<?= $is_translation ? 'any--hidden' : null; ?>" <?= $entry['date_scheduled'] ? 'open' : null; ?> id="scheduling">
+				<summary class="h3 documentation__link">📆 Scheduling</summary>
+				<div class="text text--outlined">
+					<div class="input__row">
+						<span class="input__group">
+							<label class="input__label">Publish date/time</label>
+							<input class="input" data-inputmask="'alias': 'yyyy-mm-dd'" placeholder="yyyy-mm-dd" maxlength="10" name="date_scheduled" size="12" value="<?= substr($entry['date_scheduled'], 0, 10); ?>" />
+							<input class="input--secondary" data-inputmask="'alias': 'hh:mm'" placeholder="hh:mm" maxlength="5" name="time_scheduled" size="7" value="<?= substr($entry['date_scheduled'], 11, 5); ?>" />
+							&nbsp;<strong style="line-height:2rem;" class="any--weaken-color">JST</strong>
+						</span>
+						<div class="input__note symbol__help any--weaken">
+							Scheduled articles will be saved as drafts, and automatically published on the date/time (JST) specified above.
+						</div>
+					</div>
+				</div>
+			</details>
+			
+			<!-- Sources -->
+			<details class="<?= $is_translation ? 'any--hidden' : null; ?>" id="sources">
+				<summary class="h3 documentation__link">🙏 Sources</summary>
+				<div class="text text--outlined">
+					
+					<div class="input__row">
+						<div class="input__group any--flex-grow">
+							
+							<label class="input__label">Sources</label>
+							
+							<textarea class="input__textarea any--flex-grow autosize" name="sources" placeholder="[Mr. Source](https://MrSource.com/)&#13;https://twitter.com/source2"><?= $entry['sources']; ?></textarea>
+							
+							<div class="input__note symbol__help any--weaken">Sources where the information came from (a tweet, the forum post, the band's website) or the name of the person who wrote the original article.</div>
+							<div class="input__note symbol__help any--weaken">Each source should be on its own line. Only plain text, urls, or Markdown links are allowed.</div>
+							<div class="input__note symbol__error any--weaken">Note that sources are no longer automatically mentioned in tweets. Use the <a href="#tweet">edit tweet</a> functionality for that.</div>
+							
+						</div>
+					</div>
+					
+				</div>
+			</details>
+			
+			<!-- Supplemental -->
+			<details class="<?= $is_translation ? 'any--hidden' : null; ?>" id="supplemental">
+				<summary class="h3 documentation__link">📚 Supplemental info</summary>
+				<div class="text text--outlined">
+					<div class="input__row">
+						<div class="input__group any--flex-grow">
+							<label class="input__label">Supplemental</label>
+							<textarea class="input__textarea any--flex-grow autosize" name="supplemental" placeholder="supplemental information"><?= $entry['supplemental']; ?></textarea>
+							<div class="input__note symbol__help any--weaken">This is for any additional that supplements the main post, but is less important (live schedules, links, flyers, etc). Markdown is allowed.</div>
+						</div>
+					</div>
+				</div>
+			</details>
+			
 			<!-- Tweet -->
 			<details class="<?= $is_translation ? 'any--hidden' : null; ?>" id="tweet">
-				<summary class="h3 documentation__link">Tweet</summary>
+				<summary class="h3 documentation__link">📱 Tweet</summary>
 				<div class="col c2" x-data="{body:<?= $entry['sns_overrides']['sns_body'] ? 'true' : 'false'; ?>,mentions:<?= $entry['sns_overrides']['tweet_mentions'] ? 'true' : 'false'; ?>,authors:<?= $entry['sns_overrides']['tweet_authors'] ? 'true' : 'false'; ?>}">
 					
 					<!-- Preview tweet -->
@@ -651,27 +672,6 @@
 							</li>
 
 						</ul>
-					</div>
-				</div>
-			</details>
-			
-			<!-- Public preview link -->
-			<details id="preview-link">
-				<summary class="h3 documentation__link">Public preview link</summary>
-				<div class="text text--outlined">
-					<div class="input__row">
-						<div class="input__group">
-							
-							<label class="input__label">Preview link</label>
-							
-							<a class="preview__link" href="<?= 'https://vk.gy/blog/'.$entry['friendly'].'/&preview='.$token; ?>"><?= 'https://vk.gy/blog/'.$entry['friendly'].'/&preview='.$token; ?></a>
-							
-							<input name="token" value="<?= $token; ?>" placeholder="token" hidden />
-							
-							<div class="symbol__help any--weaken input__note">Anyone with this link will be able to view the article, even if they're not signed in. It does not affect who can edit the article.</div>
-							<div class="symbol__help any--weaken input__note <?= $is_translation ? 'any--hidden' : null; ?>">If you need to revoke access, <a class="preview__generate-link">generate a new preview link</a>.</div>
-							
-						</div>
 					</div>
 				</div>
 			</details>
