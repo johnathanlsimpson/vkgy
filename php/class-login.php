@@ -33,7 +33,7 @@
 			private function hashSet($user_id) {
 				if(is_numeric($user_id)) {
 					
-					$user_agent = substr(sanitize($_SERVER['HTTP_USER_AGENT']), 0, 255);
+					$user_agent = substr(friendly($_SERVER['HTTP_USER_AGENT']), 0, 255);
 					$remote_addr = sanitize($_SERVER['REMOTE_ADDR']);
 					$token = bin2hex(random_bytes(16));
 					
@@ -71,16 +71,16 @@
 			// Check 'hash' cookie to sign in
 			private function hashCheck($cookie) {
 				if($cookie) {
-					list($user_id, $remote_addr, $token, $mac) = explode(":", $cookie);
+					list($user_id, $user_agent, $remote_addr, $token, $mac) = explode(":", $cookie);
 					
 					if(!empty($user_id) && !empty($remote_addr) && !empty($token) && !empty($mac)) {
-						if(!hash_equals(hash_hmac("sha256", $user_id.":".$remote_addr.":".$token, $this->secret_key), $mac)) {
+						if(!hash_equals(hash_hmac("sha256", $user_id.':'.$user_agent.":".$remote_addr.":".$token, $this->secret_key), $mac)) {
 							return false;
 						}
 						else {
-							$sql_token = "SELECT 1 FROM users_tokens WHERE user_id=? AND remote_addr=? AND token=? AND date_occurred >= CURRENT_DATE() - INTERVAL 1 MONTH";
+							$sql_token = "SELECT 1 FROM users_tokens WHERE user_id=? AND user_agent=? AND remote_addr=? AND token=? AND date_occurred >= CURRENT_DATE() - INTERVAL 1 MONTH";
 							$stmt_token = $this->pdo->prepare($sql_token);
-							$stmt_token->execute([$user_id, $remote_addr, $token]);
+							$stmt_token->execute([$user_id, $user_agent, $remote_addr, $token]);
 							if($stmt_token->fetchColumn()) {
 								$this->hashSet($user_id);
 								return true;
@@ -160,7 +160,7 @@
 			}
 			else {
 				if($_COOKIE["remember_me"] && $this->hashCheck($_COOKIE["remember_me"])) {
-					list($user_id, $remote_addr, $token, $mac) = explode(":", $_COOKIE["remember_me"]);
+					list($user_id, $user_agent, $remote_addr, $token, $mac) = explode(":", $_COOKIE["remember_me"]);
 
 					if(is_numeric($user_id)) {
 						$sql_user = "SELECT id, username, site_theme, site_lang, site_point_animations FROM users WHERE id=? LIMIT 1";

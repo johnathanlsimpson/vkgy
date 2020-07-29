@@ -31,7 +31,7 @@
 	// $post_type = 'twitter';
 	
 	// Get top three artists from last week
-	$sql_rankings = "
+	/*$sql_rankings = "
 		SELECT
 			SUM(artists_views.view_count) AS view_count,
 			artists.romaji,
@@ -49,7 +49,7 @@
 		date("Y-m-d", strtotime("-2 weeks sunday", time())),
 		date("Y-m-d", strtotime("-1 weeks sunday", time()))
 	]);
-	$bands = $stmt_rankings->fetchAll();
+	$bands = $stmt_rankings->fetchAll();*/
 	
 	// Go ahead if results returned
 	if(is_array($bands) && !empty($bands)) {

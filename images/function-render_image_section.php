@@ -76,7 +76,7 @@ function render_image_section($images, $args = []) {
 				'release_ids'    => render_options(($image['release_ids'] ?: $default['release']), $release_list),
 				'scanned_by'     => $image['user_id'] == $_SESSION['user_id'] ? '1' : '0',
 				'background_url' => '/images/'.$image['id'].'.thumbnail.'.$image['extension'],
-				'image_markdown' => '![](/images/'.$image['id'].'.'.$image['extension'].')',
+				'image_markdown' => '!['.$image['description'].'](/images/'.$image['id'].'.'.$image['extension'].')',
 				'image_url'      => '/images/'.$image['id'].'.'.$image['extension'],
 				'delete_class'   => $_SESSION['can_delete_data'] || $_SESSION['user_id'] === $image['user_id'] ? null : 'any--hidden',
 			]);

@@ -92,7 +92,7 @@ RewriteRule  ^blog/artist/([\w-]+)/?(?:page/(\d+)/?)?$  /?blog/&artist=$1&page=$
 RewriteRule  ^blog/tag/([\w-]+)/?(?:page/(\d+)/?)?$     /?blog/&tag=$1&page=$2
 RewriteRule  ^blog/page/(\d+)/?$                        /?blog/&page=$1
 RewriteRule  ^blog/add/?$                               /?blog/&action=update
-RewriteRule  ^blog/([\w-]+)/?$                          /?blog/&entry=$1
+RewriteRule  ^blog/([\w-]+)/?(?:&preview=([A-z0-9]+))?$ /?blog/&entry=$1&preview=$2
 RewriteRule  ^blog/([\w-]+)/edit/?$                     /?blog/&action=update&entry=$1
 RewriteRule  ^interview/?$                              /?blog/&tag=interview&view=interviews
 

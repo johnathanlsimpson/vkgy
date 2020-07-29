@@ -1,8 +1,8 @@
 <?php
 
 subnav([
-	'Interviews' => '/interview/',
 	'News' => '/blog/',
-	'Entries by tag' => '/blog/tags/',
+	'Interviews' => '/interview/',
+	'Tags' => '/blog/tags/',
 	'Comments' => '/comments/',
 ]);

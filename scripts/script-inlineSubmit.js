@@ -28,7 +28,8 @@ function setArguments(formElement, inputArgs) {
 		submitOnEvent          : "submit",
 		callbackOnSuccess      : null,
 		callbackOnError        : null,
-		showEditLink           : false
+		showEditLink           : false,
+		preserveResult         : false
 	}
 	
 	for(var key in defaultArgs) {
@@ -81,13 +82,21 @@ function submit(formElement, processorUrl, inputArgs) {
 	}
 	
 	// Reset result container
-	args.resultContainer.html("");
-	args.statusContainer.removeClass(args.removeClasses);
-	args.statusContainer.addClass(args.loadingClass);
+	if(!args.preserveResult) {
+		args.resultContainer.html("");
+		args.statusContainer.removeClass(args.removeClasses);
+		args.statusContainer.addClass(args.loadingClass);
+	}
 	
 	var formData;
 	var objectType = Object.prototype.toString.call(formElement[0]);
 
+	/*
+	// Previous to 2020-07-05, if formElement was an object, formData would be prepared from that form
+	// and then preparedFormData was appended to it. But I think in most (hopefully all?) cases what
+	// we actually want, if we pass preparedFormData, is for that to be the entirety of the formData.
+	// So changing it to check for preparedFormData first, then grab from formElement as backup.
+	
 	if(objectType === "[object HTMLFormElement]") {
 		formData = new FormData(formElement[0]);
 	}
@@ -96,7 +105,23 @@ function submit(formElement, processorUrl, inputArgs) {
 	}
 	
 	for(var key in args.preparedFormData) {
-		formData.append(key, args.preparedFormData[key]);
+		formData.set(key, args.preparedFormData[key]);
+	}*/
+	
+	// Check if preparedFormData was sent; otherwise, grab formData from the formElement itself
+	if(args.preparedFormData !== null && Object.keys(args.preparedFormData).length) {
+		formData = new FormData();
+		for(var key in args.preparedFormData) {
+			formData.set(key, args.preparedFormData[key]);
+		}
+	}
+	else {
+		if(objectType === "[object HTMLFormElement]") {
+			formData = new FormData(formElement[0]);
+		}
+		else {
+			formData = new FormData();
+		}
 	}
 	
 	// Select any inputs which had contenteditable versions generated, and update formData with data from the contenteditable

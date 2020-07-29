@@ -196,6 +196,8 @@ if(is_array($entry) && !empty($entry)) {
 		
 		<article class="row <?= 'entry--'.$entry_type; ?>">
 			
+			<?= $entry['is_queued'] ? '<div class="col c1"><div class="text text--outlined text--error symbol__error">You are previewing an unpublished article.</div></div>' : null; ?>
+			
 			<!-- Top -->
 			<div class="col c4-ABBC entry__header any--margin">
 				
@@ -240,7 +242,30 @@ if(is_array($entry) && !empty($entry)) {
 						</div>
 						
 						<?php
-							if(is_array($entry['edit_history']) && !empty($entry['edit_history'])) {
+							if($entry['contributor_ids']) {
+								$access_user = $access_user ?: new access_user($pdo);
+								$contributor_ids = json_decode($entry['contributor_ids'], true);
+								
+								if(is_array($contributor_ids) && !empty($contributor_ids)) {
+									?>
+										<div class="data__item">
+											<div>
+												<div class="h5">
+													<?= lang('Contributors', '寄稿家', 'hidden'); ?>
+												</div>
+												<?php
+													foreach($contributor_ids as $contributor_id) {
+														$contributor = $access_user->access_user([ 'id' => $contributor_id, 'get' => 'name', 'limit' => 1 ]);
+														echo '<a class="user interview__editor" data-icon="'.$contributor['icon'].'" data-is-vip="'.$contributor['is_vip'].'" href="'.$contributor['url'].'">'.$contributor['username'].'</a>';
+													}
+												?>
+											</div>
+										</div>
+									<?php
+								}
+							}
+	
+							/*if(is_array($entry['edit_history']) && !empty($entry['edit_history'])) {
 								?>
 									<div class="data__item">
 										<div>
@@ -256,7 +281,7 @@ if(is_array($entry) && !empty($entry)) {
 										</div>
 									</div>
 								<?php
-							}
+							}*/
 						?>
 
 						<?php

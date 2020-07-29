@@ -415,8 +415,8 @@ function initTribute() {
 		newElem.setAttribute('placeholder', tributableElem.getAttribute('placeholder') || '');
 		newElem.setAttribute('data-name', tributableElem.getAttribute('name'));
 		newElem.setAttribute('contenteditable', 'false');
-		if(tributableElem.dataset.limit) {
-			newElem.setAttribute('data-limit', tributableElem.dataset.limit);
+		if(tributableElem.dataset.maxlength) {
+			newElem.setAttribute('data-maxlength', tributableElem.dataset.maxlength);
 		}
 		
 		// Set default (empty) original text
