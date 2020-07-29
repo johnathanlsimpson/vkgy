@@ -129,15 +129,19 @@
 					// Blog post
 					if( ($item_type === 'blog_post' || $item_type === 'interview') && strlen($input['title']) && strlen($input['url'])) {
 						$output['url'] = $input['url'];
+						
+						$output['content_heading'] = ($item_type === 'interview' ? '💬 Interview ∙ インタビュー' : '📰 News ∙ ニュース');
+						$output['content_body'] = sanitize($input['sns_body']) ?: ( $input['title'].($input['content_ja'] ? "\n\n".'[日本語版] '.$input['content_ja'] : null) );
+						$output['content_mentions'] = sanitize($input['twitter_mentions']) ?: ( ($input['twitter_mentions'] ? '📱 '.$input['twitter_mentions'] : null) );
+						$output['content_authors'] = sanitize($input['twitter_author']) ?: ( ($user['twitter'] && $user['twitter'] != '@vkgy_' ? '✍️ '.($user['twitter'] ?: $user['username']) : null) );
+						
 						$output['content'] = '
-							'.($item_type === 'interview' ? '💬 Interview ∙ インタビュー' : '📰 News ∙ ニュース').'
+							'.$output['content_heading'].'
 							
-							'.$input['title'].($input['content_ja'] ? "\n\n".'[日本語版] '.$input['content_ja'] : null).'
+							'.$output['content_body'].'
 							
-							'.($input['twitter_mentions'] ? '📱 '.$input['twitter_mentions'] : null).'
-							'.($user['twitter'] && $user['twitter'] != '@vkgy_' ? '✍️ '.($user['twitter'] ?: $user['username']) : null).'
-							'.(is_array($input['twitter_authors']) && !empty($input['twitter_authors']) ? '✍️ '.implode(", ", $input['twitter_authors']) : null).'
-							'.(true ? null : '👑 '.$this->patreon_url).'
+							'.$output['content_mentions'].'
+							'.$output['content_authors'].'
 						';
 					}
 					
