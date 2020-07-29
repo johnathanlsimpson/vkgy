@@ -142,3 +142,8 @@
 .image__no-default:first-of-type {
 	display: none;
 }
+
+/* Select entire Markdown code for image on click */
+[data-get="image_markdown"] {
+	user-select: all;
+}
