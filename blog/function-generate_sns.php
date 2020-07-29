@@ -25,7 +25,7 @@ $contributor_ids = array_values($contributor_ids);
 if( !$facebook_author && !$twitter_author && is_array($contributor_ids) && !empty($contributor_ids) ) {
 	
 	// Get user info
-	$sql_author = 'SELECT username, twitter FROM users WHERE '.substr(str_repeat('id=? OR ', count($contributor_ids)), 0, -4).' LIMIT 1';
+	$sql_author = 'SELECT username, twitter FROM users WHERE '.substr(str_repeat('id=? OR ', count($contributor_ids)), 0, -4).'';
 	$stmt_author = $pdo->prepare($sql_author);
 	$stmt_author->execute( $contributor_ids );
 	$rslt_author = $stmt_author->fetchAll();
@@ -34,7 +34,7 @@ if( !$facebook_author && !$twitter_author && is_array($contributor_ids) && !empt
 	if(is_array($rslt_author) && !empty($rslt_author)) {
 		foreach($rslt_author as $author) {
 			$facebook_author = $author['username'];
-			$twitter_author = $author['twitter'] ? '@'.$author['twitter'] : $rslt_author['username'];
+			$twitter_author .= $author['twitter'] ? '@'.$author['twitter'].' ' : $author['username'].' ';
 		}
 	}
 	
