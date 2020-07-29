@@ -38,13 +38,14 @@ let dateScheduledElem = formElem.querySelector('[name="date_scheduled"]');
 let timeScheduledElem = formElem.querySelector('[name="time_scheduled"]');
 let scheduledElem = formElem.querySelector('.save__scheduled');
 let linkElem = formElem.querySelector('.save__link');
-let tokenElem = formElem.querySelector('[name="token"]');
 let saveStatusElem = formElem.querySelector('.save__status');
 let submitButton = formElem.querySelector('[name="form__update"] [name="submit"]');
 let idElem = formElem.querySelector('[name="id"]');
 
-let datePreviewElem  = formElem.querySelector('.preview__date');
+let datePreviewElem  = formElem.querySelector('.preview__datetime');
 let dateOccurredElem = formElem.querySelector('[name="date_occurred"]');
+let sourcesElem = document.querySelector('[name="sources"]');
+let supplementalElem = document.querySelector('[name="supplemental"]');
 
 
 // Author
@@ -59,26 +60,6 @@ authorElem.addEventListener('change', function() {
  authorPreviewElem.href = '/users/' + authorUsername + '/';
 	authorPreviewElem.innerHTML = authorUsername;
 });
-
-
-// Check current state of form
-function checkState(stateType) {
-	let state;
-	let stateElem = document.querySelector('.save__container');
-	
-	if(stateType === 'published') {
-		state = stateElem.dataset.isPublished;
-	}
-	else if(stateType === 'saved') {
-		state = stateElem.dataset.isSaved;
-	}
-	else if(stateType === 'queued') {
-		state = stateElem.dataset.isQueued;
-	}
-	
-	return state == 1 ? true : false;
-	
-}
 
 // Update slug and preview link when friendly is updated
 function updateUrlSlug() {
@@ -99,8 +80,8 @@ friendlyElem.addEventListener('change', function() {
 // Auto udate friendly
 function updateFriendly() {
 	
-	// Only autochange friendly if article is unpublished
-	if(!checkState('published')) {
+	// Only autochange friendly if article is unpublished and isn't translation
+	if(!checkState('published') && !checkState('translation')) {
 		if(titleElem && friendlyElem) {
 			
 			// If title is set, put through friendly function, then update friendly elem
@@ -135,6 +116,11 @@ friendlyEditLink.addEventListener('click', function() {
 	}, 1);
 });
 
+
+
+// Previews
+// ========================================================
+
 // Preview content
 function previewContent(inputElem, statusElem, outputElem) {
 	
@@ -144,11 +130,17 @@ function previewContent(inputElem, statusElem, outputElem) {
 	// Send text to Markdown parser and update preview element
 	if(inputText.length) {
 		initializeInlineSubmit($(inputElem), "/blog/function-preview_entry.php", {
-			preparedFormData  : { content: inputText },
+			preparedFormData  : { content: inputText, sources: sourcesElem.value, supplemental: supplementalElem.value },
 			statusContainer   : $(statusElem),
 			resultContainer   : $(outputElem),
 			preserveResult    : true,
 			callbackOnSuccess : function(event, returnedData) {
+				
+				// If summary was supplied, update that element too
+				if(returnedData.summary) {
+					let summaryPreviewElem = document.querySelector('.preview__summary');
+					summaryPreviewElem.innerHTML = returnedData.summary;
+				}
 				
 				// Check if main artist was updated
 				updateMainArtist(returnedData.artist);
@@ -200,6 +192,17 @@ function autosaveEntry() {
 	
 }
 
+// When sources updated, update preview
+['change'].forEach( event => sourcesElem.addEventListener( event, function() {
+	previewContent(contentElem, previewStatusElem, previewContentElem);
+} ) );
+
+// When supplemental updated, update preview
+['change'].forEach( event => supplementalElem.addEventListener( event, function() {
+	previewContent(contentElem, previewStatusElem, previewContentElem);
+} ) );
+
+
 
 // Artist
 // ========================================================
@@ -214,7 +217,7 @@ function updateMainArtist(inputArtist) {
  let previewArtistRomaji = document.querySelector('.artist__romaji');
 	//let artistIdElem = document.querySelector('[name="artist_id"]');
 	
-	if(inputArtist && inputArtist.id.length) {
+	if(previewArtistLink && inputArtist && inputArtist.id.length) {
 		
 		// Show artist link
 		previewArtistLink.dataset.id = inputArtist.id;
@@ -229,10 +232,105 @@ function updateMainArtist(inputArtist) {
 	else {
 		
 		// Clear artist link and dropdown
-		previewArtistLink.dataset.id = '';
+		if(previewArtistLink) {
+			previewArtistLink.dataset.id = '';
+		}
 		artistIdElem.selectize.clear();
 		
 	}
+	
+}
+
+// Page states
+// ========================================================
+
+// Get elems affected by state
+let headingTitleElem = document.querySelector('.entry__title');
+let headingDefaultTitleElem = document.querySelector('.entry__default-title');
+let editNavLinkElem = document.querySelector('.tertiary-nav--active');
+
+// Copy edit link in tertiary nav and turn into view link (active when editing)
+let viewNavLinkElem = friendlyElem.value ? document.querySelector('.tertiary-nav__link[href="/blog/' + friendlyElem.value + '/"]') : null;
+if(!viewNavLinkElem) {
+	viewNavLinkElem = editNavLinkElem.cloneNode(true);
+	viewNavLinkElem.innerHTML = 'Preview article';
+	viewNavLinkElem.href = '';
+	viewNavLinkElem.classList.remove('tertiary-nav--active');
+	viewNavLinkElem.classList.add('any--hidden');
+	editNavLinkElem.parentNode.insertBefore(viewNavLinkElem, editNavLinkElem.nextSibling);
+}
+
+// Change states (e.g. add article -> edit article)
+function changeState(state) {
+	
+	// When changing from 'add article' to 'edit article'
+	if( state === 'edit' && !document.body.classList.contains('article--edit') ) {
+		
+		// Update heading title and hide default title
+		headingTitleElem.innerHTML = titleElem.value;
+		headingDefaultTitleElem.classList.add('any--hidden');
+		
+		// Update text of edit link
+		editNavLinkElem.innerHTML.replace('Add', 'Edit');
+		
+		// Unhide preview link and update URL
+		viewNavLinkElem.href = '/blog/' + friendlyElem.value + '/';
+		viewNavLinkElem.classList.remove('any--hidden');
+		
+		// Update history
+		document.title = 'Edit: ' + titleElem.value + ' | vk.gy (ブイケージ)';
+		history.pushState('', '', '/blog/' + friendlyElem.value + '/edit/');
+		
+		// Add class to body
+		document.body.classList.add('article--edit');
+		
+	}
+	
+	else if( state === 'add' && document.body.classList.contains('article--edit') ) {
+		
+		// Hide heading title and show default title
+		headingTitleElem.innerHTML = '';
+		headingTitleElem.classList.add('any--hidden');
+		headingDefaultTitleElem.classList.remove('any--hidden');
+		
+		// Update text of edit link
+		editNavLinkElem.innerHTML.replace('Edit', 'View');
+		
+		// Hide preview link and clear URL
+		viewNavLinkElem.href = '';
+		viewNavLinkElem.classList.add('any--hidden');
+		
+		// Update history
+		document.title = 'Add article | vk.gy (ブイケージ)';
+		history.pushState('', '', '/blog/add/');
+		
+		// Remove class to body
+		document.body.classList.remove('article--edit');
+		
+	}
+	
+}
+
+// Check current state of form
+function checkState(stateType) {
+	
+	let state;
+	let stateElem = document.querySelector('.save__container');
+	
+	if(stateType === 'published') {
+		state = stateElem.dataset.isPublished;
+	}
+	else if(stateType === 'saved') {
+		state = stateElem.dataset.isSaved;
+	}
+	else if(stateType === 'queued') {
+		state = stateElem.dataset.isQueued;
+	}
+	else if(stateType === 'translation') {
+		state = stateElem.dataset.isTranslation;
+	}
+	
+	return state == 1 ? true : false;
 	
 }
 
@@ -261,7 +359,7 @@ function checkIfScheduled() {
 		draftElem.dispatchEvent(new Event('change'));
 		
 		// Update date preview
-		datePreviewElem.innerHTML = dateScheduledElem.value;
+		datePreviewElem.innerHTML = dateScheduledElem.value + ' ' + timeScheduledElem.value;
 		
 	}
 	else {
@@ -295,10 +393,13 @@ autosize($(".autosize"));
 
 // Update preview image
 document.addEventListener('image-updated', function(event) {
-	if(event.details.targetElem.name === 'image_is_default') {
+	
+	// If 'is default' was changed, or if image ID changed and has 'is default' checked (i.e. uploaded image to brand new post and 'is default' was auto set), update image preview
+	if( event.details.targetElem.name === 'image_is_default' || (event.details.targetElem.name === 'image_id' && event.details.parentElem.querySelector('[name="image_is_default"]').checked) ) {
+		
 		var imagePreviewElem = document.querySelector('.update__image');
 		
-		if(event.details.targetElem.checked) {
+		if(event.details.targetElem.checked || event.details.parentElem.querySelector('[name="image_is_default"]').checked) {
 			var newImageStyle = event.details.parentElem.querySelector('.image__image').style.backgroundImage;
 			
 			newImageStyle = newImageStyle.replace('.thumbnail.', '.large.');
@@ -308,6 +409,7 @@ document.addEventListener('image-updated', function(event) {
 		else {
 			imagePreviewElem.style.backgroundImage = '';
 		}
+		
 	}
 });
 
@@ -334,7 +436,6 @@ initDeleteButton();
 function saveEntry() {
 	
 	let isFirstAutosave = !idElem.value.length && checkState('queued') ? 1 : 0;
-	console.log(isFirstAutosave);
 	
 	// Submit
 	initializeInlineSubmit($('[name=form__update]'), '/blog/function-update_entry.php', {
@@ -342,15 +443,13 @@ function saveEntry() {
 		showEditLink: checkState('queued') ? false : true,
 		
 		callbackOnError: function(event, returnedData) {
-
+			
 			// Change state to show data not saved
 			saveContainerElem.dataset.isSaved = '0';
-
+			
 		},
 		
 		callbackOnSuccess: function(event, returnedData) {
-			
-			console.log(returnedData);
 			
 			// Re-initialize delete button (assuming ID changed)
 			initDeleteButton();
@@ -361,21 +460,27 @@ function saveEntry() {
 			// Updating showing entry was saved
 			saveContainerElem.dataset.isSaved = '1';
 			
-			// Update showing entry was published or unpublished
+			// Update 'is published' flag, and also update nav links based on state
 			if(saveContainerElem.dataset.isQueued == '0') {
 				saveContainerElem.dataset.isPublished = '1';
+				editNavLinkElem.innerHTML = 'Edit article';
+				viewNavLinkElem.innerHTML = 'View article';
 			}
 			else {
 				saveContainerElem.dataset.isPublished = '0';
+				editNavLinkElem.innerHTML = 'Edit draft';
+				viewNavLinkElem.innerHTML = 'Preview draft';
 			}
 			
-			// Trigger event showing that ID was changed
-			var e = new Event('item-id-updated');
-			e.details = {
-				'id' : returnedData.id,
-				'is_queued' : returnedData.is_queued,
-			};
-			document.dispatchEvent(e);
+			// Trigger event showing that ID was changed for first time
+			if(isFirstAutosave) {
+				var e = new Event('item-id-updated');
+				e.details = {
+					'id' : returnedData.id,
+					'is_queued' : returnedData.is_queued,
+				};
+				document.dispatchEvent(e);
+			}
 			
 			// Make save status reset
 			setTimeout(function() {
@@ -389,6 +494,9 @@ function saveEntry() {
 		
 	});
 	
+	// Update page state
+	changeState('edit');
+	
 }
 
 // Fire save on form submit
@@ -398,49 +506,15 @@ formElem.addEventListener('submit', function(event) {
 });
 
 
-// Change states
-function changeState(state) {
-	var text = { "add" : "Add entry", "edit" : "Edit entry" };
-	var elems = [".update__header", "[name=submit]"];
-	
-	for(var i = 0; i < elems.length; i++) {
-		$(elems[i]).html(text[state]);
-	}
-	
-	if(state === "edit") {
-		document.title = text[state] + ": " + $("[name=title]").val() + " |  vk.gy (ブイケージ)";
-		history.pushState("", "", "/blog/" + $("[name=friendly]").val() + "/edit/");
-	}
-	else if(state === "add") {
-		elems = [
-			"[data-id]",
-			"[name=form__update] input",
-			"[name=form__update] textarea",
-			"[name=form__update] option",
-			".update__preview",
-			".update__image"
-		];
-		
-		$("body").removeClass("any--pulse").addClass("any--pulse");
-		$(".image__template:nth-of-type(n + 2)").remove();
-		$("[name=delete]").removeClass("symbol__success symbol__loading symbol__error").addClass("symbol--standalone").html("");
-		
-		for(i = 0; i < elems.length; i++) {
-			$(elems[i]).html("").val("").attr("selected", false).attr("checked", false).attr("src", "").attr("data-id", "");
-		}
-		
-		document.title = text[state] + " | vk.gy (ブイケージ)";
-		history.pushState("", "", "/blog/add/");
-	}
-}
-
+// SNS images
+// ========================================================
 
 // Attempt to see when images are added
 document.addEventListener('image-updated', function() {
 	
 	// Get current image elements
 	let currentImages = document.querySelectorAll('.image__results .image__template .image__image');
-	let snsImageContainer = document.querySelector('.sns__container');
+	let snsImageContainer = document.querySelector('.sns__img-container');
 	let currentSnsImageId = document.querySelector('[name="sns_image_id"]:checked');
 	
 	// Clear current list of SNS images
@@ -457,8 +531,6 @@ document.addEventListener('image-updated', function() {
 			// Replace thumbnail attributes from image, then clear remaining
 			let snsImageId = currentImage.getAttribute('href').split(/\/images\/|\./)[1];
 			let snsImageThumbnail = currentImage.getAttribute('href').replace('.', '.thumbnail.');
-			
-			console.log(snsImageId, snsImageThumbnail);
 			
 			snsImageTemplate = snsImageTemplate.replace('{image_id}', snsImageId);
 			snsImageTemplate = snsImageTemplate.replace('{image_thumb}', snsImageThumbnail);
@@ -478,15 +550,88 @@ document.addEventListener('image-updated', function() {
 	
 });
 
+// Listen for SNS image changes
+let snsImgPreviewElem = document.querySelector('.sns__image');
+function initSnsImageListener(elem) {
+	elem.addEventListener('change', function() {
+		let snsImgThumb = '/images/' + elem.value + '.small.jpg';
+		snsImgPreviewElem.style.backgroundImage = 'url(' + snsImgThumb + ')';
+	});
+}
+
+// Init SNS image update listener at load
+let snsImgElems = document.querySelectorAll('[name="sns_image_id"]');
+snsImgElems.forEach(function(elem) {
+	initSnsImageListener(elem);
+});
+
+// Grab SNS image on initial load
+let snsImgOnLoad = document.querySelector('[name="sns_image_id"]:checked');
+if(snsImgOnLoad) {
+		let snsImgThumb = '/images/' + snsImgOnLoad.value + '.small.jpg';
+		snsImgPreviewElem.style.backgroundImage = 'url(' + snsImgThumb + ')';
+}
+
+
 // Generate SNS post
 // ========================================================
+
+// Field elems
+let contributorIdsElem = document.querySelector('[name="contributor_ids[]"]');
+
+// Set preview elems
+let tweetPreviewContainer = document.querySelector('.sns__container');
+let tweetPreviewLength = document.querySelector('.sns__length');
+
+// Set preview parts
+let tweetPreviewHeading = document.querySelector('.tweet__heading .sns__text');
+let tweetPreviewBody = document.querySelector('.tweet__body .sns__text');
+let tweetPreviewMentions = document.querySelector('.tweet__mentions .sns__text');
+let tweetPreviewAuthors = document.querySelector('.tweet__authors .sns__text');
+
+// Set override elems
+let snsBodyElem = document.querySelector('[name="sns_body"]');
+let twitterMentionsElem = document.querySelector('[name="twitter_mentions"]');
+let twitterAuthorsElem = document.querySelector('[name="twitter_authors"]');
+
+// Override SNS parts
+function initOverrideSns(inputElem, previewElem) {
+	
+	['keyup', 'change'].forEach(function(event) {
+		
+		inputElem.addEventListener(event, function() {
+			
+			// Get value of input element and replace linebreaks
+			let inputValue = inputElem.value;
+			inputValue = inputValue.replace(/\n/g, '<br />');
+			
+			// If value has length, override specified preview element, then update length
+			if(inputValue.length) {
+				previewElem.innerHTML = inputValue;
+				updateSnsLength();
+			}
+			
+			// Otherwise input has been cleared and we assume they want original text back, so rerun getSnsPost()
+			else {
+				getSnsPost();
+			}
+			
+		});
+		
+	});
+	
+}
+
+// Init override listeners
+initOverrideSns(snsBodyElem, tweetPreviewBody);
+initOverrideSns(twitterMentionsElem, tweetPreviewMentions);
+initOverrideSns(twitterAuthorsElem, tweetPreviewAuthors);
 
 // Get SNS preview and insert into preview elem
 function getSnsPost() {
 	
-	// Elements
+	// Form elements
 	let tagElems = document.querySelectorAll('[name="tags[]"]:checked');
-	let tweetPreviewElem = document.querySelector('.sns__tweet');
 	
 	// Values
 	let title = titleElem.value;
@@ -494,7 +639,19 @@ function getSnsPost() {
 	let id = idElem.value;
 	let artistId = artistIdElem.value;
 	let authorId = authorElem.value;
+	let contributorIds = [];
 	let postType = 'blog_post';
+	let snsBody = snsBodyElem.value;
+	let twitterMentions = twitterMentionsElem.value;
+	let twitterAuthors = twitterAuthorsElem.value;
+	
+	// Get contributor IDs
+	if(contributorIdsElem.selectedOptions) {
+		let selectedOptions = Array.from(contributorIdsElem.selectedOptions).map(o => o.value);
+		selectedOptions.forEach(function(option) {
+			contributorIds.push(option);
+		});
+	}
 	
 	// Get tag values
 	if(tagElems && tagElems.length) {
@@ -512,27 +669,35 @@ function getSnsPost() {
 		id: id,
 		artist_id: artistId,
 		author_id: authorId,
-		post_type: postType
+		contributor_ids: contributorIds,
+		post_type: postType,
+		body: snsBody,
+		twitter_mentions: twitterMentions,
+		twitter_authors: twitterAuthors
 	}
 	
 	// Get SNS preview
-	initializeInlineSubmit($(tweetPreviewElem), '/blog/function-generate_sns.php', {
+	initializeInlineSubmit($(tweetPreviewHeading), '/blog/function-generate_sns.php', {
 		
 		preparedFormData: snsData,
 		
 		callbackOnSuccess: function(event, returnedData) {
 			
-			// Output SNS previews
-			if(tweetPreviewElem && returnedData && returnedData.sns_post && returnedData.sns_post.content) {
-				tweetPreviewElem.innerHTML = returnedData.sns_post.content.replace(/\n/g, '<br />');
+			if((returnedData && returnedData.sns_post && returnedData.sns_post.content_heading) || snsBody || twitterMentions || twitterAuthors) {
+				tweetPreviewHeading.innerHTML = returnedData.sns_post.content_heading ? returnedData.sns_post.content_heading : '📰 News ∙ ニュース';
 			}
+			
+			// Output SNS previews
+			tweetPreviewBody.innerHTML = snsBody ? snsBody : (returnedData && returnedData.sns_post && returnedData.sns_post.content_body ? returnedData.sns_post.content_body : '');
+			tweetPreviewMentions.innerHTML = twitterMentions ? twitterMentions : (returnedData && returnedData.sns_post && returnedData.sns_post.content_mentions ? returnedData.sns_post.content_mentions : '');
+			tweetPreviewAuthors.innerHTML = twitterAuthors ? twitterAuthors : (returnedData && returnedData.sns_post && returnedData.sns_post.content_authors ? returnedData.sns_post.content_authors : '');
+			
+			// Update character count
+			updateSnsLength();
 			
 		},
 		
 		callbackOnError: function(event, returnedData) {
-			
-			console.log('error');
-			console.log(returnedData);
 			
 		}
 		
@@ -540,13 +705,158 @@ function getSnsPost() {
 	
 }
 
+// Update length counter
+function updateSnsLength() {
+	
+	// Get plain text of tweet preview and strip multiple spaces
+	let tweetContent = tweetPreviewContainer.textContent;
+	tweetContent = tweetContent.replace(/\s+/g, ' ');
+	tweetContent = tweetContent.replace(/^\s|\s$/g, '');
+	
+	// Insert into dummy textarea and get text back out to decode entities
+	let dummyElem = document.createElement('textarea');
+	dummyElem.innerHTML = tweetContent;
+	tweetContent = dummyElem.value;
+	
+	// Update length element
+	tweetPreviewLength.dataset.length = tweetContent.length;
+	
+	// Set flag if too long
+	if(tweetContent.length > 240) {
+		tweetPreviewLength.classList.add('sns--long');
+	}
+	else {
+		tweetPreviewLength.classList.remove('sns--long');
+	}
+	
+}
+
 // Fire SNS preview update when certain fields are changed
-// credit
 let interviewTagElem = document.querySelector('[name="tags[]"][data-friendly="interview"]');
-[ titleElem, authorElem, artistIdElem, interviewTagElem ].forEach(function(elem) {
+[ titleElem, authorElem, contributorIdsElem, artistIdElem, interviewTagElem ].forEach(function(elem) {
 	elem.addEventListener('change', function() {
 		getSnsPost();
 	});
 });
 
 getSnsPost();
+
+
+// Generate preview link
+// ========================================================
+
+// Get elems
+let generatePreviewLinkElem = document.querySelector('.preview__generate-link');
+let previewLinkElem = document.querySelector('.preview__link');
+let tokenElem = formElem.querySelector('[name="token"]');
+
+// Generate preview token
+function generatePreviewToken() {
+	return Math.random().toString(36).slice(2).substring(0,6);
+}
+
+// Generate new preview URL
+generatePreviewLinkElem.addEventListener('click', function(event) {
+	event.preventDefault();
+	
+	// Get new token and URL
+	let previewToken = generatePreviewToken();
+	let previewURL = 'https://vk.gy/blog/' + friendlyElem.value + '/&preview=' + previewToken;
+	
+	// Update link
+	previewLinkElem.href = previewURL;
+	previewLinkElem.innerHTML = previewURL;
+	
+	// Update field
+	tokenElem.value = previewToken;
+	
+});
+
+// Update preview URL when friendly changed
+friendlyElem.addEventListener('change', function() {
+	
+	// Get new URL
+	let previewURL = 'https://vk.gy/blog/' + friendlyElem.value + '/&preview=' + tokenElem.value;
+	
+	// Update link
+	previewLinkElem.href = previewURL;
+	previewLinkElem.innerHTML = previewURL;
+	
+});
+
+
+// Generate translation
+// ========================================================
+
+// Get translation elems
+let addTranslationButton = document.querySelector('.translation__add');
+let generateTranslationButton = document.querySelector('.translation__generate');
+let translationLanguageElem = document.querySelector('.translation__language');
+let generateContainerElem = document.querySelector('.translation__generation');
+let translationContainerElem = document.querySelector('.translation__container');
+
+// Show language generation container after clicking add translation
+if(addTranslationButton) {
+	addTranslationButton.addEventListener('click', function(event) {
+		
+		// Show language generation container
+		event.preventDefault();
+		generateContainerElem.classList.remove('any--hidden');
+		
+	});
+}
+
+// Generate new translation
+if(generateTranslationButton) {
+	generateTranslationButton.addEventListener('click', function(event) {
+		event.preventDefault();
+		
+		// Get translation ID and name
+		let translationLanguage = translationLanguageElem.value;
+		let translationName = translationLanguageElem.options[translationLanguageElem.selectedIndex].text;
+		
+		// If valid language selected, send to generator
+		if(translationLanguage && translationName) {
+			
+			// Create new <li> with current language and status elem
+			let newLanguageElem = document.createElement('li');
+			newLanguageElem.innerHTML = translationName + ' <span class="translation__status any--weaken-color loading">generating</span>';
+			translationContainerElem.insertBefore(newLanguageElem, generateContainerElem);
+			
+			// Hide generator
+			generateContainerElem.classList.add('any--hidden');
+			
+			// Call generator
+			initializeInlineSubmit($(generateContainerElem), '/blog/function-generate_translation.php', {
+				preparedFormData  : {
+					id: idElem.value,
+					title: titleElem.value,
+					language: translationLanguage,
+					friendly: friendlyElem.value
+				},
+				statusContainer: $(newLanguageElem.querySelector('.translation__status')),
+				callbackOnError: function(event, returnedData) {
+					
+					// On error, remove newly created list element and unhide generation container
+					newLanguageElem.remove();
+					generateContainerElem.classList.remove('any--hidden');
+					
+				},
+				callbackOnSuccess : function(event, returnedData) {
+					
+					// If language generated, remove from <select> of possibilities
+					translationLanguageElem.selectize.removeOption(translationLanguage);
+					translationLanguageElem.selectize.clear();
+					
+					// Swap out status element with edit link
+					setTimeout(function() {
+						newLanguageElem.innerHTML = translationName + ' <a class="translation__edit symbol__edit" href="' + returnedData.url + 'edit/" target="_blank">edit</a>';
+					}, 500);
+					
+				}
+			});
+			
+		}
+		
+	});
+}

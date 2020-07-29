@@ -40,7 +40,7 @@
 					.update__preview:not(:empty) {
 						margin-top: 1rem;
 					}
-					.update__preview > p:first-of-type {
+					/*.update__preview > p:first-of-type {
 						color: hsl(var(--text--secondary));
 						font-size: 0.8em;
 					}
@@ -48,7 +48,7 @@
 	border-top: 1px dotted hsl(var(--background--bold));
 	margin-top: 1rem;
 	padding-top: 1rem;
-}
+}*/
 					.update__preview p + p {
 						margin-top: 1rem;
 					}
@@ -57,7 +57,7 @@
 				.sns__container {
 					white-space: nowrap;
 				}
-				.sns__label {
+				.sns__img {
 					height: auto;
 					margin-top: 0;
 				}
