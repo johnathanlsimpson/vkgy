@@ -143,6 +143,9 @@ if(is_array($entry) && !empty($entry)) {
 	
 	?>
 		<article class="row <?= $entry_has_image ? null : 'entry--no-image'; ?> ">
+			
+			<?= $entry['is_queued'] ? '<div class="col c1"><div class="text text--outlined text--error symbol__error">You are viewing an unpublished article.</div></div>' : null; ?>
+			
 			<div class="col c4-ABBC entry__head">
 				<div class="entry__side">
 					<?php
@@ -229,7 +232,31 @@ if(is_array($entry) && !empty($entry)) {
 								</div>
 							</li>
 							<?php
-								if(is_array($entry['edit_history']) && !empty($entry['edit_history'])) {
+								if($entry['contributor_ids']) {
+									$access_user = new access_user($pdo);
+									$contributor_ids = json_decode($entry['contributor_ids'], true);
+									
+									if(is_array($contributor_ids) && !empty($contributor_ids)) {
+										?>
+											<li>
+												<h5>
+													<?= lang('Contributors', '寄稿家', 'hidden'); ?>
+												</h5>
+												<?php
+													foreach($contributor_ids as $contributor_id) {
+														$contributor = $access_user->access_user([ 'id' => $contributor_id, 'get' => 'name', 'limit' => 1 ]);
+														?>
+															<span>
+																<a class="entry__avatar lazy" data-src="<?= '/usericons/avatar-'.$contributor['username'].'.png'; ?>" href="<?= $contributor['url']; ?>"></a>
+															</span>
+														<?php
+													}
+												?>
+											</li>
+										<?php
+									}
+								}
+								/*if(is_array($entry['edit_history']) && !empty($entry['edit_history'])) {
 									foreach($entry['edit_history'] as $edit) {
 										if($edit['user']['username'] != $entry['user']['username']) {
 											$show_edits = true;
@@ -261,7 +288,7 @@ if(is_array($entry) && !empty($entry)) {
 											</li>
 										<?php
 									}
-								}
+								}*/
 							?>
 					</div>
 					
