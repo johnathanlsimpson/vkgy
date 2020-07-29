@@ -134,8 +134,8 @@
 		
 		<!-- Hidden inputs -->
 		<input data-get="id" data-get-into="value" name="id" value="<?= $entry['id']; ?>" hidden />
-		<input data-get="id" data-get-into="value" name="blog_id" value="<?= $entry['blog_id']; ?>" hidden />
-		<input                                     name="date_occurred" value="<?= $entry['date_occurred'] ?: date('Y-m-d'); ?>" hidden />
+		<input name="blog_id" value="<?= $entry['blog_id']; ?>" hidden />
+		<input name="date_occurred" value="<?= $entry['date_occurred'] ?: date('Y-m-d'); ?>" hidden />
 		
 		<!-- Notices -->
 		<div class="col c1">
@@ -450,12 +450,10 @@
 							<label class="input__label">Featured artist</label>
 							
 							<?php
-								if(is_numeric($entry['artist_id'])) {
-									echo '<span x-show="!open" class="artist artist__link"><span class="artist__romaji"></span><span class="artist__name">'.$artist_list[$entry['artist_id']][2].'</span></span>';
-								}
-								else {
-									echo '<div x-show="!open" class="symbol__error">No main artist chosen.</div>';
-								}
+								echo
+									'<span x-show="!open" class="artist artist__link"><span class="artist__romaji"></span><span class="artist__name">'.
+									(is_numeric($entry['artist_id']) ? $artist_list[$entry['artist_id']][2] : 'N/A').
+									'</span></span>';
 							?>
 							<a x-on:click="open=true" x-show="!open" class="symbol__edit" style="line-height:2rem;margin-left:1ch;">edit</a>
 							
