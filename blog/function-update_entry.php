@@ -1,4 +1,5 @@
 <?php
+
 // Setup
 include_once('../php/include.php');
 include_once('../php/class-access_social_media.php');
@@ -12,22 +13,117 @@ $date_occurred_pattern = '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$';
 $current_date = new DateTime(null, new DateTimeZone('JST'));
 $current_date = $current_date->format('Y-m-d H:i');
 
+// If working with translation, swap out ID with original ID and save translation ID separately
+if(is_numeric($_POST['blog_id'])) {
+	$is_translation = true;
+	$_POST['translation_id'] = $_POST['id'];
+	$_POST['id'] = $_POST['blog_id'];
+}
+
+// Set vars for initial check if allowed
+$id = is_numeric($_POST['id']) ? $_POST['id'] : null;
+$is_edit = is_numeric($id);
+
+// If edit, get current article to confirm user has permission
+if($is_edit && is_numeric($id)) {
+	
+	// Get current ver of entry
+	$sql_curr_entry = 'SELECT * FROM blog WHERE id=? LIMIT 1';
+	$stmt_curr_entry = $pdo->prepare($sql_curr_entry);
+	$stmt_curr_entry->execute([ $id ]);
+	$current_entry = $stmt_curr_entry->fetch();
+	
+	// Transform contributor IDs to array so we can run check against them
+	if(is_array($current_entry) && !empty($current_entry)) {
+		$current_entry['contributor_ids'] = json_decode($current_entry['contributor_ids'], true);
+	}
+	
+}
+
+// Check if user has permission to add/edit article
+if($_SESSION['is_signed_in']) {
+	if(
+		(!$is_edit)
+		||
+		($is_edit && $_SESSION['user_id'] === $current_entry['user_id'])
+		||
+		($is_edit && !$is_queued && $_SESSION['can_add_data'])
+		||
+		($is_edit && $is_queued && $_SESSION['can_access_drafts'])
+		||
+		($is_edit && in_array(277, $_POST['tags'])) /* Need to reevaluate this one */
+		||
+		(in_array($_SESSION['user_id'], $current_entry['contributor_ids']))
+	) {
+		$is_allowed = true;
+	}
+}
+
+// Translation article
+if($is_translation) {
+	
+	// Set vars
+	$id = is_numeric($_POST['translation_id']) ? $_POST['translation_id'] : null;
+	$title = sanitize($_POST['name']);
+	$content = sanitize($markdown_parser->validate_markdown($_POST['content']));
+	
+	if(is_numeric($id)) {
+		if(strlen($title) && strlen($content)) {
+			
+			$sql_trans = 'UPDATE blog_translations SET title=?, content=? WHERE id=? LIMIT 1';
+			$stmt_trans = $pdo->prepare($sql_trans);
+			
+			if($stmt_trans->execute([ $title, $content, $id ])) {
+				$output['status'] = 'success';
+			}
+			else {
+				$output['result'] = 'Something went wrong when updating the translation.';
+			}
+			
+		}
+		else {
+			$output['result'] = 'Please enter a title and text.';
+		}
+	}
+	else {
+		$output['result'] = 'No ID provided.';
+	}
+	
+}
+
+// Original (English) article
+else {
+
 // Set basic content
 $id = is_numeric($_POST['id']) ? $_POST['id'] : null;
 $title = sanitize($_POST['name']);
 $content = sanitize($markdown_parser->validate_markdown($_POST['content']));
-$content_ja = sanitize($markdown_parser->validate_markdown($_POST['content_ja'])) ?: null;
+//$content_ja = sanitize($markdown_parser->validate_markdown($_POST['content_ja'])) ?: null;
 $supplemental = sanitize($markdown_parser->validate_markdown($_POST['supplemental'])) ?: null;
 $sources = sanitize($_POST['sources']) ?: null;
 $friendly = friendly($_POST['friendly'] ?: $title);
 $references = $markdown_parser->get_reference_data($content);
-$is_edit = is_numeric($id);
 $is_queued = $_POST['is_queued'] ? 1 : 0;
 $author_id = is_numeric($_POST['user_id']) ? $_POST['user_id'] : $_SESSION['user_id'];
 $was_published = $_POST['was_published'] ? 1 : 0;
 $sns_image_id = is_numeric($_POST['sns_image_id']) ? $_POST['sns_image_id'] : null;
 $twitter_content = sanitize($_POST['twitter_content']);
 $fb_content = sanitize($_POST['fb_content']);
+$token = friendly($_POST['token']);
+$artist_id = is_numeric($_POST['artist_id']) ? $_POST['artist_id'] : null;
+
+// SNS overrides
+$overrides['sns_body'] = sanitize($_POST['sns_body']);
+$overrides['twitter_mentions'] = sanitize($_POST['twitter_mentions']);
+$overrides['twitter_authors'] = sanitize($_POST['twitter_authors']);
+$overrides['sns_image'] = is_numeric($_POST['sns_image_id']) ? $_POST['sns_image_id'] : null;
+$sns_overrides = array_filter($overrides);
+$sns_overrides = is_array($sns_overrides) && !empty($sns_overrides) ? json_encode($sns_overrides) : null;
+
+// Double check 'was published' flag
+if($is_edit && $current_entry['was_published']) {
+	$was_published = 1;
+}
 
 // Format sources
 if($sources) {
@@ -45,18 +141,58 @@ if($sources) {
 	$sources = sanitize($markdown_parser->validate_markdown($sources));
 }
 
-// If edit, get current info
-if($is_edit) {
-	$sql_curr_entry = 'SELECT * FROM blog WHERE id=? LIMIT 1';
-	$stmt_curr_entry = $pdo->prepare($sql_curr_entry);
-	$stmt_curr_entry->execute([ $id ]);
-	$current_entry = $stmt_curr_entry->fetch();
-}
+// Loop through manually specified contributors and add an edit so they're connected to the entry
+$contributor_ids = $_POST['contributor_ids'];
+if(is_array($contributor_ids) && !empty($contributor_ids)) {
 
-// Double check 'was published' flag
-if($is_edit && $current_entry['was_published']) {
-	$was_published = 1;
+	// Remove duplicates and main author
+	$contributor_ids = array_unique($contributor_ids);
+	if(is_array($contributor_ids) && !empty($contributor_ids)) {
+		foreach($contributor_ids as $contributor_key => $contributor_id) {
+			if($contributor_id == $author_id) {
+				unset($contributor_ids[$contributor_key]);
+			}
+		}
+	}
+	$contributor_ids = array_values($contributor_ids);
+
+	/*// Get extant edits for this entry to avoid multiple queries
+	$sql_extant_edits = 'SELECT user_id FROM edits_blog WHERE blog_id=? GROUP BY user_id';
+	$stmt_extant_edits = $pdo->prepare($sql_extant_edits);
+	$stmt_extant_edits->execute([ $id ]);
+	$rslt_extant_edits = $stmt_extant_edits->fetchAll();
+
+	// Remove any contributors who are already in edit history or who are author
+	if(is_array($rslt_extant_edits) && !empty($rslt_extant_edits)) {
+		foreach($contributor_ids as $contributor_key => $contributor_id) {
+
+			// Unset if already author
+			if($contributor_id == $author_id) {
+				unset($contributor_ids[$contributor_key]);
+			}
+
+			// Unset if already in edits
+			foreach($rslt_extant_edits as $rslt_extant_edit) {
+				if($rslt_extant_edit['user_id'] == $contributor_id) {
+					unset($contributor_ids[$contributor_key]);
+					break;
+				}
+			}
+
+		}
+	}
+
+	// If still have contributors left over, they need to be added as an edit
+	if(is_array($contributor_ids) && !empty($contributor_ids)) {
+		foreach($contributor_ids as $contributor_key => $contributor_id) {
+			$sql_contributor_edit = 'INSERT INTO edits_blog (blog_id, user_id, content) VALUES (?, ?, ?)';
+			$stmt_contributor_edit = $pdo->prepare($sql_contributor_edit);
+			$stmt_contributor_edit->execute([ $id, $contributor_id, 'Contributed.' ]);
+		}
+	}*/
+
 }
+$contributor_ids = is_array($contributor_ids) && !empty($contributor_ids) ? json_encode($contributor_ids) : null;
 
 // Set up date
 $date_scheduled = $_POST['date_scheduled'].' '.($_POST['time_scheduled'] ?: '00:00');
@@ -76,28 +212,6 @@ elseif($is_edit && !$date_scheduled && !$current_entry['date_occurred']) {
 // ...If was queued and now isn't
 elseif($is_edit && !$date_scheduled && !$is_queued && $current_entry['is_queued']) {
 	$date_occurred = $current_date;
-}
-
-// Check if allowed
-if($_SESSION['is_signed_in']) {
-	$sql_vip_check = 'SELECT 1 FROM users WHERE id=? AND is_vip=? LIMIT 1';
-	$stmt_vip_check = $pdo->prepare($sql_vip_check);
-	$stmt_vip_check->execute([ $_SESSION['user_id'], 1 ]);
-	$is_vip = $stmt_vip_check->fetchColumn();
-
-	if(
-		(!$is_edit)
-		||
-		($is_edit && $_SESSION['user_id'] === $current_entry['user_id'])
-		||
-		($is_edit && !$is_queued && $_SESSION['can_add_data'])
-		||
-		($is_edit && $is_queued && $_SESSION['can_access_drafts'])
-		||
-		($is_edit && in_array(277, $_POST['tags']))
-	) {
-		$is_allowed = true;
-	}
 }
 
 // Check if friendly allowed
@@ -176,8 +290,8 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 		if($friendly_is_allowed) {
 			
 			// Build query
-			$keys_blog = [ 'title', 'friendly', 'content', 'content_ja', 'supplemental', 'sources', 'sns_image_id', 'is_queued', 'date_scheduled', 'user_id' ];
-			$values_blog = [ $title, $friendly, $content, $content_ja, $supplemental, $sources, $sns_image_id, $is_queued, $date_scheduled, $author_id ];
+			$keys_blog = [ 'title', 'friendly', 'content', 'content_ja', 'supplemental', 'sources', 'sns_image_id', 'sns_overrides', 'is_queued', 'date_scheduled', 'user_id', 'contributor_ids', 'token' ];
+			$values_blog = [ $title, $friendly, $content, $content_ja, $supplemental, $sources, $sns_image_id, $sns_overrides, $is_queued, $date_scheduled, $author_id, $contributor_ids, $token ];
 			
 			if($date_occurred) {
 				$keys_blog[] = 'date_occurred';
@@ -189,6 +303,8 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 				$values_blog[] = $id;
 			}
 			else {
+				
+				// If saving new post, and no image supplied, grab main artist's default photo
 				
 				// If adding brand new post
 				// Grab default image for first artist mentioned, in case no image is supplied by user
@@ -280,17 +396,19 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 					}
 					
 					if(!$is_queued && strlen($title) && strlen($friendly)) {
-						$social_post = $access_social_media->build_post([ 'title' => $title, 'url' => 'https://vk.gy'.$output['url'], 'id' => $id, 'twitter_authors' => $twitter_authors ], 'blog_post');
+						$social_post = $access_social_media->build_post([
+							'title' => $title,
+							'url' => 'https://vk.gy'.$output['url'],
+							'id' => $id,
+							'twitter_authors' => $twitter_authors,
+							'sns_body' => $overrides['sns_body'] ?: null,
+							'twitter_mentions' => $overrides['twitter_mentions'] ?: null,
+							'twitter_authors' => $overrides['twitter_authors'] ?: null
+						], 'blog_post');
 						
-						$output['result'] .= $twitter_content == $social_post ? 'y' : 'n';
-						$output['result'] .= $twitter_content;
-						$output['result'] .= print_r($social_post, true);
 						
 						$access_social_media->queue_post($social_post, 'both', date('Y-m-d H:i:s', strtotime('+30 minutes')));
 					}
-				}
-				else {
-					$output['result'] = 'yo'.print_r($extant_social_post, true);
 				}
 				
 				// Award point
@@ -326,6 +444,9 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 }
 else {
 	$output['result'] = 'Please enter a title and text.';
+}
+
+// End if normal article
 }
 
 $output['status'] = $output['status'] ?: 'error';
