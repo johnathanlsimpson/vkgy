@@ -120,6 +120,25 @@
 		// ======================================================
 		function access_blog($args = []) {
 			
+			// If searching by friendly, and friendly ends in language code, get translation and original entry
+			if( strlen($args['friendly']) && preg_match('/'.'-(ja|jp)$'.'/', $args['friendly'], $language_match) ) {
+				
+				// Get translations
+				$sql_translation = 'SELECT * FROM blog_translations WHERE friendly=? LIMIT 1';
+				$stmt_translation = $this->pdo->prepare($sql_translation);
+				$stmt_translation->execute([ friendly($args['friendly']) ]);
+				$translation = $stmt_translation->fetch();
+				
+				if(is_array($translation) && !empty($translation)) {
+					
+					// Change getter from friendly to ID to get parent article
+					unset($args['friendly']);
+					$args['id'] = $translation['blog_id'];
+					
+				}
+				
+			}
+			
 			// SELECT
 			$sql_select = [];
 			if($args["get"] === "all") {
@@ -355,6 +374,44 @@
 						
 						$blogs[$row_key]["comments"] = $this->access_comment->access_comment(["id" => $row["id"], 'get_user_likes' => true, "type" => "blog", "get" => "all"]);
 					}
+				}
+			}
+			
+			// Get all translations
+			if($args['get'] === 'all' || $args['get'] === 'basics') {
+				for($i=0; $i<$num_blogs; $i++) {
+					$sql_translations = 'SELECT friendly, language, id FROM blog_translations WHERE blog_id=?';
+					$stmt_translations = $this->pdo->prepare($sql_translations);
+					$stmt_translations->execute([ $blogs[$i]['id'] ]);
+					$rslt_translations = $stmt_translations->fetchAll();
+					
+					if(is_array($rslt_translations) && !empty($rslt_translations)) {
+						$blogs[$i]['translations'] = $rslt_translations;
+					}
+					else {
+						$blogs[$i]['translations'] = [];
+					}
+					
+					// Make sure original English version is listed
+					array_unshift( $blogs[$i]['translations'], [ 'id' => $blogs[$i]['id'], 'language' => 'en', 'friendly' => $blogs[$i]['friendly'] ] );
+					
+				}
+			}
+			
+			// If translation, overwrite original fields with translation fields (but save some)
+			if(is_array($translation) && !empty($translation)) {
+				for($i=0; $i<$num_blogs; $i++) {
+					//$original_id = $blogs[$i]['id'];
+					$blogs[$i]['english_friendly'] = $blogs[$i]['friendly'];
+					$blogs[$i]['translation_id'] = $translation['id'];
+					$blogs[$i]['is_translation'] = true;
+					$blogs[$i] = array_merge( $blogs[$i], $translation );
+					//$blogs[$i]['id'] = $original_id;
+				}
+			}
+			else {
+				for($i=0; $i<$num_blogs; $i++) {
+					$blogs[$i]['language'] = 'en';
 				}
 			}
 			
