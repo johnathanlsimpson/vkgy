@@ -132,16 +132,18 @@
 						
 						$output['content_heading'] = ($item_type === 'interview' ? '💬 Interview ∙ インタビュー' : '📰 News ∙ ニュース');
 						$output['content_body'] = sanitize($input['sns_body']) ?: ( $input['title'].($input['content_ja'] ? "\n\n".'[日本語版] '.$input['content_ja'] : null) );
-						$output['content_mentions'] = sanitize($input['twitter_mentions']) ?: ( ($input['twitter_mentions'] ? '📱 '.$input['twitter_mentions'] : null) );
-						$output['content_authors'] = sanitize($input['twitter_author']) ?: ( ($user['twitter'] && $user['twitter'] != '@vkgy_' ? '✍️ '.($user['twitter'] ?: $user['username']) : null) );
+						$output['content_mentions'] = sanitize($input['twitter_mentions']) ?: null;
+						$output['content_authors'] = sanitize($input['twitter_author']) ?: null;
+						$output['translations'] = sanitize($input['translations']) ?: null;
 						
 						$output['content'] = '
 							'.$output['content_heading'].'
 							
 							'.$output['content_body'].'
+							'.($output['translations'] ? "\n".$output['translations'] : null).'
 							
-							'.$output['content_mentions'].'
-							'.$output['content_authors'].'
+							'.($output['content_mentions'] ? '📱 '.$output['content_mentions'] : null).'
+							'.($output['content_authors'] ? '✍️ '.$output['content_authors'] : null).'
 						';
 					}
 					
