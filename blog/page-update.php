@@ -123,7 +123,7 @@
 			?>
 				<div class="col c1">
 					<div class="text text--outlined text--notice symbol__error">
-						Currently editing <?= ['ja' => 'Japanese'][$entry['language']]; ?> translation. To change the article's settings, <a class="symbol__random" href="<?= '/blog/'.$entry['english_friendly'].'/edit/'; ?>">switch to English</a>.
+						Currently editing <?= ['ja' => 'Japanese'][$entry['language']]; ?> translation. Most article options must be changed in the <a href="#translations">original English article</a>.
 					</div>
 				</div>
 			<?php
@@ -284,68 +284,6 @@
 						}
 					?>
 				</div>
-				
-				<!-- Translations -->
-				<h3>
-					<?= lang('Translations', '訳書', 'div'); ?>
-				</h3>
-				<ul class="text text--outlined translation__container">
-					<?php
-						// Possible language options
-						$language_options = [ 'en' => 'English', 'ja' => '日本語' ];
-						
-						// Make sure translations array has at least English entry (i.e. making brand new article)
-						if(!is_array($entry['translations']) || empty($entry['translations'])) {
-							$entry['translations'] = [ [ 'language' => 'en' ] ];
-							$entry['language'] = 'en';
-						}
-						
-						// Display edit links for each translation
-						if(is_array($entry['translations']) && !empty($entry['translations'])) {
-							foreach($entry['translations'] as $translation) {
-								?>
-									<li>
-										<?= $language_options[ $translation['language'] ]; ?>
-										<?= $entry['language'] == $translation['language'] ? '<span class="any__note">currently editing</span>' : '<a class="symbol__edit" href="/blog/'.$translation['friendly'].'/edit/" target="_blank">edit</a>'; ?>
-									</li>
-								<?php
-								
-								// Remove language from options list so we don't generate duplicates later
-								unset($language_options[ $translation['language'] ]);
-								
-							}
-						}
-						
-						// Allow translation generation if some languages still untranslated
-						if( is_array($language_options) && !empty($language_options) ) {
-							?>
-								<li class="translation__generation any--hidden">
-									<div class="input__row">
-										<div class="input__group">
-											<select class="input translation__language" placeholder="select language ">
-												<option></option>
-												<?php
-													foreach($language_options as $language_key => $language_name) {
-														echo '<option value="'.$language_key.'">'.$language_name.'</option>';
-													}
-												?>
-											</select>
-										</div>
-										<div class="input__group">
-											<button class="translation__generate" type="button">
-												Generate
-											</button>
-										</div>
-									</div>
-									<div class="translation__result text text--outlined text--compact text--notice" data-role="result"></div>
-								</li>
-								<li>
-									<a class="translation__add symbol__plus"> add translation</a>
-								</li>
-							<?php
-						}
-					?>
-				</ul>
 				
 				<style>
 					.translation__result {
@@ -674,6 +612,70 @@
 				</div>
 			</details>
 			
+			<!-- Translations -->
+			<details id="translations">
+				
+				<!-- Translations -->
+				<summary class="h3 documentation__link">🔠 Translations</summary>
+				<ul class="text text--outlined translation__container">
+					<?php
+						// Possible language options
+						$language_options = [ 'en' => 'English', 'ja' => '日本語' ];
+						
+						// Make sure translations array has at least English entry (i.e. making brand new article)
+						if(!is_array($entry['translations']) || empty($entry['translations'])) {
+							$entry['translations'] = [ [ 'language' => 'en' ] ];
+							$entry['language'] = 'en';
+						}
+						
+						// Display edit links for each translation
+						if(is_array($entry['translations']) && !empty($entry['translations'])) {
+							foreach($entry['translations'] as $translation) {
+								?>
+									<li>
+										<?= $language_options[ $translation['language'] ]; ?>
+										<?= $entry['language'] == $translation['language'] ? '<span class="any__note">currently editing</span>' : '<a class="symbol__edit" href="/blog/'.$translation['friendly'].'/edit/" target="_blank">edit</a>'; ?>
+									</li>
+								<?php
+								
+								// Remove language from options list so we don't generate duplicates later
+								unset($language_options[ $translation['language'] ]);
+								
+							}
+						}
+						
+						// Allow translation generation if some languages still untranslated
+						if( is_array($language_options) && !empty($language_options) ) {
+							?>
+								<li class="translation__generation any--hidden">
+									<div class="input__row">
+										<div class="input__group">
+											<select class="input translation__language" placeholder="select language ">
+												<option></option>
+												<?php
+													foreach($language_options as $language_key => $language_name) {
+														echo '<option value="'.$language_key.'">'.$language_name.'</option>';
+													}
+												?>
+											</select>
+										</div>
+										<div class="input__group">
+											<button class="translation__generate" type="button">
+												Generate
+											</button>
+										</div>
+									</div>
+									<div class="translation__result text text--outlined text--compact text--notice" data-role="result"></div>
+								</li>
+								<li>
+									<a class="translation__add symbol__plus"> add translation</a>
+								</li>
+							<?php
+						}
+					?>
+				</ul>
+			</details>
+			
 		</div>
 		
 		<!-- Submit area -->
@@ -708,11 +710,16 @@
 					<span  class="save__scheduled any--weaken">Will be published <span class="any__note"><?= $entry['date_scheduled']; ?></span></span>
 					<input class="save__choice input__choice" id="is_queued" name="is_queued" type="checkbox" <?= $is_queued ? 'checked' : null; ?> />
 					<label class="save__draft input__checkbox symbol__unchecked" for="is_queued">Save as draft?</label>
+					
+					<!-- Delete -->
+					<?php $delete_button_class = $_SESSION['can_delete_data'] || $_SESSION['user_id'] === $entry['user_id'] ? null : 'any--hidden'; ?>
+					<label class="input__radio symbol__trash symbol--standalone <?= $delete_button_class; ?>" data-get="id" data-get-into="data-id" data-id="<?= $entry["id"]; ?>" data-translation="<?= $entry['is_translation'] ? 1 : 0 ;?>" name="delete"></label>
+					
 					<a class="save__link symbol__arrow-right-circled" href="<?= $entry_url; ?>" target="_blank">
 						<m1>Preview draft</m1>
 						<m2>View entry</m2>
 					</a>
-
+					
 					<!-- Notices -->
 					<div class="save__notice any--weaken-size text text--compact symbol__help">
 						<m1>Autosave turned off. This article will go live as soon as you press &ldquo;publish&rdquo; above.</m1>
@@ -722,10 +729,7 @@
 					</div>
 				</div>
 
-				<div class="input__group any--hidden">
-					<?php $delete_button_class = $_SESSION['can_delete_data'] || $_SESSION['user_id'] === $entry['user_id'] ? null : 'any--hidden'; ?>
-					<label class="input__radio symbol__trash symbol--standalone <?= $delete_button_class; ?>" data-get="id" data-get-into="data-id" data-id="<?= $entry["id"]; ?>" name="delete"></label>
-				</div>
+				
 			</div>
 
 			<div class="any--flex any--hidden" data-role="edit-container">
@@ -742,6 +746,16 @@
 
 
 <style>
+	
+	[name="delete"] {
+		margin-left: 0;
+		margin-right: 0.5rem;
+		margin-top: 0;
+	}
+	[name="delete"]:empty::before {
+		margin-right: 0;
+	}
+	
 	details:last-of-type:not([open]) {
 		margin-bottom: 3rem;
 	}

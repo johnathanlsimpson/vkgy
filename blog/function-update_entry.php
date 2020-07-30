@@ -66,6 +66,7 @@ if($is_translation) {
 	$id = is_numeric($_POST['translation_id']) ? $_POST['translation_id'] : null;
 	$title = sanitize($_POST['name']);
 	$content = sanitize($markdown_parser->validate_markdown($_POST['content']));
+	$friendly = friendly($_POST['friendly']);
 	
 	if(is_numeric($id)) {
 		if(strlen($title) && strlen($content)) {
@@ -75,6 +76,9 @@ if($is_translation) {
 			
 			if($stmt_trans->execute([ $title, $content, $id ])) {
 				$output['status'] = 'success';
+				$output['id'] = $id;
+				$output['url'] = '/blog/'.$friendly.'/';
+				$output['edit_url'] = '/blog/'.$friendly.'/edit/';
 			}
 			else {
 				$output['result'] = 'Something went wrong when updating the translation.';
@@ -290,8 +294,8 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 		if($friendly_is_allowed) {
 			
 			// Build query
-			$keys_blog = [ 'title', 'friendly', 'content', 'content_ja', 'supplemental', 'sources', 'sns_image_id', 'sns_overrides', 'is_queued', 'date_scheduled', 'user_id', 'contributor_ids', 'token' ];
-			$values_blog = [ $title, $friendly, $content, $content_ja, $supplemental, $sources, $sns_image_id, $sns_overrides, $is_queued, $date_scheduled, $author_id, $contributor_ids, $token ];
+			$keys_blog = [ 'title', 'friendly', 'content', 'content_ja', 'supplemental', 'sources', 'sns_image_id', 'sns_overrides', 'is_queued', 'date_scheduled', 'user_id', 'contributor_ids', 'token', 'artist_id' ];
+			$values_blog = [ $title, $friendly, $content, $content_ja, $supplemental, $sources, $sns_image_id, $sns_overrides, $is_queued, $date_scheduled, $author_id, $contributor_ids, $token, $artist_id ];
 			
 			if($date_occurred) {
 				$keys_blog[] = 'date_occurred';

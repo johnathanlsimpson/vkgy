@@ -202,6 +202,11 @@ function autosaveEntry() {
 	previewContent(contentElem, previewStatusElem, previewContentElem);
 } ) );
 
+// When title updated, update page title
+titleElem.addEventListener('change', function() {
+	document.title = 'Edit: ' + titleElem.value + ' | vk.gy (ブイケージ)';
+});
+
 
 
 // Artist
@@ -278,8 +283,10 @@ function changeState(state) {
 		viewNavLinkElem.classList.remove('any--hidden');
 		
 		// Update history
-		document.title = 'Edit: ' + titleElem.value + ' | vk.gy (ブイケージ)';
-		history.pushState('', '', '/blog/' + friendlyElem.value + '/edit/');
+		if(window.location.pathname != '/blog/' + friendlyElem.value + '/edit/') {
+			document.title = 'Edit: ' + titleElem.value + ' | vk.gy (ブイケージ)';
+			history.pushState('', '', '/blog/' + friendlyElem.value + '/edit/');
+		}
 		
 		// Add class to body
 		document.body.classList.add('article--edit');
@@ -301,8 +308,10 @@ function changeState(state) {
 		viewNavLinkElem.classList.add('any--hidden');
 		
 		// Update history
-		document.title = 'Add article | vk.gy (ブイケージ)';
-		history.pushState('', '', '/blog/add/');
+		if(window.location.pathname != '/blog/add/') {
+			document.title = 'Add article | vk.gy (ブイケージ)';
+			history.pushState('', '', '/blog/add/');
+		}
 		
 		// Remove class to body
 		document.body.classList.remove('article--edit');
@@ -422,11 +431,15 @@ function initDeleteButton() {
 	deleteButton = document.querySelector('[name=delete]');
 	deleteButton.setAttribute('data-state', null);
 	
-	initDelete(
-		$(deleteButton),
-		'/blog/function-delete_entry.php',
-		{ 'id': deleteButton.getAttribute('data-id') },
-		function() { changeState('add'); }
+	initDelete( $(deleteButton), '/blog/function-delete_entry.php',
+		{
+			'id': deleteButton.getAttribute('data-id'),
+			'is_translation': deleteButton.getAttribute('data-is-translation')
+		},
+		function() {
+			changeState('add');
+			window.location.href = '/blog/add/';
+		}
 	);
 }
 

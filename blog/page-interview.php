@@ -6,6 +6,9 @@ style([
 
 if(is_array($entry) && !empty($entry)) {
 	
+	// Set active page
+	$active_page = '/interview/';
+	
 	// Check if entry contains translation link; if so, remove from entry but save URL and language for later
 	$translation_pattern = '<a href="((?:https:\/\/vk\.gy)?\/blog\/[A-z0-9-]+\/?)">'.'&#9888; ([A-z0-9 \.\&\#\;]+)<\/a>';
 	if(preg_match('/'.$translation_pattern.'/', $entry['content'], $translation_match)) {
@@ -285,7 +288,27 @@ if(is_array($entry) && !empty($entry)) {
 						?>
 
 						<?php
-							if($translation_link) {
+							// Show available translations
+							if($entry['translations'] && count($entry['translations']) > 1) {
+								?>
+									<div class="data__item">
+										<div>
+											<div class="h5">
+												<?= lang('Translations', '翻訳', 'hidden'); ?>
+											</div>
+											<?php
+												foreach($entry['translations'] as $translation) {
+													if($translation['language'] != $entry['language']) {
+														echo '<a href="/blog/'.$translation['friendly'].'/">'.[ 'en' => 'The English version is here.', 'ja' => '日本語版へこちら。' ][ $translation['language'] ].'</a>';
+													}
+												}
+											?>
+										</div>
+									</div>
+								<?php
+							}
+							// Legacy
+							elseif($translation_link) {
 								?>
 									<div class="data__item">
 										<div>
