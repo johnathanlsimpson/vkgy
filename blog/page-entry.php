@@ -5,8 +5,18 @@ style([
 ]);
 
 // Auto-style translation button
-$entry['content'] = str_replace('>&#9888; &#26085;&#26412;&#35486;&#29256;&#12408;&#12371;&#12385;&#12425;&#12290;</a>', ' class="symbol__error a--outlined a--padded">&#26085;&#26412;&#35486;&#29256;&#12408;&#12371;&#12385;&#12425;&#12290;</a>', $entry['content']);
-$entry['content'] = str_replace('>&#9888; The English version is here.</a>', ' class="symbol__error a--outlined a--padded">The English version is here.</a>', $entry['content']);
+//$entry['content'] = str_replace('>&#9888; &#26085;&#26412;&#35486;&#29256;&#12408;&#12371;&#12385;&#12425;&#12290;</a>', ' class="symbol__error a--outlined a--padded">&#26085;&#26412;&#35486;&#29256;&#12408;&#12371;&#12385;&#12425;&#12290;</a>', $entry['content']);
+//$entry['content'] = str_replace('>&#9888; The English version is here.</a>', ' class="symbol__error a--outlined a--padded">The English version is here.</a>', $entry['content']);
+
+// Legacy	
+// Check if entry contains translation link; if so, remove from entry but save URL and language for later
+$translation_pattern = '<a href="((?:https:\/\/vk\.gy)?\/blog\/[A-z0-9-]+\/?)">'.'&#9888; ([A-z0-9 \.\&\#\;]+)<\/a>';
+if(preg_match('/'.$translation_pattern.'/', $entry['content'], $translation_match)) {
+	$entry['content'] = str_replace($translation_match[0], '', $entry['content']);
+	$translation_link = $translation_match[1];
+	$translation_text = $translation_match[2];
+	$translation_type = strpos($translation_match[2], 'English') !== false ? 'en' : 'ja';
+}
 
 if(is_array($entry) && !empty($entry)) {
 	
@@ -255,6 +265,24 @@ if(is_array($entry) && !empty($entry)) {
 											</li>
 										<?php
 									}
+								}
+								
+								// Show available translations
+								if($entry['translations'] && count($entry['translations']) > 1) {
+									?>
+										<li>
+											<div class="h5">
+												<?= lang('Translations', '翻訳', 'hidden'); ?>
+											</div>
+											<?php
+												foreach($entry['translations'] as $translation) {
+													if($translation['language'] != $entry['language']) {
+														echo '<a href="/blog/'.$translation['friendly'].'/">'.[ 'en' => 'The English version is here.', 'ja' => '日本語版へこちら。' ][ $translation['language'] ].'</a>';
+													}
+												}
+											?>
+										</li>
+									<?php
 								}
 								/*if(is_array($entry['edit_history']) && !empty($entry['edit_history'])) {
 									foreach($entry['edit_history'] as $edit) {
