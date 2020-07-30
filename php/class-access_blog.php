@@ -152,7 +152,8 @@
 					"blog.user_id",
 					"blog.id",
 					"SUBSTRING_INDEX(blog.content, '\n', 1) AS content",
-					'blog.image_id'
+					'blog.image_id',
+					'blog.artist_id'
 				);
 			}
 			elseif($args["get"] === "basics") {
@@ -163,7 +164,8 @@
 					"blog.content",
 					"blog.user_id",
 					"blog.id",
-					'blog.image_id'
+					'blog.image_id',
+					'blog.artist_id'
 				);
 			}
 			if($args['get'] === 'name') {
@@ -378,9 +380,9 @@
 			}
 			
 			// Get all translations
-			if($args['get'] === 'all' || $args['get'] === 'basics') {
+			if($args['get'] === 'all' || $args['get'] === 'basics' || $args['get'] === 'list') {
 				for($i=0; $i<$num_blogs; $i++) {
-					$sql_translations = 'SELECT friendly, language, id FROM blog_translations WHERE blog_id=?';
+					$sql_translations = 'SELECT friendly, language, id, title FROM blog_translations WHERE blog_id=?';
 					$stmt_translations = $this->pdo->prepare($sql_translations);
 					$stmt_translations->execute([ $blogs[$i]['id'] ]);
 					$rslt_translations = $stmt_translations->fetchAll();
@@ -393,7 +395,7 @@
 					}
 					
 					// Make sure original English version is listed
-					array_unshift( $blogs[$i]['translations'], [ 'id' => $blogs[$i]['id'], 'language' => 'en', 'friendly' => $blogs[$i]['friendly'] ] );
+					array_unshift( $blogs[$i]['translations'], [ 'id' => $blogs[$i]['id'], 'language' => 'en', 'friendly' => $blogs[$i]['friendly'], 'title' => $blogs[$i]['title'] ] );
 					
 				}
 			}
@@ -412,6 +414,15 @@
 			else {
 				for($i=0; $i<$num_blogs; $i++) {
 					$blogs[$i]['language'] = 'en';
+				}
+			}
+			
+			// Get main artist
+			if($args['get'] === 'all' || $args['get'] === 'basics' || $args['get'] === 'list') {
+				for($i=0; $i<$num_blogs; $i++) {
+					if(is_numeric($blogs[$i]['artist_id'])) {
+						$blogs[$i]['artist'] = $this->access_artist->access_artist([ 'id' => $blogs[$i]['artist_id'], 'get' => 'name' ]);
+					}
 				}
 			}
 			
