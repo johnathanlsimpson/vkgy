@@ -14,7 +14,7 @@ style([
 	<div class="interview__wrapper">
 	<?php
 		// Loop through entries and attach Japanese versions to English counterparts
-		for($i=0; $i<$num_entries; $i++) {
+		/*for($i=0; $i<$num_entries; $i++) {
 			
 			// If 日本語 in title, assume JP versions
 			if( strpos($entries[$i]['title'], sanitize('日本語')) ) {
@@ -41,7 +41,7 @@ style([
 				
 			}
 			
-		}
+		}*/
 		
 		// Pop off first entry so we can highlight it, then shuffle rest
 		//$entries = array_values($entries);
@@ -50,14 +50,42 @@ style([
 		//shuffle($entries);
 		//array_unshift($entries, $first_entry);
 		
+		//echo $_SESSION['username'] === 'inartistic' ? '<pre>'.print_r($entries, true).'</pre>' : null;
+		
 		// Loop back through entries and render
 		foreach($entries as $entry_key => $entry) {
 			
-			$entry['content'] = $markdown_parser->parse_markdown($entry['content']);
-			$entry['jp_content'] = $markdown_parser->parse_markdown($entry['jp_content']);
+			//$entry['content'] = $markdown_parser->parse_markdown($entry['content']);
+			//$entry['jp_content'] = $markdown_parser->parse_markdown($entry['jp_content']);
 			
-			$band_romaji = strpos($entry['title'], 'band ') > 0 ? end(explode('band ', $entry['title'])) : end(explode('with ', $entry['title']));
-			$band_name = explode(sanitize('へのインタビュー'), $entry['jp_title'])[0];
+			if(is_array($entry['artist']) && !empty($entry['artist'])) {
+				$band_romaji = $entry['artist']['romaji'];
+				$band_name = $entry['artist']['name'];
+			}
+			elseif(strpos($entry['title'], 'interview') !== false) {
+				foreach($entry['translations'] as $translation) {
+					if($translation['language'] === 'ja') {
+						$band_name = explode(sanitize('へのインタビュー'), $translation['title'])[0];
+					}
+				}
+				$band_romaji = strpos($entry['title'], 'band ') > 0 ? end(explode('band ', $entry['title'])) : end(explode('with ', $entry['title']));
+				
+				if(!$band_name && $band_romaji) {
+					$band_name = $band_romaji;
+					unset($band_romaji);
+				}
+				elseif($band_name && $band_romaji && $band_romaji == $band_name) {
+					unset($band_romaji);
+				}
+				
+			}
+			/*elseif(is_array($entry['translations']) && !empty($entry['translations'])) {
+				$band_romaji = strpos($entry['title'], 'band ') > 0 ? end(explode('band ', $entry['title'])) : end(explode('with ', $entry['title']));
+				$band_romaji = $band_romaji && $band_romaji != $band_name
+			}*/
+			
+			//$band_name = strlen($band_name) ? $band_name : 
+			
 			
 			?>
 				<div class="interview__container">
@@ -66,14 +94,22 @@ style([
 						
 						<h1 class="interview__title">
 							<a href="<?= '/blog/'.$entry['friendly'].'/'; ?>">
-								<?= $band_romaji != $band_name ? lang($band_romaji, $band_name, 'div') : $band_name; ?>
+								<?= $band_romaji && $band_romaji != $band_name ? lang($band_romaji, $band_name, 'div') : ($band_name ?: $entry['title']); ?>
 							</a>
 						</h1>
 						
 						<?= $_SESSION['can_add_data'] ? '<a class="a--padded interview__link symbol__edit" href="/blog/'.$entry['friendly'].'/edit/"><span>Edit</span></a>' : null; ?>
 						<a class="a--outlined a--padded interview__link" href="<?= '/blog/'.$entry['friendly'].'/'; ?>">Eng<span>lish</span></a>
-						<a class="a--outlined a--padded interview__link <?= $entry['jp_friendly'] ? null : 'any--hidden'; ?>" href="<?= '/blog/'.$entry['jp_friendly'].'/'; ?>">日本語<span>版</span></a>
 						
+						<?php
+							if(is_array($entry['translations']) && !empty($entry['translations'])) {
+								foreach($entry['translations'] as $translation) {
+									if($translation['language'] != 'en') {
+										echo '<a class="a--outlined a--padded interview__link" href="/blog/'.$translation['friendly'].'/">'.['ja' => '日本語版'][$translation['language']].'</a>';
+									}
+								}
+							}
+						?>
 					</div>
 					
 					<div class="text interview__content <?= $entry_key === 0 ? 'interview--latest' : null; ?> ">
@@ -84,6 +120,8 @@ style([
 					
 				</div>
 			<?php
+			
+			unset($band_name, $band_romaji);
 		}
 	?>
 	</div>
