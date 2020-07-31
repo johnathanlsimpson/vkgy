@@ -30,8 +30,6 @@ let voteElems = document.querySelectorAll('.tag__vote');
 voteElems.forEach(function(voteElem) {
 	voteElem.addEventListener('click', function(event) {
 		
-		event.preventDefault();
-		
 		let voteType = voteElem.dataset.vote;
 		let wasPreviouslySelected = voteElem.querySelector('input').checked ? true : false;
 		
