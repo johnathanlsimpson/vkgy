@@ -4,7 +4,7 @@ function friendly(inputString) {
 	let outputString = inputString;
 	
 	// Replace all non-alphanumeric characters with hyphens
-	outputString = outputString.replace(/[^A-z0-9]/g, '-');
+	outputString = outputString.replace(/[^A-Za-z0-9]/g, '-');
 	
 	// Eliminate double hyphens
 	outputString = outputString.replace(/-{2,}/g, '-');
