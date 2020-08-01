@@ -967,7 +967,7 @@
 					}
 				}
 				else {
-					unset($args["tags"], $args["get"]);
+					unset($args["tags"], $args["get"], $sql_select);
 				}
 			}
 			
