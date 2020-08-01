@@ -412,7 +412,7 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 						if(!$overrides['twitter_authors']) {
 							
 							// Combine author ID and contributor IDs, remove duplicates, remove site owner
-							$author_id = sanitize($_POST['author_id']);
+							$author_id = sanitize($_POST['user_id']);
 							$contributor_ids = is_array($_POST['contributor_ids']) ? $_POST['contributor_ids'] : explode(',', sanitize($_POST['contributor_ids']));
 							$contributor_ids = is_array($contributor_ids) ? $contributor_ids : [];
 							$contributor_ids[] = $author_id;
