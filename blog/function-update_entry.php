@@ -130,7 +130,7 @@ if($is_edit && $current_entry['was_published']) {
 }
 
 // Format sources
-if($sources) {
+/*if($sources) {
 	preg_match_all('/'.'^(@([A-z0-9-_]+))(?:\s|$)'.'/m', $sources, $twitter_matches);
 	
 	if(is_array($twitter_matches) && !empty($twitter_matches)) {
@@ -143,7 +143,7 @@ if($sources) {
 	$sources = array_filter($sources);
 	$sources = implode("\n", $sources);
 	$sources = sanitize($markdown_parser->validate_markdown($sources));
-}
+}*/
 
 // Loop through manually specified contributors and add an edit so they're connected to the entry
 $contributor_ids = $_POST['contributor_ids'];
@@ -400,18 +400,83 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 					}
 					
 					if(!$is_queued && strlen($title) && strlen($friendly)) {
+						
+						
+						
+						
+						
+						
+						
+						/* Get tweet parts--eventually need to redo this so it's all in one location */
+						
+						if(!$overrides['twitter_authors']) {
+							
+							// Combine author ID and contributor IDs, remove duplicates, remove site owner
+							$author_id = sanitize($_POST['author_id']);
+							$contributor_ids = is_array($_POST['contributor_ids']) ? $_POST['contributor_ids'] : explode(',', sanitize($_POST['contributor_ids']));
+							$contributor_ids = is_array($contributor_ids) ? $contributor_ids : [];
+							$contributor_ids[] = $author_id;
+							$contributor_ids = array_unique($contributor_ids);
+							$contributor_ids = array_filter($contributor_ids, function($x) { return $x != 0 && $x != 1; });
+							$contributor_ids = array_values($contributor_ids);
+							
+							// Get Twitter usernames of remaining contributors (if overrides not set)
+							if( !$facebook_author && !$twitter_author && is_array($contributor_ids) && !empty($contributor_ids) ) {
+								
+								// Get user info
+								$sql_author = 'SELECT username, twitter FROM users WHERE '.substr(str_repeat('id=? OR ', count($contributor_ids)), 0, -4).'';
+								$stmt_author = $pdo->prepare($sql_author);
+								$stmt_author->execute( $contributor_ids );
+								$rslt_author = $stmt_author->fetchAll();
+								
+								// Use username as FB credit, Twitter handle as Twitter credit if possible
+								if(is_array($rslt_author) && !empty($rslt_author)) {
+									foreach($rslt_author as $author) {
+										$facebook_author = $author['username'];
+										$twitter_author .= $author['twitter'] ? '@'.$author['twitter'].' ' : $author['username'].' ';
+									}
+								}
+								
+							}
+						}
+						
+						if($overrides['twitter_mentions']) {
+							
+							include_once('../blog/function-get_artist_twitters.php');
+							
+							// If artist specified, get Twitter handles for band and its members
+							$artist_id = sanitize($_POST['artist_id']);
+							if(is_numeric($artist_id)) {
+								$artist_twitters = get_artist_twitters($artist_id, $pdo, $access_artist);
+							}
+							
+						}
+						
+						// Check if post type manually set
+						$post_type = sanitize($_POST['post_type']) ?: 'blog_post';
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						// Build and save post
 						$social_post = $access_social_media->build_post([
 							'title' => $title,
 							'url' => 'https://vk.gy'.$output['url'],
 							'id' => $id,
-							'twitter_authors' => $twitter_authors,
 							'sns_body' => $overrides['sns_body'] ?: null,
-							'twitter_mentions' => $overrides['twitter_mentions'] ?: null,
-							'twitter_authors' => $overrides['twitter_authors'] ?: null
-						], 'blog_post');
+							'twitter_mentions' => $overrides['twitter_mentions'] ?: ($artist_twitters ?: null),
+							'twitter_author' => $overrides['twitter_authors'] ?: ($twitter_author ?: null)
+						], $post_type);
+						
+						$access_social_media->queue_post($social_post, 'both', date('Y-m-d H:i:s', strtotime('+15 minutes')));
 						
 						
-						$access_social_media->queue_post($social_post, 'both', date('Y-m-d H:i:s', strtotime('+30 minutes')));
 					}
 				}
 				
