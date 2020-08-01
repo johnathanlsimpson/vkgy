@@ -55,7 +55,7 @@
 
 /* Choose SNS image */
 				.sns__container {
-					white-space: nowrap;
+					/*white-space: nowrap;*/
 				}
 				.sns__img {
 					height: auto;

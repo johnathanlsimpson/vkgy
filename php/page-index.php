@@ -43,6 +43,7 @@
 		<meta property="og:description" content="<?php echo $page_description; ?>" />
 		<meta property="og:title" content="<?php echo str_replace(" | vkgy (ブイケージ)", "", $page_title); ?>" />
 		<meta property="og:image" content="<?php echo $page_image; ?>" />
+		<meta property="og:url" content="<?= $page_url ?: 'https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']; ?>" />
 		<meta name="twitter:site" content="@vkgy_" />
 		<meta name="twitter:creator" content="@<?php echo $page_creator ?: "vkgy_"; ?>" />
 		<meta name="twitter:card" content="summary_large_image" />

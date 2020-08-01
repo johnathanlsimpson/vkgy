@@ -574,8 +574,9 @@
 							<li class="input__row">
 								<div class="input__group any--flex-grow">
 									<label class="input__label">Mentions <a x-on:click="mentions=true" x-show="!mentions" class="symbol__edit">edit</a></label>
-									<input x-show="mentions" class="any--flex-grow" name="twitter_mentions" placeholder="@band_official" value="<?= $entry['sns_overrides']['twitter_mentions']; ?>" />
-									<div class="input__note any--weaken symbol__help">Auto-populated with Twitter accounts connected to main artist.</div>
+									<input x-show="mentions" class="any--flex-grow" name="twitter_mentions" placeholder="@band_1 @band_2" value="<?= $entry['sns_overrides']['twitter_mentions']; ?>" />
+									<div class="input__note any--weaken symbol__help">Auto-populated with Twitter accounts connected to main artist (edit the artist's page to add Twitter accounts, and make sure they're marked SNS).</div>
+									<div class="input__note any--weaken symbol__help">Include @ and username, and separate multiple accounts with a space.</div>
 								</div>
 							</li>
 

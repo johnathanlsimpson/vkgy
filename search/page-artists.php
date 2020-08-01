@@ -42,7 +42,16 @@
 	
 	foreach($search as $key => $value) {
 		if($key !== 'page' && $key !== 'order') {
-			$base_url .= '&'.$key.'='.$value;
+			if(strlen($value) || (is_array($value) && !empty($value))) {
+				if(is_array($value)) {
+					foreach($value as $val) {
+						$base_url .= '&'.$key.'[]='.$val;
+					}
+				}
+				else {
+					$base_url .= '&'.$key.'[]='.$value;
+				}
+			}
 		}
 	}
 	$base_url .= '#result';
@@ -203,7 +212,7 @@
 								foreach($rslt_tags as $i => $tag) {
 									?>
 										<input class="input__choice" id="tags[<?php echo $i+1; ?>]" name="tags[]" type="checkbox" value="<?php echo $tag["friendly"]; ?>" <?php echo (is_array($search["tags"]) && in_array($tag["friendly"], $search["tags"]) ? "checked" : null); ?> />
-										<label class="symbol__unchecked input__radio" for="tags[<?php echo $i+1; ?>]"><?php echo $tag["romaji"] ?: $tag["name"]; ?></label>
+										<label class="symbol__checkbox--unchecked input__radio" for="tags[<?php echo $i+1; ?>]"><?php echo $tag["romaji"] ?: $tag["name"]; ?></label>
 									<?php
 								}
 							}

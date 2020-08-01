@@ -142,8 +142,9 @@
 							'.$output['content_body'].'
 							'.($output['translations'] ? "\n".$output['translations'] : null).'
 							
-							'.($output['content_mentions'] ? '📱 '.$output['content_mentions'] : null).'
-							'.($output['content_authors'] ? '✍️ '.$output['content_authors'] : null).'
+							'.($output['content_mentions'] ? '📱 '.$output['content_mentions'] : null).
+							($output['content_mentions'] && $output['content_authors'] ? "\n\n" : null).
+							($output['content_authors'] ? '✍️ '.$output['content_authors'] : null).'
 						';
 					}
 					
