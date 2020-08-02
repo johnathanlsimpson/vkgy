@@ -33,7 +33,7 @@ let previewTitleElem = formElem.querySelector('.preview__title');
 let contentElem = formElem.querySelector('[name="content"]');
 let previewStatusElem = formElem.querySelector('.preview__status');
 let previewContentElem = formElem.querySelector('.update__preview');
-let draftElem = formElem.querySelector('[name="is_queued"]');
+let isQueuedElem = formElem.querySelector('[name="is_queued"]');
 let dateScheduledElem = formElem.querySelector('[name="date_scheduled"]');
 let timeScheduledElem = formElem.querySelector('[name="time_scheduled"]');
 let scheduledElem = formElem.querySelector('.save__scheduled');
@@ -52,11 +52,11 @@ let supplementalElem = document.querySelector('[name="supplemental"]');
 // ========================================================
 
 let authorPreviewElem  = formElem.querySelector('.preview__user a');
-let authorElem = formElem.querySelector('[name="user_id"]');
+let userIdElem = formElem.querySelector('[name="user_id"]');
 
 // Update author preview
-authorElem.addEventListener('change', function() {
-	let authorUsername = authorElem.querySelector('option[selected]').innerHTML;
+userIdElem.addEventListener('change', function() {
+	let authorUsername = userIdElem.querySelector('option[selected]').innerHTML;
  authorPreviewElem.href = '/users/' + authorUsername + '/';
 	authorPreviewElem.innerHTML = authorUsername;
 });
@@ -363,9 +363,9 @@ function checkIfScheduled() {
 		saveContainerElem.dataset.isScheduled = 1;
 		
 		// Make sure entry is set to draft and can't be un-drafted
-		draftElem.checked = true;
-		draftElem.disabled = true;
-		draftElem.dispatchEvent(new Event('change'));
+		isQueuedElem.checked = true;
+		isQueuedElem.disabled = true;
+		isQueuedElem.dispatchEvent(new Event('change'));
 		
 		// Update date preview
 		datePreviewElem.innerHTML = dateScheduledElem.value + ' ' + timeScheduledElem.value;
@@ -377,7 +377,7 @@ function checkIfScheduled() {
 		saveContainerElem.dataset.isScheduled = 0;
 		
 		// Re-allow to switch from draft to published
-		draftElem.disabled = false;
+		isQueuedElem.disabled = false;
 		
 		// Reset preview to date_occurred
 		datePreviewElem.innerHTML = dateOccurredElem.value;
@@ -386,9 +386,20 @@ function checkIfScheduled() {
 }
 
 // Update 'is draft' state, and reset save status
-draftElem.addEventListener('change', function() {
-	saveContainerElem.dataset.isQueued = draftElem.checked ? '1' : '0';
+isQueuedElem.addEventListener('change', function() {
+	saveContainerElem.dataset.isQueued = isQueuedElem.checked ? '1' : '0';
 	saveStatusElem.classList.remove('symbol__success', 'symbol__error', 'symbol__loading');
+	
+	
+	
+				var e = new Event('item-id-updated');
+				e.details = {
+					'id' : idElem.value,
+					'is_queued' : isQueuedElem.checked ? 1 : 0,
+				};
+				document.dispatchEvent(e);
+	
+	
 });
 
 // Init inputmask() on appropriate elements
@@ -528,7 +539,7 @@ document.addEventListener('image-updated', function() {
 	// Get current image elements
 	let currentImages = document.querySelectorAll('.image__results .image__template .image__image');
 	let snsImageContainer = document.querySelector('.sns__img-container');
-	let currentSnsImageId = document.querySelector('[name="sns_image_id"]:checked');
+	let currentSnsImageId = document.querySelector('[name="override_image_id"]:checked');
 	
 	// Clear current list of SNS images
 	snsImageContainer.innerHTML = '';
@@ -573,13 +584,13 @@ function initSnsImageListener(elem) {
 }
 
 // Init SNS image update listener at load
-let snsImgElems = document.querySelectorAll('[name="sns_image_id"]');
-snsImgElems.forEach(function(elem) {
+let overrideImageIdElems = document.querySelectorAll('[name="override_image_id"]');
+overrideImageIdElems.forEach(function(elem) {
 	initSnsImageListener(elem);
 });
 
 // Grab SNS image on initial load
-let snsImgOnLoad = document.querySelector('[name="sns_image_id"]:checked');
+let snsImgOnLoad = document.querySelector('[name="override_image_id"]:checked');
 if(snsImgOnLoad) {
 		let snsImgThumb = '/images/' + snsImgOnLoad.value + '.small.jpg';
 		snsImgPreviewElem.style.backgroundImage = 'url(' + snsImgThumb + ')';
@@ -603,9 +614,10 @@ let tweetPreviewMentions = document.querySelector('.tweet__mentions .sns__text')
 let tweetPreviewAuthors = document.querySelector('.tweet__authors .sns__text');
 
 // Set override elems
-let snsBodyElem = document.querySelector('[name="sns_body"]');
-let twitterMentionsElem = document.querySelector('[name="twitter_mentions"]');
-let twitterAuthorsElem = document.querySelector('[name="twitter_authors"]');
+let overrideBodyElem = document.querySelector('[name="override_body"]');
+let overrideoverrideTwitterMentionsElem = document.querySelector('[name="override_twitter_mentions"]');
+let overrideoverrideTwitterAuthors = document.querySelector('[name="override_twitter_authors"]');
+//let overrideoverrideAuthors = document.querySelector('[name="override_authors"]');
 
 // Override SNS parts
 function initOverrideSns(inputElem, previewElem) {
@@ -636,29 +648,34 @@ function initOverrideSns(inputElem, previewElem) {
 }
 
 // Init override listeners
-initOverrideSns(snsBodyElem, tweetPreviewBody);
-initOverrideSns(twitterMentionsElem, tweetPreviewMentions);
-initOverrideSns(twitterAuthorsElem, tweetPreviewAuthors);
+initOverrideSns(overrideBodyElem, tweetPreviewBody);
+initOverrideSns(overrideoverrideTwitterMentionsElem, tweetPreviewMentions);
+initOverrideSns(overrideoverrideTwitterAuthors, tweetPreviewAuthors);
 
 // Get SNS preview and insert into preview elem
 function getSnsPost() {
 	
-	// Form elements
+	// Get tag names => used for post type
 	let tagElems = document.querySelectorAll('[name="tags[]"]:checked');
+	let tags = [];
+	if(tagElems && tagElems.length) {
+		tagElems.forEach(function(tagElem) {
+			tags.push(tagElem.dataset.friendly);
+		});
+	}
 	
-	// Values
+	// Get title => used for body
 	let title = titleElem.value;
-	let url = '/blog/' + friendlyElem.value + '/';
-	let id = idElem.value;
-	let artistId = artistIdElem.value;
-	let authorId = authorElem.value;
-	let contributorIds = [];
-	let postType = 'blog_post';
-	let snsBody = snsBodyElem.value;
-	let twitterMentions = twitterMentionsElem.value;
-	let twitterAuthors = twitterAuthorsElem.value;
 	
-	// Get contributor IDs
+	// Get ID => used for translations
+	let id = idElem.value;
+	
+	// Get artist ID => used for twitter mentions
+	let artistId = artistIdElem.value;
+	
+	// Get user ID and contributor IDs => used for twitter authors and regular authors
+	let userId = userIdElem.value;
+	let contributorIds = [];
 	if(contributorIdsElem.selectedOptions) {
 		let selectedOptions = Array.from(contributorIdsElem.selectedOptions).map(o => o.value);
 		selectedOptions.forEach(function(option) {
@@ -666,44 +683,60 @@ function getSnsPost() {
 		});
 	}
 	
-	// Get tag values
-	if(tagElems && tagElems.length) {
-		tagElems.forEach(function(tagElem) {
-			if(tagElem.dataset.friendly === 'interview') {
-				postType = 'interview';
-			}
-		});
-	}
+	// Get friendly and put together URL => URL
+	let url = 'https://vk.gy/blog/' + friendlyElem.value + '/';
+	
+	// Get overrides
+	let overrideBody = overrideBodyElem.value;
+	let overrideTwitterMentions = overrideoverrideTwitterMentionsElem.value;
+	let overrideTwitterAuthors = overrideoverrideTwitterAuthors.value;
+	//let overrideAuthors = overrideoverrideAuthors.value;
 	
 	// Build form data
 	let snsData = {
-		title: title,
-		url: url,
-		id: id,
-		artist_id: artistId,
-		author_id: authorId,
-		contributor_ids: contributorIds,
-		post_type: postType,
-		body: snsBody,
-		twitter_mentions: twitterMentions,
-		twitter_authors: twitterAuthors
+		tags:                      tags,
+		title:                     title,
+		id:                        id,
+		artist_id:                 artistId,
+		user_id:                   userId,
+		contributor_ids:           contributorIds,
+		url:                       url,
+		override_body:             overrideBody,
+		override_twitter_mentions: overrideTwitterMentions,
+		override_twitter_authors:  overrideTwitterAuthors,
+		//override_authors:          overrideAuthors
 	}
 	
+	// Get preview element
+	previewSnsElem = document.querySelector('.sns__container');
+	
 	// Get SNS preview
-	initializeInlineSubmit($(tweetPreviewHeading), '/blog/function-generate_sns.php', {
+	//initializeInlineSubmit($(tweetPreviewHeading), '/blog/function-generate_sns.php', {
+	initializeInlineSubmit($(previewSnsElem), '/blog/function-generate_sns.php', {
 		
 		preparedFormData: snsData,
 		
 		callbackOnSuccess: function(event, returnedData) {
 			
-			if((returnedData && returnedData.sns_post && returnedData.sns_post.content_heading) || snsBody || twitterMentions || twitterAuthors) {
+			console.log(returnedData);
+			
+			/*if(returnedData && returnedData.sns_post && returnedData.sns_post.length > 0) {
+				
+				tweetPreviewHeading.innerHTML  = returnedData.sns_post.heading;
+				tweetPreviewBody.innerHTML     = returnedData.sns_post.body;
+				tweetPreviewMentions.innerHTML = returnedData.sns_post.twitter_mentions;
+				
+			}*/
+			
+			/*if((returnedData && returnedData.sns_post && returnedData.sns_post.content_heading) || overrideBody || overrideTwitterMentions || overrideTwitterAuthors) {
 				tweetPreviewHeading.innerHTML = returnedData.sns_post.content_heading ? returnedData.sns_post.content_heading : '📰 News ∙ ニュース';
 			}
 			
 			// Output SNS previews
-			tweetPreviewBody.innerHTML = snsBody ? snsBody : (returnedData && returnedData.sns_post && returnedData.sns_post.content_body ? returnedData.sns_post.content_body : '');
-			tweetPreviewMentions.innerHTML = twitterMentions ? twitterMentions : (returnedData && returnedData.sns_post && returnedData.sns_post.content_mentions ? returnedData.sns_post.content_mentions : '');
-			tweetPreviewAuthors.innerHTML = twitterAuthors ? twitterAuthors : (returnedData && returnedData.sns_post && returnedData.sns_post.content_authors ? returnedData.sns_post.content_authors : '');
+			tweetPreviewBody.innerHTML = overrideBody ? overrideBody : (returnedData && returnedData.sns_post && returnedData.sns_post.content_body ? returnedData.sns_post.content_body : '');
+			tweetPreviewMentions.innerHTML = overrideTwitterMentions ? overrideTwitterMentions : (returnedData && returnedData.sns_post && returnedData.sns_post.content_mentions ? returnedData.sns_post.content_mentions : '');
+			tweetPreviewAuthors.innerHTML = overrideTwitterAuthors ? overrideTwitterAuthors : (returnedData && returnedData.sns_post && returnedData.sns_post.content_authors ? returnedData.sns_post.content_authors : '');
+			*/
 			
 			// Update character count
 			updateSnsLength();
@@ -711,6 +744,9 @@ function getSnsPost() {
 		},
 		
 		callbackOnError: function(event, returnedData) {
+			
+			console.log('error');
+			console.log(returnedData);
 			
 		}
 		
@@ -746,7 +782,7 @@ function updateSnsLength() {
 
 // Fire SNS preview update when certain fields are changed
 let interviewTagElem = document.querySelector('[name="tags[]"][data-friendly="interview"]');
-[ titleElem, authorElem, contributorIdsElem, artistIdElem, interviewTagElem ].forEach(function(elem) {
+[ titleElem, userIdElem, contributorIdsElem, artistIdElem, interviewTagElem ].forEach(function(elem) {
 	elem.addEventListener('change', function() {
 		getSnsPost();
 	});

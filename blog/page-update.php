@@ -489,36 +489,48 @@
 			<!-- Tweet -->
 			<details class="<?= $is_translation ? 'any--hidden' : null; ?>" id="tweet">
 				<summary class="h3 documentation__link">📱 Tweet</summary>
-				<div class="col c2" x-data="{body:<?= $entry['sns_overrides']['sns_body'] ? 'true' : 'false'; ?>,mentions:<?= $entry['sns_overrides']['tweet_mentions'] ? 'true' : 'false'; ?>,authors:<?= $entry['sns_overrides']['tweet_authors'] ? 'true' : 'false'; ?>}">
+				<div class="col c2" x-data="{body:<?= $entry['sns_overrides']['body'] ? 'true' : 'false'; ?>,twitterMentions:<?= $entry['sns_overrides']['twitter_mentions'] ? 'true' : 'false'; ?>,twitterAuthors:<?= $entry['sns_overrides']['twitter_authors'] ? 'true' : 'false'; ?>,authors:<?= $entry['sns_overrides']['authors'] ? 'true' : 'false'; ?>}">
 					
 					<!-- Preview tweet -->
 					<div>
 						<div class="text text--outlined sns__container">
 							
 							<div class="sns__component tweet__heading">
-								<div class="sns__text"><?= $entry['sns_overrides']['sns_heading']; ?></div>
+								<div class="sns__text" data-get="heading"><?= $entry['sns_overrides']['heading']; ?></div>
 								<label class="sns__label input__label" data-heading="heading"></label>
 							</div>
 							
 							<div class="sns__component tweet__body">
-								<div class="sns__text"><?= $entry['sns_overrides']['sns_body']; ?></div>
+								<div class="sns__text" data-get="body"><?= $entry['sns_overrides']['body']; ?></div>
 								<label class="sns__label input__label" data-heading="body"><a x-on:click="body=true" x-show="!body" class="sns__edit a--inherit symbol__edit"></a></label>
 							</div>
 							
-							<!--<div class="sns__component tweet__translations">
-									<div class="sns__text"><?= $entry['sns_overrides']['sns_translations']; ?></div>
-									<label class="sns__label input__label">Translations <a class="sns__edit a--inherit symbol__edit">edit</a></label>
-							</div>-->
+							<div class="sns__component tweet__translations">
+									<div class="sns__text" data-get="translations"><?php
+										if(is_array($entry['translations']) && !empty($entry['translations'])) {
+											echo '[EN] https://vk.gy/blog/'.$entry['friendly'].'/';
+											foreach($entry['translations'] as $translation) {
+												echo "\n\n".'['.[ 'ja' => '日本語版' ][ $translation['language'] ].'] https://vk.gy/blog/'.$translation['friendly'].'/';
+											}
+										}
+									?></div>
+									<label class="sns__label input__label">Translations</label>
+							</div>
 							
 							<div class="sns__component tweet__mentions">
-								<div class="sns__text"><?= $entry['sns_overrides']['tweet_mentions']; ?></div>
-								<label class="sns__label input__label" data-heading="mentions"><a x-on:click="mentions=true" x-show="!mentions" class="sns__edit a--inherit symbol__edit"></a></label>
+								<div class="sns__text" data-get="twitter_mentions"><?= $entry['sns_overrides']['twitter_mentions']; ?></div>
+								<label class="sns__label input__label" data-heading="mentions"><a x-on:click="twitterMentions=true" x-show="!twitterMentions" class="sns__edit a--inherit symbol__edit"></a></label>
 							</div>
 							
 							<div class="sns__component tweet__authors">
-								<div class="sns__text"><?= $entry['sns_overrides']['tweet_authors']; ?></div>
-								<label class="sns__label input__label" data-heading="authors"><a x-on:click="authors=true" x-show="!authors" class="sns__edit a--inherit symbol__edit"></a></label>
+								<div class="sns__text" data-get="twitter_authors"><?= $entry['sns_overrides']['twitter_authors']; ?></div>
+								<label class="sns__label input__label" data-heading="authors"><a x-on:click="twitterAuthors=true" x-show="!twitterAuthors" class="sns__edit a--inherit symbol__edit"></a></label>
 							</div>
+							
+							<!--<div class="sns__component tweet__normal-authors">
+								<div class="sns__text" data-get="authors"><?= $entry['sns_overrides']['authors']; ?></div>
+								<label class="sns__label input__label" data-heading="authors"><a x-on:click="authors=true" x-show="!authors" class="sns__edit a--inherit symbol__edit"></a></label>
+							</div>-->
 							
 							<div class="sns__component sns__length symbol__error any--weaken" data-length="0"></div>
 							
@@ -535,7 +547,7 @@
 							?>
 								<template id="template-sns">
 									<label class="sns__img input__radio" style="margin-top:1rem;">
-										<input class="input__choice" name="sns_image_id" type="radio" value="{image_id}" {is_checked} />
+										<input class="input__choice" name="override_image_id" type="radio" value="{image_id}" {is_checked} />
 										<span class="symbol__unchecked"></span>
 										<img class="sns__thumb" src="{image_thumb}" />
 									</label>
@@ -546,6 +558,7 @@
 							$sns_template = preg_replace('/'.'<\/?template.*?>'.'/', '', $sns_template);
 						?>
 						
+						<!-- SNS overrides -->
 						<ul class="text ul--compact">
 							
 							<li class="input__row">
@@ -558,28 +571,37 @@
 							<li class="input__row">
 								<div class="input__group any--flex-grow">
 									<label class="input__label">Body <a x-on:click="body=true" x-show="!body" class="symbol__edit">edit</a></label>
-									<textarea x-show="body" class="input__textarea any--flex-grow" name="sns_body" placeholder="body text"><?= $entry['sns_overrides']['sns_body']; ?></textarea>
+									<textarea x-show="body" class="input__textarea any--flex-grow" name="override_body" placeholder="body text"><?= $entry['sns_overrides']['body']; ?></textarea>
 									<div class="input__note any--weaken symbol__help">By default, uses the title of the entry.</div>
 								</div>
 							</li>
 							
 							<li class="input__row">
 								<div class="input__group any--flex-grow">
-									<label class="input__label">Authors <a x-on:click="authors=true" x-show="!authors" class="symbol__edit">edit</a></label>
-									<input x-show="authors" class="any--flex-grow" name="twitter_authors" placeholder="@vkgy_user" value="<?= $entry['sns_overrides']['twitter_authors']; ?>" />
-									<div class="input__note any--weaken symbol__help">By default, Twitter accounts of any vkgy member who contributed to entry.</div>
+									<label class="input__label">Mentions <a x-on:click="twitterMentions=true" x-show="!twitterMentions" class="symbol__edit">edit</a></label>
+									<input x-show="twitterMentions" class="any--flex-grow" name="override_twitter_mentions" placeholder="@band_1 @band_2" value="<?= $entry['sns_overrides']['twitter_mentions']; ?>" />
+									<div class="input__note any--weaken symbol__help">Auto-populated with Twitter accounts connected to main artist.</div>
+									<div class="input__note any--weaken symbol__help">Edit the artist's page to add Twitter accounts, and make sure they're marked SNS.</div>
+									<div class="input__note any--weaken symbol__help">Include @ and username, and separate multiple accounts with a space.</div>
 								</div>
 							</li>
 							
 							<li class="input__row">
 								<div class="input__group any--flex-grow">
-									<label class="input__label">Mentions <a x-on:click="mentions=true" x-show="!mentions" class="symbol__edit">edit</a></label>
-									<input x-show="mentions" class="any--flex-grow" name="twitter_mentions" placeholder="@band_1 @band_2" value="<?= $entry['sns_overrides']['twitter_mentions']; ?>" />
-									<div class="input__note any--weaken symbol__help">Auto-populated with Twitter accounts connected to main artist (edit the artist's page to add Twitter accounts, and make sure they're marked SNS).</div>
-									<div class="input__note any--weaken symbol__help">Include @ and username, and separate multiple accounts with a space.</div>
+									<label class="input__label">Authors <a x-on:click="twitterAuthors=true" x-show="!twitterAuthors" class="symbol__edit">edit</a></label>
+									<input x-show="twitterAuthors" class="any--flex-grow" name="override_twitter_authors" placeholder="@vkgy_user" value="<?= $entry['sns_overrides']['twitter_authors']; ?>" />
+									<div class="input__note any--weaken symbol__help">By default, Twitter accounts of any vkgy member who contributed to entry.</div>
 								</div>
 							</li>
-
+							
+							<!--<li class="input__row">
+								<div class="input__group any--flex-grow">
+									<label class="input__label">Authors <a x-on:click="authors=true" x-show="!authors" class="symbol__edit">edit</a></label>
+									<input x-show="authors" class="any--flex-grow" name="override_twitter_authors" placeholder="@vkgy_user" value="<?= $entry['sns_overrides']['authors']; ?>" />
+									<div class="input__note any--weaken symbol__help">By default, Twitter accounts of any vkgy member who contributed to entry.</div>
+								</div>
+							</li>-->
+							
 							<!--<li class="input__row">
 								<div class="input__group">
 									<label class="input__label">Scheduling</label>
@@ -588,7 +610,7 @@
 									</div>
 								</div>
 							</li>-->
-
+							
 							<!-- Choose SNS image -->
 							<li class="input__row">
 								<div class="input__group sns__img-container">
@@ -599,7 +621,7 @@
 												echo render_component($sns_template, [
 													'image_id' => $image['id'],
 													'image_thumb' => str_replace('.', '.thumbnail.', $image['url']),
-													'is_checked' => $entry['sns_overrides'] && $entry['sns_overrides']['sns_image'] == $image['id'] ? 'checked' : null,
+													'is_checked' => $entry['sns_overrides'] && $entry['sns_overrides']['image_id'] == $image['id'] ? 'checked' : null,
 												]);
 											}
 										}
@@ -862,7 +884,10 @@
 								.sns__edit::after {
 									content: "edit";
 								}
-								.tweet__authors .sns__text:not(:empty)::before {
+								.sns__text {
+									white-space: pre;
+								}
+								/*.tweet__authors .sns__text:not(:empty)::before {
 									background: url(https://abs-0.twimg.com/emoji/v2/svg/270d.svg);
 									content: "";
 									display: inline-block;
@@ -877,7 +902,7 @@
 									height: 1rem;
 									margin-right: 1ch;
 									width: 1rem;
-								}
+								}*/
 								
 								/*.sns__edit,
 								.sns__label {

@@ -33,119 +33,44 @@ if(is_array($rslt_queued) && !empty($rslt_queued)) {
 				}
 			}
 			
-			// Format sources
-			if($entry['sources']) {
-				preg_match_all('/'.'^(@([A-z0-9-_]+))(?:\s|$)'.'/m', $entry['sources'], $twitter_matches);
-				
-				if(is_array($twitter_matches) && !empty($twitter_matches)) {
-					for($i=0; $i<count($twitter_matches[0]); $i++) {
-						$twitter_authors[] = $twitter_matches[1][$i];
-					}
-				}
-			}
+			// Get tags and set post type
+			$sql_tags = 'SELECT blog_tags.blog_id FROM tags LEFT JOIN blog_tags ON blog_tags.tag_id=tags.id AND blog_tags.blog_id=? WHERE tags.friendly=? LIMIT 1';
+			$stmt_tags = $pdo->prepare($sql_tags);
+			$stmt_tags->execute([ $entry['id'], 'interview' ]);
+			$rslt_tags = $stmt_tags->fetchColumn();
+			$post_type = $rslt_tags == $entry['id'] ? 'interview' : 'blog_post';
 			
-			// Immediately post to socials, if not just translated ver
-			if( strpos($entry['title'], sanitize('日本語')) === false ) {
-				if(strlen($entry['title']) && strlen($entry['friendly'])) {
-					
-					// SNS defaults
-					$title = $entry['title'];
-					$url = 'https://vk.gy/blog/'.$entry['friendly'].'/';
-					$id = $entry['id'];
-					
-					// Combine author ID and contributor IDs, remove duplicates, remove site owner
-					$author_id = sanitize($entry['user_id']);
-					$contributor_ids = $entry['contributor_ids'] ? json_decode($entry['contributor_ids'], true) : null;
-					$contributor_ids = is_array($contributor_ids) ? $contributor_ids : [];
-					$contributor_ids[] = $author_id;
-					$contributor_ids = array_unique($contributor_ids);
-					$contributor_ids = array_filter($contributor_ids, function($x) { return $x != 0 && $x != 1; });
-					$contributor_ids = array_values($contributor_ids);
-					
-					// Get Twitter usernames of remaining contributors (if overrides not set)
-					if( !$facebook_author && !$twitter_authors && is_array($contributor_ids) && !empty($contributor_ids) ) {
-						
-						// Get user info
-						$sql_author = 'SELECT username, twitter FROM users WHERE '.substr(str_repeat('id=? OR ', count($contributor_ids)), 0, -4).'';
-						$stmt_author = $pdo->prepare($sql_author);
-						$stmt_author->execute( $contributor_ids );
-						$rslt_author = $stmt_author->fetchAll();
-						
-						//print_r($rslt_author);
-						
-						// Use username as FB credit, Twitter handle as Twitter credit if possible
-						if(is_array($rslt_author) && !empty($rslt_author)) {
-							foreach($rslt_author as $author) {
-								$facebook_author = $author['username'];
-								$twitter_authors .= $author['twitter'] ? '@'.$author['twitter'].' ' : $author['username'].' ';
-							}
-						}
-						
-					}
-					
-					// If artist specified, get Twitter handles for band and its members
-					include_once('../blog/function-get_artist_twitters.php');
-					$access_artist = $access_artist ?: new access_artist($pdo);
-					$artist_id = sanitize($entry['artist_id']);
-					if(is_numeric($artist_id)) {
-						$twitter_mentions = get_artist_twitters($artist_id, $pdo, $access_artist);
-					}
-					
-					// Get translations
-					$sql_trans = 'SELECT * FROM blog_translations WHERE blog_id=?';
-					$stmt_trans = $pdo->prepare($sql_trans);
-					$stmt_trans->execute([ $entry['id'] ]);
-					$rslt_trans = $stmt_trans->fetchAll();
-					
-					if(is_array($rslt_trans) && !empty($rslt_trans)) {
-						$translations = '[En] https://vk.gy/blog/'.$entry['friendly'].'/';
-						foreach($rslt_trans as $translation) {
-							$translations .= "\n\n".'['.[ 'ja' => '日本語版' ][ $translation['language'] ].'] https://vk.gy/blog/'.$translation['friendly'].'/';
-						}
-					}
-					
-					// Get SNS overrides
-					$overrides = $entry['sns_overrides'] ? json_decode($entry['sns_overrides'], true) : null;
-					if(is_array($overrides) && !empty($overrides)) {
-						
-						$title = $overrides['sns_body'] ?: $title;
-						$twitter_mentions = $overrides['twitter_mentions'] ?: $twitter_mentions;
-						$twitter_authors = $overrides['twitter_authors'] ?: $twitter_authors;
-						
-					}
-					
-					// (Temporary) Check if interview
-					$sql_tag = 'SELECT 1 FROM blog_tags WHERE blog_id=? AND tag_id=? LIMIT 1';
-					$stmt_tag = $pdo->prepare($sql_tag);
-					$stmt_tag->execute([ $entry['id'], 25 ]);
-					$rslt_tag = $stmt_tag->fetchColumn();
-					if($rslt_tag) {
-						$post_type = 'interview';
-					}
-					
-					// Build post
-					$social_post = $access_social_media->build_post([
-						'title'            => $title,
-						'url'              => $url,
-						'id'               => $id,
-						'translations'     => $translations,
-						'twitter_mentions' => $twitter_mentions,
-						'twitter_author'   => $twitter_authors,
-					], $post_type ?: 'blog_post');
-					
-					/*$social_post = $access_social_media->build_post([
-						'title' => $entry['title'],
-						'url' => 'https://vk.gy/blog/'.$entry['friendly'].'/',
-						'content_ja' => $entry['content_ja'],
-						'id' => $entry['id'],
-						'twitter_authors' => $twitter_authors
-					], 'blog_post');*/
-					
-					$access_social_media->post_to_social($social_post, 'both');
-					//echo $_SESSION['username'] === 'inartistic' ? '<pre>'.print_r($entry, true).'*'.print_r($social_post, true).'</pre>' : null;
-					
-				}
-			}
+			// Set other vars
+			$title = sanitize($entry['title']);
+			$id = sanitize($entry['id']);
+			$artist_id = sanitize($entry['artist_id']);
+			$user_id = sanitize($entry['user_id']);
+			$contributor_ids = json_decode($entry['contributor_ids'], true);
+			$url = 'https://vk.gy/blog/'.sanitize($entry['friendly']);
+			
+			// Set overrides
+			$overrides = json_decode($entry['sns_overrides'], true);
+			$override_body = $overrides['body'] ?: null;
+			$override_twitter_mentions = $overrides['twitter_mentions'] ?: null;
+			$override_twitter_authors = $overrides['twitter_authors'] ?: null;
+			//$override_authors = $overrides['authors'] ?: null;
+			
+			// Send to SNS builder and get output
+			$sns_post = $access_social_media->build_post([
+				'title'                     => $title,
+				'id'                        => $id,
+				'artist_id'                 => $artist_id,
+				'user_id'                   => $user_id,
+				'contributor_ids'           => $contributor_ids,
+				'url'                       => $url,
+				'override_body'             => $override_body,
+				'override_twitter_mentions' => $override_twitter_mentions,
+				'override_twitter_authors'  => $override_twitter_authors,
+				//'override_authors'          => $override_authors,
+			], $post_type);
+			
+			$access_social_media->post_to_social($sns_post, 'both');
+			
 		}
 	}
 }

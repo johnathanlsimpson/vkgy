@@ -128,24 +128,113 @@
 					
 					// Blog post
 					if( ($item_type === 'blog_post' || $item_type === 'interview') && strlen($input['title']) && strlen($input['url'])) {
-						$output['url'] = $input['url'];
 						
-						$output['content_heading'] = ($item_type === 'interview' ? '💬 Interview ∙ インタビュー' : '📰 News ∙ ニュース');
-						$output['content_body'] = sanitize($input['sns_body']) ?: ( $input['title'].($input['content_ja'] ? "\n\n".'[日本語版] '.$input['content_ja'] : null) );
-						$output['content_mentions'] = sanitize($input['twitter_mentions']) ?: null;
-						$output['content_authors'] = sanitize($input['twitter_author']) ?: null;
-						$output['translations'] = sanitize($input['translations']) ?: null;
+						// Heading
+						$heading = $item_type === 'interview' ? '💬 Interview ∙ インタビュー' : '📰 News ∙ ニュース';
 						
-						$output['content'] = '
-							'.$output['content_heading'].'
+						// Body
+						$body = $input['override_body'] ?: $input['title'];
+						
+						// Translations
+						if(is_numeric($input['id'])) {
+							$sql_translations = 'SELECT language, friendly FROM blog_translations WHERE blog_id=?';
+							$stmt_translations = $this->pdo->prepare($sql_translations);
+							$stmt_translations->execute([ $input['id'] ]);
+							$rslt_translations = $stmt_translations->fetchAll();
 							
-							'.$output['content_body'].'
-							'.($output['translations'] ? "\n".$output['translations'] : null).'
+							if(is_array($rslt_translations) && !empty($rslt_translations)) {
+								$translations[] = '[EN] '.$input['url'];
+								foreach($rslt_translations as $translation) {
+									$language = [ 'ja' => '日本語版' ][ $translation['language'] ];
+									$translations[] = '['.$language.'] https://vk.gy/blog/'.$translation['friendly'].'/';
+								}
+							}
+						}
+						$translations = is_array($translations) ? implode("\n\n", $translations) : null;
+						
+						// Twitter mentions
+						if($input['override_twitter_mentions']) {
+							$twitter_mentions = $input['override_twitter_mentions'];
+						}
+						else {
+							$this->access_artist = $this->access_artist ?: new access_artist($this->pdo);
+							include_once('../blog/function-get_artist_twitters.php');
+							if(is_numeric($input['artist_id'])) {
+								$twitter_mentions = get_artist_twitters($input['artist_id'], $this->pdo, $this->access_artist);
+							}
+						}
+						$twitter_mentions = $twitter_mentions ? '📱 '.$twitter_mentions : null;
+						
+						// Twitter authors and normal authors
+						if($input['override_twitter_authors']) {
+							$twitter_authors = [ $input['override_twitter_authors'] ];
+						}
+						if($input['override_authors']) {
+							$authors = [ $input['override_authors'] ];
+						}
+						if(!$input['override_twitter_authors'] /*|| !$input['override_authors']*/) {
 							
-							'.($output['content_mentions'] ? '📱 '.$output['content_mentions'] : null).
-							($output['content_mentions'] && $output['content_authors'] ? "\n\n" : null).
-							($output['content_authors'] ? '✍️ '.$output['content_authors'] : null).'
-						';
+							// Get contributor IDs
+							$contributor_ids = is_array($input['contributor_ids']) ? $input['contributor_ids'] : [];
+							
+							// Make sure author (main user) is included
+							if(is_numeric($input['user_id'])) {
+								$contributor_ids[] = $input['user_id'];
+							}
+							
+							// Get unique user IDs, then remove owner, then reset array
+							$contributor_ids = array_unique($contributor_ids);
+							$contributor_ids = array_filter($contributor_ids, function($x) { return $x != 0 && $x != 1; });
+							$contributor_ids = array_values($contributor_ids);
+							
+							// If still have list of contributor IDs, get their usernames and Twitter handles
+							if( is_array($contributor_ids) && !empty($contributor_ids) ) {
+								
+								// Get user info
+								$sql_authors = 'SELECT username, twitter FROM users WHERE '.substr(str_repeat('id=? OR ', count($contributor_ids)), 0, -4).'';
+								$stmt_authors = $this->pdo->prepare($sql_authors);
+								$stmt_authors->execute( $contributor_ids );
+								$rslt_authors = $stmt_authors->fetchAll();
+								
+								// Use username as FB credit, Twitter handle as Twitter credit if possible
+								if(is_array($rslt_authors) && !empty($rslt_authors)) {
+									foreach($rslt_authors as $author) {
+										$authors[] = $author['username'];
+										$twitter_authors[] = $author['twitter'] ? '@'.$author['twitter'].' ' : $author['username'].' ';
+									}
+								}
+								
+							}
+							
+						}
+						$twitter_authors = is_array($twitter_authors) ? '✍️ '.implode(' ', $twitter_authors) : null;
+						$authors = is_array($authors) ? '✍️ '.implode(' ', $authors) : null;
+						
+						$output['contributors'] = $input['contributor_ids'];
+						
+						// URL
+						$url = $input['url'];
+						
+						// Output
+						$output['heading'] = $heading;
+						$output['body'] = $body;
+						$output['translations'] = $translations;
+						$output['twitter_mentions'] = $twitter_mentions;
+						$output['twitter_authors'] = $twitter_authors;
+						//$output['authors'] = $authors;
+						$output['url'] = $url;
+						$output['content'] = "
+							$heading
+							
+							$body
+							
+							$translations
+							
+							$twitter_mentions
+							
+							$twitter_authors
+						";
+						
 					}
 					
 					// Database updates
@@ -172,6 +261,7 @@
 				$output['result'] = 'Unallowed item type.';
 			}
 			
+			// Clean output
 			if(is_array($output) && $output['content']) {
 				$output['content']   = str_replace("\t", '', $output['content']);
 				$output['content']   = preg_replace('/'."\n{2,}".'/', "\n\n", $output['content']);
