@@ -13,7 +13,7 @@
 	$stmt_flyer->execute();
 	$flyer = $stmt_flyer->fetch();
 	
-	$artist_id = explode(")", str_replace("(", "", $flyer["artist_id"]))[0];
+	$artist_ids = explode(")", str_replace("(", "", $flyer["artist_id"]));
 
 	if(is_array($flyer) && !empty($flyer)) {
 		
@@ -46,14 +46,16 @@
 					$stmt_fod = $pdo->prepare($sql_fod);
 					$stmt_fod->execute([ $new_image_id, 1 ]);
 					
-					// Creat link
-					$sql_link = 'INSERT INTO images_artists (image_id, artist_id) VALUES (?, ?)';
-					$stmt_link = $pdo->prepare($sql_link);
-					$stmt_link->execute([ $new_image_id, $artist_id ]);
+					// Create link
+					foreach($artist_ids as $artist_id) {
+						$sql_link = 'INSERT INTO images_artists (image_id, artist_id) VALUES (?, ?)';
+						$stmt_link = $pdo->prepare($sql_link);
+						$stmt_link->execute([ $new_image_id, $artist_id ]);
+					}
 					
 					// Get artist info from flyer
-					if(is_numeric($artist_id)) {
-						$flyer['artist'] = $access_artist->access_artist(["id" => $artist_id, "get" => "name"]);
+					if(is_numeric($artist_id[0])) {
+						$flyer['artist'] = $access_artist->access_artist(["id" => $artist_id[0], "get" => "name"]);
 					}
 					
 					// Get filepath of watermarked version of flyer, set URL for normal access

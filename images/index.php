@@ -7,7 +7,7 @@
 		'Images' => '/images/',
 	]);
 	
-	if($_SESSION["is_boss"]) {
+	if($_SESSION["is_moderator"]) {
 		subnav([
 			"Upload queue" => "/images/add/",
 			"Edit queue" => "/images/edit/"
@@ -19,7 +19,7 @@
 ?>
 
 <?php
-	if($_SESSION["is_boss"] && !empty($_GET["action"])) {
+	if($_SESSION["is_moderator"] && !empty($_GET["action"])) {
 		if($_GET["action"] === "add") {
 			breadcrumbs([
 				"Upload queue" => "/images/add/"

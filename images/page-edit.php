@@ -37,6 +37,7 @@
 		$artist_keys[$artist_list[$i][0]] = $i + 1;
 	}
 	array_unshift($artist_list, [0, "", "(omnibus / various artists)"]);
+	array_unshift($artist_list, ['', '', '']);
 	
 	$page_header = 'Edit queued images';
 ?>
@@ -45,7 +46,7 @@
 	<div>
 		
 		<div class="text text--outlined text--notice">
-			Showing <span class="any__note"><?php echo count($images); ?></span> of <span class="any__note"><?php echo number_format($rslt_count); ?></span> queued images.
+			Showing <span class="any__note"><?php echo count($images); ?></span> of <span class="any__note image__count" data-num="<?= $rslt_count; ?>"></span> queued images.
 		</div>
 		
 		<div class="any--hidden">
@@ -62,7 +63,7 @@
 								<li class="image__template <?php $n++; echo $input[$n]; ?>">
 									<div class="any--flex">
 										<a class="image__image lazy" data-get="image_style" data-get-into="style" href="<?php $n++; echo $input[$n]; ?>" target="_blank" style="display: inline-block; height: 100px; width: 100px; background-size: cover; margin-right: 1rem;" data-src="<?php $n++; echo $input[$n]; ?>">
-											<span class="image__status"></span>
+											<span class="image__status" data-role="status"></span>
 										</a>
 										<div class="any--flex-grow image__data">
 											<input name="image_queued" value="1" hidden />
@@ -82,7 +83,7 @@
 											<div class="input__row">
 												<div class="input__group any--flex-grow">
 													<label class="input__label">Artists</label>
-													<select class="input" data-populate-on-click="true" data-multiple="true" data-source="artists" name="image_artist_id" multiple>
+													<select class="input" data-populate-on-click="true" data-source="artists" name="image_artist_id" data-select-on-tab="false">
 														<?php $n++; echo $input[$n]; ?>
 													</select>
 												</div>
@@ -94,7 +95,7 @@
 							<?php
 						}
 						
-						image_template([
+						/*image_template([
 							"any--hidden",
 							"",
 							"",
@@ -103,7 +104,7 @@
 							"",
 							"",
 							"",
-						]);
+						]);*/
 						
 						if(is_array($images) && !empty($images)) {
 							foreach($images as $image) {
@@ -125,6 +126,41 @@
 						}
 					?>
 				</ul>
+				
+				<style>
+					.image__count::before {
+						content: attr(data-num);
+					}
+					.image__template {
+						transition: opacity 0.2s ease-in-out;
+					}
+					.image__template:hover {
+						opacity: 1;
+					}
+					.image__delete {
+						margin-right: 0;
+					}
+					.image__delete::before {
+						margin-right: 0;
+					}
+					@media(min-width: 600px) {
+						.image__results {
+							display: flex;
+							flex-wrap: wrap;
+						}
+						.image__template {
+							display: inline-block;
+							width: calc(50% - 2rem);
+						}
+						.image__template:nth-of-type(odd) {
+							margin-right: 2rem;
+						}
+						.image__template:nth-of-type(2) {
+							border-top: none;
+							padding-top: 0;
+						}
+					}
+				</style>
 			</div>
 		</div>
 	</div>
