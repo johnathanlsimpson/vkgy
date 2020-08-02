@@ -718,35 +718,12 @@ function getSnsPost() {
 		
 		callbackOnSuccess: function(event, returnedData) {
 			
-			console.log(returnedData);
-			
-			/*if(returnedData && returnedData.sns_post && returnedData.sns_post.length > 0) {
-				
-				tweetPreviewHeading.innerHTML  = returnedData.sns_post.heading;
-				tweetPreviewBody.innerHTML     = returnedData.sns_post.body;
-				tweetPreviewMentions.innerHTML = returnedData.sns_post.twitter_mentions;
-				
-			}*/
-			
-			/*if((returnedData && returnedData.sns_post && returnedData.sns_post.content_heading) || overrideBody || overrideTwitterMentions || overrideTwitterAuthors) {
-				tweetPreviewHeading.innerHTML = returnedData.sns_post.content_heading ? returnedData.sns_post.content_heading : '📰 News ∙ ニュース';
-			}
-			
-			// Output SNS previews
-			tweetPreviewBody.innerHTML = overrideBody ? overrideBody : (returnedData && returnedData.sns_post && returnedData.sns_post.content_body ? returnedData.sns_post.content_body : '');
-			tweetPreviewMentions.innerHTML = overrideTwitterMentions ? overrideTwitterMentions : (returnedData && returnedData.sns_post && returnedData.sns_post.content_mentions ? returnedData.sns_post.content_mentions : '');
-			tweetPreviewAuthors.innerHTML = overrideTwitterAuthors ? overrideTwitterAuthors : (returnedData && returnedData.sns_post && returnedData.sns_post.content_authors ? returnedData.sns_post.content_authors : '');
-			*/
-			
 			// Update character count
 			updateSnsLength();
 			
 		},
 		
 		callbackOnError: function(event, returnedData) {
-			
-			console.log('error');
-			console.log(returnedData);
 			
 		}
 		
