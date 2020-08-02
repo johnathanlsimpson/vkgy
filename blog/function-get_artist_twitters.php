@@ -3,8 +3,6 @@
 // Setup
 include_once('../php/include.php');
 
-$access_artist = $access_artist ?: new access_artist($pdo);
-
 // Given artist ID, grab its twitter handle + handles of any musicians in the band
 function get_artist_twitters($artist_id, $pdo, $access_artist) {
 	

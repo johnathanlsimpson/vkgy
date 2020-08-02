@@ -122,6 +122,7 @@
 		// Check if auto post needs edit or add
 		// ======================================================
 		private function update_post($content_type, $content, $is_future) {
+			
 			// If content exists and isn't empty, and artist ID is provided
 			if(is_array($content) && !empty($content) && is_numeric($content["artist_id"])) {
 				
@@ -144,14 +145,31 @@
 				// Return url if post made
 				if(is_array($post) && !empty($post)) {
 					
+					// Set post type
+					$post_type = 'blog_post';
+					
+					// Set other vars
+					$title = $post['title'];
+					$id = $post['id'];
+					$artist_id = $content['artist_id'];
+					$user_id = $_SESSION['user_id'];
+					$url = $post['url'];
+					
 					// Create social media post and queue
 					$post['artist'] = $this->access_artist->access_artist([ 'get' => 'name', 'id' => $content['artist_id'] ]);
-					$social_post = $this->access_social_media->build_post($post, 'blog_post');
+					$social_post = $this->access_social_media->build_post([
+						'title'     => $title,
+						'id'        => $id,
+						'artist_id' => $artist_id,
+						'user_id'   => $user_id,
+						'url'       => $url,
+					], $post_type);
 					$social_result = $this->access_social_media->queue_post($social_post, 'both', date('Y-m-d H:i:s', strtotime('+ 30 minutes')));
 					
 					return ($post["url"] ?: false);
 				}
 			}
+			
 		}
 		
 		

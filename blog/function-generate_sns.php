@@ -3,12 +3,77 @@
 // Setup
 include_once('../php/include.php');
 include_once('../php/class-access_social_media.php');
-include_once('../blog/function-get_artist_twitters.php');
+$access_social_media = $access_social_media ?: new access_social_media($pdo);
+
+// Set post type
+$post_type = 'blog_post';
+if(is_array($_POST['tags']) && !empty($_POST['tags'])) {
+	foreach($_POST['tags'] as $tag) {
+		if($tag === 'interview') {
+			$post_type = 'interview';
+		}
+	}
+}
+
+// Set other vars
+$title = sanitize($_POST['title']);
+$id = sanitize($_POST['id']);
+$artist_id = sanitize($_POST['artist_id']);
+$user_id = sanitize($_POST['user_id']);
+$contributor_ids = explode(',', sanitize($_POST['contributor_ids']));
+$url = sanitize($_POST['url']);
+
+// Set overrides
+$override_body = sanitize($_POST['override_body']);
+$override_twitter_mentions = sanitize($_POST['override_twitter_mentions']);
+$override_twitter_authors = sanitize($_POST['override_twitter_authors']);
+//$override_authors = sanitize($_POST['override_authors']);
+
+// Send to SNS builder and get output
+$sns_post = $access_social_media->build_post([
+	'title'                     => $title,
+	'id'                        => $id,
+	'artist_id'                 => $artist_id,
+	'user_id'                   => $user_id,
+	'contributor_ids'           => $contributor_ids,
+	'url'                       => $url,
+	'override_body'             => $override_body,
+	'override_twitter_mentions' => $override_twitter_mentions,
+	'override_twitter_authors'  => $override_twitter_authors,
+	//'override_authors'          => $override_authors,
+], $post_type);
+
+// Return output from social post
+$output = is_array($output) ? array_merge($output, $sns_post) : $sns_post;
+
+/*$sns_type             => set by tags
+$sns_body             => set by post title
+$sns_translations     => set by id
+$sns_twitter_mentions => set by featured artist id -> find connected twitters             ┓
+$sns_twitter_authors  => set by author id and contributor id -> find connected twitters   ┣ these require query
+$sns_authors          => set by author id and contributor id -> find connected usernames  ┛
+//$sns_image_id         => set by image id--actually no 'cause that's just an <og:> tag 
+$sns_url              => set by url
+$sns_overrides[
+	sns_body             => overridden by sns_body         ┓
+	sns_twitter_mentions => overridden by twitter mentions ┃
+	sns_twitter_authors  => overridden by twitter authors  ┣ these just are what they are
+	sns_authors          => overridden by authors          ┃
+	sns_image_id         => overridden by sns_image        ┛
+]
+
+$tags;
+$title;
+$id;
+$artist_id;
+$author_id;*/
+
+/*include_once('../blog/function-get_artist_twitters.php');
 $access_artist = $access_artist ?: new access_artist($pdo);
 $access_social_media = $access_social_media ?: new access_social_media($pdo);
-$markdown_parser = $markdown_parser ?: new parse_markdown($pdo);
+$markdown_parser = $markdown_parser ?: new parse_markdown($pdo);*/
 
-// If Twitter/FB author credits specified
+/*// If Twitter/FB author credits specified
 $twitter_author = sanitize($_POST['twitter_author']);
 $facebook_author = sanitize($_POST['facebook_author']);
 
@@ -51,7 +116,7 @@ $title = sanitize($_POST['title']);
 $friendly = friendly($_POST['friendly']);
 $url = 'https://vk.gy/blog/'.$friendly.'/';
 $id = sanitize($_POST['id']);
-$language = sanitize($_POST['language']);
+$language = sanitize($_POST['language']);*/
 
 // If English (assumed source version), check for translations
 /*if(is_numeric($id) && $language === 0) {
@@ -79,10 +144,10 @@ $language = sanitize($_POST['language']);
 }*/
 
 // Check if post type manually set
-$post_type = sanitize($_POST['post_type']) ?: 'blog_post';
+/*$post_type = sanitize($_POST['post_type']) ?: 'blog_post';*/
 
 // Send everything to SNS post builder and see what we get
-$output['sns_post'] = $access_social_media->build_post([
+/*$output['sns_post'] = $access_social_media->build_post([
 	'title'            => $title,
 	'url'              => $url,
 	'translations'     => $translations,
@@ -91,7 +156,7 @@ $output['sns_post'] = $access_social_media->build_post([
 	'facebook_author'  => $facebook_author
 ], $post_type ?: 'blog_post');
 $output[] = $post_type;
-$output[] = $_POST;
+$output[] = $_POST;*/
 
 $output['status'] = 'success';
 echo json_encode($output);

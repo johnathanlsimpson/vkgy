@@ -117,10 +117,11 @@ $token = friendly($_POST['token']);
 $artist_id = is_numeric($_POST['artist_id']) ? $_POST['artist_id'] : null;
 
 // SNS overrides
-$overrides['sns_body'] = sanitize($_POST['sns_body']);
-$overrides['twitter_mentions'] = sanitize($_POST['twitter_mentions']);
-$overrides['twitter_authors'] = sanitize($_POST['twitter_authors']);
-$overrides['sns_image'] = is_numeric($_POST['sns_image_id']) ? $_POST['sns_image_id'] : null;
+$overrides['body'] = sanitize($_POST['override_body']);
+$overrides['twitter_mentions'] = sanitize($_POST['override_twitter_mentions']);
+$overrides['twitter_authors'] = sanitize($_POST['override_twitter_authors']);
+//$overrides['authors'] = sanitize($_POST['override_authors']);
+$overrides['image_id'] = is_numeric($_POST['override_image_id']) ? $_POST['override_image_id'] : null;
 $sns_overrides = array_filter($overrides);
 $sns_overrides = is_array($sns_overrides) && !empty($sns_overrides) ? json_encode($sns_overrides) : null;
 
