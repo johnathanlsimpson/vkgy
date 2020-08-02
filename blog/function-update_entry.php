@@ -108,7 +108,7 @@ $sources = sanitize($_POST['sources']) ?: null;
 $friendly = friendly($_POST['friendly'] ?: $title);
 $references = $markdown_parser->get_reference_data($content);
 $is_queued = $_POST['is_queued'] ? 1 : 0;
-$author_id = is_numeric($_POST['user_id']) ? $_POST['user_id'] : $_SESSION['user_id'];
+$user_id = is_numeric($_POST['user_id']) ? $_POST['user_id'] : $_SESSION['user_id'];
 $was_published = $_POST['was_published'] ? 1 : 0;
 $sns_image_id = is_numeric($_POST['sns_image_id']) ? $_POST['sns_image_id'] : null;
 $twitter_content = sanitize($_POST['twitter_content']);
@@ -146,7 +146,7 @@ if($is_edit && $current_entry['was_published']) {
 	$sources = sanitize($markdown_parser->validate_markdown($sources));
 }*/
 
-// Loop through manually specified contributors and add an edit so they're connected to the entry
+// JSON encode contributors (except author)
 $contributor_ids = $_POST['contributor_ids'];
 if(is_array($contributor_ids) && !empty($contributor_ids)) {
 
@@ -154,48 +154,13 @@ if(is_array($contributor_ids) && !empty($contributor_ids)) {
 	$contributor_ids = array_unique($contributor_ids);
 	if(is_array($contributor_ids) && !empty($contributor_ids)) {
 		foreach($contributor_ids as $contributor_key => $contributor_id) {
-			if($contributor_id == $author_id) {
+			if($contributor_id == $user_id) {
 				unset($contributor_ids[$contributor_key]);
 			}
 		}
 	}
 	$contributor_ids = array_values($contributor_ids);
-
-	/*// Get extant edits for this entry to avoid multiple queries
-	$sql_extant_edits = 'SELECT user_id FROM edits_blog WHERE blog_id=? GROUP BY user_id';
-	$stmt_extant_edits = $pdo->prepare($sql_extant_edits);
-	$stmt_extant_edits->execute([ $id ]);
-	$rslt_extant_edits = $stmt_extant_edits->fetchAll();
-
-	// Remove any contributors who are already in edit history or who are author
-	if(is_array($rslt_extant_edits) && !empty($rslt_extant_edits)) {
-		foreach($contributor_ids as $contributor_key => $contributor_id) {
-
-			// Unset if already author
-			if($contributor_id == $author_id) {
-				unset($contributor_ids[$contributor_key]);
-			}
-
-			// Unset if already in edits
-			foreach($rslt_extant_edits as $rslt_extant_edit) {
-				if($rslt_extant_edit['user_id'] == $contributor_id) {
-					unset($contributor_ids[$contributor_key]);
-					break;
-				}
-			}
-
-		}
-	}
-
-	// If still have contributors left over, they need to be added as an edit
-	if(is_array($contributor_ids) && !empty($contributor_ids)) {
-		foreach($contributor_ids as $contributor_key => $contributor_id) {
-			$sql_contributor_edit = 'INSERT INTO edits_blog (blog_id, user_id, content) VALUES (?, ?, ?)';
-			$stmt_contributor_edit = $pdo->prepare($sql_contributor_edit);
-			$stmt_contributor_edit->execute([ $id, $contributor_id, 'Contributed.' ]);
-		}
-	}*/
-
+	
 }
 $contributor_ids = is_array($contributor_ids) && !empty($contributor_ids) ? json_encode($contributor_ids) : null;
 
@@ -296,7 +261,7 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 			
 			// Build query
 			$keys_blog = [ 'title', 'friendly', 'content', 'content_ja', 'supplemental', 'sources', 'sns_image_id', 'sns_overrides', 'is_queued', 'date_scheduled', 'user_id', 'contributor_ids', 'token', 'artist_id' ];
-			$values_blog = [ $title, $friendly, $content, $content_ja, $supplemental, $sources, $sns_image_id, $sns_overrides, $is_queued, $date_scheduled, $author_id, $contributor_ids, $token, $artist_id ];
+			$values_blog = [ $title, $friendly, $content, $content_ja, $supplemental, $sources, $sns_image_id, $sns_overrides, $is_queued, $date_scheduled, $user_id, $contributor_ids, $token, $artist_id ];
 			
 			if($date_occurred) {
 				$keys_blog[] = 'date_occurred';
@@ -330,7 +295,7 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 				}*/
 				
 				//$keys_blog[] = 'user_id';
-				//$values_blog[] = $author_id;
+				//$values_blog[] = $user_id;
 				$sql_blog = 'INSERT INTO blog ('.implode(', ', $keys_blog).') VALUES ('.substr(str_repeat('?, ', count($values_blog)), 0, -2).')';
 			}
 			
@@ -402,81 +367,33 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 					
 					if(!$is_queued && strlen($title) && strlen($friendly)) {
 						
-						
-						
-						
-						
-						
-						
-						/* Get tweet parts--eventually need to redo this so it's all in one location */
-						
-						if(!$overrides['twitter_authors']) {
-							
-							// Combine author ID and contributor IDs, remove duplicates, remove site owner
-							$author_id = sanitize($_POST['user_id']);
-							$contributor_ids = is_array($_POST['contributor_ids']) ? $_POST['contributor_ids'] : explode(',', sanitize($_POST['contributor_ids']));
-							$contributor_ids = is_array($contributor_ids) ? $contributor_ids : [];
-							$contributor_ids[] = $author_id;
-							$contributor_ids = array_unique($contributor_ids);
-							$contributor_ids = array_filter($contributor_ids, function($x) { return $x != 0 && $x != 1; });
-							$contributor_ids = array_values($contributor_ids);
-							
-							// Get Twitter usernames of remaining contributors (if overrides not set)
-							if( !$facebook_author && !$twitter_author && is_array($contributor_ids) && !empty($contributor_ids) ) {
-								
-								// Get user info
-								$sql_author = 'SELECT username, twitter FROM users WHERE '.substr(str_repeat('id=? OR ', count($contributor_ids)), 0, -4).'';
-								$stmt_author = $pdo->prepare($sql_author);
-								$stmt_author->execute( $contributor_ids );
-								$rslt_author = $stmt_author->fetchAll();
-								
-								// Use username as FB credit, Twitter handle as Twitter credit if possible
-								if(is_array($rslt_author) && !empty($rslt_author)) {
-									foreach($rslt_author as $author) {
-										$facebook_author = $author['username'];
-										$twitter_author .= $author['twitter'] ? '@'.$author['twitter'].' ' : $author['username'].' ';
-									}
-								}
-								
+						// Set post type
+						$post_type = 'blog_post';
+						if(is_array($_POST['tags']) && !empty($_POST['tags'])) {
+							$sql_tag = 'SELECT id FROM tags WHERE friendly=? LIMIT 1';
+							$stmt_tag = $pdo->prepare($sql_tag);
+							$stmt_tag->execute([ 'interview' ]);
+							$rslt_tag = $stmt_tag->fetchColumn();
+							if(in_array($rslt_tag, $_POST['tags'])) {
+								$post_type = 'interview';
 							}
 						}
 						
-						if($overrides['twitter_mentions']) {
-							
-							include_once('../blog/function-get_artist_twitters.php');
-							
-							// If artist specified, get Twitter handles for band and its members
-							$artist_id = sanitize($_POST['artist_id']);
-							if(is_numeric($artist_id)) {
-								$artist_twitters = get_artist_twitters($artist_id, $pdo, $access_artist);
-							}
-							
-						}
-						
-						// Check if post type manually set
-						$post_type = sanitize($_POST['post_type']) ?: 'blog_post';
-						
-						
-						
-						
-						
-						
-						
-						
-						
-						
-						// Build and save post
+						// Send to SNS builder and get output
 						$social_post = $access_social_media->build_post([
-							'title' => $title,
-							'url' => 'https://vk.gy'.$output['url'],
-							'id' => $id,
-							'sns_body' => $overrides['sns_body'] ?: null,
-							'twitter_mentions' => $overrides['twitter_mentions'] ?: ($artist_twitters ?: null),
-							'twitter_author' => $overrides['twitter_authors'] ?: ($twitter_author ?: null)
+							'title'                     => $title,
+							'id'                        => $id,
+							'artist_id'                 => $artist_id,
+							'user_id'                   => $user_id,
+							'contributor_ids'           => explode(',', sanitize($_POST['contributor_ids'])),
+							'url'                       => 'https://vk.gy/blog/'.$friendly.'/',
+							'override_body'             => $overrides['body'],
+							'override_twitter_mentions' => $overrides['twitter_mentions'],
+							'override_twitter_authors'  => $overrides['twitter_authors'],
+							//'override_authors'          => $overrides['authors'],
 						], $post_type);
 						
 						$access_social_media->queue_post($social_post, 'both', date('Y-m-d H:i:s', strtotime('+15 minutes')));
-						
 						
 					}
 				}
@@ -486,7 +403,7 @@ if(strlen($title) && strlen($friendly) && strlen($content)) {
 				if($is_edit) {
 					
 					// 1 point for editing someone else's entry
-					if($_SESSION['user_id'] !== $author_id) {
+					if($_SESSION['user_id'] !== $user_id) {
 						$output['points'] += $access_points->award_points([ 'point_type' => 'edited-blog', 'allow_multiple' => false, 'item_id' => $id ]);
 					}
 					
