@@ -70,15 +70,12 @@
 											<input data-get="image_id" data-get-into="value" name="image_id" value="<?php $n++; echo $input[$n]; ?>" hidden />
 											<input name="image_is_exclusive" type="checkbox" value="1" checked hidden />
 											
-											<div class="input__row">
+											<!--<div class="input__row">
 												<div class="input__group any--flex-grow">
 													<label class="input__label">Description</label>
 													<input class="any--flex-grow" name="image_description" value="<?php $n++; echo $input[$n]; ?>" />
 												</div>
-												<div class="input__group">
-													<label class="input__radio symbol__trash symbol--standalone image__delete" data-get="image_id" data-get-into="data-id" data-id="<?php $n++; echo $input[$n]; ?>"></label>
-												</div>
-											</div>
+											</div>-->
 											
 											<div class="input__row">
 												<div class="input__group any--flex-grow">
@@ -86,6 +83,9 @@
 													<select class="input" data-populate-on-click="true" data-source="artists" name="image_artist_id" data-select-on-tab="false">
 														<?php $n++; echo $input[$n]; ?>
 													</select>
+												</div>
+												<div class="input__group">
+													<label class="input__radio symbol__trash symbol--standalone image__delete" data-get="image_id" data-get-into="data-id" data-id="<?php $n++; echo $input[$n]; ?>"></label>
 												</div>
 											</div>
 										</div>
