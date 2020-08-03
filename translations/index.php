@@ -1,5 +1,7 @@
 <?php
 
+include_once('../php/function-render_component.php');
+
 $access_user = new access_user($pdo);
 
 script([
@@ -13,58 +15,50 @@ style([
 	'/style/style-selectize.css',
 ]);
 
-$sql_translations = '
-	SELECT
-		translations.*,
-		ja.translation AS ja_translation,
-		fr.translation AS fr_translation
-	FROM translations
-	LEFT JOIN translations_proposals AS ja ON ja.id=translations.ja
-	LEFT JOIN translations_proposals AS fr ON fr.id=translations.fr
-';
+// Get translation strings
+$sql_translations = 'SELECT translations.* FROM translations';
 $stmt_translations = $pdo->prepare($sql_translations);
 $stmt_translations->execute();
-$rslt_translations = $stmt_translations->fetchAll();
+$strings = $stmt_translations->fetchAll();
 
-// Make translations associative
-if(is_array($rslt_translations) && !empty($rslt_translations)) {
-	foreach($rslt_translations as $translation) {
-		$translations[$translation['id']] = $translation;
-		unset($rslt_translations);
-	}
-}
-
-$sql_proposals = 'SELECT * FROM translations_proposals';
+// Get proposed translations
+$sql_proposals = '
+SELECT translations_proposals.*, SUM(translations_votes.vote) AS num_votes 
+FROM translations_proposals 
+LEFT JOIN translations_votes ON translations_votes.proposal_id=translations_proposals.id
+GROUP BY translations_proposals.id
+ORDER BY en_id ASC, language ASC, date_occurred DESC';
 $stmt_proposals = $pdo->prepare($sql_proposals);
 $stmt_proposals->execute();
-$proposals = $stmt_proposals->fetchAll();
+$rslt_proposals = $stmt_proposals->fetchAll();
 
-// Get translation users
-if(is_array($proposals) && !empty($proposals)) {
-	foreach($proposals as $proposal_key => $proposal) {
-		$proposals[$proposal_key]['user'] = $access_user->access_user([ 'id' => $proposal['user_id'], 'get' => 'name' ]);
+// Get proposals' users
+if(is_array($rslt_proposals) && !empty($rslt_proposals)) {
+	foreach($rslt_proposals as $proposal_key => $proposal) {
+		$proposal['user'] = $access_user->access_user([ 'id' => $proposal['user_id'], 'get' => 'name' ]);
+		$proposals[$proposal['en_id']][] = $proposal;
 	}
 }
 
-// Get current user's votes
-$sql_votes = 'SELECT * FROM translations_votes WHERE user_id=?';
-$stmt_votes = $pdo->prepare($sql_votes);
-$stmt_votes->execute([ $_SESSION['user_id'] ]);
-$rslt_votes = $stmt_votes->fetchAll();
-
-// Transform votes into upvote/downvote arrays
-if(is_array($rslt_votes) && !empty($rslt_votes)) {
-	foreach($rslt_votes as $vote) {
-		if($vote['vote'] > 0) {
-			$user_upvotes[] = $vote['proposal_id'];
-		}
-		else {
-			$user_downvotes[] = $vote['proposal_id'];
+// Get votes of user who's viewing page
+if($_SESSION['is_signed_in']) {
+	$sql_votes = 'SELECT * FROM translations_votes WHERE user_id=?';
+	$stmt_votes = $pdo->prepare($sql_votes);
+	$stmt_votes->execute([ $_SESSION['user_id'] ]);
+	$rslt_votes = $stmt_votes->fetchAll();
+	
+	// Transform votes into upvote/downvote arrays
+	if(is_array($rslt_votes) && !empty($rslt_votes)) {
+		foreach($rslt_votes as $vote) {
+			if($vote['vote'] > 0) {
+				$user_upvotes[] = $vote['proposal_id'];
+			}
+			else {
+				$user_downvotes[] = $vote['proposal_id'];
+			}
 		}
 	}
 }
-
-print_r($proposals);
 
 $allowed_languages = [
 	'en' => 'English',
@@ -80,7 +74,7 @@ $allowed_languages = [
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 
 <style>
-	.accepted__header, .proposed__header {
+	.accepted__header {
 		background: hsl(var(--background));
 		position: sticky;
 		margin: -1rem !important;
@@ -89,7 +83,7 @@ $allowed_languages = [
 		top: 3rem;
 		z-index: 1;
 	}
-	.accepted__row, .proposed__row {
+	.accepted__row {
 		display: flex;
 		flex-wrap: wrap;
 	}
@@ -105,47 +99,33 @@ $allowed_languages = [
 		text-align: right;
 		width: 4rem;
 	}
-	.accepted__details {
+	
+	.details__container {
 		background: hsl(var(--background--secondary));
 		background-image: linear-gradient(to bottom, hsla(var(--background),100), hsla(var(--background),0) 1rem);
 		margin: 1rem -1rem -1rem -1rem;
-		padding-left: 0.5rem;
 		padding-top: 2rem;
 		width: calc(100% + 2rem);
 	}
-	.accepted__container {
-		margin: 0;
+	.details__proposal {
+		align-items: flex-start;
 	}
-	.accepted__container + .accepted__container {
-		margin-top: 1rem;
+	.details__user, .details__date {
+		line-height: 1.5rem;
+		margin-right: 0.5rem;
 	}
 	
-	.proposed__en {
-		display: inline-block;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		width: 100px;
+	li.data__container {
+		clip-path: polygon(0.5rem 0, 100% 0, 100% 100%, 0.5rem 100%);
+		margin-bottom: 0.5rem;
+		margin-top: 0;
+		padding-bottom: 0.5rem;
+		padding-top: 0.5rem;
 	}
-	.proposed__translation {
-		margin-right: auto;
-	}
-	.proposed__user {
-		display: inline-block;
-		margin-right: 0.5rem;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		width: 6rem;
-	}
-	.proposed__date {
-		display: inline-block;
-		margin-right: 0.5rem;
-		width: 5rem;
-	}
-	.proposed__vote {
-		display: inline-block;
-		width: 4rem;
+	li.input__row {
+		clip-path: polygon(0.5rem 0, 100% 0, 100% 600%, 0.5rem 600%);
+		padding-top: 0.5rem;
+		z-index: 1;
 	}
 </style>
 
@@ -153,7 +133,7 @@ $allowed_languages = [
 	<div>
 		
 		<h2>
-			Accepted translations
+			<?= lang('Translations', '翻訳', 'div'); ?>
 		</h2>
 		<ul class="text">
 			
@@ -172,30 +152,130 @@ $allowed_languages = [
 			
 			<!-- Translations -->
 			<?php
-				if(is_array($translations) && !empty($translations)) {
-					foreach($translations as $translation_row) {
+				if(is_array($strings) && !empty($strings)) {
+					foreach($strings as $string) {
 						?>
-							<li class="accepted__row" x-data="{open:false}">
+							<li class="" x-data="{open:true}">
+								<form action="/translations/function-update_translation.php" class="accepted__row" enctype="multipart/form-data" method="post" name="add_translation[]">
 								
 								<!-- Text -->
-								<span class="accepted__en"><?= $translation_row['en']; ?></span>
+								<span class="accepted__en"><?= $string['content']; ?></span>
 								<?php
 									foreach($allowed_languages as $language_key => $language) {
 										if($language_key != 'en') {
-											echo '<span class="accepted__lang '.($translation_row[$language_key] ? 'symbol__checkbox--checked' : 'symbol__checkbox--unchecked').'"></span>';
+											echo '<span class="accepted__lang '.(is_numeric($string[$language_key.'_id']) ? 'symbol__checkbox--checked' : 'symbol__checkbox--unchecked').'"></span>';
 										}
 									}
 								?>
 								<span class="accepted__more"><a class="symbol__down-caret" x-on:click="open=!open">more</a></span>
 								
-								<div class="accepted__details text" x-show="open">
+								<ul class="details__container text" x-show="open">
+									
+									<!-- View current translations -->
+									<?php
+										if(!$translation_template) {
+											?>
+												<template id="template-translation">
+													<?php
+														ob_start();
+														?>
+															<li class="any--flex details__proposal">
+																<div class="any--flex-grow any--weaken-color">
+																	<h5>
+																		{language}
+																	</h5>
+																	<span class="details__content" data-id="{id}">{content}</span>
+																	<span class="details__accepted any__note {is_accepted}" data-id="{id}">accepted</span>
+																</div>
+																<span class="details__user any--weaken"><a class="user a--inherit" data-icon="{user_icon}" data-is-vip="{user_is_vip}">{user_username}</a></span>
+																<span class="details__date any--weaken">{date_occurred}</span>
+																
+																<span class="tag__voting any--weaken-color">
+																	<label class="tag__vote tag__upvote" data-vote="upvote" data-id="{id}">
+																		<input class="tag__choice input__choice" type="checkbox" {upvote_is_checked} />
+																		<span class="tag__status symbol__up-caret symbol--standalone"></span>
+																	</label>
+																	
+																	<span class="tag__num any--weaken-size" data-id="{id}" data-num-tags="{num_votes}"></span>
+																	
+																	<label class="tag__vote tag__status tag__downvote" data-vote="downvote" data-id="{id}">
+																		<input class="tag__choice input__choice" type="checkbox" {downvote_is_checked} />
+																		<span class="symbol__down-caret symbol--standalone"></span>
+																	</label>
+																</span>
+																
+															</li>
+														<?php
+														
+														$translation_template = ob_get_clean();
+														echo preg_replace('/'.'\s+'.'/', ' ', $translation_template);
+													?>
+												</template>
+											<?php
+										}
+										
+										if( is_array($proposals[$string['id']]) && !empty($proposals[$string['id']]) ) {
+											foreach($proposals[$string['id']] as $proposal) {
+												
+												echo render_component($translation_template, [
+													'language'            => $allowed_languages[ $proposal['language'] ],
+													'en_id'               => $string['id'],
+													'content'             => $proposal['content'],
+													'is_accepted'         => $proposal['id'] == $string[ $proposal['language'].'_id' ] ? null : 'any--hidden',
+													'user_icon'           => $proposal['user']['icon'],
+													'user_is_vip'         => $proposal['user']['is_vip'],
+													'user_username'       => $proposal['user']['username'],
+													'date_occurred'       => substr($proposal['date_occurred'], 0, 10),
+													'id'                  => $proposal['id'],
+													'upvote_is_checked'   => (is_array($user_upvotes) && in_array($proposal['id'], $user_upvotes) ? 'checked' : null),
+													'num_votes'           => $proposal['num_votes'] ?: 0,
+													'downvote_is_checked' => (is_array($user_downvotes) && in_array($proposal['id'], $user_downvotes) ? 'checked' : null),
+												]);
+												
+											}
+										}
+									?>
+									
+									<!-- Context -->
+									<li class="data__container any--weaken-color">
+										<?php
+											if($string['page']) {
+												?>
+													<div class="data__item">
+														<h5>
+															Page
+														</h5>
+														<?= $string['page']; ?>
+													</div>
+												<?php
+											}
+										?>
+										<?php
+											if($string['context']) {
+												?>
+													<div class="data__item">
+														<h5>
+															Context
+														</h5>
+														<?= $string['context']; ?>
+													</div>
+												<?php
+											}
+										?>
+										<div class="data__item">
+											<h5>
+												ID
+											</h5>
+											<?= $string['id']; ?>
+										</div>
+									</li>
 									
 									<!-- Add translation -->
-									<div class="accepted__container input__row">
+									<li class="input__row details__add">
 										
 										<div class="input__group">
 											<label class="input__label">Language</label>
-											<select class="input" name="translation_language" placeholder="language">
+											<select class="input" name="language[]" placeholder="language">
 												<option></option>
 												<?php
 													foreach($allowed_languages as $language_key => $language) {
@@ -205,63 +285,24 @@ $allowed_languages = [
 													}
 												?>
 											</select>
+											<input name="en_id[]" value="<?= $string['id']; ?>" hidden />
 										</div>
 										
 										<div class="input__group any--flex-grow">
 											<label class="input__label">Your translation</label>
-											<input class="any--flex-grow" name="translation" placeholder="translation..." />
+											<input class="any--flex-grow" name="content[]" placeholder="translation..." />
 										</div>
 										
 										<div class="input__group">
-											<button name="add_translation" type="button">
-												Add
-											</button>
+											<button class="symbol__plus" name="add[]" type="submit">Add</button>
+											<span data-role="status"></span>
 										</div>
 										
-									</div>
+									</li>
 									
-									<!-- Details -->
-									<div class="accepted__container data__container any--weaken-color">
-										
-										<?php
-											foreach($allowed_languages as $language_key => $language) {
-												if($language_key != 'en') {
-													if(is_numeric($translation_row[$language_key])) {
-														?>
-															<div class="data__item">
-																<h5 style="line-height:1rem;"><?= $language; ?></h5>
-																<?= $translation_row[ $language_key.'_translation' ]; ?>
-															</div>
-														<?php
-													}
-												}
-											}
-										?>
-										
-										<div class="data__item">
-											<h5>ID</h5>
-											<?= $translation_row['id']; ?>
-										</div>
-										
-										<?php
-											if($translation_row['context']) {
-												?>
-													<div class="data__item">
-														<h5>Context</h5>
-														<?= $translation_row['context']; ?>
-													</div>
-												<?php
-											}
-										?>
-										
-										<div class="data__item">
-											<h5>vote</h5>
-											<a href="">review and vote</a>
-										</div>
-										
-									</div>
-									
-								</div>
+								</ul>
+								
+								</form>
 							</li>
 						<?php
 					}
@@ -270,88 +311,14 @@ $allowed_languages = [
 			
 		</ul>
 		
-		<h2>
-			Translation proposals
-		</h2>
-		
-		<ul class="text">
-			
-			<!-- Header -->
-			<li class="proposed__row proposed__header">
-				<label class="h5 proposed__en">Original</label>
-				<label class="h5 proposed__translation">Translation</label>
-				<label class="h5 proposed__user">User</label>
-				<label class="h5 proposed__date">Date</label>
-				<label class="h5 proposed__vote">Vote</label>
-			</li>
-			
-			<?php
-				foreach($proposals as $proposal) {
-					?>
-						<li class="proposed__row">
-							<span class="proposed__en any--weaken"><?= $translations[$proposal['translation_id']]['en']; ?></span>
-							<span class="proposed__translation"><span class="any__note"><?= strtoupper($proposal['language']); ?></span> <?= $proposal['translation']; ?></span>
-							<span class="proposed__user any--weaken"><a class="a--inherit user" data-icon="<?= $proposal['user']['icon']; ?>" data-is-vip="<?= $proposal['user']['is_vip']; ?>" href="<?= $proposal['user']['url']; ?>"><?= $proposal['user']['username']; ?></a></span>
-							<span class="proposed__date any--weaken"><?= substr($proposal['date_added'], 0, 10); ?></span>
-							<span class="proposed__vote"><?php
-								echo '
-									<span class="tag__voting any--weaken-color">
-										
-										<label class="tag__vote tag__upvote" data-vote="upvote" data-id="'.$proposal['id'].'">
-											<input class="input__choice" type="checkbox" '.(is_array($user_upvotes) && in_array($proposal['id'], $user_upvotes) ? 'checked' : null).' />
-											<span class="tag__status symbol__up-caret symbol--standalone"></span>
-										</label>
-										
-										<span class="tag__num any--weaken-size" data-tag-id="'.$proposal['id'].'" data-num-tags="'.$proposal['num_upvotes'].'"></span>
-										
-										<label class="tag__vote tag__status tag__downvote" data-vote="downvote" data-id="'.$proposal['id'].'">
-											<input class="input__choice" type="checkbox" '.(is_array($user_downvotes) && in_array($proposal['id'], $user_downvotes) ? 'checked' : null).' />
-											<span class="symbol__down-caret symbol--standalone"></span>
-										</label>
-										
-									</span>
-								';
-							?></span>
-						</li>
-					<?php
-				}
-			?>
-			
-		</ul>
-		
-		
-		<table class="text">
-			
-			<thead>
-				<?php
-					foreach($proposals[0] as $key => $proposal) {
-						?>
-							<td class="h5"><?= $key; ?></td>
-						<?php
-					}
-				?>
-			</thead>
-			
-		</table>
-		
 	</div>
 </div>
 
 
 <style>
-	.tag--subgenre {
-		align-items: stretch;
-		margin-bottom: 1rem;
-	}
-	.tag--subgenre .text {
-		display: flex;
-		flex: 1;
-		margin-bottom: 0;
-	}
-	
 	.tag__voting {
 		background: hsl(var(--background--secondary));
-		border: 1px solid hsl(var(--background--secondary));
+		border: 1px solid hsl(var(--background));
 		border-radius: 3px;
 		display: inline-flex;
 		line-height: 1.5rem;
