@@ -42,7 +42,7 @@
 	
 	foreach($search as $key => $value) {
 		if($key !== 'page' && $key !== 'order') {
-			if(strlen($value) || (is_array($value) && !empty($value))) {
+			if((is_array($value) && !empty($value)) || (!is_array($value) && strlen($value))) {
 				if(is_array($value)) {
 					foreach($value as $val) {
 						$base_url .= '&'.$key.'[]='.$val;
