@@ -21,7 +21,9 @@ function try_pdo_connection($attempts = 0) {
 			return true;
 		}
 		catch(PDOException $e) {
-			file_put_contents ("../errors/mysql".str_replace ("/", "|", $_SERVER ["REQUEST_URI"].$_SERVER["PATH_INFO"].$_SERVER["QUERY_STRING"])."-".$_SERVER["REQUEST_METHOD"]."-".$_SERVER["REMOTE_ADDR"], $e->getMessage());
+			
+			$error_message = date('Y-m-d H:i:s').'attempt #'.$attempts."\n".print_r($_SESSION, true)."\n".print_r($_COOKIE, true)."\n".$e->getMessage()."\n\n---\n\n";
+			file_put_contents ("../errors/mysql".str_replace ("/", "|", $_SERVER ["REQUEST_URI"].$_SERVER["PATH_INFO"].$_SERVER["QUERY_STRING"])."-".$_SERVER["REQUEST_METHOD"]."-".$_SERVER["REMOTE_ADDR"], $error_message);
 			$attempts++;
 			
 			if($e->getMessage() === "SQLSTATE[HY000] [2002] Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (2 \"No such file or directory\")") {
