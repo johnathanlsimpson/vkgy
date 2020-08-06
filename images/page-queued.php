@@ -1,7 +1,7 @@
 <?php
 	include_once("../php/include.php");
 	
-	if($_SESSION["is_boss"]) {
+	if($_SESSION["is_moderator"]) {
 		$file = $_GET["file"];
 		$file = preg_match("/"."\d+\.jpg"."/", $file) ? $file : null;
 		$file = $file ? "../images/image_files_queued/".$file : null;
