@@ -772,8 +772,10 @@
 					
 					// Get height/width (if local image) so we can slap a 'portrait' class on there if necessary
 					if(preg_match('/'.'^(?:https?:)?(?:\/\/)?(?:vk\.gy)?\/images\/(\d+)(?:-[A-z0-9-]*)?(\.[A-z]+)$'.'/', $match[2], $local_image_match)) {
-						list($width, $height) = getimagesize('../images/image_files/'.$local_image_match[1].$local_image_match[2]);
-						$image_class = $width > $height ? 'module--landscape' : 'module--portrait';
+						if(file_exists('../images/image_files/'.$local_image_match[1].$local_image_match[2])) {
+							list($width, $height) = getimagesize('../images/image_files/'.$local_image_match[1].$local_image_match[2]);
+							$image_class = $width > $height ? 'module--landscape' : 'module--portrait';
+						}
 					}
 					
 					$image_src = $match[2];
