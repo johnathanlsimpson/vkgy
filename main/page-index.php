@@ -59,7 +59,7 @@
 			</div>
 		</div>
 		
-		<div class="main__ranking">
+		<?php /*<div class="main__ranking">
 			<h3>
 				<div class="h5">
 					<?= date('n/j', strtotime("-2 weeks sunday", time())).'~'.date('n/j', strtotime("-1 weeks sunday", time())); ?>
@@ -78,9 +78,9 @@
 					}
 				?>
 			</ol>
-		</div>
+		</div>*/ ?>
 		
-		<div class="main__ranking">
+		<?php /*<div class="main__ranking">
 			<h3>
 				<div class="h5">
 					<?= date('n/j', strtotime("-2 weeks sunday", time())).'~'.date('n/j', strtotime("-1 weeks sunday", time())); ?>
@@ -101,7 +101,7 @@
 					}
 				?>
 			</ol>
-		</div>
+		</div>*/ ?>
 	</div>
 
 	<div class="main__middle">
