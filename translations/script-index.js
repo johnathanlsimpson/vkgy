@@ -99,14 +99,9 @@ voteElems.forEach(function(voteElem) {
 			},
 			
 			callbackOnError: function(event, returnedData) {
-				console.log('hey');
-				console.log(returnedData);
 			},
 			
 			callbackOnSuccess : function(event, returnedData) {
-				console.log('hey');
-				
-				console.log(returnedData);
 				
 				// Update num votes
 				voteNumElem.dataset.numTags = returnedData.num_votes;
@@ -116,19 +111,28 @@ voteElems.forEach(function(voteElem) {
 					otherVoteElem.checked = false;
 				}
 				
-				// Hide accepted token if necessary
-				if(!returnedData.is_accepted) {
-				//	voteElem.closest('.details__proposal').querySelector('.details__accepted').classList.add('any--hidden');
-				}
+				// Get container of entire phrase block
+				let phraseContainer = voteElem.closest('.details__container');
 				
-				// Show accepted token
+				// Hide non-accepted proposals
+				let acceptedElems = phraseContainer.querySelectorAll('.details__accepted[data-language="' + returnedData.language + '"]');
+				if(acceptedElems) {
+					
+					acceptedElems.forEach(function(acceptedElem) {
+						
+						if(returnedData.accepted_id !== null && acceptedElem.dataset.id == returnedData.accepted_id) {
+							acceptedElem.classList.remove('any--hidden');
+						}
+						else {
+							acceptedElem.classList.add('any--hidden');
+						}
+						
+					});
+					
+				}
 				
 			}
 		});
-		
-		
-		console.log(voteElem);
-		console.log(voteType, isSelected);
 		
 		return false;
 		

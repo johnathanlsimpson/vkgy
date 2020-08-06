@@ -88,7 +88,8 @@ if($_SESSION['can_add_data']) {
 			$output['id'] = $id;
 			$output['username'] = $_SESSION['username'];
 			$output['content'] = $content;
-			$output['language'] = $allowed_languages[$language];
+			$output['language_name'] = $allowed_languages[$language];
+			$output['language'] = $language;
 			$output['upvote_is_checked'] = 'checked';
 			$output['downvote_is_checked'] = null;
 			

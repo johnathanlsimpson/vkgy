@@ -1,5 +1,62 @@
 <?php
 
+function init_tr() {
+	
+	$language = sanitize($_COOKIE['language']) ?: sanitize($_SESSION['language']);
+	$allowed_languages = [ 'ja' => '日本語', 'es' => 'español' ];
+	global $translations;
+	
+	if(strlen($language) && in_array($language, array_keys($allowed_languages))) {
+		
+		$folder = dirname(__FILE__);
+		$trans_file = $folder.'/lang.'.$language;
+		
+		if(strlen($folder) && file_exists($trans_file)) {
+			
+			$file_contents = file_get_contents($trans_file);
+			$file_contents = $file_contents ? gzuncompress($file_contents) : null;
+			$file_contents = $file_contents ? unserialize($file_contents) : null;
+			
+			if(is_array($file_contents) && !empty($file_contents)) {
+				$translations = is_array($translations) ? $translations : [];
+				$translations = array_merge($translations, $file_contents);
+			}
+			
+		}
+		
+	}
+	
+}
+
+function tr($string) {
+	
+	$language = sanitize($_COOKIE['language']) ?: sanitize($_SESSION['language']);
+	$allowed_languages = [ 'ja' => '日本語', 'es' => 'español' ];
+	global $translations;
+	
+	if(strlen($language) && in_array($language, array_keys($allowed_languages))) {
+		
+		if(is_array($translations) && !empty($translations)) {
+			
+			if(strlen($translations[$string])) {
+				return $translations[$string];
+			}
+			else {
+				return $string;
+			}
+			
+		}
+		
+	}
+	
+}
+
+$_SESSION['language'] = 'es';
+
+init_tr();
+
+echo '*'.tr('Profile');
+
 include_once('../php/function-render_component.php');
 
 $access_user = new access_user($pdo);
@@ -182,10 +239,10 @@ $allowed_languages = [
 															<li class="any--flex details__proposal">
 																<div class="any--flex-grow any--weaken-color">
 																	<h5>
-																		{language}
+																		{language_name}
 																	</h5>
 																	<span class="details__content" data-id="{id}">{content}</span>
-																	<span class="details__accepted any__note {is_accepted}" data-id="{id}">accepted</span>
+																	<span class="details__accepted any__note {is_accepted}" data-language="{language}" data-id="{id}">accepted</span>
 																</div>
 																<span class="details__user any--weaken"><a class="user a--inherit" data-icon="{user_icon}" data-is-vip="{user_is_vip}">{user_username}</a></span>
 																<span class="details__date any--weaken">{date_occurred}</span>
@@ -218,8 +275,8 @@ $allowed_languages = [
 											foreach($proposals[$string['id']] as $proposal) {
 												
 												echo render_component($translation_template, [
-													'language'            => $allowed_languages[ $proposal['language'] ],
-													'en_id'               => $string['id'],
+													'language_name'       => $allowed_languages[ $proposal['language'] ],
+													'language'            => $proposal['language'],
 													'content'             => $proposal['content'],
 													'is_accepted'         => $proposal['id'] == $string[ $proposal['language'].'_id' ] ? null : 'any--hidden',
 													'user_icon'           => $proposal['user']['icon'],
