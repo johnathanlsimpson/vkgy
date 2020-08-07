@@ -1049,7 +1049,7 @@
 				$sql_where[] = "artists.affiliation <= ?";
 				$sql_values[] = $args["affiliation"];
 			}
-			if(strlen($args['area'])) {
+			if(!is_array($args['area']) && strlen($args['area'])) {
 				if($args['area'] === 'overseas') {
 					$sql_where[] = 'artists_tags.tag_id=?';
 					$sql_values[] = 18;
