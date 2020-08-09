@@ -42,7 +42,7 @@ style([
 			<li class="accepted__row accepted__header">
 				<label class="h5 accepted__en">English phrase</label>
 				<?php
-					foreach($allowed_languages as $language_key => $language) {
+					foreach($translate->allowed_languages as $language_key => $language) {
 						if($language_key != 'en') {
 							echo '<label class="h5 accepted__lang">'.$language_key.'</label>';
 						}
@@ -65,7 +65,7 @@ style([
 								<!-- Text -->
 								<span class="accepted__en"><?= $string['content']; ?><?= $_SESSION['is_boss'] ? ' <a class="accepted__edit symbol__edit"></a>' : null; ?></span>
 								<?php
-									foreach($allowed_languages as $language_key => $language) {
+									foreach($translate->allowed_languages as $language_key => $language) {
 										if($language_key != 'en') {
 											echo '<span class="accepted__lang '.(is_numeric($string[$language_key.'_id']) ? 'symbol__checkbox--checked' : 'symbol__checkbox--unchecked').'"></span>';
 										}
@@ -127,7 +127,7 @@ style([
 												$string['languages'][] = $proposal['language'];
 												
 												echo render_component($translation_template, [
-													'language_name'       => $allowed_languages[ $proposal['language'] ],
+													'language_name'       => $translate->allowed_languages[ $proposal['language'] ],
 													'language'            => $proposal['language'],
 													'content'             => $proposal['content'],
 													'is_accepted'         => $proposal['id'] == $string[ $proposal['language'].'_id' ] ? null : 'any--hidden',
@@ -188,7 +188,7 @@ style([
 											<select class="input" name="language[]" placeholder="language">
 												<option></option>
 												<?php
-													foreach($allowed_languages as $language_key => $language) {
+													foreach($translate->allowed_languages as $language_key => $language) {
 														if($language_key != 'en') {
 															echo '<option value="'.$language_key.'">'.$language.'</option>';
 														}
@@ -234,7 +234,7 @@ style([
 					<select class="input any--flex-grow" name="filter_language" placeholder="language">
 						<option></option>
 						<?php
-							foreach($allowed_languages as $language_key => $language) {
+							foreach($translate->allowed_languages as $language_key => $language) {
 								if($language_key != 'en') {
 									echo '<option value="'.$language_key.'">'.$language.'</option>';
 								}
@@ -365,3 +365,8 @@ if (item.values().section == 'artists') {
 		
 	</div>
 </div>
+
+<?php
+	$documentation_page = [ 'translation' ];
+	include('../documentation/index.php');
+?>
