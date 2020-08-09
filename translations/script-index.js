@@ -138,3 +138,98 @@ voteElems.forEach(function(voteElem) {
 		
 	});
 });
+
+
+// Add string
+// ========================================================
+
+// Watch 'add string' button
+let addStringContainer = document.querySelector('.string__container');
+let contentElem = addStringContainer.querySelector('[name="content"]');
+let contextElem = addStringContainer.querySelector('[name="context"]');
+let folderElem = addStringContainer.querySelector('[name="folder"]');
+let idElem = addStringContainer.querySelector('[name="id"]');
+
+// When string submitted, fire submit
+initializeInlineSubmit($(addStringContainer), '/translations/function-add_string.php', {
+	
+	submitOnEvent: 'submit',
+	
+	callbackOnSuccess: function(event, returnedData) {
+		
+		// Clear content element
+		idElem.value = '';
+		contextElem.value = '';
+		contentElem.value = '';
+		contentElem.focus();
+		
+	},
+
+	callbackOnError: function(event, returnedData) {
+	}
+	
+});
+
+// Watch edit links
+let editStringElems = document.querySelectorAll('.accepted__edit');
+
+// When edit string clicked, populate area down below
+editStringElems.forEach(function(editStringElem) {
+	editStringElem.addEventListener('click', function(event) {
+		
+		event.preventDefault();
+		
+		// Get container and values
+		let editContainerElem = editStringElem.closest('.accepted__row');
+		let stringContent = editContainerElem.querySelector('.accepted__en').textContent;
+		let stringContextElem = editContainerElem.querySelector('.accepted__context');
+		let stringContext = stringContextElem ? stringContextElem.textContent : '';
+		let stringFolder = editContainerElem.querySelector('.accepted__folder').dataset.folder;
+		let stringId = editContainerElem.querySelector('.id').textContent;
+		
+		console.log(stringFolder);
+		console.log(folderElem);
+		console.log(folderElem.selectize);
+		
+		// Fill in inputs and focus
+		contextElem.value = stringContext;
+		contentElem.value = stringContent;
+		folderElem.selectize.setValue(stringFolder);
+		idElem.value = stringId;
+		contentElem.focus();
+		
+	});
+});
+
+// Filter/sort
+// ========================================================
+
+// Setup list.js for filtering/sorting
+let listOptions = {
+	valueNames: [ 'languages', 'section', 'no-filter' ]
+};
+
+let stringList = new List('translations-list', listOptions);
+
+// Filter by string section
+let filterSectionElem = document.querySelector('[name="filter_section"]');
+
+filterSectionElem.addEventListener('change', function(event) {
+	
+	let filterSection = filterSectionElem.value;
+	
+	stringList.filter(function(item) {
+		
+		if(!item.values().section || item.values().section === filterSection) {
+			return true;
+		}
+		else {
+			return false;
+		}
+		
+	});
+	
+});
+
+// On page load, filter to UI section
+filterSectionElem.selectize.setValue('php');
