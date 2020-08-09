@@ -6,11 +6,11 @@ $blog_id = sanitize($_POST['id']);
 $title = sanitize($_POST['title']);
 $friendly = friendly($_POST['friendly']);
 $language = friendly($_POST['language']);
-$allowed_languages = [ 'ja' ];
+//$allowed_languages = [ 'ja' ];
 
 // Check ID/language/title
 if(is_numeric($blog_id)) {
-	if( $language && in_array($language, $allowed_languages) ) {
+	if( $language && in_array($language, $translate->allowed_languages) ) {
 		if( strlen($title) && strlen($friendly) ) {
 			
 			// Update friendly to include language

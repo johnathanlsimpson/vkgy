@@ -9,17 +9,9 @@ $content = sanitize($_POST['content']);
 $language = friendly($_POST['language']);
 $id;
 
-$allowed_languages = [
-	'ja' => '日本語',
-	'es' => 'español',
-	'fr' => 'français',
-	'ru' => 'Русский',
-	'zh' => '中文',
-];
-
 if($_SESSION['can_add_data']) {
 	
-	if(is_numeric($en_id) && strlen($content) && in_array($language, array_keys($allowed_languages))) {
+	if(is_numeric($en_id) && strlen($content) && in_array($language, array_keys($translate->allowed_languages))) {
 		
 		$sql_accepted = 'SELECT *, '.$language.'_id AS accepted_id FROM translations WHERE id=? LIMIT 1';
 		$stmt_accepted = $pdo->prepare($sql_accepted);
@@ -85,7 +77,7 @@ if($_SESSION['can_add_data']) {
 					$rslt_accepted['accepted_id'] = $id;
 					
 					// Regenerate translation file
-					generate_translation_file($rslt_accepted['folder'], $language, $pdo);
+					$translate->generate_translation_file($rslt_accepted['folder'], $language);
 					
 				}
 				
@@ -104,7 +96,7 @@ if($_SESSION['can_add_data']) {
 			$output['id'] = $id;
 			$output['username'] = $_SESSION['username'];
 			$output['content'] = $content;
-			$output['language_name'] = $allowed_languages[$language];
+			$output['language_name'] = $translate->allowed_languages[$language];
 			$output['language'] = $language;
 			$output['upvote_is_checked'] = 'checked';
 			$output['downvote_is_checked'] = null;

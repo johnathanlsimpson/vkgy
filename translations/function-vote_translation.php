@@ -1,7 +1,7 @@
 <?php
 
 include_once('../php/include.php');
-include_once('../translations/function-generate_translations.php');
+//include_once('../translations/function-generate_translations.php');
 
 $proposal_id = is_numeric($_POST['id']) ? $_POST['id'] : null;
 $vote_type = in_array($_POST['vote_type'], ['upvote', 'downvote']) ? $_POST['vote_type'] : null;
@@ -36,11 +36,6 @@ if($_SESSION['is_signed_in']) {
 		$stmt_proposal = $pdo->prepare($sql_proposal);
 		$stmt_proposal->execute([ $proposal_id ]);
 		$rslt_proposal = $stmt_proposal->fetch();
-		
-		/*$sql_num = 'SELECT SUM(vote) AS num_votes FROM translations_votes WHERE proposal_id=? GROUP BY proposal_id';
-		$stmt_num = $pdo->prepare($sql_num);
-		$stmt_num->execute([ $proposal_id ]);
-		$num_votes = $stmt_num->fetchColumn();*/
 		
 		// If vote already exists
 		if(is_numeric($vote_id) && is_numeric($rslt_proposal['id'])) {
@@ -125,6 +120,9 @@ if($_SESSION['is_signed_in']) {
 						$stmt_accept = $pdo->prepare($sql_accept);
 						$stmt_accept->execute([ $top_proposal['proposal_id'], $rslt_proposal['en_id'] ]);
 						
+						// Regen translation file
+						$translate->generate_translation_file($rslt_rank['folder'], $rslt_proposal['language']);
+						
 					}
 					
 				}
@@ -153,7 +151,7 @@ if($_SESSION['is_signed_in']) {
 				
 			}
 			
-			generate_translation_file('translations', $rslt_proposal['language'], $pdo);
+			$translate->generate_translation_file($rslt_rank[0]['folder'], $rslt_proposal['language']);
 			
 			$output['language'] = $rslt_proposal['language'];
 			

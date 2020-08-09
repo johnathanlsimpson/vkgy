@@ -47,16 +47,6 @@ if($_SESSION['is_signed_in']) {
 	}
 }
 
-// Allowed languages
-$allowed_languages = [
-	'en' => 'English',
-	'ja' => '日本語',
-	'es' => 'español',
-	'fr' => 'français',
-	'ru' => 'Русский',
-	'zh' => '中文',
-];
-
 // Allowed sections
 $sections = [
 	'404',
