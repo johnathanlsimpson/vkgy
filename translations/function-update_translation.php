@@ -21,10 +21,10 @@ if($_SESSION['can_add_data']) {
 	
 	if(is_numeric($en_id) && strlen($content) && in_array($language, array_keys($allowed_languages))) {
 		
-		$sql_accepted = 'SELECT '.$language.'_id AS accepted_id FROM translations WHERE id=? LIMIT 1';
+		$sql_accepted = 'SELECT *, '.$language.'_id AS accepted_id FROM translations WHERE id=? LIMIT 1';
 		$stmt_accepted = $pdo->prepare($sql_accepted);
 		$stmt_accepted->execute([ $en_id ]);
-		$accepted_id = $stmt_accepted->fetchColumn();
+		$rslt_accepted = $stmt_accepted->fetch();
 		
 		$sql_check = 'SELECT * FROM translations_proposals WHERE en_id=? AND user_id=? AND language=? LIMIT 1';
 		$stmt_check = $pdo->prepare($sql_check);
@@ -73,6 +73,22 @@ if($_SESSION['can_add_data']) {
 				$output['num_votes'] = 1;
 				$output['status'] = 'success';
 				
+				// If no currently accepted answer, auto accept this one... for now!
+				if(!is_numeric($rslt_accepted['accepted_id'])) {
+					
+					// Update string
+					$sql_accept = 'UPDATE translations SET '.$language.'_id=? WHERE id=? LIMIT 1';
+					$stmt_accept = $pdo->prepare($sql_accept);
+					$stmt_accept->execute([ $id, $en_id ]);
+					
+					// Update accepted ID
+					$rslt_accepted['accepted_id'] = $id;
+					
+					// Regenerate translation file
+					generate_translation_file($rslt_accepted['folder'], $language, $pdo);
+					
+				}
+				
 			}
 			
 		}
@@ -81,7 +97,7 @@ if($_SESSION['can_add_data']) {
 		if(is_numeric($id) && $output['status'] === 'success') {
 			
 			$output['en_id'] = $en_id;
-			$output['is_accepted'] = $accepted_id == $id ? null : 'any--hidden';
+			$output['is_accepted'] = $rslt_accepted['accepted_id'] == $id ? null : 'any--hidden';
 			$output['user_icon'] = $_SESSION['icon'];
 			$output['user_is_vip'] = $_SESSION['is_vip'];
 			$output['user_username'] = $_SESSION['username'];
