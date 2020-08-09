@@ -791,7 +791,8 @@ li > .input__checkbox:last-of-type {
 /* For checked checkbox inputs (even if using wrong symbol class), make sure checked checkbox symbol is shown */
 .input__checkbox--selected::before,
 .input__choice:checked + [class*="symbol__checkbox"]::before,
-.input__choice:checked + .input__checkbox [class*="symbol__checkbox"]::before {
+.input__choice:checked + .input__checkbox [class*="symbol__checkbox"]::before,
+.input__checkbox .input__choice:checked + .symbol__unchecked::before {
 	-moz-clip-path:    url(#symbol__checkbox--checked);
 	-webkit-clip-path: url(#symbol__checkbox--checked);
 	clip-path:         url(#symbol__checkbox--checked);

@@ -1,4 +1,7 @@
 <?php
+	
+	//page_header(tr('Welcome to vk.gy'));
+	
 	page_header('Welcome to vk.gy', 'vk.gyへようこそ');
 	
 	subnav([

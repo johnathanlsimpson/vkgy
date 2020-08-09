@@ -5,6 +5,7 @@
 	<li><a href="/documentation/contributing/">Contributing to vkgy</a></li>
 	<li><a href="/documentation/romanization/">Romanizing Japanese</a></li>
 	<li><a href="/documentation/markdown/">Formatting text and linking pages</a></li>
+	<li><a href="/documentation/translation/">Translating vkgy</a></li>
 </ul>
 
 <h2>
