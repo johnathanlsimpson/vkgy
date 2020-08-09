@@ -2,49 +2,38 @@
 
 include_once('../php/include.php');
 
-https://stackoverflow.com/questions/2344383/what-is-the-best-way-to-put-a-translation-system-in-php-website
-
-lang(inputstring [ variables ]) {
-	// check	for file in current dir
+// Update translations for that particular page
+function generate_translation_file($folder, $language, $pdo) {
 	
-	^ prob easier for folder but maybe page is better?
-	
-	// get current lang from cookie or session or variable
-	
-	// convert file to array
-	
-	// get translated string from array
-	
-	// insert variables
-	
-	// fall back to eng?
-	
-	$file_contents = get_contents( 'my_page.de' );
-	$lang = unserialize( gzuncompress( $file_contents ) );
-}
-
-lang('blah blah');
-
-generate_lang() {
-	
-	// get all trans for certain page
-
-	// check if document exists
-	
-	// open document
-	
-	// replace contents
-	
-	^ will that cause a page to render wrong while saving?
+	if(strlen($folder) && file_exists('../'.$folder)) {
 		
-		$lang = array(
-    'hello' => 'Hallo',
-    'good_morning' => 'Guten Tag',
-    'logout_message' = > 'We are sorry to see you go, come again!'    
-);
-
-$storage_lang = gzcompress( serialize( $lang ) );
-
-// WRITE THIS INTO A FILE SUCH AS 'my_page.de'
+		$sql_translations = '
+			SELECT
+				translations.*,
+				translations_proposals.content AS translation
+			FROM
+				translations
+			LEFT JOIN
+				translations_proposals ON translations_proposals.id=translations.'.$language.'_id
+			WHERE
+				translations.folder=?
+		';
+		$stmt_translations = $pdo->prepare($sql_translations);
+		$stmt_translations->execute([ $folder ]);
+		$rslt_translations = $stmt_translations->fetchAll();
+		
+		$translations = [];
+		
+		if(is_array($rslt_translations) && !empty($rslt_translations)) {
+			foreach($rslt_translations as $translation) {
+				$translations[ $translation['content'] ] = $translation['translation'] ?: null;
+			}
+		}
+		
+		$translation_file = gzcompress( serialize( $translations ) );
+		$filename = '../'.$folder.'/lang.'.$language;
+		file_put_contents( $filename, $translation_file );
+		
+	}
 	
 }
