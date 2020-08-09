@@ -254,7 +254,7 @@
 							'search' => '/search/'
 						];
 						foreach($nav_links as $name => $url) {
-							echo '<a class="head__link primary-nav__link a--inherit" href="'.$url.'">'.tr($name, [ 'lang' => true, 'lang_args' => 'div' ]).'</a>';
+							echo '<a class="head__link primary-nav__link a--inherit" href="'.$url.'">'.tr($name, [ 'folder' => 'php', 'lang' => true, 'lang_args' => 'div' ]).'</a>';
 						}
 					?>
 				</div>

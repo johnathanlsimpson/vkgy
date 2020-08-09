@@ -12,6 +12,7 @@
 	flex-wrap: wrap;
 }
 .accepted__en {
+	flex: 1;
 	margin-right: auto;
 }
 .accepted__lang {
@@ -20,8 +21,8 @@
 }
 .accepted__more {
 	display: inline-block;
+	margin: 0 1rem;
 	text-align: right;
-	width: 4rem;
 }
 .accepted__edit::after {
 	content: "edit";

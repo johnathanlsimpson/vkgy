@@ -208,12 +208,10 @@ editStringElems.forEach(function(editStringElem) {
 let listOptions = {
 	valueNames: [ 'languages', 'section', 'no-filter' ]
 };
-
 let stringList = new List('translations-list', listOptions);
 
 // Filter by string section
 let filterSectionElem = document.querySelector('[name="filter_section"]');
-
 filterSectionElem.addEventListener('change', function(event) {
 	
 	let filterSection = filterSectionElem.value;
@@ -228,6 +226,19 @@ filterSectionElem.addEventListener('change', function(event) {
 		}
 		
 	});
+	
+});
+
+// Filter by language
+let filterLanguageElem = document.querySelector('[name="filter_language"]');
+filterLanguageElem.addEventListener('change', function(event) {
+	
+	// Get language
+	let filterLanguage = filterLanguageElem.value;
+	
+	// If language specified, hide columns from other languages
+	let translationsContainer = document.querySelector('#translations-list');
+	translationsContainer.dataset.filterLang = filterLanguage;
 	
 });
 

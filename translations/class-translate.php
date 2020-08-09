@@ -29,6 +29,7 @@ class translate {
 		$this->allowed_languages = [
 			'ja' => '日本語',
 			'en' => 'English',
+			'de' => 'Deutsch',
 			'es' => 'español',
 			'fr' => 'français',
 			'ru' => 'Русский',
@@ -62,6 +63,7 @@ class translate {
 				WHERE
 					translations.folder=?
 			';
+			
 			$stmt_translations = $this->pdo->prepare($sql_translations);
 			$stmt_translations->execute([ $folder ]);
 			$rslt_translations = $stmt_translations->fetchAll();
@@ -171,7 +173,8 @@ class translate {
 		$string = sanitize($string);
 
 		// Set working folder and translation file to look for in folder
-		$folder = friendly($args['folder']) ?: end(explode('/', dirname(__FILE__, 1)));
+		//$folder = friendly($args['folder']) ?: end(explode('/', dirname(__FILE__, 1)));
+		$folder = friendly($args['folder']) ?: (explode('/', $_SERVER['REQUEST_URI'])[1] ?: 'php');
 
 		// If string provided and requested language allowed
 		if( strlen($string) && strlen($this->language) ) {
