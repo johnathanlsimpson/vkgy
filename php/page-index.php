@@ -111,7 +111,7 @@
 					
 					<?php
 						$links = [
-							["news",   "ニュース", "/blog/"],
+							[tr('News'),   "ニュース", "/blog/"],
 							["bands",  "バンド",   "/artists/"],
 							["music",  "リリース", "/releases/"],
 							["more",   "もっと",   "/database/"],

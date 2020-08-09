@@ -28,6 +28,11 @@
 		include_once($function);
 	}
 	
+	// Get UI translations (first php for sitewide, then current folder)
+	$_SESSION['language'] = 'es';
+	init_tr('php');
+	init_tr();
+	
 	$login = new login($pdo);
 	$login->check_login();
 	
@@ -46,7 +51,7 @@
 		'/scripts/script-showSearch.js',
 		'/scripts/script-switchLang.js',
 	]);
-	
+
 	ob_start();
 	include($requested_page);
 	$page_contents = ob_get_contents();
