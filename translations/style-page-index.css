@@ -1,0 +1,111 @@
+.accepted__header {
+	background: hsl(var(--background));
+	position: sticky;
+	margin: -1rem !important;
+	margin-bottom: 0 !important;
+	padding: 1rem !important;
+	top: 3rem;
+	z-index: 1;
+}
+.accepted__row {
+	display: flex;
+	flex-wrap: wrap;
+}
+.accepted__en {
+	margin-right: auto;
+}
+.accepted__lang {
+	display: inline-block;
+	width: 2rem;
+}
+.accepted__more {
+	display: inline-block;
+	text-align: right;
+	width: 4rem;
+}
+.accepted__edit::after {
+	content: "edit";
+}
+
+.details__container {
+	background: hsl(var(--background--secondary));
+	background-image: linear-gradient(to bottom, hsla(var(--background),100), hsla(var(--background),0) 1rem);
+	margin: 1rem -1rem -1rem -1rem;
+	padding-top: 2rem;
+	width: calc(100% + 2rem);
+}
+.details__proposal {
+	align-items: flex-start;
+}
+.details__user, .details__date {
+	line-height: 1.5rem;
+	margin-right: 0.5rem;
+}
+
+li.data__container {
+	clip-path: polygon(0.5rem 0, 100% 0, 100% 100%, 0.5rem 100%);
+	margin-bottom: 0.5rem;
+	margin-top: 0;
+	padding-bottom: 0.5rem;
+	padding-top: 0.5rem;
+}
+li.input__row {
+	clip-path: polygon(0.5rem 0, 100% 0, 100% 600%, 0.5rem 600%);
+	padding-top: 0.5rem;
+	z-index: 1;
+}
+
+.tag__voting {
+	background: hsl(var(--background--secondary));
+	border: 1px solid hsl(var(--background));
+	border-radius: 3px;
+	display: inline-flex;
+	line-height: 1.5rem;
+	text-align: center;
+}
+.tag--subgenre .tag__voting {
+	flex-direction: column;
+}
+.tag__num {
+	padding: 0 5px;
+}
+.tag__num::before {
+	content: attr(data-num-tags);
+}
+.tag__num[data-num-tags^="-"] {
+	color: red;
+}
+.tag__upvote, .tag__downvote {
+	color: hsl(var(--background--bold));
+	cursor: pointer;
+	padding: 0 5px;
+	position: initial;
+}
+.tag__upvote:hover, .tag__downvote:hover {
+	color: hsl(var(--text));
+}
+.tag__upvote:hover::after, .tag__downvote:hover::after {
+	background: linear-gradient(var(--vote-dir), var(--vote-bg), transparent);
+	bottom: 0;
+	content: "";
+	display: block;
+	left: 0;
+	pointer-events: none;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+.tag__upvote:hover {
+	--vote-bg: rgba(0,255,0,0.1);
+	--vote-dir: to right;
+}
+.tag__downvote:hover {
+	--vote-bg: rgba(255,0,0,0.1);
+	--vote-dir: to left;
+}
+.tag--subgenre .tag__upvote:hover {
+	--vote-dir: to bottom;
+}
+.tag--subgenre .tag__downvote:hover {
+	--vote-dir: to top;
+}
