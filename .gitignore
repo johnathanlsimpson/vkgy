@@ -22,6 +22,9 @@ error_log
 errors/*
 !errors/.gitkeep
 
+# Ignore UI translations
+*/lang.*
+
 # Ignore old backups
 # \(*\)*
 
