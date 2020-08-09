@@ -26,6 +26,30 @@ style([
 <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 
 <div class="col c1">
+	<div>
+		
+		<div class="text text--outlined text--notice symbol__error">
+			<?= tr('This feature is currently in alpha. Editors may add translations for any available language, but the ability to view vkgy in that language won\'t come until the beta.'); ?>
+		</div>
+		
+	</div>
+</div>
+
+<style>
+	<?php
+		foreach($translate->allowed_languages as $language_key => $language_key) {
+			if($language_key != 'en') {
+				foreach($translate->allowed_languages as $lang_key => $lang_name) {
+					if($lang_key != 'en' && $lang_key != $language_key) {
+						echo '[data-filter-lang="'.$language_key.'"] [data-language="'.$lang_key.'"] {display: none;}';
+					}
+				}
+			}
+		}
+	?>
+</style>
+
+<div class="col c1">
 	
 	<h2>
 		<?= tr('Translations', [ 'lang' => true, 'lang_args' => 'div' ]); ?>
@@ -34,21 +58,21 @@ style([
 	<div class="col c4-AAAB">
 	
 	<!-- Strings and proposals -->
-	<div id="translations-list">
+	<div id="translations-list" data-filter-lang="<?= $translate->language; ?>">
 		
 		<ul class="text list">
 			
 			<!-- Header -->
 			<li class="accepted__row accepted__header">
 				<label class="h5 accepted__en">English phrase</label>
+				<label class="h5 accepted__more">&nbsp;</label>
 				<?php
 					foreach($translate->allowed_languages as $language_key => $language) {
 						if($language_key != 'en') {
-							echo '<label class="h5 accepted__lang">'.$language_key.'</label>';
+							echo '<label class="h5 accepted__lang" data-language="'.$language_key.'">'.$language_key.'</label>';
 						}
 					}
 				?>
-				<label class="h5 accepted__more">&nbsp;</label>
 			</li>
 			
 			<!-- Translations -->
@@ -63,15 +87,15 @@ style([
 								<span class="section any--hidden"><?= $string['folder']; ?></span>
 								
 								<!-- Text -->
-								<span class="accepted__en"><?= $string['content']; ?><?= $_SESSION['is_boss'] ? ' <a class="accepted__edit symbol__edit"></a>' : null; ?></span>
+								<span class="accepted__en"><?= $string['content']; ?><?= $_SESSION['is_boss'] ? ' <span class="any--weaken"><a class="accepted__edit symbol__edit a--inherit"></a></span>' : null; ?></span>
+								<span class="accepted__more"><a class="symbol__down-caret" x-on:click="open=!open">view</a></span>
 								<?php
 									foreach($translate->allowed_languages as $language_key => $language) {
 										if($language_key != 'en') {
-											echo '<span class="accepted__lang '.(is_numeric($string[$language_key.'_id']) ? 'symbol__checkbox--checked' : 'symbol__checkbox--unchecked').'"></span>';
+											echo '<span class="accepted__lang '.(is_numeric($string[$language_key.'_id']) ? 'symbol__checkbox--checked' : 'symbol__checkbox--unchecked').'" data-language="'.$language_key.'"></span>';
 										}
 									}
 								?>
-								<span class="accepted__more"><a class="symbol__down-caret" x-on:click="open=!open">more</a></span>
 								
 								<ul class="details__container text" x-show="open">
 									
@@ -84,7 +108,7 @@ style([
 													<?php
 														ob_start();
 														?>
-															<li class="any--flex details__proposal">
+															<li class="any--flex details__proposal" data-language="{language}">
 																<div class="any--flex-grow any--weaken-color">
 																	<span class="language any--hidden">{language}</span>
 																	<h5>
@@ -190,7 +214,7 @@ style([
 												<?php
 													foreach($translate->allowed_languages as $language_key => $language) {
 														if($language_key != 'en') {
-															echo '<option value="'.$language_key.'">'.$language.'</option>';
+															echo '<option value="'.$language_key.'"'.($language_key == $translate->language ? ' selected ' : null).'>'.$language.'</option>';
 														}
 													}
 												?>
@@ -228,23 +252,7 @@ style([
 		
 		<ul class="text text--outlined">
 			
-			<!--<li class="input__row" style="z-index:3;">
-				<div class="input__group any--flex-grow">
-					<label class="input__label">Language</label>
-					<select class="input any--flex-grow" name="filter_language" placeholder="language">
-						<option></option>
-						<?php
-							foreach($translate->allowed_languages as $language_key => $language) {
-								if($language_key != 'en') {
-									echo '<option value="'.$language_key.'">'.$language.'</option>';
-								}
-							}
-						?>
-					</select>
-				</div>
-			</li>-->
-			
-			<li class="input__row" style="z-index:2;">
+			<li class="input__row" style="z-index:3;">
 				<div class="input__group any--flex-grow">
 					<label class="input__label symbol__filter">Section</label>
 					<select class="input any--flex-grow" name="filter_section" placeholder="section">
@@ -252,6 +260,22 @@ style([
 						<?php
 							foreach($sections as $section) {
 								echo '<option value="'.$section.'">'.($section === 'php' ? 'UI' : $section).'</option>';
+							}
+						?>
+					</select>
+				</div>
+			</li>
+			
+			<li class="input__row" style="z-index:2;">
+				<div class="input__group any--flex-grow">
+					<label class="input__label symbol__filter">Language</label>
+					<select class="input any--flex-grow" name="filter_language" placeholder="language">
+						<option>all</option>
+						<?php
+							foreach($translate->allowed_languages as $language_key => $language) {
+								if($language_key != 'en') {
+									echo '<option value="'.$language_key.'" '.($translate->language === $language_key ? 'selected' : null).'>'.$language.'</option>';
+								}
 							}
 						?>
 					</select>
@@ -284,39 +308,7 @@ style([
 	
 </div>
 
-<script>
-	
-	/*let filterLanguageElem = document.querySelector('[name="filter_language"]');
-	filterLanguageElem.addEventListener('change', function(event) {
-		
-		let filterLanguage = filterLanguageElem.value;
-		
-		console.log(filterLanguage);
-		
-		stringList.filter(function(item) {
-			
-			if(!item.values().language || item.values().language === filterLanguage) {
-				return true;
-			}
-			else {
-				return false;
-			}
-			
-		});
-		
-	});*/
-	
-	/*hackerList.sort('section', { order: "asc" });
-	
-	hackerList.filter(function(item) {
-if (item.values().section == 'artists') {
-   return true;
-} else {
-   return false;
-}
-});*/
-</script>
-
+<?php if($_SESSION['is_boss']) { ?>
 <div class="col c1">
 	<div>
 		
@@ -365,6 +357,7 @@ if (item.values().section == 'artists') {
 		
 	</div>
 </div>
+<?php } ?>
 
 <?php
 	$documentation_page = [ 'translation' ];
