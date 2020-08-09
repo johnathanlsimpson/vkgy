@@ -8,6 +8,12 @@ $stmt_translations = $pdo->prepare($sql_translations);
 $stmt_translations->execute();
 $strings = $stmt_translations->fetchAll();
 
+// Loop through strings and get list of sections
+foreach($strings as $string) {
+	$sections[ $string['folder'] ] = '';
+}
+$sections = array_keys($sections);
+
 // Get proposed translations
 $sql_proposals = '
 SELECT translations_proposals.*, SUM(translations_votes.vote) AS num_votes 
@@ -48,7 +54,7 @@ if($_SESSION['is_signed_in']) {
 }
 
 // Allowed sections
-$sections = [
+/*$sections = [
 	'404',
 	'account',
 	'artists',
@@ -71,9 +77,9 @@ $sections = [
 	'search',
 	'support',
 	'translations'
-];
+];*/
 
-if($_SESSION['is_vip']) {
+if($_SESSION['is_editor']) {
 	include('../translations/page-index.php');
 }
 
