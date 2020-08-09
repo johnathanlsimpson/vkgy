@@ -69,8 +69,10 @@
 			include_once("../style/symbols.php");
 		?>
 		
-		<input class="any--hidden" id="language-en" name="language" type="radio" value="en" <?php echo !isset($_SESSION['site_lang']) || $_SESSION['site_lang'] == 0 ? 'checked' : null; ?> />
-		<input class="any--hidden" id="language-ja" name="language" type="radio" value="ja" <?php echo $_SESSION['site_lang'] == 1 ? 'checked' : null; ?> />
+		<!--<input class="any--hidden" id="language-en" name="language" type="radio" value="en" <?php echo !isset($_SESSION['site_lang']) || $_SESSION['site_lang'] == 0 ? 'checked' : null; ?> />
+		<input class="any--hidden" id="language-ja" name="language" type="radio" value="ja" <?php echo $_SESSION['site_lang'] == 1 ? 'checked' : null; ?> />-->
+		<input class="any--hidden" id="language-en" name="language" type="radio" value="en" <?= !isset($translate->language) || $translate->language === 'en' ? 'checked' : null; ?> />
+		<input class="any--hidden" id="language-ja" name="language" type="radio" value="ja" <?= $translate->language === 'ja' ? 'checked' : null; ?> />
 		<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5KZPGP8" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		
 		<?php
@@ -85,8 +87,141 @@
 			<div class="flex any--weaken-color">
 				<a class="secondary-nav__home" href="/"></a>
 				
+				<?php if(!$_SESSION['is_vip']) { ?>
 				<label class="secondary-nav__en input__radio symbol__unchecked" for="language-en" style="background:none;margin-bottom:0;">EN</label>
 				<label class="secondary-nav__ja input__radio symbol__unchecked" for="language-ja" style="background:none;margin-bottom:0;">日本語</label>
+				<?php } ?>
+				
+				<?php if($_SESSION['is_vip']) { ?>
+				<style>
+					/* Visible language elements */
+					.language__container {
+						color: hsl(var(--accent));
+						cursor: pointer;
+						font-family: var(--font--secondary);
+						font-size: 0.9rem;
+					}
+					.language__switch {
+						padding: 0 1rem;
+						user-select: none;
+					}
+					.language__symbol::before {
+						font-size: 1.25rem;
+						margin-top: -2px;
+						vertical-align: middle;
+					}
+					
+					/* Show/hide states for caret and dropdown */
+					.language__caret {
+						opacity: 0;
+					}
+					.language__switch:hover .language__caret,
+					.language--open .language__caret {
+						opacity: 1;
+					}
+					.language--open .language__switch:hover .language__caret::before {
+						clip-path: url(#symbol__up-caret);
+						-webkit-clip-path: url(#symbol__up-caret);
+						-moz-clip-path: url(#symbol__up-caret);
+					}
+					.language__dropdown {
+						display: none;
+					}
+					.language--open .language__dropdown {
+						display: flex;
+					}
+					
+					/* Dropdown styling */
+					.language__dropdown {
+						background: hsl(var(--background--bold));
+						border: 2px solid hsl(var(--accent));
+						border-top-width: 0;
+						border-radius: 0 0 3px 3px;
+						flex-direction: column;
+						left: -2px;
+						position: absolute;
+						right: 0;
+						z-index: 101;
+					}
+					.language__choice, .language__help {
+						background: none;
+						border: 0 solid transparent;
+						border-width: 0.5rem 1rem;
+						line-height: 1;
+					}
+					.language__help:last-of-type {
+						border-bottom-width: 1rem;
+					}
+					.language__choice:hover, .language__help:hover {
+						background: none;
+						border-color: transparent;
+						text-decoration: underline;
+					}
+				</style>
+				
+				<span class="language__container secondary-nav__lang">
+					<div class="language__switch">
+						<span class="language__symbol symbol__language symbol--standalone"></span>
+						<span class="language__current"><?= $translate->language_name ?: 'English'; ?></span>
+						<span class="language__caret symbol__down-caret symbol--standalone"></span>
+					</div>
+					
+					<div class="language__dropdown">
+						<?php
+							foreach($translate->allowed_languages as $language_key => $language_name) {
+								echo '<a class="language__choice a--inherit" data-language="'.$language_key.'" href="/translations/function-switch_language.php?refresh=1&language='.$language_key.'">'.sanitize($language_name).'</a>';
+							}
+						?>
+						<a class="language__help symbol__plus" href="/translations/">translate</a>
+					</div>
+				</span>
+				
+				<script>
+					// Get language switch button and container
+					let languageSwitchContainer = document.querySelector('.language__container');
+					let languageSwitchElem = languageSwitchContainer.querySelector('.language__switch');
+					
+					// When language switch clicked, toggle open class on container
+					languageSwitchElem.addEventListener('click', function(event) {
+						
+						if(languageSwitchContainer.classList.contains('language--open')) {
+							languageSwitchContainer.classList.remove('language--open');
+						}
+						else {
+							languageSwitchContainer.classList.add('language--open');
+						}
+						
+					});
+					
+					// Get language choices
+					let languageChoiceElems = languageSwitchContainer.querySelectorAll('.language__choice');
+					
+					// When language choice clicked, pass to function to set session/cookie, then refresh
+					languageChoiceElems.forEach(function(languageChoiceElem) {
+						languageChoiceElem.addEventListener('click', function(event) {
+							
+							// Prevent default
+							event.preventDefault();
+							
+							// Send chosen language to switcher function
+							initializeInlineSubmit($(languageSwitchContainer), '/translations/function-switch_language.php', {
+								
+								preparedFormData: { language: languageChoiceElem.dataset.language },
+								
+								// Refresh page to change language
+								callbackOnSuccess: function(event, returnedData) {
+									location.reload();
+								},
+								
+								callbackOnError: function(event, returnedData) {
+								}
+								
+							});
+							
+						});
+					});
+				</script>
+				<?php } ?>
 				
 				<a class="secondary-nav__social secondary-nav__twitter  a--inherit symbol__twitter" href="https://twitter.com/vkgy_/" target="_blank"></a>
 				<a class="secondary-nav__social secondary-nav__facebook a--inherit symbol__facebook" href="https://facebook.com/vkgy.official/" target="_blank"></a>
@@ -110,17 +245,15 @@
 					</a>
 					
 					<?php
-						$links = [
-							[tr('News'),   "ニュース", "/blog/"],
-							["bands",  "バンド",   "/artists/"],
-							["music",  "リリース", "/releases/"],
-							["more",   "もっと",   "/database/"],
-							["search", "サーチ",   "/search/"],
+						$nav_links = [
+							'news' => '/blog/',
+							'bands' => '/artists/',
+							'music' => '/releases/',
+							'more' => '/database/',
+							'search' => '/search/'
 						];
-						foreach($links as $link) {
-							?>
-								<a class="head__link primary-nav__link a--inherit" href="<?php echo $link[2]; ?>"><?php echo lang($link[0], $link[1], ['secondary_container' => 'div', 'secondary_class' => 'any--weaken']); ?></a>
-							<?php
+						foreach($nav_links as $name => $url) {
+							echo '<a class="head__link primary-nav__link a--inherit" href="'.$url.'">'.tr($name, [ 'lang' => true, 'lang_args' => 'div' ]).'</a>';
 						}
 					?>
 				</div>

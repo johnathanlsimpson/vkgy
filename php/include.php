@@ -25,7 +25,9 @@
 	include_once('../php/function-parse_edit_history.php');
 	include_once('../php/function-image_exists.php');
 	include_once('../php/function-lang.php');
-	include_once('../translations/function-translate.php');
+	include_once('../translations/class-translate.php');
+	include_once('../translations/function-init_translate.php');
+	include_once('../translations/function-tr.php');
 	
 	//echo 'before login class <pre>'.print_r($_SESSION, true).'</pre>';
 	
