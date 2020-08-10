@@ -706,11 +706,11 @@
 									</ol>
 									<!--<a class="symbol__arrow-right-circled" href="<?= $cdjapan_link; ?>" rel="nofollow" target="_blank"><?= ($reference_datum['date_occurred'] > date('Y-m-d') ? 'Preorder' : 'Order').' at CDJapan'; ?></a>-->
 									
-									<?php /* <a class="release__buy" href="<?= 'https://www.amazon.co.jp/s/ref=as_li_ss_tl?k='.urlencode(html_entity_decode($reference_datum['artist']['name'].' '.$reference_datum['name'])).'&tag=vkgy-22'; ?>" rel="nofollow" target="_blank">
+									<a class="release__buy" href="<?= 'https://www.amazon.co.jp/s/ref=as_li_ss_tl?k='.urlencode(html_entity_decode($reference_datum['artist']['name'].' '.$reference_datum['name'])).'&tag=vkgy0c-22'; ?>" rel="nofollow" target="_blank">
 										<img src="/releases/amazon.png" style="height:1rem;bottom:-2px;" /> Amazon<sup>JP</sup>
 									</a>
 									&nbsp;
-									&nbsp; */ ?>
+									&nbsp;
 									<a class="release__buy" href="<?= $cdjapan_link; ?>" target="_blank">
 										<img src="/releases/cdj.gif" style="height:1rem;" /> CDJapan
 									</a>
