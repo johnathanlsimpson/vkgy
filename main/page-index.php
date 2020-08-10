@@ -1,11 +1,13 @@
 <?php
 	
-	//page_header(tr('Welcome to vk.gy'));
-	
-	page_header('Welcome to vk.gy', 'vk.gyへようこそ');
+	$page_header = tr('Welcome to vk.gy', [
+		'ja' => 'vk.gyへようこそ',
+		'lang' => true,
+		'lang_args' => 'div'
+	]);
 	
 	subnav([
-		lang('Patreon', 'パトレオン', ['secondary_class' => 'any--hidden']) => 'https://patreon.com/vkgy/',
+		'Patreon' => 'https://patreon.com/vkgy/',
 	], 'interact');
 	
 	script([
@@ -17,7 +19,7 @@
 	<div class="main__left">
 		<div class="main__aod">
 			<h3>
-				<?php echo lang('Artist of the day', '今日のアーティスト', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
+				<?= tr('Artist of the day', [ 'ja' => '今日のアーティスト', 'lang' => true, 'lang_args' => 'div' ]); ?>
 			</h3>
 			<div class="card--small">
 				<?php $access_artist->artist_card($artist_of_day); ?>

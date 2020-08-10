@@ -313,10 +313,10 @@
 													<h5>
 														Buy
 													</h5>
-													<?php /* ?><a class="release__buy" href="<?= 'https://www.amazon.co.jp/s/ref=as_li_ss_tl?k='.urlencode(html_entity_decode($release['artist']['name'].' '.$release['name'])).'&tag=vkgy-22'; ?>" rel="nofollow" target="_blank">
+													<a class="release__buy" href="<?= 'https://www.amazon.co.jp/s/ref=as_li_ss_tl?k='.urlencode(html_entity_decode($release['artist']['name'].' '.$release['name'])).'&tag=vkgy0c-22'; ?>" rel="nofollow" target="_blank">
 														<img src="/releases/amazon.png" style="height:1rem;opacity:1;bottom:-2px;" /> Search Amazon<sup>JP</sup>
 													</a>
-													&nbsp;<?php */ ?>
+													&nbsp;
 													<a class="release__buy" href="<?= 'https://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/searches?term.media_format=&f=all&q='.($release["upc"] ? str_replace(["-000", "-00", "-0"], "-", $release["upc"]) : str_replace(" ", "+", $release["quick_name"])); ?>" target="_blank">
 														<img src="/releases/cdj.gif" style="height:1rem;opacity:1;" /> <?= $release["upc"] ? 'Buy at' : 'Search'; ?> CDJapan
 													</a>
