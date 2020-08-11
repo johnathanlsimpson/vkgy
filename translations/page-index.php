@@ -320,9 +320,12 @@ style([
 			<div class="input__row">
 				
 				<div class="input__group">
+					<label class="input__label">ID</label>
+					<input class="any--hidden" name="id" value="" />
+				</div>
+				
+				<div class="input__group">
 					<label class="input__label">Section</label>
-					<input class="any--hidden" name="id" type="hidden" value="" />
-					
 					<select class="input" name="folder" placeholder="section">
 						<option></option>
 						<?php

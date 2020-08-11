@@ -88,12 +88,12 @@
 			<div class="flex any--weaken-color">
 				<a class="secondary-nav__home" href="/"></a>
 				
-				<?php if(!$_SESSION['is_vip']) { ?>
+				<?php if(!$_SESSION['is_editor']) { ?>
 				<label class="secondary-nav__en input__radio symbol__unchecked" for="language-en" style="background:none;margin-bottom:0;">EN</label>
 				<label class="secondary-nav__ja input__radio symbol__unchecked" for="language-ja" style="background:none;margin-bottom:0;">日本語</label>
 				<?php } ?>
 				
-				<?php if($_SESSION['is_vip']) { ?>
+				<?php if($_SESSION['is_editor']) { ?>
 				<style>
 					/* Visible language elements */
 					.language__container {
@@ -163,7 +163,7 @@
 				<span class="language__container secondary-nav__lang">
 					<div class="language__switch">
 						<span class="language__symbol symbol__language symbol--standalone"></span>
-						<span class="language__current"><?= $translate->language_name ?: 'English'; ?></span>
+						<span class="language__current"><?= $translate->language_name ?: 'English'; ?>
 						<span class="language__caret symbol__down-caret symbol--standalone"></span>
 					</div>
 					

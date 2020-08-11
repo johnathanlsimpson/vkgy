@@ -25,9 +25,10 @@ $stmt_proposals = $pdo->prepare($sql_proposals);
 $stmt_proposals->execute();
 $rslt_proposals = $stmt_proposals->fetchAll();
 
-// Get proposals' users
+// Get proposals' users and replace tokens
 if(is_array($rslt_proposals) && !empty($rslt_proposals)) {
 	foreach($rslt_proposals as $proposal_key => $proposal) {
+		$proposal['content'] = str_replace(['{','}'], ['<span class="any__note">', '</span>'], $proposal['content']);
 		$proposal['user'] = $access_user->access_user([ 'id' => $proposal['user_id'], 'get' => 'name' ]);
 		$proposals[$proposal['en_id']][] = $proposal;
 	}
