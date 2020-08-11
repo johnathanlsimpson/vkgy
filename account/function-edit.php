@@ -52,12 +52,12 @@ if($_SESSION['can_edit_roles'] && is_numeric($_POST['id']) && $_SESSION['user_id
 			$output['status'] = 'success';
 		}
 		else {
-			$output['result'] = 'Couldn\'t update user permissions.';
+			$output['result'] = tr('Couldn\'t update user permissions.');
 		}
 		
 	}
 	else {
-		$output['result'] = 'Can\'t edit permissions for the requested user.';
+		$output['result'] = tr('Can\'t edit permissions for the requested user.');
 	}
 	
 }
@@ -127,7 +127,7 @@ elseif($_SESSION['is_signed_in']) {
 	
 	// If email doesn't match pattern, make note
 	if($_POST['email'] && $sql_values['email'] != $_POST['email']) {
-		$output['result'] = 'Sorry, that email isn\'t allowed. Please try another one.';
+		$output['result'] = tr('Sorry, that email isn\'t allowed. Please try another one.');
 	}
 	
 	// Set some session variables based on potential changes
@@ -145,7 +145,7 @@ elseif($_SESSION['is_signed_in']) {
 			$stmt_check_username->execute([ $new_username ]);
 			
 			if($stmt_check_username->fetchColumn() == 1) {
-				$output['result'] = 'Sorry, that username is taken.';
+				$output['result'] = tr('Sorry, that username is taken.');
 			}
 			else {
 				
@@ -154,7 +154,7 @@ elseif($_SESSION['is_signed_in']) {
 			}
 		}
 		else {
-			$output['result'] = 'Usernames must only contain letters, numbers, and/or hyphens, and must be at least 3 characters.';
+			$output['result'] = tr('Usernames must only contain letters, numbers, and/or hyphens, and must be at least 3 characters.');
 		}
 	}
 	
@@ -174,15 +174,15 @@ elseif($_SESSION['is_signed_in']) {
 					$sql_values['password'] = password_hash($_POST['new_password_1'], PASSWORD_DEFAULT);
 				}
 				else {
-					$output['result'] = 'Current password is incorrect.';
+					$output['result'] = tr('Current password is incorrect.');
 				}
 			}
 			else {
-				$output['result'] = 'New password and password confirmation don\'t match.';
+				$output['result'] = tr('New password and password confirmation don\'t match.');
 			}
 		}
 		else {
-			$output['result'] = 'Please enter your current password.';
+			$output['result'] = tr('Please enter your current password.');
 		}
 	}
 	
@@ -212,7 +212,7 @@ elseif($_SESSION['is_signed_in']) {
 			$_SESSION['username'] = $sql_values['username'];
 			
 			// Note that username was changed, redirect to new profile
-			$output['result'] = 'Username changed; redirecting to <a href="/users/'.$sql_values['useranme'].'/">new profile</a>. <meta http-equiv="refresh" content="3;url=/users/'.$sql_values['username'].'/" />';
+			$output['result'] = tr('Username changed: redirecting to {username}.', [ 'replace' => [ 'username' => '<a href="/users/'.$sql_values['username'].'/">'.$sql_values['username'].'</a>' ] ]).'<meta http-equiv="refresh" content="3;url=/users/'.$sql_values['username'].'/" />';
 		}
 		
 		// Award point
@@ -220,11 +220,11 @@ elseif($_SESSION['is_signed_in']) {
 		$output['points'] += $access_points->award_points([ 'point_type' => 'edited-profile', 'allow_multiple' => false ]);
 	}
 	else {
-		$output['result'] = 'Couldn\'t update profile.';
+		$output['result'] = tr('Couldn\'t update profile.');
 	}
 }
 else {
-	$output['result'] = 'Please sign in before editing your account.';
+	$output['result'] = tr('Please sign in before editing your account.');
 }
 
 $output['status'] = $output['status'] ?: 'error';

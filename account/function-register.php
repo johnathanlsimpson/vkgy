@@ -34,22 +34,22 @@ if($username && $password) {
 				ob_end_clean();
 				
 				$output["status"] = "success";
-				$output["result"] = "Successfully registered. ".$login->get_status_message().'<meta http-equiv="refresh" content="0;url=/users/'.$username.'/" />';
+				$output["result"] = tr('Successfully registered.').' '.$login->get_status_message().'<meta http-equiv="refresh" content="0;url=/users/'.$username.'/" />';
 			}
 			else {
-				$output["result"] = "Sorry, something went wrong.".print_r($pdo->errorInfo(), true);
+				$output["result"] = tr("Sorry, something went wrong.").print_r($pdo->errorInfo(), true);
 			}
 		}
 		else {
-			$output["result"] = "Sorry, that username is already taken.";
+			$output["result"] = tr("Sorry, that username is already taken.");
 		}
 	}
 	else {
-		$output["result"] = "Sorry, usernames can only contain <strong>letters</strong>, <strong>numbers</strong>, and <strong>hyphens</strong>.";
+		$output["result"] = tr('Usernames must only contain letters, numbers, and/or hyphens, and must be at least 3 characters.');
 	}
 }
 else {
-	$output["result"] = "Please fill out all fields.";
+	$output["result"] = tr("Please fill out all fields.");
 }
 
 $output["status"] = $output["status"] ?: "error";
