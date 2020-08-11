@@ -22,7 +22,7 @@
 					$rslt_area = $stmt_area->fetch();
 					
 					$friendly = $_POST["friendly"][$key];
-					$friendly = strlen($friendly) > 0 ? $friendly : ($rlst_area["romaji"] ?: $rslt_area["name"]).' '.($romaji ?: $name);
+					$friendly = strlen($friendly) > 0 ? $friendly : ($rslt_area["romaji"] ?: $rslt_area["name"]).' '.($romaji ?: $name);
 					$friendly = friendly($friendly);
 					
 					$values_update = [ $name, $romaji, $friendly, $capacity, $area_id, $parent_id, $renamed_to ];
