@@ -43,6 +43,9 @@ if($_SESSION['can_add_data']) {
 				$output['is_edit'] = 1;
 				$output['status'] = 'success';
 				
+				// Regenerate translation file
+				$translate->generate_translation_file($rslt_accepted['folder'], $language);
+				
 			}
 			
 		}
