@@ -77,6 +77,7 @@
 					$sql_select = [
 						'users.id',
 						'users.username',
+						'users.email',
 						'users.icon',
 						'users.is_vip',
 						'users.is_editor',
