@@ -32,6 +32,7 @@ class translate {
 			'de' => 'Deutsch',
 			'es' => 'español',
 			'fr' => 'français',
+			'nl' => 'Nederlands',
 			'ru' => 'Русский',
 			'zh' => '中文',
 		];
