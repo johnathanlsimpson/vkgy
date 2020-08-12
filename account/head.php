@@ -1,21 +1,21 @@
 <?php
 
 breadcrumbs([
-	'Users' => '/users/',
+	tr('Users') => '/users/',
 ]);
 
 subnav([
-	lang('Member list', 'メンバー一覧', ['secondary_class' => 'any--hidden']) => '/users/',
+	tr('Member list', ['ja' => 'メンバー一覧']) => '/users/',
 ], 'interact');
 
 if($_SESSION['is_signed_in']) {
 	subnav([
-		lang('My profile', 'マイページ', 'hidden') => '/users/'.$_SESSION['username'].'/',
-		lang('Sign out', 'サインアウト', 'hidden') => '/sign-out/',
+		tr('My profile', ['ja' => 'マイページ']) => '/users/'.$_SESSION['username'].'/',
+		tr('Sign out', ['ja' => 'サインアウト']) => '/sign-out/',
 	], 'interact');
 }
 else {
 	subnav([
-		lang('Register/Sign in', '登録・サインイン', 'hidden') => '/account/',
+		tr('Register/Sign in', ['ja' => '登録・サインイン']) => '/account/',
 	], 'interact');
 }
