@@ -51,13 +51,13 @@ if(in_array($template, [ 'account', 'activity', 'user' ])) {
 		// Make sure moderators can't set roles for bosses
 		if($template === 'account' && $user['is_boss'] && $_SESSION['username'] != $user['username']) {
 			unset($user);
-			$error = 'Can\'t edit permissions for requested user. Showing all users instead.';
+			$error = tr('Can\'t edit permissions for requested user. Showing all users instead.');
 			$template = 'users';
 		}
 		
 	}
 	else {
-		$error = 'Couldn\'t find the requested user. Showing all users instead.';
+		$error = tr('Couldn\'t find the requested user. Showing all users instead.');
 		$template = 'users';
 	}
 }
@@ -96,9 +96,9 @@ if($template === 'account') {
 	if($template === "users") {
 		$users = $access_user->access_user([ 'get' => 'list', 'order' => 'date_added DESC' ]);
 		
-		$pageTitle = "Member list";
+		$pageTitle = tr("Member list");
 		
-		breadcrumbs([ "Member list" => "/users/" ]);
+		breadcrumbs([ tr("Member list") => "/users/" ]);
 		
 		include("page-users.php");
 	}
@@ -106,9 +106,9 @@ if($template === 'account') {
 	// Sign out
 	// =======================================================
 	if($template === "sign-out") {
-		$pageTitle = "Sign out";
+		$pageTitle = tr("Sign out");
 		
-		breadcrumbs([ "Sign out" => "/sign-out/" ]);
+		breadcrumbs([ tr("Sign out") => "/sign-out/" ]);
 		
 		include("page-sign-out.php");
 	}
@@ -122,9 +122,9 @@ if($template === 'account') {
 // User profile: top
 // =======================================================
 if($template === "user") {
-	$page_title = $user['username'].' profile (プロフィール)';
+	$page_title = tr('{username} profile', [ 'replace' => [ 'username' => $user['username'] ] ]);
 	
-	breadcrumbs([ "Member list" => "/users/", $user["username"] => "/users/".$user["username"]."/" ]);
+	breadcrumbs([ tr("Member list") => "/users/", $user["username"] => "/users/".$user["username"]."/" ]);
 	
 	// Get points
 	$access_points = new access_points($pdo);
@@ -196,9 +196,9 @@ if($template === "user") {
 	// User profile: activity
 	// =======================================================
 	if($template === 'activity') {
-		$page_title = $user['user'].' activity';
+		$page_title = tr('{username} activity', [ 'replace' => ['username' => $user['user']] ]);
 		
-		breadcrumbs([ 'Member list' => '/users/', $user['username'] => '/users/'.$user['username'].'/', 'Activity' => '/users/'.$user['username'].'/activity/' ]);
+		breadcrumbs([ tr('Member list') => '/users/', $user['username'] => '/users/'.$user['username'].'/', tr('Activity') => '/users/'.$user['username'].'/activity/' ]);
 		
 		include('page-activity.php');
 	}
@@ -207,9 +207,9 @@ if($template === "user") {
 	// =======================================================
 	if($template === "account") {
 		
-		$pageTitle = "Edit account";
+		$pageTitle = tr("Edit account");
 		
-		breadcrumbs([ "Member list" => "/users/", $user["username"] => "/users/".$user["username"]."/", "Edit" => "/account/edit/" ]);
+		breadcrumbs([ tr("Member list") => "/users/", $user["username"] => "/users/".$user["username"]."/", tr("Edit") => "/account/edit/" ]);
 		
 		include("page-edit.php");
 	}
@@ -217,9 +217,9 @@ if($template === "user") {
 	// Edit avatar
 	// =======================================================
 	if($template === 'edit-avatar') {
-		$page_title = "Edit avatar";
+		$page_title = tr("Edit avatar");
 		
-		breadcrumbs([ "Member list" => "/users/", $user["username"] => "/users/".$user["username"]."/", "Edit" => "/account/edit/" ]);
+		breadcrumbs([ tr("Member list") => "/users/", $user["username"] => "/users/".$user["username"]."/", tr("Edit") => "/account/edit/" ]);
 		
 		include("page-edit-avatar.php");
 	}
@@ -227,9 +227,9 @@ if($template === "user") {
 	// Sign in/register
 	// =======================================================
 	if($template === "sign-in") {
-		$pageTitle = "Sign in or register";
+		$pageTitle = tr("Sign in or register");
 		
-		breadcrumbs([ "Sign in/register" => "/account/" ]);
+		breadcrumbs([ tr("Sign in/register") => "/account/" ]);
 		
 		include("page-sign-in-register.php");
 	}

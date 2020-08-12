@@ -18,7 +18,7 @@
 	
 	$access_artist = new access_artist($pdo);
 	
-	$page_header = lang('Change account settings', 'アカウント', 'div');
+	$page_header = tr('Change account settings', ['ja'=>'アカウント', 'lang'=>true,'lang_args'=>'div']);
 	
 	if($_SESSION["is_signed_in"] && is_numeric($_SESSION["user_id"])) {
 		$sql_check = "SELECT 1 FROM users WHERE id=? AND is_vip=1 LIMIT 1";
@@ -51,21 +51,21 @@
 						<input name="id" value="<?= $user['id']; ?>" hidden />
 						
 						<h2>
-							<?= lang('User roles', 'ユーザーの役割', 'div'); ?>
+							<?= tr('User roles', ['ja'=>'ユーザーの役割','lang'=>true,'lang_args'=>'div']); ?>
 						</h2>
 						
 						<ul class="text">
 							<li>
 								<label class="input__radio"><input class="input__choice" name="is_vip"       type="checkbox" value="1" <?= $user['is_vip']       ? 'checked' : null; ?> /><span class="symbol__unchecked">VIP</span></label>
-								Can access VIP-limited content.
+								<?= tr('Can access VIP-limited content.'); ?>
 							</li>
 							<li>
-								<label class="input__radio"><input class="input__choice" name="is_editor"    type="checkbox" value="1" <?= $user['is_editor']    ? 'checked' : null; ?> /><span class="symbol__unchecked">Editor</span></label>
-								Can add/edit data.
+								<label class="input__radio"><input class="input__choice" name="is_editor"    type="checkbox" value="1" <?= $user['is_editor']    ? 'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Editor'); ?></span></label>
+								<?= tr('Can add/edit data.'); ?>
 							</li>
 							<li>
-								<label class="input__radio"><input class="input__choice" name="is_moderator" type="checkbox" value="1" <?= $user['is_moderator'] ? 'checked' : null; ?> /><span class="symbol__unchecked">Moderator</span></label>
-								Can approve/delete data and assign user roles.
+								<label class="input__radio"><input class="input__choice" name="is_moderator" type="checkbox" value="1" <?= $user['is_moderator'] ? 'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Moderator'); ?></span></label>
+								<?= tr('Can approve/delete data and assign user roles.'); ?>
 							</li>
 						</ul>
 					</div>
@@ -76,34 +76,34 @@
 					<div>
 						
 						<h3>
-							<?= lang('Individual permissions', '各パーミッション', 'div'); ?>
+							<?= tr('Individual permissions', ['ja'=>'各パーミッション', 'lang'=>true,'lang_args'=>'div']); ?>
 						</h3>
 						<div class="text text--outlined user__permissions">
 							<div class="input__row">
 								
 								<div class="input__group">
 									<h5 class="input__label">
-										General
+										<?= ('General'); ?>
 									</h5>
-									<label class="input__radio"><input class="input__choice" name="can_comment" type="checkbox" value="1" <?= $user['can_comment'] ? 'checked' : null; ?> /><span class="symbol__unchecked">Leave comments</span></label>
+									<label class="input__radio"><input class="input__choice" name="can_comment" type="checkbox" value="1" <?= $user['can_comment'] ? 'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Leave comments'); ?></span></label>
 								</div>
 								
 								<div class="input__group">
 									<h5 class="input__label">
-										Editing
+										<?= ('Editing'); ?>
 									</h5>
-									<label class="input__radio"><input class="input__choice" name="can_add_data"       type="checkbox" value="1" <?= $user['can_add_data'] ?       'checked' : null; ?> /><span class="symbol__unchecked">Add data</span></label>
-									<label class="input__radio"><input class="input__choice" name="can_access_drafts"  type="checkbox" value="1" <?= $user['can_access_drafts'] ?  'checked' : null; ?> /><span class="symbol__unchecked">Access drafts</span></label>
-									<label class="input__radio"><input class="input__choice" name="can_add_livehouses" type="checkbox" value="1" <?= $user['can_add_livehouses'] ? 'checked' : null; ?> /><span class="symbol__unchecked">Add livehouses</span></label>
+									<label class="input__radio"><input class="input__choice" name="can_add_data"       type="checkbox" value="1" <?= $user['can_add_data'] ?       'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Add data'); ?></span></label>
+									<label class="input__radio"><input class="input__choice" name="can_access_drafts"  type="checkbox" value="1" <?= $user['can_access_drafts'] ?  'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Access drafts'); ?></span></label>
+									<label class="input__radio"><input class="input__choice" name="can_add_livehouses" type="checkbox" value="1" <?= $user['can_add_livehouses'] ? 'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Add livehouses'); ?></span></label>
 								</div>
 								
 								<div class="input__group">
 									<h5 class="input__label">
-										Moderating
+										<?= ('Moderating'); ?>
 									</h5>
-									<label class="input__radio"><input class="input__choice" name="can_approve_data" type="checkbox" value="1" <?= $user['can_approve_data'] ? 'checked' : null; ?> /><span class="symbol__unchecked">Approve data</span></label>
-									<label class="input__radio"><input class="input__choice" name="can_delete_data"  type="checkbox" value="1" <?= $user['can_delete_data'] ?  'checked' : null; ?> /><span class="symbol__unchecked">Delete data</span></label>
-									<label class="input__radio"><input class="input__choice" name="can_edit_roles"   type="checkbox" value="1" <?= $user['can_edit_roles'] ?   'checked' : null; ?> /><span class="symbol__unchecked">Edit roles</span></label>
+									<label class="input__radio"><input class="input__choice" name="can_approve_data" type="checkbox" value="1" <?= $user['can_approve_data'] ? 'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Approve data'); ?></span></label>
+									<label class="input__radio"><input class="input__choice" name="can_delete_data"  type="checkbox" value="1" <?= $user['can_delete_data'] ?  'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Delete data'); ?></span></label>
+									<label class="input__radio"><input class="input__choice" name="can_edit_roles"   type="checkbox" value="1" <?= $user['can_edit_roles'] ?   'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Edit roles'); ?></span></label>
 								</div>
 								
 							</div>

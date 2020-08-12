@@ -1,13 +1,13 @@
 <?php
 
 subnav([
-	lang('Profile', 'プロフィール', 'hidden') => '/users/'.$user['username'].'/',
-	lang('Activity', '活動', 'hidden') => '/users/'.$user['username'].'/activity/',
+	tr('Profile', ['ja' => 'プロフィール']) => '/users/'.$user['username'].'/',
+	tr('Activity', ['ja' => '活動']) => '/users/'.$user['username'].'/activity/',
 ]);
 
 if($_SESSION['username'] === $user['username']) {
 	subnav([
-		lang('Edit settings', '情報変更', 'hidden') => '/account/',
-		lang('Edit avatar', 'アバター変更', 'hidden') => '/account/edit-avatar/',
+		tr('Edit settings', ['ja' => '情報変更']) => '/account/',
+		tr('Edit avatar', ['ja' => 'アバター変更']) => '/account/edit-avatar/',
 	]);
 }

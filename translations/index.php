@@ -3,13 +3,14 @@
 $access_user = new access_user($pdo);
 
 // Get translation strings
-$sql_translations = 'SELECT translations.* FROM translations';
+$sql_translations = 'SELECT translations.* FROM translations ORDER BY translations.folder ASC, translations.content ASC';
 $stmt_translations = $pdo->prepare($sql_translations);
 $stmt_translations->execute();
 $strings = $stmt_translations->fetchAll();
 
-// Loop through strings and get list of sections
-foreach($strings as $string) {
+// Loop through strings and get list of sections, also replace {}
+foreach($strings as $string_key => $string) {
+	$strings[$string_key]['content'] = str_replace(['{','}'], ['<span class="any__note">&#123;','&#125;</span>'], $string['content']);
 	$sections[ $string['folder'] ] = '';
 }
 $sections = array_keys($sections);
@@ -28,7 +29,7 @@ $rslt_proposals = $stmt_proposals->fetchAll();
 // Get proposals' users and replace tokens
 if(is_array($rslt_proposals) && !empty($rslt_proposals)) {
 	foreach($rslt_proposals as $proposal_key => $proposal) {
-		$proposal['content'] = str_replace(['{','}'], ['<span class="any__note">', '</span>'], $proposal['content']);
+		$proposal['content'] = str_replace(['{','}'], ['<span class="any__note">&#123;', '&#125;</span>'], $proposal['content']);
 		$proposal['user'] = $access_user->access_user([ 'id' => $proposal['user_id'], 'get' => 'name' ]);
 		$proposals[$proposal['en_id']][] = $proposal;
 	}

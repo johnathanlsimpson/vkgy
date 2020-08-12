@@ -1,12 +1,8 @@
 <?php
 	
-	$page_title = sanitize($user['username'].' activity (活動)');
+	$page_title = tr('{username} activity', ['replace'=>['username'=>$user['username']]]);
 	
-	$page_header = lang(
-		$user['username'].'\''.(substr($user['username'], -1) == 's' ? null : 's').' activity',
-		$user['username'].'の活動',
-		'div'
-	);
+	$page_header = tr('{username} activity', ['ja'=>'{username}の活動','lang'=>true,'lang_args'=>'div','replace'=>['username'=>$user['username']]]);
 	
 	include('head-user.php');
 ?>
@@ -20,7 +16,7 @@
 <div class="col c1" id="activity">
 	<div>
 		<h2>
-			<?= lang( $user['username'].'\'s activity', $user['username'].'の活動', 'div' ); ?>
+			<?= tr('{username} activity', ['ja'=>'{username}の活動','lang'=>true,'lang_args'=>'div','replace'=>['username'=>$user['username']]]); ?>
 		</h2>
 		
 		<?php
@@ -44,14 +40,14 @@
 		?>
 		
 		<div class="filter__container">
-			<a class="input__radio input__radio--selected <?= ($url_query['order'] === 'asc' ? 'symbol__up-caret' : 'symbol__down-caret'); ?>" href="<?= $canon_url.$canon_filter.'&order='.($url_query['order'] === 'asc' ? 'desc' : 'asc').'#activity'; ?>"><?= lang('date', '年月日', 'hidden'); ?></a>
+			<a class="input__radio input__radio--selected <?= ($url_query['order'] === 'asc' ? 'symbol__up-caret' : 'symbol__down-caret'); ?>" href="<?= $canon_url.$canon_filter.'&order='.($url_query['order'] === 'asc' ? 'desc' : 'asc').'#activity'; ?>"><?= tr('date', ['ja' => '年月日']); ?></a>
 			<div>
 				<span class="symbol__filter symbol--standalone"></span>
-				<a href="<?= $canon_url.$canon_order.'#activity'; ?>"                   class="label search__filter input__radio <?= !in_array($url_query['filter'], ['discussion', 'additions', 'edits', 'other']) ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>"><?= lang('all', '全て', 'hidden'); ?></a>
-				<a href="<?= $canon_url.$canon_order.'&filter=discussion#activity'; ?>" class="label search__filter input__radio <?= $url_query['filter'] === 'discussion'                                          ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>"><?= lang('discussion', '会話', 'hidden'); ?></a>
-				<!--<a href="<?= $canon_url.$canon_order.'&filter=additions#activity'; ?>"  class="label search__filter input__radio <?= $url_query['filter'] === 'additions'                                           ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>"><?= lang('additions', '新規作成', 'hidden'); ?></a>-->
-				<a href="<?= $canon_url.$canon_order.'&filter=edits#activity'; ?>"      class="label search__filter input__radio <?= $url_query['filter'] === 'edits'                                               ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>"><?= lang('edits', '編集', 'hidden'); ?></a>
-				<a href="<?= $canon_url.$canon_order.'&filter=other#activity'; ?>"      class="label search__filter input__radio <?= $url_query['filter'] === 'other'                                               ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>"><?= lang('other', 'その他', 'hidden'); ?></a>
+				<a href="<?= $canon_url.$canon_order.'#activity'; ?>"                   class="label search__filter input__radio <?= !in_array($url_query['filter'], ['discussion', 'additions', 'edits', 'other']) ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>"><?= tr('all', ['ja'=>'全て']); ?></a>
+				<a href="<?= $canon_url.$canon_order.'&filter=discussion#activity'; ?>" class="label search__filter input__radio <?= $url_query['filter'] === 'discussion'                                          ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>"><?= tr('discussion', ['ja'=>'会話']); ?></a>
+				<!--<a href="<?= $canon_url.$canon_order.'&filter=additions#activity'; ?>"  class="label search__filter input__radio <?= $url_query['filter'] === 'additions'                                       ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>"><?= tr('additions', ['ja'=>'新規作成']); ?></a>-->
+				<a href="<?= $canon_url.$canon_order.'&filter=edits#activity'; ?>"      class="label search__filter input__radio <?= $url_query['filter'] === 'edits'                                               ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>"><?= tr('edits', ['ja'=>'編集']); ?></a>
+				<a href="<?= $canon_url.$canon_order.'&filter=other#activity'; ?>"      class="label search__filter input__radio <?= $url_query['filter'] === 'other'                                               ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>"><?= tr('other', ['ja'=>'その他']); ?></a>
 			</div>
 		</div>
 		
@@ -96,19 +92,24 @@
 						<?php
 							if(is_numeric($url_query['page']) && $url_query['page'] > 1) {
 								?>
-									<a class="symbol__previous" href="<?= $canon_url.$canon_filter.$canon_order.'&page='.($url_query['page'] - 1).'#activity'; ?>">Page <?= ($url_query['page'] - 1); ?></a>
+									<a class="symbol__previous" href="<?= $canon_url.$canon_filter.$canon_order.'&page='.($url_query['page'] - 1).'#activity'; ?>"><?= tr('Page {page_num}', ['replace'=>['page_num'=>($url_query['page'] - 1)]]); ?></a>
 								<?php
 							}
 							else {
-								echo 'Page 1';
+								echo tr('Page {page_num}', ['replace'=>['page_num'=>'1']]);
 							}
 						?>
 					</div>
 					<div style="text-align: center;">
-						Results <?= ($activity_offset + 1).' to '.($activity_offset + $activity_limit); ?>
+						<?= tr('Results {start_num} to {end_num}', [
+							'replace' => [
+								'start_num' => ($activity_offset + 1),
+								'end_num' => ($activity_offset + $activity_limit)
+							]
+						]); ?>
 					</div>
 					<div style="text-align: right;">
-						<a class="symbol__next" href="<?= $canon_url.$canon_filter.$canon_order.'&page='.(is_numeric($url_query['page']) && $url_query['page'] ? $url_query['page'] + 1 : 2).'#activity'; ?>">Page <?= (is_numeric($url_query['page']) && $url_query['page'] ? $url_query['page'] + 1 : 2); ?></a>
+						<a class="symbol__next" href="<?= $canon_url.$canon_filter.$canon_order.'&page='.(is_numeric($url_query['page']) && $url_query['page'] ? $url_query['page'] + 1 : 2).'#activity'; ?>"><?= tr('Page {page_num}', ['replace'=>['page_num'=>(is_numeric($url_query['page']) && $url_query['page'] ? $url_query['page'] + 1 : 2)]]); ?></a>
 					</div>
 				</div>
 			<?php

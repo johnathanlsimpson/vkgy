@@ -211,23 +211,45 @@ let listOptions = {
 let stringList = new List('translations-list', listOptions);
 
 // Filter by string section
-let filterSectionElem = document.querySelector('[name="filter_section"]');
-filterSectionElem.addEventListener('change', function(event) {
+let filterTitle = document.querySelector('.accepted__section');
+let filterSectionElems = document.querySelectorAll('.filter--section');
+
+filterSectionElems.forEach(function(filterSectionElem) {
 	
-	let filterSection = filterSectionElem.value;
-	
-	stringList.filter(function(item) {
+	filterSectionElem.addEventListener('click', function(event) {
 		
-		if(!item.values().section || item.values().section === filterSection) {
-			return true;
-		}
-		else {
-			return false;
-		}
+		filterByHash();
 		
 	});
 	
 });
+
+// Filter section by hash
+function filterByHash() {
+	
+	setTimeout(function() {
+		
+		let filterSection = window.location.hash;
+		filterSection = filterSection ? filterSection.substring(1) : null;
+		
+		filterTitle.innerHTML = filterSection;
+		
+		stringList.filter(function(item) {
+			
+			if(!item.values().section || item.values().section === filterSection) {
+				return true;
+			}
+			else {
+				return false;
+			}
+			
+		});
+		
+	}, 100);
+}
+
+// Filter by hash on load
+filterByHash();
 
 // Filter by language
 let filterLanguageElem = document.querySelector('[name="filter_language"]');
@@ -241,6 +263,3 @@ filterLanguageElem.addEventListener('change', function(event) {
 	translationsContainer.dataset.filterLang = filterLanguage;
 	
 });
-
-// On page load, filter to UI section
-filterSectionElem.selectize.setValue('php');

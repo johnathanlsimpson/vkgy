@@ -54,6 +54,9 @@ style([
 	<h2>
 		<?= tr('Translations', [ 'lang' => true, 'lang_args' => 'div' ]); ?>
 	</h2>
+	<h3 class="accepted__section">
+		404
+	</h3>
 	
 	<div class="col c4-AAAB">
 	
@@ -109,7 +112,7 @@ style([
 														ob_start();
 														?>
 															<li class="any--flex details__proposal" data-language="{language}">
-																<div class="any--flex-grow any--weaken-color">
+																<div class="details__content-container any--flex-grow any--weaken-color">
 																	<span class="language any--hidden">{language}</span>
 																	<h5>
 																		{language_name}
@@ -144,9 +147,17 @@ style([
 											<?php
 										}
 										
+										// Start a counter and assume each string is new (later we'll loop through proposals and update)
+										$num_new[ $string['folder'] ][ $string['id'] ] = 1;
+										
 										$string['languages'] = [];
 										if( is_array($proposals[$string['id']]) && !empty($proposals[$string['id']]) ) {
 											foreach($proposals[$string['id']] as $proposal) {
+												
+												// Decrease counter from earlier if there's a translated proposal for this string (in user's language)
+												if( $proposal['language'] === $_SESSION['language'] && $proposal['id'] == $string[ $proposal['language'].'_id' ]) {
+													unset($num_new[ $string['folder'] ][ $string['id'] ]);
+												}
 												
 												$string['languages'][] = $proposal['language'];
 												
@@ -248,27 +259,13 @@ style([
 	</div>
 	
 	<!-- Filters -->
-	<div>
+	<div class="filter__wrapper">
 		
 		<ul class="text text--outlined">
 			
-			<li class="input__row" style="z-index:3;">
-				<div class="input__group any--flex-grow">
-					<label class="input__label symbol__filter">Section</label>
-					<select class="input any--flex-grow" name="filter_section" placeholder="section">
-						<option></option>
-						<?php
-							foreach($sections as $section) {
-								echo '<option value="'.$section.'">'.($section === 'php' ? 'UI' : $section).'</option>';
-							}
-						?>
-					</select>
-				</div>
-			</li>
-			
 			<li class="input__row" style="z-index:2;">
 				<div class="input__group any--flex-grow">
-					<label class="input__label symbol__filter">Language</label>
+					<label class="input__label">Language</label>
 					<select class="input any--flex-grow" name="filter_language" placeholder="language">
 						<option>all</option>
 						<?php
@@ -279,6 +276,22 @@ style([
 							}
 						?>
 					</select>
+				</div>
+			</li>
+			
+			<li class="input__row" style="z-index:3;">
+				<div class="input__group any--flex-grow">
+					<label class="input__label">Section</label>
+					<ul class="any--flex-grow <?= count($sections) > 6 ? 'filter--scroll' : null; ?>">
+						<?php
+							foreach($sections as $section) {
+								echo '<li>';
+								echo '<a class="filter--section" href="#'.$section.'">'.($section === 'php' ? 'UI' : $section).'</a>';
+								echo is_array($num_new[$section]) && count($num_new[ $section ]) ? ' <span class="any__note">'.count($num_new[$section]).' new</span>' : null;
+								echo '</li>';
+							}
+						?>
+					</ul>
 				</div>
 			</li>
 			
@@ -321,7 +334,7 @@ style([
 				
 				<div class="input__group">
 					<label class="input__label">ID</label>
-					<input class="any--hidden" name="id" value="" />
+					<input name="id" placeholder="id" size="2" value="" />
 				</div>
 				
 				<div class="input__group">
