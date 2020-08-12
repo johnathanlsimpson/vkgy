@@ -140,8 +140,8 @@
 						border-radius: 0 0 3px 3px;
 						flex-direction: column;
 						left: -2px;
+						min-width: 100%;
 						position: absolute;
-						right: 0;
 						z-index: 101;
 					}
 					.language__choice, .language__help {
