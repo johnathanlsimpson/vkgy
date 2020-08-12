@@ -10,7 +10,7 @@ $language = friendly($_POST['language']);
 
 // Check ID/language/title
 if(is_numeric($blog_id)) {
-	if( $language && in_array($language, $translate->allowed_languages) ) {
+	if( $language && in_array($language, array_keys($translate->allowed_languages)) ) {
 		if( strlen($title) && strlen($friendly) ) {
 			
 			// Update friendly to include language
