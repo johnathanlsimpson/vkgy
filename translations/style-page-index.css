@@ -38,9 +38,19 @@
 .details__proposal {
 	align-items: flex-start;
 }
+@media(max-width:600px) {
+	.details__proposal {
+		flex-wrap: wrap;
+	}
+	.details__content-container {
+		margin-bottom: 1rem;
+		width: 100%;
+	}
+}
 .details__user, .details__date {
 	line-height: 1.5rem;
 	margin-right: 0.5rem;
+	white-space: nowrap;
 }
 
 li.data__container {
@@ -63,6 +73,7 @@ li.input__row {
 	display: inline-flex;
 	line-height: 1.5rem;
 	text-align: center;
+	white-space: nowrap;
 }
 .tag--subgenre .tag__voting {
 	flex-direction: column;
@@ -109,4 +120,14 @@ li.input__row {
 }
 .tag--subgenre .tag__downvote:hover {
 	--vote-dir: to top;
+}
+
+@media(max-width:600px) {
+	.filter__wrapper {
+		order: -1;
+	}
+}
+.filter--scroll {
+	max-height: 14rem;
+	overflow-y: scroll;
 }
