@@ -176,6 +176,10 @@ class translate {
 		// Set working folder and translation file to look for in folder
 		$folder = friendly($args['folder']) ?: (explode('/', $_SERVER['REQUEST_URI'])[1] ?: 'main');
 		
+		// Get context and file
+		$file = basename(__FILE__, '.php') ?: null;
+		$context = sanitize($args['context']) ?: null;
+		
 		// If string provided and requested language allowed
 		if( strlen($string) && strlen($this->language) ) {
 			
@@ -209,9 +213,9 @@ class translate {
 					// If string not in DB, add it, then regen language file for this folder
 					if(!$rslt_check) {
 						
-						$sql_string = 'INSERT INTO translations (content, folder) VALUES (?, ?)';
+						$sql_string = 'INSERT INTO translations (content, folder, page, context) VALUES (?, ?, ?, ?)';
 						$stmt_string = $this->pdo->prepare($sql_string);
-						if($stmt_string->execute([ $string, $folder ])) {
+						if($stmt_string->execute([ $string, $folder, $page, $context ])) {
 							
 							// If fallback Japanese was provided (i.e. for initial pass at making site translatable), insert as proposal
 							if(strlen($args['ja'])) {

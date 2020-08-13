@@ -83,14 +83,14 @@
 								
 								<div class="input__group">
 									<h5 class="input__label">
-										<?= ('General'); ?>
+										<?= tr('General', ['context'=>'Heading used to describe permissions that each user role brings.']); ?>
 									</h5>
 									<label class="input__radio"><input class="input__choice" name="can_comment" type="checkbox" value="1" <?= $user['can_comment'] ? 'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Leave comments'); ?></span></label>
 								</div>
 								
 								<div class="input__group">
 									<h5 class="input__label">
-										<?= ('Editing'); ?>
+										<?= tr('Editing', ['context'=>'Heading used to describe permissions that each user role brings.']); ?>
 									</h5>
 									<label class="input__radio"><input class="input__choice" name="can_add_data"       type="checkbox" value="1" <?= $user['can_add_data'] ?       'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Add data'); ?></span></label>
 									<label class="input__radio"><input class="input__choice" name="can_access_drafts"  type="checkbox" value="1" <?= $user['can_access_drafts'] ?  'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Access drafts'); ?></span></label>
@@ -99,7 +99,7 @@
 								
 								<div class="input__group">
 									<h5 class="input__label">
-										<?= ('Moderating'); ?>
+										<?= tr('Moderating', ['context'=>'Heading used to describe permissions that each user role brings.']); ?>
 									</h5>
 									<label class="input__radio"><input class="input__choice" name="can_approve_data" type="checkbox" value="1" <?= $user['can_approve_data'] ? 'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Approve data'); ?></span></label>
 									<label class="input__radio"><input class="input__choice" name="can_delete_data"  type="checkbox" value="1" <?= $user['can_delete_data'] ?  'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Delete data'); ?></span></label>
@@ -131,22 +131,22 @@
 					<div>
 						
 						<h3>
-							<?= lang('Profile options', '会員情報', 'div'); ?>
+							<?= tr('Profile options', ['lang'=>true,'ja'=>'会員情報','lang_args'=>'div']); ?>
 						</h3>
 						<ul class="text">
 								<li class="input__row">
 									<div class="input__group any--flex-grow">
-										<label class="input__label">Name</label>
-										<input class="any--flex-grow" name="name" placeholder="name" value="<?php echo $user["name"]; ?>" />
+										<label class="input__label"><?= tr('Name', ['context'=>'Profile option']); ?></label>
+										<input class="any--flex-grow" name="name" placeholder="<?= tr('name', ['context'=>'Profile option']); ?>" value="<?php echo $user["name"]; ?>" />
 									</div>
 									<div class="input__group">
-										<label class="input__label">Birthday</label>
+										<label class="input__label"><?= tr('Birthday', ['context'=>'Profile option']); ?></label>
 										<input data-inputmask="'alias': '####-##-##'" max-length="10" name="birthday" placeholder="yyyy-mm-dd" size="10" value="<?php echo $user["birthday"]; ?>" />
 									</div>
 							</li>
 							<li class="input__row">
 								<div class="input__group any--flex-grow" style="flex-wrap:wrap;">
-									<label class="input__label">VK fan since</label>
+									<label class="input__label"><?= tr('VK fan since', ['context'=>'Profile option (refers to a year)']); ?></label>
 									<input class="fan-since__input" min="<?= $min_fan_since; ?>" max="<?= $max_fan_since; ?>" name="fan_since" step="1" type="range" value="<?= $user['fan_since']; ?>" />
 									<div class="fan-since__labels">
 										<span class="any__note fan-since__tooltip" style="<?= '--fan-since-min:'.$min_fan_since.'; --fan-since:'.$user['fan_since'].';'; ?>"><?= $user['fan_since']; ?></span> 
@@ -159,63 +159,63 @@
 								<li>
 									<div class="input__row">
 										<div class="input__group">
-											<label class="input__label">pronouns</label>
-											<select class="input" name="pronouns" placeholder="select pronouns">
-												<option value="prefer not to say" <?= $user['pronouns'] === 'prefer not to say' ? 'selected' : null; ?>>prefer not to say</option>
-												<option value="she/her" <?= $user['pronouns'] === 'she/her' ? 'selected' : null; ?>>she/her</option>
-												<option value="he/him" <?= $user['pronouns'] == 'he/him' ? 'selected' : null; ?>>he/him</option>
-												<option value="they/them" <?= $user['pronouns'] === 'they/them' ? 'selected' : null; ?>>they/them</option>
-												<option value="custom" <?= !in_array($user['pronouns'], ['prefer not to say', 'she/her', 'he/him', 'they/them']) ? 'selected' : null; ?>>custom</option>
+											<label class="input__label"><?= tr('Pronouns', ['context'=>'Profile option']); ?></label>
+											<select class="input" name="pronouns" placeholder="<?= tr('select pronouns', ['context'=>'Profile option']); ?>">
+												<option value="prefer not to say" <?= $user['pronouns'] === 'prefer not to say' ? 'selected' : null; ?>><?= tr('prefer not to say', ['context'=>'Pronouns option']); ?></option>
+												<option value="she/her" <?= $user['pronouns'] === 'she/her' ? 'selected' : null; ?>><?= tr('she/her', ['context'=>'Pronouns option']); ?></option>
+												<option value="he/him" <?= $user['pronouns'] == 'he/him' ? 'selected' : null; ?>><?= tr('he/him', ['context'=>'Pronouns option']); ?></option>
+												<option value="they/them" <?= $user['pronouns'] === 'they/them' ? 'selected' : null; ?>><?= tr('they/them', ['context'=>'Pronouns option']); ?></option>
+												<option value="custom" <?= !in_array($user['pronouns'], ['prefer not to say', 'she/her', 'he/him', 'they/them']) ? 'selected' : null; ?>><?= tr('custom', ['context'=>'Pronouns option']); ?></option>
 											</select>
-											<input class="input input--secondary any--hidden" name="custom_pronouns" placeholder="your pronouns" value="<?= !in_array($user['pronouns'], ['prefer not to say', 'she/her', 'he/him', 'they/them', 'custom']) ? $user['pronouns'] : null; ?>" />
+											<input class="input input--secondary any--hidden" name="custom_pronouns" placeholder="<?= tr('your pronouns', ['context'=>'Profile option']); ?>" value="<?= !in_array($user['pronouns'], ['prefer not to say', 'she/her', 'he/him', 'they/them', 'custom']) ? $user['pronouns'] : null; ?>" />
 										</div>
 										<div class="input__group any--flex-grow">
-											<label class="input__label">Motto</label>
-											<input class="any--flex-grow" name="motto" placeholder="motto" value="<?php echo $user["motto"]; ?>" />
+											<label class="input__label"><?= tr('Motto', ['context'=>'Profile option']); ?></label>
+											<input class="any--flex-grow" name="motto" placeholder="<?= tr('Motto', ['context'=>'Profile option']); ?>" value="<?php echo $user["motto"]; ?>" />
 										</div>
 									</div>
 								</li>
 							</ul>
 						
 						<h3>
-							<?= lang('Socials', 'ウエブサイト', 'div'); ?>
+							<?= tr('Social Media',['context'=>'Profile option','lang'=>true,'lang_args'=>'div']); ?>
 						</h3>
 						
 						<ul class="text">
 							<li class="input__row">
 								<div class="input__group any--flex-grow">
-									<label class="input__label">Website</label>
+									<label class="input__label"><?= tr('Website', ['context'=>'Profile option']); ?></label>
 									<input class="any--flex-grow" name="website" placeholder="https://yoursite.com" value="<?= $user['website']; ?>" />
 								</div>
 							</li>
 							
 							<li class="input__row">
 								<div class="input__group any--flex-grow">
-									<label class="input__label">Twitter username</label>
+									<label class="input__label"><?= tr('Twitter username', ['context'=>'Profile option']); ?></label>
 									<span class="social__prefix">@</span>
-									<input class="any--flex-grow" name="twitter" placeholder="username" style="padding-left:calc(0rem + 3ch);" value="<?= $user['twitter']; ?>" />
+									<input class="any--flex-grow" name="twitter" placeholder="<?= tr('username', ['context'=>'Profile option']); ?>" style="padding-left:calc(0rem + 3ch);" value="<?= $user['twitter']; ?>" />
 								</div>
 							</li>
 							
 							<li class="input__row">
 								<div class="input__group any--flex-grow">
-									<label class="input__label">Facebook username</label>
+									<label class="input__label"><?= tr('Facebook username', ['context'=>'Profile option']); ?></label>
 									<span class="social__prefix">fb.com/</span>
-									<input class="any--flex-grow" name="facebook" placeholder="username" style="padding-left:calc(0rem + 8ch);" value="<?= $user['facebook']; ?>" />
+									<input class="any--flex-grow" name="facebook" placeholder="<?= tr('username', ['context'=>'Profile option']); ?>" style="padding-left:calc(0rem + 8ch);" value="<?= $user['facebook']; ?>" />
 								</div>
 							</li>
 							
 							<li class="input__row">
 								<div class="input__group any--flex-grow">
-									<label class="input__label">last.fm username</label>
+									<label class="input__label"><?= tr('last.fm username', ['context'=>'Profile option']); ?></label>
 									<span class="social__prefix">last.fm/user/</span>
-									<input class="any--flex-grow" name="lastfm" placeholder="username" style="padding-left:calc(0rem + 12ch);" value="<?= $user['lastfm']; ?>" />
+									<input class="any--flex-grow" name="lastfm" placeholder="<?= tr('username', ['context'=>'Profile option']); ?>" style="padding-left:calc(0rem + 12ch);" value="<?= $user['lastfm']; ?>" />
 								</div>
 							</li>
 							
 							<li class="input__row">
 								<div class="input__group any--flex-grow">
-									<label class="input__label">Monochrome Heaven username</label>
+									<label class="input__label"><?= tr('Monochrome Heaven username', ['context'=>'Profile option']); ?></label>
 									<span class="social__prefix">m-h.com/profile/</span>
 									<input class="any--flex-grow" name="mh" placeholder="123-username" style="padding-left:calc(0rem + 15ch);" value="<?= $user['mh']; ?>" />
 								</div>
@@ -253,7 +253,7 @@
 						</script>
 						
 						<h3>
-							<?= lang('Site customization', '表示', 'div'); ?>
+							<?= tr('Site customization', ['context'=>'Profile option','ja'=>'表示', 'lang'=>true,'lang_args'=>'div']); ?>
 						</h3>
 						<ul class="text">
 								<li>
