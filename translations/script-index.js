@@ -230,7 +230,7 @@ function filterByHash() {
 	setTimeout(function() {
 		
 		let filterSection = window.location.hash;
-		filterSection = filterSection ? filterSection.substring(1) : null;
+		filterSection = filterSection ? filterSection.substring(1) : 'php';
 		
 		filterTitle.innerHTML = filterSection;
 		
