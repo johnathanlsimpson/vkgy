@@ -263,22 +263,6 @@ style([
 		
 		<ul class="text text--outlined">
 			
-			<li class="input__row" style="z-index:2;">
-				<div class="input__group any--flex-grow">
-					<label class="input__label">Language</label>
-					<select class="input any--flex-grow" name="filter_language" placeholder="language">
-						<option>all</option>
-						<?php
-							foreach($translate->allowed_languages as $language_key => $language) {
-								if($language_key != 'en') {
-									echo '<option value="'.$language_key.'" '.($translate->language === $language_key ? 'selected' : null).'>'.$language.'</option>';
-								}
-							}
-						?>
-					</select>
-				</div>
-			</li>
-			
 			<li class="input__row" style="z-index:3;">
 				<div class="input__group any--flex-grow">
 					<label class="input__label">Section</label>
@@ -292,6 +276,22 @@ style([
 							}
 						?>
 					</ul>
+				</div>
+			</li>
+			
+			<li class="input__row" style="z-index:2;">
+				<div class="input__group any--flex-grow">
+					<label class="input__label">Language</label>
+					<select class="input any--flex-grow" name="filter_language" placeholder="language">
+						<option>all</option>
+						<?php
+							foreach($translate->allowed_languages as $language_key => $language) {
+								if($language_key != 'en') {
+									echo '<option value="'.$language_key.'" '.($translate->language === $language_key ? 'selected' : null).'>'.$language.'</option>';
+								}
+							}
+						?>
+					</select>
 				</div>
 			</li>
 			
