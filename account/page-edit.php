@@ -259,13 +259,13 @@
 								<li>
 									<div class="input__row">
 										<div class="input__group">
-											<label class="input__label"><?= lang('Site theme', '背景画像', 'hidden'); ?></label>
+											<label class="input__label"><?= tr('Site theme', ['context'=>'Profile option','ja'=>'背景画像']); ?></label>
 											
 											<input class="input__choice any--hidden" id="site_theme_0" name="site_theme" type="radio" value="0" <?php echo $user['site_theme'] == 0 ? 'checked' : null; ?> />
-											<label class="input__radio symbol__unchecked " for="site_theme_0">default</label>
+											<label class="input__radio symbol__unchecked " for="site_theme_0"><?= tr('default', ['context'=>'site theme option']); ?></label>
 											
 											<input class="input__choice any--hidden" id="site_theme_1" name="site_theme" type="radio" value="1" <?php echo $user['site_theme'] == 1 ? 'checked' : null; ?> />
-											<label class="input__radio symbol__unchecked " for="site_theme_1">dark</label>
+											<label class="input__radio symbol__unchecked " for="site_theme_1"><?= tr('dark', ['context'=>'site theme option']); ?></label>
 										</div>
 									</div>
 								</li>
@@ -274,16 +274,16 @@
 								<li>
 									<div class="input__row">
 										<div class="input__group">
-											<label class="input__label"><?= lang('Point animation', 'ポイントをアニメイトします', 'hidden'); ?></label>
+											<label class="input__label"><?= tr('Point animation', ['context'=>'Profile option','ja'=>'ポイントをアニメイトします']); ?></label>
 											
 											<label class="input__radio">
 												<input class="input__choice" name="site_point_animations" type="radio" value="1" <?= $_SESSION['site_point_animations'] ? 'checked' : null; ?> />
-												<span class="symbol__unchecked">show</span>
+												<span class="symbol__unchecked"><?= tr('show', ['context'=>'option for point animations']); ?></span>
 											</label>
 											
 											<input class="input__choice" id="hide-points" name="site_point_animations" type="radio" value="0" <?= !$_SESSION['site_point_animations'] ? 'checked' : null; ?> />
 											<label class="input__radio symbol__unchecked" for="hide-points">
-												hide
+												<?= tr('hide', ['context'=>'option for point animations']); ?>
 											</label>
 											
 											<span class="point__container point--example h5" href="/users/inartistic/" style="opacity:1;transform:none;display:inline-flex;align-items:center;height:2rem;">
@@ -320,7 +320,7 @@
 								<li>
 									<div class="input__row">
 										<div class="input__group">
-											<label class="input__label"><?= lang('Username style', 'アイコン', 'hidden'); ?></label>
+											<label class="input__label"><?= tr('Username icon', ['context'=>'Profile option','ja'=>'アイコン']); ?></label>
 											
 											<?php
 												foreach([ 'crown', 'heart', 'star', 'flower', 'moon' ] as $icon_key => $icon_name) {
