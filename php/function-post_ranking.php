@@ -31,25 +31,26 @@
 	// $post_type = 'twitter';
 	
 	// Get top three artists from last week
-	/*$sql_rankings = "
+	$sql_rank = '
 		SELECT
-			SUM(artists_views.view_count) AS view_count,
+			views_weekly_artists.*,
+			(COALESCE(views_weekly_artists.past_views, 0) - COALESCE(views_weekly_artists.past_past_views, 0)) AS num_difference,
+			artists.name,
 			artists.romaji,
 			artists.friendly,
-			artists.name
-		FROM artists_views
-		LEFT JOIN artists ON artists.id=artists_views.artist_id
-		WHERE artists_views.date_occurred > ? AND artists_views.date_occurred < ?
-		GROUP BY artists_views.artist_id
-		ORDER BY view_count DESC
+			COALESCE(artists.romaji, artists.name) AS quick_name
+		FROM
+			views_weekly_artists
+		LEFT JOIN
+			artists ON artists.id=views_weekly_artists.artist_id
+		ORDER BY
+			num_difference DESC,
+			past_views DESC
 		LIMIT 3
-	";
-	$stmt_rankings = $pdo->prepare($sql_rankings);
-	$stmt_rankings->execute([
-		date("Y-m-d", strtotime("-2 weeks sunday", time())),
-		date("Y-m-d", strtotime("-1 weeks sunday", time()))
-	]);
-	$bands = $stmt_rankings->fetchAll();*/
+	';
+	$stmt_rank = $pdo->prepare($sql_rank);
+	$stmt_rank->execute();
+	$bands = $stmt_rank->fetchAll();
 	
 	// Go ahead if results returned
 	if(is_array($bands) && !empty($bands)) {

@@ -64,26 +64,29 @@
 			</div>
 		</div>
 		
-		<?php /*<div class="main__ranking">
+		<div class="main__ranking">
 			<h3>
 				<div class="h5">
 					<?= date('n/j', strtotime("-2 weeks sunday", time())).'~'.date('n/j', strtotime("-1 weeks sunday", time())); ?>
 				</div>
-				<?php echo lang('Band access ranking', 'アクセスランキング', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
+				<?= tr('Band access ranking', ['ja'=>'アクセスランキング','lang'=>true,'lang_args'=>'div']); ?>
 			</h3>
 			<ol class="text text--outlined text--compact ul--compact">
 				<?php
-					foreach($rslt_rankings as $ranking_num => $ranking) {
-						?>
-							<li class="ranking__item">
-								<span class="ranking__number symbol__user"></span>
-								<a class="artist artist--no-symbol" href="/artists/<?php echo $ranking["friendly"]; ?>/"><?= lang($ranking['quick_name'], $ranking['name'], 'hidden'); ?></a>
-							</li>
-						<?php
+					if(is_array($rslt_rank) && !empty($rslt_rank)) {
+						foreach($rslt_rank as $rank_num => $artist) {
+							?>
+								<li class="ranking__item">
+									<span class="ranking__number symbol__user"></span>
+									<a class="artist artist--no-symbol" href="<?= '/artists/'.$artist['friendly'].'/'; ?>"><?= lang($artist['quick_name'], $artist['name'], 'hidden'); ?></a>
+									<span class="any--weaken"><?= '+'.$artist['num_difference']; ?></span>
+								</li>
+							<?php
+						}
 					}
 				?>
 			</ol>
-		</div>*/ ?>
+		</div>
 		
 		<?php /*<div class="main__ranking">
 			<h3>

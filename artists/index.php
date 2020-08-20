@@ -298,9 +298,10 @@
 		// Get musicians' band history
 		$artist["musicians"] = sort_musicians($artist["musicians"]);
 		
-		/*$sql_view = "INSERT INTO artists_views (artist_id, date_occurred, view_count) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE view_count = view_count + 1";
-		$stmt_view = $pdo->prepare($sql_view);
-		$stmt_view->execute([$artist["id"], date("Y-m-d")]);*/
+		// Record view
+		include('../php/class-views.php');
+		$views = new views($pdo);
+		$views->add('artist', $artist['id']);
 		
 		// Default video
 		$artist['video'] = $access_video->access_video([ 'artist_id' => $artist['id'], 'is_approved' => true, 'get' => 'basics', 'limit' => 1 ]);

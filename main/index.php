@@ -198,32 +198,29 @@ if(is_array($image) && !empty($image) && file_exists("../images/image_files/".$i
 }
 
 /* Artist rankings */
-/*$rank_start = date( 'Y-m-d', strtotime('-2 weeks sunday', time()) );
-$rank_end = date( 'Y-m-d', strtotime('-1 weeks sunday', time()) );
-$sql_rankings = "
+$sql_rank = '
 	SELECT
-		view_count,
-		artists.friendly,
+		views_weekly_artists.*,
+		(COALESCE(views_weekly_artists.past_views, 0) - COALESCE(views_weekly_artists.past_past_views, 0)) AS num_difference,
 		artists.name,
+		artists.romaji,
+		artists.friendly,
 		COALESCE(artists.romaji, artists.name) AS quick_name
-	FROM (
-		SELECT 
-			artists_views.artist_id,
-			SUM(artists_views.view_count) AS view_count
-		FROM artists_views
-		WHERE artists_views.date_occurred > ? AND artists_views.date_occurred < ?
-		GROUP BY artists_views.artist_id
-	) recent_views
-	LEFT JOIN artists ON artists.id=recent_views.artist_id
-	ORDER BY view_count DESC
+	FROM
+		views_weekly_artists
+	LEFT JOIN
+		artists ON artists.id=views_weekly_artists.artist_id
+	ORDER BY
+		num_difference DESC,
+		past_views DESC
 	LIMIT 3
-";
-$stmt_rankings = $pdo->prepare($sql_rankings);
-$stmt_rankings->execute([ $rank_start, $rank_end ]);
-$rslt_rankings = $stmt_rankings->fetchAll();*/
+';
+$stmt_rank = $pdo->prepare($sql_rank);
+$stmt_rank->execute();
+$rslt_rank = $stmt_rank->fetchAll();
 
 /* Points ranks */
-/*$sql_points = '
+$sql_points = '
 	SELECT weekly_points.user_id, users.username, SUM(weekly_points.point_value) AS points_value
 	FROM (
 		SELECT user_id, point_value
@@ -242,7 +239,7 @@ foreach($point_ranking as $point_key => $point) {
 	$access_points = new access_points($pdo);
 	$user_level = $access_points->access_points([ 'user_id' => $point['user_id'], 'get' => 'level' ]);
 	$point_ranking[$point_key]['level'] = $user_level[0]['level'];
-}*/
+}
 
 /*$access_points = new access_points($pdo);
 $point_ranking = $access_points->access_points([
