@@ -71,34 +71,64 @@ class views {
 	public function archive($item_type=null, $archive_type='daily') {
 		
 		// Set vars
-		$allowed_archive_types = [ 'daily', 'weekly' ];
-		$id_column_name = $item_type.'_id';
-		$views_table_name = 'views_'.$archive_type.'_'.$this->allowed_item_types[$item_type];
-		$archived_table_name = $archive_type === 'daily' ? 'views_weekly_'.$this->allowed_item_types[$item_type] : 'views_archived_'.$this->allowed_item_types[$item_type];
+		$allowed_archive_types = [
+			'daily'   => 'weekly',
+			'weekly'  => '',
+			'monthly' => 'weekly'
+		];
+		$id_column = $item_type.'_id';
+		$current_table_name = 'views_'.$archive_type.'_'.$this->allowed_item_types[$item_type];
+		$archived_table_name = 'views_'.$allowed_archive_types[$archive_type].'_'.$this->allowed_item_types[$item_type];
+		$date_occurred = date('Y-m').'-01';
 		
 		// Make sure archive type is allowed
-		if( in_array($archive_type, $allowed_archive_types) ) {
+		if( in_array($archive_type, array_keys($allowed_archive_types)) ) {
 			
 			// Make sure item type provided and allowed
 			if( strlen($item_type) && in_array($item_type, array_keys($this->allowed_item_types)) ) {
 				
-				// Aggregate current views	
-				$sql_archive = '
-					INSERT INTO '.$archived_table_name.' ('.$id_column_name.', num_views, date_occurred)
-					SELECT '.
-						$views_table_name.'.'.$id_column_name.', '.
-						$views_table_name.'.num_views, '.
-						($archive_type === 'daily' ? '"'.date('Y-m-d H:i:s', strtotime('this week Sunday')).'" AS date_occurred' : $views_table_name.'.date_occurred').'
-					FROM '.$views_table_name.'
-					ON DUPLICATE KEY UPDATE '.$archived_table_name.'.num_views='.$archived_table_name.'.num_views + '.$views_table_name.'.num_views
-				';
-				$stmt_archive = $this->pdo->prepare($sql_archive);
-				$stmt_archive->execute();
+				// Daily aggregation
+				if($archive_type === 'daily') {
+					$sql_archive = "
+						INSERT INTO $archived_table_name ($id_column, num_views)
+						SELECT $id_column, num_views FROM $current_table_name
+						ON DUPLICATE KEY UPDATE $archived_table_name.num_views = $archived_table_name.num_views + $current_table_name.num_views
+					";
+					$sql_delete = "TRUNCATE $current_table_name";
+				}
 				
-				// Wipe current table so we can start over for the day/week
-				$sql_truncate = 'TRUNCATE '.$views_table_name;
-				$stmt_truncate = $this->pdo->prepare($sql_truncate);
-				$stmt_truncate->execute();
+				// Permanent archive
+				elseif($archive_type === 'monthly') {
+					$sql_archive = "
+						INSERT INTO $current_table_name ($id_column, num_views, date_occurred)
+						SELECT $id_column, num_views, '$date_occurred' AS date_occurred FROM $archived_table_name WHERE num_views > 0 OR past_views > 0 OR past_past_views > 0
+						ON DUPLICATE KEY UPDATE $current_table_name.num_views = $current_table_name.num_views + $archived_table_name.num_views
+					";
+					echo $sql_archive;
+				}
+				
+				// Weekly aggregation
+				elseif($archive_type === 'weekly') {
+					$sql_archive = "
+						UPDATE $current_table_name
+						SET past_past_views = past_views, past_views = num_views, num_views = 0
+					";
+					$sql_delete = "
+						DELETE FROM $current_table_name
+						WHERE num_views = 0 AND past_views = 0 AND past_past_views = 0
+					";
+				}
+				
+				if($sql_archive) {
+					$stmt_archive = $this->pdo->prepare($sql_archive);
+					$stmt_archive->execute();
+				}
+				
+				// Wipe data as needed
+				if($sql_delete) {
+					$stmt_delete = $this->pdo->prepare($sql_delete);
+					$stmt_delete->execute();
+				}
 				
 			}
 			
