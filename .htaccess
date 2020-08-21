@@ -67,6 +67,11 @@ RewriteRule  ^(.*)$             https://vk.gy/%{REQUEST_URI} [R=permanent,L]
 #RewriteCond  %{SERVER_NAME}  (occult-proposal.net|occult-proposal.vk.gy)$
 #RewriteRule  ^(.*)$          /occult-proposal.net/$1
 
+RewriteRule  ^about/?$           /?about/&template=about
+RewriteRule  ^contact/?$         /?about/&template=contact
+RewriteRule  ^privacy-policy/?$  /?about/&template=privacy-policy
+
+
 RewriteRule  ^accounts(.*)$                     /account$1 [R=301,L]
 RewriteRule  ^account/?$                        /?account/&template=account
 RewriteRule  ^account/edit-avatar/?$            /?account/&template=edit-avatar
