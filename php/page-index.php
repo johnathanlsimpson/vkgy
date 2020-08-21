@@ -63,6 +63,8 @@
 		<?php display_scripts("top"); ?>
 		
 		<?php display_styles(); ?>
+		
+		<script data-ad-client="ca-pub-5797371558296978" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 	</head>
 	<body class="<?php echo $body_class; ?>">
 		
@@ -407,6 +409,15 @@
 					</li>
 					<li>
 						<a href="/documentation/">documentation</a>
+					</li>
+					<li>
+						<a href="/about/">about</a>
+					</li>
+					<li>
+						<a href="/about/#contact">contact</a>
+					</li>
+					<li>
+						<a href="/about/#privacy">privacy policy</a>
 					</li>
 				</ul>
 				
