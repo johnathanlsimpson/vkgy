@@ -297,7 +297,7 @@ opacity: 1;
 	margin-right: -0.5rem;
 }
 .module {
-	background-image: linear-gradient(to bottom right,hsl(var(--background--secondary)) 1px,transparent 0);
+	/*background-image: linear-gradient(to bottom right,hsl(var(--background--secondary)) 1px,transparent 0);*/
 	background-size: 3px 3px;
 	padding: 1rem;
 }
