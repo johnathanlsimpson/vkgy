@@ -264,11 +264,8 @@
 			</div>
 		</nav>
 			
-			<link
-  rel="stylesheet"
-  href="https://unpkg.com/simplebar@latest/dist/simplebar.css"
-/>
-<script src="https://unpkg.com/simplebar@latest/dist/simplebar.min.js"></script>
+		<link rel="stylesheet" href="/style/external/style-simplebar.css" />
+		<script src="/scripts/external/script-simplebar.js"></script>
 		
 		<nav class="col c1 primary-nav__wrapper">
 			<div class="primary-nav__container any--flex">
