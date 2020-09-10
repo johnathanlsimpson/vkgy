@@ -131,3 +131,6 @@ li.input__row {
 	max-height: 14rem;
 	overflow-y: scroll;
 }
+.red {
+	color: red;
+}

@@ -55,33 +55,95 @@ function insertNameAndRomaji(targetElem, nameAndRomaji) {
 	targetElem.value = name;
 	siblingElem.value = romaji;
 	siblingElem.focus();
+	
 }
 
-
-
-/* initEasyAutocomplete() */
+// Init easyAutocomplete
 function initEasyAutocomplete(targetElem) {
-	var options = {
-		data     : JSON.parse($("[data-contains=songs]").html()),
-		getValue : 'quick_name',
-		list     : {
-			match         : { enabled : true },
-			onChooseEvent : function() { var nameAndRomaji = splitNameAndRomaji(targetElem.val()); insertNameAndRomaji(targetElem[0], nameAndRomaji); }
+	
+	// Get data source
+	let eacSrc = targetElem.dataset.src;
+	eacSrc = document.querySelector('[data-contains="' + eacSrc + '"]');
+	eacSrc = eacSrc ? JSON.parse(eacSrc.innerHTML) : null;
+	
+	let eacOptions = {
+		data: eacSrc,
+		getValue: targetElem.dataset.getValue,
+		list: {
+			match: { enabled: true },
+			onChooseEvent: function() {
+				
+				let srcType = targetElem.dataset.src;
+				
+				// For now we'll just make assumptions based on data source
+				if(srcType == 'songs') {
+					
+					let nameAndRomaji = splitNameAndRomaji($(targetElem).val());
+					insertNameAndRomaji($(targetElem)[0], nameAndRomaji);
+					
+				}
+				
+				else if(srcType == 'types') {
+					
+					let typeAndRomaji = splitNameAndRomaji($(targetElem).val());
+					
+					// Split string into name and romaji
+					let name = typeAndRomaji.name || '';
+					name = name.replace("&#92;&#41;", "\\)").replace("&#92;&#40;", "\\(");
+					
+					let romaji = typeAndRomaji.romaji || '';
+					romaji = romaji.replace("&#92;&#41;", "\\)").replace("&#92;&#40;", "\\(");
+					
+					document.querySelector('[name="type_name"]').value = name;
+					document.querySelector('[name="type_romaji"]').value = romaji;
+					
+					// If romaji included, focus on that elem
+					if(romaji && romaji.length) {
+						document.querySelector('[name="type_romaji"]').focus();
+					}
+					else {
+						document.querySelector('[name="type_name"]').focus();
+					}
+					
+				}
+				
+			}
 		}
 	};
-
-	targetElem.easyAutocomplete(options).attr("data-easyautocompleted", true);
+	
+	// Set 'autocompleted' attribute so we don't init twice
+	targetElem.setAttribute('data-easyautocompleted', true);
+	
+	// Do the actual init
+	$(targetElem).easyAutocomplete(eacOptions);
+	
+	// Focus on the element so user can type
+	targetElem.focus();
+	
+	// If want to show all options from beginning, trigger jQuery event
+	if(targetElem.dataset.open) {
+		$(targetElem).triggerHandler(jQuery.Event("keyup", { keyCode: 65, which: 65}));
+		
+		// Also add event listener for focus
+		targetElem.addEventListener('focus', function() {
+			$(targetElem).triggerHandler(jQuery.Event("keyup", { keyCode: 65, which: 65}));
+		});
+		
+	}
+	
 }
 
-
-
-/* Fire init when appropriate */
-$("body").on("focus", '[name="tracklist[name][]"]:not([data-easyautocompleted])', function() {
-	initEasyAutocomplete($(this));
-	$(this).focus();
+// Init easyAutocomplete on first focus
+let eacElems = document.querySelectorAll('[data-easyautocomplete]:not([data-easyautocompleted])');
+eacElems.forEach(function(eacElem) {
+	
+	eacElem.addEventListener('focus', function(event) {
+		if(!this.hasAttribute('data-easyautocompleted')) {
+		initEasyAutocomplete(this);
+		}
+	});
+	
 });
-
-
 
 /* Reset easyAutocomplete() */
 function resetEasyAutocomplete() {

@@ -379,58 +379,58 @@
 										</div>
 									</div>
 									
-									<?= !$_SESSION['is_vip'] ? '<span class="symbol__vip" style="display:block;margin-top:1rem;">This feature can be accessed after becoming a <a href="https://patreon.com/vkgy" target="_blank">VIP member</a>.</span>' : null; ?>
+									<?= !$_SESSION['is_vip'] ? '<span class="symbol__vip" style="display:block;margin-top:1rem;">'.tr('This feature is limited to VIP members.').'.</span>' : null; ?>
 								</li>
 						</ul>
 					</div>
 					
 					<div>
 						<h3>
-							Email address
+							<?= tr('Email address'); ?>
 						</h3>
 						<div class="text text--outlined <?= strlen($user['email']) ? null : 'text--error'; ?> ">
 							<div class="input__row">
 								<div class="input__group any--flex-grow">
-									<label class="input__label">Email</label>
-									<input class="any--flex-grow" name="email" placeholder="email" type="email" value="<?= $user["email"]; ?>" />
+									<label class="input__label"><?= ('Email'); ?></label>
+									<input class="any--flex-grow" name="email" placeholder="<?= ('Email'); ?>" type="email" value="<?= $user["email"]; ?>" />
 								</div>
 							</div>
 							
-							<?= strlen($user['email']) ? null : '<div class="symbol__error" style="margin-top:1rem;">Your password cannot be recovered if you don\'t have an email address listed.</div>'; ?>
+							<?= strlen($user['email']) ? null : '<div class="symbol__error" style="margin-top:1rem;">'.tr('Your password cannot be recovered if you don\'t have an email address listed.').'</div>'; ?>
 						</div>
 						
 						<h3>
-							Change username
+							<?= tr('Change username'); ?>
 						</h3>
 						<div class="text text--outlined">
 							<div class="input__row">
 								<div class="input__group any--flex-grow">
-									<label class="input__label">New username</label>
-									<input autocomplete="off" class="any--flex-grow" name="new_username" placeholder="new username" />
+									<label class="input__label"><?= tr('New username'); ?></label>
+									<input autocomplete="off" class="any--flex-grow" name="new_username" placeholder="<?= tr('New username'); ?>" />
 								</div>
 							</div>
 						</div>
 						
 						<h3>
-							Change password
+							<?= tr('Change password'); ?>
 						</h3>
 						<div class="text text--outlined">
 							<div class="input__row">
 								<div class="input__group any--flex-grow">
-									<label class="input__label">Current password</label>
-									<input autocomplete="off" class="any--flex-grow" name="current_password" placeholder="current password" type="password" />
+									<label class="input__label"><?= tr('Current password'); ?></label>
+									<input autocomplete="off" class="any--flex-grow" name="current_password" placeholder="<?= tr('Current password'); ?>" type="password" />
 								</div>
 							</div>
 							<div class="input__row">
 								<div class="input__group any--flex-grow">
-									<label class="input__label">New password</label>
-									<input autocomplete="new-password" class="any--flex-grow" name="new_password_1" placeholder="new password" type="password" />
+									<label class="input__label"><?= tr('New password'); ?></label>
+									<input autocomplete="new-password" class="any--flex-grow" name="new_password_1" placeholder="<?= tr('New password'); ?>" type="password" />
 								</div>
 							</div>
 							<div class="input__row">
 								<div class="input__group any--flex-grow">
-									<label class="input__label">New password (confirm)</label>
-									<input autocomplete="new-password" class="any--flex-grow" name="new_password_2" placeholder="new password (confirm)" type="password" />
+									<label class="input__label"><?= tr('New password (confirm)'); ?></label>
+									<input autocomplete="new-password" class="any--flex-grow" name="new_password_2" placeholder="<?= tr('New password (confirm)'); ?>" type="password" />
 								</div>
 							</div>
 						</div>
@@ -443,14 +443,14 @@
 					
 					<div class="any--flex" data-role="submit-container">
 						<button class="any--flex-grow" name="submit" type="submit">
-							Save settings
+							<?= tr('Save settings'); ?>
 						</button>
 						<span data-role="status"></span>
 					</div>
 					
 					<div class="any--flex any--hidden" data-role="edit-container">
-						<a class="any--align-center a--outlined a--padded any--flex-grow symbol__user" href="<?= $user['url']; ?>">View profile</a>
-						<a class="add__edit any--weaken-color a--outlined a--padded symbol__edit" data-role="edit" href="<?= $_SESSION['can_edit_roles'] && $_SESSION['username'] != $user['username'] ? $user['url'].'edit/' : '/account/'; ?>" style="margin-left:1rem;">Edit again</a>
+						<a class="any--align-center a--outlined a--padded any--flex-grow symbol__user" href="<?= $user['url']; ?>"><?= tr('View profile'); ?></a>
+						<a class="add__edit any--weaken-color a--outlined a--padded symbol__edit" data-role="edit" href="<?= $_SESSION['can_edit_roles'] && $_SESSION['username'] != $user['username'] ? $user['url'].'edit/' : '/account/'; ?>" style="margin-left:1rem;"><?= tr('Edit again'); ?></a>
 					</div>
 					
 					<div class="edit__result text text--outlined text--notice" data-role="result"></div>
@@ -463,12 +463,11 @@
 			<div class="col c1">
 				<div>
 					<h2>
-						Avatars and banners
+						<?= tr('Avatars and banners'); ?>
 					</h2>
 					<ul class="text">
 						<li>
-							Copy any URL below and paste it into your forum signature to display your account's latest stats, or your latest avatar.<br /><br />
-							<div class="symbol__help any--weaken">If you manually save and upload the image, it will not auto-update. The image will also not auto-update on certain services such as Twitter, even if you copy+paste the link as instructed.</div>
+							<?= tr('Copy the URL below and paste it into your forum signature to display a banner of your vkgy account.'); ?>
 						</li>
 						<li>
 							<code>https://vk.gy/sig.jpg?<?= $_SESSION['username']; ?></code><br /><br />
@@ -489,61 +488,45 @@
 					</ul>
 					
 					<h2>
-						Use vkgy with Mp3tag
+						<?= tr('Use vkgy with Mp3tag'); ?>
 					</h2>
 					<input class="obscure__input" id="obscure-mp3tag" type="checkbox" checked="">
 					<div class="text obscure__container">
 						<div class="obscure__item">
-							You can now tag your music files using the vkgy database. This will automatically remove incorrect tags, add cover art, add romaji, and more.
+							<?= tr('You can correctly tag your music files using the vkgy database in Mp3tag.'); ?>
 						</div>
 						<div class="obscure__item">
-							<a class="a--outlined a--padded" href="/tag-source/">Download Mp3tag script</a>
+							<a class="a--outlined a--padded" href="/tag-source/"><?= tr('Download Mp3tag script'); ?></a>
 						</div>
 						<div class="obscure__item">
 							<hr />
 							<h3 class="obscure__item">
-								Basic usage
+								<?= tr('How to use'); ?>
 							</h3>
 						</div>
 						<div class="obscure__item">
 							<ol>
-								<li>Download <a href="https://mp3tag.de/en/" target="_blank">Mp3tag</a>.</li>
-								<li>Download the .src file above.</li>
-								<li>Move the .src file to %APPDATA%\Mp3tag\data\sources.</li>
-								<li>Open your music files in Mp3tag and select them.</li>
-								<li>Go to Tag Sources > vkgy.</li>
-								<li>Use the search popup to find the artist and/or album. (You can search like this: &ldquo;artist|album&rdquo;, &ldquo;artist&rdquo;, or &ldquo;|album&rdquo;.)</li>
+								<li><?= tr('Download the {mp3tag} program.', [ 'replace' => [ 'mp3tag' => '<a href="https://mp3tag.de/en/" target="_blank">Mp3tag</a>' ] ]); ?></li>
+								<li><?= tr('Download the .src file above.'); ?></li>
+								<li><?= tr('Move the .src file to {folder_name}.', [ 'replace' => [ 'folder_name' => '%APPDATA%\Mp3tag\data\sources' ] ]); ?></li>
+								<li><?= tr('Open your music files in Mp3tag and select them.'); ?></li>
+								<li><?= tr('In the file menu, go to Tag Sources > vkgy.'); ?></li>
+								<li><?= tr('Use the search popup to find the artist and/or album.'); ?></li>
 							</ol>
 						</div>
-						<div class="obscure__item">
-							<hr />
-						</div>
-						<div class="obscure__item">
-							<h3>
-								Notes
-							</h3>
-						</div>
-						<div class="obscure__item">
-							<ul class="ul--bulleted">
-								<li>Searches work with Japanese and/or romaji.</li>
-								<li>To search all releases by an artist, just ommit the &ldquo;|album&rdquo; portion in the search bar.</li>
-								<li>To search by album name only, leave the artist portion blank and format your search like &ldquo;|album&rdquo;.</li>
-								<li>Try leaving out press/type when search by album name.</li>
-							</ul>
-						</div>
 						
-						<label class="input__button obscure__button" for="obscure-mp3tag">Detailed instructions</label>
+						<label class="input__button obscure__button" for="obscure-mp3tag"><?= tr('Detailed instructions'); ?></label>
 					</div>
 					
 					<h2>
-						Download collection list
+						<?= tr('Download collection list'); ?>
 					</h2>
 					<div class="text">
-						Below, you can download a tab-separated <code>.csv</code> list of the items you own, or items you're selling. (These files work best when imported into Google Docs.)
+						<?= tr('You can download a tab-separated {file_type} list of the items you own.', [ 'replace' => [ 'file_type' => '<code>.csv</code>' ] ]); ?>
 						
-						<br />
+						<br /><br />
 						
-						<a class="a--outlined a--padded" href="/users/<?php echo $_SESSION["username"]; ?>/&action=download">Download collection</a> <a class="a--padded" href="/users/<?php echo $_SESSION["username"]; ?>/&action=download&limit=selling">Download selling list</a>
+						<a class="a--outlined a--padded" href="/users/<?php echo $_SESSION["username"]; ?>/&action=download"><?= tr('Download collection list'); ?></a> <a class="a--padded" href="/users/<?php echo $_SESSION["username"]; ?>/&action=download&limit=selling"><?= tr('Download selling list'); ?></a>
 					</div>
 				</div>
 			</div>

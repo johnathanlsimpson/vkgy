@@ -2,10 +2,24 @@
 
 $access_user = new access_user($pdo);
 
+// Get allowed sections
+$sql_sections = 'SELECT translations.folder AS section FROM translations GROUP BY section ORDER BY section ASC';
+$stmt_sections = $pdo->prepare($sql_sections);
+$stmt_sections->execute();
+$rslt_sections = $stmt_sections->fetchAll(PDO::FETCH_COLUMN);
+
+// Adjust main query to get specified section
+if(strlen($_GET['section']) && in_array($_GET['section'], $rslt_sections)) {
+	$section_name = friendly($_GET['section']);
+}
+else {
+	$section_name = 'UI';
+}
+
 // Get translation strings
 $sql_translations = 'SELECT translations.* FROM translations ORDER BY translations.folder ASC, translations.content ASC';
 $stmt_translations = $pdo->prepare($sql_translations);
-$stmt_translations->execute();
+$stmt_translations->execute($values_translations);
 $strings = $stmt_translations->fetchAll();
 
 // Loop through strings and get list of sections, also replace {}

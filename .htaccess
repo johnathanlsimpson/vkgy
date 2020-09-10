@@ -31,6 +31,10 @@
 	ModPagespeedEnableFilters collapse_whitespace,remove_comments
 </IfModule>
 
+<IfModule mod_security.c>
+	SecRuleRemoveById 210740
+</IfModule>
+
 AddDefaultCharset utf-8
 AddCharset utf-8 .html .css .js .xml
 DefaultLanguage en-US
