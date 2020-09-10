@@ -54,14 +54,15 @@ style([
 	<h2>
 		<?= tr('Translations', [ 'lang' => true, 'lang_args' => 'div' ]); ?>
 	</h2>
-	<h3 class="accepted__section">
-		404
-	</h3>
 	
 	<div class="col c4-AAAB">
 	
 	<!-- Strings and proposals -->
 	<div id="translations-list" data-filter-lang="<?= $translate->language; ?>">
+		
+		<h3 class="accepted__section">
+			<?= $section_name; ?> text
+		</h3>
 		
 		<ul class="text list">
 			
@@ -82,6 +83,25 @@ style([
 			<?php
 				if(is_array($strings) && !empty($strings)) {
 					foreach($strings as $string) {
+						
+						// Start a counter and assume each string is new (later we'll loop through proposals and update)
+						$num_new[ $string['folder'] ][ $string['id'] ] = 1;
+						$string['languages'] = [];
+						
+						if( is_array($proposals[$string['id']]) && !empty($proposals[$string['id']]) ) {
+							foreach($proposals[$string['id']] as $proposal) {
+								
+								// Decrease counter from earlier if there's a translated proposal for this string (in user's language)
+								if( $proposal['language'] === $_SESSION['language'] && $proposal['id'] == $string[ $proposal['language'].'_id' ]) {
+									unset($num_new[ $string['folder'] ][ $string['id'] ]);
+								}
+								
+								$string['languages'][] = $proposal['language'];
+								
+							}
+						}
+						
+						if($string['folder'] == $section_name || ($string['folder'] == 'php' && $section_name == 'UI')) {
 						?>
 							<li x-data="{open:false}">
 								<form action="/translations/function-update_translation.php" class="accepted__row" enctype="multipart/form-data" method="post" name="add_translation[]">
@@ -95,7 +115,7 @@ style([
 								<?php
 									foreach($translate->allowed_languages as $language_key => $language) {
 										if($language_key != 'en') {
-											echo '<span class="accepted__lang '.(is_numeric($string[$language_key.'_id']) ? 'symbol__checkbox--checked' : 'symbol__checkbox--unchecked').'" data-language="'.$language_key.'"></span>';
+											echo '<span class="accepted__lang '.(is_numeric($string[$language_key.'_id']) ? 'symbol__checkbox--checked' : 'symbol__checkbox--unchecked red').'" data-language="'.$language_key.'"></span>';
 										}
 									}
 								?>
@@ -118,15 +138,15 @@ style([
 																		{language_name}
 																	</h5>
 																	<span class="details__content" data-id="{id}">{content}</span>
-																	<span class="details__accepted any__note {is_accepted}" data-language="{language}" data-id="{id}">accepted</span>
+																	<span class="details__accepted symbol__success {is_accepted}" data-language="{language}" data-id="{id}" style="vertical-align:middle;"></span>
 																</div>
 																<span class="details__user any--weaken"><a class="user a--inherit" data-icon="{user_icon}" data-is-vip="{user_is_vip}">{user_username}</a></span>
 																<span class="details__date any--weaken">{date_occurred}</span>
 																
 																<span class="tag__voting any--weaken-color">
 																	<label class="tag__vote tag__upvote" data-vote="upvote" data-id="{id}">
-																		<input class="tag__choice input__choice" type="checkbox" {upvote_is_checked} />
-																		<span class="tag__status symbol__up-caret symbol--standalone"></span>
+																	<input class="tag__choice input__choice" type="checkbox" {upvote_is_checked} />
+																	<span class="tag__status symbol__up-caret symbol--standalone"></span>
 																	</label>
 																	
 																	<span class="tag__num any--weaken-size" data-id="{id}" data-num-tags="{num_votes}"></span>
@@ -147,19 +167,8 @@ style([
 											<?php
 										}
 										
-										// Start a counter and assume each string is new (later we'll loop through proposals and update)
-										$num_new[ $string['folder'] ][ $string['id'] ] = 1;
-										
-										$string['languages'] = [];
 										if( is_array($proposals[$string['id']]) && !empty($proposals[$string['id']]) ) {
 											foreach($proposals[$string['id']] as $proposal) {
-												
-												// Decrease counter from earlier if there's a translated proposal for this string (in user's language)
-												if( $proposal['language'] === $_SESSION['language'] && $proposal['id'] == $string[ $proposal['language'].'_id' ]) {
-													unset($num_new[ $string['folder'] ][ $string['id'] ]);
-												}
-												
-												$string['languages'][] = $proposal['language'];
 												
 												echo render_component($translation_template, [
 													'language_name'       => $translate->allowed_languages[ $proposal['language'] ],
@@ -250,6 +259,7 @@ style([
 								</form>
 							</li>
 						<?php
+						}
 					}
 				}
 			?>
@@ -259,27 +269,30 @@ style([
 	</div>
 	
 	<!-- Filters -->
-	<div class="filter__wrapper">
+	<div class="filter__wrapper" style="">
 		
-		<ul class="text text--outlined">
+		<h3>
+			Choose section
+		</h3>
+		
+		<div class="text text--outlined" style="">
 			
-			<li class="input__row" style="z-index:3;">
-				<div class="input__group any--flex-grow">
-					<label class="input__label">Section</label>
-					<ul class="any--flex-grow <?= count($sections) > 6 ? 'filter--scroll' : null; ?>">
+			<label class="h5">Sections</label>
+			
+			<ul class="ul--compact" style="">
 						<?php
 							foreach($sections as $section) {
 								echo '<li>';
-								echo '<a class="filter--section" href="#'.$section.'">'.($section === 'php' ? 'UI' : $section).'</a>';
+								echo '<a class="filter--section" href="/translations/&section='.($section === 'php' ? 'ui' : $section).'">'.($section === 'php' ? 'UI' : $section).'</a>';
 								echo is_array($num_new[$section]) && count($num_new[ $section ]) ? ' <span class="any__note">'.count($num_new[$section]).' new</span>' : null;
 								echo '</li>';
 							}
 						?>
-					</ul>
-				</div>
-			</li>
+			</ul>
 			
-			<li class="input__row" style="z-index:2;">
+			<hr />
+			
+			<div class="input__row" style="">
 				<div class="input__group any--flex-grow">
 					<label class="input__label">Language</label>
 					<select class="input any--flex-grow" name="filter_language" placeholder="language">
@@ -293,7 +306,7 @@ style([
 						?>
 					</select>
 				</div>
-			</li>
+			</div>
 			
 			<!--<li class="input__row any--hidden">
 				<div class="input__group">
@@ -313,7 +326,7 @@ style([
 				</div>
 			</li>-->
 			
-		</ul>
+		</div>
 		
 	</div>
 	

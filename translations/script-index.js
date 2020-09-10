@@ -210,7 +210,7 @@ let listOptions = {
 };
 let stringList = new List('translations-list', listOptions);
 
-// Filter by string section
+/*// Filter by string section
 let filterTitle = document.querySelector('.accepted__section');
 let filterSectionElems = document.querySelectorAll('.filter--section');
 
@@ -249,7 +249,7 @@ function filterByHash() {
 }
 
 // Filter by hash on load
-filterByHash();
+filterByHash();*/
 
 // Filter by language
 let filterLanguageElem = document.querySelector('[name="filter_language"]');
