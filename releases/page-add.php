@@ -247,6 +247,36 @@
 </style>
 
 <div class="col c1 any--signed-in-only any--margin">
+	<template data-contains="types"><?= json_encode([
+		[
+			'0' => $i++,
+			'name' => sanitize('通常盤'),
+			'romaji' => 'Tsuujouban',
+			'friendly' => 'tsuujouban',
+			'quick_name' => 'Tsuujouban ('.sanitize('通常盤').')'
+		],
+		[
+			'0' => $i++,
+			'name' => sanitize('初回盤'),
+			'romaji' => 'Shokai Genteiban',
+			'friendly' => 'shokai-genteiban',
+			'quick_name' => 'Shokai Genteiban ('.sanitize('初回限定盤').')'
+		],
+		[
+			'0' => $i++,
+			'name' => sanitize('完全生産限定盤'),
+			'romaji' => 'Kanzen Seisan Genteiban',
+			'friendly' => 'kanzen-seisan-genteiban',
+			'quick_name' => 'Kanzen Seisan Genteiban ('.sanitize('完全生産限定盤').')'
+		],
+		[
+			'0' => $i++,
+			'name' => 'TYPE-',
+			'romaji' => 'TYPE-',
+			'friendly' => 'TYPE-',
+			'quick_name' => 'TYPE-'
+		]
+	]); ?></template>
 	<?php
 		include_once('../php/function-render_json_list.php');
 		render_json_list('artist', null, null, null, $release['artist']['id']);
@@ -381,7 +411,7 @@
 					<div class="input__label">
 						<?= lang('Press name', 'プレス', 'hidden'); ?>
 					</div>
-					<input class="input" name="press_name" placeholder="press name" value="<?php echo $release["press_name"]; ?>" />
+					<input class="input" name="press_name" placeholder="press name" value="<?= $release["press_name"]; ?>" />
 					<input class="input--secondary" name="press_romaji" placeholder="(romaji)" value="<?php echo $release["press_romaji"]; ?>" />
 				</div>
 				
@@ -389,7 +419,7 @@
 					<div class="input__label">
 						Type name
 					</div>
-					<input class="input" name="type_name" placeholder="type name" value="<?php echo $release["type_name"]; ?>" />
+					<input class="input" name="type_name" placeholder="type name" value="<?= $release['type_name']; ?>" data-easyautocomplete data-src="types" data-get-value="quick_name" data-open="true" />
 					<input class="input--secondary" name="type_romaji" placeholder="(romaji)" value="<?php echo $release["type_romaji"]; ?>" />
 				</div>
 			</div>
@@ -716,7 +746,7 @@
 							<div class="input__row track__song-container">
 								<div class="input__group track__song any--flex-grow">
 									<span class="track__num"></span>
-									<input class="input"             value="?name"  name="tracklist[name][]"               placeholder="song name" />
+									<input class="input"             value="?name"  name="tracklist[name][]" placeholder="song name" data-easyautocomplete data-src="songs" data-get-value="quick_name" />
 									<input class="input--secondary"  value="?romaji"  name="tracklist[romaji][]"             placeholder="(romaji)" />
 								</div>
 								<div class="input__group track__artist">
