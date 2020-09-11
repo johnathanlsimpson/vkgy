@@ -77,11 +77,22 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 													
 													// Only show ellipsis once per period
 													if($d === 0) {
-														echo '<span class="any__note">...</span>';
+														
+														// Don't show ellipsis if it was preceded by one
+														if(
+															!$ellipsis_shown
+														) {
+															echo '<span class="any__note">...</span>';
+														}
+														
 													}
+													
+													$ellipsis_shown = true;
 													
 												}
 												else {
+													
+												$ellipsis_shown = false;
 												
 												if($musicians[$a]['history'][$c][$d]['is_session']) {
 													$session_id = $musicians_type.'-'.$a.'-'.$c.'-'.$d;
@@ -132,7 +143,14 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 												
 											}
 											
-											echo $c < $num_history_periods - 1 ? ' <span class="lineup__arrow symbol__next">&rarr;</span> ' : null;
+											if(
+												$c < $num_history_periods - 1
+												&&
+												(!$ellipsis_shown || ( $ellipsis_shown && $c === 0 ))
+											) {
+												echo ' <span class="lineup__arrow symbol__next">&rarr;</span> ';
+											}
+											
 										}
 									?>
 								</div>
