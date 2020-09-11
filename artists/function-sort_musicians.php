@@ -35,12 +35,14 @@
 								}
 								
 								$history[$period_key][$band_key] = [
+									'id' => $band['id'],
 									"name" => $band_name,
 									"romaji" => $band_romaji,
 									"quick_name" => $band_quick_name,
 									"url" => $url,
 									"notes" => $notes,
 									'is_session' => $band['type'] === 'session',
+									'is_hidden' => $band['is_hidden']
 								];
 							}
 						}

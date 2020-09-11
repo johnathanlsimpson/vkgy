@@ -131,12 +131,19 @@
 						<div class="text">
 							<ul>
 								<?php
+									$can_see_hidden_musician = $_SESSION['is_moderator'];
+									
 									if(is_array($musician["history"])) {
 										foreach($musician["history"] as $period) {
 											?>
 												<li class="any--weaken-color">
 													<?php
 														foreach($period as $band_key => $band) {
+															
+															if(!$band['is_hidden'] || $can_see_hidden_musician) {
+															
+															echo '<span style="'.($band['is_hidden'] ? 'opacity:0.5;' : null).'">';
+															
 															if(is_numeric($band["id"])) {
 																?>
 																	<a class="artist" href="/artists/<?php echo $band["friendly"]; ?>/">
@@ -146,7 +153,7 @@
 																			}
 																			else {
 																				echo lang($band['romaji'] ?: $band['name'], $band['name'], 'hidden');
-																			}	
+																			}
 																		?>
 																	</a>
 																<?php
@@ -170,8 +177,18 @@
 																	<?php
 																}
 															}
+															
+															echo '</span>';
 
 															echo $band_key + 1 < count($period) ? ", " : null;
+															
+															}
+															else {
+																if($band_key === 0) {
+																	echo '<span class="any__note">...</span>';
+																}
+															}
+															
 														}
 													?>
 												</li>

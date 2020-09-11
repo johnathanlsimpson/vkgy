@@ -42,6 +42,15 @@
 					foreach($band_history_periods as $period_key => $band_history_period) {
 						$x = -1;
 						
+						// If has !hide flag, remove for parsing
+						if( strpos($band_history_period, '!hide ') === 0 ) {
+							$period_is_hidden = true;
+							$band_history_period = substr_replace($band_history_period, '', 0, 6);
+						}
+						else {
+							$period_is_hidden = false;
+						}
+						
 						// Explode each time period by normal bands and session bands (pre-| and post-|)
 						$band_types = explode(' | ', $band_history_period);
 						
@@ -148,6 +157,10 @@
 												}
 											}
 										}
+										
+										// Save 'is hidden' flag
+										$tmp_band_history[$period_key][$band_key]['is_hidden'] = $period_is_hidden;
+										
 									}
 								}
 							}
