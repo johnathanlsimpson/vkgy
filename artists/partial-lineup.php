@@ -27,14 +27,32 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 					$position_name = $position_name == 'roadie' ? lang('roadie', 'ローディー', [ 'secondary_class' => 'any--hidden' ]) : $position_name;
 					$position_name = strpos($position_name, 'support') === 0 ? lang($position_name, str_replace('support ', 'サポート', $position_name), [ 'secondary_class' => 'any--hidden' ]) : $position_name;
 					
+					// Loop through bands one time to determine if we should show this musician for this band
+					$hide_musician_from_lineup = false;
+					$can_see_hidden_musician = $_SESSION['is_moderator'];
+					
+					foreach($musicians[$a]['history'] as $periods) {
+						foreach($periods as $band) {
+							if($band['id'] === $artist['id']) {
+								if($band['is_hidden'] && !$can_see_hidden_musician) {
+									$hide_musician_from_lineup = true;
+								}
+							}
+						}
+					}
+					
 					?>
 						<div class="ul">
 							<h4>
 								<a class="a--inherit" href="/search/musicians/?position=<?php echo $musicians[$a]["position"]; ?>#result"><?php echo $position_name; ?></a>
 							</h4>
 							<h3>
-								<a class="a--inherit" href="<?php echo '/musicians/'.$musicians[$a]["id"].'/'.$musicians[$a]["friendly"]; ?>/"><?php echo lang(($musicians[$a]["romaji"] ?: $musicians[$a]['name']), $musicians[$a]['name'], ['secondary_class' => 'any--hidden']); ?></a>
-								<span class="any--weaken-color any--en"><?php echo $musicians[$a]['romaji'] ? '('.$musicians[$a]['name'].')' : null; ?></span>
+								
+								<?= !$hide_musician_from_lineup || $can_see_hidden_musician ? '<a class="a--inherit" href="/musicians/'.$musicians[$a]['id'].'/'.$musicians[$a]['friendly'].'/">' : null; ?>
+								<?= $musicians[$a]['romaji'] ? lang($musicians[$a]['romaji'], $musicians[$a]['name'], 'hidden') : $musicians[$a]['name']; ?>
+								<?= !$hide_musician_from_lineup || $can_see_hidden_musician ? '</a>' : null; ?>
+								
+								<span class="any--weaken-color any--en"><?= $musicians[$a]['romaji'] ? '('.$musicians[$a]['name'].')' : null; ?></span>
 							</h3>
 							<div class="any--flex member__history">
 								<div class="lineup__container any--weaken-color">
@@ -48,6 +66,23 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 											for($d=0; $d<$num_period_chunks; $d++) {
 												$duplicate_identifier = ($musicians[$a]['history'][$c][$d]['url'] ?: 'no-url-'.$musicians[$a]['history'][$c][$d]['quick_name']);
 												
+												// Determine whether or not to show this particular band
+												// If viewing the band, then the flag should be opposite so we can see this band's history but not the rest
+												$hide_band_from_lineup = $musicians[$a]['history'][$c][0]['is_hidden'];
+												$hide_band_from_lineup = $hide_musician_from_lineup ? !$hide_band_from_lineup : $hide_band_from_lineup;
+												
+												// If first band in a period is flagged as hidden, then that entire period should be hidden
+												// But show for moderators
+												if($hide_band_from_lineup && !$can_see_hidden_musician) {
+													
+													// Only show ellipsis once per period
+													if($d === 0) {
+														echo '<span class="any__note">...</span>';
+													}
+													
+												}
+												else {
+												
 												if($musicians[$a]['history'][$c][$d]['is_session']) {
 													$session_id = $musicians_type.'-'.$a.'-'.$c.'-'.$d;
 													
@@ -59,7 +94,7 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 												}
 												else {
 													?>
-														<span class="lineup__band <?php echo in_array($duplicate_identifier, $musician_bands) ? 'lineup--duplicate' : null; ?>">
+														<span class="lineup__band <?php echo in_array($duplicate_identifier, $musician_bands) ? 'lineup--duplicate' : null; ?>" style="<?= $hide_band_from_lineup ? 'opacity:0.5;' : null; ?>">
 															<?php
 																if(!empty($musicians[$a]['history'][$c][$d]["url"])) {
 																	?>
@@ -92,6 +127,9 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 													
 													$musician_bands[] = $duplicate_identifier;
 												}
+												
+												}
+												
 											}
 											
 											echo $c < $num_history_periods - 1 ? ' <span class="lineup__arrow symbol__next">&rarr;</span> ' : null;
