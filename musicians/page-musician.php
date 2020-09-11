@@ -134,65 +134,71 @@
 									$can_see_hidden_musician = $_SESSION['is_moderator'];
 									
 									if(is_array($musician["history"])) {
-										foreach($musician["history"] as $period) {
-											?>
-												<li class="any--weaken-color">
-													<?php
-														foreach($period as $band_key => $band) {
-															
-															if(!$band['is_hidden'] || $can_see_hidden_musician) {
-															
-															echo '<span style="'.($band['is_hidden'] ? 'opacity:0.5;' : null).'">';
-															
-															if(is_numeric($band["id"])) {
-																?>
-																	<a class="artist" href="/artists/<?php echo $band["friendly"]; ?>/">
-																		<?php 
-																			if(strlen($band['display_name']) || strlen($band['display_romaji'])) {
-																				echo lang($band['display_romaji'] ?: $band['display_name'], $band['display_name'], 'hidden');
-																			}
-																			else {
-																				echo lang($band['romaji'] ?: $band['name'], $band['name'], 'hidden');
-																			}
-																		?>
-																	</a>
-																<?php
-																
-																if(strlen($band['display_romaji'])) {
-																	echo lang('('.$band['display_name'].')', null, 'hidden');
-																}
-																elseif(strlen($band['romaji'])) {
-																	echo lang('('.$band['name'].')', null, 'hidden');
-																}
-																
-															}
-															else {
-																echo $band["romaji"] ?: $band["name"].($band["romaji"] ? " (".$band["name"].")" : null);
-															}
+										foreach($musician["history"] as $period_key => $period) {
+											
+											if(!$period[0]['is_hidden'] || $can_see_hidden_musician) {
+												
+												$ellipsis_shown = false;
+												
+												?>
+													<li class="any--weaken-color" style="<?= $period[0]['is_hidden'] ? 'opacity:0.5;' : null; ?>">
+														<?php
+															foreach($period as $band_key => $band) {
 
-															if(is_array($band["notes"])) {
-																foreach($band["notes"] as $note) {
+																if(is_numeric($band["id"])) {
 																	?>
-																		<span class="any__note"><?php echo $note; ?></span>
+																		<a class="artist" href="/artists/<?php echo $band["friendly"]; ?>/">
+																			<?php 
+																				if(strlen($band['display_name']) || strlen($band['display_romaji'])) {
+																					echo lang($band['display_romaji'] ?: $band['display_name'], $band['display_name'], 'hidden');
+																				}
+																				else {
+																					echo lang($band['romaji'] ?: $band['name'], $band['name'], 'hidden');
+																				}
+																			?>
+																		</a>
 																	<?php
-																}
-															}
-															
-															echo '</span>';
 
-															echo $band_key + 1 < count($period) ? ", " : null;
-															
-															}
-															else {
-																if($band_key === 0) {
-																	echo '<span class="any__note">...</span>';
+																	if(strlen($band['display_romaji'])) {
+																		echo lang('('.$band['display_name'].')', null, 'hidden');
+																	}
+																	elseif(strlen($band['romaji'])) {
+																		echo lang('('.$band['name'].')', null, 'hidden');
+																	}
+
 																}
+																else {
+																	echo $band["romaji"] ?: $band["name"].($band["romaji"] ? " (".$band["name"].")" : null);
+																}
+
+																if(is_array($band["notes"])) {
+																	foreach($band["notes"] as $note) {
+																		?>
+																			<span class="any__note"><?php echo $note; ?></span>
+																		<?php
+																	}
+																}
+
+																echo $band_key + 1 < count($period) ? ", " : null;
+
 															}
-															
-														}
-													?>
-												</li>
-											<?php
+														?>
+													</li>
+												<?php
+												
+											}
+											
+											else {
+												
+																if(!$ellipsis_shown || $period_key === 0) {
+																	echo '<li class="any--weaken-color">';
+																	echo '<span class="any__note">...</span>';
+																	echo '</li>';
+																}
+												
+												$ellipsis_shown = true;
+												
+											}
 										}
 									}
 								?>
