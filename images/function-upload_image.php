@@ -41,10 +41,10 @@
 						$file_name = $id.'.'.$extension;
 						
 						if(in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
-							$sql_update = 'UPDATE images SET extension=?, is_queued=? WHERE id=? LIMIT 1';
+							$sql_update = 'UPDATE images SET extension=?, is_queued=?, item_type=? WHERE id=? LIMIT 1';
 							$stmt_update = $pdo->prepare($sql_update);
 							
-							if($stmt_update->execute([ $extension, $is_queued, $id ])) {
+							if($stmt_update->execute([ $extension, $is_queued, $item_type, $id ])) {
 								
 								if(rename($new_name, '../images/tmp/'.$file_name)) {
 									
