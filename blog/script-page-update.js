@@ -220,7 +220,6 @@ function updateMainArtist(inputArtist) {
  let previewArtistLink = document.querySelector('.artist__link');
  let previewArtistName = document.querySelector('.artist__name');
  let previewArtistRomaji = document.querySelector('.artist__romaji');
-	//let artistIdElem = document.querySelector('[name="artist_id"]');
 	
 	if(previewArtistLink && inputArtist && inputArtist.id.length) {
 		
@@ -390,15 +389,12 @@ isQueuedElem.addEventListener('change', function() {
 	saveContainerElem.dataset.isQueued = isQueuedElem.checked ? '1' : '0';
 	saveStatusElem.classList.remove('symbol__success', 'symbol__error', 'symbol__loading');
 	
-	
-	
-				var e = new Event('item-id-updated');
-				e.details = {
-					'id' : idElem.value,
-					'is_queued' : isQueuedElem.checked ? 1 : 0,
-				};
-				document.dispatchEvent(e);
-	
+	var e = new Event('item-id-updated');
+	e.details = {
+		'id' : idElem.value,
+		'is_queued' : isQueuedElem.checked ? 1 : 0,
+	};
+	document.dispatchEvent(e);
 	
 });
 
