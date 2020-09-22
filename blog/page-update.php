@@ -1088,29 +1088,6 @@
 									display: initial;
 								}
 
-
-
-								<?php //[name="is_queued"]:checked           ~ .save__button :nth-of-type(1),                                     /* Saving as draft */
-								//[name="is_queued"]:not(:checked)     ~ [name="is_published"][value="0"] ~ .save__button :nth-of-type(3),  /* Saving as published by haven't saved yet */
-								//[name="is_queued"]:not(:checked)     ~ [name="is_published"][value="1"] ~ .save__button :nth-of-type(2),  /* Saving as published after having published already */
-								//[name="is_queued"]:checked           ~ .save__link :nth-of-type(1),                                       /* View draft */
-								//[name="is_queued"]:not(:checked)     ~ .save__link :nth-of-type(2),                                       /* View published entry */
-								//[name="is_published"][value="0"]     ~ [name="is_saved"][value="0"]     ~ .save__link,                    /* View link but not yet saved and not yet published */
-								//[name="is_published"][value="1"]     ~ .save__status.symbol__success    ~ .save__state :nth-of-type(5),   /* State when saved and published */
-								//[name="is_published"][value="0"]     ~ .save__status.symbol__success    ~ .save__state :nth-of-type(2),   /* State when done draft */
-								//.save__status:not([class*="symbol"]) ~ .save__state :nth-of-type(4),                                      /* State when not yet saved, or when in publish mode */
-								//.save__status.symbol__loading        ~ .save__state :nth-of-type(1),                                      /* State when saving */
-								//.save__status.symbol__error          ~ .save__state :nth-of-type(3),                                      /* State when something went wrong */
-								//[name="is_scheduled"][value="1"]     ~ .save__notice :nth-of-type(1),                                     /* Notice when scheduled */
-								//[name="is_queued"]:not(:checked)     ~ [name="is_published"][value="0"] ~ [name="is_scheduled"][value="0"] ~ .save__notice :nth-of-type(2), /* Notice when publishing mode but not yet published */
-								//[name="is_queued"]:not(:checked)     ~ [name="is_published"][value="1"] ~ .save__notice :nth-of-type(3) { /* Notice when editing published entry */
-							//		display: initial;
-								//}
-							//	/* Notice when editing draft that's not scheduled */
-								//[name="is_queued"]:checked ~ [name="is_scheduled"][value="0"] ~ .save__notice,
-								//[name="is_queued"]:checked ~ [name="is_scheduled"][value="0"] ~ .save__link,
-								//[name="is_queued"]:not(:checked) ~ [name="is_published"][value="0"] ~ [name="is_saved"][value="0"] ~ .save__link { display: none; } */ ?>
-
 								/* Checkbox styling */
 								.save__choice:checked ~ .save__draft {
 									color: inherit;

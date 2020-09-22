@@ -62,6 +62,12 @@
 				}
 			}
 			
+			// Get musician's images
+			$sql_images = 'SELECT * FROM images_musicians LEFT JOIN images ON images.id=images_musicians.image_id WHERE images_musicians.musician_id=?';
+			$stmt_images = $pdo->prepare($sql_images);
+			$stmt_images->execute([ $musician['id'] ]);
+			$images = $stmt_images->fetchAll();
+			
 			$pageTitle = $musician["quick_name"]." musician profile | ".$musician["name"]."&#12503;&#12525;&#12501;&#12451;&#12540;&#12523;";
 			
 			include("../musicians/page-musician.php");

@@ -109,7 +109,8 @@
 						'users.is_moderator',
 						'users.is_boss',
 						'users.date_added',
-						'CONCAT_WS("/", "", "users", users.username, "") AS url'
+						'CONCAT_WS("/", "", "users", users.username, "") AS url',
+						'CONCAT("/usericons/avatar-", users.username, ".png") AS avatar_url'
 					];
 				
 			}
@@ -127,6 +128,11 @@
 				case $args["username"]:
 					$sql_where[] = "username=?";
 					$sql_values[] = sanitize($args["username"]);
+					break;
+					
+				case $args['is_vip']:
+					$sql_where[] = 'is_vip=?';
+					$sql_values[] = 1;
 					break;
 			}
 			

@@ -30,7 +30,13 @@ if(is_numeric($_POST['id'])) {
 	$is_queued    = $_POST['is_queued'] ? 1 : 0;
 	
 	// Set up array of possible new links (i.e. links passed from form)
-	$new_links = [ 'artists' => $_POST['artist_id'], 'blog' => $_POST['blog_id'], 'labels' => $_POST['label_id'], 'musicians' => $_POST['musician_id'], 'releases' => $_POST['release_id'] ];
+	$new_links = [
+		'artists' => $_POST['artist_id'],
+		'blog' => $_POST['blog_id'],
+		'labels' => $_POST['label_id'],
+		'musicians' => $_POST['musician_id'],
+		'releases' => $_POST['release_id']
+	];
 	
 	// Standardize new links into array of item IDs, since there may be an array of IDs or one ID as a string
 	foreach($new_links as $new_link_table => $new_item_ids) {
@@ -55,10 +61,17 @@ if(is_numeric($_POST['id'])) {
 		
 	}
 	
+	// Update is_queued flag on its own pass, as we only want to change it if the image was originally uploaded with this item type
+	// i.e. If image was uploaded with a blog post, and that blog post changes to queued, the image should be queued--
+	// but image was uploaded on artist's profile, we don't care about the blog post being queued or not
+	$sql_queued = 'UPDATE images SET is_queued=? WHERE id=? AND item_type=? LIMIT 1';
+	$stmt_queued = $pdo->prepare($sql_queued);
+	$stmt_queued->execute([ $is_queued, $id, $item_type ]);
+	
 	// Update image info
-	$sql_update = 'UPDATE images SET description=?, friendly=?, credit=?, is_exclusive=?, is_queued=? WHERE id=? LIMIT 1';
+	$sql_update = 'UPDATE images SET description=?, friendly=?, credit=?, is_exclusive=? WHERE id=? LIMIT 1';
 	$stmt_update = $pdo->prepare($sql_update);
-	if($stmt_update->execute([ $description, $friendly, $credit, $is_exclusive, $is_queued, $id ])) {
+	if($stmt_update->execute([ $description, $friendly, $credit, $is_exclusive, $id ])) {
 		
 		// Status
 		$output['status'] = 'success';

@@ -316,12 +316,14 @@
 		<!-- HEADER -->
 		<div class="header__wrapper col c1">
 			<div class="header__container lazy any--flex" data-src="<?php echo $background_image; ?>">
-				<div class="header__header">
+				<div class="header__header" style="flex-grow:1;">
 					<h1>
 						<?php echo $GLOBALS['page_header'] ?: ($page_header ?: null); ?>
 					</h1>
 					
-					<?php echo $GLOBALS['page_header_supplement'] ?: null; ?>
+					<div class="header__supplement" style="z-index:1;">
+						<?= $GLOBALS['page_header_supplement']; ?>
+					</div>
 				</div>
 				
 				<!-- INTERACT NAV -->
