@@ -1,6 +1,11 @@
 <?php
 	if(is_array($musician) && !empty($musician)) {
 		
+		// Page image
+		if(is_array($images) && count($images)) {
+			$page_image = 'https://vk.gy/images/'.$images[0]['id'].($images[0]['friendly'] ? '-'.$images[0]['friendly'] : null).'.'.$images[0]['extension'];
+		}
+		
 		$page_header = '<a class="a--inherit symbol__musician" href="/musicians/'.$musician['id'].'/'.$musician['friendly'].'/">'.$musician['name'].'</a>';
 		if($musician['romaji']) {
 			$page_header = lang(
@@ -35,7 +40,20 @@
 			}
 			
 			?>
-				<div class="col c1">
+				<div class="col <?= is_array($images) && count($images) ? 'c3-ABB' : 'c1'; ?>">
+					
+					<div>
+						<?php if(is_array($images) && count($images)): ?>
+							<div class="image__container any--margin">
+								<?php foreach($images as $image_key => $image): ?>
+									<a class="image__link" href="<?= '/images/'.$image['id'].($image['friendly'] ? '-'.$image['friendly'] : null).'.'.$image['extension']; ?>" target="_blank">
+										<img class="image__thumbnail" src="<?= '/images/'.$image['id'].($image['friendly'] ? '-'.$image['friendly'] : null).($image_key == 0 ? '.large.' : '.medium.').$image['extension']; ?>" />
+									</a>
+								<?php endforeach; ?>
+							</div>
+						<?php endif; ?>
+					</div>
+					
 					<div>
 
 						<div class="text text--outlined">
@@ -208,6 +226,7 @@
 						<?php include('../tags/partial-tags.php'); ?>
 						
 					</div>
+					
 				</div>
 			<?php
 		}
