@@ -35,6 +35,8 @@ while($patron_modulo) {
 // Get URLs
 foreach($news as $news_key => $news_item) {
 	$news[$news_key]['url'] = '/blog/'.$news_item['friendly'].'/';
+	$news[$news_key]['image']['url'] = str_replace('.thumbnail.', '.small.', $news_item['image']['url']);
+	echo '<!--'.$news[$news_key]['image']['url'].'-->';
 }
 
 /* Logic for featured cards */
@@ -112,6 +114,7 @@ foreach($latest_items as $item_key => $latest_item) {
 	
 	// Some URLs are given as thumbnail
 	$url = str_replace('.thumbnail.', '.', $image['url']);
+	$url = str_replace('.small.', '.', $url);
 	$medium_url = str_replace('.', '.medium.', $url);
 	$thumbnail_url = str_replace('.', '.thumbnail.', $url);
 	
@@ -138,7 +141,7 @@ ob_start();
 		<!-- Intro paragraph -->
 		<div class="home-head__text any--margin">
 			
-			<div class="home-head__title">
+			<div class="home-head__title h1">
 				<?= lang('Welcome to vkgy,', 'vkgyへようこそ―', 'hidden'); ?>
 			</div>
 			<p class="home-head__p">
@@ -324,7 +327,7 @@ $background_image = null;
 	}
 	
 	.home-head__title {
-		font-size: 2rem;
+		/*font-size: 2rem;*/
 		font-weight: bold;
 		margin-bottom: 0.5rem;
 	}
@@ -336,7 +339,7 @@ $background_image = null;
 		display: none;
 		font-weight: bold;
 		margin-top: 0.5rem;
-		font-size: 1.5rem;
+		/*font-size: 1.5rem;*/
 	}
 	
 	@media(min-width:800px) {
@@ -512,7 +515,10 @@ $background_image = null;
 				flex-direction: column;
 			}
 			.news__image {
-				margin: 0 0 1rem 0;
+				background-position: center 30% !important;
+				height: 100px !important;
+				margin: 0 0 1rem 0 !important;
+				width: 100% !important;
 			}
 		}
 		@media(min-width:800px) and (max-width: 899.99px) {
@@ -520,7 +526,10 @@ $background_image = null;
 				flex-direction: column;
 			}
 			.news__image {
-				margin: 0 0 1rem 0;
+				background-position: center 30% !important;
+				height: 100px !important;
+				margin: 0 0 1rem 0 !important;
+				width: 100% !important;
 			}
 		}
 	</style>
@@ -544,7 +553,7 @@ $background_image = null;
 										<a class="user a--inherit" data-icon="<?= $news_item['user']['icon']; ?>" data-is-vip="<?= $news_item['user']['is_vip']; ?>" href="<?= $news_item['user']['url']; ?>"><?= $news_item['user']['username']; ?></a>
 									</div>
 
-									<a class="news__title2 h2" href="<?= $news_item['url']; ?>"><?= $news_item['title']; ?></a>
+									<a class="news__title2" href="<?= $news_item['url']; ?>"><?= $news_item['title']; ?></a>
 								</div>
 
 							</li>
@@ -556,6 +565,8 @@ $background_image = null;
 					}
 					.news__item2 {
 						justify-content:flex-start;
+					}
+					.news__title2 {
 					}
 					.news__supertitle {
 					}
@@ -599,7 +610,10 @@ $background_image = null;
 					display: none;
 				}
 				.comment__content {
-					background: hsl(var(--background));
+					background-color: hsl(var(--background));
+					background-position: 0.5rem 1.5rem;
+					background-size: calc(100% - 1rem) 1px;
+					background-repeat: no-repeat;
 					border-radius: 5px;
 					line-height: 1;
 					margin-top: 0.5rem;
@@ -651,7 +665,7 @@ $background_image = null;
 										</h5>
 
 										<div class="any--flex">
-											<a class="comment__content" href="<?= $comments[$i]['url'] ? $comments[$i]['url'].'#comments' : '/comments/#comment-'.$comments[$i]['id']; ?>"><?= strip_tags($comments[$i]["content"]); ?></a>
+											<a class="comment__content a--inherit" href="<?= $comments[$i]['url'] ? $comments[$i]['url'].'#comments' : '/comments/#comment-'.$comments[$i]['id']; ?>"><?= strip_tags($comments[$i]["content"]); ?></a>
 											<a class="comment__next symbol__next" href="<?php echo $comments[$i]['url'] ? $comments[$i]['url'].'#comments' : '/comments/#comment-'.$comments[$i]['id']; ?>">Read</a>
 										</div>
 
@@ -876,7 +890,6 @@ $background_image = null;
 	.patreon__p {
 		color: hsl(var(--accent));
 		font-size: 1.5rem;
-		font-weight: bold;
 		line-height: 1.5;
 		margin-bottom: 3rem;
 	}
