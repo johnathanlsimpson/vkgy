@@ -52,6 +52,23 @@ function get_image($input, $pdo) {
 				$size_ratio = $height && $width ? $height / $width : null;
 				$orientation = $size_ratio ? ( $size_ratio > 1 ? 'vertical' : 'horizontal' ) : null;
 				
+				
+				// Testing using CDN for resized images
+				if($_SESSION['username'] === 'inartistic' || $_SERVER['REMOTE_ADDR'] == '71.63.39.127') {
+					
+					// Get requested size
+					if( $method ) {
+						$width = [ 'thumbnail' => 200, 'small' => 400, 'medium' => 600, 'large' => 1000 ];
+						$query = '?'.($orientation === 'vertical' ? 'height' : 'width').'='.($width[$method] ?: 1000);
+					}
+					
+					// BunnyCDN
+					$bunny_url = 'https://vkgy.b-cdn.net/images/'.$id.'.'.$ext.$query;
+					header('Location: '.$bunny_url);
+					
+				}
+				
+				
 				// If image is gif, or height/width can't be determined, or both height and width are less than max size, return original image
 				if( $ext == 'gif' || !$height || !$width || ($height < $max_sizes[$method] && $width < $max_sizes[$method]) ) {
 					$returned_image_path = $source_image_path;

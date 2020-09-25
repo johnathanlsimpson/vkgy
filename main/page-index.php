@@ -93,6 +93,20 @@ foreach($latest_items as $item_key => $latest_item) {
 	// URL
 	$latest_items[$item_key]['url'] = '/blog/'.$latest_item['friendly'].'/';
 	
+	// Decide pill
+	if($latest_item['is_interview']) {
+		$pill = 'interview';
+	}
+	else {
+		if( $item_key == 0 && $latest_item['date_occurred'] > date('Y-m-d', strtotime('1 day ago')) ) {
+			$pill = 'breaking';
+		}
+		else {
+			$pill = 'news';
+		}
+	}
+	$latest_items[$item_key]['pill'] = $pill;
+	
 	// Image
 	$image = $latest_item['image'];
 	
@@ -160,7 +174,7 @@ ob_start();
 					<span class="intro__card-image lazy" data-src="<?= $latest_item['image']['medium_url']; ?>"></span>
 					
 					<div class="intro__card-title h2">
-						<span class="intro__card-pill h5"><?= $latest_item['is_interview'] ? 'interview' : ( $item_key ? 'news' : 'breaking' );?></span>
+						<span class="intro__card-pill h5"><?= $latest_item['pill']; ?></span>
 						<div class="intro__card-text"><?= $latest_item['title']; ?></div>
 					</div>
 					
@@ -237,6 +251,9 @@ $background_image = null;
 			display: none;
 		}
 	}
+	.intro__card:hover {
+		color: white;
+	}
 	.intro__card::before {
 		background: inherit;
 		background-color: hsl(var(--accent));
@@ -275,8 +292,9 @@ $background_image = null;
 		overflow: hidden;
 	}
 	.intro__card-title::after {
+		--shadow-color: var(--accent);
 		background: none;
-		background-image: linear-gradient(4deg, hsla(var(--accent), 0.95) 30%, hsla(var(--accent), 0.0) 70%);
+		background-image: linear-gradient(4deg, hsla(var(--shadow-color), 0.95) 30%, hsla(var(--shadow-color), 0.0) 70%);
 		border: none;
 		bottom: -1rem;
 		content: "";
@@ -288,6 +306,9 @@ $background_image = null;
 		top: -10rem;
 		width: auto;
 		z-index: -1;
+	}
+	.intro__card:hover .intro__card-title::after {
+		--shadow-color: var(--attention--secondary);
 	}
 	.intro__card-pill {
 		background: white;
@@ -371,7 +392,7 @@ $background_image = null;
 				color: inherit;
 			}
 			.browse__link:hover {
-				background-color: hsl(var(--interactive));
+				color: white;
 			}
 			.browse--artists::before,
 			.browse--artists::after {
@@ -407,8 +428,10 @@ $background_image = null;
 				z-index: 1;
 			}
 			.browse__title::after {
+				--shadow-color: var(--accent);
 				background: none;
 				background-image: linear-gradient(4deg, hsla(var(--accent), 0.95) 10%, hsla(var(--accent), 0.0) 80%);
+				background-image: linear-gradient(4deg, hsla(var(--shadow-color), 0.95) 30%, hsla(var(--shadow-color), 0.0) 80%);
 				border: none;
 				border-radius: inherit;
 				bottom: -1rem;
@@ -421,6 +444,9 @@ $background_image = null;
 				top: -3rem;
 				width: auto;
 				z-index: -1;
+			}
+			.browse__link:hover .browse__title::after {
+				--shadow-color: var(--attention--secondary);
 			}
 		</style>
 		
@@ -832,15 +858,16 @@ $background_image = null;
 	}
 	.patreon__title {
 		background: hsl(var(--vkgy-red));
+		display: inline-block;
 		color: white;
-		font-size: 3rem;
+		font-size: 2rem;
 		margin: 0 auto 3rem auto;
+		padding: 0 1rem;
 		transform: rotate(-3deg);
-		width: auto;
 	}
 	@media(max-width:699.99px) {
 		.patreon__title {
-			font-size: 2rem;
+			font-size: 1.5rem;
 		}
 	}
 	.patreon__title .any--weaken {
@@ -876,16 +903,16 @@ $background_image = null;
 	.patreon__button {
 		background: #f96854;
 		display: inline-block;
-		font-size: 3rem;
+		font-size: 1.5rem;
 		font-weight: bold;
-		line-height: 3rem;
+		line-height: 1;
 		margin: 3rem auto 0 auto;
-		padding: 1.5rem;
+		padding: 1rem;
 		transform: rotate(-0deg);
 	}
 	@media(max-width:699.99px) {
 		.patreon__button {
-			font-size: 2rem;
+			font-size: 1.5rem;
 		}
 	}
 	.patreon__button:hover {

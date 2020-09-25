@@ -46,7 +46,7 @@
 
 	$edited_releases = $access_release->access_release([ 'edit_ids' => $recently_edited_ids, 'get' => 'list' ]);
 
-	$recent_releases = $access_release->access_release([ 'get' => 'calendar', 'start_date' => date('Y-m-d', strtotime('-1 month')) ]);
+	$recent_releases = $access_release->access_release([ 'get' => 'calendar', 'start_date' => date('Y-m-d', strtotime('-1 week')) ]);
 
 	if(is_array($recent_releases) && !empty($recent_releases)) {
 		$recent_releases = array_reverse($recent_releases);
@@ -125,7 +125,7 @@
 
 								foreach($day as $release) {
 									$artist_image = '/artists/'.$release['artist']['friendly'].'/main.small.jpg';
-									$cover_image = str_replace('.jpg', '.thumbnail.jpg', $release['image']['url']);
+									$cover_image = str_replace('.', '.thumbnail.', $release['image']['url']);
 									$artist_url = '/artists/'.$release['artist']['friendly'].'/';
 									$artist_name = $release['artist']['quick_name'].($release['artist']['romaji'] ? ' <span class="any--weaken">('.$release['artist']['name'].')</span>' : null);
 									$release_name = $release['quick_name'].($release['romaji'] ? ' <span class="any--weaken">('.$release['name'].')</span>' : null);
