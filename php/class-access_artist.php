@@ -813,6 +813,18 @@
 		// ======================================================
 		function access_artist($args = []) {
 			
+			// PRE-SELECT
+			if($args['vkei_only']) {
+				
+				// Get list of non-vkei artists and exclude these IDs from the search
+				$sql_non_vkei = 'SELECT artists.id FROM artists_tags LEFT JOIN artists ON artists.id=artists_tags.artist_id WHERE artists_tags.tag_id=? AND artists_tags.user_agrees>? GROUP BY artists.id';
+				$stmt_non_vkei = $this->pdo->prepare($sql_non_vkei);
+				$stmt_non_vkei->execute([ 16, -1 ]);
+				$rslt_non_vkei = $stmt_non_vkei->fetchAll(PDO::FETCH_COLUMN);
+				$args['exclude'] = $rslt_non_vkei;
+				
+			}
+			
 			// SELECT
 			$sql_select = [];
 			switch($args["get"]) {
@@ -1037,6 +1049,13 @@
 				}
 			}*/
 			
+			// Exclude
+			if(is_array($args['exclude']) && !empty($args['exclude'])) {
+				$sql_where[] = 'artists.id NOT IN ('.substr(str_repeat('?, ', count($args['exclude'])), 0, -2).')';
+				foreach($args['exclude'] as $exclude_id) {
+					$sql_values[] = $exclude_id;
+				}
+			}
 			if(is_numeric($args["label_id"])) {
 				$sql_where[] = "label_history LIKE CONCAT('%{', ?, '}%')";
 				$sql_values[] = $args["label_id"];
