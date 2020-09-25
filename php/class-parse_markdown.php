@@ -651,7 +651,7 @@
 									if(is_array($reference_datum['image']) && !empty($reference_datum['image'])) {
 										?>
 											<a style="margin-right: 1ch; width: 100px;" href="<?= '/images/'.$reference_datum['image']['id'].'-cover.'.$reference_datum['image']['extension']; ?>" target="_blank">
-												<img alt="<?= $reference_datum['quick_name'].' cover'; ?>" src="<?= '/images/'.$reference_datum['image']['id'].'-cover.thumbnail.'.$reference_datum['image']['extension']; ?>" />
+												<img alt="<?= $reference_datum['quick_name'].' cover'; ?>" src="<?= '/images/'.$reference_datum['image']['id'].'-cover.thumbnail.'.$reference_datum['image']['extension']; ?>" style="width:100px;"/>
 											</a>
 										<?php
 									}
