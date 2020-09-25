@@ -28,7 +28,7 @@
 .list--no-image {
 	border: 1px solid;
 	color: hsl(var(--background--bold));
-	padding: 1rem;
+	padding: 0;
 	text-align: center;
 }
 .list--no-image::before {
