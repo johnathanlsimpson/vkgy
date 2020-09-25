@@ -53,8 +53,13 @@ function get_image($input, $pdo) {
 				$orientation = $size_ratio ? ( $size_ratio > 1 ? 'vertical' : 'horizontal' ) : null;
 				
 				
+				
+				
+				
+				
 				// Testing using CDN for resized images
-				if($_SESSION['username'] === 'inartistic' || $_SERVER['REMOTE_ADDR'] == '71.63.39.127') {
+				// For now let's only do it to non-exclusive images--otherwise Bunny grabs the watermarked version and thus the thumbnails are watermarked
+				if(!$is_exclusive && !$rslt_image['is_queued']) {
 					
 					// Get requested size
 					if( $method ) {
@@ -67,6 +72,9 @@ function get_image($input, $pdo) {
 					header('Location: '.$bunny_url);
 					
 				}
+				
+				
+				
 				
 				
 				// If image is gif, or height/width can't be determined, or both height and width are less than max size, return original image
