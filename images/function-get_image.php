@@ -2,6 +2,8 @@
 include_once("../php/include.php");
 include_once("../php/external/class-imageresize.php");
 
+
+
 function get_image($input, $pdo) {
 	
 	// If trying to get an artist's main image, find the ID of that image
@@ -25,6 +27,12 @@ function get_image($input, $pdo) {
 	$allowed_extensions = ["jpg", "jpeg", "png", "gif"];
 	$allowed_methods = ["thumbnail", "small", "medium", "large"];
 	$max_sizes = [ 'thumbnail' => 100, 'small' => 150, 'medium' => 300, 'large' => 600, 'watermarked' => 800 ];
+	
+	// If method was opengraph (SNS preview image), just set a flag to return full image without passing through CDN
+	if($method === 'opengraph') {
+		$avoid_cdn = true;
+		unset($method);
+	}
 	
 	// Set file paths
 	$source_image_path = "../images/image_files/".$id.".".$ext;
@@ -59,7 +67,7 @@ function get_image($input, $pdo) {
 				
 				// Testing using CDN for resized images
 				// For now let's only do it to non-exclusive images--otherwise Bunny grabs the watermarked version and thus the thumbnails are watermarked
-				if(!$is_exclusive && !$rslt_image['is_queued']) {
+				if(!$avoid_cdn && !$is_exclusive && !$rslt_image['is_queued']) {
 					
 					// Get requested size
 					if( $method ) {
@@ -72,9 +80,6 @@ function get_image($input, $pdo) {
 					header('Location: '.$bunny_url);
 					
 				}
-				
-				
-				
 				
 				
 				// If image is gif, or height/width can't be determined, or both height and width are less than max size, return original image
