@@ -448,6 +448,7 @@ function showImageSection() {
 	var itemIdElem     = newImageElem.querySelector('[name^=image_' + itemType + '_id]');
 	var newOptionElem  = document.createElement('option');
 	var thumbnailElem  = newImageElem.querySelector('.image__image');
+	let messageElem    = newImageElem.querySelector('.image__loading');
 	
 	// Set certain image fields to defaults specified before loop
 	newImageElem.querySelector('[name=image_item_type]').value = itemType;
@@ -475,6 +476,7 @@ function showImageSection() {
 		thisImageElem: imagesElem.querySelector('.image__template:first-of-type'),
 		thumbnailElem: thumbnailElem,
 		imageIdElem: imageIdElem,
+		messageElem: messageElem,
 		itemType: itemType,
 		itemId: itemId
 	};
@@ -483,6 +485,11 @@ function showImageSection() {
 
 // Takes file, uploads, then updates image template
 function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
+	
+	let newImageElem = newImageTemplateArgs.thisImageElem;
+	newImageElem.classList.add('image--loading');
+	
+	newImageTemplateArgs.messageElem.innerHTML = 'Uploading...';
 	
 	// Define this so we don't have an error later
 	let file;
@@ -513,32 +520,35 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 			let imageIsNewElem = newImageTemplateArgs.thisImageElem.querySelector('[name="image_is_new"]');
 			imageIsNewElem.value = 1;
 			
+			// Get certain elements
+			let idElem = newImageTemplateArgs.thisImageElem.querySelector('[name="image_id"]');
+			let statusElem = newImageTemplateArgs.thisImageElem.querySelector('.image__status');
+			let thumbnailElem = newImageTemplateArgs.thisImageElem.querySelector('.image__image');
+			
 			// Using core submit function, actually upload the image
 			initializeInlineSubmit( $(newImageTemplateArgs.thisImageElem), '/images/function-upload_image.php', {
 				
 				'preparedFormData' : { 'image' : thisImage, 'item_type' : newImageTemplateArgs.itemType, 'item_id' : newImageTemplateArgs.itemId },
 				'callbackOnSuccess': function(event, returnedData) {
 					
-					// When image finished uploading, remove loading symbol and add status symbol
-					let statusElem = newImageTemplateArgs.thisImageElem.querySelector('.image__status');
-					statusElem.classList.remove('loading');
-					statusElem.classList.add('symbol__' + returnedData.status);
+					newImageTemplateArgs.messageElem.innerHTML = 'Compressing...';
 					
-					// After image is actually updated, grab the ID and insert it into the image_id elem
-					let idElem = newImageTemplateArgs.thisImageElem.querySelector('[name="image_id"]');
-					idElem.value = returnedData.image_id;
-					
-					// While uploading, thumbnail may be a huge blob of image data, so replace with actual thumbnail after
-					let thumbnailElem = newImageTemplateArgs.thisImageElem.querySelector('.image__image');
-					thumbnailElem.setAttribute('style', returnedData.image_style);
-					
-					// After ID is set init buttons in new image element
-					lookForSelectize();
-					initImageEditElems();
-					initImageDeleteButtons();
-					
-					// Trigger change on ID elem so that new ID (and description, etc) is saved in DB
-					idElem.dispatchEvent(new Event('change'));
+					// Do compression here
+					initializeInlineSubmit( $(newImageTemplateArgs.thisImageElem), '/images/function-compress_image.php', {
+						'preparedFormData' : { 'image_id' : returnedData.image_id, 'image_extension': returnedData.image_extension },
+						'callbackOnSuccess': function(compressEvent, compressData) {
+							
+							newImageTemplateArgs.messageElem.innerHTML = 'Finishing up...';
+							
+							finishUpload(newImageElem, idElem, statusElem, thumbnailElem, compressData);
+							
+						},
+						'callbackOnError': function(compressEvent, compressData) {
+							
+							finishUpload(newImageElem, idElem, statusElem, thumbnailElem, compressData);
+							
+						}
+					});
 					
 				},
 				'callbackOnError': function(event, returnedData) {
@@ -567,6 +577,27 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 		}
 		
 	}
+	
+}
+
+function finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedData) {
+	
+	// When image finished uploading, remove loading symbol and add status symbol
+	statusElem.classList.remove('loading');
+	statusElem.classList.add('symbol__' + returnedData.status);
+	
+	// While uploading, thumbnail may be a huge blob of image data, so replace with actual thumbnail after
+	thumbnailElem.setAttribute('style', returnedData.image_style);
+	
+	// Trigger change on ID elem so that new ID (and description, etc) is saved in DB
+	idElem.dispatchEvent(new Event('change'));
+	
+	// After ID is set init buttons in new image element
+	lookForSelectize();
+	initImageEditElems();
+	initImageDeleteButtons();
+	
+	newImageElem.classList.remove('image--loading');
 	
 }
 
