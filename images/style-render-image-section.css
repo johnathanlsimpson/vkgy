@@ -72,10 +72,10 @@
 .image__template .input__row {
 	transition: opacity 0.2s linear;
 }
-.image__template [name="image_id"][value=""] ~ .input__row:not(.image__message) {
+.image--loading [name="image_id"] ~ .input__row:not(.image__message) {
 	opacity: 0;
 }
-.image__template [name="image_id"][value=""] ~ .image__message .image__result:empty + .image__loading {
+.image--loading .image__message .image__result:empty + .image__loading {
 	display: block;
 }
 .image__message {
