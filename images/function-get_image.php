@@ -2,9 +2,9 @@
 include_once("../php/include.php");
 include_once("../php/external/class-imageresize.php");
 
-
-
 function get_image($input, $pdo) {
+	
+	session_write_close();
 	
 	// If trying to get an artist's main image, find the ID of that image
 	$artist = sanitize($input["artist"]);
@@ -71,8 +71,8 @@ function get_image($input, $pdo) {
 					
 					// Get requested size
 					if( $method ) {
-						$width = [ 'thumbnail' => 200, 'small' => 400, 'medium' => 600, 'large' => 1000 ];
-						$query = '?'.($orientation === 'vertical' ? 'height' : 'width').'='.($width[$method] ?: 1000);
+						$cdn_width = [ 'thumbnail' => 200, 'small' => 400, 'medium' => 600, 'large' => 1000 ];
+						$query = '?'.($orientation === 'vertical' ? 'height' : 'width').'='.($cdn_width[$method] ?: 1000);
 					}
 					
 					// BunnyCDN
