@@ -5,20 +5,6 @@ $access_artist = new access_artist($pdo);
 $access_comment = new access_comment($pdo);
 $markdown_parser = new parse_markdown($pdo);
 
-style([
-	"/main/style-page-index.css"
-]);
-
-script([
-	'/main/script-page-index.js'
-]);
-
-background("/images/".["470.medium.png", "3131.medium.jpg", "3134.medium.jpg", "3135.medium.jpg", "3136.medium.jpg"][rand(0, 4)]);
-
-breadcrumbs([
-	"Home" => "https://vk.gy/"
-]);
-
 $access_image = $access_image ?: new access_image($pdo);
 
 /* Get VIP news */
@@ -266,5 +252,138 @@ $sql_release_tags = "SELECT COUNT(*) AS num_tagged, tags_releases.name, tags_rel
 $stmt_release_tags = $pdo->prepare($sql_release_tags);
 $stmt_release_tags->execute();
 $rslt_release_tags = $stmt_release_tags->fetchAll();
+
+// Get VIP patrons
+$access_user = new access_user($pdo);
+$patrons = $access_user->access_user([ 'is_vip' => true ]);
+
+// Get non-VIP patrons
+foreach([ 'redaudrey' ] as $non_vip_patron) {
+	$patrons[] = $access_user->access_user([ 'username' => $non_vip_patron ]);
+}
+
+// Sort patrons
+usort($patrons, function($a, $b) { return strtolower($a['username']) <=> strtolower($b['username']); });
+
+// Make sure icons exist
+$num_patrons = count($patrons);
+for($i=0; $i<$num_patrons; $i++) {
+	if(!file_exists('..'.$patrons[$i]['avatar_url'])) {
+		$patrons[$i]['avatar_url'] = '/usericons/avatar-anonymous.png';
+	}
+}
+
+// Get dummy patrons to fill gaps in layout
+$patron_columns = 3;
+$patron_modulo = count($patrons) % $patron_columns;
+while($patron_modulo) {
+	$patrons[] = [ 'avatar_url' => '/usericons/avatar-anonymous.png' ];
+	$patron_modulo = count($patrons) % $patron_columns;
+}
+
+/* News */
+
+// Get URLs
+foreach($news as $news_key => $news_item) {
+	
+	// Set URL
+	$news[$news_key]['url'] = '/blog/'.$news_item['friendly'].'/';
+	
+	// Set thumbnail
+	if($news[$news_key]['image']) {
+		$news[$news_key]['image']['url'] = str_replace('.thumbnail.', '.small.', $news_item['image']['url']);
+	}
+	
+}
+
+/* Logic for featured cards */
+
+// Get latest news
+$latest_news = $news[0];
+
+// Get latest interview
+$latest_interviews = $access_blog->access_blog([ 'tag' => 'interview', 'get' => 'basics', 'limit' => 3 ]);
+
+// Mark all interviews as being interview
+foreach($latest_interviews as $interview_key => $latest_interview) {
+	$latest_interviews[$interview_key]['is_interview'] = true;
+}
+
+// Save latest interview
+$latest_interview = $latest_interviews[0];
+
+// Get a few other news articles, skipping 0th, which will be shuffled later
+for($i=1; $i<=4; $i++) {
+	$latest_items[] = $news[$i];
+}
+
+// Shuffle items
+shuffle($latest_items);
+
+// Get some dates
+$yesterday = date('Y-m-d', strtotime('yesterday'));
+$last_month = date('Y-m-d', strtotime('1 month ago'));
+
+// If interview in last day, that should be first no matter what
+$latest_item = $latest_interview['date_occurred'] > $yesterday ? $latest_interview : $latest_news;
+
+// Push latest item to front
+array_unshift( $latest_items, $latest_item );
+
+// Remove all but 3 items
+$latest_items = array_slice( $latest_items, 0, 3 );
+
+// If interview older than yesterday, push an interview to the end
+if($latest_interview['date_occurred'] < $yesterday) {
+	
+	// If latest interview older than one month, push random interview
+	if($latest_interview['date_occurred'] < $last_month) {
+		shuffle($latest_interviews);
+	}
+	
+	// Push
+	$latest_items[] = $latest_interviews[0];
+	
+}
+
+// Loop through items and get URL and image URLs
+foreach($latest_items as $item_key => $latest_item) {
+	
+	// URL
+	$latest_items[$item_key]['url'] = '/blog/'.$latest_item['friendly'].'/';
+	
+	// Decide pill
+	if($latest_item['is_interview']) {
+		$pill = 'interview';
+	}
+	else {
+		if( $item_key == 0 && $latest_item['date_occurred'] > date('Y-m-d', strtotime('1 day ago')) ) {
+			$pill = 'breaking';
+		}
+		else {
+			$pill = 'news';
+		}
+	}
+	$latest_items[$item_key]['pill'] = $pill;
+	
+	// Image
+	$image = $latest_item['image'];
+	
+	// Some URLs are given as thumbnail
+	if($image && $image['url']) {
+		$url = str_replace('.thumbnail.', '.', $image['url']);
+		$url = str_replace('.small.', '.', $url);
+		$medium_url = str_replace('.', '.medium.', $url);
+		$thumbnail_url = str_replace('.', '.thumbnail.', $url);
+		
+		// Push
+		$latest_items[$item_key]['image'] = array_merge( $latest_items[$item_key]['image'], [
+			'url' => $url,
+			'medium_url' => $medium_url,
+			'thumbnail_url' => $thumbnail_url
+		] );
+	}
+	
+}
 
 include('../main/page-index.php');
