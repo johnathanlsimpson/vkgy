@@ -1086,8 +1086,8 @@
 	}
 	.header__container::after {
 		background-image:
-			linear-gradient(to right, hsl(var(--background--secondary)) 1rem, transparent calc( var(--gutter) + 8rem )),
-			linear-gradient(to left, hsl(var(--background--secondary)) 1rem, transparent calc( var(--gutter) + 8rem ));
+			linear-gradient(to right, hsla(var(--background--secondary),1) 1rem, hsla(var(--background--secondary),0) calc( var(--gutter) + 8rem )),
+			linear-gradient(to left, hsla(var(--background--secondary),1) 1rem, hsla(var(--background--secondary),0) calc( var(--gutter) + 8rem ));
 		background-position:
 			left top,
 			right top;

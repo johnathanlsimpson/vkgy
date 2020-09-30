@@ -4,7 +4,10 @@
 	$page_title = $page_title ?: $pageTitle;
 	$page_title = $page_title ? $page_title.' | vkgy (ブイケージ)' : 'vkgy (ブイケージ) | visual kei library (V系ライブラリ)';
 	$background_image = $background_image ?: ($page_image ?: null);
+
+	// Get opengraph image, make sure we're passing flag so it doesn't pass through CDN
 	$page_image = $page_image ?: 'https://vk.gy/style/card.png';
+	$page_image = str_replace([ '.thumbnail.', '.small.', '.medium.', '.large.' ], '.opengraph.', $page_image);
 	
 	style([
 		"../style/style-tooltips.css"

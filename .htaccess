@@ -116,13 +116,13 @@ RewriteRule  ^images/image_files_queued/(\d+\.jpg)$                             
 RewriteRule  ^images/add/?$                                                                              /?images/&action=add
 RewriteRule  ^images/edit/?$                                                                             /?images/&action=edit
 RewriteCond  %{QUERY_STRING}                                                                             ^username=([A-z0-9\-]+)&hash=([A-z0-9]+)
-RewriteRule  ^images/(?:0+)?(\d+)(?:-[\w-]*)?(?:\.(thumbnail|small|medium|large))?\.(jpg|jpeg|gif|png)$  /images/page-image.php?id=$1&ext=$3&method=$2&username=%1&hash=%2
+RewriteRule  ^images/(?:0+)?(\d+)(?:-[\w-]*)?(?:\.(thumbnail|small|medium|large|opengraph))?\.(jpg|jpeg|gif|png)$  /images/page-image.php?id=$1&ext=$3&method=$2&username=%1&hash=%2
 
 
 RewriteCond  %{HTTP_REFERER}  ^$
 RewriteCond  %{HTTP_REFERER}  !^https?://(www\.)?vk.gy/.*$
-RewriteRule  ^images/(?:0+)?(\d+)(?:-[\w-]*)?(?:\.(thumbnail|small|medium|large))?\.(jpg|jpeg|gif|png)$  /images/page-image.php?id=$1&ext=$3&method=$2&is_hotlinked=1
-RewriteRule  ^images/(?:0+)?(\d+)(?:-[\w-]*)?(?:\.(thumbnail|small|medium|large))?\.(jpg|jpeg|gif|png)$  /images/page-image.php?id=$1&ext=$3&method=$2
+RewriteRule  ^images/(?:0+)?(\d+)(?:-[\w-]*)?(?:\.(thumbnail|small|medium|large|opengraph))?\.(jpg|jpeg|gif|png)$  /images/page-image.php?id=$1&ext=$3&method=$2&is_hotlinked=1
+RewriteRule  ^images/(?:0+)?(\d+)(?:-[\w-]*)?(?:\.(thumbnail|small|medium|large|opengraph))?\.(jpg|jpeg|gif|png)$  /images/page-image.php?id=$1&ext=$3&method=$2
 
 RewriteRule  ^labels/?$                 /?labels/
 RewriteRule  ^labels/add/?$             /?labels/&action=add

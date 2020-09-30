@@ -59,16 +59,18 @@
 											$content = str_replace('data-src', 'src', $content);
 											echo $content;
 											
-											echo
-												'<hr />'.
-												'<ul>'.
-												'<li><a href="https://vk.gy/" target"_blank">vk.gy</a></li>'.
-												'<li>Patreon: <a href="https://patreon.com/vkgy" target"_blank">vkgy</a></li>'.
-												'<li>Twitter: <a href="https://twitter.com/vkgy_" target"_blank">@vkgy</a></li>'.
-												'<li>Facebook: <a href="https://facebook.com/vkgy.official" target"_blank">vkgy.official</a></li>'.
-												'<li>YouTube: <a href="https://youtube.com/c/vkgyofficial" target"_blank">vkgyofficial</a></li>'.
-												'<li><a href="http://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/searches?term.cat_id=UA-03" target="_blank">Buy VK releases at CDJapan</a></li>'.
-												'</ul>';
+											if($_GET['source'] != 'discord') {
+												echo
+													'<hr />'.
+													'<ul>'.
+													'<li><a href="https://vk.gy/" target"_blank">vk.gy</a></li>'.
+													'<li>Patreon: <a href="https://patreon.com/vkgy" target"_blank">vkgy</a></li>'.
+													'<li>Twitter: <a href="https://twitter.com/vkgy_" target"_blank">@vkgy</a></li>'.
+													'<li>Facebook: <a href="https://facebook.com/vkgy.official" target"_blank">vkgy.official</a></li>'.
+													'<li>YouTube: <a href="https://youtube.com/c/vkgyofficial" target"_blank">vkgyofficial</a></li>'.
+													'<li><a href="http://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/searches?term.cat_id=UA-03" target="_blank">Buy VK releases at CDJapan</a></li>'.
+													'</ul>';
+											}
 										?>]]></content:encoded>
 										<description><![CDATA[<?php
 											if($entry["image"]) {

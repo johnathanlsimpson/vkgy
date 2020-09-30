@@ -4,6 +4,8 @@ include_once("../php/external/class-imageresize.php");
 
 function get_image($input, $pdo) {
 	
+	session_write_close();
+	
 	// If trying to get an artist's main image, find the ID of that image
 	$artist = sanitize($input["artist"]);
 	if(strlen($artist)) {
@@ -25,6 +27,12 @@ function get_image($input, $pdo) {
 	$allowed_extensions = ["jpg", "jpeg", "png", "gif"];
 	$allowed_methods = ["thumbnail", "small", "medium", "large"];
 	$max_sizes = [ 'thumbnail' => 100, 'small' => 150, 'medium' => 300, 'large' => 600, 'watermarked' => 800 ];
+	
+	// If method was opengraph (SNS preview image), just set a flag to return full image without passing through CDN
+	if($method === 'opengraph') {
+		$avoid_cdn = true;
+		unset($method);
+	}
 	
 	// Set file paths
 	$source_image_path = "../images/image_files/".$id.".".$ext;
@@ -51,6 +59,28 @@ function get_image($input, $pdo) {
 				// Get height:width ratio so we decide to resize
 				$size_ratio = $height && $width ? $height / $width : null;
 				$orientation = $size_ratio ? ( $size_ratio > 1 ? 'vertical' : 'horizontal' ) : null;
+				
+				
+				
+				
+				
+				
+				// Testing using CDN for resized images
+				// For now let's only do it to non-exclusive images--otherwise Bunny grabs the watermarked version and thus the thumbnails are watermarked
+				if(!$avoid_cdn && !$is_exclusive && !$rslt_image['is_queued']) {
+					
+					// Get requested size
+					if( $method ) {
+						$cdn_width = [ 'thumbnail' => 200, 'small' => 400, 'medium' => 600, 'large' => 1000 ];
+						$query = '?'.($orientation === 'vertical' ? 'height' : 'width').'='.($cdn_width[$method] ?: 1000);
+					}
+					
+					// BunnyCDN
+					$bunny_url = 'https://vkgy.b-cdn.net/images/'.$id.'.'.$ext.$query;
+					header('Location: '.$bunny_url);
+					
+				}
+				
 				
 				// If image is gif, or height/width can't be determined, or both height and width are less than max size, return original image
 				if( $ext == 'gif' || !$height || !$width || ($height < $max_sizes[$method] && $width < $max_sizes[$method]) ) {

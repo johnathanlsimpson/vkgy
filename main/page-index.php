@@ -1,116 +1,19 @@
 <?php
 
-/* Index stuff */
+style([
+	"/main/style-page-index.css"
+]);
 
-// Get VIP patrons
-$access_user = new access_user($pdo);
-$patrons = $access_user->access_user([ 'is_vip' => true ]);
+script([
+	'/main/script-page-index.js',
+	'/scripts/script-signIn.js'
+]);
 
-// Get non-VIP patrons
-foreach([ 'redaudrey' ] as $non_vip_patron) {
-	$patrons[] = $access_user->access_user([ 'username' => $non_vip_patron ]);
-}
+breadcrumbs([
+	"Home" => "https://vk.gy/"
+]);
 
-// Sort patrons
-usort($patrons, function($a, $b) { return strtolower($a['username']) <=> strtolower($b['username']); });
-
-// Make sure icons exist
-$num_patrons = count($patrons);
-for($i=0; $i<$num_patrons; $i++) {
-	if(!file_exists('..'.$patrons[$i]['avatar_url'])) {
-		$patrons[$i]['avatar_url'] = '/usericons/avatar-anonymous.png';
-	}
-}
-
-// Get dummy patrons to fill gaps in layout
-$patron_columns = 3;
-$patron_modulo = count($patrons) % $patron_columns;
-while($patron_modulo) {
-	$patrons[] = [ 'avatar_url' => '/usericons/avatar-anonymous.png' ];
-	$patron_modulo = count($patrons) % $patron_columns;
-}
-
-/* News */
-
-// Get URLs
-foreach($news as $news_key => $news_item) {
-	$news[$news_key]['url'] = '/blog/'.$news_item['friendly'].'/';
-}
-
-/* Logic for featured cards */
-
-// Get latest news
-$latest_news = $news[0];
-
-// Get latest interview
-$latest_interviews = $access_blog->access_blog([ 'tag' => 'interview', 'get' => 'basics', 'limit' => 3 ]);
-
-// Mark all interviews as being interview
-foreach($latest_interviews as $interview_key => $latest_interview) {
-	$latest_interviews[$interview_key]['is_interview'] = true;
-}
-
-// Save latest interview
-$latest_interview = $latest_interviews[0];
-
-// Get a few other news articles, skipping 0th, which will be shuffled later
-for($i=1; $i<=4; $i++) {
-	$latest_items[] = $news[$i];
-}
-
-// Shuffle items
-shuffle($latest_items);
-
-// Get some dates
-$yesterday = date('Y-m-d', strtotime('yesterday'));
-$last_month = date('Y-m-d', strtotime('1 month ago'));
-
-// If interview in last day, that should be first no matter what
-$latest_item = $latest_interview['date_occurred'] > $yesterday ? $latest_interview : $latest_news;
-
-// Push latest item to front
-array_unshift( $latest_items, $latest_item );
-
-// Remove all but 3 items
-$latest_items = array_slice( $latest_items, 0, 3 );
-
-// If interview older than yesterday, push an interview to the end
-if($latest_interview['date_occurred'] < $yesterday) {
-	
-	// If latest interview older than one month, push random interview
-	if($latest_interview['date_occurred'] < $last_month) {
-		shuffle($latest_interviews);
-	}
-	
-	// Push
-	$latest_items[] = $latest_interviews[0];
-	
-}
-
-// Loop through items and get URL and image URLs
-foreach($latest_items as $item_key => $latest_item) {
-	
-	// URL
-	$latest_items[$item_key]['url'] = '/blog/'.$latest_item['friendly'].'/';
-	
-	// Image
-	$image = $latest_item['image'];
-	
-	// Some URLs are given as thumbnail
-	$url = str_replace('.thumbnail.', '.', $image['url']);
-	$medium_url = str_replace('.', '.medium.', $url);
-	$thumbnail_url = str_replace('.', '.thumbnail.', $url);
-	
-	// Push
-	$latest_items[$item_key]['image'] = array_merge( $latest_items[$item_key]['image'], [
-		'url' => $url,
-		'medium_url' => $medium_url,
-		'thumbnail_url' => $thumbnail_url
-	] );
-	
-}
-
-
+$background_image = null;
 
 /* Page title */
 $page_header = lang('Welcome to vkgy', 'vkgyへようこそ', 'hidden');
@@ -124,7 +27,7 @@ ob_start();
 		<!-- Intro paragraph -->
 		<div class="home-head__text any--margin">
 			
-			<div class="home-head__title">
+			<div class="home-head__title h1">
 				<?= lang('Welcome to vkgy,', 'vkgyへようこそ―', 'hidden'); ?>
 			</div>
 			<p class="home-head__p">
@@ -160,7 +63,7 @@ ob_start();
 					<span class="intro__card-image lazy" data-src="<?= $latest_item['image']['medium_url']; ?>"></span>
 					
 					<div class="intro__card-title h2">
-						<span class="intro__card-pill h5"><?= $latest_item['is_interview'] ? 'interview' : ( $item_key ? 'news' : 'breaking' );?></span>
+						<span class="intro__card-pill h5"><?= $latest_item['pill']; ?></span>
 						<div class="intro__card-text"><?= $latest_item['title']; ?></div>
 					</div>
 					
@@ -169,179 +72,11 @@ ob_start();
 			
 		</div>
 	</div>
-<?php $GLOBALS['page_header_supplement'] = ob_get_clean(); 
+<?php
 
-	
-	script([
-		'/scripts/script-signIn.js',
-	]);
+$GLOBALS['page_header_supplement'] = ob_get_clean();
 
-$background_image = null;
 ?>
-
-
-<style>
-	.intro__cards {
-		--num-columns: 1;
-		display: grid;
-		grid-gap: 1rem;
-		grid-template-columns: repeat(var(--num-columns), minmax(0, 1fr));
-	}
-	@media(min-width:500px) {
-		.intro__cards {
-			--num-columns: 2;
-		}
-	}
-	@media(min-width:700px) {
-		.intro__cards {
-			--num-columns: 3;
-		}
-	}
-	@media(min-width:1000px) {
-		.intro__cards {
-			--num-columns: 4;
-		}
-	}
-	.intro__card {
-		--padding-top: 150px;
-		align-items: stretch;
-		background-color: transparent;
-		background-position: center;
-		background-size: 0 0;
-		border: none;
-		border-radius: 3px;
-		flex-direction: column;
-		justify-content: flex-end;
-		margin: 0;
-		overflow: hidden;
-		padding-top: var(--padding-top);
-	}
-	@media(min-width:1000px) {
-		.intro__card {
-			--padding-top: 200px;
-		}
-	}
-	@media(max-width:499.99px) {
-		.intro__card:nth-of-type(4) {
-			display: none;
-		}
-	}
-	@media(max-width:699.99px) {
-		.intro__card:nth-of-type(2),
-		.intro__card:nth-of-type(3) {
-			display: none;
-		}
-	}
-	@media(max-width:999.99px) {
-		.intro__card:nth-of-type(3) {
-			display: none;
-		}
-	}
-	.intro__card::before {
-		background: inherit;
-		background-color: hsl(var(--accent));
-		background-size: cover;
-		bottom: -1rem;
-		content: "";
-		left: -1rem;
-		position: absolute;
-		right: -1rem;
-		top: -1rem;
-		filter: blur(5px);
-		z-index: -1;
-	}
-	.intro__card-image {
-		background-position: center;
-		background-size: cover;
-		bottom: 0;
-		left: 0;
-		position: absolute;
-		right: 0;
-		top: 0;
-		transform: scale(1);
-		transition: transform 0.2s ease-in-out;
-		z-index: -1;
-	}
-	.intro__card:hover .intro__card-image {
-		transform: scale(1.1);
-	}
-	.intro__card-title {
-		line-height: 1.25em;
-		margin: 0;
-		padding: 0;
-	}
-	.intro__card-text {
-		max-height: calc(3 * 1.25em);
-		overflow: hidden;
-	}
-	.intro__card-title::after {
-		background: none;
-		background-image: linear-gradient(4deg, hsla(var(--accent), 0.95) 30%, hsla(var(--accent), 0.0) 70%);
-		border: none;
-		bottom: -1rem;
-		content: "";
-		display: block;
-		height: auto;
-		left: -1rem;
-		position: absolute;
-		right: -1rem;
-		top: -10rem;
-		width: auto;
-		z-index: -1;
-	}
-	.intro__card-pill {
-		background: white;
-		border-radius: 3px;
-		color: hsl(var(--accent));
-		padding: 0 3px 0 4px;
-	}
-</style>
-<style>
-	/* Hide regular header */
-	.header__header > h1 {
-		display: none;
-	}
-	
-	.home-head__title {
-		font-size: 2rem;
-		font-weight: bold;
-		margin-bottom: 0.5rem;
-	}
-	.home-head__p {
-		font-size: 1.5rem;
-	}
-	.home-head__more {
-		color: hsl(var(--accent));
-		display: none;
-		font-weight: bold;
-		margin-top: 0.5rem;
-		font-size: 1.5rem;
-	}
-	
-	@media(min-width:800px) {
-		.home-head__support {
-			text-align: right;
-		}
-		.home-head__supported {
-			margin-left: auto;
-			width: 200px;
-		}
-	}
-	.home-head__patreon {
-		background: #f96854;
-		color: white;
-		display: inline-block;
-		font-weight: bold;
-		margin-bottom: 0.5rem;
-		padding: 0.5rem;
-	}
-	.home-head__supported {
-		color: white;
-		display: block;
-		font-size: 1rem;
-	}
-</style>
-
 
 <div class="col c4-ABBC section__main">
 	<div class="main__left">
@@ -358,71 +93,6 @@ $background_image = null;
 				<?= lang('release calendar', 'リリースカレンダー', 'div'); ?>
 			</div>
 		</a>
-		
-		<style>
-			.browse__link {
-				border: none;
-				color: white;
-				display: block;
-				padding-top: 50%;
-				overflow: visible;
-			}
-			.browse__link .any--weaken {
-				color: inherit;
-			}
-			.browse__link:hover {
-				background-color: hsl(var(--interactive));
-			}
-			.browse--artists::before,
-			.browse--artists::after {
-				background-position: top 0 left -150%;
-				background-repeat: no-repeat;
-				background-size: 90% auto;
-				border-radius: inherit;
-				bottom: 0;
-				content: "";
-				left: 0;
-				position: absolute;
-				right: 0;
-				top: -2.5rem;
-				z-index: 0;
-			}
-			.browse--artists::after {
-				background-image: url(/main/main-chibi-02.png);
-				background-position: top 10% right -200%;
-			}
-			.browse--artists::before {
-				background-image: url(/main/main-chibi-01.png);
-			}
-			.browse--releases {
-				background-image: url(/main/main-cds-02.jpg);
-				background-position: center;
-				background-size: cover;
-			}
-			.browse__title {
-				border-radius: inherit;
-				color: inherit;
-				margin: 0;
-				padding: 0;
-				z-index: 1;
-			}
-			.browse__title::after {
-				background: none;
-				background-image: linear-gradient(4deg, hsla(var(--accent), 0.95) 10%, hsla(var(--accent), 0.0) 80%);
-				border: none;
-				border-radius: inherit;
-				bottom: -1rem;
-				content: "";
-				display: block;
-				height: auto;
-				left: -1rem;
-				position: absolute;
-				right: -1rem;
-				top: -3rem;
-				width: auto;
-				z-index: -1;
-			}
-		</style>
 		
 		<div class="main__ranking">
 			<h3>
@@ -469,166 +139,71 @@ $background_image = null;
 		<script>
 							(adsbygoogle = window.adsbygoogle || []).push({});
 		</script> */ ?>
-	
-	<style>
-		@media(min-width:800px) and (max-width: 1199.99px) {
-			body {
-			}
-			.main__middle {
-				flex-direction: column;
-			}
-			.main__middle > * {
-				width: 100%;
-			}
-		}
-		@media(min-width:1200px) and (max-width: 1399.99px) {
-			.news__item2 {
-				flex-direction: column;
-			}
-			.news__image {
-				margin: 0 0 1rem 0;
-			}
-		}
-		@media(min-width:800px) and (max-width: 899.99px) {
-			.news__item2 {
-				flex-direction: column;
-			}
-			.news__image {
-				margin: 0 0 1rem 0;
-			}
-		}
-	</style>
 	</div>
 	
 	<div class="main__middle col c2">
 		
 		<div class="main__middle-left">
+			
 			<!-- News -->
 			<ul class="news__container2 text">
 				<?php
 					foreach($news as $news_item) {
 						?>
 							<li class="news__item2 any--flex">
-
+								
 								<a class="news__image lazy" href="<?= $news_item['url']; ?>" data-src="<?= $news_item['image']['url']; ?>"></a>
-
+								
 								<div class="news__text">
 									<div class="news__supertitle h5">
 										<?= $news_item['date_occurred']; ?>
 										<a class="user a--inherit" data-icon="<?= $news_item['user']['icon']; ?>" data-is-vip="<?= $news_item['user']['is_vip']; ?>" href="<?= $news_item['user']['url']; ?>"><?= $news_item['user']['username']; ?></a>
 									</div>
-
-									<a class="news__title2 h2" href="<?= $news_item['url']; ?>"><?= $news_item['title']; ?></a>
+									
+									<a class="news__title2" href="<?= $news_item['url']; ?>"><?= $news_item['title']; ?></a>
 								</div>
-
+								
 							</li>
 						<?php
 					}
 				?>
-				<style>
-					.news__container2 {
-					}
-					.news__item2 {
-						justify-content:flex-start;
-					}
-					.news__supertitle {
-					}
-					.news__image {
-						background-position: 30% center;
-						background-size: cover;
-						flex: none;
-						display: block;
-						height: 80px;
-						width: 150px;
-						margin-right: 1rem;
-					}
-					.news__image:hover {
-						opacity: 0.75;
-					}
-				</style>
 			</ul>
-			
-			<div class="text text--outlined h5 any--margin" style="margin-top:-3rem;">
-				<a class="a--inherit" href="/blog/">All news</a> / 
-				<a class="a--inherit" href="/interview/">Interviews</a> / 
-				<a class="a--inherit" href="/blog/tag/new-band/">New bands</a> / 
-				<a class="a--inherit" href="/blog/tag/disbandment-revival/">Disbandments</a>
-			</div>
 		</div>
 		
 		<div class="main__middle-right">
-		
-			<style>
-				.comments__container2 {
-					align-self: stretch;
-				}
-				.comment__avatar-container {
-					margin-top: 0.25rem;
-					overflow: visible;
-				}
-				.comment__avatar-container:hover {
-					background: hsl(var(--interactive));
-				}
-				.comment__next {
-					display: none;
-				}
-				.comment__content {
-					background: hsl(var(--background));
-					border-radius: 5px;
-					line-height: 1;
-					margin-top: 0.5rem;
-					padding: 0.5rem;
-				}
-				.comment__item::before {
-					background: linear-gradient(to bottom left, hsl(var(--background)) 50%, transparent calc(50% + 1px));
-					bottom: 1.75rem;
-					content: "";
-					display: block;
-					height: 0.75rem;
-					left: 2.25rem;
-					position: absolute;
-					width: 0.75rem;
-				}
-				.comment__item:last-of-type::before {
-					bottom: 0.75rem;
-				}
-				.comment__user {
-					margin-right: 1ch;
-				}
-			</style>
-
+			
 			<!-- Comments -->
 			<ul class="comments__container2 any--margin">
 				<?php
 					$comments = array_slice($comments, 0, 10);
 					for($i=0; $i<count($comments); $i++) {
-
+						
 						$comment_class = null;
 						$comments[$i]['user']['avatar_url'] = '/usericons/avatar-'.(file_exists('../usericons/avatar-'.$comments[$i]['user']['username'].'.png') ? $comments[$i]['user']['username'] : 'anonymous').'.png?'.date('YmdH');
-
+						
 						if(!$comments[$i]['is_approved']) {
 							$comment_class .= ($_SESSION['can_approve_data'] ? 'comment--unapproved' : 'any--hidden');
 						}
-
+						
 						?>
 							<li class="comment__item <?= $comment_class; ?>">
 								<div class="any--flex">
-
+									
 									<a class="comment__avatar-container" data-icon="<?= $comments[$i]['user']['icon']; ?>" data-is-vip="<?= $comments[$i]['user']['is_vip']; ?>" href="<?= $comments[$i]['user']['url']; ?>">
-										<img alt="<?= $comments[$i]['user']['username']; ?>'s avatar" class="comment__avatar lazy" data-src="<?= $comments[$i]['user']['avatar_url']; ?>" />
+										<img class="comment__avatar lazy" data-src="<?= $comments[$i]['user']['avatar_url']; ?>" />
 									</a>
-
+									
 									<div class="comment__comment">
 										<h5 class="any--flex">
 											<a class="user a--inherit comment__user" data-icon="<?= $comments[$i]['user']['icon']; ?>" data-is-vip="<?= $comments[$i]['user']['is_vip']; ?>" href="<?= $comments[$i]['user']['url']; ?>"><?= $comments[$i]['user']['username']; ?></a>
 											<?php echo substr($comments[$i]["date_occurred"], 5); ?>
 										</h5>
-
+										
 										<div class="any--flex">
-											<a class="comment__content" href="<?= $comments[$i]['url'] ? $comments[$i]['url'].'#comments' : '/comments/#comment-'.$comments[$i]['id']; ?>"><?= strip_tags($comments[$i]["content"]); ?></a>
+											<a class="comment__content a--inherit" href="<?= $comments[$i]['url'] ? $comments[$i]['url'].'#comments' : '/comments/#comment-'.$comments[$i]['id']; ?>"><?= strip_tags($comments[$i]["content"]); ?></a>
 											<a class="comment__next symbol__next" href="<?php echo $comments[$i]['url'] ? $comments[$i]['url'].'#comments' : '/comments/#comment-'.$comments[$i]['id']; ?>">Read</a>
 										</div>
-
+										
 										<span class="any--hidden symbol__error comment__notice">This comment is awaiting approval.</span>
 									</div>
 								</div>
@@ -649,22 +224,22 @@ $background_image = null;
 					'<a class="support__link" href="http://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/" target="_blank"><img alt="Buy vk merch at CDJapan" class="support__image lazy" data-src="/main/ad-cdjapan-wide.jpg" /></a>',
 					'<a class="support__link" href="https://www.patreon.com/vkgy" target="_blank"><img alt="Support vkgy at Patreon" class="support__image lazy" data-src="/main/ad-patreon.png" /></a>',
 				];
-
+				
 				shuffle($ads);
-
+				
 				foreach($ads as $ad) {
 					echo $ad.' ';
 				}
 			?>
 		</div>
 	</div>
-
+	
 	<div class="main__right">
 		<div class="main__updates">
 			<h3>
 				<?php echo lang('Database updates', '最近の更新', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
 			</h3>
-
+			
 			<input class="obscure__input" id="obscure-updates" type="checkbox" checked />
 			<div class="text text--outlined obscure__container obscure--faint obscure--height">
 				<ul style="z-index: 1;">
@@ -675,9 +250,9 @@ $background_image = null;
 									<h5>
 										<?php echo substr($updates[$i]["date_edited"], 0, 10); ?>
 									</h5>
-
+									
 									<a class="symbol__<?php echo $updates[$i]["type"]; ?> <?php echo $updates[$i]["type"]; ?>" href="<?php echo $updates[$i]["url"]; ?>"><?php echo $updates[$i]["quick_name"]; ?></a>
-
+									
 									<?php
 										if($updates[$i]["type"] === "release" && $updates[$i]["artist_quick_name"]) {
 											?>
@@ -686,7 +261,7 @@ $background_image = null;
 												</div>
 											<?php
 										}
-
+										
 										if($updates[$i]["type"] === "news" && $updates[$i]["artist_quick_name"]) {
 											?>
 												<div class="any--weaken">
@@ -783,200 +358,6 @@ $background_image = null;
 		</div>
 	</div>
 </div>
-
-<style>
-	.patreon__bg {
-		background: hsla(var(--vkgy-red), 0.4);
-		color: white;
-		text-align: center;
-	}
-	.patreon__diagonals::before {
-		--slash-direction: to bottom left;
-		--slash-bottom: auto;
-		--slash-top: 0;
-	}
-	.patreon__diagonals::after {
-		--slash-direction: to top right;
-		--slash-bottom: 0;
-		--slash-top: auto;
-	}
-	.patreon__diagonals::before,
-	.patreon__diagonals::after {
-		background-image: linear-gradient(var(--slash-direction), hsla(var(--background--secondary), 1) 50%, hsla(var(--background--secondary), 0) calc(50% + 1px));
-		background-position: left var(--negative-gutter) var(--slash-position) -1px;
-		background-repeat: no-repeat;
-		background-size: calc(100vw + var(--gutter) * 2) 3rem;
-		bottom: var(--slash-bottom);
-		content: "";
-		display: block;
-		height: 3rem;
-		left: var(--negative-gutter);
-		position: absolute;
-		right: var(--negative-gutter);
-		top: var(--slash-top);
-		z-index: 2;
-	}
-	.patreon__container {
-		flex-direction: row;
-	}
-	.patreon__container a:hover {
-		color: hsl(146,65%,25%);
-	}
-	.patreon__container .a--inherit:hover {
-		background-image: linear-gradient(hsl(146,65%,25%),hsl(146,65%,25%));
-	}
-	
-	.patreon__text {
-		padding-bottom: 6rem;
-		padding-top: 6rem;
-	}
-	.patreon__title {
-		background: hsl(var(--vkgy-red));
-		color: white;
-		font-size: 3rem;
-		margin: 0 auto 3rem auto;
-		transform: rotate(-3deg);
-		width: auto;
-	}
-	@media(max-width:699.99px) {
-		.patreon__title {
-			font-size: 2rem;
-		}
-	}
-	.patreon__title .any--weaken {
-		color: hsl(0 0% 80%);
-	}
-	.patreon__p {
-		color: hsl(var(--accent));
-		font-size: 1.5rem;
-		font-weight: bold;
-		line-height: 1.5;
-		margin-bottom: 3rem;
-	}
-	.patreon__list {
-		color: white;
-		display: flex;
-		flex-wrap: wrap;
-		font-size: 1.25rem;
-		list-style-type: none;
-		margin-bottom: -1rem;
-	}
-	.patreon__list li {
-		border: none;
-		flex-grow: 1;
-		margin: 0 0 2rem 0 !important;
-		padding: 0 1rem !important;
-		width: 33.3%;
-	}
-	.patreon__badge {
-		border-radius: 3px;
-		box-shadow: inset 0 0 0 1px;
-		padding: 0 5px;
-	}
-	.patreon__button {
-		background: #f96854;
-		display: inline-block;
-		font-size: 3rem;
-		font-weight: bold;
-		line-height: 3rem;
-		margin: 3rem auto 0 auto;
-		padding: 1.5rem;
-		transform: rotate(-0deg);
-	}
-	@media(max-width:699.99px) {
-		.patreon__button {
-			font-size: 2rem;
-		}
-	}
-	.patreon__button:hover {
-		color: white !important;
-	}
-	
-	.patreon__wall {
-		align-self: stretch;
-		min-height: 500px;
-		-webkit-mask-image: linear-gradient(transparent, black 3rem, black calc(100% - 3rem), transparent);
-		mask-image: linear-gradient(transparent, black 3rem, black calc(100% - 3rem), transparent);
-		order: 1;
-	}
-	.patreon__scroll {
-		display: grid;
-		grid-gap: 1rem;
-		grid-template-columns: repeat(3, minmax(0,1fr));
-		left: 0;
-		position: absolute;
-		right: 0;
-		top: 0;
-		transform: translateY(0%);
-	}
-	@media screen and (prefers-reduced-motion: no-preference) {
-		.patreon__scroll {
-			animation: avatarScroll 30s linear infinite;
-		}
-	}
-	.patreon__scroll:hover {
-		animation-play-state: paused;
-	}
-	@keyframes avatarScroll {
-		0% {
-			transform: translateY(0%);
-		}
-		100% {
-			transform: translateY(-50%);
-		}
-	}
-	.patreon__patron {
-		align-items: center;
-		display: flex;
-		flex-direction: column;
-	}
-	.patreon__patron:not(:hover) {
-		color: hsl(var(--accent));
-	}
-	.patreon__avatar {
-		height: auto;
-		width: 100%;
-	}
-	.patreon__username {
-		display: block;
-		max-width: 100%;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-	
-	/* Sizing and order */
-	@media (max-width:1399.9px) {
-		.patreon__spacing .patreon__empty {
-			height: 0;
-			width: 0;
-		}
-	}
-	@media(max-width:999.99px) {
-		.patreon__container {
-			flex-direction: column;
-		}
-		.patreon__text {
-			margin-top: -1rem;
-			padding-top: 0;
-			width: 100% !important;
-			z-index: 2;
-		}
-		.patreon__wall {
-			margin: 0 auto;
-			max-width: 100%;
-			order: -1;
-			width: 600px !important;
-		}
-	}
-</style>
-
-
-
-
-
-
-
 
 <div class="col c1">
 	<div>

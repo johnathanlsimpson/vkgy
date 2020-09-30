@@ -102,7 +102,6 @@ if($is_translation) {
 	$id = is_numeric($_POST['id']) ? $_POST['id'] : null;
 	$title = sanitize($_POST['name']);
 	$content = sanitize($markdown_parser->validate_markdown($_POST['content']));
-	//$content_ja = sanitize($markdown_parser->validate_markdown($_POST['content_ja'])) ?: null;
 	$supplemental = sanitize($markdown_parser->validate_markdown($_POST['supplemental'])) ?: null;
 	$sources = sanitize($_POST['sources']) ?: null;
 	$friendly = friendly($_POST['friendly'] ?: $title);
@@ -309,7 +308,10 @@ if($is_translation) {
 					if(in_array('image_id', $keys_blog)) {
 						$sql_images_link = 'INSERT INTO images_blog (blog_id, image_id) VALUES (?, ?)';
 						$stmt_images_link = $pdo->prepare($sql_images_link);
-						$stmt_images_link->execute([ $id, $rslt_default_image ]);
+						
+						if(!$stmt_images_link->execute([ $id, $rslt_image ])) {
+							$output['result'][] = 'Couldn\'t set default image for post.';
+						}
 					}
 					
 					// Output
@@ -437,9 +439,10 @@ if($is_translation) {
 		$output['result'] = 'Please enter a title and text.';
 	}
 
-// End if normal article
+// End of English article
 }
 
+$output['result'] = is_array($output['result']) ? implode('<br />'."\n", $output['result']) : $output['result'];
 $output['status'] = $output['status'] ?: 'error';
 
 echo json_encode($output);
