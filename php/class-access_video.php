@@ -3,7 +3,7 @@
 	
 	class access_video {
 		private $curl_handler;
-		
+		public $video_types;
 		
 		// ======================================================
 		// Construct DB connection
@@ -17,6 +17,16 @@
 			
 			// Access user
 			$this->access_user = new access_user($this->pdo);
+			
+			// Video types
+			$this->video_types = [
+				'other' => 0,
+				'mv' => 1,
+				'live' => 2,
+				'trailer' => 3,
+				'cm' => 4,
+			];
+			
 		}
 		
 		
@@ -111,13 +121,16 @@
 							is_numeric($release_id) ? $release_id : null,
 							$_SESSION['user_id'],
 							$video_id,
-							$video_data['date_occurred'],
+							sanitize($video_data['name']),
+							sanitize($video_data['description']),
+							sanitize($video_data['date_occurred']),
 							$is_flagged ? 1 : 0,
 						];
 						
-						$sql_video = 'INSERT INTO videos (artist_id, release_id, user_id, youtube_id, date_occurred, is_flagged) VALUES (?, ?, ?, ?, ?, ?)';
+						$sql_video = 'INSERT INTO videos (artist_id, release_id, user_id, youtube_id, youtube_name, youtube_content, date_occurred, is_flagged) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 						$stmt_video = $this->pdo->prepare($sql_video);
 						if($stmt_video->execute($values_video)) {
+							
 							$output = array_merge($video_data, [
 								'approval_notice_class' => $is_flagged ? null : 'any--hidden',
 								'video_id' => $this->pdo->lastInsertID(),
@@ -125,6 +138,7 @@
 								'youtube_id' => $video_id,
 								'username' => $_SESSION['username']
 							]);
+							
 						}
 						
 					}
@@ -132,6 +146,64 @@
 			}
 			
 			return $output;
+		}
+		
+		
+		
+		// ======================================================
+		// Given title, guess type of video
+		// ======================================================
+		function guess_video_type($name) {
+			
+			// Un-sanitize and clean
+			$name = html_entity_decode( $name, ENT_QUOTES, 'UTF-8' );
+			$name = strtolower($name);
+			
+			// Strings to search for
+			$search_strings = [
+				
+				'cm' => [
+					'clip',
+					'spot',
+					'teaser',
+				],
+				
+				'mv' => [
+					'lyric',
+					'リリックビデオ',
+					'mv',
+					'music video',
+					'musicvideo',
+					'pv'
+				],
+				
+				'trailer' => [
+					'trailer',
+					'全曲',
+					'視聴',
+				],
+				
+				'live' => [
+					'live',
+					'ライブ',
+				],
+				
+			];
+			
+			// Search for strings and set type accordingly
+			foreach( $search_strings as $type_name => $strings ) {
+				foreach( $strings as $string ) {
+					
+					if( strpos($name, $string) !== false ) {
+						return $this->video_types[$type_name];
+					}
+					
+				}
+			}
+			
+			// Default to 'other'
+			return $this->video_types['other'];
+			
 		}
 		
 		
@@ -205,14 +277,18 @@
 			if($args['get'] === 'basics' || $args['get'] === 'all') {
 				$sql_select[] = 'videos.id';
 				$sql_select[] = 'videos.youtube_id';
+				$sql_select[] = 'CONCAT("https://youtu.be/", videos.youtube_id) AS url';
+				$sql_select[] = 'CONCAT("https://img.youtube.com/vi/", videos.youtube_id, "/mqdefault.jpg") AS thumbnail_url';
 				$sql_select[] = 'videos.is_flagged';
+				$sql_select[] = 'videos.youtube_name';
+				$sql_select[] = 'videos.youtube_content';
+				$sql_select[] = 'videos.type';
 			}
 			if($args['get'] === 'all') {
 				$sql_select[] = 'videos.date_added';
 				$sql_select[] = 'videos.artist_id';
 				$sql_select[] = 'videos.release_id';
 				$sql_select[] = 'videos.user_id';
-				//$sql_select[] = 'users.username';
 			}
 			if($args['get'] === 'count') {
 				$sql_select[] = 'COUNT(*) AS num_videos';
@@ -220,9 +296,6 @@
 			
 			// FROM ------------------------------------------------
 			$sql_from = 'videos';
-			if($args['get'] === 'all') {
-				//$sql_join[] = 'LEFT JOIN users ON users.id=videos.user_id';
-			}
 			
 			// WHERE -----------------------------------------------
 			if(is_numeric($args['id'])) {
@@ -245,8 +318,52 @@
 			// ORDER -----------------------------------------------
 			$sql_order = $args['order'] ? (is_array($args['order']) && !empty($args['order']) ? $args['order'] : [ $args['order'] ]) : [ 'videos.date_occurred DESC' ];
 			
+			// PAGINATION ------------------------------------------
+			
+			// Specific page
+			if( is_numeric($args['page']) || $args['page'] === 'last' ) {
+				
+				// Get page totals
+				$sql_total = 'SELECT COUNT(id) AS num_items FROM '.$sql_from;
+				$stmt_total = $this->pdo->prepare($sql_total);
+				$stmt_total->execute();
+				
+				// Calculations
+				$limit = $args['limit'] && is_numeric($args['limit']) ? $args['limit'] : 100;
+				$num_items = $stmt_total->fetchColumn() ?: 0;
+				$num_pages = ceil( $num_items / $limit );
+				$current_page = $args['page'];
+				
+				// If requested page > extant pages, reset to last page
+				if( $current_page > $num_pages ) {
+					$current_page = $num_pages;
+				}
+				
+				// Set query limit
+				$sql_limit = ( $current_page * $limit - $limit ).', '.$limit;
+				
+				// Pass meta data
+				$item_count = [
+					'num_items' => $num_items,
+					'num_pages' => $num_pages,
+					'current_page' => $current_page,
+					'limit' => $limit,
+				];
+				
+			}
+			
+			// Specific limit
+			elseif( is_numeric($args['limit']) ) {
+				$sql_limit = $args['limit'];
+			}
+			
+			// Default limit
+			else {
+				$sql_limit = 100;
+			}
+			
 			// LIMIT -----------------------------------------------
-			$sql_limit = $args['limit'] ?: ($args['get'] === 'count' || strlen($args['artist_id']) ? null : '100');
+			$sql_limit = $sql_limit ?: ( $args['limit'] ?: ($args['get'] === 'count' || strlen($args['artist_id']) ? null : '100') );
 			
 			// BUILD QUERY -----------------------------------------
 			$sql_videos = '
@@ -267,6 +384,8 @@
 					$num_videos = count($rslt_videos);
 					
 					// FORMAT DATA -------------------------------------
+					
+					// Get additional data
 					if($args['get'] === 'all') {
 						
 							// Get artist class
@@ -306,9 +425,6 @@
 								// Get user data
 								$rslt_videos[$i]['user'] = $this->access_user->access_user([ 'id' => $rslt_videos[$i]['user_id'], 'get' => 'name' ]);
 								
-								// Save video IDs to get YT data later
-								$video_youtube_ids[] = $rslt_videos[$i]['youtube_id'];
-								
 								// Attach artists
 								if(is_numeric($rslt_videos[$i]['artist_id'])) {
 									$rslt_videos[$i]['artist'] = $artists[$rslt_videos[$i]['artist_id']];
@@ -318,10 +434,42 @@
 								if(is_numeric($rslt_videos[$i]['release_id'])) {
 									$rslt_videos[$i]['release'] = $releases[$rslt_videos[$i]['release_id']];
 								}
+								
+								// If don't have video name or description (legacy code), get it from YT and store it
+								if( !strlen($rslt_videos[$i]['youtube_name']) ) {
+									
+									// Get data
+									$youtube_data = $this->get_youtube_data($rslt_videos[$i]['youtube_id'], true);
+									$youtube_data = is_array($youtube_data) && !empty($youtube_data) ? reset($youtube_data) : [];
+									
+									// Save it
+									if( strlen($youtube_data['name']) ) {
+										
+										// Vars
+										$youtube_name = sanitize($youtube_data['name']);
+										$youtube_content = sanitize($youtube_data['content']);
+										$youtube_date_occurred = sanitize($youtube_data['date_occurred']);
+										$video_type = $this->guess_video_type($youtube_name);
+										
+										// Save
+										$sql_data = 'UPDATE videos SET youtube_name=?, youtube_content=?, date_occurred=?, type=? WHERE id=? LIMIT 1';
+										$stmt_data = $this->pdo->prepare($sql_data);
+										$stmt_data->execute([ $youtube_name, $youtube_content, $youtube_date_occurred, $video_type, $rslt_videos[$i]['id'] ]);
+										
+										// Pass back to result
+										$rslt_videos[$i]['youtube_name'] = $youtube_name;
+										$rslt_videos[$i]['youtube_content'] = $youtube_content;
+										$rslt_videos[$i]['date_occurred'] = $youtube_date_occurred;
+										
+									}
+									
+									// Unset
+									unset($youtube_data, $youtube_name, $youtube_content, $youtube_date_occurred, $video_type);
+									
+								}
+								
 							}
 							
-							// Get YT data
-							$youtube_data = $this->get_youtube_data($video_youtube_ids, true);
 							
 							if(is_array($youtube_data) && !empty($youtube_data)) {
 								for($i=0; $i<$num_videos; $i++) {
@@ -329,6 +477,22 @@
 								}
 							}
 					}
+					
+					// Attach page counts to first item (this is kinda dumb tbh but we'll redo it eventually)
+					if( $args['page'] && is_array($item_count) && !empty($item_count) ) {
+						$rslt_videos[0]['meta'] = $item_count;
+					}
+					
+					// Get video type
+					if( $args['get'] === 'all' || $args['get'] === 'basics' ) {
+						
+						// Loop through and get string
+						for($i=0; $i<$num_videos; $i++) {
+							$rslt_videos[$i]['type'] = array_search($rslt_videos[$i]['type'], $this->video_types);
+						}
+						
+					}
+					
 				}
 				
 				// FORMAT OUTPUT -------------------------------------
