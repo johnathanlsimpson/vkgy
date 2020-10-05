@@ -150,6 +150,8 @@ RewriteRule  ^releases/([\w\-]*)/(\d+)/[\w\-]*/edit/?(?:\&prev_next_artist=(\d+)
 
 RewriteRule  ^tag-source  /releases/page-tag-source.php
 
+RewriteRule  ^videos/(\d+)/?  /?videos/&id=$1
+
 RewriteRule  ^vip/?$                /?vip/
 RewriteRule  ^vip/add/?$            /?vip/&action=update
 RewriteRule  ^vip/([\w-]+)/?$       /?vip/&friendly=$1

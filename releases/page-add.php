@@ -1001,6 +1001,52 @@
 	</form>
 </div>
 
+<style>
+	<?php if($_SESSION['username'] === 'inartistic'): ?>
+	@media(max-width:599.99px) {
+		.track__num {
+			width: 100%;
+		}
+		.track__num::before {
+			bottom: auto;
+			top: 0;
+		}
+		.track__song .input, .track__disc .input, .track__section .input {
+			height 2rem;
+			min-height: 2rem;
+			line-height: 2rem;
+			margin-bottom: 0.5rem;
+			padding-bottom: 0;
+			padding-top: 0;
+			border-radius: 3px 3px 0 0 !important;
+			width: 100%;
+		}
+		.track__song .input--secondary, .track__disc .input--secondary, .track__section .input--secondary {
+			border-radius: 0 0 3px 3px !important;
+			width: 100%;
+		}
+		.track__song, .track__disc, .track__section {
+			flex-direction: column;
+		}
+		.track__disc, .track__disc .input__group {
+			flex-direction: column;
+			flex-wrap: wrap;
+		}
+		.track__artist {
+			flex-grow: 1;
+			margin-bottom: 1rem;
+			width: 100%;
+		}
+		.track {
+		}
+		.add__tracklist {
+			padding-left: 0;
+			padding-right: 0;
+		}
+	}
+	<?php endif; ?>
+</style>
+
 <?php
 $documentation_page = 'releases';
 include('../documentation/index.php');
