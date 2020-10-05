@@ -16,7 +16,7 @@
 				
 				$output["status"] = "success";
 				
-				foreach(["artists_musicians", "artists_bio", "artists_views", "artists_urls"] as $key) {
+				foreach(["artists_musicians", "artists_bio", "artists_urls"] as $key) {
 					$sql = "DELETE FROM ".$key." WHERE artist_id=?";
 					$stmt = $pdo->prepare($sql);
 					if($stmt->execute([$id])) {
