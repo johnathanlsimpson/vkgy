@@ -25,6 +25,7 @@
 				'live' => 2,
 				'trailer' => 3,
 				'cm' => 4,
+				'lyric' => 5,
 			];
 			
 		}
@@ -123,11 +124,12 @@
 							$video_id,
 							sanitize($video_data['name']),
 							sanitize($video_data['description']),
+							$this->guess_video_type($video_data['name']),
 							sanitize($video_data['date_occurred']),
 							$is_flagged ? 1 : 0,
 						];
 						
-						$sql_video = 'INSERT INTO videos (artist_id, release_id, user_id, youtube_id, youtube_name, youtube_content, date_occurred, is_flagged) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+						$sql_video = 'INSERT INTO videos (artist_id, release_id, user_id, youtube_id, youtube_name, youtube_content, type, date_occurred, is_flagged) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
 						$stmt_video = $this->pdo->prepare($sql_video);
 						if($stmt_video->execute($values_video)) {
 							
@@ -174,7 +176,8 @@
 					'mv',
 					'music video',
 					'musicvideo',
-					'pv'
+					'official video',
+					'pv',
 				],
 				
 				'trailer' => [
@@ -283,9 +286,10 @@
 				$sql_select[] = 'videos.youtube_name';
 				$sql_select[] = 'videos.youtube_content';
 				$sql_select[] = 'videos.type';
+				$sql_select[] = 'videos.date_occurred';
+				$sql_select[] = 'videos.date_added';
 			}
 			if($args['get'] === 'all') {
-				$sql_select[] = 'videos.date_added';
 				$sql_select[] = 'videos.artist_id';
 				$sql_select[] = 'videos.release_id';
 				$sql_select[] = 'videos.user_id';
@@ -313,6 +317,23 @@
 			if($args['is_approved']) {
 				$sql_where[] = 'videos.is_flagged=?';
 				$sql_values[] = 0;
+			}
+			// Single type
+			if(is_numeric($args['type'])) {
+				$sql_where[] = 'videos.type=?';
+				$sql_values[] = $args['type'];
+			}
+			// Multiple types
+			if(is_array($args['type']) && !empty($args['type'])) {
+				foreach($args['type'] as $type_key => $type) {
+					if(is_numeric($type)) {
+						$type_wheres[] = 'videos.type=?';
+						$sql_values[] = $type;
+					}
+				}
+				if(is_array($type_wheres) && !empty($type_wheres)) {
+					$sql_where[] = '('.implode(' OR ', $type_wheres).')';
+				}
 			}
 			
 			// ORDER -----------------------------------------------
@@ -460,6 +481,7 @@
 										$rslt_videos[$i]['youtube_name'] = $youtube_name;
 										$rslt_videos[$i]['youtube_content'] = $youtube_content;
 										$rslt_videos[$i]['date_occurred'] = $youtube_date_occurred;
+										$rslt_videos[$i]['type'] = $video_type;
 										
 									}
 									

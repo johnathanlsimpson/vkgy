@@ -33,8 +33,34 @@ if( is_numeric($_GET['id']) ) {
 // Get data: index
 else {
 	
+	// Default filters
+	$type = null;
+	$order = null;
+	
+	// Filters
+	foreach( $_GET as $key => $value ) {
+		
+		// Video type (really should be an array but our URL is fucky)
+		if( strpos($key, 'type_') === 0 && in_array($value, $access_video->video_types) ) {
+			
+			$type[] = $access_video->video_types[ $value ];
+			
+		}
+		
+		// Order
+		if( $key === 'sort' ) {
+			
+			if( $value === 'date_added' ) {
+				$order = 'date_added DESC';
+			}
+			
+		}
+		
+	}
+	
+	// Query
 	$page = is_numeric($_GET['page']) ? $_GET['page'] : 1;
-	$videos = $access_video->access_video([ 'get' => 'all', 'page' => $page, 'limit' => 5 ]);
+	$videos = $access_video->access_video([ 'get' => 'all', 'page' => $page, 'type' => $type, 'order' => $order, 'limit' => 21 ]);
 	$pagination = paginate( is_array($videos) && !empty($videos[0]) && $videos[0]['meta'] ? $videos[0]['meta'] : [] );
 	
 	// Set view
