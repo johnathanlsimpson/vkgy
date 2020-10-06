@@ -39,15 +39,48 @@
 				<a class="videos__bg" data-id="<?= $video['youtube_id']; ?>" href="<?= '/videos/'.$video['id'].'/'; ?>" style="background-image:url(<?= $video['thumbnail_url']; ?>);"></a>
 			</div>
 			
-			<div class="videos__name">
-				<?= $video['youtube_name']; ?>
-				<span class="any__note any--weaken-color"><?= $video['type']; ?></span>
-			</div>
+			<a class="videos__artist artist" href="<?= '/artists/'.$video['artist']['friendly'].'/'; ?>"><?= lang($video['artist']['romaji'] ?: $video['artist']['name'], $video['artist']['name'], 'hidden'); ?></a>
 			
-			<a class="videos__artist artist any--weaken-size" href="<?= '/artists/'.$video['artist']['friendly'].'/'; ?>"><?= lang($video['artist']['romaji'] ?: $video['artist']['name'], $video['artist']['name'], 'hidden'); ?></a>
+			<div class="videos__name any--weaken-color">
+				<span class="any__note"><?= $video['type']; ?></span>
+				<?= strip_name($video['youtube_name'], $video['artist']); ?>
+				<span class="any--weaken-size">(<?= substr($video['date_occurred'], 0, 4) < date('Y') ? substr($video['date_occurred'], 0, 4) : substr($video['date_occurred'], 5, 5); ?>)</span>
+			</div>
 			
 		</div>
 	<?php endforeach; ?>
+
+	<div class="videos__pagination pagination">
+		<?php
+			foreach($pagination as $page) {
+				
+				// Set classes for pagination links
+				$page['classes'] = implode(' ', array_filter([
+					($page['is_active']                                            ? 'a--outlined'          : null),
+					($page['is_previous']                                          ? 'symbol__previous'     : null),
+					($page['is_next']                                              ? 'symbol__next'         : null),
+					($page['is_previous'] || $page['is_next']                      ? 'pagination__arrow'    : 'pagination__num'),
+					($page['is_active']                                            ? 'pagination--active'   : null),
+					($page['is_first']                                             ? 'pagination--first'    : null),
+					($page['is_last']                                              ? 'pagination--last'     : null),
+					($page['show_ellipsis_before'] || $page['show_ellipsis_after'] ? 'pagination--ellipsis' : null),
+					($page['is_disabled']                                          ? 'pagination--disabled' : null),
+					'a--padded',
+					'pagination__link',
+				]));
+				
+				// Render pagination links
+				?>
+					<a class="<?= $page['classes']; ?>" href="<?= $page['url']; ?>">
+						<?= $page['is_previous'] ? '<span class="any--hidden">Previous page</span>' : null; ?>
+						<?= $page['is_next'] ? '<span class="any--hidden">Next page</span>' : null; ?>
+						<?= $page['page_num']; ?>
+					</a>
+				<?php
+				
+			}
+		?>
+	</div>
 	
 </div>
 
@@ -102,3 +135,17 @@
 		white-space: nowrap;
 	}
 </style>
+
+<?php
+function strip_name($name, $artist) {
+	
+	if( strlen($name) && is_array($artist) && !empty($artist) ) {
+		
+		$name = str_replace($artist['name'], '', $name);
+		
+	}
+	
+	return $name;
+	
+}
+?>

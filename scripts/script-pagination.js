@@ -3,7 +3,6 @@ function changePage(paginationLink, isSilent = false) {
 	
 	// Get parent wrapper into which to load
 	let paginationWrapper = paginationLink.closest('.pagination__wrapper');
-	let paginationWrapperIndex = paginationWrapper
 	
 	// Get link URL and attach headless flag so only partial is loaded
 	let previousUrl = paginationWrapper.querySelector('.pagination--active').getAttribute('href');
