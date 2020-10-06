@@ -19,7 +19,7 @@
 		private $twitter_pattern = "(?<!\()(?:<blockquote class=\"twitter.+)?(?:(?:https?:\/\/(?:\w+\.)?)?twitter\.com\/(\w+)\/status\/(\d{10,20}))(?:[^\s]+)?(?:.+twitter\.com.+\/script>)?(?!\))";
 		private $image_pattern = "\[?!\[([^\]]*)\]\(([^\)\s]+)\)(?:\]\((.+)?\))?";
 		private $user_pattern = "(?<=^| )(@[A-z0-9-]+)(?=$|[\.,;\/ :\s\']|&#39;)";
-		private $spotify_pattern = '(https:\/\/open\.spotify\.com\/)((?:artist|track|album)\/[A-z0-9]{22})(?:\?si=[\w-]+)?';
+		private $spotify_pattern = '(https:\/\/open\.spotify\.com\/)((?:artist|track|album|playlist)\/[A-z0-9]{22})(?:\?si=[\w-]+)?';
 		private $linkcore_pattern = '(https:\/\/linkco\.re\/)([A-z0-9]{8})(?:\?[A-z0-9\=\&]*)?';
 		private $lnkto_pattern = '(https:\/\/lnk\.to\/[A-z0-9]+)';
 		
