@@ -50,7 +50,7 @@ $views->add('video', $video['id']);
 			
 		</div>
 		
-		<?php if(!$video['is_flagged']): ?>
+		<?php if($video['is_flagged']): ?>
 			<div class="text text--outlined text--error symbol__error">
 				<?= lang('This video is awaiting approval.', 'この動画は承認待ちです。', 'hidden'); ?>
 			</div>

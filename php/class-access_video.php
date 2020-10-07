@@ -1,9 +1,11 @@
 <?php
 	include_once('../php/include.php');
+	include_once('../php/class-access_comment.php');
 	
 	class access_video {
 		private $curl_handler;
 		public $video_types;
+		public $video_type_descriptions;
 		
 		// ======================================================
 		// Construct DB connection
@@ -17,6 +19,7 @@
 			
 			// Access user
 			$this->access_user = new access_user($this->pdo);
+			$this->access_comment = new access_comment($this->pdo);
 			
 			// Video types
 			$this->video_types = [
@@ -26,6 +29,13 @@
 				'trailer' => 3,
 				'cm' => 4,
 				'lyric' => 5,
+			];
+			
+			// Video type descriptions
+			$this->video_type_descriptions = [
+				'mv' => 'full MV',
+				'cm' => 'CM',
+				'lyric' => 'lyric video',
 			];
 			
 		}
@@ -153,6 +163,89 @@
 		
 		
 		// ======================================================
+		// Given title, attempt to remove superfluous info
+		// ======================================================
+		function clean_title($name, $artist) {
+			
+			if( strlen($name) && is_array($artist) && !empty($artist) ) {
+				
+				$name = html_entity_decode($name, ENT_QUOTES, 'UTF-8');
+				
+				$artist_name = html_entity_decode($artist['name'], ENT_QUOTES, 'UTF-8');
+				$artist_romaji = html_entity_decode($artist['romaji'], ENT_QUOTES, 'UTF-8');
+				
+				$artist_pattern =
+					''.
+					' ?(\- )?(\| ?|\/ ?)?'. // hyphen or slash after title
+					'[\[\【]?'.      // opening brackets
+					preg_quote($artist_name, '/').    // name
+					'[\]\】]?'.      // closing brackets
+					' ?(\- )?(\| ?|\/ ?)?'. // hyphen or slash before title
+					'';
+				
+				$romaji_pattern =
+					''.
+					' ?(\- )?(\| ?|\/ ?)?'. // hyphen or slash after title
+					'[\[\【]?'.      // opening brackets
+					preg_quote($artist_romaji, '/').    // name
+					'[\]\】]?'.      // closing brackets
+					' ?(\- )?(\| ?|\/ ?)?'. // hyphen or slash before title
+					'';
+				
+				if( preg_match('/'.$artist_pattern.'/u', $name) ) {
+					$name = preg_replace('/'.$artist_pattern.'/u', '', $name, 1);
+				}
+				elseif( strlen($artist_romaji) ) {
+					$name = preg_replace('/'.$romaji_pattern.'/u', '', $name, 1);
+				}
+				
+				$mv_pattern =
+				'('.
+				'(official|full)?'.
+				' ?'.
+				'(mv|music ?video|pv|video)'.
+				' ?'.
+				'(full ?ver.?|full|official)?'.
+				')';
+				
+				if( preg_match('/'.$mv_pattern.'/ui', $name, $mv_matches, PREG_OFFSET_CAPTURE) ) {
+					
+					$mv_position = mb_strpos( $name, $mv_matches[0][0], 0, 'UTF-8' );
+					$mv_length = mb_strlen( $mv_matches[0][0], 'UTF-8' );
+					
+					$char_before = mb_substr($name, $mv_position - 1, 1, 'UTF-8');
+					$char_after = mb_substr($name, $mv_position + $mv_length, 1, 'UTF-8');
+					
+					$bracket_pairs = [
+						'[]',
+						'()',
+						'【】',
+						'--',
+					];
+					
+					foreach($bracket_pairs as $bracket_pair) {
+						if( $char_before.$char_after === $bracket_pair ) {
+							$mv_position--;
+							$mv_length = $mv_length + 2;
+							break;
+						}
+					}
+					
+					$name = mb_substr( $name, 0, $mv_position, 'UTF-8' ).mb_substr( $name, $mv_position + $mv_length, null, 'UTF-8' );
+					
+				}
+				
+				$name = sanitize($name);
+				
+			}
+			
+			return $name;
+			
+		}
+		
+		
+		
+		// ======================================================
 		// Given title, guess type of video
 		// ======================================================
 		function guess_video_type($name) {
@@ -170,9 +263,14 @@
 					'teaser',
 				],
 				
-				'mv' => [
+				'lyric' => [
+					'lyric video',
+					'lyrics',
 					'lyric',
 					'リリックビデオ',
+				],
+				
+				'mv' => [
 					'mv',
 					'music video',
 					'musicvideo',
@@ -229,7 +327,7 @@
 				'https://www.googleapis.com/youtube/v3/videos?'.
 				'key='.$youtube_key.'&'.
 				'id='.implode(',', $input_ids).'&'.
-				'part=snippet,statistics';
+				'part=snippet,statistics,contentDetails';
 			
 			// Open curl, run API call, close curl
 			$curl_handler = curl_init();
@@ -248,14 +346,16 @@
 				foreach($data->items as $data_item) {
 					$snippet = (array) $data_item->snippet;
 					$statistics = (array) $data_item->statistics;
+					$details = (array) $data_item->contentDetails;
 					
 					$output[$data_item->id] = [
 						'name' => $snippet['title'],
-						'content' => explode("\n", $snippet['description'])[0],
+						'content' => $snippet['description'],
 						'date_occurred' => date('Y-m-d H:i:s', strtotime($snippet['publishedAt'])),
 						'channel_id' => $snippet['channelId'],
 						'num_likes' => number_format($statistics['likeCount'] ?: 0),
 						'num_views' => number_format($statistics['viewCount']),
+						'length' => preg_replace('/'.'PT(\d+)M(\d+)S'.'/', '00:$1:$2', $details['duration']),
 					];
 				}
 			}
@@ -288,6 +388,9 @@
 				$sql_select[] = 'videos.type';
 				$sql_select[] = 'videos.date_occurred';
 				$sql_select[] = 'videos.date_added';
+				$sql_select[] = 'views_daily_videos.num_views';
+				$sql_select[] = 'videos.length';
+				$sql_select[] = 'videos.is_flagged';
 			}
 			if($args['get'] === 'all') {
 				$sql_select[] = 'videos.artist_id';
@@ -300,6 +403,11 @@
 			
 			// FROM ------------------------------------------------
 			$sql_from = 'videos';
+			
+			// JOIN ------------------------------------------------
+			if($args['get'] === 'all' || $args['get'] === 'basics') {
+				$sql_join[] = 'LEFT JOIN views_daily_videos ON views_daily_videos.video_id=videos.id';
+			}
 			
 			// WHERE -----------------------------------------------
 			if(is_numeric($args['id'])) {
@@ -317,6 +425,11 @@
 			if($args['is_approved']) {
 				$sql_where[] = 'videos.is_flagged=?';
 				$sql_values[] = 0;
+			}
+			// Date published
+			if( preg_match('/'.'^\d{4}(-\d{2})?(-\d{2})?$'.'/', $args['date_occurred']) ) {
+				$sql_where[] = 'videos.date_occurred LIKE CONCAT(?, "%")';
+				$sql_values[] = friendly($args['date_occurred']);
 			}
 			// Single type
 			if(is_numeric($args['type'])) {
@@ -443,6 +556,9 @@
 							
 							for($i=0; $i<$num_videos; $i++) {
 								
+								// Get comments
+								$rslt_videos[$i]['comments'] = $this->access_comment->access_comment([ 'id' => $rslt_videos[$i]['id'], 'get_user_likes' => true, 'type' => 'video', 'get' => 'all' ]);
+								
 								// Get user data
 								$rslt_videos[$i]['user'] = $this->access_user->access_user([ 'id' => $rslt_videos[$i]['user_id'], 'get' => 'name' ]);
 								
@@ -457,7 +573,8 @@
 								}
 								
 								// If don't have video name or description (legacy code), get it from YT and store it
-								if( !strlen($rslt_videos[$i]['youtube_name']) ) {
+								//if( !strlen($rslt_videos[$i]['youtube_name']) || !strlen($rslt_videos[$i]['youtube_content']) ) {
+								if( !strlen($rslt_videos[$i]['youtube_content']) ) {
 									
 									// Get data
 									$youtube_data = $this->get_youtube_data($rslt_videos[$i]['youtube_id'], true);
@@ -471,17 +588,19 @@
 										$youtube_content = sanitize($youtube_data['content']);
 										$youtube_date_occurred = sanitize($youtube_data['date_occurred']);
 										$video_type = $this->guess_video_type($youtube_name);
+										$length = sanitize($youtube_data['length']);
 										
 										// Save
-										$sql_data = 'UPDATE videos SET youtube_name=?, youtube_content=?, date_occurred=?, type=? WHERE id=? LIMIT 1';
+										$sql_data = 'UPDATE videos SET youtube_name=?, youtube_content=?, date_occurred=?, type=?, length=? WHERE id=? LIMIT 1';
 										$stmt_data = $this->pdo->prepare($sql_data);
-										$stmt_data->execute([ $youtube_name, $youtube_content, $youtube_date_occurred, $video_type, $rslt_videos[$i]['id'] ]);
+										$stmt_data->execute([ $youtube_name, $youtube_content, $youtube_date_occurred, $video_type, $length, $rslt_videos[$i]['id'] ]);
 										
 										// Pass back to result
 										$rslt_videos[$i]['youtube_name'] = $youtube_name;
 										$rslt_videos[$i]['youtube_content'] = $youtube_content;
 										$rslt_videos[$i]['date_occurred'] = $youtube_date_occurred;
 										$rslt_videos[$i]['type'] = $video_type;
+										$rslt_videos[$i]['length'] = $length;
 										
 									}
 									
