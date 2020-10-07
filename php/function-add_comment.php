@@ -5,10 +5,10 @@
 	
 	if($_SESSION["is_signed_in"]) {
 		if(is_numeric($_POST["item_id"])) {
-			if(in_array($_POST["item_type"], ["blog", "release", "vip", "artist"])) {
+			if(in_array($_POST["item_type"], ['blog', 'release', 'vip', 'artist', 'video'])) {
 				if(!empty($_POST["content"])) {
 					$item_id = sanitize($_POST["item_id"]);
-					$item_type = array_flip(["blog", "release", "vip", "artist"])[$_POST["item_type"]];
+					$item_type = array_flip(["blog", "release", "vip", "artist", 'video'])[$_POST["item_type"]];
 					$comment_id = is_numeric($_POST["comment_id"]) ? $_POST["comment_id"] : null;
 					$thread_id = is_numeric($_POST["thread_id"]) ? $_POST["thread_id"] : null;
 					$user_id = sanitize($_SESSION["user_id"]);
@@ -82,8 +82,6 @@
 	}
 	
 	$output["status"] = $output["status"] ?: "error";
-	
-	//print_r($output);
 	
 	echo json_encode($output);
 ?>
