@@ -22,7 +22,7 @@
 			}
 			$this->access_user = new access_user($pdo);
 			
-			$this->comment_types = ['blog', 'release', 'vip', 'artist', 'none'];
+			$this->comment_types = ['blog', 'release', 'vip', 'artist', 'video', 'none'];
 		}
 		
 		
@@ -146,6 +146,9 @@
 							if($comments[$i]['item_type'] != 'none') {
 								if($comments[$i]['item_type'] === 'release') {
 									$tmp_sql_comment_links[$i] = 'SELECT releases.id, CONCAT_WS("/", "", "releases", artists.friendly, releases.id, releases.friendly, "") AS url FROM releases LEFT JOIN artists ON artists.id=releases.artist_id WHERE releases.id=?';
+								}
+								elseif($comments[$i]['item_type'] === 'video') {
+									$tmp_sql_comment_links[$i] = 'SELECT videos.id, CONCAT_WS("/", "", "videos", videos.id, "") AS url FROM videos WHERE videos.id=?';
 								}
 								else {
 									$tmp_sql_comment_links[$i] = 'SELECT id, CONCAT_WS("/", "", "'.$comments[$i]['item_type'].($comments[$i]['item_type'] === 'artist' ? 's' : null).'", friendly, "") AS url FROM '.$comments[$i]['item_type'].($comments[$i]['item_type'] === 'artist' ? 's' : null).' WHERE id=?';

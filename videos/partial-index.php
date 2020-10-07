@@ -42,8 +42,8 @@
 			<a class="videos__artist artist" href="<?= '/artists/'.$video['artist']['friendly'].'/'; ?>"><?= lang($video['artist']['romaji'] ?: $video['artist']['name'], $video['artist']['name'], 'hidden'); ?></a>
 			
 			<div class="videos__name any--weaken-color">
-				<span class="any__note"><?= $video['type']; ?></span>
-				<?= strip_name($video['youtube_name'], $video['artist']); ?>
+				<span class="any__note"><?= $access_video->video_type_descriptions[ $video['type'] ] ?: $video['type']; ?></span>
+				<?= $access_video->clean_title($video['youtube_name'], $video['artist']); ?>
 				<span class="any--weaken-size">(<?= substr($video['date_occurred'], 0, 4) < date('Y') ? substr($video['date_occurred'], 0, 4) : substr($video['date_occurred'], 5, 5); ?>)</span>
 			</div>
 			

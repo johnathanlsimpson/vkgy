@@ -9,6 +9,11 @@ $access_video = new access_video($pdo);
 // Testing
 $headless = $_GET['headless'] ? true : false;
 
+// Subnav
+subnav([
+	'All videos' => '/videos/'
+]);
+
 // Get data: ID
 if( is_numeric($_GET['id']) ) {
 	
@@ -19,6 +24,9 @@ if( is_numeric($_GET['id']) ) {
 		
 		// Returns array of videos
 		$video = reset($video);
+		
+		// Format YouTube description
+		$video['youtube_content'] = str_replace( [ "\r", "\n" ], [ '', '<br />' ], $video['youtube_content'] );
 		
 		// Get other videos from this artist
 		$artist_videos = $access_video->access_video([ 'get' => 'basics', 'artist_id' => $video['artist']['id'] ]);
@@ -51,16 +59,24 @@ else {
 		if( $key === 'sort' ) {
 			
 			if( $value === 'date_added' ) {
-				$order = 'date_added DESC';
+				$order = 'videos.date_added DESC';
+			}
+			elseif( $value === 'num_views' ) {
+				$order = 'views_daily_videos.num_views DESC';
 			}
 			
+		}
+		
+		// Date published
+		if( $key === 'date_occurred' ) {
+			$date_occurred = $value;
 		}
 		
 	}
 	
 	// Query
 	$page = is_numeric($_GET['page']) ? $_GET['page'] : 1;
-	$videos = $access_video->access_video([ 'get' => 'all', 'page' => $page, 'type' => $type, 'order' => $order, 'limit' => 21 ]);
+	$videos = $access_video->access_video([ 'get' => 'all', 'page' => $page, 'date_occurred' => $date_occurred, 'type' => $type, 'order' => $order, 'limit' => 21 ]);
 	$pagination = paginate( is_array($videos) && !empty($videos[0]) && $videos[0]['meta'] ? $videos[0]['meta'] : [] );
 	
 	// Set view

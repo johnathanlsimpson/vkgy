@@ -27,7 +27,9 @@ filterForm.addEventListener('submit', function(event) {
 	let newUrl = window.location.href.split('&')[0];
 	if( filters ) {
 		for( const [key, value] of Object.entries(filters) ) {
-			newUrl += '&' + key + '=' + value;
+			if( value.length ) {
+				newUrl += '&' + key + '=' + value;
+			}
 		}
 	}
 	

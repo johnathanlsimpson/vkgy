@@ -9,7 +9,7 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 		
 		// Check that specified entry exists
 		if($_POST['item_type'] != 'none') {
-			$item_table = $_POST['item_type'].($_POST['item_type'] === 'artist' || $_POST['item_type'] === 'release' ? 's' : null);
+			$item_table = $_POST['item_type'].($_POST['item_type'] === 'artist' || $_POST['item_type'] === 'release' || $_POST['item_type'] === 'video' ? 's' : null);
 			$sql_check = 'SELECT 1 FROM '.$item_table.' WHERE id=? LIMIT 1';
 			$stmt_check = $pdo->prepare($sql_check);
 			$stmt_check->execute([ $_POST['item_id'] ]);

@@ -24,7 +24,8 @@ class views {
 		// Set allowed item types and associated tables
 		$this->allowed_item_types = [
 			'artist' => 'artists',
-			'blog'   => 'blog,'
+			'blog'   => 'blog',
+			'video'  => 'videos',
 		];
 		
 	}
