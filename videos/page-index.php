@@ -4,11 +4,8 @@ $page_title = 'Videos';
 
 $page_header = 'Videos';
 
-subnav([
-	'Videos' => '/videos/'
-]);
-
 script([
+	'/scripts/external/script-inputmask.js',
 	'/scripts/script-pagination.js',
 	'/videos/script-index.js',
 ]);
@@ -31,9 +28,15 @@ style([
 					<label class="input__label">Sort by</label>
 					
 					<select class="input input__select" name="sort">
-						<option value="date_occurred">Date uploaded</option>
-						<option value="date_added">Date added</option>
-						<!--<option value="num_views">Most views</option>-->
+						<?php
+							foreach([
+								'date_occurred' => 'Date uploaded',
+								'date_added' => 'Date added',
+								'num_views' => 'Most views'
+							] as $key => $string) {
+								echo '<option value="'.$key.'" '.($key == $_GET['order'] ? 'checked' : null).' >'.$string.'</option>';
+							}
+						?>
 					</select>
 					
 				</div>
@@ -50,6 +53,15 @@ style([
 							<span class="symbol__unchecked"><?= strlen($type_name) < 3 ? strtoupper($type_name) : $type_name; ?></span>
 						</label>
 					<?php endforeach; ?>
+					
+				</div>
+			</li>
+			
+			<li class="input__row">
+				<div class="input__group">
+					
+					<label class="input__label">Date published</label>
+					<input class="input" data-inputmask="'alias': 'yyyy-mm-dd'" max-length="10" name="date_occurred" placeholder="yyyy-mm-dd" size="10" value="<?= sanitize($_GET['date_occurred']); ?>" />
 					
 				</div>
 			</li>
