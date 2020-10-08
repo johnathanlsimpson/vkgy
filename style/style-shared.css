@@ -604,7 +604,7 @@ table + table tr:first-of-type td, tbody + tbody tr:first-of-type td {
 .input__label + .input__textarea, .input__label + .tributable__wrapper .input__textarea {
 	margin-top: 1rem;
 }
-.input, .input--secondary, .input__button, .input__radio, .input__checkbox, .input__select, .input__textarea, button, input, select, textarea {
+.input, .input--secondary, .input__button, .input__radio, .input__checkbox, .input__dropdown, .input__select, .input__textarea, button, input, select, textarea {
 	background: hsl(var(--background--bold));
 	background-image:
 		linear-gradient(to right, hsl(var(--interactive--secondary)) 50%, transparent 0),

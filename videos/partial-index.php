@@ -39,12 +39,16 @@
 				<a class="videos__bg" data-id="<?= $video['youtube_id']; ?>" href="<?= '/videos/'.$video['id'].'/'; ?>" style="background-image:url(<?= $video['thumbnail_url']; ?>);"></a>
 			</div>
 			
-			<a class="videos__artist artist" href="<?= '/artists/'.$video['artist']['friendly'].'/'; ?>"><?= lang($video['artist']['romaji'] ?: $video['artist']['name'], $video['artist']['name'], 'hidden'); ?></a>
+			<span class="any--weaken" style="background:hsl(var(--background--secondary));border-radius:3px 0 0 0;padding:0;margin-top:-1.25rem;align-self:flex-end;max-width:100%;overflow:hidden;">
+				<a class="a--inherit videos__artist artist" style="margin:0 0 0 0.5rem;padding:0.25rem 0 0 0;line-height:1rem;vertical-align:middle;" href="<?= '/artists/'.$video['artist']['friendly'].'/'; ?>"><?= lang($video['artist']['romaji'] ?: $video['artist']['name'], $video['artist']['name'], 'hidden'); ?></a>
+			</span>
 			
 			<div class="videos__name any--weaken-color">
 				<span class="any__note"><?= $access_video->video_type_descriptions[ $video['type'] ] ?: $video['type']; ?></span>
-				<?= $access_video->clean_title($video['youtube_name'], $video['artist']); ?>
-				<span class="any--weaken-size">(<?= substr($video['date_occurred'], 0, 4) < date('Y') ? substr($video['date_occurred'], 0, 4) : substr($video['date_occurred'], 5, 5); ?>)</span>
+				<a class="" href="<?= '/videos/'.$video['id'].'/'; ?>">
+					<?= $access_video->clean_title($video['youtube_name'], $video['artist']); ?>
+					<span class="any--weaken-size">(<?= substr($video['date_occurred'], 0, 4) < date('Y') ? substr($video['date_occurred'], 0, 4) : substr($video['date_occurred'], 5, 5); ?>)</span>
+				</a>
 			</div>
 			
 		</div>
@@ -98,6 +102,7 @@
 	.videos__video {
 		display: flex;
 		flex-direction: column;
+		word-break: break-word;
 	}
 	
 	.videos__thumbnail {

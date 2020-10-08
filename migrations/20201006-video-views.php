@@ -10,8 +10,7 @@ CREATE TABLE views_daily_videos (
 
 $sql[] = "
 ALTER TABLE views_daily_videos
-  ADD PRIMARY KEY (video_id);
-COMMIT";
+  ADD PRIMARY KEY (video_id)";
 
 $sql[] = "
 ALTER TABLE `views_daily_videos` ADD FOREIGN KEY (`video_id`) REFERENCES `videos`(`id`) ON DELETE CASCADE ON UPDATE CASCADE";

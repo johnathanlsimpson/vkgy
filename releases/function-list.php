@@ -13,6 +13,12 @@ if($_SESSION['is_signed_in']) {
 	$action    = $_POST['item_is_listed'] ? 'add' : 'delete';
 	$is_sell   = $list_id == 2;
 	
+	// Only allow certain kinds of items in lists
+	$allowed_item_types = [
+		'release',
+		'video'
+	];
+	
 	// Set up points
 	$access_points = new access_points($pdo);
 	
@@ -20,7 +26,7 @@ if($_SESSION['is_signed_in']) {
 	$point_type = $list_id == 0 ? 'wanted-release' : ( $list_type == 1 ? 'collected-release' : ($list_type == 2 ? 'sold-release' : null) );
 	
 	// Make sure list and item are specified, and item is allowed
-	if( is_numeric($item_id) && is_numeric($list_id) && in_array($item_type, ['release']) ) {
+	if( is_numeric($item_id) && is_numeric($list_id) && in_array($item_type, $allowed_item_types) ) {
 		
 		// Eventually, all lists will be in one table (maybe?); for now, let's set up alternate tables
 		$list_tables = [
@@ -29,14 +35,15 @@ if($_SESSION['is_signed_in']) {
 			'releases_collections',
 		];
 		
+		// !! Start release lists
+		if( $list_id < 3 ) {
+		
 		// Check current status of item in list
 		$sql_check = 'SELECT id FROM '.$list_tables[$list_id].' WHERE user_id=? AND '.$item_type.'_id=? LIMIT 1';
 		
 		$stmt_check = $pdo->prepare($sql_check);
 		$stmt_check->execute([ $user_id, $item_id ]);
 		$extant_id = $stmt_check->fetchColumn();
-		
-		$output['result'] = $item_type.'*'.$item_id.'*'.$list_id.'*'.$user_id.'*'.$action.'*'.$is_sell.'*'.$extant_id.print_r($_POST, true);
 		
 		// Delete if necessary ($is_sell is temporary while sales are handled in releases_collections table instead of generic list table)
 		if($action === 'delete' && !$is_sell && is_numeric($extant_id)) {
@@ -89,6 +96,59 @@ if($_SESSION['is_signed_in']) {
 			}
 			
 		}
+		
+		// !! End release lists
+		}
+		
+		// !! Normal lists
+		else {
+			
+			// Check that user owns list
+			$sql_check = 'SELECT 1 FROM lists WHERE id=? AND user_id=? LIMIT 1';
+			$stmt_check = $pdo->prepare($sql_check);
+			$stmt_check->execute([ $list_id, $user_id ]);
+			
+			// Exit if not owner
+			if( $stmt_check->fetchColumn() ) {
+				
+				// Add
+				if( $action === 'add' ) {
+					
+					$values_add = [ $list_id, $item_id, array_search($item_type, $allowed_item_types) ];
+					$sql_add = 'INSERT INTO lists_items (list_id, item_id, item_type) VALUES (?, ?, ?)';
+					$stmt_add = $pdo->prepare($sql_add);
+					
+					if($stmt_add->execute($values_add)) {
+						$output['status'] = 'success';
+						$output['result'] = 'Item added to list.';
+					}
+					else {
+						$output['result'] = 'Couldn\'t add item to list.';
+					}
+					
+				}
+				
+				// Delete
+				elseif( $action === 'delete' ) {
+					
+					$values_delete = [ $list_id, $item_id, array_search($item_type, $allowed_item_types) ];
+					$sql_delete = 'DELETE FROM lists_items WHERE list_id=? AND item_id=? AND item_type=? LIMIT 1';
+					$stmt_delete = $pdo->prepare($sql_delete);
+					
+					if($stmt_delete->execute($values_delete)) {
+						$output['status'] = 'success';
+						$output['result'] = 'Item deleted from list.';
+					}
+					else {
+						$output['result'] = 'Couldn\'t delete item from list.';
+					}
+					
+				}
+				
+			}
+			
+		}
+		
 	}
 	else {
 		$output['result'] = 'Sorry, something went wrong.';
