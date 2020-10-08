@@ -44,7 +44,12 @@ style([
 							
 							<!-- Video container -->
 							<div class="video__container {video_class}">
-								<a class="lazy side__video-link youtube__embed" data-id="{youtube_id}" data-src="https://img.youtube.com/vi/{youtube_id}/mqdefault.jpg" href="https://youtu.be/{youtube_id}" target="_blank"></a>
+								<!--<a class="lazy side__video-link youtube__embed" data-id="{youtube_id}" data-src="https://img.youtube.com/vi/{youtube_id}/mqdefault.jpg" href="{url}" target="_blank"></a>-->
+								
+								<div class="videos__thumbnail module module--youtube">
+									<a class="videos__bg lazy" href="{url}" data-src="https://img.youtube.com/vi/{youtube_id}/mqdefault.jpg"></a>
+								</div>
+								
 								<div class="any--weaken-color">
 									<a class="video__report symbol__error any--weaken-size a--inherit" href="/artists/function-update_video.php?id={video_id}&amp;method=report" rel="nofollow"><?= lang('Report unofficial video', '非公式の動画を報告して', 'hidden'); ?></a>
 									<?php
@@ -59,10 +64,10 @@ style([
 							
 							<!-- Video details -->
 							<div class="video__details">
-								<a href="https://youtu.be/{youtube_id}" target="_blank">{name}</a>
+								<a href="{url}">{name}</a>
 								<p class="any--weaken-color">{content}</p>
 								<div class="video__data data__container">
-									<div class="data__item">
+									<!--<div class="data__item">
 										<h5>Views</h5>
 										{num_views}
 									</div>
@@ -73,7 +78,7 @@ style([
 									<div class="data__item">
 										<h5>Date</h5>
 										{date_occurred}
-									</div>
+									</div>-->
 									<div class="data__item">
 										<h5>Added</h5>
 										<a class="user" data-icon="{user_icon}" data-is-vip="{user_is_vip}" href="{user_url}">{username}</a>
@@ -96,6 +101,7 @@ style([
 				if(is_array($artist['videos']) && !empty($artist['videos'])) {
 					foreach($artist['videos'] as $video) {
 						$replacements = [
+							'url' => '/videos/'.$video['id'].'/',
 							'approval_notice_class' => $video['is_flagged'] ? null : 'any--hidden',
 							'admin_class' => $_SESSION['is_moderator'] ? null : 'any--hidden',
 							'video_class' => $video['is_flagged'] && !$_SESSION['is_moderator'] ? 'any--hidden' : null,
@@ -104,8 +110,8 @@ style([
 							'artist_id' => $artist['id'],
 							'channel_id' => $video['data']['channel_id'],
 							'youtube_id' => $video['youtube_id'],
-							'name' => $video['data']['name'],
-							'content' => $video['data']['content'],
+							'name' => $video['youtube_name'],
+							'content' => $video['youtube_content'],
 							'num_views' => $video['data']['num_views'],
 							'num_likes' => $video['data']['num_likes'],
 							'date_occurred' => substr($video['data']['date_occurred'], 0, 10),
@@ -172,3 +178,26 @@ style([
 <div class="col c1">
 	<?php include('partial-bottom.php'); ?>
 </div>
+	
+	<style>
+		.videos__thumbnail {
+			margin: 0 !important;
+			padding: 0;
+		}
+		.videos__bg {
+			background-position: center;
+			background-size: auto 133%;
+			cursor: pointer;
+			display: block;
+			height: auto;
+			margin: 0 auto;
+			max-width: 640px;
+			width: 100%;
+		}
+		.videos__bg:hover {
+			opacity: 0.75;
+		}
+		.videos__bg::after {
+			display: none;
+		}
+	</style>
