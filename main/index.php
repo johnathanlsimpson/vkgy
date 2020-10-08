@@ -49,6 +49,9 @@ for($i=0; $i<$num_comments; $i++) {
 		case('vip'):
 			$sql_comment[] = "SELECT id AS item_id, CONCAT_WS('/', '', 'vip', friendly, '') AS url FROM vip WHERE id=?";
 			break;
+		case('video'):
+			$sql_comment[] = "SELECT id AS item_id, CONCAT_WS('/', '', 'videos', id, '') AS url FROM videos WHERE id=?";
+			break;
 	}
 	
 	$values_comment[] = $comments[$i]['item_id'];
