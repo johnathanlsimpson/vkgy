@@ -6,6 +6,7 @@
 		private $curl_handler;
 		public $video_types;
 		public $video_type_descriptions;
+		public $flag_reasons;
 		
 		// ======================================================
 		// Construct DB connection
@@ -33,9 +34,15 @@
 			
 			// Video type descriptions
 			$this->video_type_descriptions = [
-				'mv' => 'full MV',
+				'mv' => 'MV',
 				'cm' => 'CM',
-				'lyric' => 'lyric video',
+			];
+			
+			// Flags
+			$this->flag_reasons = [
+				'unapproved' => 1,
+				'unofficial' => 2,
+				'broken'     => 3,
 			];
 			
 		}
@@ -371,6 +378,37 @@
 		
 		
 		// ======================================================
+		// Give user permission to add videos without approval
+		// ======================================================
+		function check_user_video_permissions($video_id) {
+			
+			if(is_numeric($video_id)) {
+				
+				$access_user = new access_user($this->pdo);
+				
+				// Find other approved videos which were added by the user who uploaded the video in question
+				$sql_approved = '
+					SELECT approved_videos.user_id
+					FROM videos 
+					LEFT JOIN videos approved_videos ON approved_videos.user_id=videos.user_id AND approved_videos.is_flagged=0 
+					WHERE videos.id=?
+					GROUP BY approved_videos.artist_id';
+				$stmt_approved = $this->pdo->prepare($sql_approved);
+				$stmt_approved->execute([ $video_id ]);
+				$rslt_approved = $stmt_approved->fetchAll();
+				
+				// If at least five videos, spread over at least five artists, have been approved, allow user to up w/out needing approval
+				if( is_array($rslt_approved) && !empty($rslt_approved) && count($rslt_approved) >= 5 ) {
+					//$access_user->change_permission( $rslt_approved[0]['user_id'], 'add', 'can_skip_video_approval' ) ;
+				}
+				
+			}
+			
+		}
+		
+		
+		
+		// ======================================================
 		// Build 'video' object
 		// ======================================================
 		function access_video($args = []) {
@@ -627,9 +665,12 @@
 					// Get video type
 					if( $args['get'] === 'all' || $args['get'] === 'basics' ) {
 						
-						// Loop through and get string
+						// Loop through and get type name and flagged reason
 						for($i=0; $i<$num_videos; $i++) {
+							
 							$rslt_videos[$i]['type'] = array_search($rslt_videos[$i]['type'], $this->video_types);
+							$rslt_videos[$i]['flagged_reason'] = array_search($rslt_videos[$i]['is_flagged'], $this->flag_reasons);
+							
 						}
 						
 					}
