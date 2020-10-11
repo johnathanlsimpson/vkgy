@@ -486,6 +486,16 @@
 					$sql_where[] = '('.implode(' OR ', $type_wheres).')';
 				}
 			}
+			// Flagged
+			if( is_numeric($args['is_flagged']) && $args['is_flagged'] >= 0 ) {
+				$sql_where[] = 'videos.is_flagged=?';
+				$sql_values[] = $args['is_flagged'];
+			}
+			// Added by user
+			if( is_numeric($args['user_id']) ) {
+				$sql_where[] = 'videos.user_id=?';
+				$sql_values[] = $args['user_id'];
+			}
 			
 			// ORDER -----------------------------------------------
 			$sql_order = $args['order'] ? (is_array($args['order']) && !empty($args['order']) ? $args['order'] : [ $args['order'] ]) : [ 'videos.date_occurred DESC' ];
