@@ -41,6 +41,12 @@ if( is_numeric($_GET['id']) ) {
 // Get data: index
 else {
 	
+	// Get users for filter list, if viewing as someone who can approve data
+	if( $_SESSION['can_approve_data'] ) {
+		$access_user = new access_user($pdo);
+		$users = $access_user->access_user([ 'get' => 'name' ]);
+	}
+	
 	// Default filters
 	$type = null;
 	$order = null;
