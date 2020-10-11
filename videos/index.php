@@ -35,11 +35,25 @@ if( is_numeric($_GET['id']) ) {
 		$view = 'id';
 		
 	}
+	else {
+		
+		header('Location: /videos/&error=not_found');
+		
+	}
 	
 }
 
 // Get data: index
 else {
+	
+	// Errors
+	$errors = [
+		'not_found' => 'The requested video doesn\'t exist. Showing all videos instead.'
+	];
+	
+	if( $_GET['error'] ) {
+		$error = $errors[ $_GET['error'] ];
+	}
 	
 	// Get users for filter list, if viewing as someone who can approve data
 	if( $_SESSION['can_approve_data'] ) {
@@ -50,11 +64,13 @@ else {
 	// Default filters
 	$type = null;
 	$order = null;
+	$is_flagged = $_SESSION['can_approve_data'] ? -1 : 0;
+	$user_id = null;
 	
 	// Filters
 	foreach( $_GET as $key => $value ) {
 		
-		// Video type (really should be an array but our URL is fucky)
+		// Type (really should be an array but our URL is fucky)
 		if( strpos($key, 'type_') === 0 && in_array($value, $access_video->video_types) ) {
 			
 			$type[] = $access_video->video_types[ $value ];
@@ -78,35 +94,65 @@ else {
 			$date_occurred = $value;
 		}
 		
+		// Flagged status
+		if( $key === 'is_flagged' ) {
+			
+			if( is_numeric($value) && $value < 3 && $_SESSION['can_approve_data'] ) {
+				$is_flagged = $value;
+			}
+			
+		}
+		
+		// User ID
+		if( $key === 'user_id' ) {
+			
+			if( is_numeric($value) ) {
+				$user_id = $value;
+			}
+			
+		}
+		
 	}
 	
 	// Query
 	$page = is_numeric($_GET['page']) ? $_GET['page'] : 1;
-	$videos = $access_video->access_video([ 'get' => 'all', 'page' => $page, 'date_occurred' => $date_occurred, 'type' => $type, 'order' => $order, 'limit' => 21 ]);
+	$videos = $access_video->access_video([
+		'get' => 'all',
+		'date_occurred' => $date_occurred,
+		'type' => $type,
+		'user_id' => $user_id,
+		'is_flagged' => $is_flagged,
+		'order' => $order,
+		'limit' => 26,
+		'page' => $page,
+	]);
 	$pagination = paginate( is_array($videos) && !empty($videos[0]) && $videos[0]['meta'] ? $videos[0]['meta'] : [] );
 	
 	// Set view
 	$view = 'index';
 	
+	// Set error
+	if( !is_array($videos) || empty($videos) ) {
+		$error = 'No results.';
+	}
+	
 }
 
-// Get view
+// View: ID
 if($view === 'id') {
 	
 	include('../videos/page-id.php');
 	
 }
-else {
+
+// View: Index
+elseif($view === 'index') {
 	
-	if( is_array($videos) && !empty($videos) ) {
-		
-		if($headless) {
-			include('../videos/partial-index.php');
-		}
-		else {
-			include('../videos/page-index.php');
-		}
-		
+	if($headless) {
+		include('../videos/partial-index.php');
+	}
+	else {
+		include('../videos/page-index.php');
 	}
 	
 }

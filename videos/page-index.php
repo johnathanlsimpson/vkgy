@@ -61,7 +61,7 @@ $access_video->check_user_video_permissions(78);
 					
 					<?php foreach($access_video->video_types as $type_name => $type_key): ?>
 						<label class="input__checkbox">
-							<input class="input__choice" name="type_<?= $type_key; ?>" type="checkbox" value="<?= $type_name; ?>" <?= $_GET['type_'.$type_key] == $type_name ? 'checked' : null; ?> />
+							<input class="input__choice" name="type_<?= $type_key; ?>" type="checkbox" value="<?= $type_name; ?>" <?= !is_array($type) || in_array($type_key, $type) ? 'checked' : null; ?> />
 							<span class="symbol__unchecked"><?= strlen($type_name) < 3 ? strtoupper($type_name) : $type_name; ?></span>
 						</label>
 					<?php endforeach; ?>
@@ -86,9 +86,9 @@ $access_video->check_user_video_permissions(78);
 					
 					<label class="input__label">Flagged videos</label>
 					
-					<?php foreach([ 0 => 'all', 1 => 'flagged', 2 => 'approved' ] as $flagged_key => $flagged_name): ?>
+					<?php foreach([ -1 => 'all', 1 => 'flagged', 0 => 'approved' ] as $flagged_key => $flagged_name): ?>
 						<label class="input__radio">
-							<input class="input__choice" name="<?= 'flagged_'.$flagged_key; ?>" type="radio" value="<?= $flagged_key; ?>" <?= $flagged_key == $_GET['flagged'] ? 'checked' : null; ?> />
+							<input class="input__choice" name="is_flagged" type="radio" value="<?= $flagged_key >= 0 ? $flagged_key : null; ?>" <?= $flagged_key == $is_flagged ? 'checked' : null; ?> />
 							<span class="symbol__unchecked"><?= $flagged_name; ?></span>
 						</label>
 					<?php endforeach; ?>
@@ -101,10 +101,10 @@ $access_video->check_user_video_permissions(78);
 					
 					<label class="input__label">Added by user</label>
 					
-					<select class="input any--flex-grow" placeholder="user">
-						<option>(any user)</option>
+					<select class="input any--flex-grow" name="user_id" placeholder="user">
+						<option value="" <?= !is_numeric($user_id) ? 'selected' : null; ?>>(any user)</option>
 						<?php foreach($users as $user): ?>
-							<option value="<?= $user['id']; ?>"><?= $user['username']; ?></option>
+							<option value="<?= $user['id']; ?>" <?= $user['id'] === $user_id ? 'selected' : null; ?>><?= $user['username']; ?></option>
 						<?php endforeach; ?>
 					</select>
 					
@@ -117,16 +117,28 @@ $access_video->check_user_video_permissions(78);
 			<li class="input__row">
 				
 				<div class="input__group any--flex-grow">
-					<button class="any--flex-grow symbol__filter" name="submit" type="submit">Filter</button>
+					<button class="any--flex-grow" name="submit" type="submit">Filter</button>
 				</div>
 				
-				<div class="input__group moderation--hide">
-					<label class="input__button" for="show_moderation">Moderate</label>
+				<div class="input__group">
+					<button name="clear">Reset</button>
 				</div>
 				
 			</li>
 			
 		</ul>
+		
+		<?php if($_SESSION['can_approve_data']): ?>
+			<ul class="text text--outlined moderation--hide">
+				<li class="input__row">
+					<div class="input__group any--flex-grow">
+						
+						<label class="input__button any--flex-grow" for="show_moderation" style="text-align:center;">Moderation tools</label>
+						
+					</div>
+				</li>
+			</ul>
+		<?php endif; ?>
 		
 	</form>
 	

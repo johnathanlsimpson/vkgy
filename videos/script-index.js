@@ -1,6 +1,14 @@
 // Initiate pagination
 initPagination();
 
+
+// Clear filters
+let clearElem = document.querySelector('[name="clear"]');
+clearElem.addEventListener('click', function(event) {
+	window.location.href = '/videos/';
+});
+
+
 // Handle filtering
 let filterForm = document.querySelector('[name="filter_videos"]');
 filterForm.addEventListener('submit', function(event) {
@@ -59,12 +67,17 @@ filterForm.addEventListener('submit', function(event) {
 		// Update history (unless we're manually surpressing this, i.e. forward/back in browser)
 		window.history.pushState({ 'newUrl': newUrl }, '', newUrl);
 		
+		// Blur filter button
+		filterForm.querySelector('[name="submit"]').blur();
+		
 	})
 	
 	.catch((error) => {
 	});
 	
 });
+
+
 
 // Init selectize
 lookForSelectize();

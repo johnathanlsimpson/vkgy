@@ -33,6 +33,10 @@
 		?>
 	</div>
 	
+	<?php if($error): ?>
+		<div class="text text--outlined text--error symbol__error" style="margin:0;grid-column:1/-1;"><?= $error; ?></div>
+	<?php endif; ?>
+	
 	<!-- Videos -->
 	<?php foreach($videos as $video_key => $video): ?>
 		<?php if( !$video['is_flagged'] || $_SESSION['can_approve_data'] ): ?>
