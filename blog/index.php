@@ -210,7 +210,7 @@ if(!$_GET['entry'] && !$_GET['action']) {
 	
 	// Allow user to see only appropriate queued entries
 	for($i=0; $i<$num_queued_entries; $i++) {
-		if($queued_entries[$i]['user_id'] != $_SESSION['user_id'] && !$is_vip) {
+		if($queued_entries[$i]['user_id'] != $_SESSION['user_id'] || !$_SESSION['can_access_drafts']) {
 			unset($queued_entries[$i]);
 		}
 	}
