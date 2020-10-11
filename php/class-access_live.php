@@ -2,7 +2,8 @@
 	include_once("../php/include.php");
 	
 	class access_live {
-		public  $pdo;
+		public $pdo;
+		public $live_types;
 		
 		
 		
@@ -15,6 +16,19 @@
 			}
 			
 			$this->pdo = $pdo;
+			
+			// Live types
+			$this->live_types = [
+				'taiban'   => 0,
+				'oneman'   => 1,
+				'twoman'   => 2,
+				'threeman' => 3,
+				'fourman'  => 4,
+				'session'  => 5,
+				'instore'  => 6,
+				'outstore' => 7,
+			];
+			
 		}
 		
 		
@@ -121,6 +135,7 @@
 				$sql_select[] = 'lives.lineup';
 				$sql_select[] = 'lives.name';
 				$sql_select[] = 'lives.romaji';
+				$sql_select[] = 'lives.type';
 			}
 			if($args['get'] === 'all') {
 				$sql_select[] = 'lives.*';
@@ -211,6 +226,7 @@
 					
 					// FORMAT DATA -------------------------------------
 					for($i=0; $i<$num_lives; $i++) {
+						
 						// Save all returned IDs so we can get artists
 						$live_ids[] = $rslt_lives[$i]['id'];
 						
@@ -226,12 +242,13 @@
 						
 						// Make lives array associative
 						$output_lives[$rslt_lives[$i]['id']] = $rslt_lives[$i];
+						
 					}
 					
 					// GET ARTISTS -------------------------------------
 					if($args['get'] === 'basics' || $args['get'] === 'all') {
 						$live_ids = is_array($live_ids) ? array_unique($live_ids) : [];
-						$sql_artists = 'SELECT artists.id, artists.name, artists.romaji, artists.friendly, lives_artists.live_id FROM lives_artists LEFT JOIN artists ON artists.id=lives_artists.artist_id WHERE ('.substr(str_repeat('live_id=? OR ', count($live_ids)), 0, -4).')';
+						$sql_artists = 'SELECT artists.id, artists.name, artists.romaji, artists.friendly, lives_artists.live_id, lives_artists.is_sponsor FROM lives_artists LEFT JOIN artists ON artists.id=lives_artists.artist_id WHERE ('.substr(str_repeat('live_id=? OR ', count($live_ids)), 0, -4).')';
 						$stmt_artists = $this->pdo->prepare($sql_artists);
 						$stmt_artists->execute($live_ids);
 						$rslt_artists = $stmt_artists->fetchAll();
@@ -242,7 +259,13 @@
 							// Place artists back onto lives
 							for($i=0; $i<$num_artists; $i++) {
 								if(strlen($rslt_artists[$i]['name'])) {
-									$output_lives[$rslt_artists[$i]['live_id']]['artists'][] = [ 'id' => $rslt_artists[$i]['id'], 'name' => $rslt_artists[$i]['name'], 'romaji' => $rslt_artists[$i]['romaji'], 'friendly' => $rslt_artists[$i]['friendly'] ];
+									$output_lives[ $rslt_artists[$i]['live_id'] ]['artists'][] = [ 
+										'id' => $rslt_artists[$i]['id'],
+										'is_sponsor' => $rslt_artists[$i]['is_sponsor'],
+										'name' => $rslt_artists[$i]['name'], 
+										'romaji' => $rslt_artists[$i]['romaji'], 
+										'friendly' => $rslt_artists[$i]['friendly'] 
+									];
 								}
 							}
 						}
