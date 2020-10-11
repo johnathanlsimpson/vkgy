@@ -18,7 +18,7 @@ if($_SESSION['username'] === 'inartistic') {
 			
 			foreach($sql as $sql_line) {
 				
-				$stmt = $pdo->prepare($sql);
+				$stmt = $pdo->prepare($sql_line);
 				
 				if($stmt->execute()) {
 					echo $sql_line.'<br />';

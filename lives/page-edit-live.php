@@ -92,6 +92,7 @@
 												for($i=0; $i<$num_artists; $i++) {
 													if(is_numeric($live['artists'][$i]['id'])) {
 														echo '('.$live['artists'][$i]['id'].')/'.($live['artists'][$i]['romaji'] ?: $live['artists'][$i]['name']).'/';
+														echo $live['artists'][$i]['is_sponsor'] ? ' (sponsor)' : null;
 													}
 													else {
 														echo $live['artists'][$i]['name'];
@@ -109,8 +110,23 @@
 										<span class="input__label">
 											Title
 										</span>
-										<input class="input" name="name" placeholder="event title" />
-										<input class="input input--secondary" name="romaji" placeholder="(romaji)" />
+										<input class="input" name="name" placeholder="event title" value="<?= $live['name']; ?>" />
+										<input class="input input--secondary" name="romaji" placeholder="(romaji)" value="<?= $live['romaji']; ?>" />
+									</div>
+								</div>
+								
+								<div class="input__row">
+									<div class="input__group">
+										
+										<label class="input__label">Type</label>
+										
+										<?php foreach($access_live->live_types as $type_name => $type_value): ?>
+											<label class="input__radio">
+												<input class="input__choice" name="type" type="radio" value="<?= $type_value; ?>" <?= $type_value == $live['type'] ? 'checked' : null; ?> />
+												<span class="symbol__unchecked"><?= $type_name; ?></span>
+											</label>
+										<?php endforeach; ?>
+										
 									</div>
 								</div>
 								

@@ -2,6 +2,10 @@
 
 include_once('../php/include.php');
 
+$access_live = new access_live($pdo);
+
+if($_SESSION['is_signed_in']);
+
 if(is_array($_POST) && !empty($_POST)) {
 	$livehouse_id = sanitize($_POST['livehouse_id']);
 	$name = sanitize($_POST['name']) ?: null;
@@ -11,10 +15,24 @@ if(is_array($_POST) && !empty($_POST)) {
 	$date_occurred = str_replace(['y', 'm', 'd'], '0', $date_occurred);
 	$date_occurred = preg_match('/'.'^\d{4}-\d{2}-\d{2}$'.'/', $date_occurred) ? $date_occurred : '0000-00-00';
 	
+	// Clean lineup string and make array
 	$lineup = sanitize($_POST['lineup']);
 	$lineup = str_replace(["\r\n", "\n\n"], "\n", $lineup);
 	$lineup = trim($lineup);
 	$lineup = array_filter(explode("\n", $lineup));
+	
+	// Make the lineup array deeper so we can add some attributes and statuses
+	foreach($lineup as $lineup_key => $content) {
+		$lineup[$lineup_key] = [
+			'content' => $content,
+			'is_sponsor' => strpos($content, '(sponsor)') !== false ? 1 : 0,
+			'is_guest' => strpos($content, '(guest)') !== false ? 1 : 0,
+			'is_opening' => strpos($content, '(opening act)') !== false ? 1 : 0
+		];
+	}
+	
+	$type = is_numeric($_POST['type']) ? $_POST['type'] : 0;
+	$type = in_array($type, $access_live->live_types) ? $type : 0;
 	
 	if(is_numeric($_POST['id'])) {
 		$id = sanitize($_POST['id']);
@@ -30,7 +48,7 @@ if(is_array($_POST) && !empty($_POST)) {
 				// Get all artists currently linked to this concert;
 				// if artist still in textarea, don't need to add it twice
 				// Also get num of duplicates so we can remove if needed
-				$sql_extant_artists = 'SELECT artist_id, COUNT(*) - 1 AS num_duplicates FROM lives_artists WHERE lives_artists.live_id=? GROUP BY lives_artists.artist_id';
+				$sql_extant_artists = 'SELECT artist_id, COUNT(*) - 1 AS num_duplicates, is_sponsor FROM lives_artists WHERE lives_artists.live_id=? GROUP BY lives_artists.artist_id';
 				$stmt_extant_artists = $pdo->prepare($sql_extant_artists);
 				$stmt_extant_artists->execute([ $id ]);
 				$extant_artists = $stmt_extant_artists->fetchAll();
@@ -52,12 +70,33 @@ if(is_array($_POST) && !empty($_POST)) {
 							}
 						}
 						
-						// Remove from array of newly-added artists
-						foreach($lineup as $lineup_key => $lineup_artist) {
-							if(strpos($lineup_artist, '('.$extant_artist['artist_id'].')') === 0) {
-								$extant_artists[$extant_artist_key]['is_in_lineup'] = true;
-								unset($lineup[$lineup_key]);
+						// Loop through inputted lineup, delete from DB any artist-live links which
+						// have info that has changed (e.g. is_sponsored)
+						foreach($lineup as $lineup_key => $lineup_line) {
+							
+						}
+						
+						// Loop through inputted lineup, check if they're already in DB and if anything has changed
+						foreach($lineup as $lineup_key => $lineup_line) {
+							
+							// If this artist is already linked to the live in the DB, we prob want to ignore it
+							if( strpos($lineup_line['content'], '('.$extant_artist['artist_id'].')') === 0 ) {
+								
+								// If is_sponsor attribute has been changed by user, then we want it to be deleted from DB
+								// so we'll leave is_in_lineup as false, but still leave it in $lineup so it gets added after
+								if( $lineup_line['is_sponsor'] != $extant_artist['is_sponsor'] ) {
+									$extant_artists[$extant_artist_key]['is_in_lineup'] = false;
+								}
+								
+								// If artist is already linked and nothing about the link has changed, then mark
+								// is_in_lineup as true so it won't be deleted, but unset it from $lineup so it won't be re-added
+								else {
+									$extant_artists[$extant_artist_key]['is_in_lineup'] = true;
+									unset($lineup[$lineup_key]);
+								}
+								
 							}
+							
 						}
 						
 					}
@@ -83,15 +122,20 @@ if(is_array($_POST) && !empty($_POST)) {
 				
 				// Loop through lineup array again and pull any newly-linked artists
 				if(is_array($lineup) && !empty($lineup)) {
-					foreach($lineup as $lineup_key => $lineup_artist) {
-						if(preg_match('/'.'^\((\d+)\)'.'/', $lineup_artist, $artist_match)) {
-							$artists_to_add[] = $artist_match[1];
+					foreach($lineup as $lineup_key => $lineup_line) {
+						
+						if( preg_match('/'.'^\((\d+)\)'.'/', $lineup_line['content'], $artist_match) ) {
+							$artists_to_add[] = array_merge($lineup_line, [ 'id' => $artist_match[1] ] );
 							unset($lineup[$lineup_key]);
 						}
+						
 					}
 				}
 				
-				// Collapse lineup again, since it should only contain non-linked bands now
+				// Lineup should now contain only bands not in DB, so make it a pretty string
+				foreach($lineup as $lineup_key => $lineup_line) {
+					$lineup[$lineup_key] = $lineup_line['content'] ?: null;
+				}
 				$lineup = array_filter($lineup);
 				$lineup = implode("\n", $lineup);
 				$lineup = trim($lineup);
@@ -102,11 +146,12 @@ if(is_array($_POST) && !empty($_POST)) {
 					
 					$values_add_artists = [];
 					foreach($artists_to_add as $artist_to_add) {
-						$values_add_artists[] = $id;
-						$values_add_artists[] = $artist_to_add;
+						$values_add_artists[] = $id; // live_id
+						$values_add_artists[] = $artist_to_add['id']; // artist_id
+						$values_add_artists[] = $artist_to_add['is_sponsor']; // is_sponsor
 					}
 					
-					$sql_add_artists = 'INSERT INTO lives_artists (live_id, artist_id) VALUES '.substr(str_repeat('(?, ?), ', count($artists_to_add)), 0, -2);
+					$sql_add_artists = 'INSERT INTO lives_artists (live_id, artist_id, is_sponsor) VALUES '.substr(str_repeat('(?, ?, ?), ', count($artists_to_add)), 0, -2);
 					$stmt_add_artists = $pdo->prepare($sql_add_artists);
 					
 					if($stmt_add_artists->execute($values_add_artists)) {
@@ -117,10 +162,10 @@ if(is_array($_POST) && !empty($_POST)) {
 				}
 				
 				// Do other edits
-				$sql_edit_live = 'UPDATE lives SET date_occurred=?, livehouse_id=?, lineup=?, name=?, romaji=? WHERE id=? LIMIT 1';
+				$sql_edit_live = 'UPDATE lives SET date_occurred=?, livehouse_id=?, lineup=?, name=?, romaji=?, type=? WHERE id=? LIMIT 1';
 				$stmt_edit_live = $pdo->prepare($sql_edit_live);
 				
-				if($stmt_edit_live->execute([ $date_occurred, $livehouse_id, $lineup, $name, $romaji, $id ])) {
+				if($stmt_edit_live->execute([ $date_occurred, $livehouse_id, $lineup, $name, $romaji, $type, $id ])) {
 					
 					// Output
 					$output['id'] = $id;
@@ -150,21 +195,27 @@ if(is_array($_POST) && !empty($_POST)) {
 					$output['result'][] = 'A live with that date and livehouse already exists. <a href="/lives/'.$extant_live.'/edit/">Edit it instead?</a>';
 				}
 				else {
-					foreach($lineup as $lineup_key => $lineup_artist) {
-						if(preg_match('/'.'^\((\d+)\)'.'/', $lineup_artist, $artist_match)) {
-							unset($lineup[$lineup_key]);
-							$live_artists[] = $artist_match[1];
-						}
-					}
 					
+					// Get IDs of artists in DB, then remove from lineup array so it will only contain non-DB artists
+					foreach($lineup as $lineup_key => $lineup_line) {
+						
+						if(preg_match('/'.'^\((\d+)\)'.'/', $lineup_line['content'], $artist_match)) {
+							unset($lineup[$lineup_key]);
+							$live_artists[] = array_merge( $lineup_line, ['id' => $artist_match[1]] );
+						}
+						
+						$lineup[$lineup_key] = $lineup_line['content'] ?: null;
+						
+					}
+					$lineup = array_filter($lineup);
 					$lineup = implode("\n", $lineup);
 					$lineup = trim($lineup);
 					$lineup = strlen($lineup) ? $lineup : null;
 					
 					// Add live
-					$sql_add_live = 'INSERT INTO lives (date_occurred, livehouse_id, lineup, user_id, name, romaji) VALUES (?, ?, ?, ?, ?, ?)';
+					$sql_add_live = 'INSERT INTO lives (date_occurred, livehouse_id, lineup, user_id, name, romaji, type) VALUES (?, ?, ?, ?, ?, ?, ?)';
 					$stmt_add_live = $pdo->prepare($sql_add_live);
-					if($stmt_add_live->execute([ $date_occurred, $livehouse_id, $lineup, $_SESSION['user_id'], $name, $romaji ])) {
+					if($stmt_add_live->execute([ $date_occurred, $livehouse_id, $lineup, $_SESSION['user_id'], $name, $romaji, $type ])) {
 						$id = $pdo->lastInsertId();
 						
 						// Output
@@ -177,11 +228,12 @@ if(is_array($_POST) && !empty($_POST)) {
 						if(is_array($live_artists) && !empty($live_artists)) {
 							
 							foreach($live_artists as $live_artist) {
-								$values_add_artists[] = $id;
-								$values_add_artists[] = $live_artist;
+								$values_add_artists[] = $id; // live_id
+								$values_add_artists[] = $live_artist['id']; // artist_id
+								$values_add_artists[] = $live_artist['is_sponsor']; // is_sponsor
 							}
 							
-							$sql_add_artists = 'INSERT INTO lives_artists (live_id, artist_id) VALUES '.substr(str_repeat('(?, ?), ', count($live_artists)), 0, -2);
+							$sql_add_artists = 'INSERT INTO lives_artists (live_id, artist_id, is_sponsor) VALUES '.substr(str_repeat('(?, ?, ?), ', count($live_artists)), 0, -2);
 							$stmt_add_artists = $pdo->prepare($sql_add_artists);
 							if($stmt_add_artists->execute($values_add_artists)) {
 							}
@@ -208,6 +260,8 @@ if(is_array($_POST) && !empty($_POST)) {
 else {
 	$output['result'][] = 'Data empty.';
 }
+
+endif;
 
 $output['status'] = $output['status'] ?: 'error';
 

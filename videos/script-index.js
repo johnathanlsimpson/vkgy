@@ -1,6 +1,14 @@
 // Initiate pagination
 initPagination();
 
+
+// Clear filters
+let clearElem = document.querySelector('[name="clear"]');
+clearElem.addEventListener('click', function(event) {
+	window.location.href = '/videos/';
+});
+
+
 // Handle filtering
 let filterForm = document.querySelector('[name="filter_videos"]');
 filterForm.addEventListener('submit', function(event) {
@@ -59,9 +67,87 @@ filterForm.addEventListener('submit', function(event) {
 		// Update history (unless we're manually surpressing this, i.e. forward/back in browser)
 		window.history.pushState({ 'newUrl': newUrl }, '', newUrl);
 		
+		// Blur filter button
+		filterForm.querySelector('[name="submit"]').blur();
+		
 	})
 	
 	.catch((error) => {
 	});
 	
+});
+
+
+
+// Init selectize
+lookForSelectize();
+
+
+
+// If choosing 'change_type' as bulk edit action, show dropdown of available types
+document.addEventListener('change', function(event) {
+	
+	if(event.target && event.target.name == 'action') {
+		
+		let typeElem = event.target.closest('form').querySelector('.moderation__type');
+		
+		if(event.target.value == 'change_type') {
+			typeElem.classList.remove('any--hidden');
+		}
+		else {
+			typeElem.classList.add('any--hidden');
+		}
+		
+	}
+	
+});
+
+
+
+// Do your best to handle moderation form
+document.addEventListener('submit', function(event) {
+	if(event.target && event.target.classList.contains('videos__container')) {
+		
+		event.preventDefault();
+		
+		initializeInlineSubmit($(event.target), '/videos/function-bulk_edit.php', {
+			
+			callbackOnSuccess: function(formElem, returnedData) {
+				
+				// Uncheck the checkboxes
+				let checkboxElems = formElem[0].querySelectorAll('[name="ids[]"]:checked');
+				checkboxElems.forEach(function(checkboxElem) {
+					checkboxElem.checked = false;
+				});
+				
+				// Get action
+				let actionElem = formElem[0].querySelector('[name="action"]:checked');
+				let action = actionElem.value;
+				let typeElem = formElem[0].querySelector('[name="type"]');
+				let type = typeElem.options[typeElem.selectedIndex].text;
+				
+				// Loop through checkboxes and make changes to parent video elems
+				checkboxElems.forEach(function(checkboxElem) {
+					let videoElem = checkboxElem.closest('.videos__video');
+					let typeTextElem = videoElem.querySelector('.videos__type');
+					
+					// If videos were approved, remove is_flagged attribute
+					if(action == 'approve') {
+						videoElem.classList.remove('video--flagged');
+					}
+					
+					else if(action == 'change_type') {
+						typeTextElem.innerHTML = type;
+					}
+					
+				});
+				
+			},
+			
+			callbackOnError: function(formElem, returnedData) {
+			}
+			
+		});
+		
+	}
 });
