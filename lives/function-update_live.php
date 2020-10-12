@@ -4,7 +4,7 @@ include_once('../php/include.php');
 
 $access_live = new access_live($pdo);
 
-if($_SESSION['is_signed_in']);
+if($_SESSION['is_signed_in']):
 
 if(is_array($_POST) && !empty($_POST)) {
 	$livehouse_id = sanitize($_POST['livehouse_id']);

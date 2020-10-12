@@ -1,22 +1,15 @@
 // Autosize
 autosize($(".autosize"));
 
-
-
 // Submit
 initializeInlineSubmit($("[name=form__edit]"), "/lives/function-update_live.php", {
 	submitOnEvent : "submit",
 	showEditLink : true,
 	callbackOnSuccess : function(formElement, returnedData) {
-		/*var e = new Event('item-id-updated');
-		e.details = {
-			'id' : returnedData.id
-		};
-		document.dispatchEvent(e);*/
+	},
+	callbackOnError: function(formElement, returnedData) {
 	}
 });
-
-// Delete
 
 // Change page state if adding or editing
 function changePageState(state) {

@@ -3,6 +3,7 @@
 include_once('../php/include.php');
 
 $access_artist = new access_artist($pdo);
+$access_video = new access_video($pdo);
 
 $allowed_methods = ['approve', 'delete', 'report'];
 
@@ -28,6 +29,9 @@ if(is_numeric($id)) {
 				$stmt_approve = $pdo->prepare($sql_approve);
 				if($stmt_approve->execute([ 0, $id ])) {
 					$output['status'] = 'success';
+					
+					// If we've approved 5 videos added by a certain user, spread across 5 artists, then remove the need for them to get approval
+					$access_video->check_user_video_permissions($id);
 					
 					// If artist ID and channel ID provided
 					if(is_numeric($artist_id) && strlen($channel_id)) {
