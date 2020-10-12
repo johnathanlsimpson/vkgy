@@ -65,7 +65,7 @@ style([
 							<!-- Video details -->
 							<div class="video__details">
 								<a href="{url}">{name}</a>
-								<p class="any--weaken-color">{content}</p>
+								<p class="any--weaken-color" style="max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{content}</p>
 								<div class="video__data data__container">
 									<!--<div class="data__item">
 										<h5>Views</h5>
