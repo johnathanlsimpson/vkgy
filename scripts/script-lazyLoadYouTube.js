@@ -16,6 +16,12 @@ function initYouTubeLazyLoad() {
 			
 			this.innerHTML = '';
 			this.parentNode.replaceChild(iframe, this);
+			
+			// Log the click as a 'view'
+			fetch('/videos/function-log_view.php?id=' + this.dataset.id)
+			.then((response) => {
+			});
+			
 		});
 	}
 }
