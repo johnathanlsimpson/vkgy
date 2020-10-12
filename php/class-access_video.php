@@ -122,7 +122,7 @@
 					if(is_numeric($artist_id)) {
 						
 						// If user is an admin (who can approve channel anyway), approve and add channel to artist's links
-						if($is_flagged && $_SESSION['can_approve_data']) {
+						if($is_flagged && ( $_SESSION['can_bypass_video_approval'] ) ) {
 							$is_flagged = false;
 							
 							// Get artist class
@@ -140,7 +140,7 @@
 							$_SESSION['user_id'],
 							$video_id,
 							sanitize($video_data['name']),
-							sanitize($video_data['description']),
+							sanitize($video_data['content']),
 							$this->guess_video_type($video_data['name']),
 							sanitize($video_data['date_occurred']),
 							$is_flagged ? 1 : 0,
@@ -149,6 +149,7 @@
 						$sql_video = 'INSERT INTO videos (artist_id, release_id, user_id, youtube_id, youtube_name, youtube_content, type, date_occurred, is_flagged) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
 						$stmt_video = $this->pdo->prepare($sql_video);
 						if($stmt_video->execute($values_video)) {
+							
 							
 							$output = array_merge($video_data, [
 								'approval_notice_class' => $is_flagged ? null : 'any--hidden',
@@ -210,7 +211,7 @@
 				'('.
 				'(official|full)?'.
 				' ?'.
-				'(mv|music ?video|pv|video)'.
+				'(mv|music ?video|music ?clip|pv|video)'.
 				' ?'.
 				'(full ?ver.?|full|official)?'.
 				')';
@@ -388,7 +389,7 @@
 				
 				// Find other approved videos which were added by the user who uploaded the video in question
 				$sql_approved = '
-					SELECT approved_videos.user_id
+					SELECT approved_videos.user_id, approved_videos.artist_id
 					FROM videos 
 					LEFT JOIN videos approved_videos ON approved_videos.user_id=videos.user_id AND approved_videos.is_flagged=0 
 					WHERE videos.id=?
@@ -397,9 +398,17 @@
 				$stmt_approved->execute([ $video_id ]);
 				$rslt_approved = $stmt_approved->fetchAll();
 				
-				// If at least five videos, spread over at least five artists, have been approved, allow user to up w/out needing approval
+				// If at least five videos, spread over at least five artists, have been approved, allow user to upload w/out needing approval
 				if( is_array($rslt_approved) && !empty($rslt_approved) && count($rslt_approved) >= 5 ) {
-					//$access_user->change_permission( $rslt_approved[0]['user_id'], 'add', 'can_skip_video_approval' ) ;
+					
+					// Give user permission to bypass approval
+					$access_user->change_permission( $rslt_approved[0]['user_id'], 'can_bypass_video_approval', true );
+					
+					// Approve other videos uploaded by user (but only where they have the default flag)
+					$sql_approve = 'UPDATE videos SET is_flagged=? WHERE user_id=? AND is_flagged=?';
+					$stmt_approve = $this->pdo->prepare($sql_approve);
+					$stmt_approve->execute([ 0, $rslt_approved[0]['user_id'], 1 ]);
+					
 				}
 				
 			}
@@ -620,7 +629,7 @@
 									$rslt_videos[$i]['release'] = $releases[$rslt_videos[$i]['release_id']];
 								}
 								
-								// If don't have video name or description (legacy code), get it from YT and store it
+								/*// If don't have video name or description (legacy code), get it from YT and store it
 								//if( !strlen($rslt_videos[$i]['youtube_name']) || !strlen($rslt_videos[$i]['youtube_content']) ) {
 								if( !strlen($rslt_videos[$i]['youtube_content']) ) {
 									
@@ -655,7 +664,7 @@
 									// Unset
 									unset($youtube_data, $youtube_name, $youtube_content, $youtube_date_occurred, $video_type);
 									
-								}
+								}*/
 								
 							}
 							
