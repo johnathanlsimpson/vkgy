@@ -2,6 +2,8 @@
 
 include_once('../php/include.php');
 
+$access_user = new access_user($pdo);
+
 // Edit user's role
 if($_SESSION['can_edit_roles'] && is_numeric($_POST['id']) && $_SESSION['user_id'] != $_POST['id']) {
 	
@@ -21,24 +23,39 @@ if($_SESSION['can_edit_roles'] && is_numeric($_POST['id']) && $_SESSION['user_id
 		$rslt_current = $stmt_current->fetch();
 		
 		// Set roles
-		$roles = [ 'vip' => ['access_drafts'], 'editor' => ['add_data'], 'moderator' => ['approve_data', 'delete_data', 'edit_roles'] ];
-		foreach($roles as $role_key => $permissions) {
-			$values_user[ 'is_'.$role_key ] = $_POST[ 'is_'.$role_key ] == 1 ? 1 : 0;
+		foreach($access_user->allowed_roles as $role => $role_permissions) {
 			
-			// Auto-set permissions based on roles, if user is unable to set permissions individually
-			if(!$_SESSION['can_edit_permissions']) {
-				foreach($permissions as $permission_key) {
-					$values_user[ 'can_'.$permission_key ] = $_POST[ 'is_'.$role_key ] == 1 ? 1 : 0;
-				}
+			// Update columns for each role
+			$values_user[ 'is_'.$role ] = $_POST[ 'is_'.$role ] == 1 ? 1 : 0;
+			
+			// Save default permissions from any assigned roles
+			foreach($role_permissions as $role_permission) {
+				
+				$new_permissions[ $role_permission ] = $values_user[ 'is_'.$role ];
+				
 			}
+			
 		}
 		
-		// If user can set permissions individually, get those
-		if($_SESSION['can_edit_permissions']) {
-			$permissions = [ 'add_data', 'add_livehouses', 'delete_data', 'approve_data', 'comment', 'access_drafts', 'edit_roles', 'edit_permissions' ];
-			foreach($permissions as $permission_key) {
-				$values_user[ 'can_'.$permission_key ] = $_POST[ 'can_'.$permission_key ] == 1 ? 1 : 0;
+		// If editor is allowed to set individual permissions, get those as well
+		if( $_SESSION['can_edit_permissions'] ) {
+			
+			foreach($access_user->allowed_permissions as $permission) {
+				
+				$new_permissions[ $permission ] = $_POST[ $permission ] ? 1 : 0;
+				
 			}
+			
+		}
+		
+		// If we have any permissions to change, merge them with current permissions JSON
+		if( is_array($new_permissions) && !empty($new_permissions) ) {
+			
+			$current_permissions = json_decode($rslt_current['permissions'], true);
+			$current_permissions = is_array($current_permissions) && !empty($current_permissions) ? $current_permissions : [];
+			
+			$values_user['permissions'] = json_encode( array_merge($current_permissions, $new_permissions) );
+			
 		}
 		
 		// Separate keys and values, add value for id=?

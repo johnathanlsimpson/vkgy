@@ -23,6 +23,10 @@
 			
 			include_once('../php/class-login-key.php');
 			$this->secret_key = $secret_key;
+			
+			// User object
+			$this->access_user = new access_user($this->pdo);
+			
 		}
 		
 		
@@ -30,93 +34,76 @@
 		// ======================================================
 		// Set hash cookie to enable persistent login
 		// ======================================================
-			private function hashSet($user_id) {
-				if(is_numeric($user_id)) {
+		private function hashSet($user_id) {
+			if(is_numeric($user_id)) {
+				
+				$user_agent = substr(friendly($_SERVER['HTTP_USER_AGENT']), 0, 255);
+				$remote_addr = sanitize($_SERVER['REMOTE_ADDR']);
+				$token = bin2hex(random_bytes(16));
+				
+				// Clear previous token (if it matches this IP/browser) and also clear any really old tokens (regardless of IP/browser)
+				$sql_clear_tokens = "DELETE FROM users_tokens WHERE user_id=? AND ( (remote_addr=? AND user_agent=?) OR date_occurred <= CURRENT_DATE() - INTERVAL 1 MONTH )";
+				$stmt_clear_tokens = $this->pdo->prepare($sql_clear_tokens);
+				$stmt_clear_tokens->execute([ $user_id, $user_agent, $remote_addr ]);
+				
+				// Insert new token
+				$sql_token = "INSERT INTO users_tokens (user_id, token, user_agent, remote_addr) VALUES (?, ?, ?, ?)";
+				$stmt_token = $this->pdo->prepare($sql_token);
+				if($stmt_token->execute([ $user_id, $token, $user_agent, $remote_addr ])) {
 					
-					$user_agent = substr(friendly($_SERVER['HTTP_USER_AGENT']), 0, 255);
-					$remote_addr = sanitize($_SERVER['REMOTE_ADDR']);
-					$token = bin2hex(random_bytes(16));
+					// Create cookie for persistent login
+					$cookie = $user_id.":".$user_agent.':'.$remote_addr.":".$token;
+					$mac = hash_hmac("sha256", $cookie, $this->secret_key);
+					$cookie .= ":".$mac;
+					setcookie("remember_me", $cookie, time() + 60*60*24*30, "/", $this->domain, true, true);
 					
-					// Clear previous token (if it matches this IP/browser) and also clear any really old tokens (regardless of IP/browser)
-					$sql_clear_tokens = "DELETE FROM users_tokens WHERE user_id=? AND ( (remote_addr=? AND user_agent=?) OR date_occurred <= CURRENT_DATE() - INTERVAL 1 MONTH )";
-					$stmt_clear_tokens = $this->pdo->prepare($sql_clear_tokens);
-					$stmt_clear_tokens->execute([ $user_id, $user_agent, $remote_addr ]);
+					return true;
 					
-					// Insert new token
-					$sql_token = "INSERT INTO users_tokens (user_id, token, user_agent, remote_addr) VALUES (?, ?, ?, ?)";
-					$stmt_token = $this->pdo->prepare($sql_token);
-					if($stmt_token->execute([ $user_id, $token, $user_agent, $remote_addr ])) {
-						
-						// Create cookie for persistent login
-						$cookie = $user_id.":".$user_agent.':'.$remote_addr.":".$token;
-						$mac = hash_hmac("sha256", $cookie, $this->secret_key);
-						$cookie .= ":".$mac;
-						setcookie("remember_me", $cookie, time() + 60*60*24*30, "/", $this->domain, true, true);
-						
-						return true;
-						
-					}
-					else {
-						$this->status = 2;
-						return false;
-					}
 				}
 				else {
+					$this->status = 2;
 					return false;
 				}
 			}
-			
-			
-			
-			// Check 'hash' cookie to sign in
-			private function hashCheck($cookie) {
-				if($cookie) {
-					list($user_id, $user_agent, $remote_addr, $token, $mac) = explode(":", $cookie);
-					
-					if(!empty($user_id) && !empty($remote_addr) && !empty($token) && !empty($mac)) {
-						if(!hash_equals(hash_hmac("sha256", $user_id.':'.$user_agent.":".$remote_addr.":".$token, $this->secret_key), $mac)) {
-							return false;
+			else {
+				return false;
+			}
+		}
+		
+		
+		
+		// Check 'hash' cookie to sign in
+		private function hashCheck($cookie) {
+			if($cookie) {
+				list($user_id, $user_agent, $remote_addr, $token, $mac) = explode(":", $cookie);
+				
+				if(!empty($user_id) && !empty($remote_addr) && !empty($token) && !empty($mac)) {
+					if(!hash_equals(hash_hmac("sha256", $user_id.':'.$user_agent.":".$remote_addr.":".$token, $this->secret_key), $mac)) {
+						return false;
+					}
+					else {
+						$sql_token = "SELECT 1 FROM users_tokens WHERE user_id=? AND user_agent=? AND remote_addr=? AND token=? AND date_occurred >= CURRENT_DATE() - INTERVAL 1 MONTH";
+						$stmt_token = $this->pdo->prepare($sql_token);
+						$stmt_token->execute([$user_id, $user_agent, $remote_addr, $token]);
+						if($stmt_token->fetchColumn()) {
+							$this->hashSet($user_id);
+							return true;
 						}
 						else {
-							$sql_token = "SELECT 1 FROM users_tokens WHERE user_id=? AND user_agent=? AND remote_addr=? AND token=? AND date_occurred >= CURRENT_DATE() - INTERVAL 1 MONTH";
-							$stmt_token = $this->pdo->prepare($sql_token);
-							$stmt_token->execute([$user_id, $user_agent, $remote_addr, $token]);
-							if($stmt_token->fetchColumn()) {
-								$this->hashSet($user_id);
-								return true;
-							}
-							else {
-								$this->status = 3;
-								return false;
-							}
+							$this->status = 3;
+							return false;
 						}
-					}
-					else {
-						$this->status = 11;
-						return false;
 					}
 				}
 				else {
-					$this->status = 4;
+					$this->status = 11;
 					return false;
 				}
 			}
-		
-		
-		
-		// ======================================================
-		// Get user's role/status
-		// ======================================================
-		public function check_roles($user_id, $rank_num = null, $is_vip = null) {
-			
-			// Grab roles and permissions
-			$sql_check_status = 'SELECT is_vip, is_editor, is_moderator, is_boss, can_add_data, can_add_livehouses, can_delete_data, can_approve_data, can_comment, can_access_drafts, can_edit_roles, can_edit_permissions FROM users WHERE id=? LIMIT 1';
-			$stmt_check_status = $this->pdo->prepare($sql_check_status);
-			$stmt_check_status->execute([ $user_id ]);
-			$rslt_check_status = $stmt_check_status->fetch();
-			
-			return $rslt_check_status;
-			
+			else {
+				$this->status = 4;
+				return false;
+			}
 		}
 		
 		
@@ -124,7 +111,7 @@
 		// ======================================================
 		// Set user's role/status
 		// ======================================================
-		public function set_roles($user_status) {
+		public function set_permissions($user_status) {
 			
 			if(is_array($user_status) && !empty($user_status)) {
 				foreach($user_status as $status_type => $status) {
@@ -161,15 +148,15 @@
 			else {
 				if($_COOKIE["remember_me"] && $this->hashCheck($_COOKIE["remember_me"])) {
 					list($user_id, $user_agent, $remote_addr, $token, $mac) = explode(":", $_COOKIE["remember_me"]);
-
+					
 					if(is_numeric($user_id)) {
 						$sql_user = "SELECT id, username, site_theme, site_lang, site_point_animations FROM users WHERE id=? LIMIT 1";
 						$stmt_user = $this->pdo->prepare($sql_user);
 						$stmt_user->execute([$user_id]);
 						$row = $stmt_user->fetch();
-
+						
 						if(is_array($row) && !empty($row)) {
-
+							
 							$session_data = [
 								'user_id' => $row['id'],
 								'username' => $row['username'],
@@ -179,10 +166,11 @@
 								'is_signed_in' => 1,
 							];
 							
-							// Set user role/VIP status
-							$this->set_roles( $this->check_roles( $row['id'] ) );
+							// Get user's roles and permissions, then set them for this session
+							$this->set_permissions( $this->access_user->check_permissions( $row['id'] ) );
 							
 							$this->set_login_data($session_data);
+							
 						}
 					}
 					
@@ -235,7 +223,7 @@
 						];
 						
 						// Set user role/VIP status
-						$this->check_roles( $row['id'], $row['rank'], $row['is_vip'] );
+						$this->set_permissions( $this->access_user->check_permissions( $row['id'] ) );
 						
 						// If using old password
 						if(strlen($row["password_old"]) > 0 && empty($row["password"])) {

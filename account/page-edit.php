@@ -1,6 +1,5 @@
 <?php
 
-	//$user['username'] = strlen($_GET['username']) ?  : $_SESSION['username'];
 	include('head-user.php');
 	
 	script([
@@ -19,13 +18,6 @@
 	$access_artist = new access_artist($pdo);
 	
 	$page_header = tr('Change account settings', ['ja'=>'アカウント', 'lang'=>true,'lang_args'=>'div']);
-	
-	if($_SESSION["is_signed_in"] && is_numeric($_SESSION["user_id"])) {
-		$sql_check = "SELECT 1 FROM users WHERE id=? AND is_vip=1 LIMIT 1";
-		$stmt_check = $pdo->prepare($sql_check);
-		$stmt_check->execute([ $_SESSION["user_id"] ]);
-		$is_vip = $stmt_check->fetchColumn();
-	}
 	
 	if(is_array($user) && !empty($user)) {
 		$user['fan_since'] = is_numeric($user['fan_since']) ? $user['fan_since'] : date('Y');
@@ -56,15 +48,24 @@
 						
 						<ul class="text">
 							<li>
-								<label class="input__radio"><input class="input__choice" name="is_vip"       type="checkbox" value="1" <?= $user['is_vip']       ? 'checked' : null; ?> /><span class="symbol__unchecked">VIP</span></label>
+								<label class="input__checkbox">
+									<input class="input__choice" name="is_vip" type="checkbox" value="1" <?= $user['is_vip'] ? 'checked' : null; ?> />
+									<span class="symbol__unchecked">VIP</span>
+								</label>
 								<?= tr('Can access VIP-limited content.'); ?>
 							</li>
 							<li>
-								<label class="input__radio"><input class="input__choice" name="is_editor"    type="checkbox" value="1" <?= $user['is_editor']    ? 'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Editor'); ?></span></label>
+								<label class="input__checkbox">
+									<input class="input__choice" name="is_editor" type="checkbox" value="1" <?= $user['is_editor'] ? 'checked' : null; ?> />
+									<span class="symbol__unchecked"><?= tr('Editor'); ?></span>
+								</label>
 								<?= tr('Can add/edit data.'); ?>
 							</li>
 							<li>
-								<label class="input__radio"><input class="input__choice" name="is_moderator" type="checkbox" value="1" <?= $user['is_moderator'] ? 'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Moderator'); ?></span></label>
+								<label class="input__checkbox">
+									<input class="input__choice" name="is_moderator" type="checkbox" value="1" <?= $user['is_moderator'] ? 'checked' : null; ?> />
+									<span class="symbol__unchecked"><?= tr('Moderator'); ?></span>
+								</label>
 								<?= tr('Can approve/delete data and assign user roles.'); ?>
 							</li>
 						</ul>
@@ -78,36 +79,27 @@
 						<h3>
 							<?= tr('Individual permissions', ['ja'=>'各パーミッション', 'lang'=>true,'lang_args'=>'div']); ?>
 						</h3>
-						<div class="text text--outlined user__permissions">
-							<div class="input__row">
-								
-								<div class="input__group">
-									<h5 class="input__label">
-										<?= tr('General', ['context'=>'Heading used to describe permissions that each user role brings.']); ?>
-									</h5>
-									<label class="input__radio"><input class="input__choice" name="can_comment" type="checkbox" value="1" <?= $user['can_comment'] ? 'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Leave comments'); ?></span></label>
-								</div>
-								
-								<div class="input__group">
-									<h5 class="input__label">
-										<?= tr('Editing', ['context'=>'Heading used to describe permissions that each user role brings.']); ?>
-									</h5>
-									<label class="input__radio"><input class="input__choice" name="can_add_data"       type="checkbox" value="1" <?= $user['can_add_data'] ?       'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Add data'); ?></span></label>
-									<label class="input__radio"><input class="input__choice" name="can_access_drafts"  type="checkbox" value="1" <?= $user['can_access_drafts'] ?  'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Access drafts'); ?></span></label>
-									<label class="input__radio"><input class="input__choice" name="can_add_livehouses" type="checkbox" value="1" <?= $user['can_add_livehouses'] ? 'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Add livehouses'); ?></span></label>
-								</div>
-								
-								<div class="input__group">
-									<h5 class="input__label">
-										<?= tr('Moderating', ['context'=>'Heading used to describe permissions that each user role brings.']); ?>
-									</h5>
-									<label class="input__radio"><input class="input__choice" name="can_approve_data" type="checkbox" value="1" <?= $user['can_approve_data'] ? 'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Approve data'); ?></span></label>
-									<label class="input__radio"><input class="input__choice" name="can_delete_data"  type="checkbox" value="1" <?= $user['can_delete_data'] ?  'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Delete data'); ?></span></label>
-									<label class="input__radio"><input class="input__choice" name="can_edit_roles"   type="checkbox" value="1" <?= $user['can_edit_roles'] ?   'checked' : null; ?> /><span class="symbol__unchecked"><?= tr('Edit roles'); ?></span></label>
-								</div>
-								
-							</div>
-						</div>
+						
+						<ul class="text text--outlined user__permissions">
+							<?php foreach($access_user->permissions as $permission_group => $permissions): ?>
+								<li class="input__row">
+									<div class="input__group any--flex-grow">
+										
+										<label class="input__label"><?= $permission_group; ?></label>
+										
+										<?php foreach($permissions as $permission): ?>
+											<label class="input__checkbox">
+												<input class="input__choice" name="<?= $permission; ?>" type="checkbox" value="1" <?= $user[$permission] ? 'checked' : null; ?> />
+												<span class="symbol__unchecked">
+													<?= str_replace( ['can_', '_'], ['', ' '], $permission ); ?>
+												</span>
+											</label>
+										<?php endforeach; ?>
+										
+									</div>
+								</li>
+							<?php endforeach; ?>
+						</ul>
 						
 					</div>
 					

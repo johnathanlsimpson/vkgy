@@ -3,7 +3,7 @@
 include_once('../php/include.php');
 
 $sql[] = '
-ALTER TABLE `lives_artists` ADD `is_sponsor` BOOLEAN NOT NULL DEFAULT FALSE AFTER `artist_id`'
+ALTER TABLE `lives_artists` ADD `is_sponsor` BOOLEAN NOT NULL DEFAULT FALSE AFTER `artist_id`';
 
 $sql[] = '
 UPDATE lives SET type=0 WHERE type="sponsored event" OR type="other" OR type IS NULL';
