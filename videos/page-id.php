@@ -14,11 +14,6 @@ script([
 
 $access_artist = new access_artist($pdo);
 
-// Log view
-include('../php/class-views.php');
-$views = new views($pdo);
-$views->add('video', $video['id']);
-
 ?>
 
 <div class="col c4-AAAB">
@@ -30,31 +25,22 @@ $views->add('video', $video['id']);
 	<div>
 		
 		<div class="video__thumbnail any--margin module module--youtube">
-			<a class="video__bg youtube__embed" data-id="<?= $video['youtube_id']; ?>" href="<?= $video['url']; ?>" style="background-image:url(<?= $video['thumbnail_url']; ?>);"></a>
+			<a class="video__bg youtube__embed" data-id="<?= $video['youtube_id']; ?>" href="<?= $video['url']; ?>" style="background-image:url(<?= str_replace('mqdefault', 'hqdefault', $video['thumbnail_url']); ?>);"></a>
 		</div>
 		
-		<div class="video__under">
+		<div class="col c3-AAB">
 			
-			<div class="video__details">
-				
-				<h2>
-					<div class="h5"><?= $access_video->video_type_descriptions[ $video['type'] ] ?: $video['type']; ?></div>
-					<?= $access_video->clean_title($video['youtube_name'], $video['artist']); ?>
-				</h2>
-				
-				<div class="any--weaken any--margin">
-					<?= $video['youtube_content']; ?>
-				</div>
-				
-			</div>
-			
-			<div class="video__artist">
+			<div class="video__left">
 				
 				<?php if($_SESSION['username'] === 'inartistic'): ?>
-				<label class="input__dropdown video__artist" style="margin-bottom: 1rem; width: calc(100% - 1rem);">
+				<!-- Like -->
+				<button class="video__like input__button symbol__star--empty" type="button">like</button>
+				
+				<!-- List -->
+				<label class="video__list input__button input__dropdown">
 					
 					<input class="input__choice" type="checkbox" />
-					<span class="symbol__down-caret symbol--right">add to list</span>
+					<span class="symbol__list">add to list</span>
 					
 					<ul class="input__dropdown-list list__menu">
 						
@@ -83,7 +69,34 @@ $views->add('video', $video['id']);
 				</label>
 				<?php endif; ?>
 				
-				<div class="video__artist" style="margin-right: 0;">
+				<!-- Name -->
+				<h2 class="video__name">
+					<div class="h5"><?= $access_video->video_type_descriptions[ $video['type'] ] ?: $video['type']; ?></div>
+					<?= $access_video->clean_title($video['youtube_name'], $video['artist']); ?>
+				</h2>
+				
+				<!-- Description -->
+				<input class="obscure__input" id="obscure-description" type="checkbox" <?= substr_count($video['youtube_content'], '<br />') > 12 ? 'checked' : null; ?> />
+				<div class="video__description any--weaken any--margin obscure__container obscure--height obscure--faint" style="min-height:12rem;">
+					<?= $video['youtube_content'] ?: '<em>No description.</em>'; ?>
+					<label class="input__button obscure__button" for="obscure-description">full description</label>
+				</div>
+				
+			</div>
+			
+			<div class="video__right">
+				
+				<?php if( is_array($next_artist_video) && !empty($next_artist_video) ): ?>
+					<div class="video__thumbnail any--margin module module--youtube" style="margin-bottom:1rem;">
+						<a class="artist-video__bg" href="<?= '/videos/'.$next_artist_video['id'].'/'; ?>" style="background-image:url(<?= $next_artist_video['thumbnail_url']; ?>);"></a>
+					</div>
+					<div class="h5" style="margin-top:1rem;">
+						Next video
+					</div>
+					<a href="<?= '/videos/'.$next_artist_video['id'].'/'; ?>"><?= $next_artist_video['youtube_name']; ?></a>
+				<?php endif; ?>
+				
+				<div style="margin-top:1.5rem;">
 					<?= $access_artist->artist_card($video['artist']); ?>
 				</div>
 				
@@ -92,16 +105,30 @@ $views->add('video', $video['id']);
 		</div>
 		
 		<style>
+			
+			.video__like, .video__list {
+				float: right;
+				margin: 0 0 0.5rem 0.5rem;
+				z-index: 1;
+			}
+			.video__list {
+				color: hsl(var(--text)) !important;
+			}
+			.list__button {
+				font-family: hsl(var(--font));
+				text-transform: none;
+			}
+			
 			.input__dropdown {
 				box-shadow: inset 0 0 0 1px hsl(var(--background--bold));
 				color: hsl(var(--text--secondary));
 				cursor: pointer;
-				display: inline-flex;
 				font-family: var(--font--secondary);
 				max-width: 100%;
+				overflow: visible;
 				user-select: none;
 			}
-			.input__dropdown > .symbol--right::before {
+			/*.input__dropdown > .symbol--right::before {
 				margin-left: 0.5rem;
 				transform: translateY(-1px);
 			}
@@ -112,17 +139,17 @@ $views->add('video', $video['id']);
 				-moz-clip-path: url(#symbol__up-caret);
 				-webkit-clip-path: url(#symbol__up-caret);
 				clip-path: url(#symbol__up-caret);
-			}
+			}*/
 			.input__dropdown-list {
 				background: hsl(var(--background));
 				border-radius: 0 0 3px 3px;
 				display: none;
-				left: 0;
-				min-width: 100%;
+				pointer-events: none;
 				position: absolute;
 				right: 0;
 				top: 2rem;
 				white-space: nowrap;
+				width: 200px;
 				z-index: 1;
 			}
 			.input__dropdown > .input__choice:checked ~ .input__dropdown-list {
@@ -131,6 +158,9 @@ $views->add('video', $video['id']);
 			.input__dropdown-item {
 				border: none;
 				padding: 0.5rem 0 0 0;
+			}
+			.input__dropdown-item * {
+				pointer-events: initial;
 			}
 			
 			.list__menu {
@@ -166,14 +196,14 @@ $views->add('video', $video['id']);
 					<h5>
 						Length
 					</h5>
-					<?= substr($video['length'], 3); ?>
+					<?= $video['length'] > 0 ? substr($video['length'], 3) : '?'; ?>
 				</div>
 				
 				<div class="data__item">
 					<h5>
 						Published
 					</h5>
-					<?= substr($video['date_occurred'], 0, 10); ?>
+					<a class="a--inherit" href="<?= '/videos/&date_occurred='.substr($video['date_occurred'], 0, 4); ?>"><?= substr($video['date_occurred'], 0, 4); ?></a><?= substr($video['date_occurred'], 4, 6); ?>
 				</div>
 				
 				<div class="data__item">

@@ -30,6 +30,34 @@ if( is_numeric($_GET['id']) ) {
 		
 		// Get other videos from this artist
 		$artist_videos = $access_video->access_video([ 'get' => 'basics', 'artist_id' => $video['artist']['id'] ]);
+		$num_artist_videos = count($artist_videos);
+		
+		// Remove current videos from artist_videos
+		foreach($artist_videos as $artist_video_key => $artist_video) {
+			if($artist_video['id'] === $video['id']) {
+				
+				// Save the key so we can do stuff later, then unset
+				$current_artist_video_index = $artist_video_key;
+				unset($artist_videos[$artist_video_key]);
+				
+			}
+		}
+		
+		// Get next video in loop of all videos from artist
+		if( $num_artist_videos > 1 ) {
+			
+			// If at end of loop, get video at 0th index, otherwise get video at next index
+			if( $current_artist_video_index + 1 === $num_artist_videos ) {
+				$next_artist_video_index = 0;
+			}
+			else {
+				$next_artist_video_index = $current_artist_video_index + 1;
+			}
+			
+			$next_artist_video = $artist_videos[ $next_artist_video_index ];
+			
+		}
+		
 		
 		// Set view
 		$view = 'id';
@@ -123,7 +151,7 @@ else {
 		'user_id' => $user_id,
 		'is_flagged' => $is_flagged,
 		'order' => $order,
-		'limit' => 26,
+		'limit' => 24,
 		'page' => $page,
 	]);
 	$pagination = paginate( is_array($videos) && !empty($videos[0]) && $videos[0]['meta'] ? $videos[0]['meta'] : [] );
