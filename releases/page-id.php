@@ -1,12 +1,13 @@
 <?php
+	
+	include_once('../lists/function-render_lists.php');
 	include_once("../php/class-parse_markdown.php");
 	$markdown_parser = new parse_markdown($pdo);
 	
 	script([
-		'/releases/script-list.js',
+		'/lists/script-list.js',
 	]);
-
-
+	
 	if(!empty($release)) {
 		include_once("../releases/head.php");
 		
@@ -257,20 +258,27 @@
 												<div class="input__group data__item">
 													<label class="input__label">Lists</label>
 													
-													<input class="input__choice" id="release-owned" type="checkbox" <?= $release['is_owned'] ? 'checked' : null; ?> />
+													<input class="list__choice input__choice" id="release-owned" type="checkbox" <?= $release['is_owned'] ? 'checked' : null; ?> />
 													<label class="input__checkbox" data-list-id="0" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-owned">
 														<span class="symbol__checkbox--unchecked" data-role="status">own</span>
 													</label>
 													
-													<input class="input__choice" id="release-wanted" type="checkbox" <?= $release['is_wanted'] ? 'checked' : null; ?> />
+													<input class="list__choice input__choice" id="release-wanted" type="checkbox" <?= $release['is_wanted'] ? 'checked' : null; ?> />
 													<label class="input__checkbox" data-list-id="1" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-wanted">
 														<span class="symbol__checkbox--unchecked" data-role="status">want</span>
 													</label>
 													
-													<input class="input__choice" id="release-sold" type="checkbox" <?= $release['is_for_sale'] ? 'checked' : null; ?> />
+													<input class="list__choice input__choice" id="release-sold" type="checkbox" <?= $release['is_for_sale'] ? 'checked' : null; ?> />
 													<label class="input__checkbox" data-list-id="2" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-sold">
 														<span class="symbol__checkbox--unchecked" data-role="status">sell</span>
 													</label>
+													
+													<?php if($_SESSION['is_vip']): ?>
+													<span style="top: -5px;">
+													<?= render_lists_dropdown([ 'item_id' => $release['id'], 'item_type' => 'release' ]); ?>
+													</span>
+													<?php endif; ?>
+													
 												</div>
 												
 												<div class="collect__result text text--outlined text--notice symbol__help"></div>

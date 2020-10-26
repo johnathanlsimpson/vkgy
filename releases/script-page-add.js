@@ -185,6 +185,16 @@ $(document).on("click", "[data-add]", function(event) {
 	resetTrackNums();
 	lookForSelectize();
 	
+	let eacElems = document.querySelectorAll('[data-easyautocomplete]:not([data-easyautocompleted])');
+	eacElems.forEach(function(eacElem) {
+		eacElem.addEventListener('focus', function(event) {
+			if(!this.hasAttribute('data-easyautocompleted')) {
+			initEasyAutocomplete(this);
+			}
+		});
+		
+	});
+	
 	$(this).blur();
 });
 

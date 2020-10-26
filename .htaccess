@@ -83,6 +83,7 @@ RewriteRule  ^user(?:/(.*))?$                   /users/$1 [R=301,L]
 RewriteRule  ^users/?$                          /?account/&template=users
 RewriteRule  ^users/([\w-\ \%\.]+)/?$           /?account/&username=$1&template=user
 RewriteRule  ^users/([\w-\ \%\.]+)/edit/?$      /?account/&username=$1&template=account
+RewriteRule  ^users/([\w-\ \%\.]+)/lists/?$     /?account/&username=$1&template=lists
 RewriteRule  ^users/([\w-\ \%\.]+)/activity.*$  /?account/&username=$1&template=activity
 RewriteRule  ^users/([\w-\ \%\.]+)/\&(.*)$      /account/page-download-collection.php?username=$1&$2
 RewriteRule  ^sign-out/?(.*)$                   /?account/&action=sign-out$1
@@ -135,6 +136,8 @@ RewriteRule  ^lives/livehouses/edit(?:/page/(\d+))?/?$     /?lives/&action=edit&
 RewriteRule  ^lives/livehouses/(\d+)/edit/?$               /?lives/&action=edit&method=livehouses&id=$1
 RewriteRule  ^lives/livehouses/add/?$                      /?lives/&action=add&method=livehouses
 RewriteRule  ^lives/livehouses/?$                          /?lives/&page=livehouses
+
+RewriteRule  ^lists/(\d+)/?[A-z0-9-\/]*$  /?lists/&id=$1
 
 RewriteRule  ^magazines/add/?$  /?magazines/&action=add
 

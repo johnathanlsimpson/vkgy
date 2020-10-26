@@ -151,7 +151,7 @@ if($_SESSION['is_signed_in']) {
 		
 	}
 	else {
-		$output['result'] = 'Sorry, something went wrong.';
+		$output['result'] = 'Sorry, something went wrong.'.'*'.$item_id.'*'.$list_id.'*'.$item_type.'*'.print_r($allowed_item_types, true);
 	}
 }
 else {

@@ -74,7 +74,7 @@ if(sinceElem) {
 if(document.querySelector('[name^="can_"]')) {
 	
 	let isPairings = {
-		'is_vip' : [ 'can_access_drafts' ],
+		'is_vip' : [ 'can_access_drafts', 'can_access_beta_features' ],
 		'is_editor' : [ 'can_add_data' ],
 		'is_moderator' : [ 'can_approve_data', 'can_delete_data', 'can_edit_roles' ]
 	};

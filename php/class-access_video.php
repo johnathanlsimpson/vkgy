@@ -438,8 +438,6 @@
 				$sql_select[] = 'views_daily_videos.num_views';
 				$sql_select[] = 'videos.length';
 				$sql_select[] = 'videos.is_flagged';
-			}
-			if($args['get'] === 'all') {
 				$sql_select[] = 'videos.artist_id';
 				$sql_select[] = 'videos.release_id';
 				$sql_select[] = 'videos.user_id';
@@ -457,21 +455,32 @@
 			}
 			
 			// WHERE -----------------------------------------------
+			// ID
 			if(is_numeric($args['id'])) {
 				$sql_where[] = 'videos.id=?';
 				$sql_values[] = $args['id'];
+			}
+			// Multiple IDs
+			if( is_array($args['ids']) && !empty($args['ids']) ) {
+				
+				$args['ids'] = array_filter( $args['ids'], 'is_numeric' );
+				
+				if( is_array($args['ids']) && !empty($args['ids']) ) {
+					
+					$sql_where[] = 'videos.id IN ('.substr(str_repeat('?, ', count($args['ids'])), 0, -2).')';
+					$sql_values = array_merge($sql_values, $args['ids']);
+					
+				}
+				
 			}
 			if(is_numeric($args['artist_id'])) {
 				$sql_where[] = 'videos.artist_id=?';
 				$sql_values[] = $args['artist_id'];
 			}
+			// Release ID
 			if(is_numeric($args['release_id'])) {
 				$sql_where[] = 'videos.release_id=?';
 				$sql_values[] = $args['release_id'];
-			}
-			if($args['is_approved']) {
-				$sql_where[] = 'videos.is_flagged=?';
-				$sql_values[] = 0;
 			}
 			// Date published
 			if( preg_match('/'.'^\d{4}(-\d{2})?(-\d{2})?$'.'/', $args['date_occurred']) ) {
@@ -495,15 +504,25 @@
 					$sql_where[] = '('.implode(' OR ', $type_wheres).')';
 				}
 			}
+			// Approval
+			if($args['is_approved']) {
+				$sql_where[] = 'videos.is_flagged=?';
+				$sql_values[] = 0;
+			}
 			// Flagged
 			if( is_numeric($args['is_flagged']) && $args['is_flagged'] >= 0 ) {
 				$sql_where[] = 'videos.is_flagged=?';
 				$sql_values[] = $args['is_flagged'];
 			}
-			// Added by user
+			// User
 			if( is_numeric($args['user_id']) ) {
 				$sql_where[] = 'videos.user_id=?';
 				$sql_values[] = $args['user_id'];
+			}
+			// YouTube ID
+			if( strlen($args['youtube_id']) ) {
+				$sql_where[] = 'videos.youtube_id=?';
+				$sql_values[] = $args['youtube_id'];
 			}
 			
 			// ORDER -----------------------------------------------
@@ -577,57 +596,66 @@
 					// FORMAT DATA -------------------------------------
 					
 					// Get additional data
-					if($args['get'] === 'all') {
+					if( $args['get'] === 'basics' || $args['get'] === 'all' ) {
 						
-							// Get artist class
-							if(!$this->access_artist) {
-								include_once('../php/class-access_artist.php');
-								$this->access_artist = new access_artist($this->pdo);
+						// Get artist class
+						if(!$this->access_artist) {
+							include_once('../php/class-access_artist.php');
+							$this->access_artist = new access_artist($this->pdo);
+						}
+						
+						// Get release class
+						if(!$this->access_release) {
+							include_once('../php/class-access_release.php');
+							$this->access_release = new access_release($this->pdo);
+						}
+						
+						// Save all returned artist/release IDs so we can get artists
+						for($i=0; $i<$num_videos; $i++) {
+							$artist_ids[] = $rslt_videos[$i]['artist_id'];
+							$release_ids[] = $rslt_videos[$i]['release_id'];
+						}
+						
+						// Remove duplicates and empties
+						$artist_ids = array_filter(array_unique($artist_ids));
+						$release_ids = array_filter(array_unique($release_ids));
+						
+						// Get artists
+						if(is_array($artist_ids) && !empty($artist_ids)) {
+							$artists = $this->access_artist->access_artist([ 'ids' => $artist_ids, 'get' => 'name', 'associative' => true ]);
+						}
+						
+						// Get releases
+						if(is_array($release_ids) && !empty($release_ids)) {
+							$releases = $this->access_release->access_release([ 'ids' => $release_ids, 'get' => 'name', 'associative' => true ]);
+						}
+						
+						for($i=0; $i<$num_videos; $i++) {
+							
+							// Get user data
+							$rslt_videos[$i]['user'] = $this->access_user->access_user([ 'id' => $rslt_videos[$i]['user_id'], 'get' => 'name' ]);
+							
+							// Attach artists
+							if(is_numeric($rslt_videos[$i]['artist_id'])) {
+								$rslt_videos[$i]['artist'] = $artists[$rslt_videos[$i]['artist_id']];
 							}
 							
-							// Get release class
-							if(!$this->access_release) {
-								include_once('../php/class-access_release.php');
-								$this->access_release = new access_release($this->pdo);
+							// Attach releases
+							if(is_numeric($rslt_videos[$i]['release_id'])) {
+								$rslt_videos[$i]['release'] = $releases[$rslt_videos[$i]['release_id']];
 							}
 							
-							// Save all returned artist/release IDs so we can get artists
-							for($i=0; $i<$num_videos; $i++) {
-								$artist_ids[] = $rslt_videos[$i]['artist_id'];
-								$release_ids[] = $rslt_videos[$i]['release_id'];
-							}
-							
-							// Remove duplicates and empties
-							$artist_ids = array_filter(array_unique($artist_ids));
-							$release_ids = array_filter(array_unique($release_ids));
-							
-							// Get artists
-							if(is_array($artist_ids) && !empty($artist_ids)) {
-								$artists = $this->access_artist->access_artist([ 'ids' => $artist_ids, 'get' => 'name', 'associative' => true ]);
-							}
-							
-							// Get releases
-							if(is_array($release_ids) && !empty($release_ids)) {
-								$releases = $this->access_release->access_release([ 'ids' => $release_ids, 'get' => 'name', 'associative' => true ]);
-							}
+						}
+						
+					}
+					
+					// Get additional data
+					if($args['get'] === 'all') {
 							
 							for($i=0; $i<$num_videos; $i++) {
 								
 								// Get comments
 								$rslt_videos[$i]['comments'] = $this->access_comment->access_comment([ 'id' => $rslt_videos[$i]['id'], 'get_user_likes' => true, 'type' => 'video', 'get' => 'all' ]);
-								
-								// Get user data
-								$rslt_videos[$i]['user'] = $this->access_user->access_user([ 'id' => $rslt_videos[$i]['user_id'], 'get' => 'name' ]);
-								
-								// Attach artists
-								if(is_numeric($rslt_videos[$i]['artist_id'])) {
-									$rslt_videos[$i]['artist'] = $artists[$rslt_videos[$i]['artist_id']];
-								}
-								
-								// Attach releases
-								if(is_numeric($rslt_videos[$i]['release_id'])) {
-									$rslt_videos[$i]['release'] = $releases[$rslt_videos[$i]['release_id']];
-								}
 								
 								/*// If don't have video name or description (legacy code), get it from YT and store it
 								//if( !strlen($rslt_videos[$i]['youtube_name']) || !strlen($rslt_videos[$i]['youtube_content']) ) {
@@ -668,12 +696,12 @@
 								
 							}
 							
-							
 							if(is_array($youtube_data) && !empty($youtube_data)) {
 								for($i=0; $i<$num_videos; $i++) {
 									$rslt_videos[$i]['data'] = $youtube_data[$rslt_videos[$i]['youtube_id']];
 								}
 							}
+						
 					}
 					
 					// Attach page counts to first item (this is kinda dumb tbh but we'll redo it eventually)
@@ -698,6 +726,10 @@
 				
 				// FORMAT OUTPUT -------------------------------------
 				$rslt_videos = is_array($rslt_videos) ? $rslt_videos : [];
+				
+				if( is_numeric($args['id']) || strlen($args['youtube_id']) ) {
+					$rslt_videos = reset($rslt_videos);
+				}
 				
 				if($args['get'] === 'count' && is_array($rslt_videos) && !empty($rslt_videos)) {
 					$rslt_videos = reset($rslt_videos)['num_videos'];

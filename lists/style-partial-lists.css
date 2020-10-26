@@ -1,0 +1,122 @@
+/* Tippy hacks */
+.lists__wrapper {
+	display: inline-block;
+	height: calc(2rem - 20px);
+	top: 10px;
+	overflow: visible;
+}
+.lists__open {
+	margin: 0;
+	top: -10px;
+}
+.lists__tippy {
+	width: 300px;
+	z-index: 99 !important;
+}
+.lists__tippy .tippy-tooltip {
+	color: hsl(var(--text));
+	padding: 0;
+	text-align: left !important;
+}
+.lists__tippy .tippy-backdrop {
+	background: none;
+}
+
+.lists__open {
+	background-image: linear-gradient(to left, hsla(var(--background),.3) 1.75rem, transparent 0);
+	background-size: 100% !important;
+	color: hsl(var(--text));
+	display: inline-flex !important;
+}
+.lists__open .symbol__down-caret {
+	color: hsl(var(--text--secondary));
+	justify-content: space-around;
+	margin: 0;
+	margin-left: 0.5rem;
+	margin-right: -0.5rem;
+	width: 1.75rem;
+}
+.lists__choice:checked ~ .lists__open {
+	color: hsl(var(--interactive));
+}
+.lists__choice:checked ~ .lists__open .symbol__down-caret {
+	color: inherit;
+}
+.lists__open .symbol__down-caret::before {
+	transform: translateX(-1px) translateY(-1px);
+}
+.lists__open .symbol__list::before {
+	margin-right: 3px !important;
+	margin-top: -1px;
+}
+
+.lists__container {
+	background: hsl(var(--background));
+	border: 2px solid hsl(var(--interactive--secondary));
+	padding: 1rem;
+}
+.lists__choice:checked ~ .lists__container {
+	display: block;
+}
+.lists__container .input__row:last-of-type {
+	flex-wrap: nowrap;
+	white-space: nowrap;
+}
+
+.lists__item {
+	border: none;
+	margin: 0;
+	padding: 0 0 0.5rem 0;
+}
+.list__button {
+	font-family: var(--font);
+	width: calc(100% - 1rem);
+}
+.list__button.list__button.list__button {
+	margin: 0;
+}
+.list__button .symbol__unchecked {
+	display: inline-block;
+	line-height: 2rem;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.list--private.symbol__locked::before {
+	color: hsl(var(--accent));
+	opacity: 1;
+	margin: 0;
+	margin-top: -2px;
+	position: absolute;
+	right: 0.5rem;
+}
+
+.lists__new {
+	align-items: flex-end;
+	display: flex;
+	flex-wrap: wrap;
+}
+.lists__item:last-of-type:not(:first-of-type) {
+	border-top: 1px dotted hsl(var(--background--bold));
+	margin-top: 0.5rem;
+	padding-top: 0.75rem;
+}
+.lists__name {
+	flex: 1;
+	min-width: 0;
+}
+.lists__add {
+	margin-left: 0.5rem !important;
+}
+.lists__status {
+	line-height: 2rem;
+	margin-top: 1rem;
+}
+.lists__result {
+	margin: 1rem 0 0 0;
+	width: 100%;
+}
+.lists__result:empty {
+	display: none;
+}

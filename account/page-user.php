@@ -12,7 +12,7 @@ $access_artist = new access_artist($pdo);
 
 script([
 	"/scripts/external/script-clusterize.js",
-	'/releases/script-list.js',
+	'/lists/script-list.js',
 	"/account/script-page-user.js",
 ]);
 

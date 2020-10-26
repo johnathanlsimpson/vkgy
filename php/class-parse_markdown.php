@@ -15,6 +15,7 @@
 		private $artist_pattern = "(?<=[^\w\/]|^)(?:\((\d+)\))?\/(?! )([^\/\n]+)(?! )\/(?:\[([^\[\]\/\n]+)\])?(?=\W|$)";
 		private $label_pattern = "(?<=[^\w\/\=]|^)(?:\{(\d+)\})?\=(?! )([^\=\/\n]+)(?! )\=(?:\[([^\[\]\/\=\n]+)\])?(?=\W|$)";
 		private $release_pattern = "(?:(?:https?\:)?\/\/(?:[A-z]+\.)?)?(?:weloveucp\.com|vk\.gy)\/releases\/[\w-]+\/(\d+)\/?[\w-]*\/?";
+		private $video_pattern = "(?:(?:https?\:)?\/\/(?:[A-z]+\.)?)?vk\.gy\/videos\/(\d+)\/?";
 		private $youtube_pattern = "(?:<iframe[^>]+)?(?<=\s|\"|^)(?:https?:\/\/)?(?:[A-z]+\.)?youtu\.?be.*?[\/|=]([\w-]{11})(?=\s|$|\")(?:\".+<\/iframe>)?";
 		private $twitter_pattern = "(?<!\()(?:<blockquote class=\"twitter.+)?(?:(?:https?:\/\/(?:\w+\.)?)?twitter\.com\/(\w+)\/status\/(\d{10,20}))(?:[^\s]+)?(?:.+twitter\.com.+\/script>)?(?!\))";
 		private $image_pattern = "\[?!\[([^\]]*)\]\(([^\)\s]+)\)(?:\]\((.+)?\))?";
@@ -374,11 +375,6 @@
 			}
 			unset($matches);
 			
-			
-			
-			
-			
-			
 			// YouTube link >> data object
 			// -----------------------------------------------------
 			preg_match_all("/".$this->youtube_pattern."/", $input_content, $matches, PREG_OFFSET_CAPTURE);
@@ -388,51 +384,60 @@
 				
 				if(is_array($full_matches)) {
 					foreach($full_matches as $key => $match) {
+						
 						$full_match = $match[0];
 						$offset     = $match[1];
 						$length     = strlen($match[0]);
-						$id         = $ids[$key][0];
+						$youtube_id = $ids[$key][0];
 						
-						//$video_data = $access_video->add_video($id, $artist_id);
+						$video = $access_video->access_video([ 'youtube_id' => $youtube_id, 'get' => 'basics' ]);
 						
-						//if(is_array($video_data) && !empty($video_data)) {
-							//$output = $video_data;
-							$output["id"] = $id;
-							$output["offset"] = $offset;
-							$output["length"] = $length;
-							$output["type"] = 'video';
-							
-							$references[] = $output;
-						//}
+						$output['youtube_id'] = $youtube_id;
+						$output['id'] = $video ? $video['id'] : null;
+						$output["offset"] = $offset;
+						$output["length"] = $length;
+						$output["type"] = 'youtube';
 						
-						//$returned_data = $access_video->add_video($youtube_id, $artist_id);
+						$references[] = $output;
 						
-						/*$release = $access_release->access_release(["release_id" => $id, "get" => "basics"]);
-						
-						if(is_array($release)) {
-							$output = $release;
-							
-							$output["tracklist"] = is_array($release["tracklist"]) ? $release["tracklist"] : [];
-							$output["inline"] = substr($input_content, ($offset - 2), 2) === "](" ? true : false;
-							$output["id"] = $id;
-							$output["offset"] = $offset;
-							$output["length"] = $length;
-							$output["type"] = "release";
-							
-							if(is_numeric($output["id"]) && $output["id"] >= 0) {
-								$references[] = $output;
-							}
-						}*/
 					}
 				}
 			}
 			unset($matches);
 			
-			
-			
-			
-			
-			
+			// Video link >> data object
+			// -----------------------------------------------------
+			preg_match_all("/".$this->video_pattern."/", $input_content, $matches, PREG_OFFSET_CAPTURE);
+			if(is_array($matches)) {
+				$full_matches = $matches[0];
+				$ids          = $matches[1];
+				
+				if(is_array($full_matches)) {
+					foreach($full_matches as $key => $match) {
+						
+						$full_match = $match[0];
+						$offset     = $match[1];
+						$length     = strlen($match[0]);
+						$id         = $ids[$key][0];
+						
+						$video = $access_video->access_video([ 'id' => $id, 'get' => 'basics' ]);
+						
+						$output['id'] = $video['id'];
+						$output['youtube_id'] = $video['youtube_id'];
+						$output['name'] = $access_video->clean_title($video['youtube_name'], $video['artist']);
+						$output['user'] = $access_user->render_username($video['user']);
+						$output['artist'] = $video['artist'];
+						$output['url'] = $full_match;
+						$output["offset"] = $offset;
+						$output["length"] = $length;
+						$output["type"] = 'video';
+						
+						$references[] = $output;
+						
+					}
+				}
+			}
+			unset($matches);
 			
 			// Concert markdown >> data object
 			// -----------------------------------------------------
@@ -566,6 +571,7 @@
 			if(is_array($reference_data)) {
 				foreach($reference_data as $reference_datum) {
 					$output = "";
+					$reference_datum['type'] = $reference_datum['item_type'] ?: $reference_datum['type'];
 					
 					// Artist
 					if($reference_datum["type"] === "artist") {
@@ -727,12 +733,43 @@
 					}
 					
 					// YouTube
-					elseif($reference_datum["type"] === "video" && !$ignore_references) {
+					elseif($reference_datum["type"] === 'youtube' && !$ignore_references) {
 						ob_start();
 						?>
 							<div class="module module--youtube">
-								<a class="lazy youtube__embed" data-id="<?= $reference_datum['id']; ?>" data-src="<?= 'https://img.youtube.com/vi/'.$reference_datum['id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$reference_datum['id']; ?>" target="_blank"></a>
+								<a class="lazy youtube__embed" data-id="<?= $reference_datum['youtube_id']; ?>" data-src="<?= 'https://img.youtube.com/vi/'.$reference_datum['youtube_id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$reference_datum['youtube_id']; ?>" target="_blank"></a>
 							</div>
+						<?php
+						$output = str_replace(["\n", "\t", "\r"], "", ob_get_clean());
+					}
+					
+					// YouTube
+					elseif($reference_datum["type"] === 'video' && !$ignore_references) {
+						ob_start();
+						?>
+							<div class="module module--youtube" style="background: hsl(var(--background--bold)); flex-wrap: wrap; margin: 0 auto; max-height: none; max-width: 600px; min-width: 200px; width: 100%;">
+								
+								<a class="lazy youtube__embed" data-id="<?= $reference_datum['youtube_id']; ?>" data-src="<?= 'https://img.youtube.com/vi/'.$reference_datum['youtube_id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$reference_datum['youtube_id']; ?>" target="_blank"></a>
+								
+								<div style="margin-top: 1rem;">
+									
+									<img src="https://pbs.twimg.com/profile_images/975775169284251648/exakCLms_400x400.jpg" style="border-radius: 50%; height: 50px; margin-right: 1rem; vertical-align: top; width: 50px;" />
+									
+									<div style="display: inline-block;">
+										
+										<a class="artist" href="<?= '/artists/'.$reference_datum['artist']['friendly'].'/'; ?>">
+											<?= lang($reference_datum['artist']['romaji'] ?: $reference_datum['artist']['name'], $reference_datum['artist']['name'], 'hidden'); ?>
+										</a>
+										
+										<div class="h2" style="padding: 0;">
+											<a href="<?= '/videos/'.$reference_datum['id'].'/'; ?>"><?= $reference_datum['name']; ?></a>
+										</div>
+									</div>
+									
+								</div>
+								
+							</div>
+							
 						<?php
 						$output = str_replace(["\n", "\t", "\r"], "", ob_get_clean());
 					}

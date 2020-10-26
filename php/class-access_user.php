@@ -40,6 +40,7 @@
 			$this->permissions = [
 				'participation' => [
 					'can_comment',
+					'can_access_beta_features',
 				],
 				
 				'editing' => [
@@ -77,6 +78,7 @@
 				],
 				'vip' => [
 					'can_access_drafts',
+					'can_access_beta_features',
 				],
 			];
 			
