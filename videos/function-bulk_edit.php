@@ -42,6 +42,12 @@ if($_SESSION['can_approve_data']) {
 		// Execute
 		if($stmt_edit->execute($values_edit)) {
 			$output['status'] = 'success';
+			
+			// If approved videos, check if user needs permission to upload w/out approval
+			foreach($ids as $id) {
+				$access_video->check_user_video_permissions($id);
+			}
+			
 		}
 		else {
 			$output['result'] = 'Couldn\'t update videos.';
