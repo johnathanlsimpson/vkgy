@@ -26,6 +26,9 @@ switch(true) {
 	case($_GET['template'] === 'activity' && strlen($_GET['username'])):
 		$template = 'activity'; break;
 		
+	case($_GET['template'] === 'lists' && strlen($_GET['username'])):
+		$template = 'lists'; break;
+		
 	case($_GET['action'] === 'download' && strlen($_GET['username']) && $_GET['username'] === $_SESSION['username']):
 		$template = 'download-collection'; break;
 		
@@ -43,7 +46,7 @@ switch(true) {
 }
 
 // Check if requested user exists, change template if necessary
-if(in_array($template, [ 'account', 'activity', 'user' ])) {
+if(in_array($template, [ 'account', 'activity', 'user', 'lists' ])) {
 	$user = $access_user->access_user([ 'username' => sanitize($_GET['username']) ?: $_SESSION['username'], 'get' => 'all' ]);
 	
 	if(is_array($user) && !empty($user)) {
@@ -63,7 +66,7 @@ if(in_array($template, [ 'account', 'activity', 'user' ])) {
 }
 
 // Get avatar if necessary
-if(in_array($template, [ 'activity', 'account', 'edit-avatar', 'user' ])) {
+if(in_array($template, [ 'activity', 'account', 'edit-avatar', 'user', 'lists' ])) {
 	include_once('../avatar/class-avatar.php');
 	include_once('../avatar/avatar-definitions.php');
 	
@@ -197,6 +200,16 @@ if($template === "user") {
 		breadcrumbs([ tr('Member list') => '/users/', $user['username'] => '/users/'.$user['username'].'/', tr('Activity') => '/users/'.$user['username'].'/activity/' ]);
 		
 		include('page-activity.php');
+	}
+	
+	// User profile: lists
+	// =======================================================
+	if($template === 'lists') {
+		$page_title = tr('{username} lists', [ 'replace' => ['username' => $user['user']] ]);
+		
+		breadcrumbs([ tr('Member list') => '/users/', $user['username'] => '/users/'.$user['username'].'/', tr('Lists') => '/users/'.$user['username'].'/lists/' ]);
+		
+		include('page-lists.php');
 	}
 	
 	// Edit profile
