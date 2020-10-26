@@ -18,8 +18,6 @@ style([
 	'/style/style-pagination.css',
 ]);
 
-$access_video->check_user_video_permissions(78);
-
 ?>
 	
 <input class="moderation__choice" id="show_moderation" type="checkbox" hidden  />
