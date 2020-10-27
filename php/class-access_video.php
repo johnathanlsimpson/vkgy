@@ -188,7 +188,7 @@
 					'[\[\【]?'.      // opening brackets
 					preg_quote($artist_name, '/').    // name
 					'[\]\】]?'.      // closing brackets
-					' ?(\- )?(\| ?|\/ ?)?'. // hyphen or slash before title
+					' ?(: |\- )?(\| ?|\/ ?)?'. // hyphen or slash before title
 					'';
 				
 				$romaji_pattern =
@@ -197,7 +197,7 @@
 					'[\[\【]?'.      // opening brackets
 					preg_quote($artist_romaji, '/').    // name
 					'[\]\】]?'.      // closing brackets
-					' ?(\- )?(\| ?|\/ ?)?'. // hyphen or slash before title
+					' ?(: |\- )?(\| ?|\/ ?)?'. // hyphen or slash before title
 					'';
 				
 				if( preg_match('/'.$artist_pattern.'/u', $name) ) {
@@ -209,11 +209,15 @@
 				
 				$mv_pattern =
 				'('.
-				'(official|full)?'.
+				'(【公式】|official|full-?|photo|studio)?'.
 				' ?'.
-				'(mv|music ?video|music ?clip|pv|video)'.
+				'(lyric|リリック)?'.
 				' ?'.
-				'(full ?ver.?|full|official)?'.
+				'(mv|music ?video|music ?clip|pv|video|ビデオ|version)'.
+				'-? ?'.
+				'(full version|full ?ver.?|full|official)?'.
+				' ?'.
+				'(cm|spot|trailer)?'.
 				')';
 				
 				if( preg_match('/'.$mv_pattern.'/ui', $name, $mv_matches, PREG_OFFSET_CAPTURE) ) {
