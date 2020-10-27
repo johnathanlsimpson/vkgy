@@ -22,9 +22,6 @@ if( is_numeric($_GET['id']) ) {
 	
 	if( is_array($video) && !empty($video) ) {
 		
-		// Returns array of videos
-		$video = reset($video);
-		
 		// Format YouTube description
 		$video['youtube_content'] = str_replace( [ "\r", "\n" ], [ '', '<br />' ], $video['youtube_content'] );
 		
