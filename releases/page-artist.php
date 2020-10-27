@@ -278,17 +278,17 @@
 													?>
 														<div class="release__lists">
 															<input class="list__choice input__choice" id="<?= 'release-owned-'.$release['id']; ?>" type="checkbox" <?= $release['is_owned'] ? 'checked' : null; ?> />
-															<label class="input__checkbox" data-list-id="0" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="<?= 'release-owned-'.$release['id']; ?>">
+															<label class="input__checkbox" data-list-id="-1" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="<?= 'release-owned-'.$release['id']; ?>">
 																<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">own</span>
 															</label>
 															
 															<input class="list__choice input__choice" id="<?= 'release-wanted-'.$release['id']; ?>" type="checkbox" <?= $release['is_wanted'] ? 'checked' : null; ?> />
-															<label class="input__checkbox" data-list-id="1" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="<?= 'release-wanted-'.$release['id']; ?>">
+															<label class="input__checkbox" data-list-id="-2" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="<?= 'release-wanted-'.$release['id']; ?>">
 																<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">want</span>
 															</label>
 															
 															<input class="list__choice input__choice" id="<?= 'release-sold-'.$release['id']; ?>" type="checkbox" <?= $release['is_for_sale'] ? 'checked' : null; ?> />
-															<label class="input__checkbox" data-list-id="2" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="<?= 'release-sold-'.$release['id']; ?>">
+															<label class="input__checkbox" data-list-id="-3" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="<?= 'release-sold-'.$release['id']; ?>">
 																<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">sell</span>
 															</label>
 														</div>
