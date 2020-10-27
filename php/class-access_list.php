@@ -159,6 +159,7 @@
 							// Get lists' items, adding in dummy url so we can use markdown parser to get module
 							$sql_item_ids = '
 								SELECT
+									lists_items.date_added,
 									lists_items.list_id,
 									lists_items.item_id,
 									lists_items.item_type,
