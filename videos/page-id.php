@@ -68,7 +68,7 @@ $access_artist = new access_artist($pdo);
 					</div>
 					<a href="<?= '/videos/'.$next_artist_video['id'].'/'; ?>">
 						<?= lang($video['artist']['romaji'] ?: $video['artist']['name'], $video['artist']['name'], 'hidden'); ?> - 
-						<?= $next_artist_video['youtube_name']; ?>
+						<?= $access_video->clean_title($next_artist_video['youtube_name'], $video['artist']); ?>
 					</a>
 					
 					<div class="video__thumbnail any--margin module module--youtube" style="margin-top: 1rem;">

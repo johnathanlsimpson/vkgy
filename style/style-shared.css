@@ -376,6 +376,116 @@ opacity: 1;
 .youtube__embed:hover::after {
 	background: red;
 }
+.module--release .release__container {
+	border: none;
+	flex-wrap: wrap;
+	margin-bottom: 0;
+	max-width: 100%;
+	overflow: hidden;
+	width: 350px;
+}
+.module--release .release__link {
+	border: 1px solid hsl(var(--background--bold));
+	border-radius: inherit;
+	bottom: 0;
+	content: "";
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 1;
+}
+.module--release .release__link:hover,
+.module--release .release__link:hover ~ .release__right .release__title,
+.module--release .release__link:hover ~ .release__right .release__tracklist * {
+	border-color: currentColor;
+	color: hsl(var(--interactive));
+}
+.module--release .release__artist-image {
+	background: hsl(var(--background--bold));
+	background-position: center 30%;
+	background-size: cover;
+	height: 150px;
+	margin: -1rem;
+	margin-bottom: 1rem;
+	width: calc(100% + 2rem);
+}
+.module--release .release__artist-image,
+.module--release .release__cover-link {
+	align-items: center;
+	display: inline-flex;
+	justify-content: center;
+}
+.module--release .release__artist-image[data-src=""]::before,
+.module--release .release__cover-link::before {
+	content: "no image";
+}
+
+.module--release .release__left {
+	box-shadow: 0 0 0 2px hsl(var(--background));
+	flex-direction: column;
+	margin-top: -2rem;
+	width: 100px;
+	z-index: 2;
+}
+.module--release .release__cover-link {
+	background: hsl(var(--background--bold));
+	mask-image: linear-gradient(black calc(200px - 1rem), transparent);
+	-webkit-mask-image: linear-gradient(black calc(200px - 1rem), transparent);
+	margin-bottom: 1rem;
+	max-height: 200px;
+	min-height: 100px;
+	overflow: hidden;
+	width: 100%;
+	z-index: 2;
+}
+.module--release .release__cover {
+	object-fit: cover;
+	vertical-align: middle;
+	width: 100%;
+}
+.module--release .release__stores {
+	flex-direction: column;
+}
+.module--release .release__store {
+	background-position: right center;
+	background-repeat: no-repeat;
+	background-size: 1rem auto;
+	line-height: 1.5rem;
+}
+.module--release .release__store:hover::after {
+	background: hsl(var(--background));
+	bottom: 0;
+	content: "";
+	opacity: 0.5;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 1rem;
+}
+.module--release .release__right {
+	align-items: flex-start;
+	flex: 1;
+	flex-direction: column;
+	margin-left: 1rem;
+}
+.module--release .release__artist {
+	z-index: 2;
+}
+.module--release .release__tracklist {
+	margin-top: 1rem;
+}
+.module--release .release__tracklist li::before {
+	color: inherit;
+}
+.module--release .release__tracklist.release__tracklist {
+	width: auto;
+}
+.module--release .release__break {
+	display: block;
+	height: 0;
+	width: 100%;
+}
 
 
 
