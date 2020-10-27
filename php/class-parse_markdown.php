@@ -566,6 +566,7 @@
 		// References ➥ HTML
 		// ======================================================
 		function references_to_html($input_content, $reference_data = null, $ignore_references = null) {
+			$access_release = new access_release($this->pdo);
 			
 			// Artists, releases, lives
 			if(is_array($reference_data)) {
@@ -646,88 +647,72 @@
 					
 					// Release
 					elseif($reference_datum["type"] === "release" && !$ignore_references) {
-						$cdjapan_link =
-							'http://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/searches?term.media_format=&amp;f=all&amp;q='.
-							($reference_datum["upc"] ? str_replace(["-000", "-00", "-0"], "-", $reference_datum["upc"]) : str_replace(" ", "+", $reference_datum["quick_name"]));
 						
 						ob_start();
 						?>
-							<div class="module module--release any--flex">
-								<?php
-									if(is_array($reference_datum['image']) && !empty($reference_datum['image'])) {
-										?>
-											<a style="margin-right: 1ch; width: 100px;" href="<?= '/images/'.$reference_datum['image']['id'].'-cover.'.$reference_datum['image']['extension']; ?>" target="_blank">
-												<img alt="<?= $reference_datum['quick_name'].' cover'; ?>" src="<?= '/images/'.$reference_datum['image']['id'].'-cover.thumbnail.'.$reference_datum['image']['extension']; ?>" style="width:100px;"/>
+							<div class="module module--release">
+								
+								<div class="release__container text any--flex">
+									
+									<a class="release__link" href="<?= '/releases/'.$reference_datum['artist']['friendly'].'/'.$reference_datum['id'].'/'.$reference_datum['friendly'].'/'; ?>"></a>
+									
+									<div class="release__artist-image lazy h5" data-src="<?= '/artists/'.$reference_datum['artist']['friendly'].'/main.small.jpg'; ?>"></div>
+									
+									<div class="release__left any--flex">
+										
+										<!-- Cover -->
+										<a class="release__cover-link h5" href="<?= $reference_datum['image']['url']; ?>" target="_blank"><img class="release__cover" src="<?= str_replace('.', '.thumbnail.', $reference_datum['image']['url']); ?>" /></a>
+										
+										<div class="release__list">
+										</div>
+										
+										<div class="release__stores any--weaken any--flex">
+											<?php foreach([ 'amazon.png' => 'Amazon', 'cdj.gif' => 'CDJapan', 'rh.gif' => 'RarezHut' ] as $store_image => $store): ?>
+											<a class="release__store a--inherit symbol__search" href="<?= $access_release->get_store_url($store, $reference_datum); ?>" target="_blank" style="<?= 'background-image:url(https://vk.gy/releases/'.$store_image.');'; ?>">
+												<?= $store; ?>
 											</a>
-										<?php
-									}
-								?>
-								<div style="width: 100%;">
-									<div class="h5">
-										<?= $reference_datum['date_occurred']; ?>
+											<?php endforeach; ?>
+										</div>
+										
 									</div>
-									<a class="artist" data-name="<?= $reference_datum['artist']['name']; ?>" href="<?= '/artists/'.$reference_datum['artist']['friendly'].'/'; ?>">
-										<?= $reference_datum['artist']['romaji'] ? lang(($reference_datum['artist']['romaji'] ?: $reference_datum['artist']['name']), $reference_datum['artist']['name'], 'parentheses') : $reference_datum['artist']['name']; ?>
-									</a>
-									<br />
-									<a class="symbol__release" href="<?= '/releases/'.$reference_datum['artist']['friendly'].'/'.$reference_datum['id'].'/'.$reference_datum['friendly'].'/'; ?>">
-										<?php
-											if($reference_datum['romaji']) {
-												$romaji =
-													($reference_datum['romaji']).
-													($reference_datum['press_name'] ? (' '.$reference_datum['press_romaji'] ?: $reference_datum['press_name']) : null).
-													($reference_datum['type_name'] ? (' '.$reference_datum['type_romaji'] ?: $reference_datum['type_name']) : null);
-											}
-											$name = 
-												($reference_datum['name']).
-												($reference_datum['press_name'] ? ' '.$reference_datum['press_name'] : null).
-												($reference_datum['type_name'] ? ' '.$reference_datum['type_name'] : null);
-											if(strlen($reference_datum['romaji']) && $reference_datum['romaji'] != $reference_datum['name']) {
-												echo lang($romaji, $name, 'parentheses');
-											}
-											else {
-												echo $name;
-											}
-										?>
-									</a>
-									<ol class="ol--inline" style="margin: 0; text-align: left; width: 100%;">
-										<?php
-											foreach($reference_datum["tracklist"] as $discs) {
-												foreach($discs as $disc) {
-													
-													echo $disc['disc_name'] ? '<span class="module--disc">【'.($disc['disc_romaji'] ?: $disc['disc_name']).'】</span> ' : null;
-													
-													foreach($disc['sections'] as $section) {
-														foreach($section['tracks'] as $track) {
-															?>
-																<li style="<?php echo $track['track_num'] == 1 ? 'counter-reset: defaultcounter;' : null; ?>">
-																	<?= $track['romaji'] ? lang($track['romaji'], $track['name'], 'parentheses') : $track['name']; ?>
-																</li>
-															<?php
+									
+									<div class="release__right any--flex">
+										
+										<div class="release__date h5"><?= $reference_datum['date_occurred']; ?></div>
+										
+										<a class="release__title symbol__release" href="<?= '/releases/'.$reference_datum['artist']['friendly'].'/'.$reference_datum['id'].'/'.$reference_datum['friendly'].'/'; ?>">
+											<?= lang($reference_datum['romaji'] ?: $reference_datum['name'], $reference_datum['name'], 'hidden'); ?>
+										</a>
+										
+										<a class="release__artist artist" href="<?= '/artists/'.$reference_datum['artist']['friendly'].'/'; ?>">
+											<?= lang($reference_datum['artist']['romaji'] ?: $reference_datum['artist']['name'], $reference_datum['artist']['name'], 'hidden'); ?>
+										</a>
+										
+										<ol class="release__tracklist ol--inline any--weaken">
+											<?php
+												foreach($reference_datum['tracklist'] as $discs) {
+													foreach($discs as $disc) {
+														echo $disc['disc_name'] ? '<span class="release__break"></span><span class="any__note">'.($disc['disc_romaji'] ?: $disc['disc_name']).'</span> ' : null;
+														foreach($disc['sections'] as $section) {
+															foreach($section['tracks'] as $track_num => $track) {
+																?>
+																	<li style="<?= $track_num == 1 ? 'counter-reset: defaultcounter;' : null; ?>">
+																		<?= $track['romaji'] ? lang($track['romaji'], $track['name'], 'parentheses') : $track['name']; ?>
+																	</li>
+																<?php
+															}
 														}
 													}
 												}
-											}
-										?>
-									</ol>
-									<!--<a class="symbol__arrow-right-circled" href="<?= $cdjapan_link; ?>" rel="nofollow" target="_blank"><?= ($reference_datum['date_occurred'] > date('Y-m-d') ? 'Preorder' : 'Order').' at CDJapan'; ?></a>-->
-									
-									<a class="release__buy" href="<?= 'https://www.amazon.co.jp/s/ref=as_li_ss_tl?k='.urlencode(html_entity_decode($reference_datum['artist']['name'].' '.$reference_datum['name'])).'&tag=vkgy0c-22'; ?>" rel="nofollow" target="_blank">
-										<img src="/releases/amazon.png" style="height:1rem;bottom:-2px;" /> Amazon<sup>JP</sup>
-									</a>
-									&nbsp;
-									&nbsp;
-									<a class="release__buy" href="<?= $cdjapan_link; ?>" target="_blank">
-										<img src="/releases/cdj.gif" style="height:1rem;" /> CDJapan
-									</a>
-									&nbsp;
-									&nbsp;
-									<a class="release__buy" href="<?= 'https://magento.rarezhut.net/catalogsearch/result/?q='.html_entity_decode($reference_datum['artist']['name'].' '.$reference_datum['name']); ?>" rel="nofollow" target="_blank">
-										<img src="/releases/rh.gif" style="height:1rem;" /> RarezHut
-									</a>
+											?>
+										</ol>
+										
+									</div>
 									
 								</div>
+								
 							</div>
+							
 						<?php
 						$output = str_replace(["\n", "\t", "\r"], "", ob_get_clean());
 					}
@@ -743,11 +728,11 @@
 						$output = str_replace(["\n", "\t", "\r"], "", ob_get_clean());
 					}
 					
-					// YouTube
+					// Video
 					elseif($reference_datum["type"] === 'video' && !$ignore_references) {
 						ob_start();
 						?>
-							<div class="module module--youtube" style="background: hsl(var(--background--bold)); flex-wrap: wrap; margin: 0 auto; max-height: none; max-width: 600px; min-width: 200px; width: 100%;">
+							<div class="module module--youtube" style="background:hsl(var(--background)); border-color: hsl(var(--background--bold)); flex-wrap: wrap; margin: 0 auto; max-height: none; max-width: 600px; min-width: 200px; width: 100%;">
 								
 								<a class="lazy youtube__embed" data-id="<?= $reference_datum['youtube_id']; ?>" data-src="<?= 'https://img.youtube.com/vi/'.$reference_datum['youtube_id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$reference_datum['youtube_id']; ?>" target="_blank"></a>
 								
