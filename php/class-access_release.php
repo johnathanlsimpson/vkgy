@@ -58,6 +58,49 @@
 		
 		
 		// ======================================================
+		// Generate store search URLs
+		// ======================================================
+		function get_store_url($store_name, $release_data) {
+			
+			$store_name = strtolower($store_name);
+			
+			$allowed_stores = [
+				'amazon',
+				'cdjapan',
+				'rarezhut',
+			];
+			
+			if( strlen($store_name) && in_array($store_name, $allowed_stores) ) {
+				
+				if( is_array($release_data) && strlen($release_data['name']) ) {
+					
+					if( $store_name === 'amazon' ) {
+						$url  = 'https://www.amazon.co.jp/s/ref=as_li_ss_tl?k=';
+						$url .= urlencode(html_entity_decode($release_data['artist']['name'].' '.$release_data['name']));
+						$url .= '&tag=vkgy0c-22';
+					}
+					
+					elseif( $store_name === 'cdjapan' ) {
+						$url  = 'https://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/searches?term.media_format=&amp;f=all&amp;q=';
+						$url .= $release_data['upc'] ? preg_replace('/'.'-0+'.'/', '-', $release_data['upc']) : str_replace(' ', '+', $release_data['quick_name'] ?: $release_data['name']);
+					}
+					
+					elseif( $store_name === 'rarezhut' ) {
+						$url  = 'https://magento.rarezhut.net/catalogsearch/result/?q=';
+						$url .= html_entity_decode($release_data['artist']['name'].' '.$release_data['name']);
+					}
+					
+					return $url;
+					
+				}
+				
+			}
+			
+		}
+		
+		
+		
+		// ======================================================
 		// Extract notes from track
 		// ======================================================
 		function get_notes_from_track($input_track) {
