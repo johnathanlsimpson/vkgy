@@ -2,7 +2,17 @@
 	include_once('../php/include.php');
 	
 	class access_list {
-		public $allowed_item_types;
+		
+		// List item types
+		static public $allowed_item_types = [
+			'release' => 0,
+			'video' => 1,
+			'artist' => 2,
+		];
+		
+		// Maximum allowed lists for non-VIP
+		static public $max_num_lists = 5;
+		
 		
 		
 		// ======================================================
@@ -18,13 +28,6 @@
 			$this->access_release = new access_release($pdo);
 			$this->access_video = new access_video($pdo);
 			$this->markdown_parser = new parse_markdown($pdo);
-			
-			// List item types
-			$this->allowed_item_types = [
-				'release' => 0,
-				'video' => 1,
-				'artist' => 2,
-			];
 			
 		}
 		
@@ -85,7 +88,6 @@
 				$sql_group = 'lists.id';
 			}
 			
-			
 			// ORDER -----------------------------------------------
 			$sql_order = $args['order'] ? (is_array($args['order']) && !empty($args['order']) ? $args['order'] : [ $args['order'] ]) : [ 'lists.date_occurred DESC' ];
 			
@@ -142,10 +144,6 @@
 						}
 						
 					}
-							
-					$s = 'SELECT * FROM lists_items';
-					$t = $this->pdo->prepare($s);
-					$t->execute();
 					
 					// GET ITEMS -----------------------------------------
 					if( $args['get'] === 'all' ) {
@@ -169,9 +167,9 @@
 										item_type="2", CONCAT("https://vk.gy/artists/", artists.friendly, "/"), ""
 									))) AS url
 								FROM lists_items 
-								LEFT JOIN releases ON releases.id=lists_items.item_id AND lists_items.item_type='.$this->allowed_item_types['release'].'
-								LEFT JOIN videos ON videos.id=lists_items.item_id AND lists_items.item_type='.$this->allowed_item_types['video'].'
-								LEFT JOIN artists ON artists.id=lists_items.item_id AND lists_items.item_type='.$this->allowed_item_types['artist'].'
+								LEFT JOIN releases ON releases.id=lists_items.item_id AND lists_items.item_type='.self::$allowed_item_types['release'].'
+								LEFT JOIN videos ON videos.id=lists_items.item_id AND lists_items.item_type='.self::$allowed_item_types['video'].'
+								LEFT JOIN artists ON artists.id=lists_items.item_id AND lists_items.item_type='.self::$allowed_item_types['artist'].'
 								WHERE list_id IN ('.implode(', ', $list_ids).')';
 							
 							$stmt_item_ids = $this->pdo->prepare($sql_item_ids);

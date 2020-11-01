@@ -839,6 +839,15 @@
 				case 'profile'     : array_push($sql_select, 'artists.id', 'artists.name', 'artists.romaji', 'artists.friendly', 'artists.description', 'artists.pronunciation'); break;
 			}
 			
+			if($args['get'] === 'basics') {
+				$sql_select[] = 'artists.active';
+				$sql_select[] = 'artists.date_occurred';
+				$sql_select[] = 'artists.date_ended';
+				$sql_select[] = 'GROUP_CONCAT(tags_artists.name) AS tag_names';
+				$sql_select[] = 'GROUP_CONCAT(tags_artists.romaji) AS tag_romajis';
+				$sql_select[] = 'GROUP_CONCAT(tags_artists.friendly) AS tag_friendlys';
+			}
+			
 			if($args['get'] === 'artist_list') {
 				$sql_select[] = 'artists.description';
 				$sql_select[] = 'artists.pronunciation';
@@ -1133,8 +1142,9 @@
 				}
 			}
 			
-			if($args['get'] === 'artist_list') {
-				$sql_join[] = 'LEFT JOIN artists_tags ON artists_tags.artist_id=artists.id';
+			// Get tags
+			if($args['get'] === 'artist_list' || $args['get'] === 'basics') {
+				$sql_join[] = 'LEFT JOIN artists_tags ON artists_tags.artist_id=artists.id AND artists_tags.mod_agrees>=0 AND artists_tags.user_agrees>0';
 				$sql_join[] = 'LEFT JOIN tags_artists ON tags_artists.id=artists_tags.tag_id';
 				$sql_group[] = 'artists.id';
 			}

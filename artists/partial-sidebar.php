@@ -1,14 +1,14 @@
 <?php
-	style([
-		'/artists/style-partial-sidebar.css',
-	]);
-	
-	script([
-		'/scripts/script-pronounce.js',
-		'/artists/script-partial-sidebar.js',
-	]);
 
-		
+style([
+	'/artists/style-partial-sidebar.css',
+]);
+
+script([
+	'/scripts/script-pronounce.js',
+	'/artists/script-partial-sidebar.js',
+]);
+
 ?>
 
 <!-- Stats -->

@@ -46,9 +46,7 @@ $access_artist = new access_artist($pdo);
 				<?php endif; ?>
 				
 				<!-- List -->
-				<?php if($_SESSION['is_vip']): ?>
 				<?= render_lists_dropdown([ 'item_id' => $video['id'], 'item_type' => 'video' ]); ?>
-				<?php endif; ?>
 				
 				<!-- Description -->
 				<input class="obscure__input" id="obscure-description" type="checkbox" <?= substr_count($video['youtube_content'], '<br />') > 12 ? 'checked' : null; ?> />

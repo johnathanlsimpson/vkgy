@@ -34,6 +34,7 @@ document.addEventListener('submit', function(event) {
 		
 		// Prevent form from submitting
 		event.preventDefault();
+		event.stopImmediatePropagation();
 		
 		// Get form elements
 		let newListForm = event.target;

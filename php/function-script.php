@@ -17,15 +17,21 @@
 	}
 	
 	function display_scripts($insert_location, $minimized = false) {
+		
 		$script_wrapper = '<script defer language="javascript" src="*"></script>';
 		$minimizer_stem = "/scripts/min/?b=scripts&amp;f=";
 		
 		if(is_array($GLOBALS["scripts"]) && in_array($insert_location, ["top", "bottom"])) {
+			
+			// Filter duplicate scripts
+			$GLOBALS['scripts'] = array_map('unserialize', array_unique(array_map('serialize', $GLOBALS['scripts'])));
+			
 			foreach($GLOBALS["scripts"] as $script) {
 				if($script["location"] === $insert_location) {
 					echo str_replace("*", ($minimized ? $minimizer_stem : "").$script["url"]."?".date('YmdHis', filemtime("..".$script["url"])), $script_wrapper)."\n";
 				}
 			}
+			
 		}
 	}
 ?>

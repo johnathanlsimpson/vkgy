@@ -273,11 +273,9 @@
 														<span class="symbol__checkbox--unchecked" data-role="status">sell</span>
 													</label>
 													
-													<?php if($_SESSION['is_vip']): ?>
 													<span style="top: -5px;">
 													<?= render_lists_dropdown([ 'item_id' => $release['id'], 'item_type' => 'release' ]); ?>
 													</span>
-													<?php endif; ?>
 													
 												</div>
 												

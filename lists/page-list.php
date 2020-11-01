@@ -9,10 +9,10 @@ $markdown_parser = new parse_markdown($pdo);
 	
 	<div class="col c4-ABBC" style="margin: 0 auto; width: 1000px; max-width: 100%;">
 		<span style="width:80px;"></span>
-
+		
 		<div>
 			
-			<a class="list__avatar" href="/users/Ryu/"><img class="lazy" data-src="https://vk.gy/usericons/avatar-inartistic.png" /></a>
+			<a class="list__avatar" href="<?= '/users/'.$list['user']['username'].'/'; ?>"><img class="lazy" data-src="<?= '/usericons/avatar-'.$list['user']['username'].'.png'; ?>" /></a>
 			
 			<h1 class="list__title">
 				<a class="a--inherit" href="<?= '/lists/'.$list['id'].'/'.$list['friendly'].'/'; ?>"><?= $list['name']; ?></a>
@@ -22,8 +22,6 @@ $markdown_parser = new parse_markdown($pdo);
 				</div>
 			</h1>
 			
-			
-		
 		</div>
 		
 		<span style="width:200px;"></span>
@@ -50,7 +48,7 @@ $markdown_parser = new parse_markdown($pdo);
 								<h5>
 									type
 								</h5>
-								<?= array_search($item['item_type'], $access_list->allowed_item_types); ?>
+								<?= array_search($item['item_type'], access_list::$allowed_item_types); ?>
 							</div>
 
 							<div class="data__item">
@@ -75,7 +73,6 @@ $markdown_parser = new parse_markdown($pdo);
 			<ul class="text text--outlined any--weaken">
 				
 				<li>
-					
 					
 					<h5>
 						List by
@@ -165,27 +162,7 @@ $markdown_parser = new parse_markdown($pdo);
 			width: 80px;
 		}
 	}
-	
-	.module--youtube {
-		border-radius: 3px;
-		max-width: none !important;
-		width: 100%;
-	}
-	.module--youtube .youtube__embed {
-		margin: -1rem;
-		margin-bottom: 0;
-		max-width: none;
-		width: calc(100% + 2rem);
-	}
-	.module--youtube .h2::before {
-		display: none;
-	}
-	
-	.module--release {
+	.module {
 		padding: 0;
-		width: 100%;
-	}
-	.module--release > :first-child {
-		width: 100%;
 	}
 </style>
