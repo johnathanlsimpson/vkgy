@@ -1,3 +1,9 @@
+<?php
+
+include_once('../lists/function-render_lists.php');
+
+?>
+
 <a class="artist__main-image-link <?php echo $artist['image'] ? '' : 'any--hidden'; ?>" href="<?php echo $artist['image']['url']; ?>">
 	<img class="artist__main-image" alt="<?php echo $artist["quick_name"]; ?>" src="<?php echo str_replace('.', '.large.', $artist['image']['url']); ?>" />
 </a>
@@ -109,6 +115,17 @@
 		</h5>
 		<?php echo lang(($artist['concept_romaji'] ?: $artist['concept_name']), $artist['concept_name'], ['secondary_class' => 'any--hidden']); ?>
 	</div>
+	
+	<!-- Lists -->
+	<div class="data__item">
+		<div class="h5">
+			Add to list
+		</div>
+		
+		<?= render_lists_dropdown([ 'item_id' => $artist['id'], 'item_type' => 'artist' ]); ?>
+		
+	</div>
+	
 </div>
 
 <div class="any--weaken artist__description"><?php echo $markdown_parser->parse_markdown($artist["description"], true); ?></div>
