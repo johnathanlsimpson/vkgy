@@ -68,9 +68,18 @@
 	margin: 0;
 	padding: 0 0 0.5rem 0;
 }
+.list__arrow {
+	display: inline-block;
+	float: right;
+	font-size: 1rem;
+	line-height: 2rem;
+	margin-right: -1rem;
+	text-align: center;
+	width: 2rem;
+}
 .list__button {
 	font-family: var(--font);
-	width: calc(100% - 1rem);
+	width: calc(100% - 2rem);
 }
 .list__button.list__button.list__button {
 	margin: 0;
