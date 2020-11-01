@@ -13,6 +13,7 @@
 		// ======================================================
 		private $live_pattern = "(?:(?:https?\:)?\/\/(?:[A-z]+\.)?)?weloveucp\.com\/lives\/(\d+)\/?";
 		private $artist_pattern = "(?<=[^\w\/]|^)(?:\((\d+)\))?\/(?! )([^\/\n]+)(?! )\/(?:\[([^\[\]\/\n]+)\])?(?=\W|$)";
+		private $artist_block_pattern = "(?:(?:https?\:)?\/\/(?:[A-z]+\.)?)?vk\.gy\/artists\/([A-z0-9-]+)\/?";
 		private $label_pattern = "(?<=[^\w\/\=]|^)(?:\{(\d+)\})?\=(?! )([^\=\/\n]+)(?! )\=(?:\[([^\[\]\/\=\n]+)\])?(?=\W|$)";
 		private $release_pattern = "(?:(?:https?\:)?\/\/(?:[A-z]+\.)?)?(?:weloveucp\.com|vk\.gy)\/releases\/[\w-]+\/(\d+)\/?[\w-]*\/?";
 		private $video_pattern = "(?:(?:https?\:)?\/\/(?:[A-z]+\.)?)?vk\.gy\/videos\/(\d+)\/?";
@@ -161,8 +162,6 @@
 				$id           = $match[1];
 				$name         = $match[2];
 				$display_name = $match[3];
-				
-				
 				
 				if(!is_numeric($id)) {
 					$id = $access_label->access_label(["name" => $name, "get" => "id"])[0]["id"];
@@ -375,6 +374,73 @@
 			}
 			unset($matches);
 			
+			// Artist link >> data object
+			// -----------------------------------------------------
+			preg_match_all("/".$this->artist_block_pattern."/", $input_content, $matches, PREG_OFFSET_CAPTURE);
+			if(is_array($matches)) {
+				$full_matches = $matches[0];
+				$friendlies   = $matches[1];
+				
+				if(is_array($full_matches)) {
+					foreach($full_matches as $key => $match) {
+						
+						$full_match = $match[0];
+						$offset     = $match[1];
+						$length     = strlen($match[0]);
+						$friendly   = $friendlies[ $key ][0];
+						
+						$artist = $access_artist->access_artist([ 'friendly' => $friendly, 'get' => 'basics' ]);
+						
+						// Reset lineup
+						$lineup = [];
+						$lineup_romaji = [];
+						$tags = [];
+						
+						// This should be a function in artist model
+						if( is_array($artist['musicians']) && !empty($artist['musicians']) ) {
+							foreach($artist['musicians'] as $musician) {
+								
+								$position = [ '?', 'V', 'G', 'B', 'D', 'K', 'O', 'S' ][ $musician['position'] ];
+								$lineup[] = $position.'. '.$musician['name'];
+								$lineup_romaji[] = $position.'. '.($musician['romaji'] ?: $musician['name']);
+								
+							}
+						}
+						unset($artist['musicians']);
+						
+						// Format tags--should be in artist model
+						if($artist['tag_names']) {
+							$tag_names = explode(',', $artist['tag_names']);
+							$tag_romajis = explode(',', $artist['tag_romajis']);
+							$tag_friendlies = explode(',', $artist['tag_friendlys']);
+							
+							foreach($tag_names as $tag_key => $tag_name) {
+								$tags[] = [
+									'name' => $tag_name,
+									'romaji' => $tag_romajis[$tag_key] ?: $tag_name,
+									'url' => '/search/artists/?tags[]='.$tag_friendlies[$tag_key],
+								];
+							}
+						}
+						unset($artist['tag_names'], $artist['tag_romajis'], $artist['tag_friendlys']);
+						
+						$output = $artist;
+						$output['url'] = '/artists/'.$artist['friendly'].'/';
+						$output['lineup'] = is_array($lineup) ? implode(' / ', $lineup) : null;
+						$output['lineup_romaji'] = is_array($lineup_romaji) ? implode(' / ', $lineup_romaji) : null;
+						$output['image'] = '/artists/'.$artist['friendly'].'/'.'main.medium.jpg';
+						$output['tags'] = $tags ?: null;
+						$output["offset"] = $offset;
+						$output["length"] = $length;
+						$output["type"] = 'artist_block';
+						
+						$references[] = $output;
+						
+					}
+				}
+			}
+			unset($matches);
+			
 			// YouTube link >> data object
 			// -----------------------------------------------------
 			preg_match_all("/".$this->youtube_pattern."/", $input_content, $matches, PREG_OFFSET_CAPTURE);
@@ -392,11 +458,21 @@
 						
 						$video = $access_video->access_video([ 'youtube_id' => $youtube_id, 'get' => 'basics' ]);
 						
+						// If video is in database, run that embed instead
+						if( is_array($video) && !empty($video) ) {
+							$output = $video;
+							$output['video_type'] = $video['type'];
+							$output['name'] = $access_video->clean_title($video['youtube_name'], $video['artist']);
+							$output['user'] = $access_user->render_username($video['user']);
+							$output['type'] = 'video';
+						}
+						else {
+							$output['type'] = 'youtube';
+						}
+						
 						$output['youtube_id'] = $youtube_id;
-						$output['id'] = $video ? $video['id'] : null;
-						$output["offset"] = $offset;
-						$output["length"] = $length;
-						$output["type"] = 'youtube';
+						$output['offset'] = $offset;
+						$output['length'] = $length;
 						
 						$references[] = $output;
 						
@@ -422,15 +498,15 @@
 						
 						$video = $access_video->access_video([ 'id' => $id, 'get' => 'basics' ]);
 						
-						$output['id'] = $video['id'];
-						$output['youtube_id'] = $video['youtube_id'];
+						$output = $video;
+						$output['video_type'] = $video['type'];
 						$output['name'] = $access_video->clean_title($video['youtube_name'], $video['artist']);
 						$output['user'] = $access_user->render_username($video['user']);
-						$output['artist'] = $video['artist'];
+						
 						$output['url'] = $full_match;
-						$output["offset"] = $offset;
-						$output["length"] = $length;
-						$output["type"] = 'video';
+						$output['offset'] = $offset;
+						$output['length'] = $length;
+						$output['type'] = 'video';
 						
 						$references[] = $output;
 						
@@ -599,6 +675,56 @@
 						$output = '<a class="user" data-icon="'.$reference_datum['user']['icon'].'" data-is-vip="'.$reference_datum['user']['is_vip'].'" href="'.$reference_datum['user']['url'].'">'.$reference_datum['user']['username'].'</a>';
 					}
 					
+					elseif($reference_datum['type'] === 'artist_block') {
+						ob_start();
+						?>
+							<div class="module module--artist">
+								<div class="card__container text">
+									
+									<a class="card__link" href="<?= $reference_datum['url']; ?>"></a>
+									
+									<div class="artist-card__image h5 lazy" data-src="<?= $reference_datum['image']; ?>"></div>
+									
+									<div class="artist-card__navs any--flex">
+										
+										<a class="artist-card__artist card--subject artist" href="<?= $reference_datum['url']; ?>">
+											<?= $reference_datum['romaji'] ? lang($reference_datum['romaji'], $reference_datum['name'], 'parentheses') : $reference_datum['name']; ?>
+										</a>
+										
+										<a class="artist-card__nav card--clickable symbol__artist symbol--standalone" href="<?= $reference_datum['url']; ?>"></a>
+										<a class="artist-card__nav card--clickable symbol__release symbol--standalone" href="<?= '/releases/'.$reference_datum['friendly'].'/'; ?>"></a>
+										<a class="artist-card__nav card--clickable symbol__video symbol--standalone" href="<?= '/artists/'.$reference_datum['friendly'].'/videos/'; ?>"></a>
+										<a class="artist-card__nav card--clickable symbol__news symbol--standalone" href="<?= '/blog/artists/'.$reference_datum['friendly'].'/'; ?>"></a>
+										<a class="artist-card__nav card--clickable symbol__edit symbol--standalone" href="<?= '/artists/'.$reference_datum['friendly'].'/edit/'; ?>"></a>
+										
+									</div>
+									
+									<div class="artist-card__details any--flex any--weaken">
+										
+										<span class="artist-card__tags"><?= $reference_datum['lineup']; ?><?php
+											if( is_array($reference_datum['tags']) && !empty($reference_datum['tags']) ) {
+												foreach($reference_datum['tags'] as $tag) {
+													echo '<a class="artist-card__tag card--clickable a--inherit symbol__tag" href="'.$tag['url'].'">'.lang($tag['romaji'] ?: $tag['name'], $tag['name'], 'hidden').'</a>&nbsp;';
+												}
+											}
+										?></span>
+										
+										<span class="artist-card__date">
+											<?= substr($reference_datum['date_occurred'], 0, 4); ?>
+											<?= $reference_datum['date_occurred'] || $reference_datum['date_ended'] ? '~' : null; ?>
+											<?= substr($reference_datum['date_ended'], 0, 4); ?>
+										</span>
+										
+										<span class="artist-card__status <?= ($reference_datum['active'] ? 'artist-card__status--active' : null); ?>"></span>
+										
+									</div>
+									
+								</div>
+							</div>
+						<?php
+						$output = str_replace(["\n", "\t", "\r"], "", ob_get_clean());
+					}
+					
 					// Live
 					elseif($reference_datum["type"] === "live" && !$ignore_references) {
 						ob_start();
@@ -652,23 +778,23 @@
 						?>
 							<div class="module module--release">
 								
-								<div class="release__container text any--flex">
+								<div class="release-card__container card__container text any--flex">
 									
-									<a class="release__link" href="<?= '/releases/'.$reference_datum['artist']['friendly'].'/'.$reference_datum['id'].'/'.$reference_datum['friendly'].'/'; ?>"></a>
+									<a class="card__link" href="<?= '/releases/'.$reference_datum['artist']['friendly'].'/'.$reference_datum['id'].'/'.$reference_datum['friendly'].'/'; ?>"></a>
 									
-									<div class="release__artist-image lazy h5" data-src="<?= '/artists/'.$reference_datum['artist']['friendly'].'/main.small.jpg'; ?>"></div>
+									<div class="release-card__artist-image lazy h5" data-src="<?= '/artists/'.$reference_datum['artist']['friendly'].'/main.small.jpg'; ?>"></div>
 									
-									<div class="release__left any--flex">
+									<div class="release-card__left card--clickable any--flex">
 										
 										<!-- Cover -->
-										<a class="release__cover-link h5" href="<?= $reference_datum['image']['url']; ?>" target="_blank"><img class="release__cover" src="<?= str_replace('.', '.thumbnail.', $reference_datum['image']['url']); ?>" /></a>
+										<a class="release-card__cover-link h5" href="<?= $reference_datum['image']['url']; ?>" target="_blank"><img class="release-card__cover" src="<?= str_replace('.', '.thumbnail.', $reference_datum['image']['url']); ?>" /></a>
 										
-										<div class="release__list">
+										<div class="release-card__list">
 										</div>
 										
-										<div class="release__stores any--weaken any--flex">
+										<div class="release-card__stores any--weaken any--flex">
 											<?php foreach([ 'amazon.png' => 'Amazon', 'cdj.gif' => 'CDJapan', 'rh.gif' => 'RarezHut' ] as $store_image => $store): ?>
-											<a class="release__store a--inherit symbol__search" href="<?= $access_release->get_store_url($store, $reference_datum); ?>" target="_blank" style="<?= 'background-image:url(https://vk.gy/releases/'.$store_image.');'; ?>">
+											<a class="release-card__store a--inherit symbol__search" href="<?= $access_release->get_store_url($store, $reference_datum); ?>" target="_blank" style="<?= 'background-image:url(https://vk.gy/releases/'.$store_image.');'; ?>">
 												<?= $store; ?>
 											</a>
 											<?php endforeach; ?>
@@ -676,23 +802,23 @@
 										
 									</div>
 									
-									<div class="release__right any--flex">
+									<div class="release-card__right any--flex">
 										
-										<div class="release__date h5"><?= $reference_datum['date_occurred']; ?></div>
+										<div class="release-card__date h5"><?= $reference_datum['date_occurred']; ?></div>
 										
-										<a class="release__title symbol__release" href="<?= '/releases/'.$reference_datum['artist']['friendly'].'/'.$reference_datum['id'].'/'.$reference_datum['friendly'].'/'; ?>">
+										<a class="release-card__title card--subject symbol__release" href="<?= '/releases/'.$reference_datum['artist']['friendly'].'/'.$reference_datum['id'].'/'.$reference_datum['friendly'].'/'; ?>">
 											<?= lang($reference_datum['romaji'] ?: $reference_datum['name'], $reference_datum['name'], 'hidden'); ?>
 										</a>
 										
-										<a class="release__artist artist" href="<?= '/artists/'.$reference_datum['artist']['friendly'].'/'; ?>">
+										<a class="release-card__artist card--clickable artist" href="<?= '/artists/'.$reference_datum['artist']['friendly'].'/'; ?>">
 											<?= lang($reference_datum['artist']['romaji'] ?: $reference_datum['artist']['name'], $reference_datum['artist']['name'], 'hidden'); ?>
 										</a>
 										
-										<ol class="release__tracklist ol--inline any--weaken">
+										<ol class="release-card__tracklist card--subject ol--inline any--weaken">
 											<?php
 												foreach($reference_datum['tracklist'] as $discs) {
 													foreach($discs as $disc) {
-														echo $disc['disc_name'] ? '<span class="release__break"></span><span class="any__note">'.($disc['disc_romaji'] ?: $disc['disc_name']).'</span> ' : null;
+														echo $disc['disc_name'] ? '<span class="release-card__break"></span><span class="any__note">'.($disc['disc_romaji'] ?: $disc['disc_name']).'</span> ' : null;
 														foreach($disc['sections'] as $section) {
 															foreach($section['tracks'] as $track_num => $track) {
 																?>
@@ -732,29 +858,50 @@
 					elseif($reference_datum["type"] === 'video' && !$ignore_references) {
 						ob_start();
 						?>
-							<div class="module module--youtube" style="background:hsl(var(--background)); border-color: hsl(var(--background--bold)); flex-wrap: wrap; margin: 0 auto; max-height: none; max-width: 600px; min-width: 200px; width: 100%;">
+							<div class="module module--youtube">
 								
-								<a class="lazy youtube__embed" data-id="<?= $reference_datum['youtube_id']; ?>" data-src="<?= 'https://img.youtube.com/vi/'.$reference_datum['youtube_id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$reference_datum['youtube_id']; ?>" target="_blank"></a>
-								
-								<div style="margin-top: 1rem;">
+								<div class="video-card__container card__container text">
 									
-									<img src="https://pbs.twimg.com/profile_images/975775169284251648/exakCLms_400x400.jpg" style="border-radius: 50%; height: 50px; margin-right: 1rem; vertical-align: top; width: 50px;" />
+									<a class="card__link" href="<?= '/videos/'.$reference_datum['id'].'/'; ?>"></a>
 									
-									<div style="display: inline-block;">
+									<a class="video-card__embed card--clickable youtube__embed lazy" data-id="<?= $reference_datum['youtube_id']; ?>" data-src="<?= 'https://img.youtube.com/vi/'.$reference_datum['youtube_id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$reference_datum['youtube_id']; ?>" target="_blank"></a>
+									
+									<div class="video-card__details">
 										
-										<a class="artist" href="<?= '/artists/'.$reference_datum['artist']['friendly'].'/'; ?>">
+										<span class="video-card__date any--weaken"><?= substr($reference_datum['date_occurred'], 0, 10); ?><br /><?= $reference_datum['num_views']; ?> views</span>
+										
+										<a class="video-card__name card--subject symbol__video" href="<?= '/videos/'.$reference_datum['id'].'/'; ?>"><?= $reference_datum['name']; ?></a>
+										
+										&nbsp;
+										
+										<span class="any__note"><?= $reference_datum['video_type']; ?></span>
+										
+										<br />
+										
+										<a class="video-card__artist card--clickable symbol__artist" href="<?= '/artists/'.$reference_datum['artist']['friendly'].'/'; ?>">
 											<?= lang($reference_datum['artist']['romaji'] ?: $reference_datum['artist']['name'], $reference_datum['artist']['name'], 'hidden'); ?>
 										</a>
 										
-										<div class="h2" style="padding: 0;">
-											<a href="<?= '/videos/'.$reference_datum['id'].'/'; ?>"><?= $reference_datum['name']; ?></a>
-										</div>
 									</div>
 									
 								</div>
 								
 							</div>
-							
+							<style>
+								.module__card {
+									border: 0;
+								}
+								.video-card__details {
+									padding-top: 1rem;
+								}
+								.video-card__date {
+									float: right;
+									margin-left: 0.5rem;
+									text-align: right;
+								}
+								
+background:hsl(var(--background)); border-color: hsl(var(--background--bold)); flex-wrap: wrap; margin: 0 auto; max-height: none; max-width: 600px; min-width: 200px; width: 100%;
+</style>
 						<?php
 						$output = str_replace(["\n", "\t", "\r"], "", ob_get_clean());
 					}
