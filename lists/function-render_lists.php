@@ -2,16 +2,17 @@
 
 include_once('../php/include.php');
 include_once('../php/function-render_component.php');
+include_once('../php/class-access_list.php');
 
 style([
 	'/lists/style-partial-lists.css',
 ]);
 
-// This really needs to be in a class
-$allowed_item_types = [
-	'release',
-	'video'
-];
+script([
+	'/lists/script-list.js',
+]);
+
+$allowed_item_types = array_keys(access_list::$allowed_item_types);
 
 ?>
 	<template id="template-list-button">
@@ -22,6 +23,7 @@ $allowed_item_types = [
 					<input class="list__choice input__choice" type="checkbox" {checked} />
 					<span class="symbol__unchecked" data-role="status">{list_name}</span>
 				</label>
+				<a class="list__arrow symbol__arrow-right-circled" href="{list_url}"></a>
 			<?php
 			$list_button_template = ob_get_clean();
 			echo preg_replace('/'.'\{.+?\}'.'/', '', $list_button_template);
@@ -125,6 +127,7 @@ $allowed_item_types = [
 					'list_button' => render_component($list_button_template, [
 						'list_id'       => $list['id'],
 						'list_name'     => $list['name'],
+						'list_url'      => '/lists/'.$list['id'].'/'.($list['friendly'] ? $list['friendly'].'/' : null),
 						'item_id'       => $item_data['item_id'],
 						'item_type'     => $item_data['item_type'],
 						'checked'       => $list['is_listed'] ? 'checked' : null,
@@ -153,7 +156,7 @@ $allowed_item_types = [
 					<!-- Toggle button for dropdown -->
 					<input class="lists__choice input__choice" type="checkbox" />
 					<label class="lists__open input__button input__checkbox">
-						<span class="symbol__list" style="text-transform:none;">list(&beta;)</span>
+						<span class="" style="text-transform:none;">lists</span>
 						<span class="symbol__down-caret symbol--standalone"></span>
 					</label>
 					
@@ -171,6 +174,10 @@ $allowed_item_types = [
 
 
 function render_lists_dropdown($item_data) {
+	
+	if( !$_SESSION['is_signed_in'] ) {
+		return '<span class="any--weaken"><a class="a--inherit" href="/account/">sign in</a> to add this to a list</span>';
+	}
 	
 	global $pdo;
 	global $allowed_item_types;
