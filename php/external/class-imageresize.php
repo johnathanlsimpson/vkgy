@@ -110,7 +110,7 @@ class ImageResize
                 break;
 
             default:
-                throw new ImageResizeException('Unsupported image type');
+                throw new ImageResizeException('Unsupported image type: '.$this->source_type.'. File: '.$filename.'. Image info: '.print_r($image_info, true).'. Source info: '.print_r($this->source_info));
                 break;
         }
 

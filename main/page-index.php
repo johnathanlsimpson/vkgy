@@ -58,16 +58,18 @@ ob_start();
 		<div class="intro__cards">
 			
 			<?php foreach($latest_items as $item_key => $latest_item): ?>
-				<a class="intro__card text any--flex" href="<?= $latest_item['url']; ?>" style="background-image:url(<?= $latest_item['image']['thumbnail_url']; ?>);">
-					
-					<span class="intro__card-image lazy" data-src="<?= $latest_item['image']['medium_url']; ?>"></span>
-					
-					<div class="intro__card-title h2">
-						<span class="intro__card-pill h5"><?= $latest_item['pill']; ?></span>
-						<div class="intro__card-text"><?= $latest_item['title']; ?></div>
-					</div>
-					
-				</a>
+				<?php if( is_array($latest_item) && !empty($latest_item) && isset($latest_item['url']) ): ?>
+					<a class="intro__card text any--flex" href="<?= $latest_item['url']; ?>" style="background-image:url(<?= $latest_item['image']['thumbnail_url']; ?>);">
+						
+						<span class="intro__card-image lazy" data-src="<?= $latest_item['image']['medium_url']; ?>"></span>
+						
+						<div class="intro__card-title h2">
+							<span class="intro__card-pill h5"><?= $latest_item['pill']; ?></span>
+							<div class="intro__card-text"><?= $latest_item['title']; ?></div>
+						</div>
+						
+					</a>
+				<?php endif; ?>
 			<?php endforeach; ?>
 			
 		</div>
@@ -214,72 +216,129 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 			</ul>
 			
 		</div>
+	</div>
+	
+	<div class="main__right">
+		<div class="main__updates">
+			<h3>
+				Recent artist edits
+			</h3>
+			
+			<ul class="text text--outlined" style="z-index: 1;">
+				<?php
+					for($i=0; $i<6; $i++) {
+						?>
+							<li class="recent-artist__item">
+
+								<a class="recent-artist__link" href="<?= $updates[$i]['artist_url']; ?>"></a>
+
+								<span class="recent-artist__image" style="<?= $updates[$i]['image_id'] ? 'background-image:url('.$updates[$i]['artist_url'].'main.thumbnail.jpg);' : null; ?>"></span>
+
+								<a class="artist" href="<?= $updates[$i]['url']; ?>"><?= $updates[$i]['artist_romaji'] ? lang($updates[$i]['artist_romaji'], $updates[$i]['artist_name'], 'parentheses') : $updates[$i]['artist_name']; ?></a>
+
+							</li>
+						<?php
+					}
+				?>
+			</ul>
+			
+			<h3>
+				Recent release edits
+			</h3>
+			
+			<ul class="text text--outlined " style="z-index: 1;">
+				<?php
+					$updates = array_slice($updates, 6);
+					
+					for($i=0; $i<6; $i++) {
+						if($updates[$i]) {
+							?>
+								<li>
+									
+									<a class="artist any--weaken-size" href="<?= $updates[$i]['artist_url']; ?>"><?= $updates[$i]['artist_romaji'] ? lang($updates[$i]['artist_romaji'], $updates[$i]['artist_name'], 'hidden') : $updates[$i]['artist_name']; ?></a>
+									
+									<br />
+									
+									<a class="symbol__release" href="<?= $updates[$i]['url']; ?>"><?= $updates[$i]['romaji'] != $updates[$i]['name'] ? lang($updates[$i]['romaji'], $updates[$i]['name'], 'hidden') : $updates[$i]['name']; ?></a>
+									
+									<?= $updates[$i]['num_items'] > 1 ? '<span class="any__note">+'.($updates[$i]['num_items'] - 1).' more</span>' : null; ?>
+									
+								</li>
+							<?php
+						}
+					}
+				?>
+			</ul>
+				
+				<style>
+					.recent-artist__item.recent-artist__item {
+						padding-right: calc(50px + 0.5rem);
+					}
+					.recent-artist__link {
+						bottom: 0;
+						left: 0;
+						position: absolute;
+						right: 0;
+						top: 0;
+						z-index: 1;
+					}
+					.recent-artist__link:hover ~ a {
+						color: hsl(var(--interactive));
+					}
+					.recent-artist__link:hover ~ .recent-artist__image {
+						opacity: 0.75;
+					}
+					.recent-artist__image {
+						background: hsl(var(--background));
+						background-position: center;
+						background-size: cover;
+						bottom: 0;
+						position: absolute;
+						right: -1rem;
+						top: 0;
+						width: 50px;
+					}
+					.recent-artist__item:first-of-type .recent-artist__image {
+						top: -1rem;
+					}
+					.recent-artist__item:last-of-type .recent-artist__image {
+						bottom: -1rem;
+					}
+				</style>
+				
+		</div>
+	</div>
+</div>
+
+<?php if( !$_SESSION['is_vip'] || $_SESSION['username'] === 'inartistic' ): ?>
+<div class="col c1">
+	
+	<div class="any--flex" style="justify-content:space-around;">
 		
-		<div class="support__container any--margin" style="width:100%;">
+		<div class="any--margin" style="max-width:100%;width:728px;">
+			<div class="any--weaken" style="background:hsl(var(--background));border-radius:3px 3px 0 0;display:inline-block;line-height:1;padding:0.5rem;width:auto;">
+				<span class="h5">AD</span> | 
+				<span class=""><a href="https://patreon.com/vkgy" target="_blank">Please consider becoming a VIP member</a> to remove ads and support vkgy.</span>
+			</div><br />
+			
 			<?php
 				$ads = [
 					'<a class="support__link" href="http://rarezhut.net/" target="_blank"><img alt="RarezHut" class="support__image lazy" data-src="/main/ad-rarezhut-wide.png" /></a>',
 					'<a class="support__link" href="https://discord.gg/jw8jzXn" target="_blank"><img alt="vkgy at Discord" class="support__image lazy" data-src="/main/ad-discord.png" /></a>',
 					'<a class="support__link" href="http://witchthrone.com/" target="_blank"><img alt="Witchthrone" class="support__image lazy" data-src="/main/ad-witchthrone-wide.gif" /></a>',
 					'<a class="support__link" href="http://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/" target="_blank"><img alt="Buy vk merch at CDJapan" class="support__image lazy" data-src="/main/ad-cdjapan-wide.jpg" /></a>',
-					'<a class="support__link" href="https://www.patreon.com/vkgy" target="_blank"><img alt="Support vkgy at Patreon" class="support__image lazy" data-src="/main/ad-patreon.png" /></a>',
 				];
 				
 				shuffle($ads);
 				
-				foreach($ads as $ad) {
-					echo $ad.' ';
-				}
+				echo $ads[0];
 			?>
 		</div>
+		
 	</div>
 	
-	<div class="main__right">
-		<div class="main__updates">
-			<h3>
-				<?php echo lang('Database updates', '最近の更新', ['primary_container' => 'div', 'secondary_container' => 'div']); ?>
-			</h3>
-			
-			<input class="obscure__input" id="obscure-updates" type="checkbox" checked />
-			<div class="text text--outlined obscure__container obscure--faint obscure--height">
-				<ul style="z-index: 1;">
-					<?php
-						for($i=0; $i<$num_updates; $i++) {
-							?>
-								<li>
-									<h5>
-										<?php echo substr($updates[$i]["date_edited"], 0, 10); ?>
-									</h5>
-									
-									<a class="symbol__<?php echo $updates[$i]["type"]; ?> <?php echo $updates[$i]["type"]; ?>" href="<?php echo $updates[$i]["url"]; ?>"><?php echo $updates[$i]["quick_name"]; ?></a>
-									
-									<?php
-										if($updates[$i]["type"] === "release" && $updates[$i]["artist_quick_name"]) {
-											?>
-												<div class="any--weaken">
-													<a class="artist" href="<?php echo $updates[$i]["artist_url"]; ?>"><?php echo $updates[$i]["artist_quick_name"]; ?></a>
-												</div>
-											<?php
-										}
-										
-										if($updates[$i]["type"] === "news" && $updates[$i]["artist_quick_name"]) {
-											?>
-												<div class="any--weaken">
-													<a class="" href="<?php echo $updates[$i]["url"]; ?>">&ldquo;<?php echo $updates[$i]["artist_quick_name"]; ?>&rdquo;</a>
-												</div>
-											<?php
-										}
-									?>
-								</li>
-							<?php
-						}
-					?>
-				</ul>
-				<label class="input__button obscure__button" for="obscure-updates">Show more</label>
-			</div>
-		</div>
-	</div>
 </div>
+<?php endif; ?>
 
 <!-- Background color -->
 <div class="patreon__bg">
@@ -300,6 +359,13 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 						<?= lang('Thank you for supporting vkgy', 'サポーターの皆様のおかげです', 'div'); ?>
 					</h1>
 					
+					<?php if($_SESSION['is_vip']): ?>
+						<p class="patreon__p">
+							<?= $access_user->render_username($_SESSION); ?>, thank you so much!<br />
+							vkgy is possible because of <a class="a--inherit" href="https://patreon.com/vkgy" target="_blank">Patreon</a> supporters like you.<br />
+							<span style="font-size:1rem;">&ndash; <?= $access_user->render_username(['username' => 'inartistic']); ?></span>
+						</p>
+					<?php else: ?>
 					<p class="patreon__p">
 						vkgy is possible thanks to our <a class="a--inherit" href="https://patreon.com/vkgy" target="_blank">Patreon</a> supporters!<br />Please consider joining them, for these benefits:
 					</p>
@@ -320,6 +386,7 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 						<span class=""></span>
 						Become a Patron
 					</a>
+					<?php endif; ?>
 					
 				</div>
 				

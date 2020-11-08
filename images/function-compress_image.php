@@ -51,7 +51,7 @@ if( is_numeric($id) && strlen($extension) && in_array($extension, $allowed_exten
 			catch(\Tinify\Exception $e) {
 				
 				$output['result'] = 'Couldn\'t compress. '.'..'.$filename.' '.print_r($e, true);
-				error_log("\n".date('Y-m-d H:i:s').' Unable to compress file with Tinify: '.$filename."\n", 3, 'error_tinify_log.log');
+				error_log(date('Y-m-d H:i:s').' Unable to compress file with Tinify: '.$filename."\n".print_r($e, true)."\n\n", 3, 'error_tinify_log.log');
 				
 			}
 			

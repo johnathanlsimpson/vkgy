@@ -122,23 +122,25 @@ $allowed_item_types = array_keys(access_list::$allowed_item_types);
 			$rslt_lists = $stmt_lists->fetchAll();
 			
 			// For each list, save li > button component
-			foreach($rslt_lists as $list) {
-				$lists_items[] = render_component($lists_item_template, [
-					'list_button' => render_component($list_button_template, [
-						'list_id'       => $list['id'],
-						'list_name'     => $list['name'],
-						'list_url'      => '/lists/'.$list['id'].'/'.($list['friendly'] ? $list['friendly'].'/' : null),
-						'item_id'       => $item_data['item_id'],
-						'item_type'     => $item_data['item_type'],
-						'checked'       => $list['is_listed'] ? 'checked' : null,
-						'private_class' => $list['is_private'] ? 'list--private symbol__locked' : null,
-					]),
+			if( is_array($rslt_lists) && !empty($rslt_lists) ) {
+				foreach($rslt_lists as $list) {
+					$lists_items[] = render_component($lists_item_template, [
+						'list_button' => render_component($list_button_template, [
+							'list_id'       => $list['id'],
+							'list_name'     => $list['name'],
+							'list_url'      => '/lists/'.$list['id'].'/'.($list['friendly'] ? $list['friendly'].'/' : null),
+							'item_id'       => $item_data['item_id'],
+							'item_type'     => $item_data['item_type'],
+							'checked'       => $list['is_listed'] ? 'checked' : null,
+							'private_class' => $list['is_private'] ? 'list--private symbol__locked' : null,
+						]),
+					]);
+				}
+				
+				echo render_component($lists_container_template, [
+					'lists_items' => implode("\n", $lists_items),
 				]);
 			}
-			
-			echo render_component($lists_container_template, [
-				'lists_items' => implode("\n", $lists_items),
-			]);
 			
 		?>
 	</template>

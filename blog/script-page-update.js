@@ -1,3 +1,5 @@
+// When main artist is set, automatically grab artist's image
+
 // JS version of friendly
 function friendly(inputString) {
 	
@@ -232,6 +234,9 @@ function updateMainArtist(inputArtist) {
 		// Update dropdown
 		artistIdElem.selectize.setValue(inputArtist.id);
 		
+		// Get artist's image as article image
+		getArtistImage(inputArtist.id);
+		
 	}
 	else {
 		
@@ -240,6 +245,38 @@ function updateMainArtist(inputArtist) {
 			previewArtistLink.dataset.id = '';
 		}
 		artistIdElem.selectize.clear();
+		
+	}
+	
+}
+
+// Set artist image as article image
+function getArtistImage(artistId) {
+	
+	let existingImage = document.querySelector('.image__template');
+	
+	// If no image set, grab artist's image and set default
+	if( !existingImage ) {
+			
+		initializeInlineSubmit($('<div></div>'), '/blog/function-get_artist_image.php', {
+			
+			preparedFormData: { artist_id: artistId },
+			
+			callbackOnSuccess: function(event, returnedData) {
+				
+				// Pass data to fakeUpload from script-uploadImage.js
+				fakeUpload(returnedData);
+				
+				// Get is_default and check it
+				document.querySelector('.image__template [name="image_is_default"]').checked = true;
+				
+			},
+			
+			callbackOnError: function(event, returnedData) {
+				
+			}
+			
+		});
 		
 	}
 	
@@ -707,7 +744,6 @@ function getSnsPost() {
 	previewSnsElem = document.querySelector('.sns__container');
 	
 	// Get SNS preview
-	//initializeInlineSubmit($(tweetPreviewHeading), '/blog/function-generate_sns.php', {
 	initializeInlineSubmit($(previewSnsElem), '/blog/function-generate_sns.php', {
 		
 		preparedFormData: snsData,

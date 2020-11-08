@@ -1,6 +1,7 @@
 <?php
 include_once("../php/include.php");
 include_once("../php/external/class-imageresize.php");
+include_once('../php/external/class-gumletImageResize.php');
 
 function get_image($input, $pdo) {
 	
@@ -44,11 +45,22 @@ function get_image($input, $pdo) {
 		if(file_exists($source_image_path)) {
 			
 			// Get image info
-			$sql_image = "SELECT is_exclusive, is_queued, user_id FROM images WHERE id=? LIMIT 1";
+			$sql_image = "SELECT is_exclusive, is_queued, user_id, hash FROM images WHERE id=? LIMIT 1";
 			$stmt_image = $pdo->prepare($sql_image);
 			$stmt_image->execute([$id]);
 			$rslt_image = $stmt_image->fetch();
 			$is_exclusive = $rslt_image["is_exclusive"];
+			
+			// Temporary: if image doesn't have have a hash, calculate it and update the image
+			// Will help us prevent dupes in the future
+			if( !$rslt_image['hash'] ) {
+				
+				$hash = sha1_file('../images/image_files/'.$rslt_image['id'].'.'.$rslt_image['extension']);
+				$sql_hash = 'UPDATE images SET hash=? WHERE id=? LIMIT 1';
+				$stmt_hash = $pdo->prepare($sql_hash);
+				$stmt_hash->execute([ $hash, $id ]);
+				
+			}
 			
 			// If resized
 			if(!empty($method) && in_array($method, $allowed_methods)) {
@@ -60,14 +72,9 @@ function get_image($input, $pdo) {
 				$size_ratio = $height && $width ? $height / $width : null;
 				$orientation = $size_ratio ? ( $size_ratio > 1 ? 'vertical' : 'horizontal' ) : null;
 				
-				
-				
-				
-				
-				
 				// Testing using CDN for resized images
 				// For now let's only do it to non-exclusive images--otherwise Bunny grabs the watermarked version and thus the thumbnails are watermarked
-				if(!$avoid_cdn && !$is_exclusive && !$rslt_image['is_queued']) {
+				if( !$avoid_cdn && !$is_exclusive && !$rslt_image['is_queued'] ) {
 					
 					// Get requested size
 					if( $method ) {
@@ -81,7 +88,6 @@ function get_image($input, $pdo) {
 					
 				}
 				
-				
 				// If image is gif, or height/width can't be determined, or both height and width are less than max size, return original image
 				if( $ext == 'gif' || !$height || !$width || ($height < $max_sizes[$method] && $width < $max_sizes[$method]) ) {
 					$returned_image_path = $source_image_path;
@@ -91,7 +97,7 @@ function get_image($input, $pdo) {
 				else {
 					
 					// If resized image already exists, return it
-					if(file_exists($resized_image_path)) {
+					if( file_exists($resized_image_path) ) {
 						$returned_image_path = $resized_image_path;
 					}
 					
@@ -122,7 +128,8 @@ function get_image($input, $pdo) {
 						setMemoryLimit($height, $width);
 						
 						// Set up image object
-						$image = new \Eventviva\ImageResize($source_image_path);
+						//$image = new \Eventviva\ImageResize($source_image_path);
+						$image = new \Gumlet\ImageResize($source_image_path);
 						
 						// Thumbnail gets cropped to 100x100
 						if($method === "thumbnail") {

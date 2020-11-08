@@ -102,19 +102,27 @@ for($i=0; $i<$num_comments; $i++) {
 // Then, join edit table back to self, group by item_id, and pare down to XX records
 // Then, join appropriate item based on item_id
 // And finally, union it all together
+
 $sql_recent = "
 	SELECT *
 	FROM (
-		
+
 		(
 			SELECT
 				aaa.user_id,
 				aaa.date_edited,
-				COALESCE(artists.romaji, artists.name) AS quick_name,
-				CONCAT_WS('/', '', 'artists', artists.friendly, '') AS url,
-				'artist' AS type,
-				'' AS artist_quick_name,
-				'' AS artist_url
+
+				'' AS name,
+				'' AS romaji,
+				'' AS url,
+				'1' AS num_items,
+
+				artists.name AS artist_name,
+				artists.romaji AS artist_romaji,
+				artists.image_id,
+				CONCAT_WS('/', '', 'artists', artists.friendly, '') AS artist_url,
+
+				'artist' AS type
 			FROM
 				(
 					SELECT artist_id, user_id, date_occurred AS date_edited
@@ -127,22 +135,29 @@ $sql_recent = "
 						) aa
 					LEFT JOIN edits_artists ON edits_artists.id=aa.id
 					GROUP BY edits_artists.artist_id
-					LIMIT 20
+					LIMIT 6
 				) aaa
 			LEFT JOIN artists ON artists.id=aaa.artist_id
 		)
-		
+
 		UNION
-		
+
 		(
 			SELECT
 				ccc.user_id,
 				ccc.date_edited,
-				CONCAT_WS(' ', COALESCE(releases.romaji, releases.name, ''), COALESCE(releases.press_romaji, releases.press_name, ''), COALESCE(releases.type_romaji, releases.type_name, '')) AS quick_name,
+
+				CONCAT_WS(' ', COALESCE(releases.name, ''), COALESCE(releases.press_name, ''), COALESCE(releases.type_name, '')) AS name,
+				CONCAT_WS(' ', COALESCE(releases.romaji, releases.name, ''), COALESCE(releases.press_romaji, releases.press_name, ''), COALESCE(releases.type_romaji, releases.type_name, '')) AS romaji,
 				CONCAT_WS('/', '', 'releases', artists.friendly, releases.id, releases.friendly, '') AS url,
-				'release' AS type,
-				COALESCE(artists.romaji, artists.name) AS artist_quick_name,
-				CONCAT_WS('/', '', 'artists', artists.friendly, '') AS artist_url
+				COUNT(artists.id) AS num_items,
+
+				artists.name AS artist_name,
+				artists.romaji AS artist_romaji,
+				'' AS image_id,
+				CONCAT_WS('/', '', 'artists', artists.friendly, '') AS artist_url,
+
+				'release' AS type
 			FROM
 				(
 					SELECT release_id, user_id, date_occurred AS date_edited
@@ -155,14 +170,14 @@ $sql_recent = "
 						) cc
 					LEFT JOIN edits_releases ON edits_releases.id=cc.id
 					GROUP BY edits_releases.release_id
-					LIMIT 20
 				) ccc
 			LEFT JOIN releases ON releases.id=ccc.release_id
 			LEFT JOIN artists ON artists.id=releases.artist_id
+			GROUP BY artists.id
 		)
-		
+
 	) AS recent
-	ORDER BY date_edited DESC
+	ORDER BY type ASC, date_edited DESC
 ";
 $stmt_recent = $pdo->prepare($sql_recent);
 $stmt_recent->execute();

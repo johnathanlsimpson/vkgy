@@ -35,34 +35,36 @@ $markdown_parser = new parse_markdown($pdo);
 
 			<ul class="">
 
-				<?php foreach($list['items'] as $item): ?>
-				<li class="list__item">
+				<?php if( is_array($list['items']) && !empty($list['items']) ): ?>
+					<?php foreach($list['items'] as $item): ?>
+						<li class="list__item">
 
-					<?= $item['content']; ?>
+							<?= $item['content']; ?>
 
-					<div class="list__details any--weaken">
+							<div class="list__details any--weaken">
 
-						<div class="data__container">
+								<div class="data__container">
 
-							<div class="data__item">
-								<h5>
-									type
-								</h5>
-								<?= array_search($item['item_type'], access_list::$allowed_item_types); ?>
+									<div class="data__item">
+										<h5>
+											type
+										</h5>
+										<?= array_search($item['item_type'], access_list::$allowed_item_types); ?>
+									</div>
+
+									<div class="data__item">
+										<h5>
+											added
+										</h5>
+										<?= substr($item['date_added'], 0, 10); ?>
+									</div>
+
+								</div>
+
 							</div>
-
-							<div class="data__item">
-								<h5>
-									added
-								</h5>
-								<?= substr($item['date_added'], 0, 10); ?>
-							</div>
-
-						</div>
-
-					</div>
-				</li>
-				<?php endforeach; ?>
+						</li>
+					<?php endforeach; ?>
+				<?php endif; ?>
 
 			</ul>
 

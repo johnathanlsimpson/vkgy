@@ -34,6 +34,7 @@ function initImageEditElems() {
 	});
 }
 
+
 // Update Markdown as description is altered
 function updateMarkdown(descriptionElem) {
 	let parentElem = getParent(descriptionElem, 'image__template');
@@ -99,25 +100,39 @@ function getParent(childElem, parentClass) {
 
 
 // Update image data
-function updateImageData(changedElem) {
+function updateImageData(changedElem, preparedData = false) {
 	
 	var parentElem = getParent(changedElem, 'image__template');
 	var statusElem = parentElem.querySelector('.image__status');
 	var resultElem = parentElem.querySelector('.image__result');
-	var preparedFormData = {};
+	let preparedFormData;
 	
-	var inputElems = parentElem.querySelectorAll('[name]');
-	inputElems.forEach(function(inputElem) {
-		if(inputElem.nodeName === 'SELECT') {
-			preparedFormData[inputElem.name] = Array.prototype.map.call(inputElem.selectedOptions, function(x){ return x.value });
-		}
-		else if(inputElem.type === 'checkbox' || inputElem.type === 'radio') {
-			preparedFormData[inputElem.name] = inputElem.checked ? 1 : 0;
-		}
-		else {
-			preparedFormData[inputElem.name] = inputElem.value;
-		}
-	});
+	// If preparedData provided, use that
+	if( preparedData ) {
+		
+		preparedFormData = preparedData;
+		
+	}
+	
+	// Otherwise, get data from inputs
+	else {
+		
+		preparedFormData = {};
+		
+		var inputElems = parentElem.querySelectorAll('[name]');
+		inputElems.forEach(function(inputElem) {
+			if(inputElem.nodeName === 'SELECT') {
+				preparedFormData[inputElem.name] = Array.prototype.map.call(inputElem.selectedOptions, function(x){ return x.value });
+			}
+			else if(inputElem.type === 'checkbox' || inputElem.type === 'radio') {
+				preparedFormData[inputElem.name] = inputElem.checked ? 1 : 0;
+			}
+			else {
+				preparedFormData[inputElem.name] = inputElem.value;
+			}
+		});
+		
+	}
 	
 	// Grab element that says whether or not image is new, as we'll need to change it
 	let imageIsNewElem = parentElem.querySelector('[name="image_is_new"]');
@@ -126,10 +141,14 @@ function updateImageData(changedElem) {
 	initializeInlineSubmit($(parentElem), '/images/function-update_image.php', {
 		'statusContainer' : $(statusElem),
 		'preparedFormData' : preparedFormData,
-		'callbackOnSuccess': function() {
+		'callbackOnSuccess': function(formElem, returnedData) {
 			
 			// Make sure that image is set as 'not new' after first update
 			imageIsNewElem.value = 0;
+			
+		},
+		'callbackOnError': function(formElem, returnedData) {
+			
 		}
 	});
 	
@@ -192,7 +211,7 @@ if(isAdvancedUpload) {
 		// Loop through each file and separately make new image section + send file to uploader
 		if(files && files.length) {
 			for(let i=0; i<files.length; i++) {
-				handleFiles(files[i], showImageSection());
+				handleFiles(files[i], renderImageSection());
 			}
 		}
 		
@@ -214,7 +233,7 @@ if(isAdvancedUpload) {
 				if(dropURL) {
 					
 					// Grab data from URL and transform to blob (this function also sends blob to uploader, since can't pass blob back)
-					handleFiles(dropURL, showImageSection(), 'url');
+					handleFiles(dropURL, renderImageSection(), 'url');
 					
 				}
 				
@@ -427,14 +446,14 @@ function cleanDroppedURL(inputURL) {
 }
 
 
-// Set template elements for showImageSection()
+// Set template elements for renderImageSection()
 var imageUploadElem = document.querySelector('[name=images]');
 var imagesElem = document.querySelector('.image__results');
 var imageTemplate = document.querySelector('#image-template');
 
 
 // Grab image template, clone, prepend to images area, then pass the clone so we can update it later
-function showImageSection() {
+function renderImageSection() {
 	
 	// Get default variables for newly uploaded images
 	let imageUploadParent = imageUploadElem.parentNode;
@@ -480,12 +499,14 @@ function showImageSection() {
 		itemType: itemType,
 		itemId: itemId
 	};
+	
 }
 
 
 // Takes file, uploads, then updates image template
 function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 	
+	// Set status
 	let newImageElem = newImageTemplateArgs.thisImageElem;
 	newImageElem.classList.add('image--loading');
 	
@@ -531,24 +552,35 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 				'preparedFormData' : { 'image' : thisImage, 'item_type' : newImageTemplateArgs.itemType, 'item_id' : newImageTemplateArgs.itemId },
 				'callbackOnSuccess': function(event, returnedData) {
 					
-					newImageTemplateArgs.messageElem.innerHTML = 'Compressing...';
-					
-					// Do compression here
-					initializeInlineSubmit( $(newImageTemplateArgs.thisImageElem), '/images/function-compress_image.php', {
-						'preparedFormData' : { 'image_id' : returnedData.image_id, 'image_extension': returnedData.image_extension },
-						'callbackOnSuccess': function(compressEvent, compressData) {
-							
-							newImageTemplateArgs.messageElem.innerHTML = 'Finishing up...';
-							
-							finishUpload(newImageElem, idElem, statusElem, thumbnailElem, compressData);
-							
-						},
-						'callbackOnError': function(compressEvent, compressData) {
-							
-							finishUpload(newImageElem, idElem, statusElem, thumbnailElem, compressData);
-							
-						}
-					});
+					if( typeof returnedData.is_dupe === 'undefined' || returnedData.is_dupe != 1 ) {
+						
+						newImageTemplateArgs.messageElem.innerHTML = 'Compressing...';
+						
+						// Do compression here
+						initializeInlineSubmit( $(newImageTemplateArgs.thisImageElem), '/images/function-compress_image.php', {
+							'preparedFormData' : { 'image_id' : returnedData.image_id, 'image_extension': returnedData.image_extension },
+							'callbackOnSuccess': function(compressEvent, compressData) {
+								
+								newImageTemplateArgs.messageElem.innerHTML = 'Finishing up...';
+								
+								finishUpload(newImageElem, idElem, statusElem, thumbnailElem, compressData);
+								
+							},
+							'callbackOnError': function(compressEvent, compressData) {
+								
+								finishUpload(newImageElem, idElem, statusElem, thumbnailElem, compressData);
+								
+							}
+						});
+						
+					}
+					else {
+						
+						newImageTemplateArgs.messageElem.innerHTML = 'Found duplicate image...';
+						
+						finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedData);
+						
+					}
 					
 				},
 				'callbackOnError': function(event, returnedData) {
@@ -580,6 +612,8 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 	
 }
 
+
+// Takes empty image section, inserts data from upload
 function finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedData) {
 	
 	// When image finished uploading, remove loading symbol and add status symbol
@@ -589,15 +623,77 @@ function finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedD
 	// While uploading, thumbnail may be a huge blob of image data, so replace with actual thumbnail after
 	thumbnailElem.setAttribute('style', returnedData.image_style);
 	
-	// Trigger change on ID elem so that new ID (and description, etc) is saved in DB
-	idElem.dispatchEvent(new Event('change'));
-	
 	// After ID is set init buttons in new image element
 	lookForSelectize();
 	initImageEditElems();
 	initImageDeleteButtons();
 	
+	// Trigger change on ID elem so that new ID (and description, etc) is saved in DB
+	idElem.dispatchEvent(new Event('change'));
+	
 	newImageElem.classList.remove('image--loading');
+	
+}
+
+
+// Given image ID, insert into image section as if we've just uploaded it (fake upload)
+function fakeUpload(imageData) {
+	
+	let emptyImageSection = renderImageSection();
+	let newImageSection = emptyImageSection.thisImageElem;
+	
+	// Ok, so this is absolutely awful, and someday we need to refactor the image uploads for a 14th
+	// time because it's just too much henny. But anyway, we're going to loop through and manually
+	// set all the image's data in the html template. First we'll steal the loop from initImageUpload
+	// to try to set some automatically from data-get, then we'll manually set some others.
+	//
+	// For example, if this were an actual upload, we wouldn't have a description or credit specified,
+	// but since we're actually grabbing an existing image from an artist's profile, we need to make
+	// sure those are maintained. We're just going to assume that release_id and musician_id aren't
+	// set, which... is probably wrong in some very few cases.
+	//
+	// Then, we'll run finishUpload which inits all the buttons and dropdowns and shit, and then we
+	// have to go back and select the artistId and update the image again to make sure the artist link
+	// is preserved. It's a mess!
+	
+	// Loop through and auto-set data-get values
+	$.each($(newImageSection).find('[data-get]'), function() {
+		var key = $(this).attr('data-get');
+		var value = imageData[key];
+		
+		if(value && value.length) {
+			if($(this).is('[data-get-into]')) {
+				var attribute = $(this).attr('data-get-into');
+				$(this).attr(attribute, value);
+			}
+			else {
+				$(this).html(value);
+			}
+		}
+	});
+	
+	// Manually set some other values
+	newImageSection.querySelector('[name="image_credit"]').value = imageData.credit;
+	newImageSection.querySelector('[name="image_is_exclusive[]"]').checked = imageData.is_exclusive ? true : false;
+	newImageSection.querySelector('[name="image_id"]').value = imageData.image_id;
+	
+	// Get some elements that we need to pass to finishUpload
+	let idElem = newImageSection.querySelector('[name="image_id"]');
+	let statusElem = newImageSection.querySelector('.image__status');
+	let thumbnailElem = newImageSection.querySelector('.image__image');
+	
+	// Get artist id element, and set data-populate-on-click to false, so that
+	// initSelectize will init the dropdown as soon as possible instead of on click
+	// (this occurs in finishUpload), so we can take the selectize attr and set it to
+	// the artist's id as soon as possible. Again, a mess.
+	let artistIdElem = newImageSection.querySelector('[name="image_artist_id[]"]');
+	artistIdElem.dataset.populateOnClick = false;
+	
+	// Send to finishUpload to clean up the template and init some edits and things
+	finishUpload(newImageSection, idElem, statusElem, thumbnailElem, imageData);
+	
+	// Set the artist dropdown to make sure we preserve the artist link
+	artistIdElem.selectize.setValue(imageData.artist_id);
 	
 }
 
@@ -624,7 +720,7 @@ imagePasteElem.addEventListener('paste', function(event) {
 					if(pastedString) {
 						
 						// Grab data from URL and transform to blob (this function also sends blob to uploader, since can't pass blob back)
-						handleFiles(pastedString, showImageSection(), 'url');
+						handleFiles(pastedString, renderImageSection(), 'url');
 						
 					}
 					
@@ -641,7 +737,7 @@ imagePasteElem.addEventListener('paste', function(event) {
 				let imageSrc = urlObj.createObjectURL(imageBlob);
 				
 				// Pass blob URL directly to be urlToBlob; will remake blob into an <img> and then upload it
-				urlToBlob(imageSrc, showImageSection(), false);
+				urlToBlob(imageSrc, renderImageSection(), false);
 				
 			}
 			
@@ -660,7 +756,7 @@ imageUploadElem.addEventListener('change', function() {
 		
 		for(let i=0; i<imageUploadElem.files.length; i++) {
 		
-			handleFiles(imageUploadElem.files[i], showImageSection());
+			handleFiles(imageUploadElem.files[i], renderImageSection());
 			
 		}
 	}
@@ -695,6 +791,7 @@ document.addEventListener('item-id-updated', function(event) {
 		});
 	}
 });
+
 
 // Init elements
 lookForSelectize();

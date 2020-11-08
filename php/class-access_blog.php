@@ -263,11 +263,14 @@
 			if($args["page"] === "latest") {
 				$total_num_entries = $this->get_prev_next($args);
 				
-				if($total_num_entries['remainder'] < 5) {
+				if($total_num_entries['remainder'] <= 4) {
 					$sql_limit = 'LIMIT '.(10 + $total_num_entries['remainder']);
 				}
+				elseif($total_num_entries['remainder'] >= 5) {
+					$sql_limit = 'LIMIT '.$total_num_entries['remainder'];
+				}
 				else {
-					$sql_limit = "LIMIT 10";
+					$sql_limit = 'LIMIT 10';
 				}
 			}
 			if(is_numeric($args['page'])) {
