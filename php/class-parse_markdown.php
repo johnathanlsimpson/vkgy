@@ -701,7 +701,7 @@
 									
 									<div class="artist-card__details any--flex any--weaken">
 										
-										<span class="artist-card__tags"><?= $reference_datum['lineup']; ?><?php
+										<span class="artist-card__tags"><?= $reference_datum['lineup'].' '; ?><?php
 											if( is_array($reference_datum['tags']) && !empty($reference_datum['tags']) ) {
 												foreach($reference_datum['tags'] as $tag) {
 													echo '<a class="artist-card__tag card--clickable a--inherit symbol__tag" href="'.$tag['url'].'">'.lang($tag['romaji'] ?: $tag['name'], $tag['name'], 'hidden').'</a>&nbsp;';
@@ -715,7 +715,7 @@
 											<?= substr($reference_datum['date_ended'], 0, 4); ?>
 										</span>
 										
-										<span class="artist-card__status <?= ($reference_datum['active'] ? 'artist-card__status--active' : null); ?>"></span>
+										<span class="artist-card__status <?= ($reference_datum['active'] == 1 ? 'artist-card__status--active' : null); ?>"></span>
 										
 									</div>
 									
