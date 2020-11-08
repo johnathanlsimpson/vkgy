@@ -45,7 +45,7 @@ function upload_image($image, $pdo) {
 		$dupe = $stmt_dupes->fetch();
 		
 		// If dupe, just return image info
-		if( is_array($dupe) && !empty($dupe) ) {
+		/*if( is_array($dupe) && !empty($dupe) ) {
 			$output['status']           = 'success';
 			$output['image_id']         = $dupe['id'];
 			$output['image_url']        = '/images/'.$dupe['id'].'.'.$dupe['extension'];
@@ -60,7 +60,7 @@ function upload_image($image, $pdo) {
 			$output['image_extension']  = $dupe['extension'];
 			$output['is_dupe']          = 1;
 			$is_dupe = true;
-		}
+		}*/
 		
 		// Move forward if not dupe and no initial error and appears to be image
 		if( !$is_dupe && $error === 0 && preg_match('/'.'image.+'.'/', $type) ) {
