@@ -456,8 +456,7 @@ opacity: 1;
 	display: inline-flex;
 	justify-content: center;
 }
-.release-card__artist-image[data-src=""]::before,
-.release-card__cover-link::before {
+.release-card__artist-image[data-src=""]::before {
 	content: "no image";
 }
 
