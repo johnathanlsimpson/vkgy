@@ -1,6 +1,161 @@
 <input class="lineup--compact" id="lineup--compact" type="checkbox" hidden />
 
 <?php
+
+$active_musician_ids = [];
+$former_musician_ids = [];
+
+// Collect IDs of active and former musicians (not staff)
+foreach($artist['musicians'] as $musicians_type => $musicians) {
+	if( $musicians_type == 1 || $musicians_type == 2 ) {
+		foreach( $musicians as $musician ) {
+			if( $musicians_type == 1 ) {
+				$active_musician_ids[] = $musician['id'];
+				$num_active_musicians++;
+			}
+			else {
+				$former_musician_ids[] = $musician['id'];
+			}
+		}
+	}
+}
+
+$release_images;
+
+// Get images of musicians from their time with band
+if( !empty($active_musician_ids) || !empty($former_musician_ids) ) {
+	
+	$values_musician_images = array_merge( $active_musician_ids, $former_musician_ids );
+	$values_musician_images[] = $artist['id'];
+	
+	$sql_musician_images = '
+	SELECT
+		images.id,
+		images.extension,
+		ii.*
+	FROM
+		(
+			SELECT
+				i.image_id,
+				i.musician_id,
+				images_releases.release_id,
+				releases.date_occurred
+			FROM
+				(
+					SELECT
+						images_musicians.image_id,
+						images_musicians.musician_id
+					FROM
+						images_musicians
+					WHERE
+						images_musicians.musician_id IN ('.substr( str_repeat( '?, ', count($values_musician_images) - 1 ), 0, -2 ).')
+				) i
+			LEFT JOIN
+				images_artists ON images_artists.image_id=i.image_id
+			LEFT JOIN
+				images_releases ON images_releases.image_id=i.image_id
+			LEFT JOIN
+				releases ON releases.id=images_releases.release_id AND images_releases.release_id IS NOT NULL
+			WHERE
+				images_artists.artist_id=?
+		) ii
+	LEFT JOIN
+		images ON images.id=ii.image_id
+	';
+	
+	$stmt_musician_images = $pdo->prepare( $sql_musician_images );
+	$stmt_musician_images->execute( $values_musician_images );
+	$musician_images = $stmt_musician_images->fetchAll();
+	
+	// Loop through, check for images with multiple musicians connected (a.k.a. group photos) and remove
+	if( is_array($musician_images) && !empty($musician_images) ) {
+		
+		// Format as array of arrays so we can eliminate ones with > 1 entry
+		foreach($musician_images as $musician_image_key => $musician_image) {
+			
+			$tmp_musician_images[ $musician_image['image_id'] ][] = $musician_image;
+			
+		}
+		
+		// Reset array
+		$musician_images = [];
+		
+		// Loop through and save unique images, remove images with dupes (presumed group images)
+		foreach($tmp_musician_images as $tmp_key => $tmp_images) {
+			
+			if( count($tmp_images) == 1 ) {
+				$musician_images[] = $tmp_images[0];
+			}
+			
+		}
+		
+		// Clean up temp images
+		unset($tmp_musician_images);
+		
+	}
+	
+	// Go through remaining array, and build helper skelly around releases, so we can attempt to use same photoshoot
+	if( is_array($musician_images) && !empty($musician_images) ) {
+		foreach($musician_images as $musician_image_key => $musician_image) {
+			
+			if( is_numeric($musician_image['release_id']) ) {
+				$release_images[ $musician_image['release_id'] ]['date_occurred'] = $musician_image['date_occurred'];
+				$release_images[ $musician_image['release_id'] ]['images'][] = $musician_image;
+				$release_images[ $musician_image['release_id'] ]['musician_ids'][] = $musician_image['musician_id'];
+			}
+			
+		}
+	}
+	
+	// If we have sets of images tied to a release, order them by release date, then check for latest one containing all current members
+	if( is_array($release_images) && !empty($release_images) ) {
+		
+		usort($release_images, function($a, $b) {
+			return $b['date_occurred'] <=> $a['date_occurred'];
+		});
+		
+		// If num active musicians is less than or equal to musicians in this release,
+		// *and* the number of ids in both arrays equals that number of active musicians,
+		// then this release at least features all active musicians (and possibly some former ones),
+		// which is the ideal scenario from which we want to show the musicians' images
+		foreach($release_images as $release_key => $release) {
+			
+			$num_release_musicians = count($release['musician_ids']);
+			if( $num_active_musicians <= $num_release_musicians && $num_active_musicians == count( array_intersect( $release['musician_ids'], $active_musician_ids ) ) ) {
+				$preferred_release_key = $release_key;
+			}
+			
+		}
+		
+	}
+	
+	// If we found a preferred release key, loop through its images and save them for later
+	if( is_numeric($preferred_release_key) ) {
+		foreach( $release_images[ $preferred_release_key ]['images'] as $image ) {
+			
+			$final_musician_images[ $image['musician_id'] ] = $image;
+			
+		}
+	}
+	
+	// Then loop through remaining images and set whatever random image pops up for that musician
+	foreach( $musician_images as $image ) {
+		
+		if( !isset($final_musician_images[ $image['musician_id'] ]) ) {
+			
+			$final_musician_images[ $image['musician_id'] ] = $image;
+			
+		}
+		
+	}
+	
+}
+
+$musician_images = $final_musician_images;
+
+?>
+
+<?php
 foreach($artist["musicians"] as $musicians_type => $musicians) {
 	?>
 		<span id="<?php echo $musicians_type === 1 ? 'lineup' : ($musicians_type === 2 ? 'former' : 'staff'); ?>"></span>
@@ -41,8 +196,23 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 						}
 					}
 					
+					$musician_has_image = is_array($musician_images) && !empty($musician_images) && $musician_images[ $musicians[$a]['id'] ];
+					
 					?>
-						<div class="ul">
+						<div class="ul" style="<?= $musician_has_image ? 'box-sizing: content-box; min-height: 100px; padding-left: calc(75px + 1rem);' : null; ?>" >
+							
+							<?php
+								if( $musician_has_image ) {
+									
+									$image = $musician_images[ $musicians[$a]['id'] ];
+									
+									echo '<a href="/musicians/'.$musicians[$a]['id'].'/'.$musicians[$a]['friendly'].'/" style="left: 0; position: absolute;">';
+									echo '<img src="/images/'.$image['id'].'.thumbnail.'.$image['extension'].'" style="height: 100px; object-fit: cover; object-position: center; width: 75px;" />';
+									echo '</a>';
+									
+								}
+							?>
+							
 							<h4>
 								<a class="a--inherit" href="/search/musicians/?position=<?php echo $musicians[$a]["position"]; ?>#result"><?php echo $position_name; ?></a>
 							</h4>

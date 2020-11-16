@@ -2,8 +2,8 @@
 
 include_once('../php/include.php');
 
-//$migration = '20201006-videos-time.php';
-//$migration = '20201006-video-views.php';
+//$migration = '20201115-development.php';
+
 $migration_file = '../migrations/'.$migration;
 
 if($_SESSION['username'] === 'inartistic') {

@@ -2,7 +2,7 @@
 // --------------------------------------------------------
 autosize($(".autosize"));
 
-initializeInlineSubmit($("[name=form__update]"), "/vip/function-update.php", { "submitOnEvent" : "submit", "showEditLink" : true });
+initializeInlineSubmit($("[name=form__update]"), "/about/function-update.php", { "submitOnEvent" : "submit", "showEditLink" : true });
 
 
 // Preview entry
@@ -17,15 +17,7 @@ function previewEntry() {
 		initializeInlineSubmit($("[name=form__update]"), "/blog/function-preview_entry.php", {
 			"preparedFormData" : formData,
 			"statusContainer" : $(".update__preview-status"),
-			"resultContainer" : $(".update__preview"),
-			callbackOnSuccess: function(formElem, returnedData) {
-				console.log('success');
-				console.log(returnedData);
-			},
-			callbackOnError: function(formElem, returnedData) {
-				console.log('error');
-				console.log(returnedData);
-			}
+			"resultContainer" : $(".update__preview")
 		});
 	}
 }

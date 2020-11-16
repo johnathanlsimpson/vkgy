@@ -80,7 +80,7 @@ if($artist_is_viewable) {
 							echo '<a class="artist a--inherit" href="/artists/'.$dupe['friendly'].'/">'.$dupe['name'].'</a>';
 						}
 						
-						echo $dupe_key === end( array_keys($possible_dupes) ) ? null : ' &nbsp; ';
+						echo '&nbsp;<span class="any--weaken">'.$dupe['friendly'].'</span><br />';
 					}
 				?>
 			</div>
