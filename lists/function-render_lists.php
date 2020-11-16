@@ -136,11 +136,14 @@ $allowed_item_types = array_keys(access_list::$allowed_item_types);
 						]),
 					]);
 				}
+			}
+			else {
+				$lists_items = [];
+			}
 				
 				echo render_component($lists_container_template, [
 					'lists_items' => implode("\n", $lists_items),
 				]);
-			}
 			
 		?>
 	</template>

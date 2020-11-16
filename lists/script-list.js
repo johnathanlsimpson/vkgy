@@ -48,6 +48,7 @@ document.addEventListener('submit', function(event) {
 		
 		// Get list item template so we can inject it into lists
 		let listButtonElem = document.querySelector('#template-list-button').content.firstElementChild;
+		let listLinkElem = document.querySelector('#template-list-button').content.lastElementChild;
 		let listsItemElem = document.querySelector('#template-lists-item').content.firstElementChild;
 		let listsContainerElem = document.querySelector('#template-lists-container').content.firstElementChild;
 		
@@ -64,6 +65,12 @@ document.addEventListener('submit', function(event) {
 				
 				// Insert new button into new list item
 				listsItemElem.prepend(listButtonElem);
+				
+				// Update link url to new list
+				listLinkElem.href = returnedData.url;
+				
+				// Insert link after new button
+				listsItemElem.append(listLinkElem);
 				
 				// Insert new list item into template menu
 				listsContainerElem.insertBefore(listsItemElem.cloneNode(true), listsContainerElem.querySelector('.lists__item:last-of-type'));
