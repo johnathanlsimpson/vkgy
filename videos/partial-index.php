@@ -240,6 +240,7 @@
 		height: auto;
 		margin: 0 auto;
 		max-width: 640px;
+		padding-top: 56%;
 		width: 100%;
 	}
 	.videos__bg:hover {
