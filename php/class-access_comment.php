@@ -3,7 +3,15 @@
 	
 	class access_comment {
 		public  $pdo;
-		public  $comment_types;
+		public  $comment_types = [
+			'blog',
+			'release',
+			'development',
+			'artist',
+			'video',
+			'none',
+			'vip'
+		];
 		private $access_user;
 		
 		
@@ -21,8 +29,6 @@
 				$this->pdo = $pdo;
 			}
 			$this->access_user = new access_user($pdo);
-			
-			$this->comment_types = ['blog', 'release', 'vip', 'artist', 'video', 'none'];
 		}
 		
 		
@@ -34,11 +40,22 @@
 			// SELECT
 			switch($args["get"]) {
 				case "all" :
-					$sql_select = ["comments.id", "comments.user_id", "comments.thread_id", "comments.item_id", "comments.content", "comments.date_occurred", 'comments.anonymous_id', "comments.item_type", 'comments.is_approved', 'comments.is_deleted', 'comments.name'];
+					$sql_select = ["comments.id", "comments.user_id", "comments.thread_id", "comments.item_id", "comments.date_occurred", 'comments.anonymous_id', "comments.item_type", 'comments.is_approved', 'comments.is_deleted', 'comments.name'];
+					$sql_select[] = 'IF(comments.item_type=6, '.($_SESSION['is_vip'] ? 'content' : '"Only VIP members may view this."').', comments.content) AS content';
+					$sql_select[] = 'IF(comments.item_type=6, 1, 0) AS is_vip';
 					$sql_select[] = 'num_likes.num_likes';
 					break;
 				case "list" :
-					$sql_select = ["comments.id", "comments.user_id", "comments.item_id", "comments.content", "comments.date_occurred", "comments.item_type", 'comments.is_approved'];
+					$sql_select = [
+						"comments.id",
+						"comments.user_id",
+						"comments.item_id",
+						"comments.date_occurred",
+						"comments.item_type",
+						'comments.is_approved'
+					];
+					$sql_select[] = 'IF(comments.item_type=6, '.($_SESSION['is_vip'] ? 'content' : '"Only VIP members may view this."').', comments.content) AS content';
+					$sql_select[] = 'IF(comments.item_type=6, 1, 0) AS is_vip';
 					break;
 				case "count":
 					$sql_select = ["COUNT(comments.id) AS count"];
@@ -136,7 +153,7 @@
 						}
 					}
 				}
-				if($args["get"] === "all") {
+				if($args["get"] === "all" || $args['get'] === 'list') {
 					if(is_array($comments)) {
 						
 						// Loop through comments and set up SQL to get link to page that comment was made on
@@ -150,31 +167,41 @@
 								elseif($comments[$i]['item_type'] === 'video') {
 									$tmp_sql_comment_links[$i] = 'SELECT videos.id, CONCAT_WS("/", "", "videos", videos.id, "") AS url FROM videos WHERE videos.id=?';
 								}
+								elseif($comments[$i]['item_type'] === 'development') {
+									$tmp_sql_comment_links[$i] = 'SELECT development.id, CONCAT_WS("/", "", "about", "development", development.id, "") AS url FROM development WHERE development.id=?';
+								}
+								elseif($comments[$i]['item_type'] === 'vip') {
+									$tmp_sql_comment_links[$i] = 'SELECT ? AS id, "/vip/" AS url LIMIT 1';
+								}
 								else {
 									$tmp_sql_comment_links[$i] = 'SELECT id, CONCAT_WS("/", "", "'.$comments[$i]['item_type'].($comments[$i]['item_type'] === 'artist' ? 's' : null).'", friendly, "") AS url FROM '.$comments[$i]['item_type'].($comments[$i]['item_type'] === 'artist' ? 's' : null).' WHERE id=?';
 								}
 								
+								$comment_array_keys[] = $i;
+								
 								$values_comment_links[$i] = $comments[$i]['item_id'];
+								
 							}
 						}
 						
 						// Loop through SQL generated in last step and get URLs to pages that comments were left on
 						if(is_array($tmp_sql_comment_links)) {
 							$sql_comment_links = 'SELECT * FROM (('.implode(') UNION (', $tmp_sql_comment_links).')) a';
-							
 							$stmt_comment_links = $this->pdo->prepare($sql_comment_links);
 							$stmt_comment_links->execute( array_values($values_comment_links) );
+							$rslt_comment_links = $stmt_comment_links->fetchAll();
 							
-							foreach($stmt_comment_links->fetchAll() as $rslt_comment_link) {
-								$key = $rslt_comment_link['id'];
-								$key = array_search($key, $values_comment_links);
+							foreach($rslt_comment_links as $rslt_link_key => $rslt_comment_link) {
+								
+								$key = $comment_array_keys[ $rslt_link_key ];
 								
 								$comments[$key]['item_url'] = $rslt_comment_link['url'];
+								
 							}
 						}
 						
 						// Loop through comments and restructure into threads
-						if(!$args['thread_ids']) {
+						if($args['threads'] !== false && !$args['thread_ids']) {
 							for($i=0; $i<$num_comments; $i++) {
 								$comments[$i]["thread_id"] = $comments[$i]["thread_id"] ?: $comments[$i]["id"];
 								
@@ -184,11 +211,13 @@
 								array_unshift($tmp_comments[$comments[$i]["thread_id"]], $comments[$i]);
 							}
 						}
+						
 					}
 					
-					if(!$args['thread_ids']) {
+					if($args['threads'] !== false && !$args['thread_ids']) {
 						$comments = $tmp_comments;
 					}
+					
 				}
 			}
 				
