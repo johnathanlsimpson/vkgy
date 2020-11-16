@@ -202,8 +202,8 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 										</h5>
 										
 										<div class="any--flex">
-											<a class="comment__content a--inherit" href="<?= $comments[$i]['url'] ? $comments[$i]['url'].'#comments' : '/comments/#comment-'.$comments[$i]['id']; ?>"><?= strip_tags($comments[$i]["content"]); ?></a>
-											<a class="comment__next symbol__next" href="<?php echo $comments[$i]['url'] ? $comments[$i]['url'].'#comments' : '/comments/#comment-'.$comments[$i]['id']; ?>">Read</a>
+											<a class="comment__content a--inherit" href="<?= $comments[$i]['item_url'] ? $comments[$i]['item_url'].'#comments' : '/comments/#comment-'.$comments[$i]['id']; ?>"><?= strip_tags($comments[$i]["content"]); ?></a>
+											<a class="comment__next symbol__next" href="<?php echo $comments[$i]['item_url'] ? $comments[$i]['item_url'].'#comments' : '/comments/#comment-'.$comments[$i]['id']; ?>">Read</a>
 										</div>
 										
 										<span class="any--hidden symbol__error comment__notice">This comment is awaiting approval.</span>
@@ -340,91 +340,116 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 </div>
 <?php endif; ?>
 
-<!-- Background color -->
-<div class="patreon__bg">
-	<!-- Background slashes at top and bottom -->
-	<div class="patreon__diagonals col c1 any--flex">
-		<!-- Spacing helper to keep all content in center -->
-		<div class="patreon__spacing col c4-ABBC">
-			<!-- Empty space on side -->
-			<div class="patreon__empty"></div>
+<?php include('partial-patreon.php'); ?>
+
+<!-- Videos -->
+<div class="col c1 any--margin">
+	<div>
+			<a class="a--outlined a--padded" href="/videos/" style="float:right;z-index:1;">all videos</a>
+		<h1>
+			<?= lang('Latest MV', '最新MV', 'div'); ?>
+		</h1>
+	</div>
+	<div class="videos__container">
+		<?php
+			$access_video = new access_video($pdo);
+			$videos = $access_video->access_video([ 'type' => $access_video->video_types['mv'], 'is_approved' => true, 'get' => 'basics', 'limit' => 4 ]);
 			
-			<!-- Patreon content starts here -->
-			<div class="patreon__container col c3-AAB any--flex">
-				
-				<!-- Text on left side -->
-				<div class="patreon__text">
-					
-					<h1 class="patreon__title">
-						<?= lang('Thank you for supporting vkgy', 'サポーターの皆様のおかげです', 'div'); ?>
-					</h1>
-					
-					<?php if($_SESSION['is_vip']): ?>
-						<p class="patreon__p">
-							<?= $access_user->render_username($_SESSION); ?>, thank you so much!<br />
-							vkgy is possible because of <a class="a--inherit" href="https://patreon.com/vkgy" target="_blank">Patreon</a> supporters like you.<br />
-							<span style="font-size:1rem;">&ndash; <?= $access_user->render_username(['username' => 'inartistic']); ?></span>
-						</p>
-					<?php else: ?>
-					<p class="patreon__p">
-						vkgy is possible thanks to our <a class="a--inherit" href="https://patreon.com/vkgy" target="_blank">Patreon</a> supporters!<br />Please consider joining them, for these benefits:
-					</p>
-					
-					<ul class="patreon__list">
-						<li>No ads</li>
-						<li><span class="patreon__badge" >VIP</span> badge</li>
-						<li>Early access to features</li>
-						<li>Priority support</li>
-						<li>Full-resolution images</li>
-						<li>Exclusive Discord channel</li>
-						<li>Dev blog</li>
-						<li>Avatar items and colors</li>
-						<li><a class="a--inherit" href="https://patreon.com/vkgy" target="_blank">+ more</a></li>
-					</ul>
-					
-					<a class="patreon__button a--inherit" href="https://patreon.com/vkgy" target="_blank">
-						<span class=""></span>
-						Become a Patron
-					</a>
-					<?php endif; ?>
-					
-				</div>
-				
-				<!-- Avatar wall on right side -->
-				<div class="patreon__wall">
-					<!-- Handles scrolling animation -->
-					<div class="patreon__scroll">
-						<?php
-							// Display all avatars twice to give us room to repeat scroll
-							for($i=0; $i<2; $i++) {
-								foreach($patrons as $patron) {
-									if($patron['username']) {
-										?>
-											<a class="patreon__patron" href="<?= $patron['url']; ?>">
-												<img alt="<?= $patron['username']; ?>" class="patreon__avatar" src="<?= $patron['avatar_url']; ?>" />
-												<span class="user patreon__username" data-icon="<?= $patron['icon']; ?>"><?= $patron['username']; ?></span>
-											</a>
-										<?php
-									}
-									else {
-										?>
-											<img class="patreon__avatar" src="<?= $patron['avatar_url']; ?>" />
-										<?php
-									}
-								}
-							}
-						?>
+			foreach($videos as $video) {
+				?>
+					<div class="video__container">
+						
+						<a class="video__thumbnail lazy" data-src="<?= $video['thumbnail_url']; ?>" href="<?= '/videos/'.$video['id'].'/'; ?>"></a>
+						
+						<a class="video__artist lazy" data-src="<?= '/artists/'.$video['artist']['friendly'].'/main.thumbnail.jpg'; ?>" href="<?= '/artists/'.$video['artist']['friendly'].'/'; ?>"></a>
+						
+						<a class="video__link artist any--weaken-size" href="<?= '/artists/'.$video['artist']['friendly'].'/'; ?>">
+							<?= lang($video['artist']['romaji'] ?: $video['artist']['name'], $video['artist']['name'], 'hidden'); ?>
+						</a>
+						
+						<br />
+						
+						<a class="video__link symbol__video" href="<?= '/videos/'.$video['id'].'/'; ?>"><?= $access_video->clean_title($video['youtube_name'], $video['artist']); ?></a>
+						
 					</div>
-				</div>
-				
-			</div>
-			<!-- End Patreon content -->
-			
-			<!-- Empty space on side -->
-			<div class="patreon__empty"></div>
-		</div>
+				<?php
+			}
+		?>
 	</div>
 </div>
+<style>
+	.videos__container {
+		--num-columns: 1;
+		display: grid;
+		grid-gap: var(--gutter);
+		grid-template-columns: repeat(var(--num-columns), minmax(0,1fr));
+	}
+	@media(min-width: 500px) {
+		.videos__container {
+			--num-columns: 2;
+		}
+	}
+	@media(min-width: 800px) {
+		.videos__container {
+			--num-columns: 3;
+		}
+		.video__container:last-of-type {
+			display: none;
+		}
+	}
+	@media(min-width: 1000px) {
+		.videos__container {
+			--num-columns: 4;
+		}
+		.video__container:last-of-type {
+			display: block;
+		}
+	}
+	.video__container {
+		padding-right: 1rem;
+	}
+	.video__thumbnail {
+		background-position: center;
+		background-size: auto 145%;
+		display: block;
+		margin-bottom: 0.5rem;
+		padding-top: 56%;
+		width: 100%;
+	}
+	.video__thumbnail:hover {
+		opacity: 0.75;
+	}
+	.video__artist {
+		background-color: hsl(var(--background));
+		background-position: center 30%;
+		background-size: cover;
+		border-radius: 3px 0 0 0;
+		bottom: 0;
+		box-shadow: 0 0 0 3px hsl(var(--background--secondary));
+		display: inline-block;
+		float: right;
+		height: 75px;
+		margin-right: -1rem;
+		margin-top: calc(-75px + 1rem);
+		width: 75px;
+	}
+	.video__artist:hover::after {
+		background: hsl(var(--background--secondary));
+		bottom: 0;
+		content: "";
+		display: block;
+		left: 0;
+		opacity: 0.3;
+		position: absolute;
+		right: 0;
+		top: 0;
+		z-index: 1;
+	}
+	.video__link {
+		display: inline-block;
+		line-height: 1rem;
+	}
+</style>
 
 <div class="col c1">
 	<div>
@@ -434,53 +459,104 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 	</div>
 </div>
 <div class="col c4">
+	
 	<div>
 		<h3>
-			How to add/edit
+			<?= lang('Site updates', 'サイト更新', 'div'); ?>
 		</h3>
-		<div class="text text--outlined">
-			<ol>
-				<li>Request admin permissions from <a class="user" href="/users/inartistic/">inartistic</a></li>
-				<li>Check <a href="/blog/primer/">the primer</a> and documentation at the bottom of add/edit pages</li>
-				<li>Jump in <a href="https://discord.gg/jw8jzXn" target="_blank">Discord</a> if you need help</li>
-			</ol>
-		</div>
+		<ul class="text text--outlined ul--compact">
+			<?php
+				$sql_development = 'SELECT id, title, friendly, SUBSTRING(date_occurred,1,10) AS date_occurred, content FROM development WHERE is_issue=? ORDER BY date_occurred DESC LIMIT 5';
+				$stmt_development = $pdo->prepare($sql_development);
+				$stmt_development->execute([ 0 ]);
+				$dev_entries = $stmt_development->fetchAll();
+				
+				foreach($dev_entries as $entry_key => $entry) {
+					echo '<li>';
+					echo $entry_key === 0 ? '<div class="h5">'.$entry['date_occurred'].' <span style="color:hsl(var(--accent));">NEW</span></div>' : null;
+					echo '<a href="/about/development/'.$entry['id'].'/">'.$entry['title'].'</a>';
+					echo '</li>';
+				}
+			?>
+		</ul>
+		
+		<h3>
+			<?= lang('About vkgy', 'vkgyについて', 'div'); ?>
+		</h3>
+		<ul class="text text--outlined">
+			<li><a href="/about/">About</a></li>
+			<li><a href="/about/">Privacy policy</a></li>
+			<li><a href="/about/">Contact</a></li>
+		</ul>
+		
 	</div>
+	
 	<div>
-		<h3 class="symbol__tag">
+		<h3 class="">
 			<?php echo lang('Browse artist tags', 'アーティストタグ', ['container' => 'div']); ?>
 		</h3>
 		<div class="text text--outlined">
 			<?php
 				foreach($rslt_artist_tags as $tag) {
-					echo '<span class="main__tag"><a href="/search/artists/?tags[]='.$tag["friendly"].'#result">'.lang(($tag["romaji"] ?: $tag["name"]), $tag['name'], ['secondary_class' => 'any--hidden']).'</a> <span class="any--weaken">&#215;'.$tag["num_tagged"].'</span></span>';
+					echo '<span class="main__tag" style="white-space:nowrap;margin-right:1.5ch;"><a href="/search/artists/?tags[]='.$tag["friendly"].'#result">'.lang(($tag["romaji"] ?: $tag["name"]), $tag['name'], ['secondary_class' => 'any--hidden']).'</a> <span class="any--weaken">&#215;'.$tag["num_tagged"].'</span></span>';
 				}
 			?>
 		</div>
 	</div>
 	<div>
-		<h3 class="symbol__tag">
+		<h3 class="">
 			<?php echo lang('Browse release tags', 'リリースタグ', ['container' => 'div']); ?>
 		</h3>
 		<div class="text text--outlined">
 			<?php
 				foreach($rslt_release_tags as $tag) {
-					echo '<span class="main__tag"><a href="/search/releases/?tag='.$tag["friendly"].'#result">'.lang(($tag["romaji"] ?: $tag["name"]), $tag['name'], ['secondary_class' => 'any--hidden']).'</a> <span class="any--weaken">&#215;'.$tag["num_tagged"].'</span></span>';
+					echo '<span class="main__tag" style="white-space:nowrap;margin-right:1.5ch;"><a href="/search/releases/?tag='.$tag["friendly"].'#result">'.lang(($tag["romaji"] ?: $tag["name"]), $tag['name'], ['secondary_class' => 'any--hidden']).'</a> <span class="any--weaken">&#215;'.$tag["num_tagged"].'</span></span>';
 				}
 			?>
 		</div>
 	</div>
 	<div>
 		<h3>
-			Contact
+			<?= lang('Translate vkgy', 'vkgyを翻訳', 'div'); ?>
 		</h3>
-		<div class="text text--outlined">
-			<ul>
-				<li><a href="mailto:johnathan.l.simpson@gmail.com">Email founder</a></li>
-				<li><a href="https://twitter.com/vkgy_" target="_blank">Message on Twitter</a></li>
-				<li><a href="https://facebook.com/vkgyofficial" target="_blank">Message on Facebook</a></li>
-			</ul>
-		</div>
+		<ul class="text text--outlined ul--compact">
+			<?php
+				$sql_untranslated = '
+					SELECT
+						SUM(ISNULL(ja_id)) AS num_ja,
+						SUM(ISNULL(de_id)) AS num_de,
+						SUM(ISNULL(es_id)) AS num_es,
+						SUM(ISNULL(fr_id)) AS num_fr,
+						SUM(ISNULL(ko_id)) AS num_ko,
+						SUM(ISNULL(nl_id)) AS num_nl,
+						SUM(ISNULL(ru_id)) AS num_ru,
+						SUM(ISNULL(zh_id)) AS num_zh
+					FROM
+						translations
+				';
+				$stmt_untranslated = $pdo->prepare($sql_untranslated);
+				$stmt_untranslated->execute();
+				$rslt_untranslated = $stmt_untranslated->fetch();
+				
+				foreach([
+					'ja' => '日本語',
+					'de' => 'Deutsch',
+					'es' => 'Español',
+					'fr' => 'Français',
+					'ko' => '한국어',
+					'nl' => 'Nederlands',
+					'ru' => 'Русский',
+					'zh' => '中文',
+				] as $key => $name) {
+					echo '<li>';
+					echo $name.' ';
+					echo '<span class="any--weaken">'.$rslt_untranslated[ 'num_'.$key ].' needed</span>';
+					echo '</li>';
+				}
+				
+			?>
+			<li><a class="symbol__plus" href="/translations/">translate</a></li>
+		</ul>
 	</div>
 </div>
 

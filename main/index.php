@@ -4,7 +4,7 @@ $access_blog = new access_blog($pdo);
 $access_artist = new access_artist($pdo);
 $access_comment = new access_comment($pdo);
 $markdown_parser = new parse_markdown($pdo);
-
+$access_user = new access_user($pdo);
 $access_image = $access_image ?: new access_image($pdo);
 
 /* Get VIP news */
@@ -23,19 +23,19 @@ $news[0]["content"] = $markdown_parser->parse_markdown($news[0]["content"]);
 $news[0]["comment_count"] = $access_comment->access_comment([ "id" => $news[0]["id"], "type" => "blog", "get" => "count" ]);
 $news[0]["comment_text"] = ($news[0]["comment_count"] ? 'read '.$news[0]["comment_count"].' comment'.($news[0]["comment_count"] !== "1" ? 's' : null) : 'comment on this entry');
 
-
 for($i=0; $i<$num_news; $i++) {
 	$news[$i]["date_occurred"] = substr($news[$i]["date_occurred"], 0, 10);
 	$news[$i]["image"] = str_replace(".", ".thumbnail.", $news[$i]["image"]);
 }
 
 /* Get comments */
-$comments = $access_comment->access_comment(['is_deleted' => 0, "get" => "list", "limit" => 20]);
+$comments = $access_comment->access_comment(['is_deleted' => 0, "get" => "list", "limit" => 20, 'threads' => false]);
 $num_comments = count($comments);
 
-// Comments: Loop through comments and set up query to get their URLs
+/*// Comments: Loop through comments and set up query to get their URLs
 $num_comments = count($comments);
 for($i=0; $i<$num_comments; $i++) {
+	
 	switch($comments[$i]['item_type']) {
 		case('blog'):
 			$sql_comment[] = "SELECT id AS item_id, CONCAT_WS('/', '', 'blog', friendly, '') AS url FROM blog WHERE id=?";
@@ -46,15 +46,20 @@ for($i=0; $i<$num_comments; $i++) {
 		case('artist'):
 			$sql_comment[] = "SELECT id AS item_id, CONCAT_WS('/', '', 'artists', friendly, '') AS url FROM artists WHERE id=?";
 			break;
+		case('development'):
+			$sql_comment[] = "SELECT id AS item_id, CONCAT_WS('/', '', 'about', 'development', id, '') AS url FROM development WHERE id=?";
+			break;
 		case('vip'):
-			$sql_comment[] = "SELECT id AS item_id, CONCAT_WS('/', '', 'vip', friendly, '') AS url FROM vip WHERE id=?";
+			$sql_comment[] = "SELECT ? AS item_id, '/vip/' AS url FROM vip";
 			break;
 		case('video'):
 			$sql_comment[] = "SELECT id AS item_id, CONCAT_WS('/', '', 'videos', id, '') AS url FROM videos WHERE id=?";
 			break;
 	}
 	
+	$comment_types[] = $comments[$i]['item_type'];
 	$values_comment[] = $comments[$i]['item_id'];
+	
 }
 
 // Comments: If we have SQL and values for each comment, query the DB
@@ -63,6 +68,9 @@ if( is_array($sql_comment) && !empty($sql_comment) && count($sql_comment) === co
 	$stmt_comment = $pdo->prepare($sql_comment);
 	$stmt_comment->execute( $values_comment );
 	$rslt_comments = $stmt_comment->fetchAll();
+	
+	echo 'result urls<pre>'.print_r($rslt_comments, true).'</pre>';
+	
 	$num_rslt_comments = is_array($rslt_comments) ? count($rslt_comments) : 0;
 }
 
@@ -71,15 +79,27 @@ if($num_rslt_comments) {
 	
 	// Change comment URLs to associative array
 	for($i=0; $i<$num_rslt_comments; $i++) {
-		$comments_urls[ $rslt_comments[$i]['item_id'] ] = $rslt_comments[$i]['url'];
+		
+		$comment_type = $comment_types[$i];
+		$comments_urls_ii[ $comment_type ][ $rslt_comments[$i]['item_id'] ][] = $rslt_comments[$i]['url'];
+		
+		//$comments[$i]['url'] = $comments_urls[$i]['url'];
+		//$comments_urls[ $rslt_comments[$i]['item_id'] ] = $rslt_comments[$i]['url'];
 	}
+	
+	echo '<pre>'.print_r($comments_urls_ii, true).'</pre>';
 	
 	// Grab appropriate URL for each comment
 	for($i=0; $i<$num_comments; $i++) {
-		$comments[$i]['url'] = $comments_urls[$comments[$i]['item_id']];
+		
+		echo $comments[$i]['item_type'].'*'.$comments[$i]['item_id'].'*'.$comments_urls_ii[ $comments[$i]['item_type'] ][ $comments[$i]['item_id'] ].'<br />';
+		
+		$comments[$i]['url'] = $comments_urls_ii[ $comments[$i]['item_type'] ][ $comments[$i]['item_id'] ];
+		
+		//$comments[$i]['url'] = $comments_urls[$comments[$i]['item_id']];
 	}
 	
-}
+}*/
 // Comments: Format comment data
 for($i=0; $i<$num_comments; $i++) {
 	
@@ -131,7 +151,7 @@ $sql_recent = "
 							SELECT id
 							FROM edits_artists
 							ORDER BY id DESC
-							LIMIT 30
+							LIMIT 40
 						) aa
 					LEFT JOIN edits_artists ON edits_artists.id=aa.id
 					GROUP BY edits_artists.artist_id
@@ -270,34 +290,6 @@ $sql_release_tags = "SELECT COUNT(*) AS num_tagged, tags_releases.name, tags_rel
 $stmt_release_tags = $pdo->prepare($sql_release_tags);
 $stmt_release_tags->execute();
 $rslt_release_tags = $stmt_release_tags->fetchAll();
-
-// Get VIP patrons
-$access_user = new access_user($pdo);
-$patrons = $access_user->access_user([ 'is_vip' => true ]);
-
-// Get non-VIP patrons
-foreach([ 'redaudrey' ] as $non_vip_patron) {
-	$patrons[] = $access_user->access_user([ 'username' => $non_vip_patron ]);
-}
-
-// Sort patrons
-usort($patrons, function($a, $b) { return strtolower($a['username']) <=> strtolower($b['username']); });
-
-// Make sure icons exist
-$num_patrons = count($patrons);
-for($i=0; $i<$num_patrons; $i++) {
-	if(!file_exists('..'.$patrons[$i]['avatar_url'])) {
-		$patrons[$i]['avatar_url'] = '/usericons/avatar-anonymous.png';
-	}
-}
-
-// Get dummy patrons to fill gaps in layout
-$patron_columns = 3;
-$patron_modulo = count($patrons) % $patron_columns;
-while($patron_modulo) {
-	$patrons[] = [ 'avatar_url' => '/usericons/avatar-anonymous.png' ];
-	$patron_modulo = count($patrons) % $patron_columns;
-}
 
 /* News */
 
