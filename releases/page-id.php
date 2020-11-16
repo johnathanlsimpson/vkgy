@@ -13,12 +13,21 @@
 		
 		$release['images'] = is_array($release['images']) ? $release['images'] : [];
 		
+		// If images set, grab main image and separate from rest, and also set SNS image
 		if(!empty($release['images']) && is_numeric($release['image_id'])) {
 			$release['image'] = $release['images'][$release['image_id']];
+			
+			// Set page image to release cover
+			$page_image = 'https://vk.gy/images/'.$release['image']['id'].'.opengraph.'.$release['image']['extension'];
 			
 			unset($release['images'][$release['image_id']]);
 			
 			$release['images'] = array_values($release['images']);
+		}
+		
+		// If no image, set page title to artist image
+		else {
+			$page_image = 'https://vk.gy/artists/'.$release['artist']['friendly'].'/main.opengraph.jpg';
 		}
 		
 		background("/artists/".$release["artist"]["friendly"]."/main.large.jpg");
