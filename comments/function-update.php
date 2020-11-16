@@ -16,7 +16,7 @@ if(strlen($_POST['content']) && !strlen($_POST['email']) && !strlen($_POST['webs
 			$item_exists = $stmt_check->fetchColumn();
 		}
 		
-		if($item_exists || $_POST['item_type'] === 'none') {
+		if($item_exists || $_POST['item_type'] === 'none' || $_POST['item_type'] === 'vip') {
 			
 			// Set variables
 			$item_id      = sanitize($_POST['item_id']);
