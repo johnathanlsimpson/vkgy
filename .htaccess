@@ -71,9 +71,12 @@ RewriteRule  ^(.*)$             https://vk.gy/%{REQUEST_URI} [R=permanent,L]
 #RewriteCond  %{SERVER_NAME}  (occult-proposal.net|occult-proposal.vk.gy)$
 #RewriteRule  ^(.*)$          /occult-proposal.net/$1
 
-RewriteRule  ^about/?$           /?about/&template=about
-RewriteRule  ^contact/?$         /?about/&template=contact
-RewriteRule  ^privacy-policy/?$  /?about/&template=privacy-policy
+RewriteRule  ^about/?$                         /?about/&template=about
+RewriteRule  ^contact/?$                       /?about/&template=contact
+RewriteRule  ^privacy-policy/?$                /?about/&template=privacy-policy
+RewriteRule  ^about/development/?$             /?about/&template=development
+RewriteRule  ^about/development/(\d+)/?$       /?about/&template=development&id=$1
+RewriteRule  ^about/development/(\d+)/edit/?$  /?about/&template=update&id=$1
 
 
 RewriteRule  ^accounts(.*)$                     /account$1 [R=301,L]
@@ -95,7 +98,7 @@ RewriteRule  ^artists/([-\w]+)/?$                                               
 RewriteRule  ^artists/([-\w]+)/videos/?$                                         /?artists/&artist=$1&section=videos
 RewriteRule  ^artists/([-\w]+)\.jpg$                                             /artists/page-image.php?friendly=$1
 RewriteRule  ^artists/([-\w]+)/edit/?$                                           /?artists/&action=edit&artist=$1
-RewriteRule  ^artists/([-\w]+)/main(?:\.(thumbnail|small|medium|large))?\.jpg?$  /images/page-image.php?artist=$1&method=$2
+RewriteRule  ^artists/([-\w]+)/main(?:\.(thumbnail|small|medium|large|opengraph))?\.jpg?$  /images/page-image.php?artist=$1&method=$2
 
 RewriteRule  ^blog/?$                                   /?blog/&page=latest
 RewriteRule  ^blog/artist/([\w-]+)/?(?:page/(\d+)/?)?$  /?blog/&artist=$1&page=$2
