@@ -426,6 +426,20 @@ opacity: 1;
 	border-bottom-left-radius: 0;
 	border-bottom-right-radius: 0;
 }
+								/*.module__card {
+									border: 0;
+								}*/
+								.video-card__details {
+									padding-top: 1rem;
+								}
+								.video-card__date {
+									float: right;
+									margin-left: 0.5rem;
+									text-align: right;
+								}
+								
+/*background:hsl(var(--background)); border-color: hsl(var(--background--bold)); flex-wrap: wrap; margin: 0 auto; max-height: none; max-width: 600px; min-width: 200px; width: 100%;
+*/
 
 .release-card__container {
 	flex-wrap: wrap;
