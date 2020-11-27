@@ -90,11 +90,65 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 		</a>
 		<span class="any--weaken" style="display:block;height:0;transform:translateY(-3rem);">art by <a class="a--inherit" href="https://www.instagram.com/darrylpyon/" target="_blank">@darrylpyon</a></span>
 		
-		<a class="browse__link browse--releases text" href="/releases/">
-			<div class="h2 browse__title">
-				<?= lang('release calendar', 'リリースカレンダー', 'div'); ?>
-			</div>
-		</a>
+			<a class="browse__link browse--releases text" href="/releases/" style="background-image:none;">
+				
+				<div style="bottom:0;left:0;overflow:hidden;position:absolute;right:0;top:-10%;">
+					<span class="browse__cover"><img class="browse__thumb" src="<?= '/images/'.$covers[0]['id'].'.thumbnail.'.$covers[0]['extension']; ?>" /></span>
+					<span class="browse__cover"><img class="browse__thumb" src="<?= '/images/'.$covers[1]['id'].'.thumbnail.'.$covers[1]['extension']; ?>" /></span>
+					<span class="browse__cover"><img class="browse__thumb" src="<?= '/images/'.$covers[2]['id'].'.thumbnail.'.$covers[2]['extension']; ?>" /></span>
+				</div>
+				<div class="h2 browse__title">
+					<?= lang('release calendar', 'リリースカレンダー', 'div'); ?>
+				</div>
+			</a>
+		
+		<style>
+			.browse--releases {
+			}
+			.browse__cover {
+				height: auto;
+				left: 0;
+				overflow: hidden;
+				position: absolute;
+				top: 0;
+				transform-origin: left top;
+				width: 50%;
+			}
+			.browse__cover:nth-of-type(1) {
+				background: hsla(var(--background--bold), 0);
+				/*left: 52%;
+				top: -10%;
+				transform: rotate(26deg);*/
+				transform: translateX(105%) translateY(0%) rotate(26deg);
+			}
+			.browse__cover:nth-of-type(2) {
+				background: hsla(var(--text--secondary), 0);
+				/*right: -7%;
+				left: 57%;
+				top: 40%;
+				transform: rotate(6deg);*/
+				transform: translateX(122%) translateY(60%) rotate(6deg);
+				
+				/*box-shadow: 0 0 0 4px orange;
+				opacity: 0.75;*/
+			}
+			.browse__cover:nth-of-type(3) {
+				background: hsla(var(--text), 0);
+				/*left: -10%;
+				top: 20%;
+				transform: rotate(-16deg);*/
+				transform-origin: right top;
+				transform: translateX(-20%) translateY(24%) rotate(-16deg);
+			}
+			.browse__thumb {
+				height: auto;
+				object-fit: cover;
+				object-position: center top;
+				width: 105%;
+			}
+		</style>
+		
+		
 		
 		<div class="main__ranking">
 			<h3>
@@ -177,6 +231,11 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 			<!-- Comments -->
 			<ul class="comments__container2 any--margin">
 				<?php
+					
+					// Set helper for adding symbol to links later
+					$symbol_classes = [ 'blog' => 'news', 'artist' => 'artist', 'release' => 'release', 'development' => 'news' ];
+					
+					// Only get 10 comments
 					$comments = array_slice($comments, 0, 10);
 					for($i=0; $i<count($comments); $i++) {
 						
@@ -196,14 +255,45 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 									</a>
 									
 									<div class="comment__comment">
-										<h5 class="any--flex">
-											<a class="user a--inherit comment__user" data-icon="<?= $comments[$i]['user']['icon']; ?>" data-is-vip="<?= $comments[$i]['user']['is_vip']; ?>" href="<?= $comments[$i]['user']['url']; ?>"><?= $comments[$i]['user']['username']; ?></a>
-											<?php echo substr($comments[$i]["date_occurred"], 5); ?>
-										</h5>
+										<div class="any--flex" style="white-space:nowrap;width:100%;overflow:hidden;max-width:100%;">
+											<div class="h5">
+												<a class="user a--inherit" data-icon="<?= $comments[$i]['user']['icon']; ?>" data-is-vip="<?= $comments[$i]['user']['is_vip']; ?>" href="<?= $comments[$i]['user']['url']; ?>"><?= $comments[$i]['user']['username']; ?></a>
+												<?= substr($comments[$i]["date_occurred"], 5); ?>
+											</div>
+											
+											<div class="any--weaken any--flex" style="margin-left:auto;padding-left:1rem;max-width:100%;overflow:hidden;transform:translateY(-1px);">
+												<?php
+													
+													// Set the symbol for the link to the item
+													$symbol_class = $symbol_classes[ $comments[$i]['item_type'] ] ?: ($comments[$i]['item_type'] === 'none' ? 'comment' : $comments[$i]['item_type']);
+													$symbol_class = 'symbol__'.$symbol_class;
+													
+													// Show item name if possible, otherwise assume generic comment
+													if( $comments[$i]['item_type'] != 'none' ) {
+														$link_text = $comments[$i]['item_romaji'] ? lang($comments[$i]['item_romaji'], $comments[$i]['item_name'], 'hidden') : $comments[$i]['item_name'];
+													}
+													else {
+														$link_text = 'comments';
+													}
+													
+													// If item type is set but no url found, assume page was deleted and don't show link
+													if( $comments[$i]['item_type'] != 'none' && $comments[$i]['item_url'] === '/comments/' ) {
+														$link = 'a deleted page';
+													}
+													else {
+														$link  = '<a class="a--inherit '.$symbol_class.'" href="'.$comments[$i]['item_url'].'" style="max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">'.$link_text.'</a>';
+													}
+													
+													echo 'on&nbsp;'.$link;
+													
+												?>
+											</div>
+											
+										</div>
 										
 										<div class="any--flex">
 											<a class="comment__content a--inherit" href="<?= $comments[$i]['item_url'] ? $comments[$i]['item_url'].'#comments' : '/comments/#comment-'.$comments[$i]['id']; ?>"><?= strip_tags($comments[$i]["content"]); ?></a>
-											<a class="comment__next symbol__next" href="<?php echo $comments[$i]['item_url'] ? $comments[$i]['item_url'].'#comments' : '/comments/#comment-'.$comments[$i]['id']; ?>">Read</a>
+											<a class="comment__next symbol__next" href="<?= $comments[$i]['item_url'] ? $comments[$i]['item_url'].'#comments' : '/comments/#comment-'.$comments[$i]['id']; ?>">Read</a>
 										</div>
 										
 										<span class="any--hidden symbol__error comment__notice">This comment is awaiting approval.</span>
@@ -495,10 +585,10 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 		<h3 class="">
 			<?php echo lang('Browse artist tags', 'アーティストタグ', ['container' => 'div']); ?>
 		</h3>
-		<div class="text text--outlined">
+		<div class="text text--outlined" style="white-space:normal;">
 			<?php
 				foreach($rslt_artist_tags as $tag) {
-					echo '<span class="main__tag" style="white-space:nowrap;margin-right:1.5ch;"><a href="/search/artists/?tags[]='.$tag["friendly"].'#result">'.lang(($tag["romaji"] ?: $tag["name"]), $tag['name'], ['secondary_class' => 'any--hidden']).'</a> <span class="any--weaken">&#215;'.$tag["num_tagged"].'</span></span>';
+					echo '<span class="main__tag" style="white-space:nowrap;margin-right:1.5ch;"><a href="/search/artists/?tags[]='.$tag["friendly"].'#result">'.lang(($tag["romaji"] ?: $tag["name"]), $tag['name'], ['secondary_class' => 'any--hidden']).'</a> <span class="any--weaken">&#215;'.$tag["num_tagged"].'</span></span> ';
 				}
 			?>
 		</div>
@@ -510,7 +600,7 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 		<div class="text text--outlined">
 			<?php
 				foreach($rslt_release_tags as $tag) {
-					echo '<span class="main__tag" style="white-space:nowrap;margin-right:1.5ch;"><a href="/search/releases/?tag='.$tag["friendly"].'#result">'.lang(($tag["romaji"] ?: $tag["name"]), $tag['name'], ['secondary_class' => 'any--hidden']).'</a> <span class="any--weaken">&#215;'.$tag["num_tagged"].'</span></span>';
+					echo '<span class="main__tag" style="white-space:nowrap;margin-right:1.5ch;"><a href="/search/releases/?tag='.$tag["friendly"].'#result">'.lang(($tag["romaji"] ?: $tag["name"]), $tag['name'], ['secondary_class' => 'any--hidden']).'</a> <span class="any--weaken">&#215;'.$tag["num_tagged"].'</span></span> ';
 				}
 			?>
 		</div>
