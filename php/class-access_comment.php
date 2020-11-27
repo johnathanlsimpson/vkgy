@@ -1,4 +1,4 @@
-<?php
+​<?php
 	include_once("../php/include.php");
 	
 	class access_comment {
@@ -158,44 +158,88 @@
 						
 						// Loop through comments and set up SQL to get link to page that comment was made on
 						for($i=0; $i<$num_comments; $i++) {
+							
+							// Set a default URL for the comment
 							$comments[$i]['item_url'] = '/comments/';
 							
-							if($comments[$i]['item_type'] != 'none') {
-								if($comments[$i]['item_type'] === 'release') {
-									$tmp_sql_comment_links[$i] = 'SELECT releases.id, CONCAT_WS("/", "", "releases", artists.friendly, releases.id, releases.friendly, "") AS url FROM releases LEFT JOIN artists ON artists.id=releases.artist_id WHERE releases.id=?';
-								}
-								elseif($comments[$i]['item_type'] === 'video') {
-									$tmp_sql_comment_links[$i] = 'SELECT videos.id, CONCAT_WS("/", "", "videos", videos.id, "") AS url FROM videos WHERE videos.id=?';
-								}
-								elseif($comments[$i]['item_type'] === 'development') {
-									$tmp_sql_comment_links[$i] = 'SELECT development.id, CONCAT_WS("/", "", "about", "development", development.id, "") AS url FROM development WHERE development.id=?';
-								}
-								elseif($comments[$i]['item_type'] === 'vip') {
-									$tmp_sql_comment_links[$i] = 'SELECT ? AS id, "/vip/" AS url LIMIT 1';
-								}
-								else {
-									$tmp_sql_comment_links[$i] = 'SELECT id, CONCAT_WS("/", "", "'.$comments[$i]['item_type'].($comments[$i]['item_type'] === 'artist' ? 's' : null).'", friendly, "") AS url FROM '.$comments[$i]['item_type'].($comments[$i]['item_type'] === 'artist' ? 's' : null).' WHERE id=?';
+							$item_type = $comments[$i]['item_type'];
+							
+							// If item type specified, try to find the URL for the corresponding page
+							if($item_type != 'none') {
+								
+								// For each item type, we'll define table, parameters to be used w/in CONCAT_WS for url, and joins
+								$table_name = $table_is_plural = $concat_params = $joins = $item_name = $item_romaji = null;
+								
+								switch($item_type) {
+										
+									case 'artist':
+										$table_is_plural = true;
+										$concat_params = '"artists", artists.friendly';
+										$item_name = 'artists.name';
+										$item_romaji = 'COALESCE(artists.romaji, artists.name)';
+										break;
+										
+									case 'blog':
+										$concat_params = '"blog", blog.friendly';
+										$item_name = 'blog.title';
+										break;
+										
+									case 'development':
+										$concat_params = '"about", "development", development.id';
+										$item_name = 'development.title';
+										break;
+										
+									case 'release':
+										$table_is_plural = true;
+										$concat_params = '"releases", artists.friendly, releases.id, releases.friendly';
+										$joins = 'LEFT JOIN artists ON artists.id=releases.artist_id';
+										$item_name = 'CONCAT_WS(" ", artists.name, "-", releases.name, COALESCE(releases.press_name, ""), COALESCE(releases.type_name, ""))';
+										$item_romaji = 'CONCAT_WS(" ", COALESCE(artists.romaji, artists.name), "-", COALESCE(releases.romaji, releases.name), COALESCE(releases.press_romaji, releases.press_name, ""), COALESCE(releases.type_romaji, releases.type_name, ""))';
+										break;
+										
+									case 'video':
+										$table_is_plural = true;
+										$concat_params = '"videos", videos.id';
+										$item_name = 'videos.youtube_name';
+										break;
+										
+									case 'vip':
+										$concat_params = '"vip"';
+										$item_name = '"a VIP post"';
+										break;
+										
+									default:
+										$concat_params = '"'.$item_type.($item_type === 'artist' ? 's' : null).'", friendly';
+										$table_is_plural = $item_type === 'artist' ? true : false;
+										$item_name = 'name';
+									
 								}
 								
-								$comment_array_keys[] = $i;
+								$table_name = $item_type.($table_is_plural ? 's' : null);
 								
-								$values_comment_links[$i] = $comments[$i]['item_id'];
+								// Set up the SELECT for each item (they should all be similar), and save key 
+								// of comment within comments array so we can add url to appropriate comment later
+								// (if item isn't in database, no row will be returned, so we have to save key here)
+								$tmp_sql_comment_links[] = 'SELECT "'.$i.'" AS comment_key, CONCAT_WS("/", "", '.$concat_params.', "") AS url, '.($item_name ?: '""').' AS item_name, '.($item_romaji ?: '""').' AS item_romaji FROM '.$table_name.' '.$joins.' WHERE '.$table_name.'.id=?';
+								
+								$values_comment_links[] = $comments[$i]['item_id'];
 								
 							}
+							
 						}
 						
 						// Loop through SQL generated in last step and get URLs to pages that comments were left on
 						if(is_array($tmp_sql_comment_links)) {
 							$sql_comment_links = 'SELECT * FROM (('.implode(') UNION (', $tmp_sql_comment_links).')) a';
 							$stmt_comment_links = $this->pdo->prepare($sql_comment_links);
-							$stmt_comment_links->execute( array_values($values_comment_links) );
+							$stmt_comment_links->execute( $values_comment_links );
 							$rslt_comment_links = $stmt_comment_links->fetchAll();
 							
-							foreach($rslt_comment_links as $rslt_link_key => $rslt_comment_link) {
+							foreach($rslt_comment_links as $rslt_comment_link) {
 								
-								$key = $comment_array_keys[ $rslt_link_key ];
-								
-								$comments[$key]['item_url'] = $rslt_comment_link['url'];
+								$comments[ $rslt_comment_link['comment_key'] ]['item_name'] = $rslt_comment_link['item_name'];
+								$comments[ $rslt_comment_link['comment_key'] ]['item_romaji'] = $rslt_comment_link['item_romaji'] && $rslt_comment_link['item_romaji'] != $rslt_comment_link['item_name'] ? $rslt_comment_link['item_romaji'] : null;
+								$comments[ $rslt_comment_link['comment_key'] ]['item_url'] = $rslt_comment_link['url'];
 								
 							}
 						}
