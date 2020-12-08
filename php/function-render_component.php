@@ -1,5 +1,10 @@
 <?php
 
+// Helper to clear {variables} and print template
+function clean_template($template) {
+	return preg_replace('/'.'\{.+?\}'.'/', '', $template);
+}
+
 // Populate a <template> element with data
 function render_component($component_template, $replacement_data = []) {
 	if($component_template && is_array($replacement_data)) {
