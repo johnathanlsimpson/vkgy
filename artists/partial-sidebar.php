@@ -192,6 +192,7 @@ if($artist_is_viewable) {
 	}
 	
 	// Tags
+	$item_type = 'artist';
 	include('../tags/partial-tags.php');
 	
 	// Popularity

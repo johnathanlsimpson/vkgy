@@ -44,14 +44,14 @@ style([
 													echo '<div class="tag__moderation--vertical">';
 													
 													// All moderation tags can be pinned
-													?><label class="tag__moderation tag--pin input__checkbox" data-direction="pin" data-items-tags-id="<?= $tag['items_tags_id']; ?>" data-item-type="artists_tags">
+													?><label class="tag__moderation tag--pin input__checkbox" data-direction="pin" data-items-tags-id="<?= $tag['items_tags_id']; ?>" data-item-type="<?= $item_type.'s_tags'; ?>">
 														<input class="tag__pin input__choice" type="checkbox" <?= $tag['mod_score'] > 0 ? 'checked' : null; ?> />
 														<span class="symbol__pin tag__status"></span>
 													</label><?php
 													
 													// Don't show hide button if tag can only be added by moderators
 													if( $tag['requires_permission'] != 'can_approve_data' ) {
-														?><label class="tag__moderation tag--hide input__checkbox" data-direction="hide" data-items-tags-id="<?= $tag['items_tags_id']; ?>" data-item-type="artists_tags">
+														?><label class="tag__moderation tag--hide input__checkbox" data-direction="hide" data-items-tags-id="<?= $tag['items_tags_id']; ?>" data-item-type="<?= $item_type.'s_tags'; ?>">
 															<input class="tag__hide input__choice" type="checkbox" <?= $tag['mod_score'] < 0 ? 'checked' : null; ?> />
 															<span class="symbol__hide tag__status"></span>
 														</label><?php
@@ -65,7 +65,7 @@ style([
 													echo render_component($vote_template, [
 														'direction_class' => 'vote--vertical',
 														'item_id' => $tag['items_tags_id'],
-														'item_type' => 'artists_tags',
+														'item_type' => $item_type.'s_tags',
 														'upvote_is_checked' => $tag['user_score'] > 0 ? 'checked' : null,
 														'downvote_is_checked' => $tag['user_score'] < 0 ? 'checked' : null,
 														'score' => $tag['score'],
@@ -89,14 +89,14 @@ style([
 												if( $_SESSION['can_approve_data'] ) {
 													
 													// All moderation tags can be pinned
-													?><label class="tag__moderation tag--pin input__checkbox" data-direction="pin" data-items-tags-id="<?= $tag['items_tags_id']; ?>" data-item-type="artists_tags">
+													?><label class="tag__moderation tag--pin input__checkbox" data-direction="pin" data-items-tags-id="<?= $tag['items_tags_id']; ?>" data-item-type="<?= $item_type.'s_tags'; ?>">
 														<input class="tag__pin input__choice" type="checkbox" <?= $tag['mod_score'] > 0 ? 'checked' : null; ?> />
 														<span class="symbol__pin tag__status"></span>
 													</label><?php
 													
 													// Don't show hide button if tag can only be added by moderators
 													if( $tag['requires_permission'] != 'can_approve_data' ) {
-														?><label class="tag__moderation tag--hide input__checkbox" data-direction="hide" data-items-tags-id="<?= $tag['items_tags_id']; ?>" data-item-type="artists_tags">
+														?><label class="tag__moderation tag--hide input__checkbox" data-direction="hide" data-items-tags-id="<?= $tag['items_tags_id']; ?>" data-item-type="<?= $item_type.'s_tags'; ?>">
 															<input class="tag__hide input__choice" type="checkbox" <?= $tag['mod_score'] < 0 ? 'checked' : null; ?> />
 															<span class="symbol__hide tag__status"></span>
 														</label><?php
@@ -109,7 +109,7 @@ style([
 													
 													echo render_component($vote_template, [
 														'item_id' => $tag['items_tags_id'],
-														'item_type' => 'artists_tags',
+														'item_type' => $item_type.'s_tags',
 														'upvote_is_checked' => $tag['user_score'] > 0 ? 'checked' : null,
 														'downvote_is_checked' => $tag['user_score'] < 0 ? 'checked' : null,
 														'score' => $tag['score'],
