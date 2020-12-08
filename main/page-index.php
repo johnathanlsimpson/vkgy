@@ -59,9 +59,9 @@ ob_start();
 			
 			<?php foreach($latest_items as $item_key => $latest_item): ?>
 				<?php if( is_array($latest_item) && !empty($latest_item) && isset($latest_item['url']) ): ?>
-					<a class="intro__card text any--flex" href="<?= $latest_item['url']; ?>" style="background-image:url(<?= $latest_item['image']['thumbnail_url']; ?>);">
+					<a class="intro__card text any--flex" href="<?= $latest_item['url']; ?>" style="background-image:url(<?= $latest_item['image']['thumbnail_url'] ?: null; ?>);">
 						
-						<span class="intro__card-image lazy" data-src="<?= $latest_item['image']['medium_url']; ?>"></span>
+						<span class="intro__card-image lazy" data-src="<?= $latest_item['image']['medium_url'] ?: null; ?>"></span>
 						
 						<div class="intro__card-title h2">
 							<span class="intro__card-pill h5"><?= $latest_item['pill']; ?></span>
@@ -208,7 +208,7 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 						?>
 							<li class="news__item2 any--flex">
 								
-								<a class="news__image lazy" href="<?= $news_item['url']; ?>" data-src="<?= $news_item['image']['url']; ?>"></a>
+								<a class="news__image lazy" href="<?= $news_item['url']; ?>" data-src="<?= $news_item['image']['url'] ?: null; ?>"></a>
 								
 								<div class="news__text">
 									<div class="news__supertitle h5">
