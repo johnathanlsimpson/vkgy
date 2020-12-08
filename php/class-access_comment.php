@@ -1,4 +1,4 @@
-​<?php
+<?php
 	include_once("../php/include.php");
 	
 	class access_comment {
