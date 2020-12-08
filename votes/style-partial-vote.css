@@ -1,0 +1,64 @@
+.vote__container {
+	border: 1px solid hsl(var(--background));
+	border-radius: 3px;
+	display: inline-flex;
+	line-height: 1.5rem;
+	text-align: center;
+}
+.vote--vertical {
+	flex-direction: column;
+}
+
+.vote__label {
+	align-items: center;
+	display: inline-flex;
+	justify-content: center;
+	margin: 0;
+	min-height: 1.5rem;
+	min-width: 1.5rem;
+	padding: 0;
+}
+
+.vote__label {
+	border: none;
+	background: none;
+	box-shadow: none;
+	color: hsl(var(--background--bold));
+	cursor: pointer;
+	position: initial;
+}
+.vote__label:hover {
+	color: hsl(var(--text));
+}
+.vote__label:hover::after {
+	background: linear-gradient(var(--vote-dir), var(--vote-bg), transparent);
+	bottom: 0;
+	content: "";
+	display: block;
+	left: 0;
+	pointer-events: none;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+.vote--upvote:hover {
+	--vote-bg: rgba(0,255,0,0.1);
+	--vote-dir: to right;
+}
+.vote--downvote:hover {
+	--vote-bg: rgba(255,0,0,0.1);
+	--vote-dir: to left;
+}
+.vote--vertical .vote--upvote:hover {
+	--vote-dir: to bottom;
+}
+.vote--vertical .vote--downvote:hover {
+	--vote-dir: to top;
+}
+
+.vote__score::before {
+	content: attr(data-score);
+}
+.vote__score[data-score^="-"] {
+	color: red;
+}
