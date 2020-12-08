@@ -69,7 +69,7 @@ if( in_array($template, array_keys($allowed_templates)) ) {
 			
 			$entries[0]['content'] = substr( strip_tags( $markdown_parser->parse_markdown($entries[0]['content']) ), 0, 300 );
 			
-			$sql_issues = 'SELECT id, title FROM development WHERE is_issue=? ORDER BY date_occurred DESC';
+			$sql_issues = 'SELECT id, title, is_completed FROM development WHERE is_issue=? AND (is_completed IS NULL OR is_completed < 1) ORDER BY date_occurred DESC';
 			$stmt_issues = $pdo->prepare($sql_issues);
 			$stmt_issues->execute([ 1 ]);
 			$issues = $stmt_issues->fetchAll();
