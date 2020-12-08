@@ -1,19 +1,26 @@
-.tag__wrapper {
+.tag__label {
+	background-color: hsl(var(--background--secondary));
+	box-shadow: inset 0 0 0 1px hsl(var(--background));
+	font-family: inherit;
+	font-size: inherit;
+}
+.tag__label:hover {
+	box-shadow: inset 0 0 0 1px hsl(var(--background--bold));
+	color: hsl(var(--text));
+}
+
+/* Tags wrapper */
+.tags__wrapper {
 	padding-bottom: 0;
 }
-.tag__wrapper:last-of-type {
+.tags__wrapper:last-of-type {
 	margin-bottom: -1rem;
 }
-.tag__wrapper .any__tag {
-	display: inline-block;
-	margin: 0 0.25rem 0.5rem 0;
+.tags__wrapper .h5 + .tag__container {
+	margin-top: 0.5rem;
 }
-.tag__wrapper .any__tag:last-of-type {
-	margin-bottom: 1rem;
-}
-.tag__wrapper .any__tag::before {
-	margin-right: 0;
-}
+
+/* Tag container */
 .tag__container {
 	display: inline-block;
 	margin-bottom: 1rem;
@@ -27,9 +34,17 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
-.tag--subgenre {
-	align-items: center;
+
+/* Scene tags */
+.tag--scene {
+	align-items: stretch;
 	display: flex;
+	margin-bottom: 1rem;
+}
+.tag--scene .text {
+	display: flex;
+	flex: 1;
+	margin-bottom: 0;
 }
 .tag__thumbnail {
 	align-self: stretch;
@@ -46,4 +61,104 @@
 	background-image: url('/images/36720-kote-kei.medium.png');
 	background-position: 44% 35%;
 	background-size: 280% auto;
+}
+
+/* Pin/hide */
+.tag__moderation {
+	background: none;
+	border: 1px solid hsl(var(--background));
+	border-radius: 3px;
+	box-shadow: none;
+	justify-content: center;
+	margin: 0;
+	height: 1.5rem;
+	padding: 0;
+	width: 1.5rem;
+}
+.tag__moderation ::before {
+	margin: 0 !important;
+}
+.tag--pin {
+	border-radius: 3px 0 0 3px;
+}
+.tag--pin + .tag--hide {
+	border-left-width: 0;
+	border-radius: 0 3px 3px 0;
+}
+.tag--pin:hover {
+	background: rgba(0,255,0,0.1);
+}
+.tag--hide:hover {
+	background: rgba(255,0,0,0.1);
+}
+.tag__moderation:hover * {
+	color: hsl(var(--text));
+}
+
+.tag__moderation--vertical {
+	display: flex;
+	flex-direction: column;
+}
+.tag__moderation--vertical .tag__moderation {
+	border-radius: 0;
+	border-width: 1px 0;
+	flex: 1;
+}
+.tag__moderation--vertical .tag--pin + .tag--hide {
+	border-top-width: 0;
+}
+
+/* Voting */
+.tag__voting {
+	border: 1px solid hsl(var(--background));
+	border-radius: 3px;
+	display: inline-flex;
+	line-height: 1.5rem;
+	text-align: center;
+}
+.tag--scene .tag__voting {
+	flex-direction: column;
+}
+.tag__num {
+	padding: 0 5px;
+}
+.tag__num::before {
+	content: attr(data-num-tags);
+}
+.tag__num[data-num-tags^="-"] {
+	color: red;
+}
+.tag__upvote, .tag__downvote {
+	color: hsl(var(--background--bold));
+	cursor: pointer;
+	padding: 0 5px;
+	position: initial;
+}
+.tag__upvote:hover, .tag__downvote:hover {
+	color: hsl(var(--text));
+}
+.tag__upvote:hover::after, .tag__downvote:hover::after {
+	background: linear-gradient(var(--vote-dir), var(--vote-bg), transparent);
+	bottom: 0;
+	content: "";
+	display: block;
+	left: 0;
+	pointer-events: none;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+.tag__upvote:hover {
+	--vote-bg: rgba(0,255,0,0.1);
+	--vote-dir: to right;
+}
+.tag__downvote:hover {
+	--vote-bg: rgba(255,0,0,0.1);
+	--vote-dir: to left;
+}
+.tag--scene .tag__upvote:hover {
+	--vote-dir: to bottom;
+}
+.tag--scene .tag__downvote:hover {
+	--vote-dir: to top;
 }

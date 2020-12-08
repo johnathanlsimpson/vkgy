@@ -3,6 +3,7 @@
 include_once('../php/include.php');
 
 //$migration = '20201115-development.php';
+$migration = '20201128-voting.php';
 
 $migration_file = '../migrations/'.$migration;
 
@@ -12,25 +13,33 @@ if($_SESSION['username'] === 'inartistic') {
 		
 		include_once($migration_file);
 		
-		$sql = is_array($sql) ? $sql : [ $sql ];
-		
-		if( $sql && is_array($sql) && !empty($sql) ) {
+		if( is_array($sql) || strlen($sql) ) {
 			
-			foreach($sql as $sql_line) {
+			$sql = is_array($sql) ? $sql : [ $sql ];
+			
+			if( $sql && is_array($sql) && !empty($sql) ) {
 				
-				$stmt = $pdo->prepare($sql_line);
-				
-				if($stmt->execute()) {
-					echo $sql_line.'<br />';
-					echo 'Migration completed.<br /><br />';
-				}
-				else {
-					echo $sql_line.'<br />';
-					echo 'Something went wrong.<br /><br />';
+				foreach($sql as $sql_line) {
+					
+					$stmt = $pdo->prepare($sql_line);
+					
+					if($stmt->execute()) {
+						echo $sql_line.'<br />';
+						echo 'Migration completed.<br /><br />';
+					}
+					else {
+						echo $sql_line.'<br />';
+						echo 'Something went wrong.<br /><br />';
+					}
+					
 				}
 				
 			}
 			
+		}
+		
+		else {
+			echo 'No sql set.';
 		}
 		
 	}

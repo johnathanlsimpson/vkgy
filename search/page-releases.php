@@ -372,20 +372,17 @@
 							<label class="symbol__unchecked input__radio" for="tag[0]">any tag</label>
 						</div>
 						<?php
-							$sql_tags = "SELECT * FROM tags_releases ORDER BY friendly ASC";
-							$stmt_tags = $pdo->prepare($sql_tags);
-							$stmt_tags->execute();
-							$rslt_tags = $stmt_tags->fetchAll();
+							include_once('../php/class-tag.php');
+							$access_tag = new tag($pdo);
+							$tags = $access_tag->access_tag([ 'item_type' => 'release', 'get' => 'basics', 'flat' => true ]);
 							
-							if(is_array($rslt_tags) && !empty($rslt_tags)) {
-								foreach($rslt_tags as $i => $tag) {
-									?>
-										<div class="input__group">
-											<input class="input__choice" id="tag[<?php echo $i+1; ?>]" name="tag" type="radio" value="<?php echo $tag["friendly"]; ?>" <?php echo ($search["tag"] === $tag["friendly"] ? "checked" : null); ?> />
-											<label class="symbol__unchecked input__radio" for="tag[<?php echo $i+1; ?>]"><?php echo $tag["name"]; ?></label>
-										</div>
-									<?php
-								}
+							foreach($tags as $i => $tag) {
+								?>
+									<div class="input__group">
+										<input class="input__choice" id="tag[<?php echo $i+1; ?>]" name="tag" type="radio" value="<?php echo $tag["friendly"]; ?>" <?php echo ($search["tag"] === $tag["friendly"] ? "checked" : null); ?> />
+										<label class="symbol__unchecked input__radio" for="tag[<?php echo $i+1; ?>]"><?php echo $tag["name"]; ?></label>
+									</div>
+								<?php
 							}
 						?>
 					</div>

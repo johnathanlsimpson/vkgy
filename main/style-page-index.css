@@ -664,9 +664,9 @@
 }
 .browse--artists::before,
 .browse--artists::after {
-	background-position: top 0 left -150%;
+	background-position: top 0 left -2rem;
 	background-repeat: no-repeat;
-	background-size: 90% auto;
+	background-size: auto 100%;
 	border-radius: inherit;
 	bottom: 0;
 	content: "";
@@ -678,7 +678,7 @@
 }
 .browse--artists::after {
 	background-image: url(/main/main-chibi-02.png);
-	background-position: top 10% right -200%;
+	background-position: top 0% right -2.5rem;
 }
 .browse--artists::before {
 	background-image: url(/main/main-chibi-01.png);

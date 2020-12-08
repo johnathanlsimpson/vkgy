@@ -7,13 +7,20 @@ $markdown_parser = new parse_markdown($pdo);
 $access_user = new access_user($pdo);
 $access_image = $access_image ?: new access_image($pdo);
 
+/* Get cover art for latest releases */
+$sql_covers = 'SELECT images.id, images.friendly, images.extension FROM releases LEFT JOIN images ON images.id=releases.image_id WHERE releases.image_id IS NOT NULL ORDER BY releases.date_occurred DESC LIMIT 20';
+$stmt_covers = $pdo->prepare($sql_covers);
+$stmt_covers->execute();
+$covers = $stmt_covers->fetchAll();
+shuffle($covers);
+
 /* Get VIP news */
-if($_SESSION['is_vip']) {
+/*if($_SESSION['is_vip']) {
 	$sql_vip = "SELECT vip.title, vip.friendly, vip.date_occurred, vip_views.id AS is_viewed FROM vip LEFT JOIN vip_views ON vip_views.post_id=vip.id AND vip_views.user_id=? ORDER BY vip.date_occurred DESC LIMIT 1";
 	$stmt_vip = $pdo->prepare($sql_vip);
 	$stmt_vip->execute([ $_SESSION['user_id'] ]);
 	$rslt_vip = $stmt_vip->fetch();
-}
+}*/
 
 /* Get news */
 $news = $access_blog->access_blog([ 'get' => 'list', 'limit' => 7 ]);
@@ -280,16 +287,12 @@ $stmt_vip_users->execute([ "1" ]);
 $rslt_vip_users = $stmt_vip_users->fetchAll();
 
 /* Artist tags */
-$sql_artist_tags = "SELECT COUNT(*) AS num_tagged, tags_artists.name, tags_artists.romaji, tags_artists.friendly FROM artists_tags LEFT JOIN tags_artists ON tags_artists.id=artists_tags.tag_id GROUP BY artists_tags.tag_id HAVING num_tagged > 0 ORDER BY tags_artists.friendly ASC";
-$stmt_artist_tags = $pdo->prepare($sql_artist_tags);
-$stmt_artist_tags->execute();
-$rslt_artist_tags = $stmt_artist_tags->fetchAll();
+include_once('../php/class-tag.php');
+$access_tag = new tag($pdo);
+$artist_tags = $access_tag->access_tag([ 'item_type' => 'artist', 'get' => 'basics', 'flat' => true ]);
 
 /* Release tags */
-$sql_release_tags = "SELECT COUNT(*) AS num_tagged, tags_releases.name, tags_releases.romaji, tags_releases.friendly FROM releases_tags LEFT JOIN tags_releases ON tags_releases.id=releases_tags.tag_id GROUP BY releases_tags.tag_id HAVING num_tagged > 0 ORDER BY tags_releases.friendly ASC";
-$stmt_release_tags = $pdo->prepare($sql_release_tags);
-$stmt_release_tags->execute();
-$rslt_release_tags = $stmt_release_tags->fetchAll();
+$release_tags = $access_tag->access_tag([ 'item_type' => 'release', 'get' => 'basics', 'flat' => true ]);
 
 /* News */
 

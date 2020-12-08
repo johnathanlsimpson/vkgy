@@ -153,48 +153,33 @@
 		$rslt_next = $stmt_next->fetchAll();
 		
 		// Get tags
+		// ============================================
+		include_once('../php/class-tag.php');
+		
 		$item_type = 'artist';
 		$item_id = $artist['id'];
 		
-		include_once('../tags/function-get_tags.php');
-		$tags = get_tags($pdo, $item_type, $item_id);
+		$access_tag = new tag($pdo);
+		$tags = $access_tag->access_tag([ 'item_type' => $item_type, 'item_id' => $item_id, 'get' => 'all', 'separate' => true ]);
 		
-		// Loop through tags and do some stuff
-		if(is_array($tags) && !empty($tags)) {
-			
-			$all_tags = $tags['all_tags'];
-			$current_tags = $tags['current_tags'];
-			$user_upvotes = $tags['user_upvotes'] ?: [];
-			$user_downvotes = $tags['user_downvotes'] ?: [];
-			$tag_types = $tags['tag_types'];
-			
-			// Loop through current tags and set some flags for artist
-			if(is_array($current_tags['admin']) && !empty($current_tags['admin'])) {
-				foreach($current_tags['admin'] as $numeric_key => $tag) {
+		// Loop through tags and set some flags
+		if( is_array($tags) && !empty($tags) && is_array($tags['tagged']) ) {
+			foreach($tags['tagged'] as $tag_type => $tagged_tags) {
+				foreach($tagged_tags as $tag) {
 					
 					// Set flags
 					if($tag['friendly'] === 'exclusive') {
 						$artist_is_exclusive = true;
 					}
-					if($tag['friendly'] === 'removed') {
+					else if($tag['friendly'] === 'removed') {
 						$artist_is_removed = true;
 					}
-					
-				}
-			}
-			
-			// Loop through current tags and set some flags for artist
-			if(is_array($current_tags['other']) && !empty($current_tags['other'])) {
-				foreach($current_tags['other'] as $numeric_key => $tag) {
-					
-					// Set flags
-					if($tag['friendly'] === 'non-visual') {
+					else if($tag['friendly'] === 'non-visual') {
 						$artist_is_non_visual = true;
 					}
 					
 				}
 			}
-			
 		}
 		
 		// History

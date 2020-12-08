@@ -887,21 +887,6 @@
 								</div>
 								
 							</div>
-							<style>
-								.module__card {
-									border: 0;
-								}
-								.video-card__details {
-									padding-top: 1rem;
-								}
-								.video-card__date {
-									float: right;
-									margin-left: 0.5rem;
-									text-align: right;
-								}
-								
-background:hsl(var(--background)); border-color: hsl(var(--background--bold)); flex-wrap: wrap; margin: 0 auto; max-height: none; max-width: 600px; min-width: 200px; width: 100%;
-</style>
 						<?php
 						$output = str_replace(["\n", "\t", "\r"], "", ob_get_clean());
 					}

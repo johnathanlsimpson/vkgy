@@ -636,7 +636,7 @@
 										}
 									?>
 								</table>
-
+								
 								<?php
 									if($_SESSION["is_signed_in"] && is_numeric($_SESSION["user_id"])) {
 										$sql_check = "SELECT 1 FROM users WHERE id=? AND is_vip=1 LIMIT 1";
@@ -645,26 +645,9 @@
 										$is_vip = $stmt_check->fetchColumn();
 									}
 									
-									// Get tags
-									$item_type = 'release';
-									$item_id = $release['id'];
-									include_once('../tags/function-get_tags.php');
-									$tags = get_tags($pdo, $item_type, $item_id);
-									
-									// Loop through tags and do some stuff
-									if(is_array($tags) && !empty($tags)) {
-										
-										$all_tags = $tags['all_tags'];
-										$current_tags = $tags['current_tags'];
-										$user_upvotes = $tags['user_upvotes'] ?: [];
-										$user_downvotes = $tags['user_downvotes'] ?: [];
-										$tag_types = $tags['tag_types'];
-										
-									}
 									include('../tags/partial-tags.php');
-									
 								?>
-
+								
 								<h3>
 									Contributors and updates
 								</h3>

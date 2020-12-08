@@ -1,3 +1,11 @@
+<?php
+
+script([
+	'/about/script-issues.js',
+]);
+
+?>
+
 <div class="col c2">
 	
 	<!-- Upvotes -->
@@ -61,24 +69,61 @@
 			<?php endif; ?>
 		</div>-->
 		
-		<ul class="text ">
+		<ul class="text issues__container">
 			
 			<?php foreach($issues as $issue): ?>
-				<li class="any--flex any--weaken-size" style="flex-wrap:wrap;">
-					
-					<div class="" style="flex:1;">
+				<li>
+					<form class="issue__container any--flex any--weaken-size">
 						
-						<span class="any__note"><?= '#'.$issue['id']; ?></span>
+						<div class="issue__text <?= $issue['is_completed'] ? 'issue--completed' : null; ?>">
+							<span class="any__note"><?= '#'.$issue['id']; ?></span>
+							<?= $issue['title']; ?>
+						</div>
 						
-						<?= $issue['title']; ?>
+						<div class="issue__vote">
+							
+						</div>
 						
-					<div class="h5" style="width: 100%;">
-					</div></div>
-					
+						<?php if($_SESSION['is_moderator']): ?>
+						<input name="id" value="<?= $issue['id']; ?>" hidden />
+						
+						<label class="issue__completed-label input__checkbox">
+							<input class="issue__completed input__choice" name="is_completed" type="checkbox" value="1" <?= $issue['is_completed'] ? 'checked' : null; ?> />
+							<span class="symbol__unchecked"></span>
+							<span data-role="status"></span>
+						</label>
+						<?php endif; ?>
+						
+					</form>
 				</li>
 			<?php endforeach; ?>
 			
 		</ul>
+		
+		<style>
+			.issue__container {
+				justify-content: space-between;
+			}
+			.issue--completed {
+				opacity: 0.75;
+				text-decoration: line-through;
+			}
+			.issue__completed-label {
+				margin: 0 0 0 0.5rem;
+			}
+			.issue__completed + .symbol__unchecked::before {
+				margin-right: 0 !important;
+			}
+			.issue__completed ~ [data-role="status"] {
+				margin-left: 1rem;
+			}
+			.issue__completed ~ [data-role="status"]::before {
+				opacity: 1;
+			}
+			.issue__completed ~ [data-role="status"]:not([class*="symbol"]) {
+				display: none;
+			}
+		</style>
 		
 		<?php include('partial-add_issue.php'); ?>
 		

@@ -1,64 +1,27 @@
-// Listen for permanent deletions
-/*let deleteTagElems = document.querySelectorAll('.tag__wrapper .tag__vote[data-action="permanent_delete"]');
-if(deleteTagElems && deleteTagElems.length) {
-	
-	deleteTagElems.forEach(function(deleteTagElem) {
+// Pin/hide item
+document.body.addEventListener('change', function(event) {
+	if(event.target.classList.contains('tag__pin') || event.target.classList.contains('tag__hide')) {
 		
-		// If list choice input was found, watch it for changes (a.k.a. clicks to parent)
-		if(deleteTagElem) {
-			deleteTagElem.addEventListener('click', handleTag.bind(null, deleteTagElem));
-		}
+		let pinCheckbox = event.target;
+		let pinLabel = pinCheckbox.closest('.tag__moderation');
 		
-	});
-	
-}*/
+		handlePin(pinLabel, pinCheckbox);
+		
+	}
+});
 
-// Listen for clicks on list buttons
-let tagElems = document.querySelectorAll('.tag__wrapper .tag__vote');
-if(tagElems && tagElems.length) {
+// Handle pin/hide
+function handlePin(pinLabel, pinCheckbox) {
 	
-	// Watch checkbox inside each list button, trigger handleTag when it changes
-	tagElems.forEach(function(tagElem) {
-		
-		// List choice input is probably inside the list button, but could also be outside
-		let tagChoiceElem = tagElem.querySelector('.input__choice');
-		if(!tagChoiceElem) {
-			tagChoiceElem = document.querySelector( '#' + tagElem.getAttribute('for') );
-		}
-		
-		// If list choice input was found, watch it for changes (a.k.a. clicks to parent)
-		if(tagChoiceElem) {
-			tagChoiceElem.addEventListener('change', handleTag.bind(tagElem, tagElem, tagChoiceElem));
-		}
-		
-	});
-	
-}
-
-// Handle clicks on list buttons
-function handleTag(tagElem, tagChoiceElem, event) {
-	
-	let tagId         = tagElem.dataset.tagId;
-	let itemId        = tagElem.dataset.id;
-	let itemType      = tagElem.dataset.itemType;
-	let vote          = tagElem.dataset.vote;
-	let statusElem    = tagElem.querySelector('.tag__status');
-	let numElem       = document.querySelector('.tag__wrapper .tag__num[data-tag-id="' + tagId + '"]');
-	let action        = 'add';
-	let oppositeVote  = vote === 'upvote' ? 'downvote' : 'upvote';
-	let oppositeElems;
+	let statusElem = pinLabel.querySelector('.tag__status');
+	let itemsTagsId = pinLabel.dataset.itemsTagsId;
+	let itemType = pinLabel.dataset.itemType;
+	let direction = pinLabel.dataset.direction;
+	let action = 'add';
 	
 	// Check action
-	if(tagChoiceElem && typeof tagChoiceElem !== 'undefined') {
-		action = tagChoiceElem.checked ? 'add' : 'remove';
-	}
-	
-	// If adding a vote, try to make sure opposite elements aren't checked
-	if(action === 'add') {
-		oppositeElems = document.querySelectorAll('.tag__wrapper [data-vote="' + oppositeVote + '"][data-tag-id="' + tagId + '"] .input__choice');
-		oppositeElems.forEach(function(oppositeElem) {
-			oppositeElem.checked = false;
-		});
+	if(pinCheckbox && typeof pinCheckbox !== 'undefined') {
+		action = pinCheckbox.checked ? 'add' : 'remove';
 	}
 	
 	// Set status classes
@@ -75,9 +38,76 @@ function handleTag(tagElem, tagChoiceElem, event) {
 		}, 1000);
 	}
 
-	initializeInlineSubmit($(tagElem), '/tags/function-tag.php', {
+	initializeInlineSubmit($(pinLabel), '/tags/function-pin.php', {
 		preparedFormData: {
-			'vote': vote,
+			'action': action,
+			'direction': direction,
+			'items_tags_id': itemsTagsId,
+			'item_type': itemType
+		},
+		
+		callbackOnSuccess: function(formElem, returnedData) {
+			console.log('success');
+			console.log(returnedData);
+			
+			// Reset status classes
+			if(statusElem) {
+				statusElem.classList.remove('loading', 'symbol__success');
+			}
+			
+		},
+		
+		callbackOnError: function(formElem, returnedData) {
+			console.log('error');
+			console.log(returnedData);
+		}
+	});
+	
+	
+}
+
+// Tag item
+document.body.addEventListener('change', function(event) {
+	if(event.target.classList.contains('tag__checkbox')) {
+		
+		let tagCheckbox = event.target;
+		let tagLabel = tagCheckbox.closest('.tag__label');
+		
+		handleTag(tagLabel, tagCheckbox);
+		
+	}
+});
+
+// Handle clicks on list buttons
+function handleTag(tagLabel, tagCheckbox, event) {
+	
+	let tagId      = tagLabel.dataset.tagId;
+	let itemId     = tagLabel.dataset.id;
+	let itemType   = tagLabel.dataset.itemType;
+	let statusElem = tagLabel.querySelector('.tag__status');
+	let action     = 'add';
+	
+	// Check action
+	if(tagCheckbox && typeof tagCheckbox !== 'undefined') {
+		action = tagCheckbox.checked ? 'add' : 'remove';
+	}
+	
+	// Set status classes
+	if(statusElem) {
+		statusElem.classList.remove('success');
+		statusElem.classList.add('loading');
+		setTimeout(function() {
+			
+			if(statusElem) {
+				statusElem.classList.remove('loading');
+				statusElem.classList.remove('symbol__success');
+			}
+			
+		}, 1000);
+	}
+
+	initializeInlineSubmit($(tagLabel), '/tags/function-tag.php', {
+		preparedFormData: {
 			'action': action,
 			'id': itemId,
 			'tag_id': tagId,
@@ -85,47 +115,20 @@ function handleTag(tagElem, tagChoiceElem, event) {
 		},
 		
 		callbackOnSuccess: function(formElem, returnedData) {
-			
-			// Debug
-			//console.log(vote + action);
-			//console.log(returnedData);
+			console.log('success');
+			console.log(returnedData);
 			
 			// Reset status classes
 			if(statusElem) {
-				statusElem.classList.remove('loading');
-				statusElem.classList.remove('symbol__success');
-			}
-			
-			// Update num upvotes
-			if(numElem) {
-				numElem.dataset.numTags = returnedData.num_upvotes;
-			}
-			
-			// Hide element if necessary
-			if(returnedData.hide_element) {
-				
-				tagElem.setAttribute('disabled', true);
-				
-				setTimeout(function() {
-					tagElem.classList.add('any--fade-out');
-				}, 1000);
-				
-				setTimeout(function() {
-					tagElem.style.width = '0px';
-					tagElem.style.marginRight = '-13px';
-					tagElem.style.overflow = 'hidden';
-					tagElem.style.paddingRight = '0px';
-					tagElem.style.pointerEvents = 'none';
-					tagElem.style.whiteSpace = 'nowrap';
-				}, 1300);
-				
+				statusElem.classList.remove('loading', 'symbol__success', 'symbol__plus');
+				statusElem.classList.add(action === 'add' ? 'symbol__tag' : 'symbol__plus');
 			}
 			
 		},
 		
 		callbackOnError: function(formElem, returnedData) {
-			//console.log('error');
-			//console.log(returnedData);
+			console.log('error');
+			console.log(returnedData);
 		}
 	});
 

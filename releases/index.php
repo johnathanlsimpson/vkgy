@@ -55,40 +55,29 @@
 			$needs_traversal_notice = true;
 		}
 		
-		// Tags
-		$sql_tags = "SELECT * FROM tags_releases ORDER BY friendly ASC";
-		$stmt_tags = $pdo->prepare($sql_tags);
-		$stmt_tags->execute();
-		$rslt_tags = $stmt_tags->fetchAll();
+		// Get tags
+		// ============================================
+		include_once('../php/class-tag.php');
 		
-		$sql_curr_tags = "SELECT tags_releases.*, COUNT(releases_tags.id) AS num_times_tagged FROM releases_tags LEFT JOIN tags_releases ON tags_releases.id=releases_tags.tag_id WHERE releases_tags.release_id=? GROUP BY releases_tags.tag_id";
-		$stmt_curr_tags = $pdo->prepare($sql_curr_tags);
-		$stmt_curr_tags->execute([ $release["id"] ]);
-		$rslt_curr_tags = $stmt_curr_tags->fetchAll();
+		$item_type = 'release';
+		$item_id = $release['id'];
 		
-		/*if($_SESSION['is_signed_in']) {
-			$sql_user_tags = 'SELECT tag_id FROM releases_tags WHERE release_id=? AND user_id=?';
-			$stmt_user_tags = $pdo->prepare($sql_user_tags);
-			$stmt_user_tags->execute([ $release['id'], $_SESSION['user_id'] ]);
-			$rslt_user_tags = $stmt_user_tags->fetchAll();
-			$num_user_tags = count($rslt_user_tags);
-			
-			for($i=0; $i<$num_user_tags; $i++) {
-				$user_tags[ $rslt_user_tags[$i]['tag_id'] ] = true;
-			}
-		}*/
+		$access_tag = new tag($pdo);
+		$tags = $access_tag->access_tag([ 'item_type' => $item_type, 'item_id' => $item_id, 'get' => 'all', 'separate' => true ]);
 		
-		if(is_array($rslt_curr_tags['admin']) && !empty($rslt_curr_tags['admin'])) {
-			foreach($rslt_curr_tags['admin'] as $tag) {
-				$needs_admin_tags = $needs_admin_tags ?: ($tag["is_admin_tag"] ?: false);
-				$rslt_curr_tag_ids[] = $tag["id"];
-				
-				if($tag['friendly'] === 'exclusive') {
-					$release_is_exclusive = true;
-				}
-				
-				if($tag['friendly'] === 'removed') {
-					$release_is_removed = true;
+		// Loop through tags and set some flags
+		if( is_array($tags) && !empty($tags) && is_array($tags['tagged']) ) {
+			foreach($tags['tagged'] as $tag_type => $tagged_tags) {
+				foreach($tagged_tags as $tag) {
+					
+					// Set flags
+					if($tag['friendly'] === 'exclusive') {
+						$release_is_exclusive = true;
+					}
+					else if($tag['friendly'] === 'removed') {
+						$release_is_removed = true;
+					}
+					
 				}
 			}
 		}

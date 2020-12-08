@@ -21,14 +21,14 @@ elseif($activity_filter === 'edits') {
 }
 elseif($activity_tables === 'other') {
 	$activity_tables = [
-		'artists_tags',
+		//'artists_tags',
 		'comments_likes',
 		'images',
 		'lives',
 		'lives_livehouses',
 		'releases_collections',
 		'releases_ratings',
-		'releases_tags',
+		//'releases_tags',
 		'releases_wants',
 		'videos'
 	];
@@ -36,7 +36,7 @@ elseif($activity_tables === 'other') {
 else {
 	$activity_tables = [
 		'artists',
-		'artists_tags',
+		//'artists_tags',
 		'blog',
 		'comments',
 		'comments_likes',
@@ -50,19 +50,19 @@ else {
 		'releases',
 		'releases_collections',
 		'releases_ratings',
-		'releases_tags',
+		//'releases_tags',
 		'releases_wants',
 		'videos'
 	];
 }
 
 $group_activity_by = [
-	'artists_tags' => 'artist_id',
+	//'artists_tags' => 'artist_id',
 	'edits_artists' => 'artist_id',
 	'edits_labels' => 'label_id',
 	'edits_musicians' => 'musician_id',
 	'edits_releases' => 'release_id',
-	'releases_tags' => 'release_id',
+	//'releases_tags' => 'release_id',
 ];
 
 foreach($activity_tables as $activity_table) {
