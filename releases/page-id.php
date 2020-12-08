@@ -645,6 +645,7 @@
 										$is_vip = $stmt_check->fetchColumn();
 									}
 									
+									$item_type = 'release';
 									include('../tags/partial-tags.php');
 								?>
 								
