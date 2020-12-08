@@ -64,9 +64,11 @@ include_once('../lists/function-render_lists.php');
 				}
 			}
 			else {
-				if(is_array($rslt_curr_tags) && !empty($rslt_curr_tags)) {
-					foreach($rslt_curr_tags as $curr_tag) {
-						if($curr_tag['friendly'] === 'foreign') {
+				
+				// Check if artist is foreign
+				if( is_array($tags) && is_array($tags['tagged']['other']) ) {
+					foreach($tags['tagged']['other'] as $tag) {
+						if($tag['friendly'] === 'foreign') {
 							$artist_is_foreign = true;
 							break;
 						}
@@ -84,17 +86,17 @@ include_once('../lists/function-render_lists.php');
 	</div>
 	
 	<?php
-		if( !$artist_is_non_visual && ( is_array($current_tags) && is_array($current_tags['subgenres']) && !empty($current_tags['subgenres']) ) ) {
+		if( !$artist_is_non_visual && is_array($tags['tagged']['scenes']) ) {
 			?>
 				<div class="data__item">
 					<h5>
-						<?= lang('Subgenres', 'V系ジャンル', 'hidden'); ?>
+						<?= lang('scenes', 'V系ジャンル', 'hidden'); ?>
 					</h5>
 					<?php
-						$num_subgenres = count($current_tags['subgenres']);						
-						foreach($current_tags['subgenres'] as $tag_key => $tag) {
+						$num_scenes = count($tags['tagged']['scenes']);
+						foreach($tags['tagged']['scenes'] as $tag_key => $tag) {
 							echo '<a href="/search/artists/?tags[]='.$tag['friendly'].'">'.str_replace( [' kei', '&#31995;' ], '', lang($tag['romaji'] ?: $tag['name'], $tag['name'], 'hidden') ).'</a>';
-							echo $tag_key + 1 < $num_subgenres ? '<span class="any--weaken">,</span> ' : null;
+							echo $tag_key + 1 < $num_scenes ? '<span class="any--weaken">,</span> ' : null;
 						}
 					?>
 				</div>

@@ -203,18 +203,15 @@
 						</label>
 						
 						<?php
-							$sql_tags = "SELECT * FROM tags_artists ORDER BY friendly ASC";
-							$stmt_tags = $pdo->prepare($sql_tags);
-							$stmt_tags->execute();
-							$rslt_tags = $stmt_tags->fetchAll();
+							include_once('../php/class-tag.php');
+							$access_tag = new tag($pdo);
+							$tags = $access_tag->access_tag([ 'item_type' => 'artist', 'get' => 'basics', 'flat' => true ]);
 							
-							if(is_array($rslt_tags) && !empty($rslt_tags)) {
-								foreach($rslt_tags as $i => $tag) {
-									?>
-										<input class="input__choice" id="tags[<?php echo $i+1; ?>]" name="tags[]" type="checkbox" value="<?php echo $tag["friendly"]; ?>" <?php echo (is_array($search["tags"]) && in_array($tag["friendly"], $search["tags"]) ? "checked" : null); ?> />
-										<label class="symbol__checkbox--unchecked input__radio" for="tags[<?php echo $i+1; ?>]"><?php echo $tag["romaji"] ?: $tag["name"]; ?></label>
-									<?php
-								}
+							foreach($tags as $i => $tag) {
+								?>
+									<input class="input__choice" id="tags[<?= $i+1; ?>]" name="tags[]" type="checkbox" value="<?= $tag["friendly"]; ?>" <?= (is_array($search["tags"]) && in_array($tag["friendly"], $search["tags"]) ? "checked" : null); ?> />
+									<label class="symbol__checkbox--unchecked input__radio" for="tags[<?= $i+1; ?>]"><?= $tag["romaji"] ?: $tag["name"]; ?></label>
+								<?php
 							}
 						?>
 					</div>

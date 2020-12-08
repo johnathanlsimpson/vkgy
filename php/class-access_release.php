@@ -397,7 +397,7 @@
 			}
 			// [PRE-SELECT] Tag
 			if(strlen($args["tag"]) > 0) {
-				$sql_pre = "SELECT releases_tags.release_id AS id FROM tags_releases LEFT JOIN releases_tags ON releases_tags.tag_id=tags_releases.id WHERE tags_releases.friendly=? GROUP BY releases_tags.release_id";
+				$sql_pre = "SELECT releases_tags.release_id AS id FROM tags_releases LEFT JOIN releases_tags ON releases_tags.tag_id=tags_releases.id WHERE ((releases_tags.mod_score>-1 AND releases_tags.score>0) OR releases_tags.mod_score=1) AND tags_releases.friendly=? GROUP BY releases_tags.release_id";
 				$stmt_pre = $this->pdo->prepare($sql_pre);
 				$stmt_pre->execute([ sanitize($args["tag"]) ]);
 				$rslt_pre = $stmt_pre->fetchAll();

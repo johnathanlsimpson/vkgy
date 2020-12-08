@@ -20,37 +20,34 @@
 		$musician = $access_musician->access_musician(["id" => $musician_id, "get" => "all"]);
 		
 		// Get tags
+		// ============================================
+		include_once('../php/class-tag.php');
+		
 		$item_type = 'musician';
 		$item_id = $musician['id'];
-		include_once('../tags/function-get_tags.php');
-		$tags = get_tags($pdo, $item_type, $item_id);
 		
-		// Loop through tags and do some stuff
-		if(is_array($tags) && !empty($tags)) {
-			
-			$all_tags = $tags['all_tags'];
-			$current_tags = $tags['current_tags'];
-			$user_upvotes = $tags['user_upvotes'] ?: [];
-			$user_downvotes = $tags['user_downvotes'] ?: [];
-			$tag_types = $tags['tag_types'];
-			
-			// Loop through current tags and set some flags for artist
-			if(is_array($current_tags['admin']) && !empty($current_tags['admin'])) {
-				foreach($current_tags['admin'] as $numeric_key => $tag) {
+		$access_tag = new tag($pdo);
+		$tags = $access_tag->access_tag([ 'item_type' => $item_type, 'item_id' => $item_id, 'get' => 'all', 'separate' => true ]);
+		
+		// Loop through tags and set some flags
+		if( is_array($tags) && !empty($tags) && is_array($tags['tagged']) ) {
+			foreach($tags['tagged'] as $tag_type => $tagged_tags) {
+				foreach($tagged_tags as $tag) {
 					
 					// Set flags
 					if($tag['friendly'] === 'exclusive') {
 						$musician_is_exclusive = true;
 					}
-					if($tag['friendly'] === 'removed') {
+					else if($tag['friendly'] === 'removed') {
 						$musician_is_removed = true;
 					}
 					
 				}
 			}
-			
 		}
 		
+		// Navigation
+		// ============================================
 		if(is_array($musician) && !empty($musician)) {
 			breadcrumbs([$musician["quick_name"] => "/musicians/".$musician["friendly"]."/"]);
 			

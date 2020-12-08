@@ -287,16 +287,12 @@ $stmt_vip_users->execute([ "1" ]);
 $rslt_vip_users = $stmt_vip_users->fetchAll();
 
 /* Artist tags */
-$sql_artist_tags = "SELECT COUNT(*) AS num_tagged, tags_artists.name, tags_artists.romaji, tags_artists.friendly FROM artists_tags LEFT JOIN tags_artists ON tags_artists.id=artists_tags.tag_id GROUP BY artists_tags.tag_id HAVING num_tagged > 0 ORDER BY tags_artists.friendly ASC";
-$stmt_artist_tags = $pdo->prepare($sql_artist_tags);
-$stmt_artist_tags->execute();
-$rslt_artist_tags = $stmt_artist_tags->fetchAll();
+include_once('../php/class-tag.php');
+$access_tag = new tag($pdo);
+$artist_tags = $access_tag->access_tag([ 'item_type' => 'artist', 'get' => 'basics', 'flat' => true ]);
 
 /* Release tags */
-$sql_release_tags = "SELECT COUNT(*) AS num_tagged, tags_releases.name, tags_releases.romaji, tags_releases.friendly FROM releases_tags LEFT JOIN tags_releases ON tags_releases.id=releases_tags.tag_id GROUP BY releases_tags.tag_id HAVING num_tagged > 0 ORDER BY tags_releases.friendly ASC";
-$stmt_release_tags = $pdo->prepare($sql_release_tags);
-$stmt_release_tags->execute();
-$rslt_release_tags = $stmt_release_tags->fetchAll();
+$release_tags = $access_tag->access_tag([ 'item_type' => 'release', 'get' => 'basics', 'flat' => true ]);
 
 /* News */
 

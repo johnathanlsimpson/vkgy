@@ -587,7 +587,7 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 		</h3>
 		<div class="text text--outlined" style="white-space:normal;">
 			<?php
-				foreach($rslt_artist_tags as $tag) {
+				foreach($artist_tags as $tag) {
 					echo '<span class="main__tag" style="white-space:nowrap;margin-right:1.5ch;"><a href="/search/artists/?tags[]='.$tag["friendly"].'#result">'.lang(($tag["romaji"] ?: $tag["name"]), $tag['name'], ['secondary_class' => 'any--hidden']).'</a> <span class="any--weaken">&#215;'.$tag["num_tagged"].'</span></span> ';
 				}
 			?>
@@ -599,7 +599,7 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 		</h3>
 		<div class="text text--outlined">
 			<?php
-				foreach($rslt_release_tags as $tag) {
+				foreach($release_tags as $tag) {
 					echo '<span class="main__tag" style="white-space:nowrap;margin-right:1.5ch;"><a href="/search/releases/?tag='.$tag["friendly"].'#result">'.lang(($tag["romaji"] ?: $tag["name"]), $tag['name'], ['secondary_class' => 'any--hidden']).'</a> <span class="any--weaken">&#215;'.$tag["num_tagged"].'</span></span> ';
 				}
 			?>

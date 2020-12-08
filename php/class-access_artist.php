@@ -162,6 +162,7 @@
 			}
 			
 			if(is_array($artist_ids) && !empty($artist_ids)) {
+				
 				// Get label info for provided artist IDs
 				$sql_artist_labels = 'SELECT label_history FROM artists WHERE '.substr(str_repeat('id=? OR ', count($artist_ids)), 0, -4);
 				$stmt_artist_labels = $this->pdo->prepare($sql_artist_labels);
@@ -190,11 +191,19 @@
 							}
 						}
 					}
+					
 				}
 				
 				// Get tag info for provided artist IDs
 				if($type != 'label') {
-					$sql_artist_tags = 'SELECT a.artist_id FROM artists_tags LEFT JOIN artists_tags a ON a.tag_id=artists_tags.tag_id WHERE '.substr(str_repeat('artists_tags.artist_id=? OR ', count($artist_ids)), 0, -4);
+					
+					$sql_artist_tags = '
+						SELECT a.artist_id 
+						FROM artists_tags 
+						LEFT JOIN artists_tags a ON a.tag_id=artists_tags.tag_id 
+						WHERE 
+							( (artists_tags.mod_score>-1 AND artists_tags.score>0) OR (artists_tags.mod_score=1) )
+							AND ('.substr(str_repeat('artists_tags.artist_id=? OR ', count($artist_ids)), 0, -4).')';
 					$stmt_artist_tags = $this->pdo->prepare($sql_artist_tags);
 					$stmt_artist_tags->execute($artist_ids);
 					$rslt_artist_tags = $stmt_artist_tags->fetchAll();
@@ -817,9 +826,14 @@
 			if($args['vkei_only']) {
 				
 				// Get list of non-vkei artists and exclude these IDs from the search
-				$sql_non_vkei = 'SELECT artists.id FROM artists_tags LEFT JOIN artists ON artists.id=artists_tags.artist_id WHERE artists_tags.tag_id=? AND artists_tags.user_agrees>? GROUP BY artists.id';
+				$sql_non_vkei = '
+					SELECT artists_tags.artist_id AS id
+					FROM tags_artists
+					LEFT JOIN artists_tags ON artists_tags.tag_id=tags_artists.id
+					WHERE tags_artists.friendly=? AND ((artists_tags.score>? AND artists_tags.mod_score>?) OR artists_tags.mod_score>?)
+				';
 				$stmt_non_vkei = $this->pdo->prepare($sql_non_vkei);
-				$stmt_non_vkei->execute([ 16, -1 ]);
+				$stmt_non_vkei->execute([ 'non-visual', 0, -1, 0 ]);
 				$rslt_non_vkei = $stmt_non_vkei->fetchAll(PDO::FETCH_COLUMN);
 				$args['exclude'] = $rslt_non_vkei;
 				
@@ -958,7 +972,7 @@
 			if(is_array($args["tags"]) && !empty($args["tags"])) {
 				foreach($args["tags"] as $i => $tag) {
 					if(strlen($tag) > 0) {
-						$sql_pre = "SELECT artists_tags.artist_id AS id FROM tags_artists LEFT JOIN artists_tags ON artists_tags.tag_id=tags_artists.id WHERE tags_artists.friendly=? GROUP BY artists_tags.artist_id";
+						$sql_pre = "SELECT artists_tags.artist_id AS id FROM tags_artists LEFT JOIN artists_tags ON artists_tags.tag_id=tags_artists.id WHERE ((artists_tags.score>0 AND artists_tags.mod_score>-1) OR artists_tags.mod_score=1) AND tags_artists.friendly=? GROUP BY artists_tags.artist_id";
 						$stmt_pre = $this->pdo->prepare($sql_pre);
 						$stmt_pre->execute([ friendly($tag) ]);
 						$rslt_pre = $stmt_pre->fetchAll();
@@ -1079,7 +1093,7 @@
 			}
 			if(!is_array($args['area']) && strlen($args['area'])) {
 				if($args['area'] === 'overseas') {
-					$sql_where[] = 'artists_tags.tag_id=?';
+					$sql_where[] = 'artists_tags.tag_id=? AND ((artists_tags.score>0 AND artists_tags.mod_score>-1) OR artists_tags.mod_score=1)';
 					$sql_values[] = 18;
 					$sql_from = 'artists_tags';
 					$sql_join[] = 'LEFT JOIN artists ON artists.id=artists_tags.artist_id';
@@ -1144,7 +1158,7 @@
 			
 			// Get tags
 			if($args['get'] === 'artist_list' || $args['get'] === 'basics') {
-				$sql_join[] = 'LEFT JOIN artists_tags ON artists_tags.artist_id=artists.id AND artists_tags.mod_agrees>=0 AND artists_tags.user_agrees>0';
+				$sql_join[] = 'LEFT JOIN artists_tags ON artists_tags.artist_id=artists.id AND ((artists_tags.mod_score>-1 AND artists_tags.score>0) OR artists_tags.mod_score>0)';
 				$sql_join[] = 'LEFT JOIN tags_artists ON tags_artists.id=artists_tags.tag_id';
 				$sql_group[] = 'artists.id';
 			}
