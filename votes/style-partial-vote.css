@@ -1,4 +1,5 @@
 .vote__container {
+	background: hsl(var(--background--secondary));
 	border: 1px solid hsl(var(--background));
 	border-radius: 3px;
 	display: inline-flex;
