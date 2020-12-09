@@ -1,5 +1,10 @@
 <?php
 
+include_once('../votes/function-render_vote.php');
+include_once('../php/class-vote.php');
+
+$vote = new vote($pdo);
+
 script([
 	'/about/script-issues.js',
 ]);
@@ -8,7 +13,7 @@ script([
 
 <div class="col c2">
 	
-	<!-- Upvotes -->
+	<!-- Updates -->
 	<div>
 		
 		<h2>
@@ -69,22 +74,18 @@ script([
 			<?php endif; ?>
 		</div>-->
 		
-		<ul class="text issues__container">
+		<ul class="text text--outlined issues__container">
 			
 			<?php foreach($issues as $issue): ?>
 				<li>
 					<form class="issue__container any--flex any--weaken-size">
 						
-						<div class="issue__text <?= $issue['is_completed'] ? 'issue--completed' : null; ?>">
+						<div class="issue__text <?= $issue['is_completed'] ? 'issue--completed' : null; ?>" style="margin-right:auto;">
 							<span class="any__note"><?= '#'.$issue['id']; ?></span>
 							<?= $issue['title']; ?>
 						</div>
 						
-						<div class="issue__vote">
-							
-						</div>
-						
-						<?php if($_SESSION['is_moderator']): ?>
+						<?php /*if($_SESSION['is_moderator']): ?>
 						<input name="id" value="<?= $issue['id']; ?>" hidden />
 						
 						<label class="issue__completed-label input__checkbox">
@@ -92,7 +93,24 @@ script([
 							<span class="symbol__unchecked"></span>
 							<span data-role="status"></span>
 						</label>
-						<?php endif; ?>
+						<?php endif;*/ ?>
+						
+						<div class="issue__vote">
+							<?php
+								$item_type = 'development';
+								$item_id = $issue['id'];
+								$issue['votes'] = $vote->access_vote([ 'item_type' => $item_type, 'item_id' => $item_id, 'get' => 'basics' ])[0];
+								
+								echo render_component($vote_template, [
+									//'direction_class' => 'vote--vertical',
+									'item_id' => $item_id,
+									'item_type' => $item_type,
+									'upvote_is_checked' => $issue['votes']['user_score'] > 0 ? 'checked' : null,
+									'downvote_is_checked' => $issue['votes']['user_score'] < 0 ? 'checked' : null,
+									'score' => $issue['votes']['score'] ?: 0,
+								]);
+							?>
+						</div>
 						
 					</form>
 				</li>
