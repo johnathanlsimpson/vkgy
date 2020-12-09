@@ -29,7 +29,7 @@
 				
 				// If flyers were uploaded to DB, add line about it (or increase count if line already added)
 				if($args["type"] === "flyer") {
-					$sql_curr_log = "SELECT * FROM vip WHERE friendly=? LIMIT 1";
+					$sql_curr_log = "SELECT * FROM development WHERE friendly=? LIMIT 1";
 					$stmt_curr_log = $pdo->prepare($sql_curr_log);
 					$stmt_curr_log->execute([ $friendly ]);
 					$rslt_curr_log = $stmt_curr_log->fetch();
@@ -41,7 +41,7 @@
 				}
 				
 				// Get current VIP post if it exists
-				$sql_curr_post = 'SELECT * FROM vip WHERE friendly=? LIMIT 1';
+				$sql_curr_post = 'SELECT * FROM development WHERE friendly=? LIMIT 1';
 				$stmt_curr_post = $pdo->prepare($sql_curr_post);
 				$stmt_curr_post->execute([ $friendly ]);
 				$rslt_curr_post = $stmt_curr_post->fetch();
@@ -53,14 +53,14 @@
 					if(strpos($updated_content, $content) === false) {
 						$updated_content .= "\n".$content;
 						
-						// Since entry was updated, make sure it shows as new for everyone
+						/*// Since entry was updated, make sure it shows as new for everyone
 						$sql_views = 'DELETE FROM vip_views WHERE post_id=?';
 						$stmt_views = $pdo->prepare($sql_views);
-						$stmt_views->execute([ $rslt_curr_post['id'] ]);
+						$stmt_views->execute([ $rslt_curr_post['id'] ]);*/
 					}
 				}
 				
-				$sql_log_commit = "INSERT INTO vip (title, friendly, content, user_id) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE content=?";
+				$sql_log_commit = "INSERT INTO development (title, friendly, content, user_id) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE content=?";
 				$stmt_log_commit = $pdo->prepare($sql_log_commit);
 				
 				if($stmt_log_commit->execute([ $title, $friendly, $header.$content, $user_id, $updated_content ])) {
