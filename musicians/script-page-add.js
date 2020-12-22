@@ -8,3 +8,6 @@ lookForSelectize();
 initializeInlineSubmit($("[name=form__add]"), "/musicians/function-add.php", {
 	submitOnEvent : "submit"
 });
+
+// Init inputmask() on appropriate elements
+$(":input").inputmask();
