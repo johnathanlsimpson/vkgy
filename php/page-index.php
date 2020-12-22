@@ -67,7 +67,7 @@
 		
 		<?php display_styles(); ?>
 		
-		<script data-ad-client="ca-pub-5797371558296978" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+		<?= !$_SESSION['is_vip'] || $_SESSION['username'] === 'inartistic' ? '<script data-ad-client="ca-pub-5797371558296978" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>' : null; ?>
 	</head>
 	<body class="<?php echo $body_class; ?>">
 		
