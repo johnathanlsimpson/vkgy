@@ -6,6 +6,7 @@
 		"/scripts/external/script-autosize.js",
 		"/scripts/external/script-selectize.js",
 		'/scripts/external/script-tribute.js',
+		'/scripts/external/script-inputmask.js',
 		
 		"/scripts/script-showElem.js",
 		"/scripts/script-initDelete.js",
@@ -39,6 +40,7 @@
 							render_json_list('artist');
 							render_json_list('musician', $artist['musicians']);
 							render_json_list('release', $artist['id'], 'artist_id');
+							render_json_list('area', $areas);
 						?>
 						
 						<input id="form__changes" name="changes" type="hidden" />
@@ -426,12 +428,22 @@
 																	
 																	<div class="input__group">
 																		<label class="input__label">Birth date</label>
-																		<input name="musicians[<?php echo $m; ?>][birth_date]" placeholder="yyyy-mm-dd" value="<?php echo $musician["birth_date"]; ?>" />
+																		<input data-inputmask="'alias': '99-99'" max-length="5" name="musicians[<?= $m; ?>][birth_date]" placeholder="mm-dd" size="8" value="<?= substr($musician['birth_date'], 5) ?: null; ?>" />
+																	</div>
+																	
+																	<div class="input__group">
+																		<label class="input__label">Birth year</label>
+																		<input data-inputmask="'alias': '[A99][9999]','greedy':false" max-length="4" name="musicians[<?= $m; ?>][birth_year]" placeholder="yyyy" size="8" value="<?= $musician['birth_date'] > '0001' ? substr($musician['birth_date'], 0, 4) : null; ?>" />
 																	</div>
 																	
 																	<div class="input__group">
 																		<label class="input__label">Home area</label>
-																		<input name="musicians[<?php echo $m; ?>][birthplace]" placeholder="eg. Tokyo (東京)" value="<?php echo $musician["birthplace"]; ?>" />
+																		
+																		<select class="input" data-source="areas" name="musicians[<?= $m; ?>][birthplace]">
+																			<option value="">unknown</option>
+																			<?= is_numeric($musician['birthplace']) ? '<option value="'.$musician['birthplace'].'" selected></option>' : null; ?>
+																		</select>
+																		
 																	</div>
 																</div>
 															</li>

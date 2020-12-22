@@ -107,11 +107,11 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 					if(!empty($musician["name"])) {
 
 						// Format musician birthdate
-						if(strlen($musician['birth_date'])) {
-							$b = $musician['birth_date'];
-
+						if( strlen($musician['birth_year']) || strlen($musician['birth_date']) ) {
+							
+							$b = $musician['birth_year'].( strlen($musician['birth_year']) && strlen($musician['birth_date']) ? '-' : null ).$musician['birth_date'];
+							
 							if(preg_match('/'.'^\d{4}-\d{2}-\d{2}$'.'/', $b)) {
-
 							}
 							elseif(preg_match('/'.'^\d{2}-\d{2}$'.'/', $b)) {
 								$b = '0000-'.$b;
@@ -122,10 +122,13 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 							elseif(preg_match('/'.'^[Hh](\d{2})'.'/', $b, $match)) {
 								$b = str_replace($match[0], $match[1] + 1988, $b);
 							}
+							elseif(preg_match('/'.'^[Rr](\d{2})'.'/', $b, $match)) {
+								$b = str_replace($match[0], $match[1] + 2019, $b);
+							}
 							if(preg_match('/'.'^\d{4}$'.'/', $b)) {
 								$b .= '-00-00';
 							}
-
+							
 							$musician['birth_date'] = $b;
 						}
 

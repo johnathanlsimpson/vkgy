@@ -1,3 +1,7 @@
+// Init inputmask() on appropriate elements
+$(":input").inputmask();
+
+
 // Auto-size textareas
 autosize($(".autoresize"));
 
