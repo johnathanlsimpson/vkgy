@@ -95,6 +95,19 @@
 				foreach($commits as $commit) {
 					$content = trim($commit["message"]);
 					
+					// Add folders affected to commit message
+					$files_affected = $commit['modified'];
+					
+					if( is_array($files_affected) && !empty($files_affected) ) {
+						
+						// Only save folder name
+						foreach($files_affected as $file_key => $file) {
+							$files_affected[$file_key] = reset(explode('/', $file));
+						}
+						
+						$content .= "\n\n".' ('.implode(', ', $files_affected).')';
+					}
+					
 					if($array_payload['ref'] === 'refs/heads/master' && strpos($content, 'Merge') !== 0) {
 						if(strlen($commit['author']['email'])) {
 							$sql_user = "SELECT id FROM users WHERE email=? LIMIT 1";
@@ -106,10 +119,10 @@
 						$user_id = is_numeric($user_id) ? $user_id : 1;
 						
 						if(update_development($pdo, ["content" => $content, "user_id" => $user_id])) {
-							file_put_contents('deploy/log.txt', date("Y-m-d H:i:s").' Success updating VIP section.', FILE_APPEND | LOCK_EX);
+							file_put_contents('deploy/log.txt', date("Y-m-d H:i:s").' Success updating development section.', FILE_APPEND | LOCK_EX);
 						}
 						else {
-							file_put_contents('deploy/log.txt', date("Y-m-d H:i:s").' Error updating VIP section.', FILE_APPEND | LOCK_EX);
+							file_put_contents('deploy/log.txt', date("Y-m-d H:i:s").' Error updating development section.', FILE_APPEND | LOCK_EX);
 						}
 					}
 				}

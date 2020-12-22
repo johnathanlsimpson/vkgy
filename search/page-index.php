@@ -1,3 +1,11 @@
+<?php
+foreach(['artists', 'labels', 'musicians', 'posts', 'releases'] as $key) {
+	if(!is_array($results[$key])) {
+		$results[$key] = [];
+	}
+}
+?>
+
 <div class="col c1">
 	<div>
 		<h2>
@@ -60,10 +68,10 @@
 							<span class="symbol__artist"></span>
 							Artists
 						</h3>
-						<input class="obscure__input" id="obscure-artists" type="checkbox" <?php echo count($results["artists"]) > 10 ? 'checked' : null; ?> />
+						<input class="obscure__input" id="obscure-artists" type="checkbox" <?php echo is_array($results['artists']) && count($results["artists"]) > 10 ? 'checked' : null; ?> />
 						<div class="obscure__container obscure--faint">
 							<?php
-								if(count($results["artists"]) > 0) {
+								if(is_array($results['artists']) && count($results["artists"]) > 0) {
 									$result = $results["artists"];
 									?>
 										<?php
@@ -79,7 +87,7 @@
 									echo '<div class="text text--outlined" style="margin-top: -2rem;">No artists found. Try an <a href="/search/artists/">advanced artist search</a>.</div>';
 								}
 							?>
-							<label class="input__button obscure__button" for="obscure-artists">Show <?php echo count($result) - 3; ?> more</label>
+							<label class="input__button obscure__button" for="obscure-artists">Show <?php echo is_array($result) ? count($result) - 3 : 0; ?> more</label>
 						</div>
 					</div>
 					
@@ -93,7 +101,7 @@
 								<input class="obscure__input" id="obscure-labels" type="checkbox" <?php echo count($results["labels"]) > 10 ? 'checked' : null; ?> />
 								<div class="text text--outlined obscure__container obscure--faint">
 									<?php
-										if(count($results["labels"]) > 0) {
+										if(is_array($results['labels']) && count($results["labels"]) > 0) {
 											$result = $results["labels"];
 											?>
 												<ul>
@@ -113,7 +121,7 @@
 											echo 'No labels found.';
 										}
 									?>
-									<label class="input__button obscure__button" for="obscure-labels">Show <?php echo count($result) - 3; ?> more</label>
+									<label class="input__button obscure__button" for="obscure-labels">Show <?php echo is_array($result) ? count($result) - 3 : 0; ?> more</label>
 								</div>
 							</div>
 							
@@ -124,7 +132,7 @@
 								</h3>
 								<div class="text text--outlined">
 									<?php
-										if(count($results["musicians"]) > 0) {
+										if(is_array($results['musicians']) && count($results["musicians"]) > 0) {
 											$result = $results["musicians"];
 											?>
 												<ul class="ul ul--inline">
@@ -156,7 +164,7 @@
 							<input class="obscure__input" id="obscure-release" name="obscure-release" type="checkbox" <?php echo count($results["releases"]) > 10 ? 'checked' : null; ?> />
 							<div class="text obscure__container">
 								<?php
-									if(count($results["releases"]) > 0) {
+									if(is_array($results['releases']) && count($results["releases"]) > 0) {
 										$result = $results["releases"];
 										?>
 											<ul class="ul">
@@ -183,7 +191,7 @@
 										echo 'No releases found. Try an <a href="/search/releases/">advanced release search</a>.';
 									}
 								?>
-								<label class="obscure__button input__button" for="obscure-release">Show <?php echo count($result) - 3; ?> more</label>
+								<label class="obscure__button input__button" for="obscure-release">Show <?php echo is_array($result) ? count($result) - 3 : 0; ?> more</label>
 							</div>
 						</div>
 						
@@ -194,7 +202,7 @@
 							<input class="obscure__input" id="obscure-posts" type="checkbox" <?php echo count($results["posts"]) > 10 ? 'checked' : null; ?> />
 							<div class="text obscure__container">
 								<?php
-									if(count($results["posts"]) > 0) {
+									if(is_array($results['posts']) && count($results["posts"]) > 0) {
 										$result = $results["posts"];
 										?>
 											<ul class="ul">
@@ -212,7 +220,7 @@
 													}
 												?>
 											</ul>
-											<label class="input__button obscure__button" for="obscure-posts">Show <?php echo count($result) - 3; ?> more</label>
+											<label class="input__button obscure__button" for="obscure-posts">Show <?php echo is_array($result) ? count($result) - 3 : 0; ?> more</label>
 										<?php
 									}
 									else {

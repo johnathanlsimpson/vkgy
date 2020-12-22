@@ -113,7 +113,7 @@
 			$sql_order = is_array($sql_order) ? $sql_order : ["comments.date_occurred DESC"];
 			
 			// LIMIT
-			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : $sql_limit ?: null;
+			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : ($sql_limit ?: null);
 
 			
 			if($sql_select && $sql_from) {

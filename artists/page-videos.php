@@ -33,12 +33,12 @@ style([
 							<div class="video__flag-notice text text--compact text--outlined text--error symbol__error any--flex {approval_notice_class}">
 								<?= lang('This video is awaiting approval.', 'この動画は承認待ちです。', 'hidden'); ?>
 								<?php
-									if($_SESSION['can_approve_data']) {
+									/*if($_SESSION['can_approve_data']) {
 										?>
 											<a class="video__delete a--padded" data-id="{video_id}" href="/artists/function-update_video.php?id={video_id}&amp;method=deny" rel="nofollow">Deny</a>
 											<a class="video__approve a--padded a--outlined" href="/artists/function-update_video.php?id={video_id}&amp;artist_id={artist_id}&amp;channel_id={channel_id}&amp;method=approve" rel="nofollow">Approve</a>
 										<?php
-									}
+									}*/
 								?>
 							</div>
 							

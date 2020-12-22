@@ -11,8 +11,38 @@
 				$romaji = sanitize($_POST["romaji"][$key]) ?: null;
 				$friendly = friendly($romaji ?: $name);
 				$position = sanitize($_POST["position"][$key]) ?: 6;
+				$blood_type = sanitize($_POST['blood_type'][$key]) ?: null;
+				$birth_date = null;
 				
 				if($name) {
+					
+					// Format birth date
+					if( strlen($_POST['birth_year'][$key]) || strlen($_POST['birth_date'][$key]) ) {
+						
+						$b = $_POST['birth_year'][$key].( strlen($_POST['birth_year'][$key]) && strlen($_POST['birth_date'][$key]) ? '-' : null ).$_POST['birth_date'][$key];
+						
+						if(preg_match('/'.'^\d{4}-\d{2}-\d{2}$'.'/', $b)) {
+						}
+						elseif(preg_match('/'.'^\d{2}-\d{2}$'.'/', $b)) {
+							$b = '0000-'.$b;
+						}
+						elseif(preg_match('/'.'^[Ss](\d{2})'.'/', $b, $match)) {
+							$b = str_replace($match[0], $match[1] + 1925, $b);
+						}
+						elseif(preg_match('/'.'^[Hh](\d{2})'.'/', $b, $match)) {
+							$b = str_replace($match[0], $match[1] + 1988, $b);
+						}
+						elseif(preg_match('/'.'^[Rr](\d{2})'.'/', $b, $match)) {
+							$b = str_replace($match[0], $match[1] + 2019, $b);
+						}
+						if(preg_match('/'.'^\d{4}$'.'/', $b)) {
+							$b .= '-00-00';
+						}
+						
+						$birth_date = $b;
+						
+					}
+					
 					$history = $_POST["history"][$key];
 					$history = str_replace("\r\n", "\n", $history);
 					$history_lines = explode("\n", $history);
@@ -28,19 +58,19 @@
 					$history = implode("\n", $history_lines);
 					
 					if(preg_match("/"."\(\d+\)"."/", $history)) {
-						$sql_musician = "INSERT INTO musicians (name, romaji, friendly, usual_position, history) VALUES (?, ?, ?, ?, ?)";
+						$sql_musician = "INSERT INTO musicians (name, romaji, friendly, usual_position, history, blood_type, birth_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
 						$stmt_musician = $pdo->prepare($sql_musician);
 						
-						if($stmt_musician->execute([$name, $romaji, $friendly, $position, $history])) {
-							$musician_id = $pdo->lastInsertId();
+						if($stmt_musician->execute([ $name, $romaji, $friendly, $position, $history, $blood_type, $birth_date ])) {
+							$_POST_id = $pdo->lastInsertId();
 							
 							// Update edits table
 							$sql_edit_history = 'INSERT INTO edits_musicians (musician_id, user_id, content) VALUES (?, ?, ?)';
 							$stmt_edit_history = $pdo->prepare($sql_edit_history);
-							if($stmt_edit_history->execute([ $musician_id, $_SESSION['user_id'], 'created' ])) {
+							if($stmt_edit_history->execute([ $_POST_id, $_SESSION['user_id'], 'created' ])) {
 							}
 							
-							$output["result"]["artists"][] = '<a class="artist" href="/musicians/'.$musician_id.'/'.$friendly.'/">'.($romaji ?: $name).'</a>';
+							$output["result"]["artists"][] = '<a class="artist" href="/musicians/'.$_POST_id.'/'.$friendly.'/">'.($romaji ?: $name).'</a>';
 							
 							if(is_array($history_lines)) {
 								foreach($history_lines as $line) {
@@ -83,7 +113,7 @@
 											$sql_link = "INSERT INTO artists_musicians (artist_id, musician_id, position, position_name, as_name, as_romaji, to_end, unique_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 											$stmt_link = $pdo->prepare($sql_link);
 											
-											if($stmt_link->execute([ $band_in_db_id, $musician_id, $link_position, $position_name, $as_name, $as_romaji, 1, $band_in_db_id."-".$musician_id ])) {
+											if($stmt_link->execute([ $band_in_db_id, $_POST_id, $link_position, $position_name, $as_name, $as_romaji, 1, $band_in_db_id."-".$_POST_id ])) {
 												$output["status"] = "success";
 												$linked_artists[] = $band_in_db_id;
 											}

@@ -1170,7 +1170,7 @@
 			$sql_where = $sql_where ?: [];
 			$sql_values = $sql_values ?: [];
 			$sql_order = $sql_order ?: ["artists.friendly ASC"];
-			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : $sql_limit ?: null;
+			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : ($sql_limit ?: null);
 			
 			// QUERY
 			if(is_numeric($args["id"]) && $args["get"] !== "all" && is_array($this->indexed_artists) && !empty($this->indexed_artists[$args["id"]])) {

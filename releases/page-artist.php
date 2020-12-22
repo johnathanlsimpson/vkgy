@@ -209,7 +209,7 @@
 																		'track_num' => $track_num,
 																		'artist_official_name' => $artist_official_name,
 																		'artist_name' => $artist_name,
-																		'artist_quick_name' => $track['artist']['display_name'] ? ($track['artist']['display_romaji'] ?: $track['artist']['display_name']) : $track['artist']['romaji'] ?: $track['artist']['name'],
+																		'artist_quick_name' => $track['artist']['display_name'] ? ($track['artist']['display_romaji'] ?: $track['artist']['display_name']) : ($track['artist']['romaji'] ?: $track['artist']['name']),
 																		'artist_friendly' => strlen($track['artist']['friendly']) ? $track['artist']['friendly'] : $release['artist']['friendly'],
 																		'artist_class' => !strlen($artist_name) ? 'track--no-artist' : null,
 																		'track_official_name' => $track_official_name,

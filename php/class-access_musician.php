@@ -349,7 +349,7 @@
 			}
 			
 			// Limit
-			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : $sql_limit ?: null;
+			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : ($sql_limit ?: null);
 			
 			// Query
 			$sql_musician = "SELECT ".implode(", ", $sql_select)." FROM ".implode(" ", $sql_from)." ".(!empty($sql_where) ? "WHERE (".implode(") AND (", $sql_where).")" : null)." ORDER BY ".implode(", ", $sql_order)." ".$sql_limit;

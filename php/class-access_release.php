@@ -688,7 +688,7 @@
 			// LIMIT
 			if($args["get"] === "basics" || $args["get"] === "all") {
 			}
-			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : $sql_limit ?: null;
+			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : ($sql_limit ?: null);
 			
 			if(is_array($sql_select) && !empty($args["get"])) {
 				$sql_releases =

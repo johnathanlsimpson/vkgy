@@ -100,6 +100,12 @@
 			}
 		}
 		
+		// Get areas for musicians' hometown
+		$sql_areas = 'SELECT areas.id, areas.name, areas.romaji, areas.friendly FROM areas ORDER BY areas.friendly ASC';
+		$stmt_areas = $pdo->prepare($sql_areas);
+		$stmt_areas->execute();
+		$areas = $stmt_areas->fetchAll();
+		
 		include("../artists/page-edit.php");
 	}
 	
