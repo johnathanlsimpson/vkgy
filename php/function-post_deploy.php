@@ -35,7 +35,7 @@
 					$rslt_curr_log = $stmt_curr_log->fetch();
 					
 					if(is_array($rslt_curr_log) && preg_match('/'.str_replace(['1', 'flyer'], ['(\d+)', 'flyers?'], $flyer_str).'/', $rslt_curr_log["content"], $matches)) {
-						$content = '1. '.str_replace(['1', 'flyer'], [($matches[1] + 1), 'flyers'], $flyer_str);
+						$content = '* '.str_replace(['1', 'flyer'], [($matches[1] + 1), 'flyers'], $flyer_str);
 						$replace_regex  = '\r?\n?1. '.$matches[0];
 					}
 				}
@@ -105,7 +105,9 @@
 							$files_affected[$file_key] = reset(explode('/', $file));
 						}
 						
-						$content .= "\n\n".' ('.implode(', ', $files_affected).')';
+						$files_affected = array_filter($files_affected);
+						
+						$content .= ' ```'.implode('```, ```', $files_affected).'```';
 					}
 					
 					if($array_payload['ref'] === 'refs/heads/master' && strpos($content, 'Merge') !== 0) {

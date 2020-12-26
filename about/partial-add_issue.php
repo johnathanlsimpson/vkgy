@@ -76,9 +76,3 @@ include_once('../php/function-render_json_list.php');
 	<div class="text text--outlined text--error" data-role="result" style="margin: 1rem 0 0 0;"></div>
 
 </form>
-
-<style>
-	[data-role="result"]:empty {
-		display: none;
-	}
-</style>

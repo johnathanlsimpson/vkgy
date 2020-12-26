@@ -1040,6 +1040,7 @@ li > .input__checkbox:last-of-type {
 .input__checkbox--selected::before,
 .input__choice:checked + [class*="symbol__checkbox"]::before,
 .input__choice:checked + .input__checkbox [class*="symbol__checkbox"]::before,
+.input__choice:checked + [class*="input__checkbox"][class*="symbol__unchecked"]::before,
 .input__checkbox .input__choice:checked + .symbol__unchecked::before {
 	-moz-clip-path:    url(#symbol__checkbox--checked);
 	-webkit-clip-path: url(#symbol__checkbox--checked);
