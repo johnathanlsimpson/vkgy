@@ -551,24 +551,56 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 <div class="col c4">
 	
 	<div>
+		<?php
+			$sql_development = 'SELECT id, title, friendly, content, SUBSTRING(date_occurred,1,10) AS date_occurred FROM development WHERE is_issue=? ORDER BY date_occurred DESC LIMIT 5';
+			$stmt_development = $pdo->prepare($sql_development);
+			$stmt_development->execute([ 0 ]);
+			$development = $stmt_development->fetch();
+			
+			$development['content'] = $markdown_parser->parse_markdown($development['content']);
+			$development['content'] = str_replace('</li>', '<br />', $development['content']);
+			$development['content'] = strip_tags( $development['content'], ['br'] );
+			$development['content'] = str_replace('Here are today&#39;s development updates. As always, thank you for supporting vkgy!', '', $development['content']);
+			$development['length'] = strlen($development['content']);
+		?>
 		<h3>
-			<?= lang('Site updates', 'サイト更新', 'div'); ?>
+			<?= lang('Development update', 'サイト更新', 'div'); ?>
 		</h3>
-		<ul class="text text--outlined ul--compact">
-			<?php
-				$sql_development = 'SELECT id, title, friendly, SUBSTRING(date_occurred,1,10) AS date_occurred, content FROM development WHERE is_issue=? ORDER BY date_occurred DESC LIMIT 5';
-				$stmt_development = $pdo->prepare($sql_development);
-				$stmt_development->execute([ 0 ]);
-				$dev_entries = $stmt_development->fetchAll();
-				
-				foreach($dev_entries as $entry_key => $entry) {
-					echo '<li>';
-					echo $entry_key === 0 ? '<div class="h5">'.$entry['date_occurred'].' <span style="color:hsl(var(--accent));">NEW</span></div>' : null;
-					echo '<a href="/about/development/'.$entry['id'].'/">'.$entry['title'].'</a>';
-					echo '</li>';
-				}
-			?>
-		</ul>
+		
+		<input class="obscure__input" type="checkbox" checked />
+		<div class="dev__container text text--outlined obscure__container obscure--faint">
+			
+			<a class="card__link" href="/development/"></a>
+			
+			<div class="h5"><?= $development['date_occurred']; ?></div>
+			
+			<?= substr( $development['content'], 0, 200 ).( $development['length'] > 200 ? '...' : null ); ?>
+			
+			<a class="dev__link a--padded a--outlined" href="/development/" style="margin-top: 1rem;">track development</a>
+			
+		</div>
+		
+		<div class="any--weaken symbol__help" style="margin-top: -2rem; margin-bottom: 3rem;">
+			Please consider supporting our development through <a class="a--inherit" href="https://patreon.com/vkgy" target="_blank">vkgy's Patreon</a>.
+		</div>
+		
+		<style>
+			.dev__container::after {
+				bottom: 4rem;
+				opacity: 1;
+			}
+			.dev__link {
+				display: block;
+				max-width: 100%;
+				overflow: hidden;
+				text-align: center;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.card__link:hover ~ .dev__link {
+				color: hsl(var(--interactive));
+			}
+		</style>
 		
 		<h3>
 			<?= lang('About vkgy', 'vkgyについて', 'div'); ?>

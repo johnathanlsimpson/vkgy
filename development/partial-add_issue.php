@@ -20,9 +20,9 @@ include_once('../php/function-render_json_list.php');
 
 ?>
 
-<h2>
+<h3>
 	<?= lang('Add issue', '問題を追加する', 'div'); ?>
-</h2>
+</h3>
 
 <form action="/about/function-update.php" class="text text--outlined" enctype="multipart/form-data" method="post" name="form__add-issue">
 	

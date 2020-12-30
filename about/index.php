@@ -62,12 +62,12 @@ if( in_array($template, array_keys($allowed_templates)) ) {
 		// Development home
 		else {
 			
-			$sql_entries = 'SELECT id, title, friendly, SUBSTRING(date_occurred,1,10) AS date_occurred, content FROM development WHERE is_issue=? ORDER BY date_occurred DESC LIMIT 10';
-			$stmt_entries = $pdo->prepare($sql_entries);
-			$stmt_entries->execute([ 0 ]);
-			$entries = $stmt_entries->fetchAll();
+			$sql_entry = 'SELECT id, title, friendly, content, SUBSTRING(date_occurred,1,10) AS date_occurred FROM development WHERE is_issue=? ORDER BY date_occurred DESC LIMIT 1';
+			$stmt_entry = $pdo->prepare($sql_entry);
+			$stmt_entry->execute([ 0 ]);
+			$entry = $stmt_entry->fetch();
 			
-			$entries[0]['content'] = substr( strip_tags( $markdown_parser->parse_markdown($entries[0]['content']) ), 0, 300 );
+			$entry['content'] = $markdown_parser->parse_markdown($entry['content']);
 			
 			$sql_issues = '
 				SELECT development.id, development.title, development.is_completed, IF(votes_development.score, SUM(votes_development.score), 0) AS score
