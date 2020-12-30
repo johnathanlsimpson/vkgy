@@ -74,9 +74,9 @@ RewriteRule  ^(.*)$             https://vk.gy/%{REQUEST_URI} [R=permanent,L]
 RewriteRule  ^about/?$                         /?about/&template=about
 RewriteRule  ^contact/?$                       /?about/&template=contact
 RewriteRule  ^privacy-policy/?$                /?about/&template=privacy-policy
-RewriteRule  ^about/development/?$             /?about/&template=development
-RewriteRule  ^about/development/(\d+)/?$       /?about/&template=development&id=$1
-RewriteRule  ^about/development/(\d+)/edit/?$  /?about/&template=update&id=$1
+RewriteRule  ^development/?$             /?development/&template=index
+RewriteRule  ^development/(\d+)/?$       /?development/&template=entry&id=$1
+RewriteRule  ^development/(\d+)/edit/?$  /?development/&template=update&id=$1
 
 
 RewriteRule  ^accounts(.*)$                     /account$1 [R=301,L]
