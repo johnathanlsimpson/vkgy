@@ -22,7 +22,7 @@ subnav([
 $active_page = '/about/development/add/';
 
 // Only boss can edit dev posts
-if( $_SESSION['is_boss'] ) {
+if( !$_SESSION['is_boss'] ) {
 	?>
 		<form action="/about/function-update.php" class="col c1" enctype="multipart/form-data" method="post" name="form__update">
 			

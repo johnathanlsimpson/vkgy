@@ -935,7 +935,7 @@
 					$image_src = $match[2];
 					$image_src = preg_replace('/'.'(^(?:https?:)?(?:\/\/)?(?:vk\.gy)?\/images\/\d+(?:-[A-z0-9-]*)?)(\.[A-z]+)$'.'/', '$1.medium$2', $image_src);
 					
-					return '<div class="module module--image '.$image_class.' any--weaken any--align-center"><a href="'.($match[3] ?: $match[2]).'"><img alt="'.$match[1].'" class="lazy" data-src="'.$image_src.'" /></a><div>'.$match[1].'</div></div>';
+					return '<div class="module module--image '.$image_class.' any--weaken any--align-center"><a href="'.($match[3] ?: $match[2]).'"><img alt="'.strip_tags($match[1]).'" class="lazy" data-src="'.$image_src.'" /></a><p>'.$match[1].'</p></div>';
 					
 					unset($height, $width, $image_class);
 				}, $input_content);
