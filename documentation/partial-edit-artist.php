@@ -96,9 +96,7 @@
 
 ### Special tags
 
-* ''-activity,, Change in activity, but not formation/disbandment. i.e. the band moves from Tokyo to Nagoya, or officially starts activity after having played secret lives.
-
-* ''-formation,, When the band forms or re-forms. Will be highlighted on the artist page.
+* ''-start,, When the band forms, revives, or resumes activity. Will be highlighted on the artist page.
 
  The artist's pronunciation will be automatically pulled from entries with this tag. Pronunciation should be katakana/hiragana in parentheses after the band's link.
 
@@ -106,9 +104,9 @@
 
  Activity period is also based on these entries, but is calculated automatically.
 
- ''1999-06-18 /Dali/ (ダリ) forms in Nagoya. -formation,,
+ ''1999-06-18 /Dali/ (ダリ) forms in Nagoya. -start,,
 
-* ''-disbandment,, The artist disbands or otherwise stops activity. Will be highlighted on the artist page.
+* ''-end,, The artist disbands or otherwise stops activity. Will be highlighted on the artist page.
 
  This one should be concise; further details about the disbandment should be added in a separate entry.
 
@@ -116,7 +114,11 @@
 
  Activity period is based on these entries, and is calculated automatically.
 
- ''2000-01-06 /Dali/ disbands -disbandment\n\n2000-01-06 Live is held, and due to all members seceding at once, the band breaks up.,,
+ ''2000-01-06 /Dali/ disbands -end\n\n2000-01-06 Live is held, and due to all members seceding at once, the band breaks up.,,
+
+* ''-activity,, Change in activity, but not formation/disbandment. i.e. the band moves from Tokyo to Nagoya, or officially starts activity after having played secret lives.
+
+ Should also be used for one-day revivals.
 
 * ''-lineup,, Use when listing the new lineup after formation or member change. (*Only* the lineup should go here; other information about the member change can go in a separate entry.)
 

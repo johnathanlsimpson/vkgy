@@ -348,12 +348,14 @@
 			2  => "live",         // live event or tour
 			3  => "release",      // release
 			4  => "name",         // band name change
-			5  => "disbandment",  // disbandment or activity end
+			//5  => "disbandment",  // disbandment or activity end
+5 => 'end', // disbandment
 			6  => "media",        // media, fanclub, etc
 			7  => "other",        // ?:?
 			8  => "label",        // label change or start
 			9  => "lineup",       // notes current lineup (not for lineup change)
-			10 => "formation",    // formation-related
+			//10 => "formation",    // formation-related
+10 => 'start', // formation
 			11 => "member",       // member change, member name change, etc.
 			12 => "setlist",      // setlist,
 			13 => "trouble",      // death, injury, arrest, etc
@@ -369,6 +371,7 @@
 		// ======================================================
 		function validate_bio($artist_id, $content) {
 			if(is_numeric($artist_id) && !empty($content)) {
+				
 				$content = str_replace(["\r\n", "\r"], "\n", $content);
 				$break_pattern = "\n\n(?=(?:\d{4}-)?(?:\d{2}-)?\d{2} )";
 				$bio_lines = preg_split("/".$break_pattern."/", $content);
@@ -380,6 +383,11 @@
 					foreach($bio_lines as $line) {
 						
 						$line_type = [];
+						
+						// 2020-12-31: Replace -formation and -disbandment with -start and -end, respectively
+						$line = preg_replace_callback('/'.'(-|,)(formation|disbandment)([a-z\,]*?)$'.'/', function($matches) {
+							return $matches[1].($matches[2] === 'formation' ? 'start' : 'end').$matches[3];
+						}, $line);
 						
 						// Auto-fill date
 						$date_pattern = "^(?:(\d{4})-?)?(?:(\d{2})-?)?(\d{2}) ";
@@ -418,12 +426,15 @@
 						// Or, guess event type
 						else {
 							$tag_patterns = [
-								"formation"    => "\bforms\b|\bformed\b|\bformation\b",
+								//"formation"    => "\bforms\b|\bformed\b|\bformation\b",
+'start' => '\bforms\b|\bformed\b|\bformation\b|revive|restart|resume',
 								"label"        => "\blabels?\b|\bgraduates?\b|\bsublabel\b",
 								"live"         => "\blive\b|\btour\b|\bevent\b|\boneman\b|\btwoman\b|\bthreeman\b|\bfourman\b",
 								"name"         => "\bchanges?\b.*\bnames?\b",
-								"activity"     => "(?:\bpauses?\b|\bactivit(?:y|ies)\b|\bfreezes?\b)",
-								"disbandment"  => "\bdisbands\b",
+								//"activity"     => "(?:\bpauses?\b|\bactivit(?:y|ies)\b|\bfreezes?\b)",
+'activity' => 'moves to|formal band|area of activity|changes to|major|one(?:-| )(?:day|night)',
+								//"disbandment"  => "\bdisbands\b",
+'end' => '\bdisbands\b|breaks? up|(?:pauses?|ends?) activit',
 								"lineup"       => "lineup| [\/\,] [VoGuBaDrKy]{1,2}\.| G: | Gu: ",
 								"member"       => "\bmember\b|\bjoins?\b|\bsecedes?\b|\bbegins support\b|\bas support\b|\bon support\b|\bvocalist\b|\bguitarist\b|\bbassist\b|\bdrummer\b",
 								"release"      => "\breleases?\b",
