@@ -73,6 +73,23 @@
 		width: calc((100% * (2 / 4)) - (var(--gutter) * 2));
 	}
 }
+/* Spacing for prose columns */
+@media(min-width:700px) {
+	.col--prose {
+		display: grid;
+		grid-template-columns: [left] fit-content(200px) [center] minmax(0, 800px) [right] fit-content(200px);
+		justify-content: center;
+		margin: 0 calc( -1 * var(--gutter) / 2 );
+		width: calc(100% + var(--gutter));
+	}
+	.col--prose > * {
+		padding: 0 calc( var(--gutter) / 2 );
+		width: 100%;
+	}
+}
+.col--main {
+	grid-column: center;
+}
 
 /**
 	* ========================================================
