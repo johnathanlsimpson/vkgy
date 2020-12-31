@@ -162,6 +162,7 @@ $sql_recent = "
 						) aa
 					LEFT JOIN edits_artists ON edits_artists.id=aa.id
 					GROUP BY edits_artists.artist_id
+					ORDER BY edits_artists.date_occurred DESC
 					LIMIT 6
 				) aaa
 			LEFT JOIN artists ON artists.id=aaa.artist_id

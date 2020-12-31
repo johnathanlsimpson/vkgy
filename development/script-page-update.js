@@ -1,8 +1,12 @@
+// Selectize
+// --------------------------------------------------------
+lookForSelectize();
+
 // Init autosize and submit
 // --------------------------------------------------------
 autosize($(".autosize"));
 
-initializeInlineSubmit($("[name=form__update]"), "/about/function-update.php", { "submitOnEvent" : "submit", "showEditLink" : true });
+initializeInlineSubmit($("[name=form__update]"), "/development/function-update.php", { "submitOnEvent" : "submit", "showEditLink" : true });
 
 
 // Preview entry

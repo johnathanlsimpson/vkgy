@@ -75,6 +75,8 @@ RewriteRule  ^about/?$                         /?about/&template=about
 RewriteRule  ^contact/?$                       /?about/&template=contact
 RewriteRule  ^privacy-policy/?$                /?about/&template=privacy-policy
 RewriteRule  ^development/?$             /?development/&template=index
+RewriteRule  ^development/all/?$         /?development/&template=all
+RewriteRule  ^development/issues/?$      /?development/&template=issues
 RewriteRule  ^development/(\d+)/?$       /?development/&template=entry&id=$1
 RewriteRule  ^development/(\d+)/edit/?$  /?development/&template=update&id=$1
 

@@ -7,7 +7,7 @@ issuesContainer.addEventListener('change', function(event) {
 		let issueElem = completedElem.closest('.issue__container');
 		let issueTextElem = issueElem.querySelector('.issue__text');
 		
-		initializeInlineSubmit($(issueElem), '/about/function-complete_issue.php', {
+		initializeInlineSubmit($(issueElem), '/development/function-complete_issue.php', {
 			
 			callbackOnSuccess: function(formElem, returnedData) {
 				
@@ -33,33 +33,3 @@ issuesContainer.addEventListener('change', function(event) {
 		
 	}
 });
-
-
-
-/*
-
-let completeIssueElems = document.querySelectorAll('.issue__complete');
-completeIssueElems.forEach(function(completeIssueElem) {
-	
-	
-	initializeInlineSubmit($(completeIssueElem), '/about/function-complete_issue.php', {
-		
-		submitOnEvent: 'change',
-		
-		callbackOnSuccess: function(formElem, returnedData) {
-			console.log('success');
-			console.log(returnedData);
-			
-		},
-		
-		callbackOnError: function(formElem, returnedData) {
-			console.log('error');
-			console.log(returnedData);
-		}
-		
-	});
-});
-
-function completeIssue(issueID) {
-	
-}*/

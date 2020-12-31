@@ -6,7 +6,7 @@ $access_comment = new access_comment($pdo);
 $page_header = lang('About vkgy', 'vkgyについて', 'div');
 
 subnav([
-	'Site updates' => '/about/development/',
+	'Site updates' => '/development/',
 	'About' => '/about/#about',
 	'Contact' => '/about/#contact',
 	'Privacy policy' => '/about/#privacy',

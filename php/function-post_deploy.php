@@ -20,6 +20,7 @@
 			$friendly      = strlen($args["friendly"]) ? friendly($args["friendly"]) : 'development-'.date('Y-m-d');
 			$user_id       = is_numeric($args["user_id"]) ? $args["user_id"] : 0;
 			$header        = "Here are today's development updates. As always, thank you for supporting vkgy!\n\n---\n\n";
+			$header        = '';
 			$flyer_str     = 'Added 1 flyer to queue.';
 			$content       = sanitize($args["content"]) ?: ($args["type"] === "flyer" ? $flyer_str : null);
 			$content       = $content ? '1. '.$content : null;
@@ -107,7 +108,7 @@
 						
 						$files_affected = array_filter($files_affected);
 						
-						$content .= ' ```'.implode('```, ```', $files_affected).'```';
+						$content .= ' ```'.implode('``` ```', $files_affected).'```';
 					}
 					
 					if($array_payload['ref'] === 'refs/heads/master' && strpos($content, 'Merge') !== 0) {

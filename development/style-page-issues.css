@@ -1,0 +1,56 @@
+/* Mark complete/incomplete */
+.issues__options-button {
+	float: right;
+	z-index: 1;
+}
+.issues__options-button::before {
+	content: "edit";
+}
+.issues__options-checkbox:checked + .issues__options-button::before {
+	content: "hide";
+}
+.issue__completed-label {
+	box-shadow: 0 0 0.5rem 0.5rem hsl(var(--background));
+	display: none;
+	margin: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	transition: opacity 0.1s linear;
+	z-index: 2;
+}
+.issues__options-checkbox:checked ~ .issues__container .issue__completed-label {
+	display: initial;
+}
+
+/* Voting */
+.issue__vote {
+	float: right;
+	margin: 0 0 0.25rem 0.25rem;
+	float: left;
+	margin: 0 1rem 0 0;
+	z-index: 1;
+}
+
+/* Text */
+.issue__container::after {
+	clear: both;
+	content: "";
+	display: block;
+}
+.issue__text {
+	margin-right: auto;
+	padding-bottom: 0;
+}
+.issue__completed:checked ~ .issue__text {
+	opacity: 0.75;
+	text-decoration: line-through;
+}
+.issue__text .any__note {
+	text-decoration: inherit;
+}
+.issue__right {
+	float: right;
+	margin: 0 0 0 0.5rem;
+	z-index: 1;
+}

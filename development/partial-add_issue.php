@@ -1,5 +1,7 @@
 <?php
 
+include_once('../php/function-render_json_list.php');
+
 script([
 	'/scripts/external/script-autosize.js',
 	'/scripts/external/script-selectize.js',
@@ -7,7 +9,8 @@ script([
 	'/scripts/external/script-tribute.js',
 	'/scripts/script-initSelectize.js',
 	'/scripts/script-initTribute.js',
-	'/about/script-partial-add_issue.js',
+	
+	'/development/script-partial-add_issue.js',
 ]);
 
 style([
@@ -15,8 +18,6 @@ style([
 	'/style/external/style-tribute.css',
 	'/style/style-selectize.css',
 ]);
-
-include_once('../php/function-render_json_list.php');
 
 ?>
 
@@ -38,15 +39,14 @@ include_once('../php/function-render_json_list.php');
 	</div>
 	
 	<div class="input__row">
+		
 		<div class="input__group any--flex-grow">
 			
 			<?php render_json_list('user'); ?>
 			
 			<label class="input__label">Reported by</label>
 			<select class="input" data-source="users" name="user_id" placeholder="username">
-				
-				<option></option>
-				
+				<option value="1" selected>inartistic</option>
 			</select>
 			
 		</div>
@@ -58,7 +58,7 @@ include_once('../php/function-render_json_list.php');
 				
 				<option></option>
 				<?php foreach(['other', 'bug', 'feature'] as $value => $key): ?>
-					<option value="<?= $value; ?>"><?= $key; ?></option>
+					<option value="<?= $value; ?>" <?= $key === 'bug' ? 'checked' : null; ?> ><?= $key; ?></option>
 				<?php endforeach; ?>
 				
 			</select>
