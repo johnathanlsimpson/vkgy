@@ -34,15 +34,15 @@ if( $_SESSION['is_signed_in'] ) {
 				// Moderators can edit issues, but only bosses can edit dev posts
 				if( ( $extant_post['is_issue'] && $_SESSION['is_moderator'] ) || ( !$extant_post['is_issue'] && $_SESSION['user_id'] == $extant_post['user_id'] ) ) {
 					
-					$sql_update = 'UPDATE development SET title=?, content=?, friendly=?, is_completed=?, issue_type=? WHERE id=?';
+					$sql_update = 'UPDATE development SET title=?, content=?, friendly=?, is_completed=?, issue_type=?, user_id=? WHERE id=?';
 					$stmt_update = $pdo->prepare($sql_update);
-					if($stmt_update->execute([ $title, $content, $friendly, $is_completed, $issue_type, $id ])) {
+					if($stmt_update->execute([ $title, $content, $friendly, $is_completed, $issue_type, $user_id, $id ])) {
 						
 						$output['status'] = 'success';
 						$output['friendly'] = $friendly;
 						$output['title'] = $title;
-						$output['url'] = '/about/development/'.$id.'/';
-						$output['edit_url'] = '/about/development/'.$id.'/edit/';
+						$output['url'] = '/development/'.$id.'/';
+						$output['edit_url'] = '/development/'.$id.'/edit/';
 						
 					}
 					else {
@@ -68,8 +68,8 @@ if( $_SESSION['is_signed_in'] ) {
 					$output['status'] = 'success';
 					$output['friendly'] = $friendly;
 					$output['title'] = $title;
-					$output['url'] = '/about/development/'.$id.'/';
-					$output['edit_url'] = '/about/development/'.$id.'/edit/';
+					$output['url'] = '/development/'.$id.'/';
+					$output['edit_url'] = '/development/'.$id.'/edit/';
 					
 				}
 				else {
