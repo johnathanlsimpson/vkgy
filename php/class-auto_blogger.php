@@ -28,8 +28,8 @@
 			$this->blog_tags = $this->access_blog->list_tags();
 			
 			$this->wanted_bio_types = [
-				"formation",
-				"disbandment",
+				"start",
+				"end",
 				"member"
 			];
 			foreach($this->wanted_bio_types as $key => $type) {
@@ -77,7 +77,7 @@
 							// Content should be type bio or release, handle accordingly
 							if($content_type === "bio") {
 								
-								// Confirm that the bio content is of a type that we care about (e.g. formation)
+								// Confirm that the bio content is of a type that we care about (e.g. start)
 								foreach($this->wanted_bio_types as $type) {
 									if(strpos($content["type"], $type) !== false) {
 										$continue = true;
@@ -304,14 +304,14 @@
 								$post[] = $string;
 								$tag = 'lineup';
 							}
-							elseif(strpos($content["type"], $this->wanted_bio_types["disbandment"]) !== false) {
+							elseif(strpos($content["type"], $this->wanted_bio_types["end"]) !== false) {
 								$title = $artist["quick_name"].' '.($is_future ? 'will disband' : 'has disbanded');
 								$post = [
 									'('.$artist["id"].')/'.$artist["friendly"].'/ '.($is_future ? 'will disband' : 'has disbanded').' on '.date('F jS', strtotime($content["date_occurred"])).'.',
 								];
 								$tag = 'disbandment-revival';
 							}
-							elseif(strpos($content["type"], $this->wanted_bio_types["formation"]) !== false) {
+							elseif(strpos($content["type"], $this->wanted_bio_types["start"]) !== false) {
 								$title = 'New band: '.$artist["quick_name"];
 								$post[] = 'New band ('.$artist["id"].')/'.$artist["friendly"].'/ '.($is_future ? 'began' : 'will begin').' activity on '.date('F jS', strtotime($content["date_occurred"])).'.';
 								
@@ -485,7 +485,7 @@
 											$new_content = $post["content"];
 											$tag = 'lineup';
 										}
-										elseif(strpos($content["type"], $this->wanted_bio_types["disbandment"]) !== false && !in_array("disbandment-revival", $post["tags"])) {
+										elseif(strpos($content["type"], $this->wanted_bio_types["end"]) !== false && !in_array("disbandment-revival", $post["tags"])) {
 											$title = $artist["quick_name"].' '.($is_future ? 'will disband' : 'has disbanded');
 											$new_content = [
 												'('.$artist["id"].')/'.$artist["friendly"].'/ '.($is_future ? 'will disband' : 'has disbanded').' on '.date('F jS', strtotime($content["date_occurred"])).'.',
@@ -494,7 +494,7 @@
 											];
 											$tag = 'disbandment-revival';
 										}
-										elseif(strpos($content["type"], $this->wanted_bio_types["formation"]) !== false && !in_array("new-band", $post["tags"])) {
+										elseif(strpos($content["type"], $this->wanted_bio_types["start"]) !== false && !in_array("new-band", $post["tags"])) {
 											$title = 'New band: '.$artist["quick_name"];
 											$new_content[] = 'New band ('.$artist["id"].')/'.$artist["friendly"].'/ '.($is_future ? 'began' : 'will begin').' activity on '.date('F jS', strtotime($content["date_occurred"])).'.';
 											
