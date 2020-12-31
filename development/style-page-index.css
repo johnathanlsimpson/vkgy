@@ -12,6 +12,18 @@
 	content: ", ";
 }
 
+/* Temporary */
+.text--prose ol:last-of-type li::before {
+	display: none;
+}
+.text--prose ol:last-of-type .any__note {
+	float: right;
+	margin: 0 0 0 0.5rem;
+}
+.text--prose {
+	background-color: transparent;
+}
+
 /* Issues */
 .issue__vote {
 	float: right;
