@@ -181,19 +181,19 @@
 	border-radius: 3px;
 	padding: 0.5rem;
 }
-.bio__item[data-item-type~="disbandment"] .bio__content {
+.bio__item[data-item-type~="end"] .bio__content {
 	border: 3px solid hsl(var(--accent));
 	border-radius: 3px;
 	color: hsl(var(--accent)) !important;
 	padding: 0.5rem;
 }
-.bio__item[data-item-type~="formation"] .bio__content {
+.bio__item[data-item-type~="start"] .bio__content {
 	border: 3px solid hsl(var(--attention--secondary));
 	border-radius: 3px;
 	color: hsl(var(--attention--secondary)) !important;
 	padding: 0.5rem;
 }
-.bio__item[data-item-type~="disbandment"] p:last-of-type::after {
+.bio__item[data-item-type~="end"] p:last-of-type::after {
 	content: "...";
 }
 .bio__item:not([data-item-num="0"]) .h4 {
@@ -354,8 +354,8 @@ td h3 {
 }
 #history__all:checked ~ .bio__container .bio__item,
 #history__activity:checked ~ .bio__container .bio__item[data-item-type*="activity"],
-#history__activity:checked ~ .bio__container .bio__item[data-item-type*="formation"],
-#history__activity:checked ~ .bio__container .bio__item[data-item-type*="disbandment"],
+#history__activity:checked ~ .bio__container .bio__item[data-item-type*="start"],
+#history__activity:checked ~ .bio__container .bio__item[data-item-type*="end"],
 #history__release:checked ~ .bio__container .bio__item[data-item-type*="release"],
 #history__live:checked ~ .bio__container .bio__item[data-item-type*="live"],
 #history__member:checked ~ .bio__container .bio__item[data-item-type*="member"],

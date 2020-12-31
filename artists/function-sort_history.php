@@ -93,7 +93,7 @@ function link_activity_area($history, $artist_areas) {
 		for($i=0; $i<$num_history; $i++) {
 			
 			// If line is tagged formation or activity, look for mention of area (that is also in $artist['areas']) and replace it with ink
-			if(in_array('formation', $history[$i]['type']) || in_array('activity', $history[$i]['type'])) {
+			if(in_array('start', $history[$i]['type']) || in_array('activity', $history[$i]['type'])) {
 				foreach($artist_areas as $active_area) {
 					if($active_area['romaji']) {
 						$history[$i]['content'] = str_replace(
@@ -119,12 +119,12 @@ function get_formation_dates($history) {
 	for($i=0; $i<$num_history; $i++) {
 		$y = substr($history[$i]['date_occurred'], 0, 4);
 		
-		if(in_array('formation', $history[$i]['type']) && $y > '0000') {
+		if(in_array('start', $history[$i]['type']) && $y > '0000') {
 			$dates[] = [ 'year' => $y, 'id' => $i, 'type' => 'start' ];
 			$years[] = $y;
 			$ids[] = $i;
 		}
-		if(in_array('disbandment', $history[$i]['type']) && $y > '0000') {
+		if(in_array('end', $history[$i]['type']) && $y > '0000') {
 			$dates[] = [ 'year' => $y, 'id' => $i, 'type' => 'end' ];
 			$years[] = $y;
 			$ids[] = $i;
@@ -183,7 +183,7 @@ function structure_by_date($history) {
 				
 				// For each type, if a history entry has that type, move it to the bottom of the day
 				// Repeat for each applicable type until they're ordered
-				foreach(['member', 'schedule', 'setlist', 'release', 'lineup', 'disbandment'] as $type) {
+				foreach(['member', 'schedule', 'setlist', 'release', 'lineup', 'end'] as $type) {
 					for($i=0; $i<$num_events; $i++) {
 						if(in_array($type, $history_day[$i]['type'])) {
 							$history_day[] = $history_day[$i];
@@ -196,7 +196,7 @@ function structure_by_date($history) {
 				
 				// For formation events, push to front
 				for($i=0; $i<$num_events; $i++) {
-					if(in_array('formation', $history_day[$i]['type'])) {
+					if(in_array('start', $history_day[$i]['type'])) {
 						$tmp_event = $history_day[$i];
 						unset($history_day[$i]);
 						array_unshift($history_day, $tmp_event);
