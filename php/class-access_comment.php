@@ -185,7 +185,7 @@
 										break;
 										
 									case 'development':
-										$concat_params = '"about", "development", development.id';
+										$concat_params = '"development", development.id';
 										$item_name = 'development.title';
 										break;
 										
