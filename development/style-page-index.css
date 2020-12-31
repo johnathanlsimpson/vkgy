@@ -1,0 +1,22 @@
+/* Entry */
+.entry__edit {
+	float: right;
+	margin: 0 0 0 0.5rem;
+	z-index: 1;
+}
+.entry__affects::before {
+	content: " \A affects: ";
+	white-space: pre-wrap;
+}
+.entry__affects + .entry__affects::before {
+	content: ", ";
+}
+
+/* Issues */
+.issue__vote {
+	float: right;
+	margin: 0 0 0.25rem 0.25rem;
+}
+.issue__completed-label {
+	box-shadow: 0 0 0.5rem 0.5rem hsl(var(--background--secondary));
+}
