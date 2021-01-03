@@ -54,7 +54,7 @@ if(is_numeric($_POST['id'])) {
 	];
 	
 	// Make empty face boundaries array for later
-	//$musician_face_boundaries = [];
+	$musician_face_boundaries = [];
 	
 	// Standardize new links into array of item IDs, since there may be an array of IDs or one ID as a string
 	foreach($image_item_join_types as $items_table => $item_ids) {
@@ -82,11 +82,11 @@ if(is_numeric($_POST['id'])) {
 			
 			// Construct boundaries array
 			foreach( $item_ids as $musician_array_key => $musician_id ) {
-				//$musician_face_boundaries[ $musician_array_key ] = $_POST['musician_face_boundaries'][ $musician_array_key ] ?: null;
+				$musician_face_boundaries[ $musician_array_key ] = $_POST['musician_face_boundaries'][ $musician_array_key ] ?: null;
 			}
 			
 			// Clean up keys (will clean up musician keys in next step)
-			//$musician_face_boundaries = array_values($musician_face_boundaries);
+			$musician_face_boundaries = array_values($musician_face_boundaries);
 			
 		}
 		
@@ -99,8 +99,8 @@ if(is_numeric($_POST['id'])) {
 		
 	}
 	
-	//print_r($image_item_join_types);
-	//print_r($musician_face_boundaries);
+	print_r($image_item_join_types);
+	print_r($musician_face_boundaries);
 	
 	// Make sure there's at least one join to an item (unless this is an "other" type image, in which case it's basically just an unlinked upload)
 	if($item_type != 'other') {
@@ -160,51 +160,82 @@ if(is_numeric($_POST['id'])) {
 			// Make sure we have some kind of array for extant_joins
 			$extant_joins = is_array($extant_joins) ? $extant_joins : [];
 			
+			echo 'extant joins';
+			print_r($extant_joins);
+			
 			// If we have at least one item id passed from the post for this item type, continue checks
 			if( is_array($item_ids) && !empty($item_ids) ) {
 				
 				// For each item_ids => item_id
-				foreach($item_ids as $key_in_item_ids_array => $item_id_to_be_joined) {
+				foreach($item_ids as $items_ids_array_key => $temp_item_id) {
 					
-					
-					
-					
-					
-					// If this particular item has already been joined to the image, we probably don't have to do anything
-					if( isset( $extant_joins[ $item_id_to_be_joined ] ) ) {
+					/*// If we're looking at potential images_musicians links, then we need to check if face boundary needs to be updated
+					if($items_table === 'musicians') {
 						
-						// If looking at musician table, first we need to see if the join has the correct boundary, and if not we need to update it
-						if( $items_table === 'musicians' ) {
+						// Which face boundary are we looking at?
+						$face_boundary = $musician_faces[ $items_ids_array_key ];
+						
+						// If the face boundary coming from POST is not already in the extant links, OR if it is but has a different musician id, update it
+						$extant_face_boundary_key = is_array($extant_face_boundaries) ? array_search($face_boundary, $extant_face_boundaries) : null;
+						
+						// So if we found the face boundary json in the array of faces already in images_musicians
+						// Then we need to check if the musician changed
+						if( is_numeric($extant_face_boundary_key) ) {
 							
-							// If face boundary as changed, we need to update that join row; then either way we remove this entry from both arrays since item is already joined to image
-							if( $extant_joins[ $item_id_to_be_joined ]['face_boundaries'] != $_POST['musician_face_boundaries'][ $item_id_to_be_joined ] ) {
+							// So get the musician id from the other extant array of images_musicians from the db
+							if( $extant_joins[$extant_face_boundary_key] == $item_ids[$extant_face_boundary_key] ) {
 								
-								$sql_update_join = 'UPDATE images_'.$items_table.' SET face_boundaries=? WHERE id=?';
-								$stmt_update_join = $pdo->prepare($sql_update_join);
-								$stmt_update_join->execute([ $_POST['musician_face_boundaries'][ $item_id_to_be_joined ], $extant_joins[ $item_id_to_be_joined ]['join_id'] ]);
+								
+								
+							}
+							
+							else {
 								
 							}
 							
 						}
 						
-						// Now, since item is already joined to image (and if it was musician we already updated face boundary if necessary), we remove from both arrays
-						// so that it's neither added nor deleted from joins
-						unset($extant_joins[ $item_id_to_be_joined ]);
-						unset($item_ids[ $key_in_item_ids_array ]);
+						
+						
+						
+						
+						print_r($item_ids);
+						print_r($musician_faces);
+						echo 'extant links:';
+						print_r($extant_joins);
+						echo 'extant faces:';
+						print_r($extant_face_boundaries);
+						echo "\n";
+						
+						
+						
+						
+					}*/
+					
+					// If item key is one of the arrays of the extant joins, we probably don't have to do anything
+					if( in_array( $temp_item_id, array_keys($extant_joins) ) ) {
+						
+						// If item type is musicians specifically, 
+						
+							
+							// Since ID is both in the POST and in the DB, we don't have to do anything, so unset it from both arrays and keep it moving Mary
+							unset($extant_joins[ array_search($temp_item_id, $extant_joins) ]);
+							unset($item_ids[$items_ids_array_key]);
+							
 						
 					}
 					
 					// If the item_id from the POST array isn't a number somehow, ignore it
-					elseif(!is_numeric($item_id_to_be_joined)) {
-						unset($item_ids[$key_in_item_ids_array]);
+					elseif(!is_numeric($temp_item_id)) {
+						unset($item_ids[$items_ids_array_key]);
 					}
 					
 					// If the item_id from the POST isn't in DB, then we need to add it
 					else {
 						
 						// If linking images_musicians, also need to update face_boundaries
-						$values_add_link = [ $id, $item_id_to_be_joined ];
-						$face_boundary = $_POST['musician_face_boundaries'][$item_id_to_be_joined];
+						$values_add_link = [ $id, $temp_item_id ];
+						$face_boundary = $_POST['image_musician_face'][$items_ids_array_key];
 						
 						if($items_table === 'musicians') {
 							$sql_add_link = 'INSERT INTO images_'.$items_table.' (image_id, '.$item_id_column.', face_boundaries) VALUES (?, ?, ?)';
@@ -216,7 +247,7 @@ if(is_numeric($_POST['id'])) {
 						
 						$stmt_add_link = $pdo->prepare($sql_add_link);
 						
-						if( $stmt_add_link->execute($values_add_link) ) {
+						if($stmt_add_link->execute()) {
 						}
 						else {
 							$output['result'][] = 'Couldn\'t link image to '.$items_table.'.';
@@ -228,17 +259,14 @@ if(is_numeric($_POST['id'])) {
 			
 			// If links from the DB were also in the links passed from the POST, then they're unset; if any from DB remain, that means they're not in POST i.e. need deletion
 			if(is_array($extant_joins) && !empty($extant_joins)) {
-				foreach($extant_joins as $extant_join) {
-					
+				foreach($extant_joins as $extant_join_id => $extant_join_artist_id) {
 					$sql_delete_link = 'DELETE FROM images_'.$items_table.' WHERE id=? LIMIT 1';
 					$stmt_delete_link = $pdo->prepare($sql_delete_link);
-					
-					if($stmt_delete_link->execute([ $extant_join['join_id'] ])) {
+					if($stmt_delete_link->execute([ $extant_join_id ])) {
 					}
 					else {
 						$output['result'][] = 'Couldn\'t delete image-'.$items_table.' link.';
 					}
-					
 				}
 			}
 			

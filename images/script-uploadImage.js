@@ -1,6 +1,191 @@
-// Loop through image <input>s and attach updateImageData
+// Show tagging options on click
+document.addEventListener('click', function(event) {
+	
+	let targetClass = event.target.classList;
+	
+	if( targetClass.contains('image__show-tags') ) {
+		
+		event.preventDefault();
+		
+		showTaggingSection( event.target.closest('.image__template'), event.target.dataset.tagType );
+		
+	}
+	
+});
+
+
+// Show appropriate tagging section
+function showTaggingSection(imageElem, tagType) {
+	
+	let linkElem = imageElem.querySelector('.image__show-tags[data-tag-type="' + tagType + '"]');
+	let tagsElem = imageElem.querySelector('.image__tags--' + tagType);
+	
+	let hiddenClass = 'any--hidden';
+	linkElem.classList.add('any--hidden');
+	tagsElem.classList.remove('any--hidden');
+	
+	// If showing musicians tagging, load options into that
+	if( tagType == 'musicians' ) {
+		
+		getFacesHtml(imageElem);
+		
+	}
+	
+	// If all tagging links are hidden, make sure label is hidden as well
+	let unclickedLinkElem = imageElem.querySelector('.image__show-tags:not(.any--hidden)');
+	if( !unclickedLinkElem ) {
+		linkElem.closest('.input__row').classList.add(hiddenClass);
+	}
+	
+}
+
+
+// Update description when certain fields changed
+document.addEventListener('change', function(event) {
+	
+	let itemName = event.target.name;
+	let namesAffectingDescription = ['image_type', 'image_release_id[]', 'image_artist_id[]', 'image_musician_id[]'];
+	
+	if( namesAffectingDescription.includes(itemName) ) {
+		
+		updateDescription( event.target.closest('.image__template') );
+		
+	}
+	
+});
+
+
+// Update description
+function updateDescription(imageElem) {
+	
+	let descriptionElem = imageElem.querySelector('[name="image_description"]');
+	let description = '';
+	
+	let typeElem = imageElem.querySelector('[name="image_type"]:checked');
+	let imageType = typeElem ? typeElem.value : 0;
+	
+	let defaultElem = imageElem.querySelector('[name="is_default"]:checked');
+	let isDefault = defaultElem ? 1 : 0;
+	
+	let artistElem = imageElem.querySelector('[name="image_artist_id[]"]');
+	let artistName = artistElem.selectedIndex > -1 ? artistElem.options[artistElem.selectedIndex].text : '';
+	
+	let releaseElem = imageElem.querySelector('[name="image_release_id[]"]');
+	let releaseName = releaseElem.selectedIndex > -1 ? releaseElem.options[releaseElem.selectedIndex].text : '';
+	
+	let musicianElem = imageElem.querySelector('[name="image_musician_id[]"]');
+	let musicianName = musicianElem.selectedIndex > -1 ? musicianElem.options[musicianElem.selectedIndex].text : '';
+	
+	// If image is one musician, use their name
+	if(imageType == 1) {
+		description += musicianName + ' ';
+	}
+	
+	// For release, just release name
+	else if(imageType == 4) {
+		description += releaseName + ' ';
+	}
+	
+	// Otherwise start with artist name
+	else {
+		description += artistName + ' ';
+	}
+	
+	// Image description
+	if(imageType == 0) {
+		description += 'group photo ';
+	}
+	else if(imageType == 1) {
+		description += 'solo photo ';
+	}
+	else if(imageType == 2) {
+		description += 'flyer ';
+	}
+	else if(imageType == 3) {
+		description += 'logo ';
+	}
+	else if(imageType == 4 && isDefault) {
+		description += 'cover ';
+	}
+	else {
+		description += 'photo ';
+	}
+	
+	// If release specified and not release image, mentioned title
+	if( releaseName && imageType != 4 ) {
+		description += 'for ' + releaseName;
+	}
+	
+	descriptionElem.value = description;
+	
+}
+
+
+// Get faces html
+function getFacesHtml(imageElem) {
+	
+	let imageUrl = imageElem.querySelector('.image__image').href;
+	//let faces = imageElem.dataset.faces ? imageElem.dataset.faces : '';
+	let facesElem = imageElem.querySelector('[name="image_face_boundaries"]');
+	let faces = facesElem.value ? facesElem.value : '';
+//faces = '[{"start_x":9,"start_y":9,"end_x":71,"end_y":99},{"start_x":103,"start_y":22,"end_x":154,"end_y":90}]';
+	
+	// Show loading
+	let tagsElem = imageElem.querySelector('.image__musician-tags');
+	tagsElem.innerHTML = 'Detecting faces...';
+	tagsElem.classList.add('loading');
+	
+	// Detect faces if necessary, and spit out html
+	initializeInlineSubmit( $(imageElem), '/images/function-get_faces_html.php', {
+		'preparedFormData' : { 'image_url' : imageUrl, 'faces' : faces },
+		
+		'callbackOnSuccess': function(event, returnedData) {
+			
+			tagsElem.classList.remove('loading');
+			tagsElem.innerHTML = returnedData.result;
+			
+			// Save all faces' boundaries with image
+			facesElem.value = returnedData.face_boundaries;
+			facesElem.dispatchEvent(new Event('change'));
+			console.log(returnedData);
+			
+			lookForSelectize();
+			
+		},
+		
+		'callbackOnError': function(event, returnedData) {
+			
+			console.log('error');
+			console.log(returnedData);
+			
+		}
+	});
+	
+}
+
+
+// Replaces initImageEditElems
+document.addEventListener('change', function(event) {
+	
+	let eventName = event.target.name;
+	
+	if( eventName.startsWith('image_') ) {
+		
+		updateImageData(event.target);
+		
+		// For description specifically, update Markdown while typing
+		if(eventName === 'image_description') {
+			event.target.addEventListener('keyup', function() {
+				updateMarkdown(event.target);
+			});
+		}
+		
+	}
+	
+});
+
 function initImageEditElems() {
-	var imageElemNames = [
+	/*var imageElemNames = [
 		'id',
 		'item_type',
 		'item_id',
@@ -11,7 +196,8 @@ function initImageEditElems() {
 		'release_id',
 		'is_exclusive',
 		'is_queued',
-		'credit'
+		'credit',
+		'face_boundaries'
 	];
 	imageElemNames.forEach(function(imageElemName) {
 		var imageElems = document.querySelectorAll('[name^="image_' + imageElemName + '"]');
@@ -31,7 +217,7 @@ function initImageEditElems() {
 			}
 			
 		});
-	});
+	});*/
 }
 
 
@@ -44,6 +230,8 @@ function updateMarkdown(descriptionElem) {
 	markdownElem.textContent = markdown;
 }
 
+
+// Handle 'no default image'
 let noDefaultElem = document.querySelector('.image__no-default:last-of-type [name="image_is_default"]');
 if(noDefaultElem) {
 	noDefaultElem.addEventListener('change', function() {
@@ -79,7 +267,7 @@ function initImageDeleteButtons() {
 }
 
 
-// Function get specified parent
+// Helper to get specified parent
 function getParent(childElem, parentClass) {
 	var currentElem = childElem;
 	var parentElem;
@@ -97,6 +285,33 @@ function getParent(childElem, parentClass) {
 	
 	return parentElem;
 }
+
+
+// Manually add face to be tagged
+document.addEventListener('click', function(event) {
+	if(event.target.classList.contains('image__add-face')) {
+		
+		let linkElem = event.target;
+		let imageUrl = linkElem.dataset.image;
+		
+		
+		
+	}
+});
+document.addEventListener('click', function(event) {
+	
+	console.log(event);
+	if(event.target.classList.contains('add-face__wrapper')) {
+		
+		
+		event.preventDefault();
+		
+		console.log(event);
+		
+		
+		
+	}
+});
 
 
 // Update image data
@@ -119,17 +334,64 @@ function updateImageData(changedElem, preparedData = false) {
 		
 		preparedFormData = {};
 		
+		// Get all fields in this image container
 		var inputElems = parentElem.querySelectorAll('[name]');
+		
+		// Loop through each field and transform values if necessary
 		inputElems.forEach(function(inputElem) {
+			
+			// Selects
 			if(inputElem.nodeName === 'SELECT') {
-				preparedFormData[inputElem.name] = Array.prototype.map.call(inputElem.selectedOptions, function(x){ return x.value });
+				
+				// If select is musician tag, and has face json as data, treat that specially
+				if( inputElem.name.startsWith('image_musician_id') && inputElem.value && inputElem.dataset.face ) {
+					
+					console.log('hey');
+					
+					let idName = inputElem.name;
+					let faceName = 'musician_face_boundaries[' + inputElem.value + ']';
+					
+				preparedFormData[idName] = inputElem.value;
+					preparedFormData[faceName] = inputElem.dataset.face;
+					
+					
+					/*if( !preparedFormData[inputElem.name] ) {
+						preparedFormData[inputElem.name] = [];
+						preparedFormData['image_musician_face[]'] = [];
+					}
+					
+					//console.log('select value is ' + inputElem.value);
+					preparedFormData[inputElem.name].push(inputElem.value);
+					preparedFormData['image_musician_face[]'].push(inputElem.dataset.face);*/
+					
+					//preparedFormData[inputElem.name] = Array.prototype.map.call(inputElem.selectedOptions, function(x){ return x.value });
+					//console.log('prepared data rn is');
+					console.log(preparedFormData);
+					
+				//}
+				}
+				
+				
+				// For other selects, map selected options to array
+				else {
+					preparedFormData[inputElem.name] = Array.prototype.map.call(inputElem.selectedOptions, function(x){ return x.value });
+					//console.log('prepared data rn is');
+					console.log(preparedFormData);
+				}
+				
+				
 			}
+			
+			// Checkboxes and radios
 			else if(inputElem.type === 'checkbox' || inputElem.type === 'radio') {
 				preparedFormData[inputElem.name] = inputElem.checked ? 1 : 0;
 			}
+			
+			// Rest of fields
 			else {
 				preparedFormData[inputElem.name] = inputElem.value;
 			}
+			
 		});
 		
 	}
@@ -148,6 +410,9 @@ function updateImageData(changedElem, preparedData = false) {
 			
 		},
 		'callbackOnError': function(formElem, returnedData) {
+			
+			console.log('error');
+			console.log(returnedData);
 			
 		}
 	});
@@ -563,12 +828,12 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 								
 								newImageTemplateArgs.messageElem.innerHTML = 'Finishing up...';
 								
-								finishUpload(newImageElem, idElem, statusElem, thumbnailElem, compressData);
+								finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedData);
 								
 							},
 							'callbackOnError': function(compressEvent, compressData) {
 								
-								finishUpload(newImageElem, idElem, statusElem, thumbnailElem, compressData);
+								finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedData);
 								
 							}
 						});
@@ -627,6 +892,15 @@ function finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedD
 	lookForSelectize();
 	initImageEditElems();
 	initImageDeleteButtons();
+	
+	console.log(returnedData);
+	
+	// If upload function suggests face detection, show the 'tag musicians' section to do that
+	if(returnedData.needs_facial_detection) {
+		
+		showTaggingSection(newImageElem, 'musicians');
+		
+	}
 	
 	// Trigger change on ID elem so that new ID (and description, etc) is saved in DB
 	idElem.dispatchEvent(new Event('change'));
