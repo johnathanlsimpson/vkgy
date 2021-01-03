@@ -6,10 +6,34 @@
 		private $pdo;
 		private $resize_methods;
 		private $allowed_resize_methods;
-		private $allowed_extensions;
 		private $image_paths;
 		private $font_source;
 		private $site_credit;
+		
+		// Allowed extensions
+		static public $allowed_extensions = [
+			'gif',
+			'jpeg',
+			'jpg',
+			'png',
+			'webp',
+		];
+		
+		// Image contents
+		static public $allowed_image_contents = [
+			'group photo' => 1,
+			'musician' => 2,
+			'flyer' => 3,
+			'logo' => 4,
+			'release' => 5,
+			'other' => 0,
+		];
+		
+		// Image format ratios (short side / long side)
+		static public $image_ratios = [
+			'0.70' => 'flyer',
+			'0.66' => 'musician',
+		];
 		
 		// ======================================================
 		// Connect
@@ -30,8 +54,6 @@
 			foreach($this->resize_methods as $key => $value) {
 				$this->image_paths[$key] = '../images/image_files'.($key != 'full' ? '_'.($key === 'watermark' ? 'watermarked' : $key) : null).'/';
 			}
-			
-			$this->allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
 			
 			$this->font_source = '../style/font-lucida.ttf';
 			
@@ -202,7 +224,7 @@
 					}
 					
 					// Otherwise, let's resize it
-					elseif(strlen($source_extension) && in_array($source_extension, $this->allowed_extensions)) {
+					elseif(strlen($source_extension) && in_array($source_extension, self::allowed_extensions)) {
 						
 						// Increase memory limit if necessary
 						if($this->set_memory_limit($full_path)) {
@@ -424,7 +446,7 @@
 					$image_ext = $stmt_image->fetchColumn();
 					
 					// If extension found
-					if(strlen($image_ext) && in_array($image_ext, $this->allowed_extensions)) {
+					if(strlen($image_ext) && in_array($image_ext, self::allowed_extensions)) {
 						
 						if($resize_method === 'full') {
 							$image_url = $this->get_full_size_image($image_id, $image_ext);
