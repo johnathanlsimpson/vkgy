@@ -307,6 +307,9 @@ foreach($news as $news_key => $news_item) {
 	if($news[$news_key]['image']) {
 		$news[$news_key]['image']['url'] = str_replace('.thumbnail.', '.small.', $news_item['image']['url']);
 	}
+	else {
+		$news[$news_key]['image'] = ['url' => null];
+	}
 	
 }
 
@@ -389,14 +392,14 @@ foreach($latest_items as $item_key => $latest_item) {
 		$url = str_replace('.small.', '.', $url);
 		$medium_url = str_replace('.', '.medium.', $url);
 		$thumbnail_url = str_replace('.', '.thumbnail.', $url);
-		
-		// Push
-		$latest_items[$item_key]['image'] = array_merge( $latest_items[$item_key]['image'], [
-			'url' => $url,
-			'medium_url' => $medium_url,
-			'thumbnail_url' => $thumbnail_url
-		] );
 	}
+	
+	// Push
+	$latest_items[$item_key]['image'] = array_merge( $latest_items[$item_key]['image'], [
+		'url' => $url ?: null,
+		'medium_url' => $medium_url ?: null,
+		'thumbnail_url' => $thumbnail_url ?: null
+	] );
 	
 }
 
