@@ -1,3 +1,52 @@
+document.addEventListener('click', function(event) {
+	if(event.target.classList.contains('xx')) {
+		
+		let rectangle = event.target.getBoundingClientRect();
+		let clickX = event.clientX - rectangle.left;
+		let clickY = event.clientY - rectangle.top;
+		
+		let boxWidth = rectangle.width;
+		let boxHeight = rectangle.height;
+		let imageWidth = event.target.naturalWidth;
+		let imageHeight = event.target.naturalHeight;
+		
+		let leftRatio = ( clickX - 50 ) / boxWidth;
+		let widthRatio = 100 / boxWidth;
+		let topRatio = ( clickY - 50 ) / boxHeight;
+		let heightRatio = 100 / boxHeight;
+		
+		let left = Math.round(imageWidth * leftRatio);
+		let width = Math.round(imageWidth * widthRatio);
+		let top = Math.round(imageHeight * topRatio);
+		let height = Math.round(imageHeight * heightRatio);
+		
+		let data = {
+			'image_width': imageWidth,
+			'image_height': imageHeight,
+			'image_url': event.target.src,
+		};
+		
+		let face = [{
+			'start_x': left,
+			'end_x': left + width,
+			'start_y': top,
+			'end_y': top + height,
+		}];
+		
+		showTaggingSection( event.target.closest('.image__template'), 'musicians' );
+		
+		getFacesHtml(event.target.closest('.image__template'), JSON.stringify(face));
+		
+		console.log(boxWidth, boxHeight, imageWidth, imageHeight);
+		console.log(clickX, clickY);
+		console.log(left, width, top, height);
+		
+		
+	}
+});
+
+
+
 // Show tagging options on click
 document.addEventListener('click', function(event) {
 	
@@ -122,12 +171,12 @@ function updateDescription(imageElem) {
 
 
 // Get faces html
-function getFacesHtml(imageElem) {
+function getFacesHtml(imageElem, manualFaces = null) {
 	
 	let imageUrl = imageElem.querySelector('.image__image').href;
 	//let faces = imageElem.dataset.faces ? imageElem.dataset.faces : '';
 	let facesElem = imageElem.querySelector('[name="image_face_boundaries"]');
-	let faces = facesElem.value ? facesElem.value : '';
+	let faces = manualFaces ? manualFaces : ( facesElem.value ? facesElem.value : '' );
 //faces = '[{"start_x":9,"start_y":9,"end_x":71,"end_y":99},{"start_x":103,"start_y":22,"end_x":154,"end_y":90}]';
 	
 	// Show loading

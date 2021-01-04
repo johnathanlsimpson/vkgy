@@ -162,6 +162,20 @@
 								<!---->
 							</div>
 							
+							
+							
+							<div class="input__row" style="box-shadow:0 0 20px 0 purple;">
+								
+								<div class="input__group" style="cursor:crosshair;box-shadow: 0 0 15px 0 yellow; max-height: 300px; overflow-y: auto; ">
+									
+									<img class="xx" src="https://vk.gy/images/22139-haklo-group-photo.jpg" style="box-shadow: 0 0 10px green; max-width: 100%; height: auto;" />
+									
+								</div>
+								
+							</div>
+							
+							
+							
 							<!-- Tag artists -->
 							<div class="input__row image__tags--artists image__selects any--hidden">
 								<div class="input__group any--flex-grow image__artists">
