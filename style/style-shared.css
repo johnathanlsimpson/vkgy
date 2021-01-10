@@ -1138,7 +1138,7 @@ input {
 	background-size: 100% 2px, 0, 0, 0;
 	color: hsl(var(--text));
 	cursor: pointer;
-	font-family: monospace, "brackets", メイリオ, Meiryo, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "ＭＳ Ｐゴシック", "MS PGothic", serif;
+	font-family: var(--font--secondary);
 	font-weight: normal;
 	height: auto;
 	max-width: 100%;
@@ -1176,7 +1176,6 @@ input {
 	background-image: none;
 	color: hsl(var(--text--secondary));
 	cursor: pointer;
-	font-family: monospace, "brackets", メイリオ, Meiryo, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "ＭＳ Ｐゴシック", "MS PGothic", serif;
 	max-width: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
