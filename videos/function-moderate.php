@@ -28,6 +28,7 @@ if( $_SESSION['can_approve_data'] ) {
 				if( $stmt_approve->execute([ 0, $id ]) ) {
 					
 					$output['status'] = 'success';
+					$access_video->check_user_video_permissions($id);
 					
 				}
 				else {
