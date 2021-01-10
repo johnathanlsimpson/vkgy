@@ -45,7 +45,7 @@ function initSelectize(selectElement, populatedOnClick = false) {
 	var selectizedObject  = selectizedElement[0].selectize;
 	
 	selectizedObject.on('change', function() {
-		selectElement[0].dispatchEvent(new Event('change'));
+		selectElement[0].dispatchEvent(new Event('change', {bubbles: true}));
 	});
 	
 	if(populatedOnClick) {

@@ -924,13 +924,8 @@
 				// Image
 				$input_content = preg_replace_callback("/".$this->image_pattern."/", function($match) {
 					
-					// Get height/width (if local image) so we can slap a 'portrait' class on there if necessary
-					if(preg_match('/'.'^(?:https?:)?(?:\/\/)?(?:vk\.gy)?\/images\/(\d+)(?:-[A-z0-9-]*)?(\.[A-z]+)$'.'/', $match[2], $local_image_match)) {
-						if(file_exists('../images/image_files/'.$local_image_match[1].$local_image_match[2])) {
-							list($width, $height) = getimagesize('../images/image_files/'.$local_image_match[1].$local_image_match[2]);
-							$image_class = $width > $height ? 'module--landscape' : 'module--portrait';
-						}
-					}
+					list($width, $height) = getimagesize($match[2]);
+					$image_class = $width > $height ? 'module--landscape' : 'module--portrait';
 					
 					$image_src = $match[2];
 					$image_src = preg_replace('/'.'(^(?:https?:)?(?:\/\/)?(?:vk\.gy)?\/images\/\d+(?:-[A-z0-9-]*)?)(\.[A-z]+)$'.'/', '$1.medium$2', $image_src);
