@@ -1,6 +1,7 @@
 <?php
 
 include_once('../lists/function-render_lists.php');
+include_once('../videos/function-render_report.php');
 
 $page_title =  $access_video->clean_title($video['youtube_name'], $video['artist']);
 
@@ -19,16 +20,45 @@ $access_artist = new access_artist($pdo);
 ?>
 <div class="col c4-AAAB">
 	
-	
-	<!-- Left sidebar -->
-	<!--<div></div>-->
-	
 	<!-- Center content -->
 	<div>
 		
 		<div class="video__thumbnail any--margin module module--youtube">
 			<a class="video__bg youtube__embed" data-id="<?= $video['youtube_id']; ?>" href="<?= $video['url']; ?>" style="background-image:url(<?= str_replace('mqdefault', 'hqdefault', $video['thumbnail_url']); ?>);"></a>
 		</div>
+		
+		<?php if($video['is_flagged']): ?>
+			<div class="moderation__container text text--outlined text--error symbol__error">
+				
+				<?php if($video['is_flagged'] == 1): ?>
+					This video is from a new user. Please check that it's from an official source before approving.
+				<?php else: ?>
+					This video is flagged <span class="any__note"><?= $allowed_report_types[ $video['is_flagged'] ]; ?></span>. Please review it and take appropriate action.
+				<?php endif; ?>
+				
+				<br /><br />
+				
+				<div class="input__row">
+					
+					<!-- Approve -->
+					<div class="input__group">
+						<button class="moderation__button input__button symbol__like" data-id="<?= $video['id']; ?>" value="approve">approve video</button>
+					</div>
+					
+					<!-- Approve all -->
+					<div class="input__group" style="margin-right:auto;">
+						<button class="moderation__button input__button symbol__join" data-id="<?= $video['id']; ?>" value="approve_all">approve user</button>
+					</div>
+					
+					<!-- Delete -->
+					<div class="input__group">
+						<button class="moderation__button input__button symbol__trash" data-id="<?= $video['id']; ?>" value="delete">delete video</button>
+					</div>
+					
+				</div>
+				
+			</div>
+		<?php endif; ?>
 		
 		<div class="col c3-AAB">
 			
@@ -40,13 +70,15 @@ $access_artist = new access_artist($pdo);
 					<?= $access_video->clean_title($video['youtube_name'], $video['artist']); ?>
 				</h2>
 				
-				<?php if($_SESSION['username'] === 'inartistic'): ?>
+				<?php /*if($_SESSION['username'] === 'inartistic'): ?>
 				<!-- Like -->
 				<button class="video__like input__button symbol__star--empty" type="button">like</button>
-				<?php endif; ?>
+				<?php endif;*/ ?>
 				
-				<!-- List -->
-				<?= render_lists_dropdown([ 'item_id' => $video['id'], 'item_type' => 'video' ]); ?>
+				<div class="any--flex">
+					<!-- List -->
+					<?= render_lists_dropdown([ 'item_id' => $video['id'], 'item_type' => 'video' ]); ?>
+				</div>
 				
 				<!-- Description -->
 				<input class="obscure__input" id="obscure-description" type="checkbox" <?= substr_count($video['youtube_content'], '<br />') > 12 ? 'checked' : null; ?> />
@@ -87,12 +119,6 @@ $access_artist = new access_artist($pdo);
 			
 		</style>
 		
-		<?php if($video['is_flagged']): ?>
-			<div class="text text--outlined text--error symbol__error">
-				<?= lang('This video is awaiting approval.', 'この動画は承認待ちです。', 'hidden'); ?>
-			</div>
-		<?php endif; ?>
-		
 		<div class="text text--outlined">
 			<div class="data__container">
 				
@@ -124,11 +150,24 @@ $access_artist = new access_artist($pdo);
 					<?= substr($video['date_added'], 0, 10); ?>
 				</div>
 				
-				<div class="data__item">
+				<div class="data__item" style="margin-right:auto;">
 					<h5>
 						Added by
 					</h5>
 					<a class="user" data-icon="<?= $video['user']['icon']; ?>" data-is-vip="<?= $video['user']['is_vip']; ?>" href="<?= $video['user']['url']; ?>"><?= $video['user']['username']; ?></a>
+				</div>
+				
+				<div class="data__item">
+					<h5>
+						Moderate
+					</h5>
+					<?php if( $_SESSION['can_approve_data'] ): ?>
+						<button class="moderation__button input__button symbol__trash" data-id="<?= $video['id']; ?>" value="delete">delete video</button>
+					<?php endif; ?>
+				
+					<?php if( $video['is_flagged'] == 0 ): ?>
+						<?= render_report_dropdown([ 'item_id' => $video['id'], 'is_flagged' => $video['is_flagged'] ]); ?>
+					<?php endif; ?>
 				</div>
 				
 			</div>

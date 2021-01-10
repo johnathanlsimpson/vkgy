@@ -14,6 +14,7 @@
 	$flyer = $stmt_flyer->fetch();
 	
 	$artist_ids = explode(")", str_replace("(", "", $flyer["artist_id"]));
+	$artist_ids = array_filter($artist_ids, 'is_numeric');
 
 	if(is_array($flyer) && !empty($flyer)) {
 		
@@ -53,9 +54,11 @@
 						$stmt_link->execute([ $new_image_id, $artist_id ]);
 					}
 					
+					$artist_id = reset($artist_ids);
+					
 					// Get artist info from flyer
-					if(is_numeric($artist_id[0])) {
-						$flyer['artist'] = $access_artist->access_artist(["id" => $artist_id[0], "get" => "name"]);
+					if(is_numeric($artist_id)) {
+						$flyer['artist'] = $access_artist->access_artist(["id" => $artist_id, "get" => "name"]);
 					}
 					
 					// Get filepath of watermarked version of flyer, set URL for normal access
@@ -65,6 +68,7 @@
 					// Build and queue social media post
 					$social_post = $access_social_media->build_post($flyer, 'flyer_of_day');
 					$access_social_media->post_to_social($social_post, 'both');
+					
 				}
 			}
 		}

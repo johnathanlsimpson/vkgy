@@ -161,7 +161,7 @@ $allowed_item_types = array_keys(access_list::$allowed_item_types);
 					<!-- Toggle button for dropdown -->
 					<input class="lists__choice input__choice" type="checkbox" />
 					<label class="lists__open input__button input__checkbox">
-						<span class="" style="text-transform:none;">lists</span>
+						<span class="symbol__list">add to list</span>
 						<span class="symbol__down-caret symbol--standalone"></span>
 					</label>
 					

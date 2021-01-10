@@ -122,7 +122,7 @@
 					if(is_numeric($artist_id)) {
 						
 						// If user is an admin (who can approve channel anyway), approve and add channel to artist's links
-						if($is_flagged && ( $_SESSION['can_bypass_video_approval'] ) ) {
+						if($is_flagged && $_SESSION['can_bypass_video_approval'] ) {
 							$is_flagged = false;
 							
 							// Get artist class
@@ -149,7 +149,6 @@
 						$sql_video = 'INSERT INTO videos (artist_id, release_id, user_id, youtube_id, youtube_name, youtube_content, type, date_occurred, is_flagged) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
 						$stmt_video = $this->pdo->prepare($sql_video);
 						if($stmt_video->execute($values_video)) {
-							
 							
 							$output = array_merge($video_data, [
 								'approval_notice_class' => $is_flagged ? null : 'any--hidden',
@@ -383,13 +382,11 @@
 		
 		
 		// ======================================================
-		// Give user permission to add videos without approval
+		// Check if user needs permission to add w/out approval
 		// ======================================================
 		function check_user_video_permissions($video_id) {
 			
 			if(is_numeric($video_id)) {
-				
-				$access_user = new access_user($this->pdo);
 				
 				// Find other approved videos which were added by the user who uploaded the video in question
 				$sql_approved = '
@@ -405,15 +402,32 @@
 				// If at least five videos, spread over at least five artists, have been approved, allow user to upload w/out needing approval
 				if( is_array($rslt_approved) && !empty($rslt_approved) && count($rslt_approved) >= 5 ) {
 					
-					// Give user permission to bypass approval
-					$access_user->change_permission( $rslt_approved[0]['user_id'], 'can_bypass_video_approval', true );
-					
-					// Approve other videos uploaded by user (but only where they have the default flag)
-					$sql_approve = 'UPDATE videos SET is_flagged=? WHERE user_id=? AND is_flagged=?';
-					$stmt_approve = $this->pdo->prepare($sql_approve);
-					$stmt_approve->execute([ 0, $rslt_approved[0]['user_id'], 1 ]);
+					$this->give_user_video_permission($rslt_approved[0]['user_id']);
 					
 				}
+				
+			}
+			
+		}
+		
+		
+		
+		// ======================================================
+		// Give permission to add w/out approval
+		// ======================================================
+		function give_user_video_permission($user_id) {
+			
+			if( is_numeric($user_id) ) {
+				
+				$access_user = new access_user($this->pdo);
+				
+				// Give user permission to bypass approval
+				$access_user->change_permission($user_id, 'can_bypass_video_approval', true );
+				
+				// Approve all videos from user with default ('not yet reviewed') flag
+				$sql_approve = 'UPDATE videos SET is_flagged=? WHERE user_id=? AND is_flagged=?';
+				$stmt_approve = $this->pdo->prepare($sql_approve);
+				$stmt_approve->execute([ 0, $user_id, 1 ]);
 				
 			}
 			
