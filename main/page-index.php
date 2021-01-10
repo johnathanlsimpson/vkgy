@@ -430,8 +430,6 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 </div>
 <?php endif; ?>
 
-<?php include('partial-patreon.php'); ?>
-
 <!-- Videos -->
 <div class="col c1 any--margin">
 	<div>
@@ -540,6 +538,8 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 		line-height: 1rem;
 	}
 </style>
+
+<?php include('partial-patreon.php'); ?>
 
 <div class="col c1">
 	<div>
