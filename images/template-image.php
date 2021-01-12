@@ -10,25 +10,31 @@
 				?>
 					<li class="image__template any--flex" data-get="image_status" data-get-into="data-image-status">
 						
-						<div style="box-shadow:0 0 5px 0 green; display: flex; flex-direction: column; margin-right: 1rem;">
+						<div class="input__row" style="display: flex; flex-direction: column; margin-right: 1rem; align-items:flex-start;">
 							
 							<!-- Thumbnail -->
-							<a class="image__image" data-get="image_url" data-get-into="href" href="{image_url}" style="background-image:url({background_url});margin-right:0;" target="_blank">
-								<span class="image__status symbol--standalone"></span>
-							</a>
-							
-							<!-- Default image -->
-							<label class="input__radio">
-								<input class="input__choice" name="image_is_default" type="radio" value="1" {is_default} />
-								<span class="symbol__unchecked"><?= 'main'; ?></span>
-							</label>
-							
-							<!-- Delete -->
-							<div class="input__group {delete_class}" style="padding-left:0 !important;margin-top:0 !important;">
-								<label class="input__radio symbol__trash symbol--standalone image__delete" style="margin-left:0;"></label>
+							<div class="input__group">
+								<a class="image__image" data-get="image_url" data-get-into="href" href="{image_url}" style="background-color:hsl(var(--background--bold));background-image:url({background_url});" target="_blank">
+									<span class="image__status symbol--standalone"></span>
+								</a>
 							</div>
 							
-							<label class="input__checkbox"><span class="symbol__copy">copy code</span></label>
+							<!-- Default image -->
+							<div class="input__group">
+								<label class="input__radio">
+									<input class="input__choice" name="image_is_default" type="radio" value="1" {is_default} />
+									<span class="symbol__unchecked">main image</span>
+								</label>
+							</div>
+							
+							<div class="input__group" style="margin-bottom:auto;">
+								<button class="input__button symbol__copy">copy code</button>
+							</div>
+							
+							<!-- Delete -->
+							<div class="input__group {delete_class}" style="">
+								<button class="input__button symbol__trash image__delete" style="margin-left:0;">delete</button>
+							</div>
 							
 						</div>
 						
@@ -36,12 +42,13 @@
 						<div class="image__data any--flex-grow">
 							
 							<!-- IDs -->
-							<input data-get="image_id" data-get-into="value" name="image_id" value="{id}" hidden />
-							<input name="image_item_type" value="{item_type}" hidden />
-							<input name="image_item_id" value="{item_id}" hidden />
-							<input name="image_is_queued" value="{is_queued}" hidden />
-							<input class="any--hidden" data-get="image_is_new" data-get-into="value" name="image_is_new" value="0" disabled hidden />
-							<input name="image_face_boundaries" value='{face_boundaries}' />
+							<input data-get="image_id"      data-get-into="value"                         name="image_id"              value="{id}" hidden />
+							<input                                                                        name="image_item_type"       value="{item_type}" hidden />
+							<input                                                                        name="image_item_id"         value="{item_id}" hidden />
+							<input                                                                        name="image_is_queued"       value="{is_queued}" hidden />
+							<input class="any--hidden"      data-get="image_is_new" data-get-into="value" name="image_is_new"          value="0" disabled hidden />
+							<input                                                                        name="image_face_boundaries" value='{face_boundaries}' hidden />
+							<input class="image__extension" data-get="image_extension"                                                 value="{extension}" hidden />
 							
 							<!-- Description, default, delete -->
 							<div class="input__row image__message">
@@ -60,16 +67,16 @@
 							
 							
 						<!-- Left -->
-						<div class="input__row" style="box-shadow: 0 0 10px 0 blue; display: flex; align-items: flex-start;">
+						<div class="input__row" style="">
 							
 							<!-- Type -->
-							<div style="box-shadow: 0 0 5px 0 green; flex-basis: 300px;flex-grow:1;">
+							
 								<div class="input__group">
 									
 									<label class="input__label">Image type</label>
 									
 									<?php
-										foreach([ 'group photo', 'musician', 'flyer', 'logo', 'release', 'other' ] as $value => $key) {
+										foreach([ 'group photo', 'individual', 'flyer', 'logo', 'release', 'other' ] as $value => $key) {
 											?>
 												<label class="input__radio">
 													<input class="input__choice" name="image_type" type="radio" value="<?= $value; ?>" <?= $key === 'group photo' ? 'checked' : null; ?> />
@@ -82,22 +89,13 @@
 								</div>
 								
 								<!-- Description -->
-								<div class="input__group any--flex-grow">
+								<div class="image__description input__group any--flex-grow any--hidden">
 									<label class="input__label">Description</label>
 									<input class="any--flex-grow" data-get="description" data-get-into="value" name="image_description" placeholder="description" value="{description}" />
 								</div>
 								
-							</div>
-							
-							<div style="box-shadow: 0 0 5px 0 pink; flex-basis:300px;flex-grow:1;">
-								<!-- Credit url -->
-								<div class="input__group">
-									
-									<label class="input__label">Credit url</label>
-									<input class="any--flex-grow" name="image_credit" placeholder="http://website.com" value="{credit}" />
-									
-								</div>
-								
+						</div>
+						<div class="input__row">
 								<!-- Watermark -->
 								<div class="input__group">
 									
@@ -121,7 +119,14 @@
 									</label>
 									
 								</div>
-							</div>
+								<!-- Credit url -->
+								<div class="input__group">
+									
+									<label class="input__label">Credit url</label>
+									<input class="any--flex-grow" name="image_credit" placeholder="http://website.com" value="{credit}" />
+									
+								</div>
+								
 						</div>
 							
 							
@@ -164,12 +169,23 @@
 							
 							
 							
-							<div class="input__row" style="box-shadow:0 0 20px 0 purple;">
+							<div class="input__row" style="">
 								
-								<div class="input__group" style="cursor:crosshair;box-shadow: 0 0 15px 0 yellow; max-height: 300px; overflow-y: auto; ">
+								<div class="input__group">
 									
-									<img class="xx" src="https://vk.gy/images/22139-haklo-group-photo.jpg" style="box-shadow: 0 0 10px green; max-width: 100%; height: auto;" />
+									<label class="input__label">tag sldkfj</label>
 									
+									<div style="cursor:crosshair;max-height: 300px; overflow-y: auto; margin-top:1rem;">
+										
+									<img class="xx" src="https://vk.gy/images/5582-ifa-group-shot.png" style="max-width: 100%; height: auto;" />
+									
+									</div>
+								</div>
+								
+								<div class="input__group">
+									<a class="a--outlined symbol__plus" style="display:inline-flex;align-items:center;height:160px;width:100px; text-align:center;flex-wrap:wrap;"><div style="width:100%;">
+										
+										add face</div></a>
 								</div>
 								
 							</div>

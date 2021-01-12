@@ -42,20 +42,31 @@ function detect_faces($image) {
 	else {
 		
 		$response = json_decode($response, true);
-		$response = $response['detected_faces'];
 		
-		// Only want to save the coordinate data
-		foreach($response as $response_key => $face) {
+		// Make sure some faces were returned, then clean them up
+		if( is_array($response) && is_array($response['detected_faces']) ) {
 			
-			$face = $face['BoundingBox'];
+			$response = $response['detected_faces'];
 			
-			$response[$response_key] = [
-				'start_x' => $face['startX'],
-				'start_y' => $face['startY'],
-				'end_x' => $face['endX'],
-				'end_y' => $face['endY'],
-			];
+			// Only want to save the coordinate data
+			foreach($response as $response_key => $face) {
+				
+				$face = $face['BoundingBox'];
+				
+				$response[$response_key] = [
+					'start_x' => $face['startX'],
+					'start_y' => $face['startY'],
+					'end_x' => $face['endX'],
+					'end_y' => $face['endY'],
+				];
+				
+			}
 			
+		}
+		
+		// If no faces detected, return empty array
+		else {
+			$response = [];
 		}
 		
 		return json_encode($response);

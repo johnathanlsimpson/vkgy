@@ -1,3 +1,14 @@
+// Show description
+document.addEventListener('click', function(event) {
+	if(event.target.name == 'image_type') {
+		
+		let descriptionElem = event.target.closest('.image__template').querySelector('.image__description');
+		
+		descriptionElem.classList.remove('any--hidden');
+		
+	}
+});
+
 document.addEventListener('click', function(event) {
 	if(event.target.classList.contains('xx')) {
 		

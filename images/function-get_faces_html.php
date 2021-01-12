@@ -48,10 +48,10 @@ if( strlen($image_url) /*&& strpos($image_url, 'https://vk.gy') === 0 && file_ex
 	
 	$returned_html[] = '<div class="input__group" style="margin-left:-0.5rem;"><label class="input__label">other musicians</label><select class="input" data-populate-on-click="true" data-source="musicians" name="image_musician_id[]" placeholder="musicians"></select></div>';
 	
-	/*$returned_html[] = '<a class="image__add-face symbol__plus">add face</a>';
+	$returned_html[] = '<a class="image__add-face symbol__plus">add face</a>';
 	$returned_html[] = '<a class="add-face__wrapper" style="box-shadow:0 0 10px 0 pink;position:fixed;top:5;left:0;right:0;bottom:0;margin:var(--gutter);background:hsl(var(--background));z-index:2;">';
 	$returned_html[] = '<img class="add-face__image" src="'.$image_url.'" style="max-width:100%;max-height:100%;object-fit:contain;" ismap />';
-	$returned_html[] = '</a>';*/
+	$returned_html[] = '</a>';
 	
 	$output['status'] = 'success';
 	$output['result'] = implode('', $returned_html);
