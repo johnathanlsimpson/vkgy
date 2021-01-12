@@ -1,208 +1,239 @@
 <?php
-	include_once("../releases/head.php");
 
-	$access_release = new access_release($pdo);
-	$access_user = new access_user($pdo);
+include_once("../releases/head.php");
 
-	script([
-		"/scripts/external/script-selectize.js",
-		"/scripts/external/script-inputmask.js",
-		"/scripts/script-initSelectize.js",
-		"/releases/script-page-index.js"
-	]);
+$access_release = new access_release($pdo);
+$access_user = new access_user($pdo);
 
-	style([
-		"/style/external/style-selectize.css",
-		"/releases/style-page-index.css"
-	]);
+script([
+	"/scripts/external/script-selectize.js",
+	"/scripts/external/script-inputmask.js",
+	"/scripts/script-initSelectize.js",
+	"/releases/script-page-index.js"
+]);
 
-	subnav([
-		lang('Release calendar', '新譜一覧', ['secondary_class' => 'any--hidden']) => '/releases/',
-		lang('Search', 'サーチ', ['secondary_class' => 'any--hidden']) => '/search/releases/',
-	]);
+style([
+	"/style/external/style-selectize.css",
+	"/releases/style-page-index.css"
+]);
 
-	$page_header = lang('VK release information', 'V系リリース情報', ['container' => 'div']);
+subnav([
+	lang('Release calendar', '新譜一覧', ['secondary_class' => 'any--hidden']) => '/releases/',
+	lang('Search', 'サーチ', ['secondary_class' => 'any--hidden']) => '/search/releases/',
+]);
+
+$page_header = lang('New visual kei releases', 'ビジュアル系 新譜情報', ['container' => 'div']);
+
+$markdown_parser = new parse_markdown($pdo);
+
 ?>
 
-<?php
-	if($error) {
-		?>
-			<div class="col c1">
-				<div>
-					<div class="text text--outlined text--error symbol__error">
-						<?php echo $error; ?>
-					</div>
-				</div>
-			</div>
-		<?php
-	}
+<?php if($error): ?>
+	<div class="col c1">
+		<div>
+			<div class="text text--outlined text--error symbol__error"><?= $error; ?></div>
+		</div>
+	</div>
+<?php endif; ?>
 
-	$sql_recently_edited = 'SELECT MAX(id) AS id FROM edits_releases GROUP BY release_id ORDER BY id DESC LIMIT 20';
-	$stmt_recently_edited = $pdo->prepare($sql_recently_edited);
-	$stmt_recently_edited->execute();
-	foreach($stmt_recently_edited->fetchAll() as $rslt_recently_edited) {
-		$recently_edited_ids[] = $rslt_recently_edited['id'];
-	}
+<div class="col c4-AAAB">
 
-	$edited_releases = $access_release->access_release([ 'edit_ids' => $recently_edited_ids, 'get' => 'list' ]);
-
-	$recent_releases = $access_release->access_release([ 'get' => 'calendar', 'start_date' => date('Y-m-d', strtotime('-1 week')) ]);
-
-	if(is_array($recent_releases) && !empty($recent_releases)) {
-		$recent_releases = array_reverse($recent_releases);
-
-		foreach($recent_releases as $release) {
-			$day = $release['date_occurred'];
-			$month = substr($day, 0, 7);
-			$alph_key = $release['artist']['friendly'].'-'.$release['friendly'].'-'.$release['id'];
-			
-			if(is_array($release['medium']) && !empty($release['medium'])) {
-				foreach($release['medium'] as $medium_key => $medium) {
-					$release['medium'][$medium_key] = strtolower($medium['friendly']);
-				}
-				$release['medium'] = implode(' ', $release['medium']);
-			}
-			else {
-				$release['medium'] = 'other';
-			}
-			
-			$release_ids_by_name[$alph_key] = $release['id'];
-			$releases_by_date[$month][] = $release;
+<div class="col c1">
+	<?php
+		
+		$access_release = new access_release($pdo);
+		$upcoming_releases = $access_release->access_release([ 'get' => 'list', 'start_date' => date('Y-m-01'), 'order' => 'releases.date_occurred ASC' ]);
+		$upcoming_releases = array_values($upcoming_releases);
+		
+		foreach($upcoming_releases as $release) {
+			$month = substr($release['date_occurred'], 0, 7).'-01';
+			$monthly_releases[$month][] = 'https://vk.gy/releases/dummy/'.$release['id'].'/dummy/';
 		}
-
-		ksort($release_ids_by_name);
-		$release_ids_by_name = array_values($release_ids_by_name);
-		$release_ids_by_name = array_flip($release_ids_by_name);
-	}
-?>
-
-<?php
-	if(is_array($releases_by_date) && !empty($releases_by_date)) {
-		?>
-			<div class="col c3-AAB">
-				<div class="calendar__wrapper">
-					<h2>
-						<?php echo lang('Visual kei release calendar', 'ビジュアル系新譜一覧', ['container' => 'div']); ?>
-					</h2>
-
-					<input class="any--hidden" id="order-by--date-asc"  name="order-by" type="radio" checked />
-					<input class="any--hidden" id="order-by--date-desc" name="order-by" type="radio" />
-					<input class="any--hidden" id="order-by--name"      name="order-by" type="radio" />
-					<input class="any--hidden" id="filter--all" name="filter" value="all" type="radio" checked />
-					<input class="any--hidden" id="filter--cd" name="filter" value="cd" type="radio" />
-					<input class="any--hidden" id="filter--dvd" name="filter" value="dvd" type="radio" />
-					<input class="any--hidden" id="filter--other" name="filter" value="other" type="radio" />
-
-					<div class="calendar__controls any--flex any--flex-space-between">
-						<div>
-							<label class="input__radio" for="order-by--date-asc"><span class="symbol__up-caret">date</span></label>
-							<label class="input__radio" for="order-by--date-desc"><span class="symbol__down-caret">date</span></label>
-							<label class="input__radio" for="order-by--name"><span class="symbol__up-caret">A-Z</span></label>
-						</div>
-						<div>
-							<label class="input__radio" for="filter--all"><span class="symbol__unchecked">all</span></label>
-							<label class="input__radio" for="filter--cd"><span class="symbol__unchecked">CD</span></label>
-							<label class="input__radio" for="filter--dvd"><span class="symbol__unchecked"><?= lang('video', '映像', 'hidden'); ?></span></label>
-							<label class="input__radio" for="filter--other"><span class="symbol__unchecked">other</span></label>
-						</div>
-					</div>
-
-					<div class="calendar__container text text--outlined">
-						<?php
-							foreach($releases_by_date as $month => $day) {
-								$header_en =
-									(substr($month, 5, 2) === '00' ? 'TBA' : date('F', strtotime($month.'-01'))).
-									($month < date('Y-01') || $month > date('Y-12-31') ? ' '.substr($month, 0, 4) : null);
-								$header_jp =
-									substr($month, 0, 4).'年'.
-									(substr($month, 5, 2) === '00' ? ' 未定' : substr($month, 5, 2).'月');
-
-								?>
-									<h2 class="calendar__header">
-										<?php echo lang($header_en, $header_jp, ['container' => 'div']); ?>
-									</h2>
-								<?php
-
-								foreach($day as $release) {
-									$artist_image = '/artists/'.$release['artist']['friendly'].'/main.small.jpg';
-									$cover_image = str_replace('.', '.thumbnail.', $release['image']['url']);
-									$artist_url = '/artists/'.$release['artist']['friendly'].'/';
-									$artist_name = $release['artist']['quick_name'].($release['artist']['romaji'] ? ' <span class="any--weaken">('.$release['artist']['name'].')</span>' : null);
-									$release_name = $release['quick_name'].($release['romaji'] ? ' <span class="any--weaken">('.$release['name'].')</span>' : null);
-									?>
-										<div
-												 class="calendar__item text text--outlined text--compact any--flex any__obscure"
-												 data-medium="<?= $release['medium']; ?>"
-												 style="order: <?php echo $release_ids_by_name[$release['id']]; ?>">
-											<a class="calendar__cover" href="<?php echo str_replace(['.small', '.thumbnail'], '', ($cover_image ?: $artist_image)); ?>" target="_blank" title="<?php echo ($cover_image ? '&ldquo;'.$release['quick_name'].'&rdquo; cover' : $release['artist']['quick_name'].' image'); ?>">
-												<img alt="<?php echo '&ldquo;'.$release['quick_name'].'&rdquo; cover'; ?>" class="lazy" data-src="<?php echo $cover_image ?: $artist_image; ?>" />
-											</a>
-											<div class="calendar__content">
-												<h5 class="calendar__date">
-													<?php echo $release['date_occurred']; ?>
-												</h5>
-												<a class="calendar__artist artist" href="<?php echo $artist_url; ?>"><?php echo $artist_name; ?></a>
-												<a class="calendar__title symbol__release" href="<?php echo '/releases/'.$release['artist']['friendly'].'/'.$release['id'].'/'.$release['friendly'].'/'; ?>"><?php echo $release_name; ?></a>
-												<a class="calendar__buy any--weaken symbol__exit" href="http://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/searches?term.media_format=&f=all&q=<?php echo str_replace('-', '+', $release['friendly']); ?>">Search CDJapan</a>
-											</div>
-										</div>
-									<?php
-								}
-
-								?>
-									<h2 class="calendar__header calendar__header--reverse">
-										<?php echo lang($header_en, $header_jp, ['container' => 'div']); ?>
-									</h2>
-								<?php
-							}
-						?>
-					</div>
+		
+		foreach($monthly_releases as $date => $releases) {
+			?>
+				<h2>
+					<?= lang(date('F', strtotime($date)).' '.substr($date, 0, 4).' - new vkei releases', substr($date, 0, 4).'年'.substr($date, 5, 2).'月・ビジュアル系 新作', 'div'); ?>
+				</h2>
+				
+				<div class="releases__month any--margin">
+					<?= $markdown_parser->parse_markdown( implode("\n", $releases) ); ?>
 				</div>
+			<?php
+		}
+		
+	?>
+</div>
+	
+	<!-- CDJ -->
+	
+	<div>
+		<h2>
+			<?= lang('Top vkei preorders', 'ビジュアル系 予約ランキング', 'div'); ?>
+		</h2>
+	<div class="x" style="">
+		<script src="https://www.cdjapan.co.jp/aff/data/tp_visual_cd_sen_ure.js"></script>
+		
+		
+		
+		<script src="https://www.cdjapan.co.jp/aff/data/tp_visual_cd_sen_ure.js"></script>
+		
+		<script type="text/javascript">
+			//let CdjapanAffiliate = {};
+			let blah = document.querySelector('.x');
+			console.log(blah);
+			
+			
+			conf = {
+				'sid':'6128',
+				'aid':'A549875',
+			};
+				let tmpl = '';
+				let allPreorders = CdjapanAffiliate.data.click_page + conf.sid + '/' + conf.aid + '/' + CdjapanAffiliate.data.more_page;
+				let updated = CdjapanAffiliate.data.last_upd;
+				let preorderLink, image, date, artist, title;
+				
+				for(let i=0; i < CdjapanAffiliate.data.list.length; i++ ){
+					
+					preorderLink = CdjapanAffiliate.data.click_page + conf.sid + '/' + conf.aid + '/detailview.html%3FKEY%3D' + CdjapanAffiliate.data.list[i].key;
+					image = CdjapanAffiliate.data.list[i].img;
+					date = CdjapanAffiliate.data.list[i].rel;
+					artist = CdjapanAffiliate.data.list[i].artist;
+					title = CdjapanAffiliate.data.list[i].title;
+					
+					tmpl +=
+						'<li class="z ranking__item">'+
+						'<a class="y any--flex" href="'+preorderLink+'" target="_blank">'+
+						(i < 3 ? '<span class="ranking__number symbol__user"></span>' : '')+
+						'<div style="flex:1;">'+
+						'<strong>' +artist+'</strong>'+
+						'<br />'+
+						title+
+						'</div>'+
+						'<img src="'+image+'" style="margin-left:0.5rem;width:100px;object-fit:cover;" />'+
+						'</a>'+
+						'</li>';
+					
+				}
+				
+				blah.innerHTML = '<ol style="counter-reset:defaultcounter;">' + tmpl + '</ol>';
+		</script>
+		
+		
+		
+		
+	</div>
+</div>
+	
+</div>
 
-				<?php
-					if(is_array($edited_releases)) {
-						?>
-							<div>
-								<h2>
-									<?php echo lang('Recently updated', '最近の更新', ['container' => 'div']); ?>
-								</h2>
-								<div class="text">
-									<ul>
-										<?php
-											$edited_release_ids = array_keys($edited_releases);
-											$num_edited_releases = count($edited_releases);
-											$edited_releases = array_values($edited_releases);
-											
-											for($i=0; $i<$num_edited_releases; $i++) {
-												?>
-													<li>
-														<div class="h5">
-															<?php
-																echo $edited_releases[$i]['date_edited'].' by '.'<a class="user a--inherit" data-icon="'.$edited_releases[$i]['user']['icon'].'" data-is-vip="'.$edited_releases[$i]['user']['is_vip'].'" href="'.$edited_releases[$i]['url'].'">'.$edited_releases[$i]['user']['username'].'</a>';
-															?>
-														</div>
-														<div>
-															<a class="artist any--weaken-size" href="/releases/<?php echo $edited_releases[$i]["artist"]["friendly"]; ?>/"><?php echo $edited_releases[$i]["artist"]["quick_name"]; ?></a>
-															<br />
-															<a class="symbol__release" href="/releases/<?php echo $edited_releases[$i]["artist"]["friendly"]."/".$edited_releases[$i]["id"]."/".$edited_releases[$i]["friendly"]; ?>/"><?php echo $edited_releases[$i]["quick_name"]; ?></a>
-														</div>
-													</li>
-												<?php
-											}
-										?>
-									</ul>
-								</div>
-							</div>
-						<?php
-					}
-				?>
-			</div>
-		<?php
+<style>
+	.z::before {
+		display: none;
 	}
-?>
+	.y {
+		margin: -0.5rem;
+		padding: 0.5rem;
+	}
+	.y:hover {
+		box-shadow: inset 0 0 0 3px currentColor;
+	}
+</style>
 
-<?php
-	include("../search/page-releases.php");
-
-	$pageTitle = "Release calendar | リリースカレンダー";
-?>
+<style>
+	.releases__month {
+		display:grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		grid-gap:2rem;
+	}
+	
+	.module--release {
+		display: inline-block;
+		margin: 0;
+		padding: 0;
+	}
+	.release-card__container {
+		flex-wrap: nowrap;
+		height: 100%;
+		max-height: 400px;
+		padding-top: calc(1rem + 150px);
+	}
+	.release-card__artist-image {
+		background: hsl(var(--background--bold));
+		background-position: center 30%;
+		background-size: cover;
+		height: 150px;
+		margin: 0;
+		width: auto;
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+	}
+	.release-card__cover {
+		height: 100%;
+	}
+	.release-card__right {
+		overflow: hidden;
+	}
+	.release-card__right::after {
+		background: linear-gradient( hsla(var(--background),0), hsla(var(--background),1) );
+		bottom: 0;
+		content: "";
+		display: block;
+		flex: none;
+		height: 2rem;
+		position: sticky;
+		width: 100%;
+	}
+	
+	
+	
+	
+.ranking__item:nth-of-type(1) .ranking__number {
+	background-color: hsl(51,100%,50%);
+	color: hsl(40,100%,38%);
+}
+.ranking__item:nth-of-type(2) .ranking__number {
+	background-color: hsl(0,0%,75%);
+	color: hsl(0,0%,55%);
+}
+.ranking__item:nth-of-type(3) .ranking__number {
+	background-color: hsl(30,61%,70%);
+	color: hsl(30,61%,50%);
+}
+.ranking__number {
+	border-radius: 50%;
+	display: inline-block;
+	flex: none;
+	float: left;
+	height: 2rem;
+	margin-left: -1rem;
+	margin-top: -4px;
+	margin-right: 5px;
+	vertical-align: middle;
+	width: 2rem;
+}
+.ranking__number::before {
+	color: inherit;
+	font-size: 24px;
+	opacity: 1;
+	left: 50%;
+	position: absolute;
+	top: 50%;
+	transform: translate(calc(-50% - 1px), calc(-50% - 1px)) rotate(-20deg);
+}
+.ranking__number::after {
+	color: hsl(var(--background--secondary));
+	content: counter(defaultcounter);
+	font-size: 13px;
+	font-style: italic;
+	font-weight: bold;
+	left: 50%;
+	line-height: 0;
+	position: absolute;
+	top: 50%;
+	transform: translate(calc(-50% - 2px), calc(-50% + 2px)) rotate(-20deg);
+}
+	
+</style>
