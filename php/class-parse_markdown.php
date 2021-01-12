@@ -774,6 +774,10 @@
 					// Release
 					elseif($reference_datum["type"] === "release" && !$ignore_references) {
 						
+						script([
+							'/lists/script-list.js',
+						]);
+						
 						ob_start();
 						?>
 							<div class="module module--release">
@@ -789,15 +793,18 @@
 										<!-- Cover -->
 										<a class="release-card__cover-link h5" href="<?= $reference_datum['image']['url']; ?>" target="_blank"><img class="release-card__cover" src="<?= str_replace('.', '.thumbnail.', $reference_datum['image']['url']); ?>" /></a>
 										
-										<div class="release-card__list">
-										</div>
-										
 										<div class="release-card__stores any--weaken any--flex">
 											<?php foreach([ 'amazon.png' => 'Amazon', 'cdj.gif' => 'CDJapan', 'rh.gif' => 'RarezHut' ] as $store_image => $store): ?>
 											<a class="release-card__store a--inherit symbol__search" href="<?= $access_release->get_store_url($store, $reference_datum); ?>" target="_blank" style="<?= 'background-image:url(https://vk.gy/releases/'.$store_image.');'; ?>">
 												<?= $store; ?>
 											</a>
 											<?php endforeach; ?>
+											
+											<label class="release-card__list list__button card--clickable input__checkbox" data-list-id="-2" data-item-id="<?= $reference_datum['id']; ?>" data-item-type="release" style="margin:0;margin-top:1rem;align-self:stretch;">
+												<input class="list__choice input__choice" type="checkbox" <?= $reference_datum['is_wanted'] ? 'checked' : null; ?> />
+												<span class="symbol__checkbox--unchecked" data-role="status">wishlist</span>
+											</label>
+											
 										</div>
 										
 									</div>
@@ -806,12 +813,20 @@
 										
 										<div class="release-card__date h5"><?= $reference_datum['date_occurred']; ?></div>
 										
-										<a class="release-card__title card--subject symbol__release" href="<?= '/releases/'.$reference_datum['artist']['friendly'].'/'.$reference_datum['id'].'/'.$reference_datum['friendly'].'/'; ?>">
-											<?= lang($reference_datum['romaji'] ?: $reference_datum['name'], $reference_datum['name'], 'hidden'); ?>
-										</a>
-										
 										<a class="release-card__artist card--clickable artist" href="<?= '/artists/'.$reference_datum['artist']['friendly'].'/'; ?>">
 											<?= lang($reference_datum['artist']['romaji'] ?: $reference_datum['artist']['name'], $reference_datum['artist']['name'], 'hidden'); ?>
+										</a>
+										
+										<a class="release-card__title card--subject symbol__release" href="<?= '/releases/'.$reference_datum['artist']['friendly'].'/'.$reference_datum['id'].'/'.$reference_datum['friendly'].'/'; ?>">
+											<?= lang($reference_datum['romaji'] ?: $reference_datum['name'], $reference_datum['name'], 'hidden'); ?>
+											<?php
+												if( $reference_datum['press_name'] ) {
+													echo '&nbsp;<span class="a--outlined">'.lang($reference_datum['press_romaji'] ?: $reference_datum['press_name'], $reference_datum['press_name'], 'hidden').'</span>';
+												}
+												if( $reference_datum['type_name'] ) {
+													echo '&nbsp;<span class="a--outlined">'.lang($reference_datum['type_romaji'] ?: $reference_datum['type_name'], $reference_datum['type_name'], 'hidden').'</span>';
+												}
+											?>
 										</a>
 										
 										<ol class="release-card__tracklist card--subject ol--inline any--weaken">

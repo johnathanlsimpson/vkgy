@@ -190,6 +190,10 @@ function initListTippys() {
 	
 	// Get list triggers
 	let listsWrapperElems = document.querySelectorAll('.lists__wrapper:not(.tippy-active)');
+	
+	// Some pages may only have a manual list
+	if( listsWrapperElems && listsWrapperElems.length ) {
+		
 	let listsContainerElem = document.querySelector('#template-lists-container');
 	
 	// Get json list of user's items in lists--will use to set 'checked' prop of buttons
@@ -271,6 +275,8 @@ function initListTippys() {
 			});
 			
 		});
+	}
+		
 	}
 	
 }
