@@ -1,3 +1,14 @@
+<?php
+
+if($artist) {
+	
+	$page_title = $artist['quick_name'].' news | '.$artist['name'].'のニュース';
+	$page_description = 'Latest news for visual kei band '.$artist['quick_name'].'. ビジュアル系バンド「'.$artist['name'].'」最新ニュース、情報のまとめ';
+	
+}
+
+?>
+
 <div class="col c1">
 	<div>
 		<?php

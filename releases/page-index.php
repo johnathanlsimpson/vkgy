@@ -22,6 +22,9 @@ subnav([
 	lang('Search', 'サーチ', ['secondary_class' => 'any--hidden']) => '/search/releases/',
 ]);
 
+$page_title = 'New visual kei releases | ビジュアル系 新譜情報';
+$page_description = 'New visual kei releases info and ranking for '.date('F Y').'. ビジュアル系 新譜情報一覧 ランキング '.date('Y年m月');
+
 $page_header = lang('New visual kei releases', 'ビジュアル系 新譜情報', ['container' => 'div']);
 
 $markdown_parser = new parse_markdown($pdo);

@@ -13,6 +13,9 @@ breadcrumbs([
 	"Home" => "https://vk.gy/"
 ]);
 
+$page_title = 'Visual kei bands, news, profiles | ビジュアル系 バンド、ニュース、歴史';
+$page_description = 'The visual kei library: bands, subgenres, news, history, forum, and more. ビジュアル系 バンド、ニュース、歴史、ランキング';
+
 $background_image = null;
 
 /* Page title */

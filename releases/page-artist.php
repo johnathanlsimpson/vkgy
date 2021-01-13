@@ -15,6 +15,10 @@
 		
 		$pageTitle  = $artist["quick_name"]." discography";
 		$pageTitle .= " | ".$artist["name"]."ディスコグラフィ";
+
+$page_description =
+	'Visual kei band '.$artist['quick_name'].' full discography and album list. '.
+	'ビジュアル系バンド「'.$artist['name'].'」のディスコグラフィ・アルバム・作品の一覧';
 		
 		include('../artists/head.php');
 		
