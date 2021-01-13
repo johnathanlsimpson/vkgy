@@ -11,6 +11,27 @@ function render_component($component_template, $replacement_data = []) {
 		ob_start();
 		
 		foreach($replacement_data as $key => $value) {
+			
+			// Handle checkboxes and radios
+			if( strpos($key, 'checked_') === 0 ) {
+				
+				// Find {checked_item_id:3} and replace with 'checked'
+				unset($replacement_data[$key]);
+				$key = $key.':'.$value;
+				$value = 'checked';
+				
+			}
+			
+			// Handle selects
+			elseif( strpos($key, 'selected_') === 0 ) {
+				
+				// Find {selected_item_id:3} and replace with 'selected'
+				unset($replacement_data[$key]);
+				$key = $key.':'.$value;
+				$value = 'selected';
+				
+			}
+			
 			$replacement_data['{'.$key.'}'] = $value;
 			unset($replacement_data[$key]);
 		}
