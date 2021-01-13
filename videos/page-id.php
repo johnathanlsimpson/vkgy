@@ -3,7 +3,12 @@
 include_once('../lists/function-render_lists.php');
 include_once('../videos/function-render_report.php');
 
-$page_title =  $access_video->clean_title($video['youtube_name'], $video['artist']);
+$page_title = 
+	$access_video->clean_title($video['youtube_name'], $video['artist']).' MV by '.($video['artist']['romaji'] ?: $video['artist']['name']).
+	($video['artist']['romaji'] ? ' | '.$video['artist']['name'] : null);
+$page_description =
+	'「'.$access_video->clean_title($video['youtube_name'], $video['artist']).'」 music video (MV) by '.($video['artist']['romaji'] ?: $video['artist']['name']).'. '.
+	$video['artist']['name'].' ミュージックビデオ、MV、動画';
 
 $page_header = 'Watch video';
 

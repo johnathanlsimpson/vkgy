@@ -3,6 +3,10 @@
 	include_once('../lists/function-render_lists.php');
 	include_once("../php/class-parse_markdown.php");
 	$markdown_parser = new parse_markdown($pdo);
+
+$page_description =
+	'Tracklist &amp; reviews for 「'.($release['romaji'] ?: $release['name']).'」 by '.$release['artist']['quick_name'].'. '.
+	$release['artist']['name'].'「'.$release['name'].'」曲・情報・レビュー';
 	
 	script([
 		'/lists/script-list.js',

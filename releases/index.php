@@ -83,7 +83,7 @@
 		}
 		
 		if(is_array($release) && !empty($release)) {
-			$page_description = $release["artist"]["quick_name"]." 「".$release["quick_name"]."」 release information, reviews, etc. ".$release["artist"]["name"]." 「".$release["name"]." ".$release["press_name"]." ".$release["type_name"]."」のリリース情報、レビュー、など。 | vk.gy (ブイケージ)";
+			
 			
 			include_once("../releases/page-id.php");
 		}

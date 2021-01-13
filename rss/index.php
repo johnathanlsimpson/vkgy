@@ -1,5 +1,6 @@
 <?php
 	include_once("../php/include.php");
+include_once('../php/function-script.php');
 	
 	$access_blog     = new access_blog($pdo);
 	$markdown_parser = new parse_markdown($pdo);

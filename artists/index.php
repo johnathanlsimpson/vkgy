@@ -250,7 +250,7 @@
 		
 		// Set page variables
 		$page_title = $artist['quick_name'].' videos | '.$artist['name'].sanitize('の動画');
-		$page_description = 'Official videos by '.$artist['quick_name'].'. '.$artist['name'].sanitize('より公式の動画。');
+		$page_description = 'All music videos (MV) by visual kei band '.$artist['quick_name'].'. ビジュアル系バンド「'.$artist['name'].'」'.sanitize('動画・MV');
 		$page_image = 'https://vk.gy/artists/'.$artist['friendly'].'/main.large.jpg';
 		
 		breadcrumbs([
@@ -274,7 +274,7 @@
 		
 		// Set page variables
 		$pageTitle = $artist["quick_name"]." profile | ".$artist["name"]."&#12503;&#12525;&#12501;&#12451;&#12540;&#12523;";
-		$page_description = $artist["quick_name"]." profile, biography, members' history. 「".$artist["name"]."」のプロフィール、活動、リリース情報、など。".($artist["lineup"] ? " (".$artist["lineup"].")" : null);
+		$page_description = 'About visual kei band '.$artist["quick_name"].': profile, biography, history. ビジュアル系バンド「'.$artist["name"].'」プロフィール・活動'.($artist["lineup"] ? " (".$artist["lineup"].")" : null);
 		$page_image = "https://vk.gy/artists/".$artist["friendly"]."/main.large.jpg";
 		
 		breadcrumbs([

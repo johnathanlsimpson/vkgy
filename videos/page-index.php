@@ -1,6 +1,9 @@
 <?php
 
-$page_title = 'Videos';
+$page_title = 'New visual kei MV | ビジュアル系 MV ';
+
+$page_description = 'The latest visual kei music videos (MV). '.
+	'ビジュアル系バンド ミュージックビデオ、MV、動画';
 
 $page_header = 'Videos';
 
