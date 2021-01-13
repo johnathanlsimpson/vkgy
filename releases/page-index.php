@@ -81,7 +81,6 @@ $markdown_parser = new parse_markdown($pdo);
 		<script type="text/javascript">
 			//let CdjapanAffiliate = {};
 			let blah = document.querySelector('.x');
-			console.log(blah);
 			
 			
 			conf = {
@@ -143,10 +142,23 @@ $markdown_parser = new parse_markdown($pdo);
 <style>
 	.releases__month {
 		display:grid;
-		grid-template-columns: 1fr 1fr 1fr;
 		grid-gap:2rem;
 	}
-	
+	@media(min-width:1300px) {
+		.releases__month {
+			grid-template-columns: 1fr 1fr 1fr;
+		}
+	}
+	@media(min-width:900px) and (max-width:1299.99px) {
+		.releases__month {
+			grid-template-columns: 1fr 1fr;
+		}
+	}
+	@media(min-width:600px) and (max-width:799.99px) {
+		.releases__month {
+			grid-template-columns: 1fr 1fr;
+		}
+	}
 	.module--release {
 		display: inline-block;
 		margin: 0;
