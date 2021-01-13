@@ -1,17 +1,21 @@
 <?php
-	$body_class = $_SESSION["is_signed_in"] ? "body--signed-in" : "body--signed-out";
-	$page_description = $page_description ? $page_description." | vkgy (ブイケージ)" : "vkgy is a visual kei library maintained by overseas fans. vkgy（ブイケージ）はビジュアル系のファンサイトとライブラリです。関連するアーティストのメンバープロフィールや活動やリリース情報などがあります。";
-	$page_title = $page_title ?: $pageTitle;
-	$page_title = $page_title ? $page_title.' | vkgy (ブイケージ)' : 'vkgy (ブイケージ) | visual kei library (V系ライブラリ)';
-	$background_image = $background_image ?: ($page_image ?: null);
 
-	// Get opengraph image, make sure we're passing flag so it doesn't pass through CDN
-	$page_image = $page_image ?: 'https://vk.gy/style/card.png';
-	$page_image = str_replace([ '.thumbnail.', '.small.', '.medium.', '.large.' ], '.opengraph.', $page_image);
-	
-	style([
-		"../style/style-tooltips.css"
-	]);
+$page_title = $page_title ?: $pageTitle;
+$page_title = $page_title ? $page_title.' | vkgy (ブイケージ)' : 'vkgy (ブイケージ) | visual kei library (V系ライブラリ)';
+
+$page_description = $page_description ? $page_description." | vkgy (ブイケージ)" : "vkgy is a visual kei library maintained by overseas fans. vkgy（ブイケージ）はビジュアル系のファンサイトとライブラリです。関連するアーティストのメンバープロフィールや活動やリリース情報などがあります。";
+
+$background_image = $background_image ?: ($page_image ?: null);
+$body_class = $_SESSION["is_signed_in"] ? "body--signed-in" : "body--signed-out";
+
+// Get opengraph image, make sure we're passing flag so it doesn't pass through CDN
+$page_image = $page_image ?: 'https://vk.gy/style/card.png';
+$page_image = str_replace([ '.thumbnail.', '.small.', '.medium.', '.large.' ], '.opengraph.', $page_image);
+
+style([
+	"../style/style-tooltips.css"
+]);
+
 ?>
 <!doctype html>
 <html>
