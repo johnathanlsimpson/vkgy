@@ -66,36 +66,70 @@
 							</div>
 							
 							
-						<!-- Left -->
-						<div class="input__row" style="">
-							
-							<!-- Type -->
-							
-								<div class="input__group">
-									
-									<label class="input__label">Image type</label>
-									
-									<?php
-										foreach([ 'group photo', 'individual', 'flyer', 'logo', 'release', 'other' ] as $value => $key) {
-											?>
-												<label class="input__radio">
-													<input class="input__choice" name="image_type" type="radio" value="<?= $value; ?>" <?= $key === 'group photo' ? 'checked' : null; ?> />
-													<span class="symbol__unchecked"><?= $key; ?></span>
-												</label>
-											<?php
-										}
-									?>
-									
-								</div>
+						<!-- Type -->
+						<div class="input__row">
+							<div class="input__group">
 								
-								<!-- Description -->
-								<div class="image__description input__group any--flex-grow any--hidden">
-									<label class="input__label">Description</label>
-									<input class="any--flex-grow" data-get="description" data-get-into="value" name="image_description" placeholder="description" value="{description}" />
-								</div>
+								<label class="input__label">Image type</label>
+								
+								<?php
+									foreach([ 1 => 'group photo', 2 => 'individual', 3 => 'flyer', 4 => 'logo', 0 => 'other' ] as $value => $key) {
+										?>
+											<label class="input__radio">
+												<input class="input__choice" name="image_type[{id}]" type="radio" value="<?= $value; ?>" {checked_image_type:<?= $value; ?>} />
+												<span class="symbol__unchecked"><?= $key; ?></span>
+											</label>
+										<?php
+									}
+								?>
+								
+							</div>
+						</div>
+						
+						<!-- Type note -->
+						<!--<div class="input__row">
+							<div class="input__note any--weaken">
+								<span class="symbol__help"></span>The description and tagging options are based on image type.
+							</div>
+						</div>-->
+						
+						<div class="input__row">
+							
+							<div class="input__group">
+								
+								<label class="input__label">Credit URL</label>
+								<input placeholder="https://website.com" />
+								
+								<label class="input__checkbox" style="margin-left:0.5rem;margin-top:0.5rem;">
+									<input class="input__choice" type="checkbox" />
+									<span class="symbol__unchecked">I scanned this</span>
+								</label>
+								
+							</div>
+							
+						</div>
+						
+						<div class="input__row">
+							<div class="input__group">
+								
+								<label class="input__label" style="height:1rem;">Description</label>
+								
+								<span style="margin-top:1rem;">Dollis Marry (&#12489;&#12540;&#12522;&#12473;&#12510;&#12522;&#12451;) flyer <a class="symbol__edit" href="">edit</a></span>
+								
+							</div>
+						</div>
+						
+							
+						<div class="input__row" style="display:none;">
+
+							<!-- Description -->
+							<div class="image__description input__group any--flex-grow any--hidden">
+								<label class="input__label">Description</label>
+								<input class="any--flex-grow" data-get="description" data-get-into="value" name="image_description" placeholder="description" value="{description}" />
+							</div>
 								
 						</div>
-						<div class="input__row">
+						<div class="input__row" style="display:none;">
 								<!-- Watermark -->
 								<div class="input__group">
 									
@@ -155,7 +189,7 @@
 							
 							
 							<!-- Description, default, delete -->
-							<div class="input__row image__details">
+							<div class="input__row image__details" style="display:none;">
 								
 								<!-- Default button -->
 								<!--<div class="input__group">
@@ -169,7 +203,7 @@
 							
 							
 							
-							<div class="input__row" style="">
+							<div class="input__row" style="display:none;">
 								
 								<div class="input__group">
 									
