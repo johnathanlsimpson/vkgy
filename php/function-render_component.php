@@ -2,7 +2,7 @@
 
 // Helper to clear {variables} and print template
 function clean_template($template) {
-	return preg_replace('/'.'\{.+?\}'.'/', '', $template);
+	return preg_replace('/'.'\{[^ ].*?[^ ]\}'.'/', '', $template);
 }
 
 // Populate a <template> element with data
@@ -43,7 +43,8 @@ function render_component($component_template, $replacement_data = []) {
 		);
 		
 		$output = ob_get_clean();
-		$output = preg_replace('/'.'{.+?}'.'/', '', $output);
+		//$output = preg_replace('/'.'{.+?}'.'/', '', $output);
+		$output = clean_template($output);
 		$output = preg_replace('/'.'<!--.+?-->'.'/', '', $output);
 		
 		return $output;
