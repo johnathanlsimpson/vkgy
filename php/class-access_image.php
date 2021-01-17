@@ -21,12 +21,12 @@
 		
 		// Image contents
 		static public $allowed_image_contents = [
-			'group photo' => 1,
-			'musician' => 2,
-			'flyer' => 3,
-			'logo' => 4,
-			'release' => 5,
-			'other' => 0,
+			1 => 'group photo',
+			2 => 'musician',
+			3 => 'flyer',
+			4 => 'logo',
+			5 => 'release',
+			0 => 'other',
 		];
 		
 		// Image format ratios (short side / long side)
