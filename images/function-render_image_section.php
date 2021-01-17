@@ -6,6 +6,7 @@ include_once('../images/template-upload.php');
 
 script([
 	'/scripts/external/script-selectize.js',
+	'/scripts/external/script-alpine.js',
 	'/scripts/script-initSelectize.js',
 	'/scripts/script-initDelete.js',
 	'/images/script-uploadImage.js',

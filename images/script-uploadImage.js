@@ -1,5 +1,15 @@
+//
+// Helper: Trigger change
+// Alpinejs can't seem to trigger change, so we wait a millisecond to trigger change after value has been updated e_e
+//
+function triggerChange(elem) {
+	setTimeout(function() {
+		elem.dispatchEvent( new Event( 'change', { bubbles:true } ) );
+	}, 100);
+}
+
 // Show description
-document.addEventListener('click', function(event) {
+/*document.addEventListener('click', function(event) {
 	if(event.target.name == 'image_type') {
 		
 		let descriptionElem = event.target.closest('.image__template').querySelector('.image__description');
@@ -7,7 +17,7 @@ document.addEventListener('click', function(event) {
 		descriptionElem.classList.remove('any--hidden');
 		
 	}
-});
+});*/
 
 document.addEventListener('click', function(event) {
 	if(event.target.classList.contains('xx')) {
@@ -101,7 +111,7 @@ function showTaggingSection(imageElem, tagType) {
 
 
 // Update description when certain fields changed
-document.addEventListener('change', function(event) {
+/*document.addEventListener('change', function(event) {
 	
 	let itemName = event.target.name;
 	let namesAffectingDescription = ['image_type', 'image_release_id[]', 'image_artist_id[]', 'image_musician_id[]'];
@@ -112,71 +122,84 @@ document.addEventListener('change', function(event) {
 		
 	}
 	
-});
+});*/
 
 
 // Update description
-function updateDescription(imageElem) {
+function getDescription(targetElem) {
 	
-	let descriptionElem = imageElem.querySelector('[name="image_description"]');
+	let imageElem = targetElem.closest('.image__template');
+	
+	// Default values
+	let imageType = 'other';
+	let isDefault = 0;
 	let description = '';
+	let artistName = '';
+	let musicianName = '';
+	let releaseName = '';
 	
-	let typeElem = imageElem.querySelector('[name="image_type"]:checked');
-	let imageType = typeElem ? typeElem.value : 0;
+	// Image type
+	let typeElem = imageElem.querySelector('[name^="image_type"]:checked');
+	if(typeElem) {
+		imageType = typeElem.closest('.input__radio').innerText;
+	}
 	
+	// Image is default
 	let defaultElem = imageElem.querySelector('[name="is_default"]:checked');
-	let isDefault = defaultElem ? 1 : 0;
+	if(defaultElem) {
+		isDefault = defaultElem.value;
+	}
 	
+	// Artist/musician/release name
 	let artistElem = imageElem.querySelector('[name="image_artist_id[]"]');
-	let artistName = artistElem.selectedIndex > -1 ? artistElem.options[artistElem.selectedIndex].text : '';
-	
-	let releaseElem = imageElem.querySelector('[name="image_release_id[]"]');
-	let releaseName = releaseElem.selectedIndex > -1 ? releaseElem.options[releaseElem.selectedIndex].text : '';
+	if(artistElem && artistElem.selectedIndex > -1) { 
+		artistName = artistElem.options[artistElem.selectedIndex].text;
+	}
 	
 	let musicianElem = imageElem.querySelector('[name="image_musician_id[]"]');
-	let musicianName = musicianElem.selectedIndex > -1 ? musicianElem.options[musicianElem.selectedIndex].text : '';
+	if(musicianElem && musicianElem.selectedIndex > -1) { 
+		musicianName = musicianElem.options[musicianElem.selectedIndex].text;
+	}
 	
-	// If image is one musician, use their name
+	let releaseElem = imageElem.querySelector('[name="image_release_id[]"]');
+	if(releaseElem && releaseElem.selectedIndex > -1) { 
+		releaseName = releaseElem.options[releaseElem.selectedIndex].text;
+	}
+	
+	// Prepend artist/musician/release name if necessary
 	if(imageType == 1) {
 		description += musicianName + ' ';
 	}
-	
-	// For release, just release name
 	else if(imageType == 4) {
 		description += releaseName + ' ';
 	}
-	
-	// Otherwise start with artist name
 	else {
 		description += artistName + ' ';
 	}
 	
-	// Image description
-	if(imageType == 0) {
-		description += 'group photo ';
+	// Set rest of image description
+	if(imageType == 'musician') {
+		description += 'solo photo';
 	}
-	else if(imageType == 1) {
-		description += 'solo photo ';
+	else if(imageType == 'release' && isDefault) {
+		description += 'cover';
 	}
-	else if(imageType == 2) {
-		description += 'flyer ';
-	}
-	else if(imageType == 3) {
-		description += 'logo ';
-	}
-	else if(imageType == 4 && isDefault) {
-		description += 'cover ';
+	else if(imageType == 'other' || imageType == 'release') {
+		description += 'photo';
 	}
 	else {
-		description += 'photo ';
+		description += imageType;
 	}
 	
-	// If release specified and not release image, mentioned title
-	if( releaseName && imageType != 4 ) {
-		description += 'for ' + releaseName;
+	// If release specified and not release image (i.e. group photo tagged to release), mention title
+	if( releaseName && imageType != 'release' ) {
+		description += ' for ' + releaseName;
 	}
 	
-	descriptionElem.value = description;
+	return description;
+	
+	/*descriptionElem.value = description;
+	descriptionElem.dispatchEvent(new Event('change'));*/
 	
 }
 
@@ -234,60 +257,43 @@ document.addEventListener('change', function(event) {
 		updateImageData(event.target);
 		
 		// For description specifically, update Markdown while typing
-		if(eventName === 'image_description') {
+		/*if(eventName === 'image_description') {
 			event.target.addEventListener('keyup', function() {
 				updateMarkdown(event.target);
 			});
-		}
+		}*/
 		
 	}
 	
 });
 
-function initImageEditElems() {
-	/*var imageElemNames = [
-		'id',
-		'item_type',
-		'item_id',
-		'description',
-		'is_default',
-		'artist_id',
-		'musician_id',
-		'release_id',
-		'is_exclusive',
-		'is_queued',
-		'credit',
-		'face_boundaries'
-	];
-	imageElemNames.forEach(function(imageElemName) {
-		var imageElems = document.querySelectorAll('[name^="image_' + imageElemName + '"]');
-		
-		imageElems.forEach(function(imageElem) {
-			
-			// Trigger data update when these elements are changed
-			imageElem.addEventListener('change', function() {
-				updateImageData(imageElem);
-			});
-			
-			// For description specifically, update Markdown while typing
-			if(imageElemName === 'description') {
-				imageElem.addEventListener('keyup', function() {
-					updateMarkdown(imageElem);
-				});
-			}
-			
-		});
-	});*/
-}
 
-
-// Update Markdown as description is altered
-function updateMarkdown(descriptionElem) {
-	let parentElem = getParent(descriptionElem, 'image__template');
+// Update Markdown based on description
+function getMarkdown(descriptionElem) {
+	
+	let parentElem = descriptionElem.closest('image__template');
 	let markdownElem = parentElem.querySelector('[data-get="image_markdown"]');
+	
 	let markdown = markdownElem.textContent.split('](');
 	markdown = '![' + descriptionElem.value + '](' + markdown[1];
-	markdownElem.textContent = markdown;
+	
+	return markdown;
+	
+}
+
+// Copy Markdown
+function copyMarkdown(markdownElem) {
+	
+	let markdown = markdownElem.textContent;
+	let dummyElem = document.createElement('textarea');
+	
+	// Create dummy element and insert Markdown so we can copy it e_e
+	dummyElem.value = markdown;
+	document.body.appendChild(dummyElem);
+	dummyElem.select();
+	document.execCommand("Copy");
+	dummyElem.remove();
+	
 }
 
 
@@ -950,7 +956,7 @@ function finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedD
 	
 	// After ID is set init buttons in new image element
 	lookForSelectize();
-	initImageEditElems();
+	//initImageEditElems();
 	initImageDeleteButtons();
 	
 	console.log(returnedData);
@@ -1129,5 +1135,5 @@ document.addEventListener('item-id-updated', function(event) {
 
 // Init elements
 lookForSelectize();
-initImageEditElems();
+//initImageEditElems();
 initImageDeleteButtons();

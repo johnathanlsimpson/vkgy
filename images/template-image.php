@@ -2,13 +2,15 @@
 	ob_start();
 	
 	?>
-		<!-- Template: Image -->
+		<!-- Template: Image --> 
 		<template id="image-template">
 			<?php
 				ob_start();
 				
 				?>
-					<li class="image__template any--flex" data-get="image_status" data-get-into="data-image-status">
+					<li class="image__template any--flex" data-get="image_status" data-get-into="data-image-status" x-data="{ description: '{description}', showDescription: false, showArtists: false, showMusicians: false, showReleases: false }" x-init="$watch('description', () => { triggerChange($refs.description); })">
+						
+						
 						
 						<div class="input__row" style="display: flex; flex-direction: column; margin-right: 1rem; align-items:flex-start;">
 							
@@ -28,7 +30,7 @@
 							</div>
 							
 							<div class="input__group" style="margin-bottom:auto;">
-								<button class="input__button symbol__copy">copy code</button>
+								<button class="input__button symbol__copy" x-on:click.prevent="copyMarkdown($refs.markdown)">copy code</button>
 							</div>
 							
 							<!-- Delete -->
@@ -65,7 +67,6 @@
 								</div>
 							</div>
 							
-							
 						<!-- Type -->
 						<div class="input__row">
 							<div class="input__group">
@@ -73,10 +74,10 @@
 								<label class="input__label">Image type</label>
 								
 								<?php
-									foreach([ 1 => 'group photo', 2 => 'individual', 3 => 'flyer', 4 => 'logo', 0 => 'other' ] as $value => $key) {
+									foreach(access_image::$allowed_image_contents as $value => $key) {
 										?>
 											<label class="input__radio">
-												<input class="input__choice" name="image_type[{id}]" type="radio" value="<?= $value; ?>" {checked_image_type:<?= $value; ?>} />
+												<input class="input__choice" name="image_type[{id}]" type="radio" value="<?= $value; ?>" {checked_image_type:<?= $value; ?>} x-on:change="description = getDescription($el)" />
 												<span class="symbol__unchecked"><?= $key; ?></span>
 											</label>
 										<?php
@@ -110,22 +111,19 @@
 						</div>
 						
 						<div class="input__row">
-							<div class="input__group">
+							<div class="input__group" x-show="!showDescription">
 								
 								<label class="input__label" style="height:1rem;">Description</label>
 								
-								<span style="margin-top:1rem;">Dollis Marry (&#12489;&#12540;&#12522;&#12473;&#12510;&#12522;&#12451;) flyer <a class="symbol__edit" href="">edit</a></span>
+								<span style="margin-top:1rem;" x-text="description">{description}</span>&nbsp;<a class="symbol__edit" href="#" x-on:click.prevent="showDescription=true;$nextTick(() => { $refs.description.focus(); });">edit</a>
 								
 							</div>
-						</div>
-						
 							
-						<div class="input__row" style="display:none;">
 
 							<!-- Description -->
-							<div class="image__description input__group any--flex-grow any--hidden">
+							<div class="image__description input__group any--flex-grow" x-show="showDescription">
 								<label class="input__label">Description</label>
-								<input class="any--flex-grow" data-get="description" data-get-into="value" name="image_description" placeholder="description" value="{description}" />
+								<input class="any--flex-grow" data-get="description" data-get-into="value" name="image_description" placeholder="description" value="{description}" x-model="description" x-ref="description" />
 							</div>
 								
 						</div>
@@ -166,22 +164,22 @@
 							
 							
 							<!-- Markdown code -->
-							<!--<div class="input__row image__markdown">
+							<div class="input__row any--hidden">
 								<div class="input__group any--flex-grow">
 									<label class="input__label">Markdown code</label>
-									<span data-get="image_markdown">{image_markdown}</span>
+									<span x-ref="markdown">![<span data-get="description" x-text="description">{description}</span>](<span data-get="image_url">{image_url}</span>)</span>
 								</div>
-							</div>-->
+							</div>
 							
 							<!-- Tagging options -->
-							<div class="input__row">
+							<div class="input__row" x-show="!showMusicians || !showReleases || !showArtists">
 								<div class="input__group">
 									
 									<label class="input__label">Tag photo</label>
 									
-									<a class="image__show-tags symbol__plus" data-tag-type="musicians" style="line-height:2rem;margin-right:1rem;">musicians</a>
-									<a class="image__show-tags symbol__plus" data-tag-type="releases" style="line-height:2rem;margin-right:1rem;">releases</a>
-									<a class="image__show-tags symbol__plus" data-tag-type="artists" style="line-height:2rem;margin-right:1rem;">artists</a>
+									<a class="symbol__plus" data-tag-type="musicians" style="line-height:2rem;margin-right:1rem;" x-on:click.prevent="showMusicians=true" x-show="!showMusicians">musicians</a>
+									<a class="symbol__plus" data-tag-type="releases" style="line-height:2rem;margin-right:1rem;" x-on:click.prevent="showReleases=true" x-show="!showReleases">releases</a>
+									<a class="symbol__plus" data-tag-type="artists" style="line-height:2rem;margin-right:1rem;" x-on:click.prevent="showArtists=true" x-show="!showArtists">artists</a>
 									
 								</div>
 							</div>
@@ -227,11 +225,11 @@
 							
 							
 							<!-- Tag artists -->
-							<div class="input__row image__tags--artists image__selects any--hidden">
+							<div class="input__row image__selects" x-show="showArtists">
 								<div class="input__group any--flex-grow image__artists">
 									
 									<label class="input__label">Tag artists</label>
-									<select class="input" data-populate-on-click="true" data-multiple="true" data-source="artists" name="image_artist_id[]" placeholder="artists" multiple>{artist_ids}</select>
+									<select class="input" data-populate-on-click="true" data-multiple="true" data-source="artists" name="image_artist_id[]" placeholder="artists" x-on:change="description = getDescription($el)" multiple>{artist_ids}</select>
 									
 								</div>
 							</div>
@@ -252,7 +250,7 @@
 								</div>-->
 							
 							<!-- Tag releases -->
-							<div class="input__row image__tags--releases image__selects any--hidden">
+							<div class="input__row image__selects" x-show="showReleases">
 								<div class="input__group any--flex-grow image__releases">
 									
 									<label class="input__label">Tag releases</label>
@@ -263,7 +261,7 @@
 							
 							
 							<!-- Tag musicians -->
-							<div class="input__row image__tags--musicians any--hidden">
+							<div class="input__row" x-show="showMusicians">
 								<div class="input__group">
 									
 									<label class="input__label">Tag musicians</label>
@@ -300,6 +298,8 @@ foreach($faces as $face) {
 							</div>
 							
 						</div>
+						
+						
 					</li>
 				<?php
 				
