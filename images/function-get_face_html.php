@@ -1,8 +1,10 @@
 <?php
 
 include_once('../php/include.php');
-include_once('../images/function-detect_faces.php');
+include_once('../php/function-render_component.php');
+//include_once('../images/function-detect_faces.php');
 include_once('../images/function-get_face_box.php');
+include_once('../images/template-face.php');
 
 $image_url = $_POST['image_url'];
 $faces = $_POST['faces'];
@@ -13,13 +15,13 @@ if( strlen($image_url) /*&& strpos($image_url, 'https://vk.gy') === 0 && file_ex
 	list($image_width, $image_height) = getimagesize($image_url);
 	
 	// If faces not already found, use API
-	if( !strlen($faces) ) {
+	/*if( !strlen($faces) ) {
 		$faces = detect_faces($image_url);
 		$output['got_faces'] = 1;
 	}
 	else {
 		$output['got_faces'] = 0;
-	}
+	}*/
 	
 	// Decode faces
 	$faces = json_decode($faces, true);
@@ -34,7 +36,7 @@ if( strlen($image_url) /*&& strpos($image_url, 'https://vk.gy') === 0 && file_ex
 		// Get a random-ish key just to differentiate fields in the html
 		$key = substr( md5($image_url), 0, 5 ).$i;
 		
-		$face_css  = 'background-position: -'.$face_box['box_left'].'px -'.$face_box['box_top'].'px;';
+		/*$face_css  = 'background-position: -'.$face_box['box_left'].'px -'.$face_box['box_top'].'px;';
 		$face_css .= 'background-size: '.$face_box['image_width'].'px '.$face_box['image_height'].'px;';
 		$face_css .= 'height: '.$face_box['box_height'].'px;';
 		$face_css .= 'width: '.$face_box['box_width'].'px;';
@@ -42,16 +44,26 @@ if( strlen($image_url) /*&& strpos($image_url, 'https://vk.gy') === 0 && file_ex
 		$returned_html[] = '<div style="margin-top:1rem;display:inline-block;margin-right:1rem;width:116px;">';
 		$returned_html[] = '<div style="background-image:url('.$image_url.');background-repeat:no-repeat;display:inline-block;'.$face_css.'"></div>';
 		$returned_html[] = '<select class="input" data-populate-on-click="true" data-source="musicians" data-face=\''.json_encode($face).'\' name="image_musician_id['.$key.']" placeholder="musicians"></select>';
-		$returned_html[] = '</div>';
+		$returned_html[] = '</div>';*/
+		
+		$returned_html[] = render_component($face_template, [
+			'image_url' => $image_url,
+			'background_position' => '-'.$face_box['box_left'].'px -'.$face_box['box_top'].'px',
+			'background_size' => $face_box['image_width'].'px '.$face_box['image_height'].'px',
+			'height' => $face_box['box_height'].'px',
+			'width' => $face_box['box_width'].'px',
+			'face_coordinates' => json_encode($face),
+			'random_key' => $key,
+		]);
 		
 	}
 	
-	$returned_html[] = '<div class="input__group" style="margin-left:-0.5rem;"><label class="input__label">other musicians</label><select class="input" data-populate-on-click="true" data-source="musicians" name="image_musician_id[]" placeholder="musicians"></select></div>';
+	/*$returned_html[] = '<div class="input__group" style="margin-left:-0.5rem;"><label class="input__label">other musicians</label><select class="input" data-populate-on-click="true" data-source="musicians" name="image_musician_id[]" placeholder="musicians"></select></div>';
 	
 	$returned_html[] = '<a class="image__add-face symbol__plus">add face</a>';
 	$returned_html[] = '<a class="add-face__wrapper" style="box-shadow:0 0 10px 0 pink;position:fixed;top:5;left:0;right:0;bottom:0;margin:var(--gutter);background:hsl(var(--background));z-index:2;">';
 	$returned_html[] = '<img class="add-face__image" src="'.$image_url.'" style="max-width:100%;max-height:100%;object-fit:contain;" ismap />';
-	$returned_html[] = '</a>';
+	$returned_html[] = '</a>';*/
 	
 	$output['status'] = 'success';
 	$output['result'] = implode('', $returned_html);
