@@ -8,17 +8,6 @@ function triggerChange(elem) {
 	}, 100);
 }
 
-// Show description
-/*document.addEventListener('click', function(event) {
-	if(event.target.name == 'image_type') {
-		
-		let descriptionElem = event.target.closest('.image__template').querySelector('.image__description');
-		
-		descriptionElem.classList.remove('any--hidden');
-		
-	}
-});*/
-
 document.addEventListener('click', function(event) {
 	if(event.target.classList.contains('xx')) {
 		
@@ -68,7 +57,7 @@ document.addEventListener('click', function(event) {
 
 
 
-// Show tagging options on click
+/*// Show tagging options on click
 document.addEventListener('click', function(event) {
 	
 	let targetClass = event.target.classList;
@@ -81,7 +70,7 @@ document.addEventListener('click', function(event) {
 		
 	}
 	
-});
+});*/
 
 
 // Show appropriate tagging section
@@ -110,22 +99,8 @@ function showTaggingSection(imageElem, tagType) {
 }
 
 
-// Update description when certain fields changed
-/*document.addEventListener('change', function(event) {
-	
-	let itemName = event.target.name;
-	let namesAffectingDescription = ['image_type', 'image_release_id[]', 'image_artist_id[]', 'image_musician_id[]'];
-	
-	if( namesAffectingDescription.includes(itemName) ) {
-		
-		updateDescription( event.target.closest('.image__template') );
-		
-	}
-	
-});*/
 
-
-// Update description
+// Return updated description
 function getDescription(targetElem) {
 	
 	let imageElem = targetElem.closest('.image__template');
@@ -198,11 +173,157 @@ function getDescription(targetElem) {
 	
 	return description;
 	
-	/*descriptionElem.value = description;
-	descriptionElem.dispatchEvent(new Event('change'));*/
+}
+
+
+//
+// Facial detection
+//
+
+// Send image to API to find faces
+function getFaces(imageElem, imageUrl) {
+	
+	let detectedFaces = null;
+	
+	initializeInlineSubmit( $(imageElem), '/images/function-get_faces.php', {
+		
+		'preparedFormData' : { 'image_url' : imageUrl },
+		
+		'callbackOnSuccess': function(event, returnedData) {
+			
+			console.log('success getting faces');
+			console.log(returnedData);
+			
+			detectedFaces = returnedData.result;
+			
+		},
+		
+		'callbackOnError': function(event, returnedData) {
+			
+			console.log('error getting faces');
+			console.log(returnedData);
+			
+		}
+		
+	});
+	
+	return detectedFaces;
 	
 }
 
+// Given coordinates, render faces for tagging
+function getFaceHtml(imageElem, imageUrl, detectedFaces) {
+	
+	let faceHtml = null;
+	
+	// Given faces, calculate bounding boxes from image
+	initializeInlineSubmit( $(imageElem), '/images/function-get_face_html.php', {
+		
+		'preparedFormData' : { 'image_url' : imageUrl, 'faces' : detectedFaces },
+		
+		'callbackOnSuccess': function(event, returnedData) {
+			
+			faceHtml = returnedData.result;
+			
+			console.log('success getting face html');
+			console.log(returnedData);
+			
+			//return faceHtml;
+			
+			  return new Promise(resolve => 'blah');
+			
+		},
+		
+		'callbackOnError': function(event, returnedData) {
+			
+			console.log('error getting face html');
+			console.log(returnedData);
+			
+		}
+		
+	});
+	
+}
+
+// Populate the faces container with the individual faces to be tagged
+async function populateFacesContainer(refElem) {
+	
+	let imageElem = refElem.closest('.image__template');
+	let facesElem = imageElem.querySelector('[name="image_face_boundaries"]');
+	let facesContainer = imageElem.querySelector('.image__faces');
+	
+	// First get image url and filetype
+	let imageUrl = imageElem.querySelector('.image__image').href;
+	let imageExtension = imageUrl.split(/\./).pop();
+	
+	// Don't bother with gifs--can only tag by reference
+	if( imageExtension == 'gif' ) {
+		
+		facesContainer.classList.add('any--hidden');
+		
+	}
+	
+	// If not gif, move on and populate the container
+	else {
+		
+		// Next determine if we can populate with extant data (i.e. editing old image)
+		let faces = null;
+		if( facesElem.value && facesElem.value.length ) {
+			faces = facesElem.value;
+			console.log('already had faces');
+			console.log(faces);
+		}
+		
+		// If no extant faces, try to detect faces from image
+		if( !faces ) {
+			
+			let returnedFaceData = getFaces(imageElem, imageUrl);
+			if( returnedFaceData.status == 'success' && returnedFaceData.result ) {
+				faces = returnedFaceData.result;
+			}
+			
+		}
+		
+		// If we have faces now, either from before or by getting them, get the html representing them
+		if( faces ) {
+			
+			let faceHtml = await getFaceHtml(imageElem, imageUrl, faces);
+			
+			//const msg = await scaryClown();
+  console.log('Message:', faceHtml);
+			
+			/*if( faceHtml ) {
+				console.log('got face html');
+				console.log(faceHtml);
+			}
+			else {
+				console.log('didnt got face html');
+			}
+			
+			setTimeout(function() {
+				
+			if( faceHtml ) {
+				console.log('got face html2');
+				console.log(faceHtml);
+			}
+			else {
+				console.log('didnt got face html2');
+			}
+			}, 500);*/
+		}
+		
+	}
+	
+}
+
+// When un-hiding the 'tag musicians' area, populate the faces container
+// (we set it as an event cause otherwise Alpine waits for the results
+// before showing the container. There's prob a better way to do it...)
+document.addEventListener('show-faces', function(event) {
+	setTimeout(function() {
+		populateFacesContainer(event.target);
+	}, 100);
+});
 
 // Get faces html
 function getFacesHtml(imageElem, manualFaces = null) {

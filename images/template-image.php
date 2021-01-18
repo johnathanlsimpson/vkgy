@@ -49,7 +49,7 @@
 							<input                                                                        name="image_item_id"         value="{item_id}" hidden />
 							<input                                                                        name="image_is_queued"       value="{is_queued}" hidden />
 							<input class="any--hidden"      data-get="image_is_new" data-get-into="value" name="image_is_new"          value="0" disabled hidden />
-							<input                                                                        name="image_face_boundaries" value='{face_boundaries}' hidden />
+							<input                                                                        name="image_face_boundaries" value='{face_boundaries}' />
 							<input class="image__extension" data-get="image_extension"                                                 value="{extension}" hidden />
 							
 							<!-- Description, default, delete -->
@@ -177,7 +177,7 @@
 									
 									<label class="input__label">Tag photo</label>
 									
-									<a class="symbol__plus" data-tag-type="musicians" style="line-height:2rem;margin-right:1rem;" x-on:click.prevent="showMusicians=true" x-show="!showMusicians">musicians</a>
+									<a class="symbol__plus" data-tag-type="musicians" style="line-height:2rem;margin-right:1rem;" x-on:click.prevent="showMusicians=true; $dispatch('show-faces');" x-show="!showMusicians">musicians</a>
 									<a class="symbol__plus" data-tag-type="releases" style="line-height:2rem;margin-right:1rem;" x-on:click.prevent="showReleases=true" x-show="!showReleases">releases</a>
 									<a class="symbol__plus" data-tag-type="artists" style="line-height:2rem;margin-right:1rem;" x-on:click.prevent="showArtists=true" x-show="!showArtists">artists</a>
 									
@@ -264,9 +264,13 @@
 							<div class="input__row" x-show="showMusicians">
 								<div class="input__group">
 									
-									<label class="input__label">Tag musicians</label>
+									<label class="input__label">Tag musicians by face</label>
 									
-									<div class="image__musician-tags"></div>
+									<div class="image__faces any--flex" style="flex-wrap:wrap;">
+										
+										<span class="loading" style="align-self:flex-start;">Detecting faces...</span>
+										
+									</div>
 								<?php
 									/*include_once('../images/function-detect_faces.php');
 									include_once('../images/function-get_face_box.php');
