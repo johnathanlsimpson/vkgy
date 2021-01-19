@@ -579,7 +579,7 @@
 							in_array(array_search('live', $this->artist_bio_types), $line_type)
 						) {
 							// Patern: blah blah at Shinuku (新宿) HOLIDAY (ホリデー).
-							$pattern_schedule_ref_in_live = 'at(?: ([\w-\. ]+?)(?:\(([\w-\. &#;]+)\))?){1,2}\.?$';
+							$pattern_schedule_ref_in_live = 'at(?: ([\-\w\. ]+?)(?:\(([\-\w\. &#;]+)\))?){1,2}\.?$';
 							
 							// If -live entry potentially has livehouse mentioned at end, grab that
 							if(preg_match('/'.$pattern_schedule_ref_in_live.'/', $line, $schedule_match)) {

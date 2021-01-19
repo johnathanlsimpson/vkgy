@@ -6,12 +6,12 @@ function image_exists($input_string, $pdo, $return_dimensions = false) {
 		$input_string = substr($input_string, 2);
 	}
 
-	if(preg_match('/'.'\/images\/(\d+)(?:-[\w-]*)\.(jpg|jpeg|gif|png)'.'/', $input_string, $match)) {
+	if(preg_match('/'.'\/images\/(\d+)(?:-[\-\w]*)\.(jpg|jpeg|gif|png)'.'/', $input_string, $match)) {
 		if(is_array($match)) {
 			$check_file = strtolower('/images/image_files/'.$match[1].'.'.$match[2]);
 		}
 	}
-	elseif(preg_match('/'.'\/artists\/([\w-]+)\/main(?:\.(?:small|medium|large))?.jpg'.'/', $input_string, $match)) {
+	elseif(preg_match('/'.'\/artists\/([\-\w]+)\/main(?:\.(?:small|medium|large))?.jpg'.'/', $input_string, $match)) {
 		if(is_array($match)) {
 			$sql_check_default = 'SELECT images.id, images.extension FROM artists LEFT JOIN images ON images.id=artists.image_id WHERE artists.friendly=? LIMIT 1';
 			$stmt_check_default = $pdo->prepare($sql_check_default);

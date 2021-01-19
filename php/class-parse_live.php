@@ -5,7 +5,7 @@
 		public  $pdo;
 		private $access_artist;
 		private $regex_livehouse_nickname = "^[A-z0-9 ]+$";
-		private $regex_livehouse_name = "(?:([\w-&#; ]+) \(([\w-&#; ]+)\) )?([\w-&#; ]+)(?: \(([\w-&#; ]+)\))?";
+		private $regex_livehouse_name = "(?:([\-\w&#; ]+) \(([\-\w&#; ]+)\) )?([\-\w&#; ]+)(?: \(([\-\w&#; ]+)\))?";
 		
 		// ======================================================
 		// Construct DB connection

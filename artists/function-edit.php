@@ -246,7 +246,7 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 			
 			// Explode changes input and clean
 			$changes = $_POST['changes'];
-			$changes = preg_match('/'.'^[\w-\[\]\,]+$'.'/', $changes) ? $changes : null;
+			$changes = preg_match('/'.'^[\-\w\[\]\,]+$'.'/', $changes) ? $changes : null;
 			$changes = explode(',', $changes);
 			$changes = array_filter($changes);
 			$changes = array_unique($changes);
