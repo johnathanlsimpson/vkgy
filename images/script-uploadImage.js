@@ -47,11 +47,6 @@ document.addEventListener('click', function(event) {
 		
 		getFacesHtml(event.target.closest('.image__template'), JSON.stringify(face));
 		
-		console.log(boxWidth, boxHeight, imageWidth, imageHeight);
-		console.log(clickX, clickY);
-		console.log(left, width, top, height);
-		
-		
 	}
 });
 
@@ -183,27 +178,31 @@ function getDescription(targetElem) {
 // Send image to API to find faces
 function getFaces(imageElem, imageUrl) {
 	
-	let detectedFaces = null;
-	
-	initializeInlineSubmit( $(imageElem), '/images/function-get_faces.php', {
+	let detectedFaces = new Promise(function(response, rejection) {
 		
-		'preparedFormData' : { 'image_url' : imageUrl },
-		
-		'callbackOnSuccess': function(event, returnedData) {
+		initializeInlineSubmit( $(imageElem), '/images/function-get_faces.php', {
 			
-			console.log('success getting faces');
-			console.log(returnedData);
+			'preparedFormData' : { 'image_url' : imageUrl },
 			
-			detectedFaces = returnedData.result;
+			'callbackOnSuccess': function(event, returnedData) {
+				
+				console.log('success getting faces');
+				console.log(returnedData);
+				
+				response(returnedData);
+				
+			},
 			
-		},
-		
-		'callbackOnError': function(event, returnedData) {
+			'callbackOnError': function(event, returnedData) {
+				
+				console.log('error getting faces');
+				console.log(returnedData);
+				
+				rejection(returnedData);
+				
+			}
 			
-			console.log('error getting faces');
-			console.log(returnedData);
-			
-		}
+		});
 		
 	});
 	
@@ -214,34 +213,36 @@ function getFaces(imageElem, imageUrl) {
 // Given coordinates, render faces for tagging
 function getFaceHtml(imageElem, imageUrl, detectedFaces) {
 	
-	let faceHtml = null;
-	
-	// Given faces, calculate bounding boxes from image
-	initializeInlineSubmit( $(imageElem), '/images/function-get_face_html.php', {
+	let faceHtml = new Promise(function(response, rejection) {
 		
-		'preparedFormData' : { 'image_url' : imageUrl, 'faces' : detectedFaces },
-		
-		'callbackOnSuccess': function(event, returnedData) {
+		// Given faces, calculate bounding boxes from image
+		initializeInlineSubmit( $(imageElem), '/images/function-get_face_html.php', {
 			
-			faceHtml = returnedData.result;
+			'preparedFormData' : { 'image_url' : imageUrl, 'faces' : detectedFaces },
 			
-			console.log('success getting face html');
-			console.log(returnedData);
+			'callbackOnSuccess': function(event, returnedData) {
+				
+				console.log('success getting face html');
+				console.log(returnedData);
+				
+				response(returnedData);
+				
+			},
 			
-			//return faceHtml;
+			'callbackOnError': function(event, returnedData) {
+				
+				console.log('error getting face html');
+				console.log(returnedData);
+				
+				rejection(returnedData);
+				
+			}
 			
-			  return new Promise(resolve => 'blah');
-			
-		},
-		
-		'callbackOnError': function(event, returnedData) {
-			
-			console.log('error getting face html');
-			console.log(returnedData);
-			
-		}
+		});
 		
 	});
+	
+	return faceHtml;
 	
 }
 
@@ -277,9 +278,17 @@ async function populateFacesContainer(refElem) {
 		// If no extant faces, try to detect faces from image
 		if( !faces ) {
 			
-			let returnedFaceData = getFaces(imageElem, imageUrl);
+			let returnedFaceData = await getFaces(imageElem, imageUrl);
+			
 			if( returnedFaceData.status == 'success' && returnedFaceData.result ) {
+				
 				faces = returnedFaceData.result;
+				
+				// Save face boundaries for later
+				let boundariesElem = imageElem.querySelector('[name="image_face_boundaries"]');
+				boundariesElem.value = faces;
+				triggerChange(boundariesElem);
+				
 			}
 			
 		}
@@ -287,29 +296,25 @@ async function populateFacesContainer(refElem) {
 		// If we have faces now, either from before or by getting them, get the html representing them
 		if( faces ) {
 			
-			let faceHtml = await getFaceHtml(imageElem, imageUrl, faces);
+			let faceHtml = null;
+			let returnedFaceHtml = await getFaceHtml(imageElem, imageUrl, faces);
 			
-			//const msg = await scaryClown();
-  console.log('Message:', faceHtml);
+			if( returnedFaceHtml.status == 'success' && returnedFaceHtml.result ) {
+				faceHtml = returnedFaceHtml.result;
+			}
 			
-			/*if( faceHtml ) {
-				console.log('got face html');
-				console.log(faceHtml);
+			if( faceHtml ) {
+				
+				// Insert html and init selects
+				facesContainer.querySelector('.loading').classList.add('any--hidden');
+				facesContainer.innerHTML = faceHtml + facesContainer.innerHTML;
+				lookForSelectize();
+				
 			}
 			else {
 				console.log('didnt got face html');
 			}
 			
-			setTimeout(function() {
-				
-			if( faceHtml ) {
-				console.log('got face html2');
-				console.log(faceHtml);
-			}
-			else {
-				console.log('didnt got face html2');
-			}
-			}, 500);*/
 		}
 		
 	}
@@ -320,9 +325,7 @@ async function populateFacesContainer(refElem) {
 // (we set it as an event cause otherwise Alpine waits for the results
 // before showing the container. There's prob a better way to do it...)
 document.addEventListener('show-faces', function(event) {
-	setTimeout(function() {
-		populateFacesContainer(event.target);
-	}, 100);
+	populateFacesContainer(event.target);
 });
 
 // Get faces html

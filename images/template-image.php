@@ -270,6 +270,8 @@
 										
 										<span class="loading" style="align-self:flex-start;">Detecting faces...</span>
 										
+										<a class="a--outlined a--padded" href="" style="align-items:center;flex-wrap:wrap;display:inline-flex;height:174px;margin-top:1rem;width:116px;text-align:center;justify-content:center;"><span class="symbol__plus symbol--standalone"><br />manually<br /></b>add face</span></a>
+										
 									</div>
 								<?php
 									/*include_once('../images/function-detect_faces.php');
