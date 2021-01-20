@@ -8,64 +8,102 @@ function triggerChange(elem) {
 	}, 100);
 }
 
+// Given center point, calculate bounding box coordinates and get image to tag face
+async function addFace(event) {
+	
+	let imageUrl = event.target.src;
+	let imageElem = event.target.closest('.image__template');
+	let facesContainer = imageElem.querySelector('.image__faces');
+	
+	let rectangle = event.target.getBoundingClientRect();
+	let clickX = event.clientX - rectangle.left;
+	let clickY = event.clientY - rectangle.top;
+	
+	let boxWidth = rectangle.width;
+	let boxHeight = rectangle.height;
+	let imageWidth = event.target.naturalWidth;
+	let imageHeight = event.target.naturalHeight;
+	
+	let leftRatio = ( clickX - 50 ) / boxWidth;
+	let widthRatio = 100 / boxWidth;
+	let topRatio = ( clickY - 50 ) / boxHeight;
+	let heightRatio = 100 / boxHeight;
+	
+	let left = Math.round(imageWidth * leftRatio);
+	let width = Math.round(imageWidth * widthRatio);
+	let top = Math.round(imageHeight * topRatio);
+	let height = Math.round(imageHeight * heightRatio);
+	
+	let data = {
+		'image_width': imageWidth,
+		'image_height': imageHeight,
+		'image_url': imageUrl,
+	};
+	
+	let face = [{
+		'start_x': left,
+		'end_x': left + width,
+		'start_y': top,
+		'end_y': top + height,
+	}];
+		
+	face = JSON.stringify(face);
+	
+	let returnedFaceHtml = await getFaceHtml(imageElem, imageUrl, face);
+		
+	if( returnedFaceHtml && returnedFaceHtml.status === 'success' ) {
+		
+		// Update master list of face boundaries
+		updateFaceBoundaries(imageElem, returnedFaceHtml.face_boundaries);
+		
+		// Insert html and init selects
+		facesContainer.innerHTML = returnedFaceHtml.result + facesContainer.innerHTML;
+		lookForSelectize();
+		
+	}
+	
+}
+
+// Trigger addFace when clicking on full image (Alpine can't handle async I guess)
 document.addEventListener('click', function(event) {
-	if(event.target.classList.contains('xx')) {
-		
-		let rectangle = event.target.getBoundingClientRect();
-		let clickX = event.clientX - rectangle.left;
-		let clickY = event.clientY - rectangle.top;
-		
-		let boxWidth = rectangle.width;
-		let boxHeight = rectangle.height;
-		let imageWidth = event.target.naturalWidth;
-		let imageHeight = event.target.naturalHeight;
-		
-		let leftRatio = ( clickX - 50 ) / boxWidth;
-		let widthRatio = 100 / boxWidth;
-		let topRatio = ( clickY - 50 ) / boxHeight;
-		let heightRatio = 100 / boxHeight;
-		
-		let left = Math.round(imageWidth * leftRatio);
-		let width = Math.round(imageWidth * widthRatio);
-		let top = Math.round(imageHeight * topRatio);
-		let height = Math.round(imageHeight * heightRatio);
-		
-		let data = {
-			'image_width': imageWidth,
-			'image_height': imageHeight,
-			'image_url': event.target.src,
-		};
-		
-		let face = [{
-			'start_x': left,
-			'end_x': left + width,
-			'start_y': top,
-			'end_y': top + height,
-		}];
-		
-		showTaggingSection( event.target.closest('.image__template'), 'musicians' );
-		
-		getFacesHtml(event.target.closest('.image__template'), JSON.stringify(face));
-		
+	if(event.target.classList.contains('add-face__image')) {
+		addFace(event);
 	}
 });
 
-
-
-/*// Show tagging options on click
-document.addEventListener('click', function(event) {
+// Update the image's field which has all face boundaries from members
+function updateFaceBoundaries(imageElem, faceBoundary, action = 'add') {
 	
-	let targetClass = event.target.classList;
+	let faceBoundariesElem = imageElem.querySelector('[name="image_face_boundaries"]');
+	let extantBoundaries = faceBoundariesElem.value;
+	let newBoundaries = '';
 	
-	if( targetClass.contains('image__show-tags') ) {
-		
-		event.preventDefault();
-		
-		showTaggingSection( event.target.closest('.image__template'), event.target.dataset.tagType );
-		
+	// Remove brackets if necessary
+	faceBoundary = faceBoundary.replace(/\[|\]/g, '', faceBoundary);
+	
+	// Adding boundary to empty boundaries
+	if( action === 'add' && !extantBoundaries ) {
+		newBoundaries = '[' + faceBoundary + ']';
 	}
 	
-});*/
+	// Adding boundary to extant boundaries
+	else if( action === 'add' ) {
+		newBoundaries = extantBoundaries.slice(0,-1) + ',' + faceBoundary + ']';
+	}
+	
+	// Removing boundary from extant boundaries
+	else if( action === 'remove' ) {
+		newBoundaries = extantBoundaries;
+		newBoundaries = newBoundaries.replace(faceBoundary, '');
+		newBoundaries = newBoundaries.replace(/\[\,|\,\]/, '');
+		newBoundaries = newBoundaries.replace(',,', ',');
+		newBoundaries = newBoundaries.replace('[]', '');
+	}
+	
+	faceBoundariesElem.value = newBoundaries;
+	triggerChange(faceBoundariesElem);
+	
+}
 
 
 // Show appropriate tagging section
@@ -222,17 +260,11 @@ function getFaceHtml(imageElem, imageUrl, detectedFaces) {
 			
 			'callbackOnSuccess': function(event, returnedData) {
 				
-				console.log('success getting face html');
-				console.log(returnedData);
-				
 				response(returnedData);
 				
 			},
 			
 			'callbackOnError': function(event, returnedData) {
-				
-				console.log('error getting face html');
-				console.log(returnedData);
 				
 				rejection(returnedData);
 				
@@ -271,8 +303,6 @@ async function populateFacesContainer(refElem) {
 		let faces = null;
 		if( facesElem.value && facesElem.value.length ) {
 			faces = facesElem.value;
-			console.log('already had faces');
-			console.log(faces);
 		}
 		
 		// If no extant faces, try to detect faces from image
@@ -282,12 +312,8 @@ async function populateFacesContainer(refElem) {
 			
 			if( returnedFaceData.status == 'success' && returnedFaceData.result ) {
 				
-				faces = returnedFaceData.result;
-				
 				// Save face boundaries for later
-				let boundariesElem = imageElem.querySelector('[name="image_face_boundaries"]');
-				boundariesElem.value = faces;
-				triggerChange(boundariesElem);
+				updateFaceBoundaries(imageElem, returnedFaceData.result);
 				
 			}
 			
@@ -330,12 +356,11 @@ document.addEventListener('show-faces', function(event) {
 
 // Get faces html
 function getFacesHtml(imageElem, manualFaces = null) {
-	
+	/*
 	let imageUrl = imageElem.querySelector('.image__image').href;
 	//let faces = imageElem.dataset.faces ? imageElem.dataset.faces : '';
 	let facesElem = imageElem.querySelector('[name="image_face_boundaries"]');
 	let faces = manualFaces ? manualFaces : ( facesElem.value ? facesElem.value : '' );
-//faces = '[{"start_x":9,"start_y":9,"end_x":71,"end_y":99},{"start_x":103,"start_y":22,"end_x":154,"end_y":90}]';
 	
 	// Show loading
 	let tagsElem = imageElem.querySelector('.image__musician-tags');
@@ -367,7 +392,7 @@ function getFacesHtml(imageElem, manualFaces = null) {
 			
 		}
 	});
-	
+	*/
 }
 
 

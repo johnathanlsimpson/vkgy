@@ -147,3 +147,15 @@
 [data-get="image_markdown"] {
 	user-select: all;
 }
+
+/* Image tagging */
+.add-face__container {
+	cursor: crosshair;
+	margin-top:1rem;
+	max-height: 300px;
+	overflow-y: auto;
+}
+.add-face__image {
+	height: auto;
+	max-width: 100%;
+}

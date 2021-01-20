@@ -8,7 +8,7 @@
 				ob_start();
 				
 				?>
-					<li class="image__template any--flex" data-get="image_status" data-get-into="data-image-status" x-data="{ description: '{description}', showDescription: false, showArtists: false, showMusicians: false, showReleases: false }" x-init="$watch('description', () => { triggerChange($refs.description); })">
+					<li class="image__template any--flex" data-get="image_status" data-get-into="data-image-status" x-data="{ description: '{description}', addFace: false, showDescription: false, showArtists: false, showMusicians: false, showReleases: false }" x-init="$watch('description', () => { triggerChange($refs.description); })">
 						
 						
 						
@@ -201,25 +201,20 @@
 							
 							
 							
-							<div class="input__row" style="display:none;">
-								
+							<div class="input__row" x-show="addFace">
 								<div class="input__group">
 									
-									<label class="input__label">tag sldkfj</label>
+									<label class="input__label">Mark faces</label>
 									
-									<div style="cursor:crosshair;max-height: 300px; overflow-y: auto; margin-top:1rem;">
-										
-									<img class="xx" src="https://vk.gy/images/5582-ifa-group-shot.png" style="max-width: 100%; height: auto;" />
-									
+									<div class="input__note symbol__help">
+										Click in the center of a member's face to tag him.
 									</div>
+									
+									<div class="add-face__container">
+										<img class="add-face__image" src="{image_url}" />
+									</div>
+									
 								</div>
-								
-								<div class="input__group">
-									<a class="a--outlined symbol__plus" style="display:inline-flex;align-items:center;height:160px;width:100px; text-align:center;flex-wrap:wrap;"><div style="width:100%;">
-										
-										add face</div></a>
-								</div>
-								
 							</div>
 							
 							
@@ -270,7 +265,7 @@
 										
 										<span class="loading" style="align-self:flex-start;">Detecting faces...</span>
 										
-										<a class="a--outlined a--padded" href="" style="align-items:center;flex-wrap:wrap;display:inline-flex;height:174px;margin-top:1rem;width:116px;text-align:center;justify-content:center;"><span class="symbol__plus symbol--standalone"><br />manually<br /></b>add face</span></a>
+										<a class="a--outlined a--padded" href="" x-on:click.prevent="addFace=true" style="align-items:center;flex-wrap:wrap;display:inline-flex;height:174px;margin-top:1rem;width:116px;text-align:center;justify-content:center;"><span class="symbol__plus symbol--standalone"><br />manually<br /></b>add face</span></a>
 										
 									</div>
 								<?php
