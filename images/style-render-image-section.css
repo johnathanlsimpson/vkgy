@@ -99,12 +99,12 @@
 .image__details {
 	margin-top: 0 !important;
 }
-[name="image_is_exclusive[]"] + ::after {
+/*[name="image_is_exclusive[]"] + ::after {
 	content: "vkgy user?";
 }
 [data-image-status="new"] [name="image_is_exclusive[]"] + ::after {
 	content: "you?";
-}
+}*/
 [data-hide-selects="1"] .image__selects,
 [data-hide-markdown="1"] .image__markdown,
 [data-hide-artists="1"] .image__artists,
@@ -158,4 +158,64 @@
 .add-face__image {
 	height: auto;
 	max-width: 100%;
+}
+
+.image__tag {
+	line-height: 2rem;
+	margin-right:1rem;
+}
+.image__description-label {
+	height: 2.5rem;
+}
+.image__description-span {
+	display: inline-block;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.image__description-span:empty::before {
+	content: "No description";
+	font-style: italic;
+}
+
+.image__faces {
+	flex-wrap: wrap;
+	margin: 0 -0.5rem;
+	padding-top: 1rem;
+}
+.face__loading {
+	align-self: flex-start;
+	margin: 0.5rem;
+}
+.face__add {
+	align-items: center;
+	display: inline-flex;
+	flex-wrap: wrap;
+	height: 174px;
+	justify-content: center;
+	margin-top: 0.5rem;
+	width: 116px;
+	text-align: center;
+}
+.face__container {
+	display: inline-block;
+	margin: 0.5rem;
+	width: 116px;
+}
+.face__image {
+	background-color: hsl(var(--background--bold));
+	background-repeat: no-repeat;
+	margin-bottom: 0.5rem;
+}
+.face__close {
+	background: hsl(var(--background));
+	border-radius: 0 0 0 5px;
+	line-height: 1;
+	padding: 0 0 0.5rem 0.5rem;
+	position: absolute;
+	right: 0;
+	text-align: right;
+	top: 0;
+	z-index: 1;
 }

@@ -6,8 +6,9 @@
 			<?php
 				ob_start();
 				?>
-					<div style="margin-top:1rem;display:inline-block;margin-right:1rem;width:116px;">
-						<div style="background-image:url({image_url});background-position:{background_position};background-repeat:no-repeat;background-size:{background_size};display:inline-block;height:{height};width:{width};"></div>
+					<div class="face__container">
+						<a class="face__close symbol__trash" href="#"></a>
+						<div class="face__image" style="background-image:url({image_url});background-position:{background_position};background-size:{background_size};height:{height};width:{width};"></div>
 						<select class="input" data-populate-on-click="true" data-source="musicians" data-face='{face_coordinates}' name="image_musician_id[{random_key}]" placeholder="musicians"></select>
 					</div>
 				<?php
