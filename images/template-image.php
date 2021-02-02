@@ -120,7 +120,7 @@
 									
 									<label class="input__label">Tag photo</label>
 									
-									<a class="image__tag symbol__plus" data-tag-type="musicians" x-on:click.prevent="showMusicians=true;" x-show="!showMusicians">musicians</a>
+									<a class="image__tag symbol__plus" data-tag-type="musicians" x-on:click.prevent="showMusicians=true;" x-show="!showMusicians && (imageContent <= 3 || imageContent == 0)">musicians</a>
 									<a class="image__tag symbol__plus" data-tag-type="releases" x-on:click.prevent="showReleases=true; tagStyle='order:-1;'" x-show="!showReleases">releases</a>
 									<a class="image__tag symbol__plus" data-tag-type="artists" x-on:click.prevent="showArtists=true; tagStyle=''" x-show="!showArtists">artists</a>
 									
