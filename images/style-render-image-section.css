@@ -161,14 +161,15 @@
 }
 
 .image__tag {
-	line-height: 2rem;
+	line-height: 2.5rem;
 	margin-right:1rem;
 }
 .image__description-label {
-	height: 2.5rem;
+	height: 3rem;
 }
 .image__description-span {
 	display: inline-block;
+	line-height: 2rem;
 	max-width: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -177,6 +178,9 @@
 .image__description-span:empty::before {
 	content: "No description";
 	font-style: italic;
+}
+.image__description-span ~ a {
+	line-height: 2rem;
 }
 
 .image__faces {
@@ -208,7 +212,7 @@
 	background-repeat: no-repeat;
 	margin-bottom: 0.5rem;
 }
-.face__close {
+.face__delete {
 	background: hsl(var(--background));
 	border-radius: 0 0 0 5px;
 	line-height: 1;
