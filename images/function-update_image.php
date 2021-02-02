@@ -7,6 +7,11 @@ foreach($_POST as $key => $value) {
 	if(strpos($key, 'image_') === 0) {
 		$new_key = substr($key, 6);
 		
+		// image_content has to have unique id to make it work as a radio, so just strip that
+		if( strpos($new_key, 'type') === 0 ) {
+			$value = is_array($_POST[$key]) ? reset($_POST[$key]) : 0;
+		}
+		
 		$_POST[$new_key] = $value;
 		
 		unset($_POST[$key]);
@@ -20,6 +25,7 @@ if(is_numeric($_POST['id'])) {
 	$id           = sanitize($_POST['id']);
 	$item_type    = in_array($_POST['item_type'], $allowed_item_types) ? $_POST['item_type'] : 'other';
 	$item_id      = is_numeric($_POST['item_id']) ? $_POST['item_id'] : null;
+	$image_type   = is_numeric($_POST['type']) ? $_POST['type'] : 0;
 	
 	$description  = sanitize($_POST['description']) ?: (sanitize($_POST['default_description']) ?: null);
 	$friendly     = friendly($description) ?: null;
@@ -53,14 +59,36 @@ if(is_numeric($_POST['id'])) {
 		'releases'  => $_POST['release_id']
 	];
 	
-	// Make empty face boundaries array for later
-	//$musician_face_boundaries = [];
-	
 	// Standardize new links into array of item IDs, since there may be an array of IDs or one ID as a string
 	foreach($image_item_join_types as $items_table => $item_ids) {
 		
+		// For $_POST[musician_id] specifically, we may have {xyz} => 1, {xyz} => 2, 0 => 3,4,5
+		// So we have to potentially explode entries with numeric keys
+		if( $items_table === 'musicians' ) {
+			
+			if( is_array($item_ids) ) {
+				
+				foreach($item_ids as $item_ids_key => $ids) {
+					
+					if( is_numeric($item_ids_key) ) {
+						
+						unset($item_ids[$item_ids_key]);
+						$item_ids = array_merge( $item_ids, explode(',', $ids) );
+						
+					}
+					
+				}
+				
+			}
+			
+			else {
+				$item_ids = explode(',', $item_ids);
+			}
+			
+		}
+		
 		// IDs may be passed like 1,2 so make sure we turn into proper array
-		if( !is_array($item_ids) ) {
+		elseif( !is_array($item_ids) ) {
 			$item_ids = explode(',', $item_ids);
 		}
 		
@@ -76,31 +104,38 @@ if(is_numeric($_POST['id'])) {
 		$item_ids = array_unique( $item_ids );
 		$item_ids = array_filter( $item_ids, 'is_numeric' );
 		
-		// Musicians_ids [ 'abc' => 1, 'xyz' => 2 ] Musicians_face_boundaries [ 'abc' => 'xxx', 'xyz' => 'xxx' ]
-		// So after cleaning up musicians_ids, we're going to make a face_boundaries array with only the entries that have associated ids
+		// Loop through $_POST['musician_id'] and combine duplicates and hold onto face boundary
 		if( $items_table === 'musicians' ) {
 			
-			// Construct boundaries array
+			$tmp_musician_ids = [];
+			
 			foreach( $item_ids as $musician_array_key => $musician_id ) {
-				//$musician_face_boundaries[ $musician_array_key ] = $_POST['musician_face_boundaries'][ $musician_array_key ] ?: null;
+				
+				// We'll make a temporary array that prefers to store IDs with face boundaries attached
+				// So basically if there's an array entry with the same ID but non-numeric (i.e. JSON) as key, we'll just continue loop
+				// Otherwise store this ID and key, and then we'll update the original array later
+				if( !isset($tmp_musician_ids[ $musician_id ]) || is_numeric( $tmp_musician_ids[ $musician_id ]['key'] ) ) {
+					$tmp_musician_ids[ $musician_id ] = [
+						'id' => $musician_id,
+						'key' => $musician_array_key,
+						'face_boundaries' => is_numeric($musician_array_key) ? null : html_entity_decode( urldecode($musician_array_key), ENT_QUOTES, 'UTF-8' )
+					];
+				}
+				
 			}
 			
-			// Clean up keys (will clean up musician keys in next step)
-			//$musician_face_boundaries = array_values($musician_face_boundaries);
+			$item_ids = $tmp_musician_ids;
 			
 		}
 		
 		// Now clean up keys and update original array
-		$item_ids = array_values($item_ids);
+		//$item_ids = array_values($item_ids);
 		$image_item_join_types[$items_table] = $item_ids;
 		
 		// This was used to reset array keys but let's see if we can get on without it
 		//$image_item_join_types[$items_table] = array_values($image_item_join_types[$items_table]);
 		
 	}
-	
-	//print_r($image_item_join_types);
-	//print_r($musician_face_boundaries);
 	
 	// Make sure there's at least one join to an item (unless this is an "other" type image, in which case it's basically just an unlinked upload)
 	if($item_type != 'other') {
@@ -120,9 +155,9 @@ if(is_numeric($_POST['id'])) {
 	$stmt_queued->execute([ $is_queued, $id, $item_type ]);
 	
 	// Update image info
-	$sql_update = 'UPDATE images SET description=?, friendly=?, credit=?, is_exclusive=?, face_boundaries=? WHERE id=? LIMIT 1';
+	$sql_update = 'UPDATE images SET description=?, friendly=?, credit=?, is_exclusive=?, image_content=?, face_boundaries=? WHERE id=? LIMIT 1';
 	$stmt_update = $pdo->prepare($sql_update);
-	if($stmt_update->execute([ $description, $friendly, $credit, $is_exclusive, $face_boundaries, $id ])) {
+	if($stmt_update->execute([ $description, $friendly, $credit, $is_exclusive, $image_type, $face_boundaries, $id ])) {
 		
 		// Status
 		$output['status'] = 'success';
@@ -140,9 +175,6 @@ if(is_numeric($_POST['id'])) {
 			
 			// Grab ids of extant images_items rows, plug item_id
 			foreach($rslt_extant_joins as $extant_join) {
-				
-				//$extant_joins[ $extant_join['id'] ] = $extant_join[ $item_id_column ];
-				// Save like [ item_id => images_items_id ]
 				
 				$extant_joins[ $extant_join[ $item_id_column ] ] = [
 					'join_id' => $extant_join['id'],
@@ -166,22 +198,23 @@ if(is_numeric($_POST['id'])) {
 				// For each item_ids => item_id
 				foreach($item_ids as $key_in_item_ids_array => $item_id_to_be_joined) {
 					
+					// For item_ids[musicians] only, each item is an array instead of just id, so get id
+					if( $items_table === 'musicians' ) {
+						$item_id_to_be_joined = $item_id_to_be_joined['id'];
+					}
 					
-					
-					
-					
-					// If this particular item has already been joined to the image, we probably don't have to do anything
+					// If this particular item has already been joined to the image, we probably don't have to do anything, but let's make sure
 					if( isset( $extant_joins[ $item_id_to_be_joined ] ) ) {
 						
 						// If looking at musician table, first we need to see if the join has the correct boundary, and if not we need to update it
 						if( $items_table === 'musicians' ) {
 							
-							// If face boundary as changed, we need to update that join row; then either way we remove this entry from both arrays since item is already joined to image
-							if( $extant_joins[ $item_id_to_be_joined ]['face_boundaries'] != $_POST['musician_face_boundaries'][ $item_id_to_be_joined ] ) {
+							// If face boundary has changed, we need to update that join row; then either way we remove this entry from both arrays since item is already joined to image
+							if( $extant_joins[ $item_id_to_be_joined ]['face_boundaries'] != $item_ids[ $item_id_to_be_joined ]['face_boundaries'] ) {
 								
 								$sql_update_join = 'UPDATE images_'.$items_table.' SET face_boundaries=? WHERE id=?';
 								$stmt_update_join = $pdo->prepare($sql_update_join);
-								$stmt_update_join->execute([ $_POST['musician_face_boundaries'][ $item_id_to_be_joined ], $extant_joins[ $item_id_to_be_joined ]['join_id'] ]);
+								$stmt_update_join->execute([ $item_ids[ $item_id_to_be_joined ]['face_boundaries'], $extant_joins[ $item_id_to_be_joined ]['join_id'] ]);
 								
 							}
 							
@@ -204,11 +237,12 @@ if(is_numeric($_POST['id'])) {
 						
 						// If linking images_musicians, also need to update face_boundaries
 						$values_add_link = [ $id, $item_id_to_be_joined ];
-						$face_boundary = $_POST['musician_face_boundaries'][$item_id_to_be_joined];
+						//$face_boundary = $_POST['musician_face_boundaries'][$item_id_to_be_joined];
+						$musician_face_boundaries = $item_ids[ $item_id_to_be_joined ]['face_boundaries'];
 						
 						if($items_table === 'musicians') {
 							$sql_add_link = 'INSERT INTO images_'.$items_table.' (image_id, '.$item_id_column.', face_boundaries) VALUES (?, ?, ?)';
-							$values_add_link[] = $face_boundary;
+							$values_add_link[] = $musician_face_boundaries;
 						}
 						else {
 							$sql_add_link = 'INSERT INTO images_'.$items_table.' (image_id, '.$item_id_column.') VALUES (?, ?)';

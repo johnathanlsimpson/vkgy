@@ -1,5 +1,6 @@
 <?php
 include_once('../php/function-render_component.php');
+include_once('../images/function-render_face.php');
 include_once('../images/template-option.php');
 include_once('../images/template-image.php');
 include_once('../images/template-upload.php');
@@ -44,6 +45,7 @@ function render_options($option_ids_string, $option_list) {
 // Render image upload area and image edit areas
 function render_image_section($images, $args = []) {
 	global $image_template;
+	global $face_template;
 	global $image_upload_template;
 	global $wrapped_image_template;
 	global $wrapped_image_upload_template;
@@ -62,6 +64,24 @@ function render_image_section($images, $args = []) {
 	
 	if(is_array($images) && !empty($images)) {
 		foreach($images as $image) {
+			
+			$image['url'] = '/images/'.$image['id'].'.thumbnail.'.$image['extension'];
+			$tagged_faces = '';
+			
+			// For musicians tagged to image by face, get the html box for each
+			if( is_array($image['musicians']) && !empty($image['musicians']) ) {
+				foreach( $image['musicians'] as $musician ) {
+					
+					$tagged_faces .= render_face([
+						'image_url'     => '/images/'.$image['id'].'.'.$image['extension'],
+						'face'          => json_decode( $musician['face_boundaries'], true ),
+						'musician_id'   => $musician['musician_id'],
+						'musician_name' => is_numeric($musician['musician_id']) ? '(tagged)' : null,
+					]);
+					
+				}
+			}
+			
 			$rendered_images[] = render_component($image_template, [
 				'id'                 => $image['id'],
 				'item_type'          => $args['item_type'],
@@ -82,7 +102,10 @@ function render_image_section($images, $args = []) {
 				'delete_class'       => $_SESSION['can_delete_data'] || $_SESSION['user_id'] === $image['user_id'] ? null : 'any--hidden',
 				'face_boundaries'    => str_replace(['{','}'], ['&#123;','&#125;'], sanitize($image['face_boundaries'])),
 				'checked_image_type' => $image['image_content'],
+				'extension'          => $image['extension'],
+				'tagged_faces'       => $tagged_faces,
 			]);
+			
 		}
 	}
 	else {

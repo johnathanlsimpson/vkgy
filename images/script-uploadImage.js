@@ -8,129 +8,6 @@ function triggerChange(elem) {
 	}, 100);
 }
 
-// Given center point, calculate bounding box coordinates and get image to tag face
-async function addFace(event) {
-	
-	let imageUrl = event.target.src;
-	let imageElem = event.target.closest('.image__template');
-	let facesContainer = imageElem.querySelector('.image__faces');
-	
-	let rectangle = event.target.getBoundingClientRect();
-	let clickX = event.clientX - rectangle.left;
-	let clickY = event.clientY - rectangle.top;
-	
-	let boxWidth = rectangle.width;
-	let boxHeight = rectangle.height;
-	let imageWidth = event.target.naturalWidth;
-	let imageHeight = event.target.naturalHeight;
-	
-	let leftRatio = ( clickX - 50 ) / boxWidth;
-	let widthRatio = 100 / boxWidth;
-	let topRatio = ( clickY - 50 ) / boxHeight;
-	let heightRatio = 100 / boxHeight;
-	
-	let left = Math.round(imageWidth * leftRatio);
-	let width = Math.round(imageWidth * widthRatio);
-	let top = Math.round(imageHeight * topRatio);
-	let height = Math.round(imageHeight * heightRatio);
-	
-	let data = {
-		'image_width': imageWidth,
-		'image_height': imageHeight,
-		'image_url': imageUrl,
-	};
-	
-	let face = [{
-		'start_x': left,
-		'end_x': left + width,
-		'start_y': top,
-		'end_y': top + height,
-	}];
-		
-	face = JSON.stringify(face);
-	
-	let returnedFaceHtml = await getFaceHtml(imageElem, imageUrl, face);
-		
-	if( returnedFaceHtml && returnedFaceHtml.status === 'success' ) {
-		
-		// Update master list of face boundaries
-		updateFaceBoundaries(imageElem, returnedFaceHtml.face_boundaries);
-		
-		// Insert html and init selects
-		facesContainer.innerHTML = returnedFaceHtml.result + facesContainer.innerHTML;
-		lookForSelectize();
-		
-	}
-	
-}
-
-// Trigger addFace when clicking on full image (Alpine can't handle async I guess)
-document.addEventListener('click', function(event) {
-	if(event.target.classList.contains('add-face__image')) {
-		addFace(event);
-	}
-});
-
-// Update the image's field which has all face boundaries from members
-function updateFaceBoundaries(imageElem, faceBoundary, action = 'add') {
-	
-	let faceBoundariesElem = imageElem.querySelector('[name="image_face_boundaries"]');
-	let extantBoundaries = faceBoundariesElem.value;
-	let newBoundaries = '';
-	
-	// Remove brackets if necessary
-	faceBoundary = faceBoundary.replace(/\[|\]/g, '', faceBoundary);
-	
-	// Adding boundary to empty boundaries
-	if( action === 'add' && !extantBoundaries ) {
-		newBoundaries = '[' + faceBoundary + ']';
-	}
-	
-	// Adding boundary to extant boundaries
-	else if( action === 'add' ) {
-		newBoundaries = extantBoundaries.slice(0,-1) + ',' + faceBoundary + ']';
-	}
-	
-	// Removing boundary from extant boundaries
-	else if( action === 'remove' ) {
-		newBoundaries = extantBoundaries;
-		newBoundaries = newBoundaries.replace(faceBoundary, '');
-		newBoundaries = newBoundaries.replace(/\[\,|\,\]/, '');
-		newBoundaries = newBoundaries.replace(',,', ',');
-		newBoundaries = newBoundaries.replace('[]', '');
-	}
-	
-	faceBoundariesElem.value = newBoundaries;
-	triggerChange(faceBoundariesElem);
-	
-}
-
-
-// Show appropriate tagging section
-function showTaggingSection(imageElem, tagType) {
-	
-	let linkElem = imageElem.querySelector('.image__show-tags[data-tag-type="' + tagType + '"]');
-	let tagsElem = imageElem.querySelector('.image__tags--' + tagType);
-	
-	let hiddenClass = 'any--hidden';
-	linkElem.classList.add('any--hidden');
-	tagsElem.classList.remove('any--hidden');
-	
-	// If showing musicians tagging, load options into that
-	if( tagType == 'musicians' ) {
-		
-		getFacesHtml(imageElem);
-		
-	}
-	
-	// If all tagging links are hidden, make sure label is hidden as well
-	let unclickedLinkElem = imageElem.querySelector('.image__show-tags:not(.any--hidden)');
-	if( !unclickedLinkElem ) {
-		linkElem.closest('.input__row').classList.add(hiddenClass);
-	}
-	
-}
-
 
 
 // Return updated description
@@ -224,17 +101,11 @@ function getFaces(imageElem, imageUrl) {
 			
 			'callbackOnSuccess': function(event, returnedData) {
 				
-				console.log('success getting faces');
-				console.log(returnedData);
-				
 				response(returnedData);
 				
 			},
 			
 			'callbackOnError': function(event, returnedData) {
-				
-				console.log('error getting faces');
-				console.log(returnedData);
 				
 				rejection(returnedData);
 				
@@ -266,7 +137,7 @@ function getFaceHtml(imageElem, imageUrl, detectedFaces) {
 			
 			'callbackOnError': function(event, returnedData) {
 				
-				rejection(returnedData);
+				response(returnedData);
 				
 			}
 			
@@ -286,8 +157,12 @@ async function populateFacesContainer(refElem) {
 	let facesContainer = imageElem.querySelector('.image__faces');
 	
 	// First get image url and filetype
-	let imageUrl = imageElem.querySelector('.image__image').href;
+	// Btw href resolves to full path instead of relative which will cause file_exists to fail
+	let imageUrl = imageElem.querySelector('.image__image').getAttribute('href');
 	let imageExtension = imageUrl.split(/\./).pop();
+	
+	// Show button to manually add face
+	facesContainer.querySelector('.face__add').classList.remove('any--hidden');
 	
 	// Don't bother with gifs--can only tag by reference
 	if( imageExtension == 'gif' ) {
@@ -297,55 +172,158 @@ async function populateFacesContainer(refElem) {
 	}
 	
 	// If not gif, move on and populate the container
-	else {
+	else if( !facesElem.value || !facesElem.value.length ) {
 		
-		// Next determine if we can populate with extant data (i.e. editing old image)
+		facesContainer.querySelector('.face__loading').classList.remove('any--hidden');
+		facesContainer.querySelector('.face__add').classList.add('any--hidden');
+		
 		let faces = null;
-		if( facesElem.value && facesElem.value.length ) {
-			faces = facesElem.value;
-		}
 		
-		// If no extant faces, try to detect faces from image
-		if( !faces ) {
+		let returnedFaceData = await getFaces(imageElem, imageUrl);
+		
+		if( returnedFaceData.status == 'success' && returnedFaceData.result ) {
 			
-			let returnedFaceData = await getFaces(imageElem, imageUrl);
-			
-			if( returnedFaceData.status == 'success' && returnedFaceData.result ) {
-				
-				// Save face boundaries for later
-				updateFaceBoundaries(imageElem, returnedFaceData.result);
-				
-			}
+			// Save face boundaries for later
+			updateFaceBoundaries(imageElem, returnedFaceData.result);
 			
 		}
 		
-		// If we have faces now, either from before or by getting them, get the html representing them
+		// If we have face boundaries now, get the html representing them
 		if( faces ) {
 			
 			let faceHtml = null;
 			let returnedFaceHtml = await getFaceHtml(imageElem, imageUrl, faces);
 			
 			if( returnedFaceHtml.status == 'success' && returnedFaceHtml.result ) {
-				faceHtml = returnedFaceHtml.result;
-			}
-			
-			if( faceHtml ) {
 				
 				// Insert html and init selects
-				facesContainer.querySelector('.loading').classList.add('any--hidden');
-				facesContainer.innerHTML = faceHtml + facesContainer.innerHTML;
+				facesContainer.innerHTML = returnedFaceHtml.result + facesContainer.innerHTML;
 				lookForSelectize();
 				
-			}
-			else {
-				console.log('didnt got face html');
 			}
 			
 		}
 		
+		// Hide loading indicator and show button to manually add
+		facesContainer.querySelector('.face__loading').classList.add('any--hidden');
+		facesContainer.querySelector('.face__add').classList.remove('any--hidden');
+		
+	}
+
+}
+
+// Update the image's field which has all face boundaries from members
+function updateFaceBoundaries(imageElem, faceBoundary, action = 'add') {
+	
+	let faceBoundariesElem = imageElem.querySelector('[name="image_face_boundaries"]');
+	let extantBoundaries = faceBoundariesElem.value;
+	let newBoundaries = '';
+	
+	// Remove brackets if necessary
+	faceBoundary = faceBoundary.replace(/\[|\]/g, '', faceBoundary);
+	
+	// Adding boundary to empty boundaries
+	if( action === 'add' && !extantBoundaries ) {
+		newBoundaries = '[' + faceBoundary + ']';
+	}
+	
+	// Adding boundary to extant boundaries
+	else if( action === 'add' ) {
+		newBoundaries = extantBoundaries.slice(0,-1) + ',' + faceBoundary + ']';
+	}
+	
+	// Removing boundary from extant boundaries
+	else if( action === 'remove' ) {
+		newBoundaries = extantBoundaries;
+		newBoundaries = newBoundaries.replace(faceBoundary, '');
+		newBoundaries = newBoundaries.replace('[,', '[');
+		newBoundaries = newBoundaries.replace(',]', ']');
+		newBoundaries = newBoundaries.replace(',,', ',');
+		newBoundaries = newBoundaries.replace('[]', '');
+	}
+	
+	faceBoundariesElem.value = newBoundaries;
+	triggerChange(faceBoundariesElem);
+	
+}
+
+// Remove face
+function removeFace(deleteElem) {
+	
+	let faceElem = deleteElem.closest('.face__container');
+	let faceBoundaries = faceElem.querySelector('[data-face]').dataset.face;
+	let imageElem = faceElem.closest('.image__template');
+	
+	// Remove face element (next step removes from DB)
+	faceElem.remove();
+	
+	// Remove face from master list of face boundaries--triggers change event which will remove from DB
+	updateFaceBoundaries(imageElem, faceBoundaries, 'remove');
+
+}
+
+// Given center point, calculate bounding box coordinates and get image to tag face
+async function addFace(event) {
+	
+	let imageUrl = event.target.src;
+	let imageElem = event.target.closest('.image__template');
+	let facesContainer = imageElem.querySelector('.image__faces');
+	
+	let rectangle = event.target.getBoundingClientRect();
+	let clickX = event.clientX - rectangle.left;
+	let clickY = event.clientY - rectangle.top;
+	
+	let boxWidth = rectangle.width;
+	let boxHeight = rectangle.height;
+	let imageWidth = event.target.naturalWidth;
+	let imageHeight = event.target.naturalHeight;
+	
+	let leftRatio = ( clickX - 50 ) / boxWidth;
+	let widthRatio = 100 / boxWidth;
+	let topRatio = ( clickY - 50 ) / boxHeight;
+	let heightRatio = 100 / boxHeight;
+	
+	let left = Math.round(imageWidth * leftRatio);
+	let width = Math.round(imageWidth * widthRatio);
+	let top = Math.round(imageHeight * topRatio);
+	let height = Math.round(imageHeight * heightRatio);
+	
+	let data = {
+		'image_width': imageWidth,
+		'image_height': imageHeight,
+		'image_url': imageUrl,
+	};
+	
+	let face = [{
+		'start_x': left,
+		'end_x': left + width,
+		'start_y': top,
+		'end_y': top + height,
+	}];
+	
+	face = JSON.stringify(face);
+	
+	let returnedFaceHtml = await getFaceHtml(imageElem, imageUrl, face);
+	
+	if( returnedFaceHtml && returnedFaceHtml.status === 'success' ) {
+		
+		// Update master list of face boundaries
+		updateFaceBoundaries(imageElem, returnedFaceHtml.face_boundaries);
+		
+		// Insert html and init selects
+		facesContainer.innerHTML = returnedFaceHtml.result + facesContainer.innerHTML;
+		lookForSelectize();
+		
 	}
 	
 }
+
+// Trigger addFace when clicking on full image (Alpine can't handle async I guess)
+document.addEventListener('click', function(event) {
+	if(event.target.classList.contains('add-face__image')) {
+		addFace(event);
+	}
+});
 
 // When un-hiding the 'tag musicians' area, populate the faces container
 // (we set it as an event cause otherwise Alpine waits for the results
@@ -353,47 +331,6 @@ async function populateFacesContainer(refElem) {
 document.addEventListener('show-faces', function(event) {
 	populateFacesContainer(event.target);
 });
-
-// Get faces html
-function getFacesHtml(imageElem, manualFaces = null) {
-	/*
-	let imageUrl = imageElem.querySelector('.image__image').href;
-	//let faces = imageElem.dataset.faces ? imageElem.dataset.faces : '';
-	let facesElem = imageElem.querySelector('[name="image_face_boundaries"]');
-	let faces = manualFaces ? manualFaces : ( facesElem.value ? facesElem.value : '' );
-	
-	// Show loading
-	let tagsElem = imageElem.querySelector('.image__musician-tags');
-	tagsElem.innerHTML = 'Detecting faces...';
-	tagsElem.classList.add('loading');
-	
-	// Detect faces if necessary, and spit out html
-	initializeInlineSubmit( $(imageElem), '/images/function-get_faces_html.php', {
-		'preparedFormData' : { 'image_url' : imageUrl, 'faces' : faces },
-		
-		'callbackOnSuccess': function(event, returnedData) {
-			
-			tagsElem.classList.remove('loading');
-			tagsElem.innerHTML = returnedData.result;
-			
-			// Save all faces' boundaries with image
-			facesElem.value = returnedData.face_boundaries;
-			facesElem.dispatchEvent(new Event('change'));
-			console.log(returnedData);
-			
-			lookForSelectize();
-			
-		},
-		
-		'callbackOnError': function(event, returnedData) {
-			
-			console.log('error');
-			console.log(returnedData);
-			
-		}
-	});
-	*/
-}
 
 
 // Replaces initImageEditElems
@@ -404,13 +341,6 @@ document.addEventListener('change', function(event) {
 	if( eventName.startsWith('image_') ) {
 		
 		updateImageData(event.target);
-		
-		// For description specifically, update Markdown while typing
-		/*if(eventName === 'image_description') {
-			event.target.addEventListener('keyup', function() {
-				updateMarkdown(event.target);
-			});
-		}*/
 		
 	}
 	
@@ -429,6 +359,7 @@ function getMarkdown(descriptionElem) {
 	return markdown;
 	
 }
+
 
 // Copy Markdown
 function copyMarkdown(markdownElem) {
@@ -471,7 +402,12 @@ function initImageDeleteButtons() {
 		var parentElem = getParent(imageDeleteButton, 'image__template');
 		var imageId = parentElem.querySelector('[name=image_id]').value;
 		
-		initDelete($(imageDeleteButton), '/images/function-delete_image.php', { 'id' : imageId, 'item_type': itemType, 'item_id': itemId }, function(deleteButton) {
+		initDelete($(imageDeleteButton), '/images/function-delete_image.php', {
+			'id' : imageId,
+			'item_type': itemType,
+			'item_id': itemId
+		},
+		function(deleteButton) {
 			parentElem.classList.add('any--fade-out');
 			
 			setTimeout(function() {
@@ -509,22 +445,6 @@ document.addEventListener('click', function(event) {
 		let linkElem = event.target;
 		let imageUrl = linkElem.dataset.image;
 		
-		
-		
-	}
-});
-document.addEventListener('click', function(event) {
-	
-	console.log(event);
-	if(event.target.classList.contains('add-face__wrapper')) {
-		
-		
-		event.preventDefault();
-		
-		console.log(event);
-		
-		
-		
 	}
 });
 
@@ -561,12 +481,10 @@ function updateImageData(changedElem, preparedData = false) {
 				// If select is musician tag, and has face json as data, treat that specially
 				if( inputElem.name.startsWith('image_musician_id') && inputElem.value && inputElem.dataset.face ) {
 					
-					console.log('hey');
-					
 					let idName = inputElem.name;
 					let faceName = 'musician_face_boundaries[' + inputElem.value + ']';
 					
-				preparedFormData[idName] = inputElem.value;
+					preparedFormData[idName] = inputElem.value;
 					preparedFormData[faceName] = inputElem.dataset.face;
 					
 					
@@ -594,12 +512,17 @@ function updateImageData(changedElem, preparedData = false) {
 					console.log(preparedFormData);
 				}
 				
-				
 			}
 			
-			// Checkboxes and radios
-			else if(inputElem.type === 'checkbox' || inputElem.type === 'radio') {
+			// Checkboxes
+			else if( inputElem.type === 'checkbox' ) {
 				preparedFormData[inputElem.name] = inputElem.checked ? 1 : 0;
+			}
+			
+			else if( inputElem.type === 'radio' ) {
+				if( inputElem.checked ) {
+					preparedFormData[inputElem.name] = inputElem.value;
+				}
 			}
 			
 			// Rest of fields
@@ -1112,9 +1035,6 @@ function finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedD
 	
 	// If upload function suggests face detection, show the 'tag musicians' section to do that
 	if(returnedData.needs_facial_detection) {
-		
-		showTaggingSection(newImageElem, 'musicians');
-		
 	}
 	
 	// Trigger change on ID elem so that new ID (and description, etc) is saved in DB
