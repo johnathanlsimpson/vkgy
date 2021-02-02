@@ -15,6 +15,9 @@ function render_component($component_template, $replacement_data = []) {
 			// Handle checkboxes and radios
 			if( strpos($key, 'checked_') === 0 ) {
 				
+				// Replace {checked_item_id} with 3, in case we want the actual value somewhere
+				$replacement_data['{'.$key.'}'] = $value;
+				
 				// Find {checked_item_id:3} and replace with 'checked'
 				unset($replacement_data[$key]);
 				$key = $key.':'.$value;
