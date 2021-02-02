@@ -7,9 +7,11 @@
 				ob_start();
 				?>
 					<div class="face__container">
-						<a class="face__close symbol__trash" href="#"></a>
+						<a class="face__delete symbol__trash" href="#" x-on:click.prevent="removeFace($event.target)"></a>
 						<div class="face__image" style="background-image:url({image_url});background-position:{background_position};background-size:{background_size};height:{height};width:{width};"></div>
-						<select class="input" data-populate-on-click="true" data-source="musicians" data-face='{face_coordinates}' name="image_musician_id[{random_key}]" placeholder="musicians"></select>
+						<select class="input" data-populate-on-click="true" data-source="musicians" data-face='{face_coordinates}' name='image_musician_id[{face_coordinates}]' placeholder="musician">
+							<option value="{musician_id}" selected>{musician_name}</option>
+						</select>
 					</div>
 				<?php
 				$face_template = ob_get_clean();
