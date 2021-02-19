@@ -1,22 +1,56 @@
+.image__results {
+	display: grid;
+	grid-template-columns: repeat( auto-fit, minmax(calc(150px + 1rem), 1fr) );
+}
 .image__template {
-	flex-wrap: wrap;
+	display: inline-flex;
+	margin-top: 1rem;
+	max-width: 100%;
+	padding-bottom: 0;
+}
+@media(max-width: 599.99px) {
+	.image__template {
+		flex-direction: column;
+	}
+}
+.image--edit {
+	grid-column: 1 / -1;
+}
+.image__side {
+	align-items: flex-start;
+	display: flex;
+	flex-direction: column;
+	margin-right: 1rem;
+	width: 100%;
+}
+@media(max-width: 599.99px) {
+	.image__side {
+		margin-bottom: 1rem;
+	}
+}
+.image--edit .image__side {
+	max-width: 150px;
+}
+.image__side-top {
+	margin-top: 0;
+}
+.image__copy {
+	margin-left: auto;
 }
 .image__image {
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
-	height: 100px;
+	height: 150px;
 	line-height: 1rem;
-	margin-right: 1rem;
+	margin-right: 0;
 	margin-top: 0;
 	text-align: right;
-	width: 100px;
+	/*width: 150px;*/
+	width: 100%;
 }
 @media(max-width: 599.99px) {
 	.image__image {
-		background-position: left center;
-		background-size: contain;
-		margin-bottom: 1rem;
 		margin-right: 0;
 		text-align: left;
 		width: 100%;
@@ -79,7 +113,7 @@
 	display: block;
 }
 .image__message {
-	margin-top: -1rem !important;
+	margin-top: -1.5rem;
 }
 .image__markdown {
 	margin-top: 0 !important;
@@ -94,17 +128,11 @@
 	display: none;
 	line-height: 1;
 	position: absolute;
-	top: 0.5rem;
+	top: 1rem;
 }
 .image__details {
 	margin-top: 0 !important;
 }
-/*[name="image_is_exclusive[]"] + ::after {
-	content: "vkgy user?";
-}
-[data-image-status="new"] [name="image_is_exclusive[]"] + ::after {
-	content: "you?";
-}*/
 [data-hide-selects="1"] .image__selects,
 [data-hide-markdown="1"] .image__markdown,
 [data-hide-artists="1"] .image__artists,
@@ -138,6 +166,8 @@
 }
 .image__no-default:last-of-type {
 	display: flex;
+	grid-column: 1 / -1;
+	margin-top: 1rem;
 }
 .image__no-default:first-of-type {
 	display: none;
@@ -162,7 +192,7 @@
 
 .image__tag {
 	line-height: 2.5rem;
-	margin-right:1rem;
+	margin-right: 1rem;
 }
 .image__description-label {
 	height: 3rem;
@@ -178,6 +208,7 @@
 .image__description-span:empty::before {
 	content: "No description";
 	font-style: italic;
+	padding-right: 5px;
 }
 .image__description-span ~ a {
 	line-height: 2rem;
@@ -186,7 +217,10 @@
 .image__faces {
 	flex-wrap: wrap;
 	margin: 0 -0.5rem;
-	padding-top: 1rem;
+}
+.face__label {
+	height: 1rem;
+	width: 100%;
 }
 .face__loading {
 	align-self: flex-start;
@@ -198,6 +232,7 @@
 	flex-wrap: wrap;
 	height: 174px;
 	justify-content: center;
+	margin-left: 0.5rem;
 	margin-top: 0.5rem;
 	width: 116px;
 	text-align: center;
