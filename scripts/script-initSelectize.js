@@ -5,7 +5,12 @@
  */
 
 function initSelectize(selectElement, populatedOnClick = false) {
-	var dataSource  = selectElement.data("source");
+	
+	// I'm making this get the actual attribute instead because data wasn't updating
+	// this may cause issues throughout the site so... let's see
+	//var dataSource  = selectElement.data("source");
+	
+	var dataSource  = selectElement[0].getAttribute('data-source');
 	var data        = $("[data-contains=" + dataSource + "]").html();
 	var isMultiple  = selectElement.data("multiple") ? true : false;
 	var allowCreate = selectElement.data("create") ? true : false;
@@ -57,13 +62,21 @@ function initSelectize(selectElement, populatedOnClick = false) {
 
 function lookForSelectize() {
 	$.each($("select:not(.selectized)"), function() {
-		if($(this).data("populate-on-click")) {
+		
+		if($(this).data("populate-on-click") && !$(this).hasClass('will-selectize')) {
+			
+			// Make sure we don't accidentally spawn multiple selectizes when lookForSelectize() is done multiple times in a page
+			$(this).addClass('will-selectize');
+			
 			$(this).on("focus click", function() {
 				initSelectize($(this), true);
 			});
+			
 		}
+		
 		else {
 			initSelectize($(this), false);
 		}
+		
 	});
 }
