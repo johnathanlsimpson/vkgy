@@ -29,7 +29,7 @@ if( is_numeric($artist_id) ) {
 		$output['is_exclusive_for']  = 'is-exclusive-'.$image['id'];
 		$output['is_default_for']    = 'is-default-'.$image['id'];
 		$output['image_extension']   = $image['extension'];
-		$output['is_dupe']           = 1;
+		$output['is_facsimile']      = 1;
 		
 	}
 	
