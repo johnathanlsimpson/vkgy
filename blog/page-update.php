@@ -249,8 +249,6 @@
 						'default_id' => $entry['image_id'],
 						'hide_blog' => '1',
 						'hide_labels' => '1',
-						'hide_musicians' => '1',
-						'hide_releases' => '1',
 						'is_queued' => 1,
 					]);
 				?>
