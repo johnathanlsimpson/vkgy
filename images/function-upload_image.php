@@ -42,7 +42,7 @@ function upload_image($image, $pdo) {
 		$dupe = $stmt_dupes->fetch();
 		
 		// If dupe, just return image info
-		/*if( is_array($dupe) && !empty($dupe) ) {
+		if( is_array($dupe) && !empty($dupe) ) {
 			$output['status']           = 'success';
 			$output['image_id']         = $dupe['id'];
 			$output['image_url']        = '/images/'.$dupe['id'].'.'.$dupe['extension'];
@@ -55,26 +55,16 @@ function upload_image($image, $pdo) {
 			$output[$item_type.'_id']   = $item_id;
 			$output['image_status']     = 'new';
 			$output['image_extension']  = $dupe['extension'];
-			$output['is_dupe']          = 1;
-			$is_dupe = true;
-		}*/
+			$output['is_facsimile']     = 1;
+			$is_facsimile = true;
+		}
 		
 		// Move forward if not dupe and no initial error and appears to be image
-		if( !$is_dupe && $error === 0 && preg_match('/'.'image.+'.'/', $type) ) {
+		if( !$is_facsimile && $error === 0 && preg_match('/'.'image.+'.'/', $type) ) {
 			
-			
-			
-					
 			// Get actual file type
-			//$extension = strtolower( pathinfo($new_tmp_name, PATHINFO_EXTENSION) );
 			list($width, $height, $file_type) = getimagesize($tmp_name);
-			//$file_type = $image_info[2];
-
-			/*// Make sure webp type is set
-			if( !defined('IMAGETYPE_WEBP') ) {
-				define('IMAGETYPE_WEBP', 18);
-			}*/
-
+			
 			// Set extension based on actual file type
 			switch($file_type) {
 				case IMAGETYPE_GIF:
@@ -98,101 +88,98 @@ function upload_image($image, $pdo) {
 				$sql_init = 'INSERT INTO images (extension, user_id) VALUES (?, ?)';
 				$stmt_init = $pdo->prepare($sql_init);
 				$stmt_init->execute([ 'jpg', $user_id ]);
-
+				
 				$id = $pdo->lastInsertId();
 				$new_tmp_name = '../images/tmp/'.$id.'-'.$name;
-
+				
 				if(is_numeric($id)) {
 					if(($queued && rename($tmp_name, $new_tmp_name)) || move_uploaded_file($tmp_name, $new_tmp_name)) {
-
+						
 						// Convert webp to jpg, since some users still can't see them
 						if($extension === 'webp') {
-
+							
 							$webp_image = new \Gumlet\ImageResize($new_tmp_name);
 							$new_tmp_name = '../images/tmp/'.$id.'.jpg';
-
+							
 							// Attempt to save
 							if($webp_image->save($new_tmp_name, IMAGETYPE_JPEG, 100)) {
 								$extension = 'jpg';
 							}
-
+							
 							// If failed, return null so rest of function stops
 							else {
 								$extension = null;
 							}
-
+							
 						}
-
+						
 						if($extension) {
 							
-							// If uploading on artist page, make a guess at the image contents
-							if( $item_type === 'artist' ) {
-								
-								// Get size ratio by shortest side
-								$size_ratio = $height < $width ? $height / $width : $width / $height;
-								
-								// Check size ratio against standard sizes
-								if( access_image::$image_ratios[$size_ratio] ) {
-									
-									$image_content = access_image::$allowed_image_contents[ access_image::$image_ratios[$size_ratio] ];
-									
-								}
-								
-							}
-							
 							// If uploading on release, assume image contents are release
-							elseif( $item_type === 'release' ) {
+							if( $item_type === 'release' ) {
 								
-								$image_content = access_image::$allowed_image_contents['release'];
+								$image_content_name = 'release';
 								
 							}
 							
 							// If "queued" (not is_queued, but rather uploading flyer from queue), mark as flyer
 							elseif( $queued ) {
 								
-								$image_content = access_image::$allowed_image_contents['flyer'];
+								$image_content_name = 'flyer';
 								
 							}
 							
-							// If item type is artist, trigger face detection
-							$needs_facial_detection = $item_type === 'artist' ? 1 : 0;
+							// Otherwise make a guess at the image contents
+							else {
+								
+								// Get size ratio by shortest side
+								$size_ratio = $width / $height;
+								$size_ratio = sprintf("%01.2f", $size_ratio);
+								
+								// Check size ratio against standard sizes
+								if( access_image::$image_ratios[$size_ratio] ) {
+									
+									$image_content_name = access_image::$image_ratios[ $size_ratio ];
+									
+								}
+								
+							}
 							
+							$image_content = array_search( $image_content_name, access_image::$allowed_image_contents ) ?: 0;
 							
-							
-
 							// Set the final file name
 							$file_name = $id.'.'.$extension;
-
+							
 							$sql_update = 'UPDATE images SET extension=?, is_queued=?, item_type=?, image_content=?, hash=? WHERE id=? LIMIT 1';
 							$stmt_update = $pdo->prepare($sql_update);
-
 							
 							if($stmt_update->execute([ $extension, $is_queued, $item_type, $image_content, $hash, $id ])) {
-
+								
 								if(rename($new_tmp_name, '../images/tmp/'.$file_name)) {
-
+									
 									rename('../images/tmp/'.$file_name, ($queued ? '../images/image_files_queued/' : '../images/image_files/').$file_name);
-
+									
 									// If uploading queued flyer, save thumbnail so we can show it
 									if($queued) {
 										$image_thumb = new \Gumlet\ImageResize('../images/image_files_queued/'.$file_name);
 										$image_thumb->resizeToWidth(100);
 										$image_thumb->save('../images/image_files_queued_thumbnail/'.$file_name);
-
+										
 										update_development($pdo, [ 'type' => 'flyer', 'user_id' => $_SESSION['user_id'] ]);
 									}
-
+									
 									// Set data for update_image function
 									$_POST[$item_type.'_id'] = $item_id;
 									$_POST['id'] = $id;
 									$suppress_output = true;
 									include_once('../images/function-update_image.php');
-
+									
 									$output['status'] = 'success';
 									$output['image_id'] = $id;
 									$output['image_url'] = '/images/'.$id.'.'.$extension;
 									$output['image_style'] = 'background-image: url(/images/'.$id.'.thumbnail.'.$extension.');';
 									$output['image_markdown'] = '![](/images/'.$file_name.')';
+									$output['image_content'] = $image_content;
 									$output['is_exclusive_for'] = 'is-exclusive-'.$id;
 									$output['is_default_for'] = 'is-default-'.$id;
 									$output['item_type'] = $item_type;
@@ -200,8 +187,7 @@ function upload_image($image, $pdo) {
 									$output[$item_type.'_id'] = $item_id;
 									$output['image_status'] = 'new';
 									$output['image_extension'] = $extension;
-									$output['needs_facial_detection'] = $needs_facial_detection;
-
+									
 									// Award point here, but don't show it until update_image, since status elem might not exist until that point
 									$access_points = new access_points($pdo);
 									$access_points->award_points([ 'point_type' => 'added-image' ]);
@@ -234,8 +220,10 @@ function upload_image($image, $pdo) {
 				$output['result'][] = 'File isn\'t a valid jpg, gif, png, or webp.';
 			}
 		}
-		elseif( !$is_dupe ) {
-			$output['result'][] = 'The image couldn\'t be uploaded. '.$error.'*'.$type;
+		
+		// Throw error if couldn't upload (and isn't facsimile)
+		elseif( !$is_facsimile ) {
+			$output['result'][] = 'The image couldn\'t be uploaded: '.$error;
 		}
 		
 	}
