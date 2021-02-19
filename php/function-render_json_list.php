@@ -122,7 +122,7 @@ function render_json_list($input_type, $input = null, $input_id_type = null, $in
 			elseif($input_type === 'musician') {
 				$input_chunk[] = friendly($input[$i]['as_romaji'] ?: $input[$i]['as_name'] ?: $input[$i]['romaji'] ?: $input[$i]['name']);
 				$input_chunk[] =
-					[ 'V. ', 'G. ', 'B. ', 'D. ', 'K. ', 'R. ' ][ $input[$i]['position'] ].
+					[ 'O.', 'V. ', 'G. ', 'B. ', 'D. ', 'K. ', 'S. ' ][ $input[$i]['position'] ].
 					($input[$i]["as_romaji"] ?: $input[$i]["as_name"] ?: $input[$i]["romaji"] ?: $input[$i]["name"]).
 					($input[$i]["as_romaji"] ? " (".$input[$i]["as_name"].")" : (!$input[$i]["as_name"] && $input[$i]["romaji"] ? " (".$input[$i]["name"].")" : null));
 			}
