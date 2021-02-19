@@ -1,5 +1,3 @@
-
-
 <?php
 	include('../artists/head.php');
 	include_once('../php/function-render_component.php');
@@ -282,7 +280,7 @@
 									Edit image gallery
 								</h2>
 								<?php
-									/*include('../images/function-render_image_section.php');
+									include('../images/function-render_image_section.php');
 									render_image_section($artist['images'], [
 										'item_type' => 'artist',
 										'item_id' => $artist['id'],
@@ -292,7 +290,7 @@
 										'hide_blog' => true,
 										'hide_labels' => true,
 										'hide_markdown' => true,
-									]);*/
+									]);
 								?>
 								<div class="text text--outlined text--error symbol__error">
 									Image uploads are temporarily disabled.
