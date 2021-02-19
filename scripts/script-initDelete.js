@@ -35,7 +35,12 @@ function initDelete(deleteButton, processorUrl, data, callbackFn = function() {}
 		}
 		else {
 			$(deleteButton).removeClass("symbol--standalone").attr("data-state", "confirmation");
-			$(deleteButton).html("Delete?");
+			if( $(deleteButton).text() ) {
+				$(deleteButton).text( $(deleteButton).text() + '?' );
+			}
+			else {
+				$(deleteButton).html("Delete?");
+			}
 		}
 	});
 		
