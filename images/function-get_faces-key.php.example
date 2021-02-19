@@ -1,0 +1,7 @@
+<?php
+
+// Used in function-get_faces.php
+
+$api_url = 'https://face-detection6.p.rapidapi.com/img/face';
+$api_host = 'face-detection6.p.rapidapi.com';
+$api_key = '';

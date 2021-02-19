@@ -249,8 +249,6 @@
 						'default_id' => $entry['image_id'],
 						'hide_blog' => '1',
 						'hide_labels' => '1',
-						'hide_musicians' => '1',
-						'hide_releases' => '1',
 						'is_queued' => 1,
 					]);
 				?>
@@ -987,14 +985,6 @@
 							</style>
 
 						<style>
-							.input__note {
-								flex-grow: 1;
-								margin-top: 0.5rem;
-								width: 100%;
-							}
-							.input__row > .input__note {
-								padding-left: 0.5rem;
-							}
 						</style>
 	
 

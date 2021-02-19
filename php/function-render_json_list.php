@@ -28,15 +28,18 @@ $access_release = $access_release ?: new access_release($pdo);
 $access_user = $access_user ?: new access_user($pdo);
 
 // Grab data of a certain type and output it as a json object
-function render_json_list($input_type, $input = null, $input_id_type = null, $include_friendly = null, $first_option_id = null) {
+function render_json_list($input_type, $input = null, $input_id_type = null, $include_friendly = null, $first_option_id = null, $args = []) {
 	global $pdo;
 	global $access_artist, $access_label, $access_musician, $access_release, $access_user;
 	global $artist_list, $label_list, $musician_list, $release_list, $user_list;
 	global $list_is_rendered;
 	
+	// Name used in data-contains attribute--also used to check if we need to get it again
+	$data_contains_name = $input_type.'s'.( $args['append_id'] && is_numeric($input) ? '_'.$input : null );
+	
 	// Check if list was already generated
-	if(!$list_is_rendered[$input_type]) {
-		$list_is_rendered[$input_type] = true;
+	if( !$list_is_rendered[ $data_contains_name ] ) {
+		$list_is_rendered[ $data_contains_name ] = true;
 		
 		// If provided array of data, do nothing, and format it later
 		if(is_array($input)) {
@@ -119,6 +122,7 @@ function render_json_list($input_type, $input = null, $input_id_type = null, $in
 			elseif($input_type === 'musician') {
 				$input_chunk[] = friendly($input[$i]['as_romaji'] ?: $input[$i]['as_name'] ?: $input[$i]['romaji'] ?: $input[$i]['name']);
 				$input_chunk[] =
+					[ 'V. ', 'G. ', 'B. ', 'D. ', 'K. ', 'R. ' ][ $input[$i]['position'] ].
 					($input[$i]["as_romaji"] ?: $input[$i]["as_name"] ?: $input[$i]["romaji"] ?: $input[$i]["name"]).
 					($input[$i]["as_romaji"] ? " (".$input[$i]["as_name"].")" : (!$input[$i]["as_name"] && $input[$i]["romaji"] ? " (".$input[$i]["name"].")" : null));
 			}
@@ -200,7 +204,8 @@ function render_json_list($input_type, $input = null, $input_id_type = null, $in
 		${$input_type . '_list'} = $output_list;
 		$output_list = array_values($output_list);
 		
-		// Echo json version of output
-		echo '<template data-contains="'.$input_type.'s">'.json_encode($output_list).'</template>';
+		// Echo JSON version of output
+		echo '<template data-contains="'.$data_contains_name.'">'.json_encode($output_list).'</template>';
 	}
+	
 }

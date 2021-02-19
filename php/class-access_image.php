@@ -21,18 +21,36 @@
 		
 		// Image contents
 		static public $allowed_image_contents = [
-			'group photo' => 1,
-			'musician' => 2,
-			'flyer' => 3,
-			'logo' => 4,
-			'release' => 5,
-			'other' => 0,
+			1 => 'group photo',
+			2 => 'musician',
+			3 => 'flyer',
+			4 => 'logo',
+			5 => 'release',
+			0 => 'uncategorized',
 		];
 		
 		// Image format ratios (short side / long side)
 		static public $image_ratios = [
-			'0.70' => 'flyer',
+			'0.65' => 'musician',
 			'0.66' => 'musician',
+			'0.67' => 'musician',
+			
+			'0.68' => 'flyer',
+			'0.69' => 'flyer',
+			'0.70' => 'flyer',
+			'0.71' => 'flyer',
+			
+			'0.99' => 'release',
+			'1.00' => 'release',
+			'1.01' => 'release',
+			
+			'1.49' => 'group photo',
+			'1.50' => 'group photo',
+			'1.51' => 'group photo',
+			
+			'1.69' => 'group photo',
+			'1.70' => 'group photo',
+			'1.71' => 'group photo',
 		];
 		
 		// ======================================================
@@ -498,9 +516,8 @@
 				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_artists.artist_id) AS artist_ids';
 				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_blog.blog_id) AS blog_id';
 				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_labels.label_id) AS label_ids';
-				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_musicians.musician_id) AS musician_ids';
+				$sql_select[] = '"" AS musician_ids';
 				$sql_select[] = 'GROUP_CONCAT(DISTINCT images_releases.release_id) AS release_ids';
-				//$sql_select[] = 'users.username';
 			}
 			if($args['get'] === 'name') {
 				$sql_select[] = 'images.id';
@@ -548,9 +565,7 @@
 				$sql_join[] = 'LEFT JOIN images_artists ON images_artists.image_id=images.id';
 				$sql_join[] = 'LEFT JOIN images_blog ON images_blog.image_id=images.id';
 				$sql_join[] = 'LEFT JOIN images_labels ON images_labels.image_id=images.id';
-				$sql_join[] = 'LEFT JOIN images_musicians ON images_musicians.image_id=images.id';
 				$sql_join[] = 'LEFT JOIN images_releases ON images_releases.image_id=images.id';
-				//$sql_join[] = 'LEFT JOIN users ON users.id=images.user_id';
 			}
 			
 			// Where
@@ -598,6 +613,70 @@
 				if($stmt_images->execute( $sql_values )) {
 					$images = $stmt_images->fetchAll();
 					$num_images = count($images);
+					
+					// Get musicians which are tagged generally and/or by face
+					if( $num_images && ( $args['get'] === 'all' || $args['get'] === 'most' ) ) {
+						
+						// Loop through images and save all IDs
+						// Also create empty skeleton with detected faces
+						for($i=0; $i<$num_images; $i++) {
+							
+							$image_ids[] = $images[$i]['id'];
+							
+							// Make empty musicians array from any present face boundaries--later we'll fill in the musician ID if it's been tagged
+							if( $images[$i]['face_boundaries'] ) {
+								
+								$face_boundaries = json_decode( $images[$i]['face_boundaries'], true );
+								
+								if( is_array($face_boundaries) && !empty($face_boundaries) ) {
+									
+									foreach($face_boundaries as $face_boundary) {
+										
+										$face_boundary = json_encode($face_boundary);
+										$images[$i]['musicians'][ $face_boundary ] = [ 'musician_id' => null, 'face_boundaries' => $face_boundary ];
+										
+									}
+									
+								}
+								
+							}
+							
+						}
+						
+						// Get all musician links for all images
+						$sql_musicians = 'SELECT * FROM images_musicians WHERE images_musicians.image_id IN ('.implode(',', $image_ids).')';
+						$stmt_musicians = $this->pdo->prepare($sql_musicians);
+						$stmt_musicians->execute();
+						$rslt_musicians = $stmt_musicians->fetchAll();
+						
+						// Flip array of image ids so we can easily put musicians back on original image
+						$image_ids = array_flip($image_ids);
+						
+						if( is_array($rslt_musicians) && !empty($rslt_musicians) ) {
+							foreach($rslt_musicians as $musician) {
+								
+								$image_key = $image_ids[ $musician['image_id'] ];
+								
+								// If musician has face boundary specified, then we'll save it separately; otherwise just chuck id into one string
+								if( strlen($musician['face_boundaries']) ) {
+									$images[ $image_key ]['musicians'][ $musician['face_boundaries'] ] = $musician;
+								}
+								else {
+									$images[ $image_key ]['musician_ids'] = strlen( $images[ $image_key ]['musician_ids'] ) ? $images[ $image_key ]['musician_ids'].','.$musician['musician_id'] : $musician['musician_id'];
+								}
+								
+							}
+						}
+						
+						// Loop back through images and clean up musician arrays
+						// Also create empty skeleton with detected faces
+						for($i=0; $i<$num_images; $i++) {
+							
+							$images[$i]['musicians'] = is_array($images[$i]['musicians']) ? array_values($images[$i]['musicians']) : [];
+							
+						}
+						
+					}
 					
 					// Get artists etc
 					if($args['get'] === 'all') {

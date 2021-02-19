@@ -7,6 +7,7 @@ uploads/*
 !uploads/.gitkeep
 
 # Ignore sensitive data
+images/function-get_faces-key.php
 php/database-variables.php
 php/class-access_social_media-key.php
 php/class-login-key.php
