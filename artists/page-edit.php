@@ -292,9 +292,6 @@
 										'hide_markdown' => true,
 									]);
 								?>
-								<div class="text text--outlined text--error symbol__error">
-									Image uploads are temporarily disabled.
-								</div>
 							</div>
 						</div>
 						
