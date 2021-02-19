@@ -242,7 +242,7 @@
 					}
 					
 					// Otherwise, let's resize it
-					elseif(strlen($source_extension) && in_array($source_extension, self::allowed_extensions)) {
+					elseif(strlen($source_extension) && in_array($source_extension, $this->allowed_extensions)) {
 						
 						// Increase memory limit if necessary
 						if($this->set_memory_limit($full_path)) {
@@ -464,7 +464,7 @@
 					$image_ext = $stmt_image->fetchColumn();
 					
 					// If extension found
-					if(strlen($image_ext) && in_array($image_ext, self::allowed_extensions)) {
+					if(strlen($image_ext) && in_array($image_ext, $this->allowed_extensions)) {
 						
 						if($resize_method === 'full') {
 							$image_url = $this->get_full_size_image($image_id, $image_ext);
