@@ -249,7 +249,7 @@
 									
 									<label class="input__checkbox">
 										<input class="input__choice" name="image_is_exclusive[]" type="checkbox" value="1" {is_exclusive} />
-										<span class="symbol__checkbox--unchecked">I scanned this</span>
+										<span class="symbol__checkbox--unchecked" x-text="isNew ? 'scanned by me' : 'scanned by vkgy user'">I scanned this</span>
 									</label>
 									
 								</div>
