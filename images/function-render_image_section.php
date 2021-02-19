@@ -114,7 +114,7 @@ function render_image_section($images, $args = []) {
 				'id'                 => $image['id'],
 				'item_type'          => $args['item_type'],
 				'item_id'            => $args['item_id'],
-				'description'        => $image['description'],
+				'description'        => str_replace("&#39;", '\&#39;', $image['description']),
 				'credit'             => $image['credit'],
 				'is_exclusive'       => $image['is_exclusive'] ? 'checked' : null,
 				'is_default'         => $image['id'] == $args['default_id'] ? 'checked' : null,
@@ -134,7 +134,7 @@ function render_image_section($images, $args = []) {
 				'extension'          => $image['extension'],
 				'tagged_faces'       => $tagged_faces,
 				'is_previous_upload' => true,
-				'is_facsimile'       => $args['item_type'] != $image['item_type'] ? '1' : null, // If we eventually want to make facsimiles different in image list somehow; currently this is only set to 1 (= can't edit) if auto-populating image in blog post
+				'is_facsimile'       => $image['item_type'] && $args['item_type'] != $image['item_type'] ? '1' : null, // If we eventually want to make facsimiles different in image list somehow; currently this is only set to 1 (= can't edit) if auto-populating image in blog post
 				'artist_is_set'      => $image['artist_ids'] || $default['artist']
 			]);
 			
