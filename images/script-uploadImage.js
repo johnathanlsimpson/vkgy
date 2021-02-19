@@ -1,14 +1,156 @@
-//
-// Helper: Trigger change
-// Alpinejs can't seem to trigger change, so we wait a millisecond to trigger change after value has been updated e_e
-//
+// ========================================================
+// Helpers
+// ========================================================
+
+// Trigger change
+// Alpinejs can't seem to trigger change, so we wait a millisecond to trigger change after value has been updated
+// ^ Apparently? Seems fine now IDK
 function triggerChange(elem) {
-	setTimeout(function() {
-		elem.dispatchEvent( new Event( 'change', { bubbles:true } ) );
-	}, 100);
+	elem.dispatchEvent( new Event( 'change', { bubbles:true } ) );
+}
+
+// Helper to get specified parent
+// Isn't this just .closest? Need to investigate at some point
+function getParent(childElem, parentClass) {
+	var currentElem = childElem;
+	var parentElem;
+	var parentIsFound = false;
+	
+	while(!parentIsFound) {
+		currentElem = currentElem.parentNode;
+		
+		if(currentElem.classList.contains(parentClass)) {
+			parentElem = currentElem;
+			
+			parentIsFound = true;
+		}
+	}
+	
+	return parentElem;
 }
 
 
+
+// ========================================================
+// JSON Lists
+// ========================================================
+
+function updateJsonLists(artistElem) {
+	
+	// If we ever want to get all selected artists
+	// ...But for now I can't think of a good way to combine both artists'
+	// musicians into one dropdown for example so we'll just make it such
+	// that only the first select artist's musicians/releases can be tagged
+	//let values = Array.from(artistElem.selectedOptions).map(v=>v.value);
+	
+	// Helper function for later I guess
+	let getNodes = str => new DOMParser().parseFromString(str, 'text/html').body.childNodes;
+	
+	// Get artist
+	let artistId = artistElem.value;
+	
+	// Set up new data-contains attributes
+	let musicianDataKey = 'musicians_' + artistId;
+	let releaseDataKey = 'releases_' + artistId;
+	
+	// Get template with artist data so we can insert new ones after it
+	let artistListElem = document.querySelector('[data-contains="artists"]');
+
+	// Get tagging selects so we can update which list they use
+	let imageElem = artistElem.closest('.image__template');
+	let musicianElems = imageElem.querySelectorAll('[data-source^="musicians"]');
+	let releaseElems = imageElem.querySelectorAll('[data-source^="releases"]');
+	
+	// Let's see if musician and release lists for this artist are already in page
+	let musicianListElem = document.querySelector('[data-contains="' + musicianDataKey + '"]');
+	
+	// If musician list not already gotten (and presumably release list isn't either), let's get them
+	if( !musicianListElem ) {
+		
+		// Set up post
+		let formData = new FormData();
+		formData.append('id_column', 'artist_id');
+		formData.append('artist_id', artistId);
+		
+		// Get musician/release lists
+		fetch('/images/function-get_json_lists.php', {
+			
+			method: 'POST',
+			body: formData
+			
+		})
+		
+		.then((response) => {
+			
+			return response.json();
+			
+		})
+		
+		.then((data) => {
+			
+			if( data.status === 'success' ) {
+				
+				// Add musician list to page
+				if( data.musician_list ) {
+					
+					musicianListElem = document.createRange().createContextualFragment( data.musician_list );
+					artistListElem.after(musicianListElem);
+					
+				}
+				
+				// Add release list to page
+				if( data.release_list ) {
+					
+					let releaseListElem = document.createRange().createContextualFragment( data.release_list );
+					artistListElem.after(releaseListElem);
+					
+				}
+				
+			}
+			
+			else {
+				
+			}
+			
+		});
+	
+	}
+	
+	// Go through any tagging dropdowns and update to use correct list
+	musicianElems.forEach(function(musicianElem) {
+
+		musicianElem.setAttribute('data-source', musicianDataKey);
+
+		// If no value set but selectize active, destroy it
+		if( !musicianElem.value && musicianElem.classList.contains('selectized') ) {
+
+			musicianElem.selectize.destroy();
+
+		}
+
+	});
+
+	// Go through any tagging dropdowns and update to use correct list
+	releaseElems.forEach(function(releaseElem) {
+		
+		releaseElem.setAttribute('data-source', releaseDataKey);
+		
+		// If no value set but selectize active, destroy it
+		if( !releaseElem.value.length && releaseElem.classList.contains('selectized') ) {
+			
+			releaseElem.selectize.destroy();
+			
+		}
+		
+	});
+	
+}
+
+
+
+// ========================================================
+// Description
+// ========================================================
 
 // Return updated description
 function getDescription(targetElem) {
@@ -86,9 +228,10 @@ function getDescription(targetElem) {
 }
 
 
-//
+
+// ========================================================
 // Facial detection
-//
+// ========================================================
 
 // Send image to API to find faces
 function getFaces(imageElem, imageUrl) {
@@ -113,6 +256,8 @@ function getFaces(imageElem, imageUrl) {
 			
 		});
 		
+	}).catch(function(rejection) {
+		return rejection;
 	});
 	
 	return detectedFaces;
@@ -122,12 +267,15 @@ function getFaces(imageElem, imageUrl) {
 // Given coordinates, render faces for tagging
 function getFaceHtml(imageElem, imageUrl, detectedFaces) {
 	
+	let artistId = imageElem.querySelector('[name^="image_artist_id"]');
+	artistId = artistId ? artistId.value : 0;
+	
 	let faceHtml = new Promise(function(response, rejection) {
 		
 		// Given faces, calculate bounding boxes from image
 		initializeInlineSubmit( $(imageElem), '/images/function-get_face_html.php', {
 			
-			'preparedFormData' : { 'image_url' : imageUrl, 'faces' : detectedFaces },
+			'preparedFormData' : { 'image_url' : imageUrl, 'faces' : detectedFaces, 'artist_id' : artistId },
 			
 			'callbackOnSuccess': function(event, returnedData) {
 				
@@ -137,12 +285,14 @@ function getFaceHtml(imageElem, imageUrl, detectedFaces) {
 			
 			'callbackOnError': function(event, returnedData) {
 				
-				response(returnedData);
+				rejection(returnedData);
 				
 			}
 			
 		});
 		
+	}).catch(function(rejection) {
+		return rejection;
 	});
 	
 	return faceHtml;
@@ -158,7 +308,7 @@ async function populateFacesContainer(refElem) {
 	
 	// First get image url and filetype
 	// Btw href resolves to full path instead of relative which will cause file_exists to fail
-	let imageUrl = imageElem.querySelector('.image__image').getAttribute('href');
+	let imageUrl = imageElem.querySelector('.image__image').href;
 	let imageExtension = imageUrl.split(/\./).pop();
 	
 	// Show button to manually add face
@@ -182,6 +332,9 @@ async function populateFacesContainer(refElem) {
 		let returnedFaceData = await getFaces(imageElem, imageUrl);
 		
 		if( returnedFaceData.status == 'success' && returnedFaceData.result ) {
+			
+			// Move face json to next step
+			faces = returnedFaceData.result;
 			
 			// Save face boundaries for later
 			updateFaceBoundaries(imageElem, returnedFaceData.result);
@@ -332,6 +485,21 @@ document.addEventListener('show-faces', function(event) {
 	populateFacesContainer(event.target);
 });
 
+// Manually add face to be tagged
+document.addEventListener('click', function(event) {
+	if(event.target.classList.contains('image__add-face')) {
+		
+		let linkElem = event.target;
+		let imageUrl = linkElem.dataset.image;
+		
+	}
+});
+
+
+
+// ========================================================
+// Update image data
+// ========================================================
 
 // Replaces initImageEditElems
 document.addEventListener('change', function(event) {
@@ -346,111 +514,10 @@ document.addEventListener('change', function(event) {
 	
 });
 
-
-// Update Markdown based on description
-function getMarkdown(descriptionElem) {
-	
-	let parentElem = descriptionElem.closest('image__template');
-	let markdownElem = parentElem.querySelector('[data-get="image_markdown"]');
-	
-	let markdown = markdownElem.textContent.split('](');
-	markdown = '![' + descriptionElem.value + '](' + markdown[1];
-	
-	return markdown;
-	
-}
-
-
-// Copy Markdown
-function copyMarkdown(markdownElem) {
-	
-	let markdown = markdownElem.textContent;
-	let dummyElem = document.createElement('textarea');
-	
-	// Create dummy element and insert Markdown so we can copy it e_e
-	dummyElem.value = markdown;
-	document.body.appendChild(dummyElem);
-	dummyElem.select();
-	document.execCommand("Copy");
-	dummyElem.remove();
-	
-}
-
-
-// Handle 'no default image'
-let noDefaultElem = document.querySelector('.image__no-default:last-of-type [name="image_is_default"]');
-if(noDefaultElem) {
-	noDefaultElem.addEventListener('change', function() {
-		let otherDefaultElems = document.querySelectorAll('.image__results .image__template [name="image_is_default"]');
-		if(otherDefaultElems && otherDefaultElems.length) {
-			otherDefaultElems.forEach(function(otherDefaultElem) {
-				otherDefaultElem.dispatchEvent(new Event('change'));
-			});
-		}
-	});
-}
-
-
-// Init delete buttons
-function initImageDeleteButtons() {
-	var imageDeleteButtons = document.querySelectorAll('.image__delete');
-	var itemType = document.querySelector('[name=image_item_type]').value;
-	var itemId = document.querySelector('[name=image_item_id]').value;
-	
-	imageDeleteButtons.forEach(function(imageDeleteButton) {
-		
-		var parentElem = getParent(imageDeleteButton, 'image__template');
-		var imageId = parentElem.querySelector('[name=image_id]').value;
-		
-		initDelete($(imageDeleteButton), '/images/function-delete_image.php', {
-			'id' : imageId,
-			'item_type': itemType,
-			'item_id': itemId
-		},
-		function(deleteButton) {
-			parentElem.classList.add('any--fade-out');
-			
-			setTimeout(function() {
-				parentElem.remove();
-			}, 300);
-		});
-	});
-}
-
-
-// Helper to get specified parent
-function getParent(childElem, parentClass) {
-	var currentElem = childElem;
-	var parentElem;
-	var parentIsFound = false;
-	
-	while(!parentIsFound) {
-		currentElem = currentElem.parentNode;
-		
-		if(currentElem.classList.contains(parentClass)) {
-			parentElem = currentElem;
-			
-			parentIsFound = true;
-		}
-	}
-	
-	return parentElem;
-}
-
-
-// Manually add face to be tagged
-document.addEventListener('click', function(event) {
-	if(event.target.classList.contains('image__add-face')) {
-		
-		let linkElem = event.target;
-		let imageUrl = linkElem.dataset.image;
-		
-	}
-});
-
-
 // Update image data
 function updateImageData(changedElem, preparedData = false) {
+	
+	console.log('updating data');
 	
 	var parentElem = getParent(changedElem, 'image__template');
 	var statusElem = parentElem.querySelector('.image__status');
@@ -487,29 +554,11 @@ function updateImageData(changedElem, preparedData = false) {
 					preparedFormData[idName] = inputElem.value;
 					preparedFormData[faceName] = inputElem.dataset.face;
 					
-					
-					/*if( !preparedFormData[inputElem.name] ) {
-						preparedFormData[inputElem.name] = [];
-						preparedFormData['image_musician_face[]'] = [];
-					}
-					
-					//console.log('select value is ' + inputElem.value);
-					preparedFormData[inputElem.name].push(inputElem.value);
-					preparedFormData['image_musician_face[]'].push(inputElem.dataset.face);*/
-					
-					//preparedFormData[inputElem.name] = Array.prototype.map.call(inputElem.selectedOptions, function(x){ return x.value });
-					//console.log('prepared data rn is');
-					console.log(preparedFormData);
-					
-				//}
 				}
-				
 				
 				// For other selects, map selected options to array
 				else {
 					preparedFormData[inputElem.name] = Array.prototype.map.call(inputElem.selectedOptions, function(x){ return x.value });
-					//console.log('prepared data rn is');
-					console.log(preparedFormData);
 				}
 				
 			}
@@ -549,9 +598,6 @@ function updateImageData(changedElem, preparedData = false) {
 		},
 		'callbackOnError': function(formElem, returnedData) {
 			
-			console.log('error');
-			console.log(returnedData);
-			
 		}
 	});
 	
@@ -564,17 +610,105 @@ function updateImageData(changedElem, preparedData = false) {
 }
 
 
+
+// ========================================================
+// Markdown
+// ========================================================
+
+// Update Markdown based on description
+function getMarkdown(descriptionElem) {
+	
+	let parentElem = descriptionElem.closest('image__template');
+	let markdownElem = parentElem.querySelector('[data-get="image_markdown"]');
+	
+	let markdown = markdownElem.textContent.split('](');
+	markdown = '![' + descriptionElem.value + '](' + markdown[1];
+	
+	return markdown;
+	
+}
+
+// Copy Markdown
+function copyMarkdown(markdownElem) {
+	
+	let markdown = markdownElem.textContent;
+	let dummyElem = document.createElement('textarea');
+	
+	// Create dummy element and insert Markdown so we can copy it e_e
+	dummyElem.value = markdown;
+	document.body.appendChild(dummyElem);
+	dummyElem.select();
+	document.execCommand("Copy");
+	dummyElem.remove();
+	
+}
+
+
+
+// ========================================================
+// Default image
+// ========================================================
+
+// Handle 'no default image'
+let noDefaultElem = document.querySelector('.image__no-default:last-of-type [name="image_is_default"]');
+if(noDefaultElem) {
+	noDefaultElem.addEventListener('change', function() {
+		let otherDefaultElems = document.querySelectorAll('.image__results .image__template [name="image_is_default"]');
+		if(otherDefaultElems && otherDefaultElems.length) {
+			otherDefaultElems.forEach(function(otherDefaultElem) {
+				otherDefaultElem.dispatchEvent(new Event('change'));
+			});
+		}
+	});
+}
+
+
+
+// ========================================================
+// Delete
+// ========================================================
+
+// Init delete buttons
+function initImageDeleteButtons() {
+	var imageDeleteButtons = document.querySelectorAll('.image__delete');
+	var itemType = document.querySelector('[name=image_item_type]').value;
+	var itemId = document.querySelector('[name=image_item_id]').value;
+	
+	imageDeleteButtons.forEach(function(imageDeleteButton) {
+		
+		var parentElem = getParent(imageDeleteButton, 'image__template');
+		var imageId = parentElem.querySelector('[name=image_id]').value;
+		
+		initDelete($(imageDeleteButton), '/images/function-delete_image.php', {
+			'id' : imageId,
+			'item_type': itemType,
+			'item_id': itemId
+		},
+		function(deleteButton) {
+			parentElem.classList.add('any--fade-out');
+			
+			setTimeout(function() {
+				parentElem.remove();
+			}, 300);
+		});
+	});
+}
+
+
+
+// ========================================================
+// Drag and drop to image
+// ========================================================
+
 // Set image template elements, some variables
 var droppedFiles;
 var isAdvancedUpload = true;
-
 
 // Detect whether browser can handle drag and drop upload
 isAdvancedUpload = function() {
 	var div = document.createElement('div');
 	return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
 }();
-
 
 // If we can handle drag and drop, let's do so
 if(isAdvancedUpload) {
@@ -651,6 +785,11 @@ if(isAdvancedUpload) {
 	
 }
 
+
+
+// ========================================================
+// URL to image
+// ========================================================
 
 // Given a URL, try to grab as blob image
 function urlToBlob(inputURL, newImageTemplateArgs, tryProxy = true) {
@@ -733,7 +872,6 @@ function urlToBlob(inputURL, newImageTemplateArgs, tryProxy = true) {
 	}
 }
 
-
 // Given a pasted blob image, transform it into a pseudo fileList
 function blobToFiles(inputBlob, dropURL) {
 	
@@ -753,7 +891,6 @@ function blobToFiles(inputBlob, dropURL) {
 	
 }
 
-
 // Given an image's URL, attempt to get a pretty file name
 function urlToFileName(inputBlobType, inputURL) {
 	
@@ -770,7 +907,6 @@ function urlToFileName(inputBlobType, inputURL) {
 	
 }
 
-
 // Prepend URL with proxy to avoid CORS issues
 function proxyURL(inputURL) {
 	
@@ -781,7 +917,6 @@ function proxyURL(inputURL) {
 	return proxyPrefix + inputURL;
 	
 }
-
 
 // Given a pasted image source, try to get the best version of the image and apply proxy
 function cleanDroppedURL(inputURL) {
@@ -849,11 +984,154 @@ function cleanDroppedURL(inputURL) {
 }
 
 
+
+// ========================================================
+// Facsimile to image
+// ========================================================
+
+// Given image ID, insert into image section as if we've just uploaded it (fake upload)
+function fakeUpload(imageData) {
+	
+	let emptyImageSection = renderImageSection();
+	let newImageSection = emptyImageSection.thisImageElem;
+	
+	// Ok, so this is absolutely awful, and someday we need to refactor the image uploads for a 14th
+	// time because it's just too much henny. But anyway, we're going to loop through and manually
+	// set all the image's data in the html template. First we'll steal the loop from initImageUpload
+	// to try to set some automatically from data-get, then we'll manually set some others.
+	//
+	// For example, if this were an actual upload, we wouldn't have a description or credit specified,
+	// but since we're actually grabbing an existing image from an artist's profile, we need to make
+	// sure those are maintained. We're just going to assume that release_id and musician_id aren't
+	// set, which... is probably wrong in some very few cases.
+	//
+	// Then, we'll run finishUpload which inits all the buttons and dropdowns and shit, and then we
+	// have to go back and select the artistId and update the image again to make sure the artist link
+	// is preserved. It's a mess!
+	
+	// Loop through and auto-set data-get values
+	$.each($(newImageSection).find('[data-get]'), function() {
+		
+		var key = $(this).attr('data-get');
+		var value = imageData[key];
+		
+		if( typeof value !== 'undefined' ) {
+			
+			if( $(this).is('[data-get-into]') ) {
+				
+				var attribute = $(this).attr('data-get-into');
+				$(this).attr(attribute, value);
+				
+			}
+			else {
+				
+				$(this).html(value);
+				
+			}
+			
+		}
+		
+	});
+	
+	// Get some elements that we need to pass to finishUpload
+	let idElem = newImageSection.querySelector('[name="image_id"]');
+	let statusElem = newImageSection.querySelector('.image__status');
+	let thumbnailElem = newImageSection.querySelector('.image__image');
+	
+	// Send to finishUpload to clean up the template and init some edits and things
+	finishUpload(newImageSection, idElem, statusElem, thumbnailElem, imageData);
+	
+}
+
+
+
+// ========================================================
+// Paste to image
+// ========================================================
+
+// Upload images via paste
+let imagePasteElem = document.querySelector('[name="image_url"]');
+imagePasteElem.addEventListener('paste', function(event) {
+	
+	// Loop through pasted items
+	let items = event.clipboardData.items;
+	if(items && items.length) {
+		
+		for(let i=0; i<items.length; i++) {
+			
+			// If pasted item is plain text (i.e. URL)
+			if(items[i].type.includes('text/plain')) {
+				
+				// Get text object as string
+				items[i].getAsString(function(pastedString) {
+					
+					pastedString = cleanDroppedURL(pastedString);
+					
+					// If URL not empty after being cleaned
+					if(pastedString) {
+						
+						// Grab data from URL and transform to blob (this function also sends blob to uploader, since can't pass blob back)
+						handleFiles(pastedString, renderImageSection(), 'url');
+						
+					}
+					
+				});
+				
+			}
+			
+			// Or if pasted item is an image
+			else if(items[i].type.includes('image')) {
+				
+				// Retrieve image on clipboard as blob, then transform it into URL
+				let imageBlob = items[i].getAsFile();
+				let urlObj = window.URL || window.webkitURL;
+				let imageSrc = urlObj.createObjectURL(imageBlob);
+				
+				// Pass blob URL directly to be urlToBlob; will remake blob into an <img> and then upload it
+				urlToBlob(imageSrc, renderImageSection(), false);
+				
+			}
+			
+		}
+		
+	}
+	
+});
+
+
+
+// ========================================================
+// Input to image
+// ========================================================
+
 // Set template elements for renderImageSection()
 var imageUploadElem = document.querySelector('[name=images]');
 var imagesElem = document.querySelector('.image__results');
 var imageTemplate = document.querySelector('#image-template');
 
+// Manually upload images via <file> input
+imageUploadElem.addEventListener('change', function() {
+	
+	// Send files for upload
+	if(imageUploadElem.files.length) {
+		
+		for(let i=0; i<imageUploadElem.files.length; i++) {
+			
+			handleFiles(imageUploadElem.files[i], renderImageSection());
+			
+		}
+	}
+	
+	// Make sure <file> input is empty after files are accepted; otherwise you'll get facsimiles
+	imageUploadElem.value = '';
+	
+});
+
+
+
+// ========================================================
+// Image upload
+// ========================================================
 
 // Grab image template, clone, prepend to images area, then pass the clone so we can update it later
 function renderImageSection() {
@@ -905,7 +1183,6 @@ function renderImageSection() {
 	
 }
 
-
 // Takes file, uploads, then updates image template
 function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 	
@@ -955,7 +1232,7 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 				'preparedFormData' : { 'image' : thisImage, 'item_type' : newImageTemplateArgs.itemType, 'item_id' : newImageTemplateArgs.itemId },
 				'callbackOnSuccess': function(event, returnedData) {
 					
-					if( typeof returnedData.is_dupe === 'undefined' || returnedData.is_dupe != 1 ) {
+					if( typeof returnedData.is_facsimile === 'undefined' || returnedData.is_facsimile != 1 ) {
 						
 						newImageTemplateArgs.messageElem.innerHTML = 'Compressing...';
 						
@@ -1015,7 +1292,6 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 	
 }
 
-
 // Takes empty image section, inserts data from upload
 function finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedData) {
 	
@@ -1026,154 +1302,45 @@ function finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedD
 	// While uploading, thumbnail may be a huge blob of image data, so replace with actual thumbnail after
 	thumbnailElem.setAttribute('style', returnedData.image_style);
 	
-	// After ID is set init buttons in new image element
-	lookForSelectize();
-	//initImageEditElems();
-	initImageDeleteButtons();
+	// If facsimile (i.e. artist image auto-linked to blog post), make sure that's set
+	if( returnedData.is_facsimile ) {
+		
+		// Set isFacsimile and isNew to true in Alpine data
+		newImageElem.setAttribute( 'x-data', newImageElem.getAttribute('x-data').replace( "isFacsimile: ''", "isFacsimile: '1'" ) );
+		newImageElem.setAttribute( 'x-data', newImageElem.getAttribute('x-data').replace( "isNew: ''", "isNew: '1'" ) );
+		
+		// Set in input
+		newImageElem.querySelector('[name="image_is_facsimile"]').value = 1;
+		
+	}
 	
-	console.log(returnedData);
-	
-	// If upload function suggests face detection, show the 'tag musicians' section to do that
-	if(returnedData.needs_facial_detection) {
+	// Otherwise run all normal things
+	else if( !newImageElem.querySelector('[name="image_is_facsimile"]').value ) {
+		
+		// After ID is set init buttons in new image element
+		lookForSelectize();
+		initImageDeleteButtons();
+		
+		// Update names of image_type radios
+		let imageTypeElems = newImageElem.querySelectorAll('[name="image_type[]"]');
+		imageTypeElems.forEach(function(imageTypeElem) {
+			
+			imageTypeElem.name = 'image_type[' + returnedData.image_id + ']';
+			
+		});
+		
+		// Set image content
+		newImageElem.querySelector('[name^="image_type"][value="' + returnedData.image_content + '"]').checked = true;
+		
 	}
 	
 	// Trigger change on ID elem so that new ID (and description, etc) is saved in DB
-	idElem.dispatchEvent(new Event('change'));
+	// This might need to be moved before 'set image content'
+	idElem.dispatchEvent(new Event('change', { bubbles: true }));
 	
 	newImageElem.classList.remove('image--loading');
 	
 }
-
-
-// Given image ID, insert into image section as if we've just uploaded it (fake upload)
-function fakeUpload(imageData) {
-	
-	let emptyImageSection = renderImageSection();
-	let newImageSection = emptyImageSection.thisImageElem;
-	
-	// Ok, so this is absolutely awful, and someday we need to refactor the image uploads for a 14th
-	// time because it's just too much henny. But anyway, we're going to loop through and manually
-	// set all the image's data in the html template. First we'll steal the loop from initImageUpload
-	// to try to set some automatically from data-get, then we'll manually set some others.
-	//
-	// For example, if this were an actual upload, we wouldn't have a description or credit specified,
-	// but since we're actually grabbing an existing image from an artist's profile, we need to make
-	// sure those are maintained. We're just going to assume that release_id and musician_id aren't
-	// set, which... is probably wrong in some very few cases.
-	//
-	// Then, we'll run finishUpload which inits all the buttons and dropdowns and shit, and then we
-	// have to go back and select the artistId and update the image again to make sure the artist link
-	// is preserved. It's a mess!
-	
-	// Loop through and auto-set data-get values
-	$.each($(newImageSection).find('[data-get]'), function() {
-		var key = $(this).attr('data-get');
-		var value = imageData[key];
-		
-		if(value && value.length) {
-			if($(this).is('[data-get-into]')) {
-				var attribute = $(this).attr('data-get-into');
-				$(this).attr(attribute, value);
-			}
-			else {
-				$(this).html(value);
-			}
-		}
-	});
-	
-	// Manually set some other values
-	newImageSection.querySelector('[name="image_credit"]').value = imageData.credit;
-	newImageSection.querySelector('[name="image_is_exclusive[]"]').checked = imageData.is_exclusive ? true : false;
-	newImageSection.querySelector('[name="image_id"]').value = imageData.image_id;
-	
-	// Get some elements that we need to pass to finishUpload
-	let idElem = newImageSection.querySelector('[name="image_id"]');
-	let statusElem = newImageSection.querySelector('.image__status');
-	let thumbnailElem = newImageSection.querySelector('.image__image');
-	
-	// Get artist id element, and set data-populate-on-click to false, so that
-	// initSelectize will init the dropdown as soon as possible instead of on click
-	// (this occurs in finishUpload), so we can take the selectize attr and set it to
-	// the artist's id as soon as possible. Again, a mess.
-	let artistIdElem = newImageSection.querySelector('[name="image_artist_id[]"]');
-	artistIdElem.dataset.populateOnClick = false;
-	
-	// Send to finishUpload to clean up the template and init some edits and things
-	finishUpload(newImageSection, idElem, statusElem, thumbnailElem, imageData);
-	
-	// Set the artist dropdown to make sure we preserve the artist link
-	artistIdElem.selectize.setValue(imageData.artist_id);
-	
-}
-
-
-// Upload images via paste
-let imagePasteElem = document.querySelector('[name="image_url"]');
-imagePasteElem.addEventListener('paste', function(event) {
-	
-	// Loop through pasted items
-	let items = event.clipboardData.items;
-	if(items && items.length) {
-		
-		for(let i=0; i<items.length; i++) {
-			
-			// If pasted item is plain text (i.e. URL)
-			if(items[i].type.includes('text/plain')) {
-				
-				// Get text object as string
-				items[i].getAsString(function(pastedString) {
-					
-					pastedString = cleanDroppedURL(pastedString);
-					
-					// If URL not empty after being cleaned
-					if(pastedString) {
-						
-						// Grab data from URL and transform to blob (this function also sends blob to uploader, since can't pass blob back)
-						handleFiles(pastedString, renderImageSection(), 'url');
-						
-					}
-					
-				});
-				
-			}
-			
-			// Or if pasted item is an image
-			else if(items[i].type.includes('image')) {
-				
-				// Retrieve image on clipboard as blob, then transform it into URL
-				let imageBlob = items[i].getAsFile();
-				let urlObj = window.URL || window.webkitURL;
-				let imageSrc = urlObj.createObjectURL(imageBlob);
-				
-				// Pass blob URL directly to be urlToBlob; will remake blob into an <img> and then upload it
-				urlToBlob(imageSrc, renderImageSection(), false);
-				
-			}
-			
-		}
-		
-	}
-	
-});
-
-
-// Manually upload images via <file> input
-imageUploadElem.addEventListener('change', function() {
-	
-	// Send files for upload
-	if(imageUploadElem.files.length) {
-		
-		for(let i=0; i<imageUploadElem.files.length; i++) {
-		
-			handleFiles(imageUploadElem.files[i], renderImageSection());
-			
-		}
-	}
-	
-	// Make sure <file> input is empty after files are accepted; otherwise you'll get dupes
-	imageUploadElem.value = '';
-	
-});
 
 
 // If *item* ID changes (e.g. adding release or blog), update all images' item IDs to match
@@ -1204,5 +1371,4 @@ document.addEventListener('item-id-updated', function(event) {
 
 // Init elements
 lookForSelectize();
-//initImageEditElems();
 initImageDeleteButtons();
