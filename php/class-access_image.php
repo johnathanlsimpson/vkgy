@@ -26,13 +26,31 @@
 			3 => 'flyer',
 			4 => 'logo',
 			5 => 'release',
-			0 => 'other',
+			0 => 'uncategorized',
 		];
 		
 		// Image format ratios (short side / long side)
 		static public $image_ratios = [
-			'0.70' => 'flyer',
+			'0.65' => 'musician',
 			'0.66' => 'musician',
+			'0.67' => 'musician',
+			
+			'0.68' => 'flyer',
+			'0.69' => 'flyer',
+			'0.70' => 'flyer',
+			'0.71' => 'flyer',
+			
+			'0.99' => 'release',
+			'1.00' => 'release',
+			'1.01' => 'release',
+			
+			'1.49' => 'group photo',
+			'1.50' => 'group photo',
+			'1.51' => 'group photo',
+			
+			'1.69' => 'group photo',
+			'1.70' => 'group photo',
+			'1.71' => 'group photo',
 		];
 		
 		// ======================================================
@@ -597,7 +615,7 @@
 					$num_images = count($images);
 					
 					// Get musicians which are tagged generally and/or by face
-					if( $args['get'] === 'all' || $args['get'] === 'most' ) {
+					if( $num_images && ( $args['get'] === 'all' || $args['get'] === 'most' ) ) {
 						
 						// Loop through images and save all IDs
 						// Also create empty skeleton with detected faces
