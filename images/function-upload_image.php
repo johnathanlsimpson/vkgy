@@ -187,6 +187,7 @@ function upload_image($image, $pdo) {
 									$output[$item_type.'_id'] = $item_id;
 									$output['image_status'] = 'new';
 									$output['image_extension'] = $extension;
+									$output['is_new'] = 1;
 									
 									// Award point here, but don't show it until update_image, since status elem might not exist until that point
 									$access_points = new access_points($pdo);

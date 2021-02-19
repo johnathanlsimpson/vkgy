@@ -1302,12 +1302,14 @@ function finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedD
 	// While uploading, thumbnail may be a huge blob of image data, so replace with actual thumbnail after
 	thumbnailElem.setAttribute('style', returnedData.image_style);
 	
+	// Set as new image
+	newImageElem.setAttribute( 'x-data', newImageElem.getAttribute('x-data').replace( "isNew: ''", "isNew: '1'" ) );
+	
 	// If facsimile (i.e. artist image auto-linked to blog post), make sure that's set
 	if( returnedData.is_facsimile ) {
 		
 		// Set isFacsimile and isNew to true in Alpine data
 		newImageElem.setAttribute( 'x-data', newImageElem.getAttribute('x-data').replace( "isFacsimile: ''", "isFacsimile: '1'" ) );
-		newImageElem.setAttribute( 'x-data', newImageElem.getAttribute('x-data').replace( "isNew: ''", "isNew: '1'" ) );
 		
 		// Set in input
 		newImageElem.querySelector('[name="image_is_facsimile"]').value = 1;
