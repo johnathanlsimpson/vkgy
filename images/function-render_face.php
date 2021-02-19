@@ -12,6 +12,7 @@ function render_face($args) {
 	$relative_image_url = preg_replace('/'.'^.*?\/images\/(.+)$'.'/', '../images/image_files/$1', $image_url);
 	$musician_id        = is_numeric($args['musician_id']) ? $args['musician_id'] : null;
 	$musician_name      = strlen($args['musician_name']) ? $args['musician_name'] : null;
+	$artist_id          = $args['artist_id'];
 	
 	global $face_template;
 	
@@ -38,6 +39,7 @@ function render_face($args) {
 					'face_coordinates'    => str_replace( ['{','}'], ['&lcub;','&rcub;'], json_encode($face) ),
 					'musician_id'         => $musician_id,
 					'musician_name'       => $musician_name,
+					'artist_id'           => $artist_id,
 				]);
 				
 			}
