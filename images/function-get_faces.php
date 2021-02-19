@@ -1,6 +1,7 @@
 <?php
 
 include_once('../php/include.php');
+include_once('../images/function-get_faces-key.php');
 
 $image_url = $_POST['image_url'];
 
@@ -10,9 +11,6 @@ if( strlen($image_url) ) {
 	$accuracy_boost = 4;
 	
 	// Set other vars
-	$api_url = 'https://face-detection6.p.rapidapi.com/img/face';
-	$api_host = 'face-detection6.p.rapidapi.com';
-	$api_key = '7428f07834msh3c52d201a82eb6dp1e0738jsn4385bf72f0a8';
 	$post_fields = json_encode([
 		'url' => $image_url,
 		'accuracy_boost' => $accuracy_boost
