@@ -8,6 +8,7 @@ include_once('../images/template-face.php');
 
 $image_url = $_POST['image_url'];
 $faces = $_POST['faces'];
+$artist_id = $_POST['artist_id'];
 
 // Decode faces
 $faces = json_decode($faces, true);
@@ -17,7 +18,7 @@ if( $faces && is_array($faces) && !empty($faces) ) {
 	
 	// Turn API response into boxes
 	foreach($faces as $i => $face) {
-		$returned_html[] = render_face([ 'face' => $face, 'image_url' => $image_url ]);
+		$returned_html[] = render_face([ 'face' => $face, 'image_url' => $image_url, 'artist_id' => $artist_id ]);
 	}
 	
 	$output['status'] = 'success';
