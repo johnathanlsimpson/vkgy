@@ -8,47 +8,77 @@
 				ob_start();
 				
 				?>
-					<li class="image__template any--flex" data-get="image_status" data-get-into="data-image-status" x-data="{ description: '{description}', imageContent: '{checked_image_type}', addFace: false, showDescription: false, showArtists: false, showMusicians: false, showReleases: false, tagStyle: '', extension: '{extension}', imageContent: '{checked_image_type}' }" x-init="$watch('description', () => { triggerChange($refs.description); }); $watch('showMusicians', value => { if(value) { $dispatch('show-faces'); } })">
+					<li class="image__template any--flex" data-get="image_status" data-get-into="data-image-status" x-bind:class="{ 'image--edit': !isCollapsed && ( !isFacsimile || !isNew ) }" x-data="{
+						description: '{description}',
+						artistIsSet: '{artist_is_set}',
+						isCollapsed: '{is_previous_upload}',
+						imageContent: '{checked_image_type}',
+						addFace: false,
+						showDescription: false,
+						showArtists: false,
+						showMusicians: false,
+						showReleases: false,
+						tagStyle: '',
+						extension: '{extension}',
+						imageContent: '{checked_image_type}',
+						isFacsimile: '{is_facsimile}',
+						isNew: '{is_new}'
+					}" x-init="$watch('showMusicians', value => { if(value) { $dispatch('show-faces'); } })">
 						
-						<div class="input__row" style="display: flex; flex-direction: column; margin-right: 1rem; align-items:flex-start;">
+						<div class="image__side input__row">
 							
 							<!-- Thumbnail -->
-							<div class="input__group">
+							<div class="input__group" style="width:100%;">
 								<a class="image__image" data-get="image_url" data-get-into="href" href="{image_url}" style="background-color:hsl(var(--background--bold));background-image:url({background_url});" target="_blank">
 									<span class="image__status symbol--standalone"></span>
 								</a>
 							</div>
 							
-							<!-- Default image -->
-							<div class="input__group">
+							<div class="image__side-top input__group" style="width:100%;">
+								
+								<!-- Default image -->
 								<label class="input__radio">
 									<input class="input__choice" name="image_is_default" type="radio" value="1" {is_default} />
 									<span class="symbol__unchecked">default</span>
 								</label>
+								
 							</div>
 							
-							<div class="input__group" style="margin-top:auto;">
-								<button class="input__button symbol__copy" x-on:click.prevent="copyMarkdown($refs.markdown)">copy</button>
+							<div class="input__group">
+								
+								<!-- Copy code -->
+								<button class="image__copy input__button symbol__copy" data-tippy-content="Code copied." x-on:click.prevent="copyMarkdown($refs.markdown)">Copy code</button>
+								
 							</div>
 							
-							<!-- Delete -->
-							<div class="input__group {delete_class}" style="">
-								<button class="input__button symbol__trash image__delete" style="margin-left:0;">delete</button>
+							<div class="input__group">
+								
+								<!-- Delete/unlink -->
+								<button class="input__button symbol__trash image__delete {delete_class}" x-show="!isCollapsed || isFacsimile" x-text="isFacsimile ? 'Unlink' : 'Delete'">Delete</button>
+								
+							</div>
+							
+							<div class="input__group">
+								
+								<!-- Edit link -->
+								<a class="symbol__edit" x-on:click.prevent="isCollapsed=0" x-show="isCollapsed && ( !isFacsimile || !isNew )">edit image</a>
+								
 							</div>
 							
 						</div>
 						
 						<!-- Data -->
-						<div class="image__data any--flex-grow">
+						<div class="image__data any--flex-grow" x-show="!isCollapsed && ( !isFacsimile || !isNew )">
 							
 							<!-- IDs -->
 							<input data-get="image_id"      data-get-into="value"                         name="image_id"              value="{id}" hidden />
 							<input                                                                        name="image_item_type"       value="{item_type}" hidden />
 							<input                                                                        name="image_item_id"         value="{item_id}" hidden />
 							<input                                                                        name="image_is_queued"       value="{is_queued}" hidden />
-							<input class="any--hidden"      data-get="image_is_new" data-get-into="value" name="image_is_new"          value="0" disabled hidden />
+							<input data-get="image_is_new"  data-get-into="value"                         name="image_is_new"          value="0" disabled hidden />
 							<input                                                                        name="image_face_boundaries" value='{face_boundaries}' hidden />
 							<input class="image__extension" data-get="image_extension"                                                 value="{extension}" x-model="extension" hidden />
+							<input                                                                        name="image_is_facsimile"    value="{is_facsimile}" hidden />
 							
 							<!-- Description, default, delete -->
 							<div class="input__row image__message">
@@ -68,9 +98,9 @@
 							<!-- Type -->
 							<div class="input__row">
 								<div class="input__group">
-
-									<label class="input__label">Image type</label>
-
+									
+									<label class="input__label">Image contents</label>
+									
 									<?php
 										foreach(access_image::$allowed_image_contents as $value => $key) {
 											?>
@@ -83,29 +113,7 @@
 									?>
 								</div>
 							</div>
-
-							<div class="input__row">
-
-								<!-- Credit url -->
-								<div class="input__group">
-
-									<label class="input__label">Credit url</label>
-									<input class="any--flex-grow" name="image_credit" placeholder="https://url.com" value="{credit}" />
-
-								</div>
-
-								<!-- Watermark -->
-								<div class="input__group">
-
-									<label class="input__checkbox">
-										<input class="input__choice" name="image_is_exclusive[]" type="checkbox" value="1" {is_exclusive} />
-										<span class="symbol__checkbox--unchecked">I scanned this</span>
-									</label>
-
-								</div>
-
-							</div>
-
+							
 							<!-- Markdown code -->
 							<div class="input__row any--hidden">
 								<div class="input__group any--flex-grow">
@@ -115,46 +123,52 @@
 							</div>
 							
 							<!-- Tagging options -->
-							<div class="input__row" x-show="!showMusicians || !showReleases || !showArtists">
+							<div class="input__row" x-show="artistIsSet && ( !showMusicians || !showReleases || !showArtists )">
 								<div class="input__group">
 									
 									<label class="input__label">Tag photo</label>
 									
-									<a class="image__tag symbol__plus" data-tag-type="musicians" x-on:click.prevent="showMusicians=true;" x-show="!showMusicians && (imageContent <= 3 || imageContent == 0)">musicians</a>
-									<a class="image__tag symbol__plus" data-tag-type="releases" x-on:click.prevent="showReleases=true; tagStyle='order:-1;'" x-show="!showReleases">releases</a>
 									<a class="image__tag symbol__plus" data-tag-type="artists" x-on:click.prevent="showArtists=true; tagStyle=''" x-show="!showArtists">artists</a>
+									<a class="image__tag symbol__plus" data-tag-type="releases" x-on:click.prevent="showReleases=true; tagStyle='order:-1;'" x-show="!showReleases">releases</a>
+									<a class="image__tag symbol__plus" data-tag-type="musicians" x-on:click.prevent="showMusicians=true;" x-show="!showMusicians && (imageContent != 4 && imageContent != 5)">musicians</a>
 									
 								</div>
 							</div>
 							
-							<!-- Tag artists -->
-							<div class="input__row image__selects" x-show="showArtists || showReleases">
-								<div class="input__group any--flex-grow image__artists" x-show="showArtists">
+							<!-- Artist -->
+							<div class="input__row image__selects" x-show="showArtists || !artistIsSet">
+								
+								<div class="input__group any--flex-grow image__artists">
 									
-									<label class="input__label">Tag artists</label>
-									<select class="input" data-populate-on-click="true" data-multiple="true" data-source="artists" name="image_artist_id[]" placeholder="artists" x-on:change="description = getDescription($el)" multiple>{artist_ids}</select>
+									<label class="input__label">Tag artist</label>
+									
+									<select class="input" data-populate-on-click="true" data-multiple="true" data-source="artists" name="image_artist_id[]" placeholder="artists" x-on:change="description = getDescription($el); artistIsSet=($event.target.value); showArtists=true; updateJsonLists($event.target); if(imageContent == 1) { showMusicians = true; }" multiple>{artist_ids}</select>
 									
 								</div>
+								
+								<!-- Tag blog (hidden) -->
+								<select class="input any--hidden" name="image_blog_id">{blog_id}</select>
+								
+							</div>
 							
-							<!--<div class="input__group any--flex-grow image__labels">
-								<label class="input__label">Labels</label>
-								<select class="input" data-populate-on-click="true" data-multiple="true" data-source="labels" name="image_label_id[]" placeholder="labels" multiple>{label_ids}</select>
-							</div>-->
-							
-							<!-- Tag releases -->
-								<div class="input__group any--flex-grow image__releases" x-show="showReleases" x-bind:style="tagStyle">
+							<!-- Releases -->
+							<div class="input__row image__selects" x-show="artistIsSet && showReleases" >
+								
+								<div class="input__group any--flex-grow image__releases" x-bind:style="tagStyle">
 									
 									<label class="input__label">Tag releases</label>
-									<select class="input" data-populate-on-click="true" data-multiple="true" data-source="releases" name="image_release_id[]" placeholder="releases" multiple>{release_ids}</select>
+									
+									<select class="input" data-populate-on-click="true" data-multiple="true" data-source="releases_{artist_id}" name="image_release_id[]" placeholder="releases" multiple>{release_ids}</select>
 									
 								</div>
+								
 							</div>
 							
 							<!-- Tag musicians by face -->
-							<div class="input__row" x-show="showMusicians && (imageContent == 1 || imageContent == 3)" >
+							<div class="input__row" x-show="artistIsSet && showMusicians && (imageContent == 1 || imageContent == 3)">
 								<div class="input__group">
 									
-									<label class="input__label">Tag musicians by face</label>
+									<label class="input__label face__label">Tag musicians by face</label>
 									
 									<div class="image__faces any--flex">
 										
@@ -170,7 +184,7 @@
 							</div>
 							
 							<!-- Mark additional faces -->
-							<div class="input__row" x-show="addFace && (imageContent == 1 || imageContent == 3)">
+							<div class="input__row" x-show="artistIsSet && addFace">
 								<div class="input__group">
 									
 									<label class="input__label">Mark faces</label>
@@ -187,7 +201,7 @@
 							</div>
 							
 							<!-- Tag musicians w/out face -->
-							<div class="input__row" x-show="(showMusicians && imageContent != 4) || imageContent == 2">
+							<div class="input__row" x-show="artistIsSet && ( (showMusicians && imageContent != 4) || (imageContent == 2 && isNew) )">
 								<div class="input__group any--flex-grow image__musicians">
 									
 									<label class="input__label">Tag <span x-show="imageContent == 1 || imageContent == 3">other</span> musician<span x-show="imageContent != 2">s</span></label>
@@ -204,18 +218,40 @@
 							
 								<!-- Show description -->
 								<div class="input__group" x-show="!showDescription">
-
+									
 									<label class="image__description-label input__label">Description</label>
 									<span class="image__description-span" x-text="description">{description}</span>&nbsp;<a class="symbol__edit image__edit" href="#" x-on:click.prevent="showDescription=true;$nextTick(() => { $refs.description.focus(); });">edit</a>
-
+									
 								</div>
-
+								
 								<!-- Edit description -->
 								<div class="image__description input__group any--flex-grow" x-show="showDescription">
-
+									
 									<label class="input__label">Description</label>
 									<input class="any--flex-grow" data-get="description" data-get-into="value" name="image_description" placeholder="description" value="{description}" x-model="description" x-ref="description" />
-
+									
+								</div>
+								
+							</div>
+							
+							<div class="input__row">
+								
+								<!-- Credit url -->
+								<div class="input__group">
+									
+									<label class="input__label">Credit url</label>
+									<input class="any--flex-grow" name="image_credit" placeholder="https://url.com" value="{credit}" />
+									
+								</div>
+								
+								<!-- Watermark -->
+								<div class="input__group">
+									
+									<label class="input__checkbox">
+										<input class="input__choice" name="image_is_exclusive[]" type="checkbox" value="1" {is_exclusive} />
+										<span class="symbol__checkbox--unchecked">I scanned this</span>
+									</label>
+									
 								</div>
 								
 							</div>
