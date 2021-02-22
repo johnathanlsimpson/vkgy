@@ -6,7 +6,7 @@ function image_exists($input_string, $pdo, $return_dimensions = false) {
 		$input_string = substr($input_string, 2);
 	}
 
-	if(preg_match('/'.'\/images\/(\d+)(?:-[\-\w]*)\.(jpg|jpeg|gif|png)'.'/', $input_string, $match)) {
+	if(preg_match('/'.'\/images\/(\d+)(?:-[\-\w]*)?\.(jpg|jpeg|gif|png)'.'/', $input_string, $match)) {
 		if(is_array($match)) {
 			$check_file = strtolower('/images/image_files/'.$match[1].'.'.$match[2]);
 		}
@@ -26,7 +26,7 @@ function image_exists($input_string, $pdo, $return_dimensions = false) {
 	else {
 		$check_file = $input_string;
 	}
-
+	
 	if(strlen($check_file)) {
 		if(file_exists('..'.$check_file)) {
 			if($return_dimensions) {

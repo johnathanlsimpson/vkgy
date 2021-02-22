@@ -24,17 +24,15 @@ function standardize($input) {
 			'…',
 		],
 		
-		// Horizontal spaces
-		' ' => [
-			"\h",
-		],
-		
 	];
 	
 	// Standardize symbols
 	foreach($symbols as $replacement => $searches) {
-		$input = str_replace( $searchs, $replacement, $input );
+		$input = str_replace( $searches, $replacement, $input );
 	}
+	
+	// Standardize spaces
+	$input = preg_replace('/(\h+)/u', ' ', $input);
 	
 	// Trim whitespace
 	$input = trim($input, " \t\0\x0B");

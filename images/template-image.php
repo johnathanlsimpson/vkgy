@@ -11,6 +11,7 @@
 					<li class="image__template any--flex" data-get="image_status" data-get-into="data-image-status" x-bind:class="{ 'image--edit': !isCollapsed && ( !isFacsimile || !isNew ) }" x-data="{
 						description: '{description}',
 						artistIsSet: '{artist_is_set}',
+						musicianIsSet: '{musician_is_set}',
 						isCollapsed: '{is_previous_upload}',
 						imageContent: '{checked_image_type}',
 						addFace: false,
@@ -23,7 +24,7 @@
 						imageContent: '{checked_image_type}',
 						isFacsimile: '{is_facsimile}',
 						isNew: '{is_new}'
-					}" x-init="$watch('showMusicians', value => { if(value) { $dispatch('show-faces'); } })">
+					}" x-init="$watch('showMusicians', value => { if(value) { $dispatch('show-faces'); } }); <?php /*console.log(isNew ? 'y' : 'n'); $watch('isNew', value => { if(value)  { console.log('1'); description = getDescription($el); console.log('*'+description); } });*/ ?>">
 						
 						<div class="image__side input__row">
 							
@@ -130,7 +131,7 @@
 									
 									<a class="image__tag symbol__plus" data-tag-type="artists" x-on:click.prevent="showArtists=true; tagStyle=''" x-show="!showArtists">artists</a>
 									<a class="image__tag symbol__plus" data-tag-type="releases" x-on:click.prevent="showReleases=true; tagStyle='order:-1;'" x-show="!showReleases">releases</a>
-									<a class="image__tag symbol__plus" data-tag-type="musicians" x-on:click.prevent="showMusicians=true;" x-show="!showMusicians && (imageContent != 4 && imageContent != 5)">musicians</a>
+									<a class="image__tag symbol__plus" data-tag-type="musicians" x-on:click.prevent="showMusicians=true;" x-show="!showMusicians && ( imageContent != 2 || musicianIsSet ) && (imageContent != 4 && imageContent != 5)">musicians</a>
 									
 								</div>
 							</div>
@@ -201,11 +202,11 @@
 							</div>
 							
 							<!-- Tag musicians w/out face -->
-							<div class="input__row" x-show="artistIsSet && ( (showMusicians && imageContent != 4) || (imageContent == 2 && isNew) )">
+							<div class="input__row" x-show="artistIsSet && ( (showMusicians && imageContent != 4) || (imageContent == 2 && !musicianIsSet) )">
 								<div class="input__group any--flex-grow image__musicians">
 									
 									<label class="input__label">Tag <span x-show="imageContent == 1 || imageContent == 3">other</span> musician<span x-show="imageContent != 2">s</span></label>
-									<select class="input" data-populate-on-click="true" data-multiple="true" data-source="musicians" name="image_musician_id[]" placeholder="musicians" multiple>{musician_ids}</select>
+									<select class="input" data-populate-on-click="true" data-multiple="true" data-source="musicians" name="image_musician_id[]" placeholder="musicians" x-on:change="description = imageContent == 2 ? getDescription($el) : description;" multiple>{musician_ids}</select>
 									
 									<div class="input__note symbol__help any--weaken-color" x-show="imageContent != 1 && imageContent != 3">
 										Musicians can be tagged by face in group photos or flyers.
