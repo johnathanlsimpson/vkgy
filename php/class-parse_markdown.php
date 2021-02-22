@@ -2,6 +2,8 @@
 	include_once("../php/include.php");
 	include_once('../php/class-access_video.php');
 	include_once("../php/external/class-parsedown.php");
+	include_once('../php/function-script.php');
+	include_once('../php/function-image_exists.php');
 
 	class parse_markdown {
 		// VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
@@ -939,13 +941,17 @@
 				// Image
 				$input_content = preg_replace_callback("/".$this->image_pattern."/", function($match) {
 					
-					list($width, $height) = getimagesize($match[2]);
-					$image_class = $width > $height ? 'module--landscape' : 'module--portrait';
-					
-					$image_src = $match[2];
-					$image_src = preg_replace('/'.'(^(?:https?:)?(?:\/\/)?(?:vk\.gy)?\/images\/\d+(?:-[A-z0-9-]*)?)(\.[A-z]+)$'.'/', '$1.medium$2', $image_src);
-					
-					return '<div class="module module--image '.$image_class.' any--weaken any--align-center"><a href="'.($match[3] ?: $match[2]).'"><img alt="'.strip_tags($match[1]).'" class="lazy" data-src="'.$image_src.'" /></a><p>'.$match[1].'</p></div>';
+					if( strlen($match[2]) && image_exists($match[2], $this->pdo) ) {
+						
+						list($width, $height) = getimagesize($match[2]);
+						$image_class = $width > $height ? 'module--landscape' : 'module--portrait';
+						
+						$image_src = $match[2];
+						$image_src = preg_replace('/'.'(^(?:https?:)?(?:\/\/)?(?:vk\.gy)?\/images\/\d+(?:-[A-z0-9-]*)?)(\.[A-z]+)$'.'/', '$1.medium$2', $image_src);
+						
+						return '<div class="module module--image '.$image_class.' any--weaken any--align-center"><a href="'.($match[3] ?: $match[2]).'"><img alt="'.strip_tags($match[1]).'" class="lazy" data-src="'.$image_src.'" /></a><p>'.$match[1].'</p></div>';
+						
+					}
 					
 					unset($height, $width, $image_class);
 				}, $input_content);
