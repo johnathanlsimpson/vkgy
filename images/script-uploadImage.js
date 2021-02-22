@@ -6,7 +6,9 @@
 // Alpinejs can't seem to trigger change, so we wait a millisecond to trigger change after value has been updated
 // ^ Apparently? Seems fine now IDK
 function triggerChange(elem) {
-	elem.dispatchEvent( new Event( 'change', { bubbles:true } ) );
+	setTimeout(function() {
+		elem.dispatchEvent( new Event( 'change', { bubbles:true } ) );
+	},100);
 }
 
 // Helper to get specified parent
@@ -27,6 +29,25 @@ function getParent(childElem, parentClass) {
 	}
 	
 	return parentElem;
+}
+
+// Helper to change variables in x-data (Alpine)
+function updateAlpine(inputElem, key, value) {
+	
+	// Handle document fragment??
+	if( !inputElem.classList ) {
+		inputElem = inputElem.querySelector('.image__template');
+	}
+	
+	inputElem.setAttribute( 'x-data', inputElem.getAttribute('x-data').replace( key + ": ''", key + ": '" + value + "'" ) );
+	
+	// Update input if necessary
+	let dummyElem = inputElem.querySelector('[x-data="' + key + '"]');
+	if( dummyElem ) {
+		dummyElem.value = value;
+		triggerChange(dummyElem);
+	}
+	
 }
 
 
@@ -194,10 +215,11 @@ function getDescription(targetElem) {
 	}
 	
 	// Prepend artist/musician/release name if necessary
-	if(imageType == 1) {
+	if(imageType == 'musician') {
+		description += artistName + ' ';
 		description += musicianName + ' ';
 	}
-	else if(imageType == 4) {
+	else if(imageType == 'release') {
 		description += releaseName + ' ';
 	}
 	else {
@@ -516,8 +538,6 @@ document.addEventListener('change', function(event) {
 
 // Update image data
 function updateImageData(changedElem, preparedData = false) {
-	
-	console.log('updating data');
 	
 	var parentElem = getParent(changedElem, 'image__template');
 	var statusElem = parentElem.querySelector('.image__status');
@@ -1160,6 +1180,11 @@ function renderImageSection() {
 	newOptionElem.selected  = true;
 	itemIdElem.prepend(newOptionElem);
 	
+	// If artist is set by default, make sure that's reflected in Alpine
+	if( itemType === 'artist' ) {
+		updateAlpine(newImageElem, 'artistIsSet', 1);
+	}
+	
 	// (Before ajax done,) append new image, add loading symbol
 	newImageElem.querySelector('.image__status').classList.add('loading');
 	imagesElem.prepend(newImageElem);
@@ -1303,13 +1328,14 @@ function finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedD
 	thumbnailElem.setAttribute('style', returnedData.image_style);
 	
 	// Set as new image
-	newImageElem.setAttribute( 'x-data', newImageElem.getAttribute('x-data').replace( "isNew: ''", "isNew: '1'" ) );
+	updateAlpine(newImageElem, 'isNew', 1);
+	updateAlpine(newImageElem, 'imageContent', returnedData.image_content);
 	
 	// If facsimile (i.e. artist image auto-linked to blog post), make sure that's set
 	if( returnedData.is_facsimile ) {
 		
 		// Set isFacsimile and isNew to true in Alpine data
-		newImageElem.setAttribute( 'x-data', newImageElem.getAttribute('x-data').replace( "isFacsimile: ''", "isFacsimile: '1'" ) );
+		updateAlpine(newImageElem, 'isFacsimile', 1);
 		
 		// Set in input
 		newImageElem.querySelector('[name="image_is_facsimile"]').value = 1;
@@ -1332,7 +1358,9 @@ function finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedD
 		});
 		
 		// Set image content
-		newImageElem.querySelector('[name^="image_type"][value="' + returnedData.image_content + '"]').checked = true;
+		let imageContentElem = newImageElem.querySelector('[name^="image_type"][value="' + returnedData.image_content + '"]');
+		imageContentElem.checked = true;
+		triggerChange(imageContentElem);
 		
 	}
 	
@@ -1347,6 +1375,7 @@ function finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedD
 
 // If *item* ID changes (e.g. adding release or blog), update all images' item IDs to match
 document.addEventListener('item-id-updated', function(event) {
+	
 	var imageItemIdElems = document.querySelectorAll('[name=image_item_id]');
 	var imageIsQueuedElems = document.querySelectorAll('[name=image_is_queued]');
 	var isQueued;
@@ -1361,13 +1390,14 @@ document.addEventListener('item-id-updated', function(event) {
 			imageIsQueuedElems[i].setAttribute('value', isQueued);
 			
 			if(!imageItemIdElem.disabled) {
-				imageItemIdElem.dispatchEvent(new Event('change'));
+				triggerChange(imageItemIdElem);
 			}
 			if(!imageIsQueuedElems[i].disabled) {
-				imageIsQueuedElems[i].dispatchEvent(new Event('change'));
+				triggerChange(imageIsQueuedElems[i]);
 			}
 		});
 	}
+	
 });
 
 
