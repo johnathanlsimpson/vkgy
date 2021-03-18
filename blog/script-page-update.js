@@ -237,6 +237,8 @@ function updateMainArtist(inputArtist) {
 		// Get artist's image as article image
 		getArtistImage(inputArtist.id);
 		
+		updateDefaultImageArtist( inputArtist.id, inputArtist.romaji ? inputArtist.romaji + '(' + inputArtist.name + ')' : inputArtist.name );
+		
 	}
 	else {
 		
