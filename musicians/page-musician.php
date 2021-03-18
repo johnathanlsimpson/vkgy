@@ -223,7 +223,11 @@
 							</ul>
 						</div>
 						
-						<?php $item_type = 'musician'; include('../tags/partial-tags.php'); ?>
+						<?php
+							$item_type = 'musician';
+							include('../tags/partial-tags.php');
+							include('../tags/partial-add.php');
+						?>
 						
 					</div>
 					
