@@ -28,7 +28,17 @@
 		$artist = $access_artist->access_artist(["friendly" => friendly($_GET["artist"]), "get" => "all"]);
 		
 		if(is_array($artist) && !empty($artist)) {
-			if($_GET["action"] === "edit") {
+			
+			if($_GET['section'] === 'videos') {
+				$show_videos = true;
+			}
+			elseif($_GET['section'] === 'tags') {
+				$show_tags = true;
+			}
+			elseif($_GET['section'] === 'images') {
+				$show_images = true;
+			}
+			elseif($_GET["action"] === "edit") {
 				if($_SESSION["can_add_data"]) {
 					$show_edit_page = true;
 				}
@@ -37,13 +47,9 @@
 				}
 			}
 			else {
-				if($_GET['section'] === 'videos') {
-					$show_videos = true;
-				}
-				else {
-					$show_artist_page = true;
-				}
+				$show_artist_page = true;
 			}
+			
 		}
 		else {
 			$error = 'Sorry, <span class="any__note">'.friendly($_GET["artist"]).'</span> isn\'t in the database. Showing artist list instead.';
@@ -110,6 +116,29 @@
 	}
 	
 	//
+	// Transform data & load page: tags
+	//
+	if( $show_tags ) {
+		
+		include('../artists/page-tags.php');
+		
+	}
+	
+	//
+	// Transform data & load page: images
+	//
+	if( $show_images ) {
+		
+		if( $_GET['action'] === 'edit' ) {
+			include('../artists/page-edit-images.php');
+		}
+		else {
+			include('../artists/page-images.php');
+		}
+		
+	}
+	
+	//
 	// Transform data & load page: profile or videos
 	//
 	if($show_videos || $show_artist_page) {
@@ -135,13 +164,6 @@
 			$artist['edit_history'] = array_values($artist['edit_history']);
 		}
 		
-		// Pull out default image from images array
-		if(!empty($artist['images']) && is_numeric($artist['image_id'])) {
-			$artist['image'] = $artist['images'][$artist['image_id']];
-			unset($artist['images'][$artist['image_id']]);
-			$artist['images'] = array_values($artist['images']);
-		}
-		
 		// Get comments
 		$access_comment = new access_comment($pdo);
 		$artist["comments"] = $access_comment->access_comment(["id" => $artist["id"], 'get_user_likes' => true, "type" => "artist", "get" => "all"]);
@@ -157,36 +179,6 @@
 		$stmt_next = $pdo->prepare($sql_next);
 		$stmt_next->execute([ $artist["friendly"], $artist["friendly"] ]);
 		$rslt_next = $stmt_next->fetchAll();
-		
-		// Get tags
-		// ============================================
-		include_once('../php/class-tag.php');
-		
-		$item_type = 'artist';
-		$item_id = $artist['id'];
-		
-		$access_tag = new tag($pdo);
-		$tags = $access_tag->access_tag([ 'item_type' => $item_type, 'item_id' => $item_id, 'get' => 'all', 'separate' => true ]);
-		
-		// Loop through tags and set some flags
-		if( is_array($tags) && !empty($tags) && is_array($tags['tagged']) ) {
-			foreach($tags['tagged'] as $tag_type => $tagged_tags) {
-				foreach($tagged_tags as $tag) {
-					
-					// Set flags
-					if($tag['friendly'] === 'exclusive') {
-						$artist_is_exclusive = true;
-					}
-					else if($tag['friendly'] === 'removed') {
-						$artist_is_removed = true;
-					}
-					else if($tag['friendly'] === 'non-visual') {
-						$artist_is_non_visual = true;
-					}
-					
-				}
-			}
-		}
 		
 		// History
 		include('function-sort_history.php');
@@ -295,7 +287,7 @@
 		$views->add('artist', $artist['id']);
 		
 		// Default video
-		$artist['video'] = $access_video->access_video([ 'artist_id' => $artist['id'], 'is_approved' => true, 'get' => 'basics', 'limit' => 1 ]);
+		$artist['video'] = $access_video->access_video([ 'artist_id' => $artist['id'], 'is_approved' => true, 'get' => 'basics', 'limit' => 1 ])[0];
 		
 		include("../artists/page-artist.php");
 	}
@@ -316,7 +308,7 @@
 	//
 	// Transform data & load page: artist list
 	//
-	if(!$show_add_page && !$show_artist_page && !$show_videos && !$show_edit_page) {
+	if( !$show_add_page && !$show_artist_page && !$show_videos && !$show_edit_page && !$show_tags && !$show_images ) {
 		$artist_list = $access_artist->access_artist([ "letter" => $_GET["letter"], "get" => "artist_list", 'vkei_only' => true ]);
 		$num_artists = is_array($artist_list) ? count($artist_list) : 0;
 		

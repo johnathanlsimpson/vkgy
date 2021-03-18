@@ -150,10 +150,10 @@ function upload_image($image, $pdo) {
 							// Set the final file name
 							$file_name = $id.'.'.$extension;
 							
-							$sql_update = 'UPDATE images SET extension=?, is_queued=?, item_type=?, image_content=?, hash=? WHERE id=? LIMIT 1';
+							$sql_update = 'UPDATE images SET extension=?, is_queued=?, item_type=?, image_content=?, hash=?, width=?, height=? WHERE id=? LIMIT 1';
 							$stmt_update = $pdo->prepare($sql_update);
 							
-							if($stmt_update->execute([ $extension, $is_queued, $item_type, $image_content, $hash, $id ])) {
+							if($stmt_update->execute([ $extension, $is_queued, $item_type, $image_content, $hash, $width, $height, $id ])) {
 								
 								if(rename($new_tmp_name, '../images/tmp/'.$file_name)) {
 									
@@ -177,7 +177,7 @@ function upload_image($image, $pdo) {
 									$output['status'] = 'success';
 									$output['image_id'] = $id;
 									$output['image_url'] = '/images/'.$id.'.'.$extension;
-									$output['image_style'] = 'background-image: url(/images/'.$id.'.thumbnail.'.$extension.');';
+									$output['image_style'] = 'background-image: url(https://vk.gy/images/'.$id.'.thumbnail.'.$extension.');';
 									$output['image_markdown'] = '![](/images/'.$file_name.')';
 									$output['image_content'] = $image_content;
 									$output['is_exclusive_for'] = 'is-exclusive-'.$id;

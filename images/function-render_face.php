@@ -40,6 +40,7 @@ function render_face($args) {
 					'musician_id'         => $musician_id,
 					'musician_name'       => $musician_name,
 					'artist_id'           => $artist_id,
+				'source_attr_suffix' => is_numeric($artist_id) ? '_'.$artist_id : null,
 				]);
 				
 			}

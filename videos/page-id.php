@@ -28,9 +28,7 @@ $access_artist = new access_artist($pdo);
 	<!-- Center content -->
 	<div>
 		
-		<div class="video__thumbnail any--margin module module--youtube">
-			<a class="video__bg youtube__embed" data-id="<?= $video['youtube_id']; ?>" href="<?= $video['url']; ?>" style="background-image:url(<?= str_replace('mqdefault', 'hqdefault', $video['thumbnail_url']); ?>);"></a>
-		</div>
+		<a class="video__thumbnail" data-id="<?= $video['youtube_id']; ?>" href="<?= $video['url']; ?>" style="background-image:url(<?= str_replace('mqdefault', 'hqdefault', $video['thumbnail_url']); ?>);"></a>
 		
 		<?php if($video['is_flagged']): ?>
 			<div class="moderation__container text text--outlined text--error symbol__error">
@@ -106,9 +104,7 @@ $access_artist = new access_artist($pdo);
 						<?= $access_video->clean_title($next_artist_video['youtube_name'], $video['artist']); ?>
 					</a>
 					
-					<div class="video__thumbnail any--margin module module--youtube" style="margin-top: 1rem;">
-						<a class="artist-video__bg" href="<?= '/videos/'.$next_artist_video['id'].'/'; ?>" style="background-image:url(<?= $next_artist_video['thumbnail_url']; ?>);"></a>
-					</div>
+					<a class="video__thumbnail" href="<?= '/videos/'.$next_artist_video['id'].'/'; ?>" style="background-image:url(<?= $next_artist_video['thumbnail_url']; ?>);"></a>
 					
 				<?php endif; ?>
 				
@@ -197,10 +193,7 @@ $access_artist = new access_artist($pdo);
 				<?php foreach($artist_videos as $artist_video): ?>
 					
 					<div>
-						<div class="video__thumbnail any--margin module module--youtube" style="margin-bottom:0.5rem;">
-							<a class="artist-video__bg" href="<?= '/videos/'.$artist_video['id'].'/'; ?>" style="background-image:url(<?= $artist_video['thumbnail_url']; ?>);"></a>
-						</div>
-						
+						<a class="video__thumbnail" href="<?= '/videos/'.$artist_video['id'].'/'; ?>" style="background-image:url(<?= $artist_video['thumbnail_url']; ?>);"></a>
 						<a href="<?= '/videos/'.$artist_video['id'].'/'; ?>"><?= $access_video->clean_title($artist_video['youtube_name'], $video['artist']); ?></a><br />
 					</div>
 					
@@ -213,7 +206,7 @@ $access_artist = new access_artist($pdo);
 </div>
 
 <style>
-	.video__thumbnail {
+	/*.video__thumbnail {
 		background: hsl(var(--background));
 		max-height: none;
 		padding: 0;
@@ -223,7 +216,7 @@ $access_artist = new access_artist($pdo);
 	}
 	.video__bg {
 		max-width: 100%;
-	}
+	}*/
 	.video__under {
 		display: flex;
 		flex-wrap: wrap;
@@ -246,7 +239,7 @@ $access_artist = new access_artist($pdo);
 		margin-top: 3rem;
 	}
 	
-	.artist-video__bg {
+	/*.artist-video__bg {
 		background-position: center;
 		background-size: auto 133%;
 		cursor: pointer;
@@ -261,7 +254,7 @@ $access_artist = new access_artist($pdo);
 	}
 	.artist-video__bg::after {
 		display: none;
-	}
+	}*/
 	
 	.artist-video__container {
 		display: grid;

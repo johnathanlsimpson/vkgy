@@ -1,5 +1,5 @@
 function initYouTubeLazyLoad() {
-	var youtubeElems = document.querySelectorAll('.youtube__embed');
+	var youtubeElems = document.querySelectorAll('.video__thumbnail[data-id]');
 	
 	for(var i=0; i<youtubeElems.length; i++) {
 		youtubeElems[i].addEventListener('click', function(event) {

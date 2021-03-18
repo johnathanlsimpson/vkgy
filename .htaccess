@@ -98,6 +98,9 @@ RewriteRule  ^av.jpg$                           /account/page-av.php
 RewriteRule  ^artists/add/?$                                                     /?artists/&action=add
 RewriteRule  ^artists/([-\w]+)/?$                                                /?artists/&artist=$1
 RewriteRule  ^artists/([-\w]+)/videos/?$                                         /?artists/&artist=$1&section=videos
+RewriteRule  ^artists/([-\w]+)/tags/?$                                           /?artists/&artist=$1&section=tags
+RewriteRule  ^artists/([-\w]+)/images/?$                                         /?artists/&artist=$1&section=images
+RewriteRule  ^artists/([-\w]+)/images/edit/?$                                    /?artists/&artist=$1&section=images&action=edit
 RewriteRule  ^artists/([-\w]+)\.jpg$                                             /artists/page-image.php?friendly=$1
 RewriteRule  ^artists/([-\w]+)/edit/?$                                           /?artists/&action=edit&artist=$1
 RewriteRule  ^artists/([-\w]+)/main(?:\.(thumbnail|small|medium|large|opengraph))?\.jpg?$  /images/page-image.php?artist=$1&method=$2

@@ -1,0 +1,39 @@
+.artist__status {
+	box-shadow: inset 0 0 0 1px currentcolor;
+	border-radius: 3px;
+	display: inline-block;
+}
+.artist__status::before {
+	background: currentcolor;
+	border-radius: 50%;
+	content: "";
+	display: inline-block;
+	height: 0.6rem;
+	margin-right: 0.5ch;
+	top: -1px;
+	width: 0.6rem;
+	vertical-align: middle;
+}
+.artist--active::before {
+	background: green;
+}
+.artist--disbanded::before {
+	background: red;
+}
+.artist--paused::before {
+	background: yellow;
+}
+.header__supplement .lists__open {
+	background: none;
+	border: none;
+	box-shadow: none;
+	color: white;
+	font: inherit;
+	text-transform: none;
+}
+.header__supplement .lists__open:hover {
+	color: hsl(var(--interactive));
+}
+.header__supplement .lists__open .symbol__down-caret {
+	display: none;
+}

@@ -379,7 +379,7 @@
 							<?= lang('Latest video', '最近の動画', 'div'); ?>
 						</h3>
 						<div class="any--margin">
-							<a class="youtube__embed lazy any--margin" data-id="<?= $recent_video['youtube_id']; ?>" data-src="<?= 'https://img.youtube.com/vi/'.$recent_video['youtube_id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$recent_video['youtube_id']; ?>" target="_blank"></a>
+							<a class="video__thumbnail lazy any--margin" data-id="<?= $recent_video['youtube_id']; ?>" data-src="<?= 'https://img.youtube.com/vi/'.$recent_video['youtube_id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$recent_video['youtube_id']; ?>" target="_blank"></a>
 						</div>
 					<?php
 				}

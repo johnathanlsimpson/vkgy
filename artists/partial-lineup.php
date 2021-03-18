@@ -155,12 +155,18 @@ $musician_images = $final_musician_images;
 
 ?>
 
+
+
 <?php
 foreach($artist["musicians"] as $musicians_type => $musicians) {
+	
+	echo '<details class="any--margin" '.($musicians_type === 1 ? 'open' : null).'>';
+	
 	?>
 		<span id="<?php echo $musicians_type === 1 ? 'lineup' : ($musicians_type === 2 ? 'former' : 'staff'); ?>"></span>
 		
-		<h2 class="<?php echo $musicians_type > 1 ? null : 'any--hidden'; ?>">
+		<summary class="h2 lineup__title <?php echo $musicians_type > 1 ? null : 'any--hidden'; ?>">
+			
 			<?php
 				echo lang(
 					($musicians_type === 1 ? 'Lineup' : ($musicians_type === 2 ? 'Former members' : 'Staff')),
@@ -168,7 +174,7 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 					['container' => 'div', 'secondary_class' => 'any--weaken']
 				);
 			?>
-		</h2>
+		</summary>
 		
 		<div class="text lineup__wrapper <?php echo $musicians_type !== 1 ? "text--outlined" : null; ?>">
 			<label class="lineup__compact input__checkbox symbol__unchecked <?= !$compact_button_shown ? '' : 'any--hidden'; $compact_button_shown = true; ?>" for="lineup--compact">
@@ -216,6 +222,7 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 							<h4>
 								<a class="a--inherit" href="/search/musicians/?position=<?php echo $musicians[$a]["position"]; ?>#result"><?php echo $position_name; ?></a>
 							</h4>
+							
 							<h3>
 								
 								<?= !$hide_musician_from_lineup || $can_see_hidden_musician ? '<a class="a--inherit" href="/musicians/'.$musicians[$a]['id'].'/'.$musicians[$a]['friendly'].'/">' : null; ?>
@@ -223,7 +230,9 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 								<?= !$hide_musician_from_lineup || $can_see_hidden_musician ? '</a>' : null; ?>
 								
 								<span class="any--weaken-color any--en"><?= $musicians[$a]['romaji'] ? '('.$musicians[$a]['name'].')' : null; ?></span>
+								
 							</h3>
+							
 							<div class="any--flex member__history">
 								<div class="lineup__container any--weaken-color">
 									<?php
@@ -369,5 +378,8 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 			?>
 		</div>
 	<?php
+	
+	echo '</details>';
+	
 }
 ?>

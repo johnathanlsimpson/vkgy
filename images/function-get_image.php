@@ -51,7 +51,7 @@ function get_image($input, $pdo) {
 			$rslt_image = $stmt_image->fetch();
 			$is_exclusive = $rslt_image["is_exclusive"];
 			
-			// Temporary: if image doesn't have have a hash, calculate it and update the image
+			/*// Temporary: if image doesn't have have a hash, calculate it and update the image
 			// Will help us prevent dupes in the future
 			if( !$rslt_image['hash'] ) {
 				
@@ -60,7 +60,7 @@ function get_image($input, $pdo) {
 				$stmt_hash = $pdo->prepare($sql_hash);
 				$stmt_hash->execute([ $hash, $id ]);
 				
-			}
+			}*/
 			
 			// If resized
 			if(!empty($method) && in_array($method, $allowed_methods)) {
@@ -293,14 +293,14 @@ function get_image($input, $pdo) {
 			
 			// 404 if image doesn't exist
 			else {
-				header("Location: /404/");
+				header("Location: https://vk.gy/404/");
 			}
 			
 		}
 		
 		// 404 if file doesn't exist
 		else {
-			header("Location: /404/");
+			header("Location: https://vk.gy/404/");
 		}
 	}
 	

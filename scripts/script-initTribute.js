@@ -345,6 +345,7 @@ function showHideTributingElem(args) {
 
 // Find inputs which use tribute.js, replace with contenteditable clones, init tribute.js on clones
 function initTribute() {
+	
 	// Get elements which use the tribute.js script, but ignore clones
 	var tributableElems = document.querySelectorAll('.any--tributable:not(.tributable--tributed):not(.tributable--tributing)');
 	
@@ -435,6 +436,8 @@ function initTribute() {
 			
 			// Get text of original input, insert into clone
 			originalText = tributableElem.textContent;
+			originalText = originalText.replace(/</g, '&lt;');
+			originalText = originalText.replace(/>/g, '&gt;');
 			newElem.innerHTML = originalText;
 			
 			// Parse originalText and insert tokens

@@ -499,43 +499,6 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 	.video__container {
 		padding-right: 1rem;
 	}
-	.video__thumbnail {
-		background-position: center;
-		background-size: auto 145%;
-		display: block;
-		margin-bottom: 0.5rem;
-		padding-top: 56%;
-		width: 100%;
-	}
-	.video__thumbnail:hover {
-		opacity: 0.75;
-	}
-	.video__artist {
-		background-color: hsl(var(--background));
-		background-position: center 30%;
-		background-size: cover;
-		border-radius: 3px 0 0 0;
-		bottom: 0;
-		box-shadow: 0 0 0 3px hsl(var(--background--secondary));
-		display: inline-block;
-		float: right;
-		height: 75px;
-		margin-right: -1rem;
-		margin-top: calc(-75px + 1rem);
-		width: 75px;
-	}
-	.video__artist:hover::after {
-		background: hsl(var(--background--secondary));
-		bottom: 0;
-		content: "";
-		display: block;
-		left: 0;
-		opacity: 0.3;
-		position: absolute;
-		right: 0;
-		top: 0;
-		z-index: 1;
-	}
 	.video__link {
 		display: inline-block;
 		line-height: 1rem;

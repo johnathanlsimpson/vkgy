@@ -1,13 +1,3 @@
-<?php
-
-include_once('../lists/function-render_lists.php');
-
-?>
-
-<a class="artist__main-image-link <?php echo $artist['image'] ? '' : 'any--hidden'; ?>" href="<?php echo $artist['image']['url']; ?>">
-	<img class="artist__main-image" alt="<?php echo $artist["quick_name"]; ?>" src="<?php echo str_replace('.', '.large.', $artist['image']['url']); ?>" />
-</a>
-
 <div class="data__container">
 	<div class="data__item">
 		<div>
@@ -85,25 +75,6 @@ include_once('../lists/function-render_lists.php');
 		?>
 	</div>
 	
-	<?php
-		if( !$artist_is_non_visual && is_array($tags['tagged']['scenes']) ) {
-			?>
-				<div class="data__item">
-					<h5>
-						<?= lang('scenes', 'V系ジャンル', 'hidden'); ?>
-					</h5>
-					<?php
-						$num_scenes = count($tags['tagged']['scenes']);
-						foreach($tags['tagged']['scenes'] as $tag_key => $tag) {
-							echo '<a href="/search/artists/?tags[]='.$tag['friendly'].'">'.str_replace( [' kei', '&#31995;' ], '', lang($tag['romaji'] ?: $tag['name'], $tag['name'], 'hidden') ).'</a>';
-							echo $tag_key + 1 < $num_scenes ? '<span class="any--weaken">,</span> ' : null;
-						}
-					?>
-				</div>
-			<?php
-		}
-	?>
-	
 	<div class="data__item <?php echo $artist['pronunciation'] ? null : 'any--hidden'; ?>">
 		<h5>
 			<?php echo lang('Pronunciation', '発音', ['secondary_class' => 'any--hidden']); ?>
@@ -111,21 +82,12 @@ include_once('../lists/function-render_lists.php');
 		<?php echo $artist['pronunciation']; ?>
 		<button class="symbol--standalone symbol__caret-right" data-pronunciation="<?php echo html_entity_decode($artist['pronunciation'], ENT_NOQUOTES, "UTF-8"); ?>" type="button"></button>
 	</div>
+	
 	<div class="data__item <?php echo $artist['concept_name'] ? null : 'any--hidden'; ?>">
 		<h5>
 			<?php echo lang('Concept', 'コンセプト', ['secondary_class' => 'any--hidden']); ?>
 		</h5>
 		<?php echo lang(($artist['concept_romaji'] ?: $artist['concept_name']), $artist['concept_name'], ['secondary_class' => 'any--hidden']); ?>
-	</div>
-	
-	<!-- Lists -->
-	<div class="data__item">
-		<div class="h5">
-			Add to list
-		</div>
-		
-		<?= render_lists_dropdown([ 'item_id' => $artist['id'], 'item_type' => 'artist' ]); ?>
-		
 	</div>
 	
 </div>

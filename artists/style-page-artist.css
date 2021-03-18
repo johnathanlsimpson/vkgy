@@ -1,3 +1,20 @@
+/* Layout */
+.artist__left {
+	max-width: 100% !important;
+}
+@media(min-width:800px) {
+	.artist__left {
+		flex-grow: 1;
+		margin-right: var(--gutter);
+	}
+	.artist__right {
+		width: 200px;
+	}
+	.artist__title {
+		display: none;
+	}
+}
+
 @media(max-width: 799.9px) {
 	.artist__details--second {
 		display: none;
@@ -246,7 +263,7 @@
 }
 
 
-.artist__nav {
+/*.artist__nav {
 	flex-wrap: wrap;
 	justify-content: space-between;
 	margin-top: -1rem;
@@ -292,7 +309,7 @@
 		margin-right: var(--gutter);
 		width: auto;
 	}
-}
+}*/
 .obscure__input:checked + .obscure__container.a {
 	max-height: 8rem;
 	overflow:hidden;

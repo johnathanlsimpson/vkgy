@@ -46,9 +46,7 @@ style([
 							<div class="video__container {video_class}">
 								<!--<a class="lazy side__video-link youtube__embed" data-id="{youtube_id}" data-src="https://img.youtube.com/vi/{youtube_id}/mqdefault.jpg" href="{url}" target="_blank"></a>-->
 								
-								<div class="videos__thumbnail module module--youtube">
-									<a class="videos__bg lazy" href="{url}" data-src="https://img.youtube.com/vi/{youtube_id}/mqdefault.jpg" style="padding-top:56%;"></a>
-								</div>
+								<a class="video__thumbnail lazy" href="{url}" data-src="https://img.youtube.com/vi/{youtube_id}/mqdefault.jpg" style="padding-top:56%;"></a>
 								
 								<?php /*<div class="any--weaken-color">
 									<a class="video__report symbol__error any--weaken-size a--inherit" href="/artists/function-update_video.php?id={video_id}&amp;method=report" rel="nofollow"><?= lang('Report unofficial video', '非公式の動画を報告して', 'hidden'); ?></a>

@@ -14,14 +14,6 @@ $stmt_covers->execute();
 $covers = $stmt_covers->fetchAll();
 shuffle($covers);
 
-/* Get VIP news */
-/*if($_SESSION['is_vip']) {
-	$sql_vip = "SELECT vip.title, vip.friendly, vip.date_occurred, vip_views.id AS is_viewed FROM vip LEFT JOIN vip_views ON vip_views.post_id=vip.id AND vip_views.user_id=? ORDER BY vip.date_occurred DESC LIMIT 1";
-	$stmt_vip = $pdo->prepare($sql_vip);
-	$stmt_vip->execute([ $_SESSION['user_id'] ]);
-	$rslt_vip = $stmt_vip->fetch();
-}*/
-
 /* Get news */
 $news = $access_blog->access_blog([ 'get' => 'list', 'limit' => 7 ]);
 $num_news = count($news);
@@ -39,74 +31,6 @@ for($i=0; $i<$num_news; $i++) {
 $comments = $access_comment->access_comment(['is_deleted' => 0, "get" => "list", "limit" => 20, 'threads' => false]);
 $num_comments = count($comments);
 
-/*// Comments: Loop through comments and set up query to get their URLs
-$num_comments = count($comments);
-for($i=0; $i<$num_comments; $i++) {
-	
-	switch($comments[$i]['item_type']) {
-		case('blog'):
-			$sql_comment[] = "SELECT id AS item_id, CONCAT_WS('/', '', 'blog', friendly, '') AS url FROM blog WHERE id=?";
-			break;
-		case('release'):
-			$sql_comment[] = "SELECT releases.id AS item_id, CONCAT_WS('/', '', 'releases', artists.friendly, releases.id, releases.friendly, '') AS url FROM releases LEFT JOIN artists ON artists.id=releases.artist_id WHERE releases.id=?";
-			break;
-		case('artist'):
-			$sql_comment[] = "SELECT id AS item_id, CONCAT_WS('/', '', 'artists', friendly, '') AS url FROM artists WHERE id=?";
-			break;
-		case('development'):
-			$sql_comment[] = "SELECT id AS item_id, CONCAT_WS('/', '', 'about', 'development', id, '') AS url FROM development WHERE id=?";
-			break;
-		case('vip'):
-			$sql_comment[] = "SELECT ? AS item_id, '/vip/' AS url FROM vip";
-			break;
-		case('video'):
-			$sql_comment[] = "SELECT id AS item_id, CONCAT_WS('/', '', 'videos', id, '') AS url FROM videos WHERE id=?";
-			break;
-	}
-	
-	$comment_types[] = $comments[$i]['item_type'];
-	$values_comment[] = $comments[$i]['item_id'];
-	
-}
-
-// Comments: If we have SQL and values for each comment, query the DB
-if( is_array($sql_comment) && !empty($sql_comment) && count($sql_comment) === count($values_comment) ) {
-	$sql_comment = 'SELECT * FROM ( ('.implode(') UNION (', $sql_comment).') ) urls';
-	$stmt_comment = $pdo->prepare($sql_comment);
-	$stmt_comment->execute( $values_comment );
-	$rslt_comments = $stmt_comment->fetchAll();
-	
-	echo 'result urls<pre>'.print_r($rslt_comments, true).'</pre>';
-	
-	$num_rslt_comments = is_array($rslt_comments) ? count($rslt_comments) : 0;
-}
-
-// Comments: If got comment URLs, loop through and apply them
-if($num_rslt_comments) {
-	
-	// Change comment URLs to associative array
-	for($i=0; $i<$num_rslt_comments; $i++) {
-		
-		$comment_type = $comment_types[$i];
-		$comments_urls_ii[ $comment_type ][ $rslt_comments[$i]['item_id'] ][] = $rslt_comments[$i]['url'];
-		
-		//$comments[$i]['url'] = $comments_urls[$i]['url'];
-		//$comments_urls[ $rslt_comments[$i]['item_id'] ] = $rslt_comments[$i]['url'];
-	}
-	
-	echo '<pre>'.print_r($comments_urls_ii, true).'</pre>';
-	
-	// Grab appropriate URL for each comment
-	for($i=0; $i<$num_comments; $i++) {
-		
-		echo $comments[$i]['item_type'].'*'.$comments[$i]['item_id'].'*'.$comments_urls_ii[ $comments[$i]['item_type'] ][ $comments[$i]['item_id'] ].'<br />';
-		
-		$comments[$i]['url'] = $comments_urls_ii[ $comments[$i]['item_type'] ][ $comments[$i]['item_id'] ];
-		
-		//$comments[$i]['url'] = $comments_urls[$comments[$i]['item_id']];
-	}
-	
-}*/
 // Comments: Format comment data
 for($i=0; $i<$num_comments; $i++) {
 	
@@ -348,7 +272,7 @@ $latest_item = $latest_interview['date_occurred'] > $yesterday ? $latest_intervi
 array_unshift( $latest_items, $latest_item );
 
 // Remove all but 3 items
-$latest_items = array_slice( $latest_items, 0, 3 );
+$latest_items = array_slice( $latest_items, 0, ( $latest_interview['date_occurred'] > $yesterday ? 4 : 3 ) );
 
 // If interview older than yesterday, push an interview to the end
 if($latest_interview['date_occurred'] < $yesterday) {

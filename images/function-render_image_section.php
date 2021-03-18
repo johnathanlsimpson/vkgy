@@ -1,5 +1,6 @@
 <?php
 include_once('../php/function-render_component.php');
+include_once('../php/function-render_json_list.php');
 include_once('../images/function-render_face.php');
 include_once('../images/template-option.php');
 include_once('../images/template-image.php');
@@ -10,6 +11,7 @@ script([
 	'/scripts/external/script-alpine.js',
 	'/scripts/script-initSelectize.js',
 	'/scripts/script-initDelete.js',
+	'/scripts/script-renderJsonList.js',
 	'/images/script-uploadImage.js',
 ]);
 
@@ -110,6 +112,9 @@ function render_image_section($images, $args = []) {
 				}
 			}
 			
+			$musician_id = explode(',', $image['musician_ids'])[0] ?: $default['musician'];
+			$musician_name = is_numeric($musician_id) ? '(tagged)' : null;
+			
 			$rendered_images[] = render_component($image_template, [
 				'id'                 => $image['id'],
 				'item_type'          => $args['item_type'],
@@ -118,11 +123,17 @@ function render_image_section($images, $args = []) {
 				'credit'             => $image['credit'],
 				'is_exclusive'       => $image['is_exclusive'] ? 'checked' : null,
 				'is_default'         => $image['id'] == $args['default_id'] ? 'checked' : null,
+				'is_queued'         => $image['is_queued'] ? 1 : null,
 				'artist_id'          => $artist_id,
 				'artist_ids'         => render_options(($image['artist_ids'] ?: $default['artist']), $artist_list),
 				'blog_id'            => render_options(($image['blog_id'] ?: $default['blog']), $blog_list),
 				'musician_ids'       => render_options(($image['label_ids'] ?: $default['label']), $label_list),
-				'musician_ids'       => render_options(($image['musician_ids'] ?: $default['musician']), $musician_list),
+				
+				'musician_id'        => $musician_id,
+				'musician_name'      => $musician_name,
+				
+				'source_attr_suffix' => is_numeric($artist_id) ? '_'.$artist_id : null,
+				
 				'release_ids'        => render_options(($image['release_ids'] ?: $default['release']), $release_list),
 				'scanned_by'         => $image['user_id'] == $_SESSION['user_id'] ? '1' : '0',
 				'background_url'     => '/images/'.$image['id'].'.thumbnail.'.$image['extension'],

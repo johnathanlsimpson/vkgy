@@ -16,8 +16,8 @@
 .tags__wrapper:last-of-type {
 	margin-bottom: -1rem;
 }
-.tags__wrapper .h5 + .tag__container {
-	margin-top: 0.5rem;
+.tags--active .tags__wrapper .h5 {
+	margin-bottom: 0.5rem;
 }
 
 /* Tag container */
@@ -38,7 +38,7 @@
 /* Scene tags */
 .tag--scene {
 	align-items: stretch;
-	display: flex;
+	display: inline-flex;
 	margin-bottom: 1rem;
 }
 .tag--scene .text {
@@ -55,7 +55,7 @@
 	margin: -1rem;
 	margin-right: 1ch;
 	min-width: 25px;
-	padding: 25% 25% 0 0;
+	width: 80px;
 }
 .tag--kote-kei .tag__thumbnail {
 	background-image: url('/images/36720-kote-kei.medium.png');

@@ -651,6 +651,7 @@ $page_description =
 									
 									$item_type = 'release';
 									include('../tags/partial-tags.php');
+									include('../tags/partial-add.php');
 								?>
 								
 								<h3>
