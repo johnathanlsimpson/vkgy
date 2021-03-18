@@ -5,12 +5,9 @@ $page_title = $page_title ? $page_title.' | vkgy (ブイケージ)' : 'vkgy (ブ
 
 $page_description = $page_description ? $page_description." | vkgy (ブイケージ)" : "vkgy is a visual kei library maintained by overseas fans. vkgy（ブイケージ）はビジュアル系のファンサイトとライブラリです。関連するアーティストのメンバープロフィールや活動やリリース情報などがあります。";
 
-$background_image = $background_image ?: ($page_image ?: null);
 $body_class = $_SESSION["is_signed_in"] ? "body--signed-in" : "body--signed-out";
 
-// Get opengraph image, make sure we're passing flag so it doesn't pass through CDN
-$page_image = $page_image ?: 'https://vk.gy/style/card.png';
-$page_image = str_replace([ '.thumbnail.', '.small.', '.medium.', '.large.' ], '.opengraph.', $page_image);
+include_once('../php/function-choose_page_images.php');
 
 style([
 	"../style/style-tooltips.css"
@@ -321,8 +318,11 @@ style([
 		<form action="/search/" class="any--hidden" enctype="multipart/form-data" id="form__search" method="get" name="form__search"><button type="submit"></button></form>
 		
 		<!-- HEADER -->
-		<div class="header__wrapper col c1">
-			<div class="header__container lazy any--flex" data-src="<?php echo $background_image; ?>">
+		<div class="header__wrapper col c1" data-orientation="<?= $background_image['orientation']; ?>" style="<?= $background_image['url'] ? '--background-image:url('.$background_image['url'].');--background-thumbnail:url('.$background_image['thumbnail_url'].');' : null; ?>">
+			
+			<?= $background_image ? '<img class="header__thumbnail" src="'.$background_image['thumbnail_url'].'" />' : null; ?>
+			
+			<div class="header__container lazy any--flex">
 				<div class="header__header" style="flex-grow:1;">
 					<h1>
 						<?php echo $GLOBALS['page_header'] ?: ($page_header ?: null); ?>

@@ -865,7 +865,7 @@
 						ob_start();
 						?>
 							<div class="module module--youtube">
-								<a class="lazy youtube__embed" data-id="<?= $reference_datum['youtube_id']; ?>" data-src="<?= 'https://img.youtube.com/vi/'.$reference_datum['youtube_id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$reference_datum['youtube_id']; ?>" target="_blank"></a>
+								<a class="lazy video__thumbnail" data-id="<?= $reference_datum['youtube_id']; ?>" data-src="<?= 'https://img.youtube.com/vi/'.$reference_datum['youtube_id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$reference_datum['youtube_id']; ?>" target="_blank"></a>
 							</div>
 						<?php
 						$output = str_replace(["\n", "\t", "\r"], "", ob_get_clean());
@@ -881,7 +881,7 @@
 									
 									<a class="card__link" href="<?= '/videos/'.$reference_datum['id'].'/'; ?>"></a>
 									
-									<a class="video-card__embed card--clickable youtube__embed lazy" data-id="<?= $reference_datum['youtube_id']; ?>" data-src="<?= 'https://img.youtube.com/vi/'.$reference_datum['youtube_id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$reference_datum['youtube_id']; ?>" target="_blank"></a>
+									<a class="video-card__embed card--clickable video__thumbnail lazy" data-id="<?= $reference_datum['youtube_id']; ?>" data-src="<?= 'https://img.youtube.com/vi/'.$reference_datum['youtube_id'].'/mqdefault.jpg'; ?>" href="<?= 'https://youtu.be/'.$reference_datum['youtube_id']; ?>" target="_blank"></a>
 									
 									<div class="video-card__details">
 										

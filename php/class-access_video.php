@@ -551,16 +551,22 @@
 			// Specific page
 			if( is_numeric($args['page']) || $args['page'] === 'last' ) {
 				
-				// Get page totals
-				$sql_total = 'SELECT COUNT(id) AS num_items FROM '.$sql_from;
+				// Get page totals (considering any filters in use)
+				$sql_total = '
+					SELECT COUNT(id) AS num_items
+					FROM '.$sql_from.'
+					'.(is_array($sql_join) && !empty($sql_join) ? implode(' ', $sql_join) : null).'
+					'.(is_array($sql_where) && !empty($sql_where) ? 'WHERE ('.implode(') AND (', $sql_where).')' : null);
 				$stmt_total = $this->pdo->prepare($sql_total);
-				$stmt_total->execute();
+				$stmt_total->execute($sql_values);
 				
 				// Calculations
 				$limit = $args['limit'] && is_numeric($args['limit']) ? $args['limit'] : 100;
 				$num_items = $stmt_total->fetchColumn() ?: 0;
 				$num_pages = ceil( $num_items / $limit );
 				$current_page = $args['page'];
+				$offset = $current_page * $limit - $limit;
+				$offset = $offset ?: 0;
 				
 				// If requested page > extant pages, reset to last page
 				if( $current_page > $num_pages ) {
@@ -568,7 +574,7 @@
 				}
 				
 				// Set query limit
-				$sql_limit = ( $current_page * $limit - $limit ).', '.$limit;
+				$sql_limit = $offset.', '.$limit;
 				
 				// Pass meta data
 				$item_count = [

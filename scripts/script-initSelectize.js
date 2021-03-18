@@ -63,7 +63,7 @@ function initSelectize(selectElement, populatedOnClick = false) {
 function lookForSelectize() {
 	$.each($("select:not(.selectized)"), function() {
 		
-		if($(this).data("populate-on-click") && !$(this).hasClass('will-selectize')) {
+		if($(this).data("populate-on-click") && ( !$(this).hasClass('will-selectize') || $(this)[0].getAttribute('name').indexOf("tracklist") > -1 ) ) {
 			
 			// Make sure we don't accidentally spawn multiple selectizes when lookForSelectize() is done multiple times in a page
 			$(this).addClass('will-selectize');

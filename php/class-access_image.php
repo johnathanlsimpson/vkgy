@@ -580,6 +580,10 @@
 				$sql_where[] = 'images.is_queued=?';
 				$sql_values[] = 0;
 			}
+			if( is_numeric($args['id']) ) {
+				$sql_where[] = 'images.id=?';
+				$sql_values[] = $args['id'];
+			}
 			
 			// Group
 			if($args['get'] === 'all' || $args['get'] === 'most') {
@@ -613,6 +617,20 @@
 				if($stmt_images->execute( $sql_values )) {
 					$images = $stmt_images->fetchAll();
 					$num_images = count($images);
+					
+					// Get image URLs
+					if( $num_images ) {
+						for($i=0; $i<$num_images; $i++) {
+							
+							$base_url = '/images/'.$images[$i]['id'].( $images[$i]['friendly'] ? '-'.$images[$i]['friendly'] : null );
+							$images[$i]['url'] = $base_url.'.'.$images[$i]['extension'];
+							
+							foreach( $this->resize_methods as $resize_key => $resize_resolution ) {
+								$images[$i][ $resize_key.'_url' ] = $base_url.'.'.$resize_key.'.'.$images[$i]['extension'];
+							}
+							
+						}
+					}
 					
 					// Get musicians which are tagged generally and/or by face
 					if( $num_images && ( $args['get'] === 'all' || $args['get'] === 'most' ) ) {

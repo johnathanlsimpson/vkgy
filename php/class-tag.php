@@ -16,7 +16,7 @@ class tag {
 	];
 	
 	public const tag_types = [
-		'artist'   => [ 'scenes', 'styles', 'other', 'moderation', 'disputed' ],
+		'artist'   => [ 'scenes', 'sounds like', 'other tags', 'moderator tags', 'disputed' ],
 		'musician' => [ 'moderation', 'disputed' ],
 		'release'  => [ 'styles', 'other', 'moderation', 'disputed' ]
 	];
