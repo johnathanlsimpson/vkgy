@@ -58,7 +58,8 @@
 					"position" => $musician["position"],
 					"position_name" => $position,
 					"history" => $history
-				];
+				] + $musician;
+				
 			}
 		}
 		
