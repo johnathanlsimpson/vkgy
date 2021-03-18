@@ -14,6 +14,7 @@ foreach($_POST as $key => $value) {
 $image_id = sanitize($_POST['id']);
 $item_type = sanitize($_POST['item_type']);
 $item_id = sanitize($_POST['item_id']);
+$action = $_POST['action'] === 'delete' ? 'delete' : 'unlink';
 
 // Check whether user can delete images
 if($_SESSION['can_delete_data']) {
@@ -51,8 +52,9 @@ if(is_numeric($image_id) && $can_delete_image) {
 		$rslt_check += $stmt_check->fetchColumn();
 	}
 	
-	// Fake delete
-	if($rslt_check > 1) {
+	// Unlink image (unless image was only linked to one thing, in which case we'll do an actual delete)
+	if( $action === 'unlink' && $rslt_check > 1 ) {
+		
 		$values_delete = [ $image_id ];
 		if(is_numeric($item_id)) {
 			$values_delete[] = $item_id;
@@ -66,10 +68,12 @@ if(is_numeric($image_id) && $can_delete_image) {
 		else {
 			$output['result'] = 'Couldn\'t delete link.';
 		}
+		
 	}
 	
 	// Real delete
 	else {
+		
 		$sql_get = "SELECT extension FROM images WHERE id=? LIMIT 1";
 		$stmt_get = $pdo->prepare($sql_get);
 		$stmt_get->execute([ $image_id ]);
@@ -101,6 +105,7 @@ if(is_numeric($image_id) && $can_delete_image) {
 		else {
 			$output["result"] = "Not found in database.";
 		}
+		
 	}
 }
 else {

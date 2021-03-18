@@ -52,12 +52,16 @@
 								
 							</div>
 							
-							<div class="input__group">
-								
-								<!-- Delete/unlink -->
-								<button class="input__button symbol__trash image__delete {delete_class}" x-show="!isCollapsed || isFacsimile" x-text="isFacsimile ? 'Unlink' : 'Delete'">Delete</button>
-								
-							</div>
+							<!-- Unlink -->
+							<?php
+								if($_SESSION['can_delete_data']) {
+									?>
+										<div class="input__group">
+											<button class="input__button symbol__hide image__unlink">Unlink</button>
+										</div>
+									<?php
+								}
+							?>
 							
 							<div class="input__group">
 								
@@ -106,7 +110,7 @@
 										foreach(access_image::$allowed_image_contents as $value => $key) {
 											?>
 												<label class="input__radio">
-													<input class="input__choice" name="image_type[{id}]" type="radio" value="<?= $value; ?>" {checked_image_type:<?= $value; ?>} x-on:change="description = getDescription($el); imageContent = $el.querySelector('[name^=image_type]:checked').value; if(imageContent == 1) { showMusicians = true; }" />
+													<input class="input__choice" name="image_type[{id}]" type="radio" value="<?= $value; ?>" {checked_image_type:<?= $value; ?>} x-on:change="description = getDescription($el); triggerChange($refs.description); imageContent = $el.querySelector('[name^=image_type]:checked').value; if(imageContent == 1) { showMusicians = true; }" />
 													<span class="symbol__unchecked"><?= $key; ?></span>
 												</label>
 											<?php
@@ -143,7 +147,7 @@
 									
 									<label class="input__label">Tag artist</label>
 									
-									<select class="input" data-populate-on-click="true" data-multiple="true" data-source="artists" name="image_artist_id[]" placeholder="artists" x-on:change="description = getDescription($el); artistIsSet=($event.target.value); showArtists=true; updateJsonLists($event.target); if(imageContent == 1) { showMusicians = true; }" multiple>{artist_ids}</select>
+									<select class="input" data-populate-on-click="true" data-multiple="true" data-source="artists" name="image_artist_id[]" placeholder="artists" x-on:change="description = getDescription($el); triggerChange($refs.description); artistIsSet=($event.target.value); showArtists=true; updateJsonLists($event.target); if(imageContent == 1) { showMusicians = true; }" multiple>{artist_ids}</select>
 									
 								</div>
 								
@@ -159,7 +163,7 @@
 									
 									<label class="input__label">Tag releases</label>
 									
-									<select class="input" data-populate-on-click="true" data-multiple="true" data-source="releases_{artist_id}" name="image_release_id[]" placeholder="releases" multiple>{release_ids}</select>
+									<select class="input" data-populate-on-click="true" data-multiple="true" data-source="releases{source_attr_suffix}" name="image_release_id[]" placeholder="releases" multiple>{release_ids}</select>
 									
 								</div>
 								
@@ -206,7 +210,7 @@
 								<div class="input__group any--flex-grow image__musicians">
 									
 									<label class="input__label">Tag <span x-show="imageContent == 1 || imageContent == 3">other</span> musician<span x-show="imageContent != 2">s</span></label>
-									<select class="input" data-populate-on-click="true" data-multiple="true" data-source="musicians" name="image_musician_id[]" placeholder="musicians" x-on:change="description = imageContent == 2 ? getDescription($el) : description;" multiple>{musician_ids}</select>
+									<select class="input" data-populate-on-click="true" data-multiple="true" data-source="musicians{source_attr_suffix}" name="image_musician_id[]" placeholder="musicians" x-on:change="description = imageContent == 2 ? getDescription($el) : description; triggerChange($refs.description);" multiple><option value="{musician_id}" selected>{musician_name}</option>{musician_ids}</select>
 									
 									<div class="input__note symbol__help any--weaken-color" x-show="imageContent != 1 && imageContent != 3">
 										Musicians can be tagged by face in group photos or flyers.
@@ -256,6 +260,20 @@
 								</div>
 								
 							</div>
+							
+							<!-- Delete -->
+							<?php
+								if($_SESSION['can_delete_data']) {
+									?>
+										<div class="input__row">
+											<div class="input__group">
+												<label class="input__label">Permanently delete image</label>
+												<button class="input__button symbol__trash image__delete {delete_class}">Delete</button>
+											</div>
+										</div>
+									<?php
+								}
+							?>
 							
 						</div>
 						

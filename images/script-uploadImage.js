@@ -88,69 +88,24 @@ function updateJsonLists(artistElem) {
 	// If musician list not already gotten (and presumably release list isn't either), let's get them
 	if( !musicianListElem ) {
 		
-		// Set up post
-		let formData = new FormData();
-		formData.append('id_column', 'artist_id');
-		formData.append('artist_id', artistId);
+		renderJsonList(artistId);
 		
-		// Get musician/release lists
-		fetch('/images/function-get_json_lists.php', {
-			
-			method: 'POST',
-			body: formData
-			
-		})
-		
-		.then((response) => {
-			
-			return response.json();
-			
-		})
-		
-		.then((data) => {
-			
-			if( data.status === 'success' ) {
-				
-				// Add musician list to page
-				if( data.musician_list ) {
-					
-					musicianListElem = document.createRange().createContextualFragment( data.musician_list );
-					artistListElem.after(musicianListElem);
-					
-				}
-				
-				// Add release list to page
-				if( data.release_list ) {
-					
-					let releaseListElem = document.createRange().createContextualFragment( data.release_list );
-					artistListElem.after(releaseListElem);
-					
-				}
-				
-			}
-			
-			else {
-				
-			}
-			
-		});
-	
 	}
 	
 	// Go through any tagging dropdowns and update to use correct list
 	musicianElems.forEach(function(musicianElem) {
-
+		
 		musicianElem.setAttribute('data-source', musicianDataKey);
-
+		
 		// If no value set but selectize active, destroy it
 		if( !musicianElem.value && musicianElem.classList.contains('selectized') ) {
-
+			
 			musicianElem.selectize.destroy();
-
+			
 		}
-
+		
 	});
-
+	
 	// Go through any tagging dropdowns and update to use correct list
 	releaseElems.forEach(function(releaseElem) {
 		
@@ -175,6 +130,8 @@ function updateJsonLists(artistElem) {
 
 // Return updated description
 function getDescription(targetElem) {
+	
+	console.log('updating description');
 	
 	let imageElem = targetElem.closest('.image__template');
 	
@@ -267,20 +224,26 @@ function getFaces(imageElem, imageUrl) {
 			'callbackOnSuccess': function(event, returnedData) {
 				
 				response(returnedData);
+		console.log('2' + returnedData);
 				
 			},
 			
 			'callbackOnError': function(event, returnedData) {
 				
+		console.log('3' + returnedData);
 				rejection(returnedData);
 				
 			}
 			
 		});
 		
+		console.log('4' + imageUrl);
+		
 	}).catch(function(rejection) {
+		console.log('5' + rejection);
 		return rejection;
 	});
+		console.log('1' + detectedFaces);
 	
 	return detectedFaces;
 	
@@ -528,7 +491,9 @@ document.addEventListener('change', function(event) {
 	
 	let eventName = event.target.name;
 	
-	if( eventName.startsWith('image_') ) {
+	if( eventName.startsWith('image_') && event.target.closest('.image__template') ) {
+		
+		console.log('triggering update image data' + Math.random());
 		
 		updateImageData(event.target);
 		
@@ -602,6 +567,8 @@ function updateImageData(changedElem, preparedData = false) {
 		});
 		
 	}
+	
+	console.log(preparedFormData);
 	
 	// Grab element that says whether or not image is new, as we'll need to change it
 	let imageIsNewElem = parentElem.querySelector('[name="image_is_new"]');
@@ -689,7 +656,47 @@ if(noDefaultElem) {
 // ========================================================
 
 // Init delete buttons
-function initImageDeleteButtons() {
+/*function initImageDeleteButtons() {
+}*/
+
+document.addEventListener('click', function(event) {
+	
+	if( event.target.classList.contains('image__delete') || event.target.classList.contains('image__unlink') ) {
+		
+		let action = event.target.classList.contains('image__delete') ? 'delete' : 'unlink';
+		
+		removeImage( event.target, action );
+		
+	}
+	
+});
+
+function removeImage(removeButton, action) {
+	
+	let imageElem = removeButton.closest('.image__template');
+	let imageId = imageElem.querySelector('[name="image_id"]').value;
+	let itemType = imageElem.querySelector('[name="image_item_type"]').value;
+	let itemId = imageElem.querySelector('[name="image_item_id"]').value;
+	
+	initDelete( $(removeButton), '/images/function-delete_image.php', {
+		'id': imageId,
+		'item_type': itemType,
+		'item_id': itemId,
+		'action': action,
+	},
+	function( removeButton ) {
+		
+		imageElem.classList.add('any--fade-out');
+		
+		setTimeout(function() {
+			imageElem.remove();
+		}, 300);
+		
+	}, true);
+	
+}
+
+/*function initImageDeleteButtons() {
 	var imageDeleteButtons = document.querySelectorAll('.image__delete');
 	var itemType = document.querySelector('[name=image_item_type]').value;
 	var itemId = document.querySelector('[name=image_item_id]').value;
@@ -712,7 +719,7 @@ function initImageDeleteButtons() {
 			}, 300);
 		});
 	});
-}
+}*/
 
 
 
@@ -1217,6 +1224,10 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 	
 	newImageTemplateArgs.messageElem.innerHTML = 'Uploading...';
 	
+	// Need to set whether or not the image is queued
+	let isQueuedElem = newImageElem.querySelector('[name="image_is_queued"]');
+	let isQueued = isQueuedElem && isQueuedElem.value ? '1' : null;
+	
 	// Define this so we don't have an error later
 	let file;
 	
@@ -1254,16 +1265,29 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 			// Using core submit function, actually upload the image
 			initializeInlineSubmit( $(newImageTemplateArgs.thisImageElem), '/images/function-upload_image.php', {
 				
-				'preparedFormData' : { 'image' : thisImage, 'item_type' : newImageTemplateArgs.itemType, 'item_id' : newImageTemplateArgs.itemId },
+				'preparedFormData' : {
+					'image' : thisImage,
+					'item_type' : newImageTemplateArgs.itemType,
+					'item_id' : newImageTemplateArgs.itemId,
+					'is_queued': isQueued,
+				},
+				
 				'callbackOnSuccess': function(event, returnedData) {
 					
+					// First time uploading image
 					if( typeof returnedData.is_facsimile === 'undefined' || returnedData.is_facsimile != 1 ) {
 						
 						newImageTemplateArgs.messageElem.innerHTML = 'Compressing...';
 						
 						// Do compression here
 						initializeInlineSubmit( $(newImageTemplateArgs.thisImageElem), '/images/function-compress_image.php', {
-							'preparedFormData' : { 'image_id' : returnedData.image_id, 'image_extension': returnedData.image_extension },
+							
+							'preparedFormData' : {
+								'image_id' : returnedData.image_id,
+								'image_extension': returnedData.image_extension
+							},
+							
+							// Compressed image
 							'callbackOnSuccess': function(compressEvent, compressData) {
 								
 								newImageTemplateArgs.messageElem.innerHTML = 'Finishing up...';
@@ -1271,14 +1295,19 @@ function handleFiles(input, newImageTemplateArgs, inputType = 'files') {
 								finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedData);
 								
 							},
+							
+							// Couldn't compress image
 							'callbackOnError': function(compressEvent, compressData) {
 								
 								finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedData);
 								
 							}
+							
 						});
 						
 					}
+					
+					// Found facsimile
 					else {
 						
 						newImageTemplateArgs.messageElem.innerHTML = 'Found duplicate image...';
@@ -1347,7 +1376,6 @@ function finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedD
 		
 		// After ID is set init buttons in new image element
 		lookForSelectize();
-		initImageDeleteButtons();
 		
 		// Update names of image_type radios
 		let imageTypeElems = newImageElem.querySelectorAll('[name="image_type[]"]');
@@ -1366,12 +1394,12 @@ function finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedD
 	
 	// Trigger change on ID elem so that new ID (and description, etc) is saved in DB
 	// This might need to be moved before 'set image content'
-	idElem.dispatchEvent(new Event('change', { bubbles: true }));
+	// This is super hacky but Alpine isn't updating the description quick enough so we set an arbitrary wait before saving the data
+	triggerChange(idElem);
 	
 	newImageElem.classList.remove('image--loading');
 	
 }
-
 
 // If *item* ID changes (e.g. adding release or blog), update all images' item IDs to match
 document.addEventListener('item-id-updated', function(event) {
@@ -1400,7 +1428,23 @@ document.addEventListener('item-id-updated', function(event) {
 	
 });
 
+// If artist on page has changed (i.e. main artist set for blog) update image template for further uploads
+function updateDefaultImageArtist(artistId, artistName) {
+	
+	// Update image template so further images uploaded will default to that artist
+	let imageTemplate = document.querySelector('#image-template');
+	if(imageTemplate) {
+		
+		renderJsonList(artistId);
+		
+		imageTemplate.innerHTML = imageTemplate.innerHTML.replace(/(data-source="artists".+?>)(<\/select>)/, '$1<option value="' + artistId + '" selected>' + artistName + '</option>$2');
+		imageTemplate.innerHTML = imageTemplate.innerHTML.replace("artistIsSet: ''", "artistIsSet: '1'");
+		imageTemplate.innerHTML = imageTemplate.innerHTML.replace('data-source="musicians"', 'data-source="musicians_' + artistId + '"');
+		imageTemplate.innerHTML = imageTemplate.innerHTML.replace('data-source="releases"', 'data-source="releases_' + artistId + '"');
+		
+	}
+	
+}
 
 // Init elements
 lookForSelectize();
-initImageDeleteButtons();
