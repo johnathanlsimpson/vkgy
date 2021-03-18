@@ -53,10 +53,14 @@
 			<div class="col c1">
 				<div>
 					<span id="comments"></span>
-					<h2>
-						<?php echo lang('Comments', 'コメント', ['container' => 'div']); ?>
+					<h2 class="h1">
+						<?= lang('Comments', 'コメント', ['container' => 'div']); ?>
 					</h2>
-					
+				</div>
+			</div>
+			
+			<div class="col c2">
+				<div style="position:sticky;top:5rem;">
 					<!-- Add comment -->
 					<?php
 						echo render_comment_component($comment_thread_template, [
@@ -74,6 +78,8 @@
 								])
 						]);
 					?>
+				</div>
+				<div>
 					
 					<!-- Other comments -->
 					<?php
@@ -111,6 +117,9 @@
 									'comments' => implode("\n", $rendered_comments),
 								]);
 							}
+						}
+						else {
+							echo '<div class="text text--outlined">No comments yet.</div>';
 						}
 					?>
 				</div>
