@@ -229,10 +229,21 @@
 			}
 		}
 		
-		// Set up permissions
-		$artist_is_removed;
-		$artist_is_stub = $artist['musicians'] || $artist['history'] ? false : true;
-		$artist_is_viewable = $artist_is_removed && $_SESSION['is_vip'] || !$artist_is_removed ? true : false;
+	}
+
+		
+	$sql_removed = 'SELECT 1 FROM artists_tags WHERE artist_id=? AND tag_id=? LIMIT 1';
+	$stmt_removed = $pdo->prepare($sql_removed);
+	$stmt_removed->execute([ $artist['id'], 21 ]);
+	$artist_is_removed = $stmt_removed->fetchColumn();
+		
+	// Set up permissions
+	$artist_is_removed;
+	$artist_is_stub = $artist['musicians'] || $artist['history'] ? false : true;
+	$artist_is_viewable = $artist_is_removed && $_SESSION['is_vip'] || !$artist_is_removed ? true : false;
+
+	if( !$artist_is_viewable ) {
+		unset( $show_videos, $show_tags, $show_images, $show_artist_page );
 	}
 	
 	//
