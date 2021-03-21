@@ -277,6 +277,21 @@
 						<div class="col c1">
 							<div>
 								<h2>
+									<?= lang('Add images', '画像をアップロード', 'div'); ?>
+								</h2>
+								<div class="text text--outlined">
+									<p class="symbol__error any--small-margin">
+										Images have moved to their own section.
+									</p>
+									
+									<a class="a--padded a--outlined symbol__arrow-right-circled" href="<?= '/artists/'.$artist['friendly'].'/images/edit/'; ?>">add/edit images</a>
+								</div>
+							</div>
+						</div>
+						
+						<div class="col c1">
+							<div>
+								<h2>
 									Edit member information
 								</h2>
 								<?php
