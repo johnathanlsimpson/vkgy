@@ -3,12 +3,31 @@
 include_once('../php/include.php');
 
 // Set potential sizes
-$image_size_searches = [ '.thumbnail.', '.small.', '.medium.', '.large.' ];
+$image_size_searches = [ '.thumbnail.', '.small.', '.medium.', '.large.', '.opengraph.' ];
+
+// Clean page image
+$page_image = str_replace($image_size_searches, '.', $page_image);
+$page_image = str_replace('https://vk.gy', '', $page_image);
+$page_image = str_replace('../', '/', $page_image);
 
 // If background not specified, default to page image if specified
 $background_image = $background_image ?: ($page_image ?: null);
 $background_image = str_replace($image_size_searches, '.', $background_image);
 $background_image = str_replace('https://vk.gy', '', $background_image);
+$background_image = str_replace('../', '/', $background_image);
+
+// Unset page image if needed
+if( image_exists($page_image, $pdo) ) {
+	$page_image = 'https://vk.gy'.str_replace('.', '.opengraph.', $page_image);
+}
+else {
+	$page_image = 'https://vk.gy/style/card.png';
+}
+
+// Unset background image if needed
+if( $background_image != $page_image && !image_exists($background_image, $pdo) ) {
+	unset( $background_image );
+}
 
 // For background image, let's get its details so we can do some calculations
 if( $background_image ) {
@@ -74,7 +93,7 @@ if( is_array($background_image) && !empty($background_image) ) {
 
 	// If background resolution is too small in total or in the dimension of its orientation, don't use it
 	if( $background_image['resolution'] < 120000 || 500 > ( $background_image['orientation'] === 'horizontal' ? $background_image['width'] : $background_image['height'] ) ) {
-		unset($background_image);
+		$large_header = false;
 	}
 
 }
