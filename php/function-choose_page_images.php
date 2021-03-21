@@ -24,7 +24,7 @@ if( $background_image ) {
 	}
 	
 	// Otherwise get info from id
-	elseif( preg_match('/'.'\/images\/(\d)+'.'/', $background_image, $matches) ) {
+	elseif( preg_match('/'.'\/images\/(\d+)'.'/', $background_image, $matches) ) {
 		
 		$image_id = $matches[1];
 		
