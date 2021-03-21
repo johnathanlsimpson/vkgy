@@ -8,9 +8,42 @@
 	]);
 	
 	$page_header = lang('Releases', 'リリース', ['container' => 'div']);
+
+if( is_numeric($_GET['id']) ) {
+	
+	$sql_removed = 'SELECT artists_tags.id FROM releases LEFT JOIN artists_tags ON artists_tags.artist_id=releases.artist_id AND artists_tags.tag_id=? WHERE releases.id=? LIMIT 1';
+	$values_removed = [ 21, $_GET['id'] ];
+	
+}
+elseif( $_GET['artist'] ) {
+	
+	$sql_removed = 'SELECT artists_tags.id FROM artists LEFT JOIN artists_tags ON artists_tags.artist_id=artists.id AND artists_tags.tag_id=? WHERE artists.friendly=? LIMIT 1';
+	$values_removed = [ 21, sanitize($_GET['artist']) ];
+	
+}
+
+if( $sql_removed ) {
+	
+	$stmt_removed = $pdo->prepare($sql_removed);
+	$stmt_removed->execute( $values_removed );
+	$artist_is_removed = $stmt_removed->fetchColumn();
+	
+	// Set up permissions
+	$artist_is_viewable = $artist_is_removed && $_SESSION['is_vip'] || !$artist_is_removed ? true : false;
+	
+}
+else {
+	
+	$artist_is_viewable = true;
+	
+}
+
+
+
+
 	
 	// ID template
-	if(is_numeric($_GET["id"])) {
+	if( is_numeric($_GET["id"]) && $artist_is_viewable ) {
 		$release = $access_release->access_release(["release_id" => $_GET["id"], "get" => "all"]);
 		
 		subnav([
@@ -93,7 +126,7 @@
 		}
 	}
 	
-	elseif(!empty($_GET["artist"])) {
+	elseif( !empty($_GET["artist"]) && $artist_is_viewable ) {
 		$_GET["artist"] = friendly($_GET["artist"]);
 		
 		if(!empty($_GET["artist"])) {
@@ -126,6 +159,7 @@
 			}
 		}
 	}
+
 	else {
 		include_once("../releases/page-index.php");
 	}
