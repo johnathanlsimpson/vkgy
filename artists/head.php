@@ -42,8 +42,14 @@ else {
 	unset($default_image);
 }
 
-
 include_once('../lists/function-render_lists.php');
+
+// If don't have activity status, get it
+if( !is_numeric($artist['active']) ) {
+
+	$artist = $artist + $access_artist->access_artist([ 'id' => $artist['id'], 'get' => 'basics' ]);
+
+}
 
 // Get appropriate name of band's activity status
 $activity_statuses = [
