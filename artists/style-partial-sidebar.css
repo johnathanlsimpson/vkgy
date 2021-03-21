@@ -31,6 +31,7 @@
 .artist__image--main img {
 	height: auto;
 	max-height: 500px;
+	min-height: 100%;
 	object-fit: cover;
 	vertical-align: middle;
 	width: 100%;

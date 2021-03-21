@@ -57,7 +57,7 @@
 		width: calc((100% - (var(--gutter) * 1)) * (1/3));
 	}
 	.c4-AAAB > :nth-child(odd), .c4-ABBB > :nth-child(even) {
-		width: calc((100% - (var(--gutter) * 1)) * (3/4));
+		width: calc((100% - (var(--gutter) * 1)) * (3/4) - 1px);
 	}
 	.c4-AAAB > :nth-child(even), .c4-ABBB > :nth-child(odd) {
 		width: calc((100% - (var(--gutter) * 1)) * (1/4));
@@ -1107,54 +1107,6 @@
 		overflow: hidden;
 		padding: 1rem 0 2rem 0;
 	}
-	/*.header__wrapper::after,
-	.header__container::before,
-	.header__container::after {
-		bottom: 0;
-		content: "";
-		display: block;
-		left: 0;
-		position: absolute;
-		right: 0;
-		top: 0;
-		z-index: -1;
-	}
-	.header__container::before {
-		background-image: inherit;
-		background-position: center 25%;
-		background-size: cover;
-		filter: blur(2px);
-	}
-	.header__container::after {
-		background-image:
-			linear-gradient(to right, hsla(var(--background--secondary),1) 1rem, hsla(var(--background--secondary),0) calc( var(--gutter) + 8rem )),
-			linear-gradient(to left, hsla(var(--background--secondary),1) 1rem, hsla(var(--background--secondary),0) calc( var(--gutter) + 8rem ));
-		background-position:
-			left top,
-			right top;
-		left: -1rem;
-		right: -1rem;
-	}
-	.header__wrapper::after {
-		background-image:
-			linear-gradient( to bottom right, transparent 50%, hsl(var(--background--secondary)) calc(50% + 1px) ),
-			linear-gradient( to bottom right, hsla(340, 73%, 25%, 0.5) 1px, hsla(340, 73%, 25%, 0) 0 ),
-			linear-gradient( hsla(340, 73%, 25%, 0.5), hsla(340, 73%, 25%, 0.5) );
-		background-position:
-			left var(--negative-gutter) bottom -1px,
-			left 0 bottom 0,
-			left 0 bottom 0;
-		background-repeat:
-			no-repeat,
-			repeat,
-			no-repeat;
-		background-size:
-			calc(100vw + var(--gutter) * 2) 3rem,
-			3px 3px,
-			100% 100%;
-		left: var(--negative-gutter);
-		right: var(--negative-gutter);
-	}*/
 	/* Fallback background color */
 	.header__wrapper {
 		background-color: hsla( var(--vkgy-red), 0.5 );
@@ -1162,16 +1114,16 @@
 	/* Background calculations */
 	.header__wrapper {
 		--background-top-padding: 1rem;
-		--background-x-position: max( 0px, var(--page-margin) );
-		--vertical-background-width: 60vw;
+		--background-x-position: max( 0.01px, var(--page-margin) );
+		--vertical-background-width: min( 100vw, calc( 100vw - var(--page-margin) - var(--page-margin) ) );
 	}
-	.header__wrapper[style*="--background-image"] {
+	.header--large[style*="--background-image"] {
 		--background-position: center 30%;
 		--background-size: cover;
 		--background-top-padding: 30vh;
 	}
 	@media(min-width:1100px) {
-		.header__wrapper[style*="--background-image"][data-orientation="vertical"] {
+		.header--large[style*="--background-image"][data-orientation="vertical"] {
 			--background-position: var(--background-x-position) 20%;
 			--background-size: var(--vertical-background-width) auto;
 			--background-top-padding: 40vh;
@@ -1185,16 +1137,47 @@
 		position: absolute;
 		right: var(--negative-gutter);
 		top: 0;
-		width: 100vw;
+		width: calc( var(--gutter) + 100% + var(--gutter) );
 		height: 100%;
 		z-index: -2;
 	}
 	/* Full size image, left and right fades if necessary, bottom fade */
 	.header__wrapper[style*="--background-image"]::before {
+		background: hsla(var(--vkgy-red), 0.7);
+		backdrop-filter: blur(5px);
+		content: "";
+		display: block;
+		height: 100%;
+		left: var(--negative-gutter);
+		position: absolute;
+		right: var(--negative-gutter);
+		top: 0;
+		z-index: -1;
+	}
+	.header--large[style*="--background-image"]::before {
+		--gradient-start-offset: 14rem;
+		--gradient-height: 20rem;
+		background-color: transparent;
 		background-image:
-			linear-gradient( hsla( var(--vkgy-red), 0 ) 40%, hsla( var(--vkgy-red), 0.01 ) 45%, hsla( var(--vkgy-red), 0.7 ) 80% ),
-			linear-gradient( to right, hsla( var(--background--secondary), 0.3 ), hsla( var(--background--secondary), 1.0 ) ),
-			linear-gradient( to right, hsla( var(--background--secondary), 1.0 ), hsla( var(--background--secondary), 0.3 ) ),
+			linear-gradient(
+				hsla( var(--vkgy-red), calc( 0.95 * 0.000 ) ) calc( var(--background-top-padding) - var(--gradient-start-offset) + ( var(--gradient-height) * 0.000 ) ),
+				hsla( var(--vkgy-red), calc( 0.95 * 0.013 ) ) calc( var(--background-top-padding) - var(--gradient-start-offset) + ( var(--gradient-height) * 0.081 ) ),
+				hsla( var(--vkgy-red), calc( 0.95 * 0.049 ) ) calc( var(--background-top-padding) - var(--gradient-start-offset) + ( var(--gradient-height) * 0.155 ) ),
+				hsla( var(--vkgy-red), calc( 0.95 * 0.104 ) ) calc( var(--background-top-padding) - var(--gradient-start-offset) + ( var(--gradient-height) * 0.225 ) ),
+				hsla( var(--vkgy-red), calc( 0.95 * 0.175 ) ) calc( var(--background-top-padding) - var(--gradient-start-offset) + ( var(--gradient-height) * 0.290 ) ),
+				hsla( var(--vkgy-red), calc( 0.95 * 0.259 ) ) calc( var(--background-top-padding) - var(--gradient-start-offset) + ( var(--gradient-height) * 0.353 ) ),
+				hsla( var(--vkgy-red), calc( 0.95 * 0.352 ) ) calc( var(--background-top-padding) - var(--gradient-start-offset) + ( var(--gradient-height) * 0.412 ) ),
+				hsla( var(--vkgy-red), calc( 0.95 * 0.450 ) ) calc( var(--background-top-padding) - var(--gradient-start-offset) + ( var(--gradient-height) * 0.471 ) ),
+				hsla( var(--vkgy-red), calc( 0.95 * 0.550 ) ) calc( var(--background-top-padding) - var(--gradient-start-offset) + ( var(--gradient-height) * 0.529 ) ),
+				hsla( var(--vkgy-red), calc( 0.95 * 0.648 ) ) calc( var(--background-top-padding) - var(--gradient-start-offset) + ( var(--gradient-height) * 0.588 ) ),
+				hsla( var(--vkgy-red), calc( 0.95 * 0.741 ) ) calc( var(--background-top-padding) - var(--gradient-start-offset) + ( var(--gradient-height) * 0.647 ) ),
+				hsla( var(--vkgy-red), calc( 0.95 * 0.825 ) ) calc( var(--background-top-padding) - var(--gradient-start-offset) + ( var(--gradient-height) * 0.710 ) ),
+				hsla( var(--vkgy-red), calc( 0.95 * 0.896 ) ) calc( var(--background-top-padding) - var(--gradient-start-offset) + ( var(--gradient-height) * 0.775 ) ),
+				hsla( var(--vkgy-red), calc( 0.95 * 0.951 ) ) calc( var(--background-top-padding) - var(--gradient-start-offset) + ( var(--gradient-height) * 0.845 ) ),
+				hsla( var(--vkgy-red), calc( 0.95 * 0.987 ) ) calc( var(--background-top-padding) - var(--gradient-start-offset) + ( var(--gradient-height) * 0.919 ) )
+			),
+			linear-gradient( to right, hsla( var(--background--secondary), 0.3 ), hsla( var(--background--secondary), 1.0 ) ), /* left fade */
+			linear-gradient( to right, hsla( var(--background--secondary), 1.0 ), hsla( var(--background--secondary), 0.3 ) ), /* right fade */
 			var(--background-image);
 		background-position:
 			left bottom,
@@ -1208,17 +1191,10 @@
 			0,
 			0,
 			var(--background-size);
-		content: "";
-		display: block;
-		height: 100%;
-		left: var(--negative-gutter);
-		position: absolute;
-		right: var(--negative-gutter);
-		top: 0;
-		z-index: -1;
+		backdrop-filter: none;
 	}
 	@media(min-width:1100px) {
-		.header__wrapper[style*="--background-image"][data-orientation="vertical"]::before {
+		.header--large[style*="--background-image"][data-orientation="vertical"]::before {
 			background-size:
 				100%,
 				var(--background-x-position) 100%,

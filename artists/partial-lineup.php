@@ -160,17 +160,18 @@ $musician_images = $final_musician_images;
 <?php
 foreach($artist["musicians"] as $musicians_type => $musicians) {
 	
-	echo '<details class="any--margin" '.($musicians_type === 1 ? 'open' : null).'>';
+	$num_musicians_in_group = count($musicians);
+	
+	echo '<details class="any--margin" '.($musicians_type === 1 || $num_musicians_in_group === 1 ? 'open' : null).'>';
 	
 	?>
 		<span id="<?php echo $musicians_type === 1 ? 'lineup' : ($musicians_type === 2 ? 'former' : 'staff'); ?>"></span>
 		
 		<summary class="h2 lineup__title <?php echo $musicians_type > 1 ? null : 'any--hidden'; ?>">
-			
 			<?php
 				echo lang(
-					($musicians_type === 1 ? 'Lineup' : ($musicians_type === 2 ? 'Former members' : 'Staff')),
-					($musicians_type === 1 ? 'メンバー' : ($musicians_type === 2 ? '元メンバー' : 'スタッフ')),
+					($musicians_type === 1 ? 'Lineup' : ($musicians_type === 2 ? 'Former members' : 'Staff').($num_musicians_in_group > 1 ? ' <span class="any--weaken" style="float:none;clear:none;">('.$num_musicians_in_group.')</span>' : null) ),
+					($musicians_type === 1 ? 'メンバー' : ($musicians_type === 2 ? '元メンバー' : 'スタッフ').($num_musicians_in_group > 1 ? ' <span class="any--weaken" style="float:none;clear:none;">('.$num_musicians_in_group.')</span>' : null) ),
 					['container' => 'div', 'secondary_class' => 'any--weaken']
 				);
 			?>

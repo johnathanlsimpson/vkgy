@@ -11,6 +11,10 @@ $page_title = 'Photos';
 $access_image = new access_image($pdo);
 $images = $access_image->access_image([ 'artist_id' => $artist['id'], 'get' => 'all' ]);
 
+subnav([
+	'Add/edit images' => '/artists/'.$artist['friendly'].'/images/edit/',
+], 'interact', true);
+
 ?>
 
 <div class="col c1">

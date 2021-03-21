@@ -46,7 +46,7 @@ style([
 		<meta property="og:site_name" content="vk.gy (ブイケージ)" />
 		<meta property="og:description" content="<?php echo $page_description; ?>" />
 		<meta property="og:title" content="<?php echo str_replace(" | vkgy (ブイケージ)", "", $page_title); ?>" />
-		<meta property="og:image" content="<?php echo $page_image; ?>" />
+		<meta property="og:image" content="<?php echo str_replace('.large.', '.opengraph.', $page_image); ?>" />
 		<meta property="og:url" content="<?= $page_url ?: 'https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']; ?>" />
 		<meta name="twitter:site" content="@vkgy_" />
 		<meta name="twitter:creator" content="@<?php echo $page_creator ?: "vkgy_"; ?>" />
@@ -318,7 +318,7 @@ style([
 		<form action="/search/" class="any--hidden" enctype="multipart/form-data" id="form__search" method="get" name="form__search"><button type="submit"></button></form>
 		
 		<!-- HEADER -->
-		<div class="header__wrapper col c1" data-orientation="<?= $background_image['orientation']; ?>" style="<?= $background_image['url'] ? '--background-image:url('.$background_image['url'].');--background-thumbnail:url('.$background_image['thumbnail_url'].');' : null; ?>">
+		<div class="header__wrapper col c1 <?= $large_header ? 'header--large' : null; ?> " data-orientation="<?= $background_image['orientation']; ?>" style="<?= $background_image['url'] ? '--background-image:url('.$background_image['url'].');--background-thumbnail:url('.$background_image['thumbnail_url'].');' : null; ?>">
 			
 			<?= $background_image ? '<img class="header__thumbnail" src="'.$background_image['thumbnail_url'].'" />' : null; ?>
 			

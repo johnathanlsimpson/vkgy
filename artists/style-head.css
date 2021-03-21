@@ -3,7 +3,10 @@
 	border-radius: 3px;
 	display: inline-block;
 }
-.artist__status::before {
+.artist__status + .any--weaken {
+	margin-left: 1rem;
+}
+/*.artist__status::before {
 	background: currentcolor;
 	border-radius: 50%;
 	content: "";
@@ -22,7 +25,7 @@
 }
 .artist--paused::before {
 	background: yellow;
-}
+}*/
 .header__supplement .lists__open {
 	background: none;
 	border: none;
