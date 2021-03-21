@@ -69,11 +69,19 @@ if( is_array($tags) && !empty($tags) && is_array($tags['tagged']) ) {
 
 ?>
 
+<?php if($_SESSION['username'] === 'inartistic'): ?>
+
+		
+			<div class="text text--outlined">
+				<?php include('partial-stats.php'); ?>
+			</div>
+<?php endif; ?>
+
 <div class="artist__images any--flex">
 	
 	<?php if( $artist['image'] ): ?>
 		<a class="artist__image--main" href="<?= $artist['image']['url']; ?>">
-			<img src="<?= $artist['image']['medium_url']; ?>" height="<?= $artist['image']['height'].'px'; ?>" width="<?= $artist['image']['height'].'px'; ?>" />
+			<img src="<?= $artist['image']['medium_url']; ?>" height="<?= $artist['image']['height'].'px'; ?>" width="<?= $artist['image']['width'].'px'; ?>" />
 		</a>
 	<?php elseif( !$artist['image'] && !$artist['images'] ): ?>
 		<div class="artist__image--empty"></div>
@@ -88,7 +96,7 @@ if( is_array($tags) && !empty($tags) && is_array($tags['tagged']) ) {
 			
 				if( $i + 1 === $image_limit && $num_artist_images > 2 ) {
 					?>
-						<a class="artist__image" href="<?= '/artists'.$artist['friendly'].'/images'; ?>" style="<?= 'background-image:url('.$artist['images'][$i]['thumbnail_url'].');'; ?>">
+						<a class="artist__image" href="<?= '/artists/'.$artist['friendly'].'/images/'; ?>" style="<?= 'background-image:url('.$artist['images'][$i]['thumbnail_url'].');'; ?>">
 							<span><?= ( $num_artist_images - 1 ).' other image'.( $num_artist_images > 2 ? 's' : null ); ?></span>
 						</a>
 					<?php
@@ -106,7 +114,7 @@ if( is_array($tags) && !empty($tags) && is_array($tags['tagged']) ) {
 	
 </div>
 	
-<a class="a--padded a--outlined any--small-margin symbol__plus" href="<?= '/artists/'.$artist['friendly'].'/images/'; ?>">add images</a>
+<a class="a--padded a--outlined any--small-margin symbol__plus" href="<?= '/artists/'.$artist['friendly'].'/images/edit/'; ?>">add images</a>
 
 <?php if( $artist['video'] ): ?>
 	<h5 style="margin-bottom:0.5rem;">
