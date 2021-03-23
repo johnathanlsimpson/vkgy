@@ -112,8 +112,8 @@ if($artist_is_removed) {
 								<?= lang('History', '活動', 'div'); ?>
 							</h2>
 							
-							<input class="obscure__input" id="show-history" type="checkbox" <?= $num_history_lines >= 2 ? 'checked' : null; ?> />
-							<div class="history__container text obscure__container obscure--height obscure--faint" <?= $num_history_lines >= 2 ? 'style="min-height:10vh;"' : null; ?> >
+							<input class="obscure__input" id="show-history" type="checkbox" <?= $num_history_lines >= 50 ? 'checked' : null; ?> />
+							<div class="history__container text obscure__container obscure--height obscure--faint" <?= $num_history_lines >= 50 ? 'style="min-height:60vh;"' : null; ?> >
 								
 								<details class="history__filters">
 
