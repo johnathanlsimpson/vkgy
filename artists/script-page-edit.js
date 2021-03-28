@@ -28,6 +28,11 @@ formElement.addEventListener('change', function(event) {
 	changesElement.value = changesElement.value + (changesElement.value ? ',' : '') + event.target.name;
 });
 
+// Log names of elements which had changes (for contenteditable elements)
+formElement.addEventListener('contenteditable-change', function(event) {
+	changesElement.value = changesElement.value + (changesElement.value ? ',' : '') + event.target.getAttribute('data-name');
+});
+
 
 // Handle submit
 initializeInlineSubmit($("[name=form__edit]"), "/artists/function-edit.php", {
