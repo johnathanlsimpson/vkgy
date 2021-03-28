@@ -7,6 +7,24 @@ $image_url = $_POST['image_url'];
 
 if( strlen($image_url) ) {
 	
+	// Get image id
+	$image_id = explode('.', explode('/images/', $image_url)[1])[0];
+	
+	// See if image queued
+	$sql_image = 'SELECT * FROM images WHERE id=? LIMIT 1';
+	$stmt_image = $pdo->prepare($sql_image);
+	$stmt_image->execute([ $image_id ]);
+	$rslt_image = $stmt_image->fetch();
+	
+	// If image queued, unqueue before we try to detect faces
+	if( $rslt_image['is_queued'] ) {
+		
+		$sql_unqueue = 'UPDATE images SET is_queued=? WHERE id=? LIMIT 1';
+		$stmt_unqueue = $pdo->prepare($sql_unqueue);
+		$stmt_unqueue->execute([ 0, $image_id ]);
+		
+	}
+	
 	// Higher accuracy = longer loading; for vkei images, 4 seems to work best so far
 	$accuracy_boost = 4;
 	
@@ -77,6 +95,15 @@ if( strlen($image_url) ) {
 			$output['result'] = 'No faces detected.'.print_r($response2, true).print_r($_POST, true);
 			
 		}
+		
+	}
+	
+	// Re-queue image if we need to
+	if( $rslt_image['is_queued'] ) {
+		
+		$sql_unqueue = 'UPDATE images SET is_queued=? WHERE id=? LIMIT 1';
+		$stmt_unqueue = $pdo->prepare($sql_unqueue);
+		$stmt_unqueue->execute([ 1, $image_id ]);
 		
 	}
 	
