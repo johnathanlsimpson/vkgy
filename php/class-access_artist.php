@@ -348,14 +348,12 @@
 			2  => "live",         // live event or tour
 			3  => "release",      // release
 			4  => "name",         // band name change
-			//5  => "disbandment",  // disbandment or activity end
-5 => 'end', // disbandment
+			5 => 'end',           // disbandment
 			6  => "media",        // media, fanclub, etc
 			7  => "other",        // ?:?
 			8  => "label",        // label change or start
 			9  => "lineup",       // notes current lineup (not for lineup change)
-			//10 => "formation",    // formation-related
-10 => 'start', // formation
+			10 => 'start',        // formation
 			11 => "member",       // member change, member name change, etc.
 			12 => "setlist",      // setlist,
 			13 => "trouble",      // death, injury, arrest, etc
@@ -873,6 +871,10 @@
 				$sql_select[] = 'GROUP_CONCAT(tags_artists.friendly) AS tag_friendlys';
 			}
 			
+			if( $args['get'] === 'basics' || $args['get'] === 'all' ) {
+				$sql_select[] = 'GROUP_CONCAT(artists_years.year) AS years_active';
+			}
+			
 			if($args['get'] === 'artist_list') {
 				$sql_select[] = 'artists.description';
 				$sql_select[] = 'artists.pronunciation';
@@ -1065,23 +1067,15 @@
 				$sql_values[] = $args['active'];
 			}
 			
-			// Search by name
-			/*if($args["name"] && $_SESSION['username'] != 'inartistic') {
-				$tmp_name = html_entity_decode($args["name"], ENT_QUOTES, "utf-8");
+			// Where year is
+			if( is_numeric($args['year']) ) {
 				
-				if($args["fuzzy"] && mb_strlen($tmp_name) > 2) {
-					$sql_where[] = "artists.friendly = ? OR artists.name=? OR artists.romaji=? OR (artists.name LIKE CONCAT('%', ?, '%') OR artists.romaji LIKE CONCAT('%', ?, '%'))";
-					array_push($sql_values, friendly($args["name"]), sanitize($args["name"]), sanitize($args["name"]), sanitize($args["name"]), sanitize($args["name"]));
-				}
-				elseif($args['exact_name']) {
-					$sql_where[] = "artists.name=? OR artists.romaji=?";
-					array_push($sql_values, sanitize($args["name"]), sanitize($args["name"]));
-				}
-				else {
-					$sql_where[] = "artists.friendly=? OR artists.name=? OR artists.romaji=?";
-					array_push($sql_values, friendly($args["name"]), sanitize($args["name"]), sanitize($args["name"]));
-				}
-			}*/
+				$sql_from = 'artists_years';
+				$sql_join[] = 'artists ON artists.id=artists_years.artist_id';
+				$sql_where[] = 'artists_years.year=?';
+				$sql_values[] = $args['year'];
+				
+			}
 			
 			// Exclude
 			if(is_array($args['exclude']) && !empty($args['exclude'])) {
@@ -1165,6 +1159,15 @@
 						}
 					}
 				}
+			}
+			
+			//
+			// JOINS
+			//
+			
+			// Join years active
+			if( !$args['year'] && ( $args['get'] === 'all' || $args['get'] === 'basics' ) ) {
+				$sql_join[] = 'LEFT JOIN artists_years ON artists_years.artist_id=artists.id';
 			}
 			
 			// Get tags
@@ -1378,4 +1381,376 @@
 				}
 			}
 		}
+		
+		
+		
+		// ======================================================
+		// Calculate the years that an artist was active
+		// ======================================================
+		function calculate_years_active($artist_id) {
+			
+			if( is_numeric($artist_id) ) {
+				
+				$sql_artist = 'SELECT active FROM artists WHERE id=? LIMIT 1';
+				$stmt_artist = $this->pdo->prepare($sql_artist);
+				$stmt_artist->execute([ $artist_id ]);
+				$artist_status = $stmt_artist->fetchColumn();
+				
+				// Use status as proxy to see if artist exists
+				if( is_numeric($artist_status) ) {
+					
+					$sql_start_end = '
+						SELECT 
+							artist_history.type,
+							SUBSTRING(artist_history.date_occurred, 1, 4) AS year
+						FROM (
+							SELECT artists_bio.id, artists_bio.date_occurred, artists_bio.type FROM artists_bio WHERE artist_id=?
+						) artist_history
+						WHERE
+							artist_history.date_occurred > ?
+							AND
+							(
+								artist_history.type LIKE CONCAT("%", ?, "%") 
+								OR
+								artist_history.type LIKE CONCAT("%", ?, "%")
+							)
+						ORDER BY
+							artist_history.date_occurred ASC,
+							artist_history.id ASC
+					';
+					$stmt_start_end = $this->pdo->prepare($sql_start_end);
+					$stmt_start_end->execute([ $artist_id, '0000-12-31', '(10)', '(5)' ]);
+					$artist_start_end = $stmt_start_end->fetchAll();
+					
+					// Set up empty arrays for the eras and eventually the years
+					$eras = [];
+					$years_active = [];
+					
+					if( is_array($artist_start_end) && !empty($artist_start_end) ) {
+						
+						$current_era_number = 0;
+						
+						foreach( $artist_start_end as $start_end_event ) {
+							
+							$current_year = $start_end_event['year'];
+							
+							// Ignore events on '0000-00-00'
+							if( $current_year > 0 ) {
+								
+								$is_start = strpos( $start_end_event['type'], '(10)' ) !== false;
+								$is_end = !$is_start;
+								
+								// Start a new era
+								if( $is_start ) {
+									$current_era_number++;
+									$eras[ $current_era_number ]['start'] = $current_year;
+								}
+								
+								if( $is_end ) {
+									$eras[ $current_era_number ]['end'] = $current_year;
+								}
+								
+							}
+							
+						}
+						
+					}
+					
+					// If we have any eras set up, go back and try to fill in the dates
+					if( is_array($eras) && !empty($eras) ) {
+						
+						foreach( $eras as $era_key => $era ) {
+							
+							// If the era has only a start or an end but not both, we need to do some further checks
+							if( !$era['start'] || !$era['end'] ) {
+								
+								$eras_needing_further_checks[] = $era_key;
+								
+							}
+							
+						}
+						
+					}
+					
+					// If no eras are set up by now (e.g. bio doesn't have start or end), let's go ahead and get additional data and just set their active years as anything that's occurred
+					else {
+						
+						$additional_events = $this->get_activity_events($artist_id);
+						
+						if( is_array($additional_events) && !empty($additional_events) ) {
+							foreach($additional_events as $event_year) {
+								
+								$years[] = $event_year;
+								
+							}
+						}
+						
+					}
+					
+					// If there are any eras needing further checks (meaning there *were* some start and end dates in bio, but one or more eras has only one boundary), let's use additional data to get the other boundary
+					if( is_array($eras_needing_further_checks) && !empty($eras_needing_further_checks) ) {
+						
+						$last_era_key = end( $eras_needing_further_checks );
+						
+						foreach( $eras_needing_further_checks as $era_key ) {
+							
+							$era = $eras[ $era_key ];
+							
+							// If this is the last era, and it has a start date but not an end date, and the artist is active, we'll just set the end of this era to the current year irl
+							if( $era['start'] && $artist_status === 1 ) {
+								
+								$eras[ $era_key ]['end'] = date('Y');
+								
+							}
+							
+							// Otherwise, we'll have to make a guess at the activity period through additional data
+							else {
+								
+								// See if there are previous and next eras
+								$previous_era_key = $era_key - 1;
+								$next_era_key = $era_key + 1;
+								
+								// Get additional events
+								$comparison_date = ( $era['start'] ?: $era['end'] ).'-01-01';
+								$comparison_symbol = $era['start'] ? '>' : '<';
+								$additional_events = $this->get_activity_events($artist_id, $comparison_symbol, $comparison_date);
+								
+								// Given the additional events, let's try to get the other boundaries
+								if( is_array($additional_events) && !empty($additional_events) ) {
+									
+									// If there's a next era, make sure we don't look at dates in that one
+									if( $eras[$next_era_key] && $eras[$next_era_key]['start'] ) {
+										
+										$additional_events = array_filter( $additional_events, function($var) { return $var < $eras[$next_era_key]['start']; } );
+										
+									}
+									
+									// ...And the opposite if there was a previous era
+									if( $eras[$previous_era_key] && $eras[$previous_era_key]['end'] ) {
+										
+										$additional_events = array_filter( $additional_events, function($var) { return $var > $eras[$previous_era_key]['end']; } );
+										
+									}
+									
+									// If we already have start boundary, let's get the last event as the end
+									if( $era['start'] ) {
+										$eras[$era_key]['end'] = end($additional_events);
+									}
+									
+									// And otherwise get the earliest event as the start
+									else {
+										$eras[$era_key]['start'] = $additional_events[0];
+									}
+									
+									unset($additional_events);
+									
+								}
+								
+							}
+							
+						}
+						
+					}
+					
+					// Ok, so now if we have some eras, we'll loop through and populate the list of years
+					if( is_array($eras) && !empty($eras) ) {
+						
+						foreach( $eras as $era ) {
+							
+							// If both boundaries supplied, just add everything between them
+							if( $era['start'] && $era['end'] ) {
+								
+								for( $year = $era['start']; $year < $era['end'] + 1; $year++ ) {
+									
+									$years[] = $year;
+									
+								}
+								
+							}
+							
+							// If we still only have one boundary event after getting additional data, that boundary will be the only year in that era
+							elseif( $era['start'] || $era['end'] ) {
+								
+								$years[] = $era['start'] ?: $era['end'];
+								
+							}
+							
+						}
+						
+					}
+					
+					// If we have years after all that, return them
+					if( is_array($years) && !empty($years) ) {
+						return $years;
+					}
+					
+				}
+				else {
+					$output['result'] = 'The artist couldn\'t be found.';
+				}
+				
+			}
+			else {
+				$output['result'] = 'No artist specified.';
+			}
+			
+		}
+		
+		
+		
+		// ======================================================
+		// Helper function to help calculate years active
+		// ======================================================
+		function get_activity_events( $artist_id, $comparison_symbol = null, $comparison_date = null ) {
+			
+			$null_date = '0000-12-31';
+			$bio_note_type = '(16)';
+			
+			if( is_numeric($artist_id) ) {
+				
+				// Just here so I can close the group
+				if(1) {
+					$sql_additional = '
+						SELECT
+							SUBSTRING(additional.date_occurred, 1, 4) AS year
+						FROM
+							(
+								(
+									SELECT
+										artist_bio.date_occurred
+									FROM (
+										SELECT date_occurred, type FROM artists_bio WHERE artist_id=?
+									) artist_bio
+									WHERE
+										artist_bio.type!=? AND artist_bio.date_occurred > ? '.( $comparison_date ? 'AND artist_bio.date_occurred '.$comparison_symbol.' ?' : null).'
+								)
+								UNION
+								(
+									SELECT
+										artist_lives.date_occurred
+									FROM (
+										SELECT lives.date_occurred FROM lives_artists LEFT JOIN lives ON lives.id=lives_artists.live_id WHERE artist_id=?
+									) artist_lives
+									WHERE
+										artist_lives.date_occurred > ? '.( $comparison_date ? 'AND artist_lives.date_occurred '.$comparison_symbol.' ?' : null).'
+								)
+								UNION
+								(
+									SELECT
+										artist_releases.date_occurred
+									FROM (
+										SELECT date_occurred FROM releases WHERE artist_id=?
+									) artist_releases
+									WHERE
+										artist_releases.date_occurred > ? '.( $comparison_date ? 'AND artist_releases.date_occurred '.$comparison_symbol.' ?' : null).'
+								)
+							) additional
+						ORDER BY
+							additional.date_occurred ASC
+					';
+				}
+				
+				// If we have a comparison date, make sure to include that in the query
+				if( $comparison_date ) {
+					
+					$values_additional = [ $artist_id, $bio_note_type, $null_date, $comparison_date, $artist_id, $null_date, $comparison_date, $artist_id, $null_date, $comparison_date ];
+					
+				}
+				
+				else {
+					
+					$values_additional = [ $artist_id, $bio_note_type, $null_date, $artist_id, $null_date, $artist_id, $null_date ];
+					
+				}
+				
+				// Get additional events (sql is set up earlier)
+				$stmt_additional = $this->pdo->prepare($sql_additional);
+				$stmt_additional->execute( $values_additional );
+				$additional_events = $stmt_additional->fetchAll(PDO::FETCH_COLUMN, 0);
+				
+				return $additional_events;
+				
+			}
+			
+		}
+		
+		
+		
+		// ======================================================
+		// Update the years that an artist was active
+		// ======================================================
+		function update_years_active($artist_id, $years) {
+			
+			// If after all that we have some years, we'll update the database accordingly
+			if( is_numeric($artist_id) && is_array($years) && !empty($years) ) {
+
+				// Make sure we have a clean array of just years
+				$updated_years = array_filter($years, function($x) {
+					return strlen($x) === 4 && is_numeric($x);
+				});
+				
+				$updated_years = array_values( array_unique($years) );
+
+				// Get artist's current dates
+				$sql_current_years = 'SELECT year FROM artists_years WHERE artist_id=?';
+				$stmt_current_years = $this->pdo->prepare( $sql_current_years );
+				$stmt_current_years->execute([ $artist_id ]);
+				$current_years = $stmt_current_years->fetchAll(PDO::FETCH_COLUMN, 0);
+
+				if( is_array($current_years) && !empty($current_years) ) {
+
+					foreach( $current_years as $current_year ) {
+
+						// If year already in DB, unset it from the list of ones we're about to add
+						if( in_array( $current_year, $updated_years ) ) {
+
+							$updated_key = array_search( $current_year, $updated_years );
+							unset( $updated_years[ $updated_key ] );
+
+						}
+
+						// If year in DB that isn't in updated list, we need to delete it
+						else {
+
+							$years_to_delete[] = $current_year;
+
+						}
+
+					}
+
+				}
+
+				$years_to_add = array_values( $updated_years );
+
+				// Add years
+				if( is_array($years_to_add) && !empty($years_to_add) ) {
+
+					foreach( $years_to_add as $year_to_add ) {
+						$values_add[] = $artist_id;
+						$values_add[] = $year_to_add;
+					}
+
+					$sql_add = 'INSERT INTO artists_years (artist_id, year) VALUES '.substr( str_repeat( '(?, ?), ', count($years_to_add) ), 0, -2 );
+					$stmt_add = $this->pdo->prepare($sql_add);
+					$stmt_add->execute( $values_add );
+
+				}
+
+				// Delete years
+				if( is_array($years_to_delete) && !empty($years_to_delete) ) {
+
+					$values_delete = $years_to_delete;
+					array_unshift( $values_delete, $artist_id );
+
+					$sql_delete = 'DELETE FROM artists_years WHERE artist_id=? AND year IN ('.substr( str_repeat( '?,', count($years_to_delete) ), 0, -1 ).')';
+
+					$stmt_delete = $this->pdo->prepare($sql_delete);
+					$stmt_delete->execute( $values_delete );
+
+				}
+
+			}
+			
+		}
+		
 	}
