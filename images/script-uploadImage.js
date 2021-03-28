@@ -131,8 +131,6 @@ function updateJsonLists(artistElem) {
 // Return updated description
 function getDescription(targetElem) {
 	
-	console.log('updating description');
-	
 	let imageElem = targetElem.closest('.image__template');
 	
 	// Default values
@@ -224,26 +222,20 @@ function getFaces(imageElem, imageUrl) {
 			'callbackOnSuccess': function(event, returnedData) {
 				
 				response(returnedData);
-		console.log('2' + returnedData);
 				
 			},
 			
 			'callbackOnError': function(event, returnedData) {
 				
-		console.log('3' + returnedData);
 				rejection(returnedData);
 				
 			}
 			
 		});
 		
-		console.log('4' + imageUrl);
-		
 	}).catch(function(rejection) {
-		console.log('5' + rejection);
 		return rejection;
 	});
-		console.log('1' + detectedFaces);
 	
 	return detectedFaces;
 	
@@ -463,11 +455,14 @@ document.addEventListener('click', function(event) {
 	}
 });
 
+// Auto-show 'tag faces' section
 // When un-hiding the 'tag musicians' area, populate the faces container
 // (we set it as an event cause otherwise Alpine waits for the results
 // before showing the container. There's prob a better way to do it...)
 document.addEventListener('show-faces', function(event) {
+	
 	populateFacesContainer(event.target);
+	
 });
 
 // Manually add face to be tagged
@@ -492,8 +487,6 @@ document.addEventListener('change', function(event) {
 	let eventName = event.target.name;
 	
 	if( eventName.startsWith('image_') && event.target.closest('.image__template') ) {
-		
-		console.log('triggering update image data' + Math.random());
 		
 		updateImageData(event.target);
 		
@@ -567,8 +560,6 @@ function updateImageData(changedElem, preparedData = false) {
 		});
 		
 	}
-	
-	console.log(preparedFormData);
 	
 	// Grab element that says whether or not image is new, as we'll need to change it
 	let imageIsNewElem = parentElem.querySelector('[name="image_is_new"]');
@@ -656,9 +647,6 @@ if(noDefaultElem) {
 // ========================================================
 
 // Init delete buttons
-/*function initImageDeleteButtons() {
-}*/
-
 document.addEventListener('click', function(event) {
 	
 	if( event.target.classList.contains('image__delete') || event.target.classList.contains('image__unlink') ) {
@@ -695,31 +683,6 @@ function removeImage(removeButton, action) {
 	}, true);
 	
 }
-
-/*function initImageDeleteButtons() {
-	var imageDeleteButtons = document.querySelectorAll('.image__delete');
-	var itemType = document.querySelector('[name=image_item_type]').value;
-	var itemId = document.querySelector('[name=image_item_id]').value;
-	
-	imageDeleteButtons.forEach(function(imageDeleteButton) {
-		
-		var parentElem = getParent(imageDeleteButton, 'image__template');
-		var imageId = parentElem.querySelector('[name=image_id]').value;
-		
-		initDelete($(imageDeleteButton), '/images/function-delete_image.php', {
-			'id' : imageId,
-			'item_type': itemType,
-			'item_id': itemId
-		},
-		function(deleteButton) {
-			parentElem.classList.add('any--fade-out');
-			
-			setTimeout(function() {
-				parentElem.remove();
-			}, 300);
-		});
-	});
-}*/
 
 
 
@@ -1189,7 +1152,25 @@ function renderImageSection() {
 	
 	// If artist is set by default, make sure that's reflected in Alpine
 	if( itemType === 'artist' ) {
+		
 		updateAlpine(newImageElem, 'artistIsSet', 1);
+		
+		// Update musician sources
+		let musicianElems = newImageElem.querySelectorAll('[data-source="musicians"]');
+		if(musicianElems) {
+			musicianElems.forEach(function(musicianElem) {
+				musicianElem.setAttribute('data-source', 'musicians_' + itemId);
+			});
+		}
+		
+		// Update release sources
+		let releaseElems = newImageElem.querySelectorAll('[data-source="releases"]');
+		if(releaseElems) {
+			releaseElems.forEach(function(releaseElem) {
+				releaseElem.setAttribute('data-source', 'releases_' + itemId);
+			});
+		}
+		
 	}
 	
 	// (Before ajax done,) append new image, add loading symbol
@@ -1389,6 +1370,9 @@ function finishUpload(newImageElem, idElem, statusElem, thumbnailElem, returnedD
 		let imageContentElem = newImageElem.querySelector('[name^="image_type"][value="' + returnedData.image_content + '"]');
 		imageContentElem.checked = true;
 		triggerChange(imageContentElem);
+		
+		// Set src of the image that allows manual face tagging
+		newImageElem.querySelector('.add-face__image').setAttribute( 'src', newImageElem.querySelector('.image__image').href );
 		
 	}
 	
