@@ -185,6 +185,8 @@ if($artist_is_removed) {
 																$span_classes[] = 'any--weaken';
 															}
 														}
+														
+														$item['content'] = str_replace('class="symbol__release" href="/releases/magazine/', 'class="a--inherit" href="/releases/magazine"', $item['content']);
 
 														if( count($item['type']) === 1 && $item['type'][0] === 'note' ) {
 															$span_classes[] = 'any--weaken';
@@ -426,6 +428,7 @@ if($artist_is_removed) {
 						</div>
 					<?php
 				}
+			
 			?>
 
 		</div>
