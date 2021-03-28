@@ -112,8 +112,8 @@ if($artist_is_removed) {
 								<?= lang('History', '活動', 'div'); ?>
 							</h2>
 							
-							<input class="obscure__input" id="show-history" type="checkbox" <?= $num_history_lines >= 2 ? 'checked' : null; ?> />
-							<div class="history__container text obscure__container obscure--height obscure--faint" <?= $num_history_lines >= 2 ? 'style="min-height:10vh;"' : null; ?> >
+							<input class="obscure__input" id="show-history" type="checkbox" <?= $num_history_lines >= 50 ? 'checked' : null; ?> />
+							<div class="history__container text obscure__container obscure--height obscure--faint" <?= $num_history_lines >= 50 ? 'style="min-height:60vh;"' : null; ?> >
 								
 								<details class="history__filters">
 
@@ -185,6 +185,8 @@ if($artist_is_removed) {
 																$span_classes[] = 'any--weaken';
 															}
 														}
+														
+														$item['content'] = str_replace('class="symbol__release" href="/releases/magazine/', 'class="a--inherit" href="/releases/magazine"', $item['content']);
 
 														if( count($item['type']) === 1 && $item['type'][0] === 'note' ) {
 															$span_classes[] = 'any--weaken';
@@ -426,6 +428,7 @@ if($artist_is_removed) {
 						</div>
 					<?php
 				}
+			
 			?>
 
 		</div>

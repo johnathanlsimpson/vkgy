@@ -3,6 +3,7 @@
 	include_once('../php/function-render_component.php');
 	
 	script([
+		'/scripts/external/script-alpine.js',
 		"/scripts/external/script-autosize.js",
 		"/scripts/external/script-selectize.js",
 		'/scripts/external/script-tribute.js',
@@ -34,7 +35,7 @@
 			if(!empty($artist)) {
 				$artist['images'] = is_array($artist['images']) ? array_values($artist['images']) : [];
 				?>
-					<form action="" class="col c1 any--margin" enctype="multipart/form-data" id="form__edit" method="post" name="form__edit">
+					<form action="" class="col c1 any--margin" enctype="multipart/form-data" id="form__edit" method="post" name="form__edit" x-data="{ showAdvanced:0,showYears:0 }" >
 						<?php
 							include_once('../php/function-render_json_list.php');
 							render_json_list('artist');
@@ -50,6 +51,7 @@
 								<h2>Edit basic information</h2>
 								<div class="text">
 									<ul>
+										
 										<li>
 											<div class="input__row">
 												<div class="input__group">
@@ -69,6 +71,7 @@
 												</div>
 											</div>
 										</li>
+										
 										<li>
 											<div class="input__row any--flex-space-between">
 												<span class="input__group">
@@ -125,6 +128,7 @@
 												</span>
 											</div>
 										</li>
+										
 										<li>
 											<div class="input__row">
 												<div class="input__group any--flex-grow">
@@ -135,10 +139,54 @@
 												</div>
 											</div>
 										</li>
+										
+										<!-- Advanced stuff -->
+										<?php if( $_SESSION['can_approve_data'] ): ?>
+											<li x-show="showAdvanced">
+												
+												<a class="symbol__plus" href="#" @click.prevent="showAdvanced=1">show advanced options</a>
+												
+											</li>
+										<?php endif; ?>
+										
 									</ul>
 								</div>
 							</div>
 						</div>
+						
+						<?php if( $_SESSION['can_approve_data'] ): ?>
+							<div class="col c1" x-show="showAdvanced">
+								<div>
+									
+									<h2>
+										Advanced options
+									</h2>
+									
+									<ul class="text text--outlined">
+										
+										<!-- Years -->
+										<li>
+											
+											<a class="symbol__edit" href="#" @click.prevent="showYears=1;$refs.years.value=$refs.years.dataset.value" x-show="!showYears">years active</a>
+											
+											<div class="input__row" x-show="showYears">
+												<div class="input__group any--flex-grow">
+													
+													<label class="input__label">Years active</label>
+													<textarea class="input__textarea any--flex-grow" data-value="<?= str_replace(',', "\n", $artist['years_active']); ?>" name="years_active" placeholder="1999&#10;2000" x-ref="years"></textarea>
+													
+													<div class="symbol__help input__note any--weaken">An artist's &ldquo;years active&rdquo; are recalculated when the profile is edited. Fix incorrect years by removing errant data (lives, releases). If still incorrect, they can be overridden here.</div>
+													
+												</div>
+											</div>
+											
+										</li>
+										
+									</ul>
+									
+								</div>
+							</div>
+						<?php endif; ?>
 						
 						<div class="col c1">
 							<div>

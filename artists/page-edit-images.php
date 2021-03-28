@@ -25,6 +25,8 @@ subnav([
 ]);
 
 render_json_list('artist');
+render_json_list('musician', $artist['musicians']);
+render_json_list('release', $artist['id'], 'artist_id');
 
 ?>
 

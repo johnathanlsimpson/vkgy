@@ -110,7 +110,7 @@
 										foreach(access_image::$allowed_image_contents as $value => $key) {
 											?>
 												<label class="input__radio">
-													<input class="input__choice" name="image_type[{id}]" type="radio" value="<?= $value; ?>" {checked_image_type:<?= $value; ?>} x-on:change="description = getDescription($el); triggerChange($refs.description); imageContent = $el.querySelector('[name^=image_type]:checked').value; if(imageContent == 1) { showMusicians = true; }" />
+													<input class="input__choice" name="image_type[{id}]" type="radio" value="<?= $value; ?>" {checked_image_type:<?= $value; ?>} x-on:change="description = getDescription($el); triggerChange($refs.description); imageContent = $el.querySelector('[name^=image_type]:checked').value; if(imageContent == 1 || imageContent == 2) { showMusicians = true; }; if(imageContent == 5) { showReleases = true; }" />
 													<span class="symbol__unchecked"><?= $key; ?></span>
 												</label>
 											<?php
@@ -128,7 +128,7 @@
 							</div>
 							
 							<!-- Tagging options -->
-							<div class="input__row" x-show="artistIsSet && ( !showMusicians || !showReleases || !showArtists )">
+							<div class="input__row" x-show="artistIsSet && ( ( !showMusicians && imageContent != 4 ) || !showReleases || !showArtists )">
 								<div class="input__group">
 									
 									<label class="input__label">Tag photo</label>
@@ -163,7 +163,7 @@
 									
 									<label class="input__label">Tag releases</label>
 									
-									<select class="input" data-populate-on-click="true" data-multiple="true" data-source="releases{source_attr_suffix}" name="image_release_id[]" placeholder="releases" multiple>{release_ids}</select>
+									<select class="input" data-populate-on-click="true" data-multiple="true" data-source="releases{source_attr_suffix}" name="image_release_id[]" placeholder="releases" x-on:change="description = getDescription($el); triggerChange($refs.description);" multiple>{release_ids}</select>
 									
 								</div>
 								
@@ -195,7 +195,7 @@
 									<label class="input__label">Mark faces</label>
 									
 									<div class="input__note symbol__help">
-										Click in the center of a member's face to tag him.
+										Click in the center of a member's face to tag them.
 									</div>
 									
 									<div class="add-face__container">

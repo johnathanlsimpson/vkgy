@@ -466,6 +466,7 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 			}
 		}
 		
+		// Update bio entries
 		$sql_history = "SELECT id FROM artists_bio WHERE artist_id=?";
 		$stmt_history = $pdo->prepare($sql_history);
 		$stmt_history->execute([ $artist_id ]);
@@ -504,6 +505,25 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 				}
 			}
 		}
+		
+		// Update activity years
+		
+		// If activity years were manually edited, just clean up and use that
+		if( strlen($_POST['years_active']) && $_SESSION['can_approve_data'] ) {
+			$years_active = sanitize( $_POST['years_active'] );
+			$years_active = explode("\n", $years_active);
+		}
+		
+		// Otherwise automatically calculate years
+		else {
+			$years_active = $access_artist->calculate_years_active( $artist_id );
+		}
+		
+		// And if we managed to get an array of years, go ahead and update it
+		if( is_array($years_active) && !empty($years_active) ) {
+			$access_artist->update_years_active( $artist_id, $years_active );
+		}
+		
 	}
 	
 	// If *not* successful, send error

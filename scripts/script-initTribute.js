@@ -510,6 +510,12 @@ function initTribute() {
 			handleFirefoxMovement(event);
 		});
 		
+		// contenteditable doesn't seem to fire a change event, so let's approximate it by triggering a fake one on blur
+		// (let's just do a fake one in case adding a change event has unforeseen consequences)
+		newElem.addEventListener('blur', function() {
+			newElem.dispatchEvent(new Event('contenteditable-change', {'bubbles':true}));
+		});
+		
 	});
 	
 }

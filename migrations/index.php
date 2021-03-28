@@ -3,7 +3,7 @@
 include_once('../php/include.php');
 
 //$migration = '20201115-development.php';
-$migration = '20201128-voting.php';
+//$migration = '20210326-artist_years.php';
 
 $migration_file = '../migrations/'.$migration;
 
