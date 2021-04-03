@@ -117,6 +117,10 @@ function getTributeToken(input, tributeType, returnType = 'rich') {
 		name = input.original[2].split(' (')[0];
 	}
 	
+	// Remove any slashes or equal signs from name to make sure it doesn't break the text link
+	name = name.replace('/', '-');
+	name = name.replace('=', '-');
+	
 	// Templates
 	if(tributeType === 'artist') {
 		symbol    = 'symbol__artist';
