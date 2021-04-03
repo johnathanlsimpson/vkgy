@@ -1,3 +1,5 @@
+<?php if($_SESSION['username'] === 'inartistic'): ?>
+
 <?php
 	include('../artists/head.php');
 	include_once('../php/function-render_component.php');
@@ -565,3 +567,15 @@
 		<?php
 	}
 ?>
+
+<?php else: ?>
+
+
+<div class="col c1">
+	<div>
+		<div class="text text--outlined symbol__error">
+			Editing artists is temporarily disabled.
+		</div>
+	</div>
+</div>
+<?php endif; ?>

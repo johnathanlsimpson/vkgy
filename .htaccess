@@ -150,7 +150,8 @@ RewriteRule  ^lists/(\d+)/?[A-z0-9-\/]*$  /?lists/&id=$1
 RewriteRule  ^magazines/add/?$  /?magazines/&action=add
 
 RewriteRule  ^musicians/add/?$           /?musicians/&action=add
-RewriteRule  ^musicians/(\d+)/[\w-]+/?$  /?musicians/&musician=$1
+RewriteRule  ^musicians/(\d+)/edit/?$    /?musicians/&action=edit&id=$1
+RewriteRule  ^musicians/(\d+)/[\w-]+/?$  /?musicians/&id=$1
 
 RewriteRule  ^php/?$  / [R=permanent,L]
 

@@ -1067,13 +1067,34 @@
 				$sql_values[] = $args['active'];
 			}
 			
-			// Where year is
+			// Where: year
 			if( is_numeric($args['year']) ) {
 				
 				$sql_from = 'artists_years';
-				$sql_join[] = 'artists ON artists.id=artists_years.artist_id';
+				$sql_join[] = 'LEFT JOIN artists ON artists.id=artists_years.artist_id';
 				$sql_where[] = 'artists_years.year=?';
 				$sql_values[] = $args['year'];
+				
+			}
+			
+			// Where: years
+			if( is_array($args['years']) && !empty($args['years']) ) {
+				
+				$args['years'] = array_filter($args['years'], function($x) {
+					return is_numeric($x) && strlen($x) === 4;
+				});
+				
+				if( is_array($args['years']) && !empty($args['years']) ) {
+					
+					$sql_from = 'artists_years';
+					$sql_join[] = 'LEFT JOIN artists ON artists.id=artists_years.artist_id';
+					$sql_where[] = 'artists_years.year IN ('.substr( str_repeat('?,', count($args['years'])), 0, -1 ).')';
+					
+					foreach( $args['years'] as $year) {
+						$sql_values[] = $year;
+					}
+					
+				}
 				
 			}
 			
@@ -1096,6 +1117,8 @@
 				$sql_where[] = "artists.affiliation <= ?";
 				$sql_values[] = $args["affiliation"];
 			}
+			
+			// Where: area
 			if(!is_array($args['area']) && strlen($args['area'])) {
 				if($args['area'] === 'overseas') {
 					$sql_where[] = 'artists_tags.tag_id=? AND ((artists_tags.score>0 AND artists_tags.mod_score>-1) OR artists_tags.mod_score=1)';
@@ -1197,6 +1220,7 @@
 					$stmt = $this->pdo->prepare($sql_artist);
 					
 					if($stmt) {
+						
 						$stmt->execute($sql_values);
 						$artists = $stmt->fetchAll();
 						$num_artists = count($artists);
@@ -1210,6 +1234,8 @@
 								for($i=0; $i<$num_artists; $i++) {
 									$lineup = [];
 									$musicians = $access_musician->access_musician([ 'artist_id' => $artists[$i]['id'], 'get' => ($args['get'] === 'all' ? 'all' : 'list') ]);
+									$num_musicians = count($musicians);
+									$musicians = array_values($musicians);
 									
 									for($n=0; $n<$num_musicians; $n++) {
 										if($musicians[$n]['to_end'] && $musicians[$n]['position'] != 7 && $musicians[$n]['position_name'] != 'roadie') {

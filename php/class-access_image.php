@@ -584,6 +584,13 @@
 				$sql_where[] = 'images.id=?';
 				$sql_values[] = $args['id'];
 			}
+			// Where musician id
+			if( is_numeric($args['musician_id']) ) {
+				$sql_from = 'images_musicians';
+				$sql_join[] = 'LEFT JOIN images ON images.id=images_musicians.image_id';
+				$sql_where[] = 'images_musicians.musician_id=?';
+				$sql_values[] = $args['musician_id'];
+			}
 			
 			// Group
 			if($args['get'] === 'all' || $args['get'] === 'most') {
