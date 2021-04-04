@@ -684,6 +684,7 @@
 								
 								// If musician has face boundary specified, then we'll save it separately; otherwise just chuck id into one string
 								if( strlen($musician['face_boundaries']) ) {
+						
 									$images[ $image_key ]['musicians'][ $musician['face_boundaries'] ] = $musician;
 								}
 								else {
@@ -711,7 +712,7 @@
 							$images[$i]['user'] = $this->access_user->access_user([ 'id' => $images[$i]['user_id'], 'get' => 'name' ]);
 						}
 						
-						foreach(['artists', 'blog', 'labels', 'musicians', 'releases'] as $link_table) {
+						foreach(['artists', 'blog', 'labels', /*'musicians',*/ 'releases'] as $link_table) {
 							$singular_link_table = $link_table === 'blog' ? $link_table : substr($link_table, 0, -1);
 							$link_column = $singular_link_table.'_id'.($link_table != 'blog' ? 's' : null);
 							
@@ -746,6 +747,7 @@
 							}
 						}
 					}
+					//echo $_SESSION['username'] === 'inartistic' ? '******<pre>'.print_r($images[ 3 ]['musicians'], true).'</pre>' : null;
 					
 					// Switch to associative
 					if($args['associative']) {
