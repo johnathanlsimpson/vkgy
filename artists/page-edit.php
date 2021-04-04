@@ -1,5 +1,3 @@
-<?php if($_SESSION['username'] === 'inartistic'): ?>
-
 <?php
 	include('../artists/head.php');
 	include_once('../php/function-render_component.php');
@@ -335,6 +333,8 @@
 									</p>
 									
 									<a class="a--padded a--outlined symbol__arrow-right-circled" href="<?= '/artists/'.$artist['friendly'].'/images/edit/'; ?>">add/edit images</a>
+									<a class="a--padded" href="<?= '/artists/'.$artist['friendly'].'/images/edit/#musicians'; ?>">edit musician defaults</a>
+									
 								</div>
 							</div>
 						</div>
@@ -567,15 +567,3 @@
 		<?php
 	}
 ?>
-
-<?php else: ?>
-
-
-<div class="col c1">
-	<div>
-		<div class="text text--outlined symbol__error">
-			Editing artists is temporarily disabled.
-		</div>
-	</div>
-</div>
-<?php endif; ?>
