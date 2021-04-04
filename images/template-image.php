@@ -24,7 +24,9 @@
 						imageContent: '{checked_image_type}',
 						isFacsimile: '{is_facsimile}',
 						isNew: '{is_new}'
-					}" x-init="$watch('showMusicians', value => { if(value) { $dispatch('show-faces'); } }); <?php /*console.log(isNew ? 'y' : 'n'); $watch('isNew', value => { if(value)  { console.log('1'); description = getDescription($el); console.log('*'+description); } });*/ ?>">
+					}" x-init="$watch('showMusicians', value => { if(value) { $dispatch('show-faces'); } });" x-cloak>
+						
+						<span class="loading"></span>
 						
 						<div class="image__side input__row">
 							

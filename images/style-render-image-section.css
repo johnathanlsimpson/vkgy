@@ -1,3 +1,10 @@
+[x-cloak] > *,
+.image__template:not([x-cloak]) > .loading {
+	display: none !important;
+}
+[x-cloak] > .loading {
+	display: inline-block !important;
+}
 .image__results {
 	display: grid;
 	grid-template-columns: repeat( auto-fit, minmax(calc(150px + 1rem), 1fr) );
