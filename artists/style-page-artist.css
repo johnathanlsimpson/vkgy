@@ -356,3 +356,20 @@
 .filters__sort.desc::after {
 	content: " ↑";
 }
+/* Musician images on profile page */
+.musician__thumbnail {
+	--background-position: center;
+	--background-size: cover;
+	background-color: hsl(var(--background--bold));
+	background-position: var(--background-position);
+	background-repeat: no-repeat;
+	background-size: var(--background-size);
+	display: inline-block;
+	height: 100px;
+	left: 0;
+	position: absolute;
+	width: 75px;
+}
+.musician__thumbnail:hover {
+	opacity: 0.75;
+}

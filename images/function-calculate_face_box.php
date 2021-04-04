@@ -53,6 +53,12 @@ function calculate_face_box($args) {
 		$return[$key] = round($value);
 	}
 	
+	// Make a css string w/ variables for convenience	
+	$face_styles  = '--background-position:-'.$return['box_left'].'px -'.$return['box_top'].'px;';
+	$face_styles .= '--background-size:'.$return['image_width'].'px '.$return['image_height'].'px;';
+	
+	$return['css'] = $face_styles;
+	
 	return $return;
 	
 }

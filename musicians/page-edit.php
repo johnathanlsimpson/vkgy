@@ -196,9 +196,6 @@ render_json_list('area', $areas);
 
 		</div>
 		
-		
-		
-						
 	</form>
 
 <?php endif; ?>

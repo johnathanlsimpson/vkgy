@@ -169,7 +169,8 @@ RewriteRule  ^vip/add/?$            /?vip/&action=update
 RewriteRule  ^vip/([\w-]+)/?$       /?vip/&friendly=$1
 RewriteRule  ^vip/([\w-]+)/edit/?$  /?vip/&action=update&friendly=$1
 
-RewriteRule  ^rss.*$  /rss/index.php
+RewriteRule  ^rss/development.*$  /rss/index.php?template=development
+RewriteRule  ^rss.*$              /rss/index.php
 
 RewriteRule  ^search/releases.*$   /?search/&search_type=releases
 RewriteRule  ^search/artists.*$    /?search/&search_type=artists

@@ -143,8 +143,8 @@ if( is_numeric($musician_id) && $_SESSION['can_add_data'] ) {
 							$as_romaji = $as_name_match[2] ? $as_name_match[1] : null;
 						}
 
-						$sql_add_link = 'INSERT INTO artists_musicians (artist_id, musician_id, position, position_name, as_name, as_romaji, unique_id) VALUES (?, ?, ?, ?, ?, ?, ?)';
-						$values_add_link = [ $band_in_db_id, $musician_id, $position, $position_name, $as_name, $as_romaji, $band_in_db_id.'-'.sanitize($musician['id']) ];
+						$sql_add_link = 'INSERT INTO artists_musicians (artist_id, musician_id, position, position_name, as_name, as_romaji) VALUES (?, ?, ?, ?, ?, ?)';
+						$values_add_link = [ $band_in_db_id, $musician_id, $position, $position_name, $as_name, $as_romaji ];
 						$stmt_add_link = $pdo->prepare($sql_add_link);
 						$stmt_add_link->execute($values_add_link);
 
