@@ -104,7 +104,7 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 				$stmt = $pdo->prepare($sql_artist_musician);
 
 				if($stmt->execute($artist_musician_values)) {
-					if(!empty($musician["name"])) {
+					if( strlen($musician["name"]) && preg_match('/'.'\(\d+\)'.'/', $musician['history']) ) {
 
 						// Format musician birthdate
 						if( strlen($musician['birth_year']) || strlen($musician['birth_date']) ) {
