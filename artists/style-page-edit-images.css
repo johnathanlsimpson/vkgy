@@ -1,0 +1,23 @@
+.musician__label {
+	height: auto;
+	margin-right: 1rem;
+	margin-top: 1rem;
+}
+.input__label + .musician__label {
+	margin-top: 1.5rem;
+}
+.musician__label .symbol__loading::before {
+	clip-path: url(#symbol__loading) !important;
+	-webkit-clip-path: url(#symbol__loading) !important;
+}
+.musician__thumbnail {
+	--background-position: center;
+	--background-size: cover;
+	background-color: hsl(var(--background--bold));
+	background-position: var(--background-position);
+	background-repeat: no-repeat;
+	background-size: var(--background-size);
+	height: 150px;
+	margin: -0.5rem;
+	width: 100px;
+}
