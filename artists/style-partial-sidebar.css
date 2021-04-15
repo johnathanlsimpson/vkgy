@@ -55,7 +55,7 @@
 	z-index: 1;
 }
 .artist__image span::before {
-	background: linear-gradient(to top, hsla(var(--vkgy-red),1) 0.5rem, hsla(var(--vkgy-red),0.8) 2rem, hsla(var(--vkgy-red),0));
+	background: linear-gradient(to top, hsla(var(--brand-color),1) 0.5rem, hsla(var(--brand-color),0.8) 2rem, hsla(var(--brand-color),0));
 	position:absolute;
 	content: "";
 	bottom:0;

@@ -1,5 +1,5 @@
 .patreon__bg {
-	background: hsla(var(--vkgy-red), 0.4);
+	background: hsla(var(--brand-color), 0.4);
 	color: white;
 	text-align: center;
 }
@@ -44,7 +44,7 @@
 	padding-top: 6rem;
 }
 .patreon__title {
-	background: hsl(var(--vkgy-red));
+	background: hsl(var(--brand-color));
 	display: inline-block;
 	color: white;
 	font-size: 1.25rem;
