@@ -1,29 +1,57 @@
 <?php
-	include('../php/function-render_component.php');
-	$markdown_parser = new parse_markdown($pdo);
+
+include('../php/function-render_component.php');
+$markdown_parser = new parse_markdown($pdo);
+
+subnav([
+	lang('Artist list', 'アーティスト一覧', [ 'secondary_class' => 'any--hidden' ]) => '/artists/',
+	lang('Search', 'サーチ', [ 'secondary_class' => 'any--hidden' ]) => '/search/artists/',
+]);
+
+script([
+	'/scripts/external/script-selectize.js',
+	'/scripts/script-initSelectize.js',
 	
-	style([
-		"/style/external/style-selectize.css",
-		"/style/style-selectize.css",
-		"/artists/style-page-letter.css",
-	]);
-	
-	script([
-		"/scripts/external/script-selectize.js",
-		"/scripts/script-initSelectize.js",
-		"/artists/script-page-letter.js",
-	]);
-	
-	subnav([
-		lang('Artist list', 'アーティスト一覧', [ 'secondary_class' => 'any--hidden' ]) => '/artists/',
-		lang('Search', 'サーチ', [ 'secondary_class' => 'any--hidden' ]) => '/search/artists/',
-	]);
-	
-	$str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ-";
-	
-	$page_header = lang('Visual kei artist list', 'ビジュアル系アーティストの一覧', [ 'container' => 'div' ]);
+	'/artists/script-page-index.js',
+]);
+
+style([
+	'/style/external/style-selectize.css',
+	'/style/style-selectize.css',
+]);
+
+$page_header = lang('Visual kei bands', 'ビジュアル系バンド', 'div');
+
+$page_title = 'Active visual kei bands | 活動中のビジュアル系バンド';
+
+if($error) {
+	?>
+		<div class="col c1">
+			<div class="text text--outlined text--error symbol__error">
+				<?= $error; ?>
+			</div>
+		</div>
+	<?php
+}
 ?>
 
+<div class="col c1">
+	
+	<div>
+		
+		<div class="controls__search" style="float:right; width:200px;max-width:100%;margin-bottom:0.5rem;">
+				<span data-contains="artists" hidden><?php echo json_encode($full_artist_list); ?></span>
+				<select class="input" id="artist_jump" placeholder="jump to artist" data-source="artists">
+					<option></option>
+				</select>
+		</div>
+		
+		<?php include('partial-list.php'); ?>
+	</div>
+	
+</div>
+
+<?php /*
 <div class="col c1">
 	<?php
 		if($error) {
@@ -428,3 +456,5 @@
 		</div>
 	</div>
 </div>
+
+<?php */ ?>
