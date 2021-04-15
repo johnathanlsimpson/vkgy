@@ -142,9 +142,9 @@
 										
 										<!-- Advanced stuff -->
 										<?php if( $_SESSION['can_approve_data'] ): ?>
-											<li x-show="showAdvanced">
+											<li x-show="!showAdvanced">
 												
-												<a class="symbol__plus" href="#" @click.prevent="showAdvanced=1">show advanced options</a>
+												<a class="symbol__plus" href="#" @click.prevent="showAdvanced=1">show moderator options</a>
 												
 											</li>
 										<?php endif; ?>
@@ -155,17 +155,58 @@
 						</div>
 						
 						<?php if( $_SESSION['can_approve_data'] ): ?>
+						<?php 
+														$vkei_ness = $access_artist->calculate_vkei_ness($artist['id']); ?>
 							<div class="col c1" x-show="showAdvanced">
 								<div>
 									
 									<h2>
-										Advanced options
+										Moderator options
 									</h2>
 									
 									<ul class="text text--outlined">
 										
+										<!-- Is vkei -->
+										<li class="input__row">
+											
+											<div class="input__group">
+												
+												<label class="input__label">Is vkei?</label>
+												
+												<label class="input__radio">
+													<input class="input__choice" name="is_vkei" type="radio" value="1" <?= $artist['is_vkei'] == 1 ? 'checked' : null; ?> />
+													<span class="symbol__unchecked">is vkei</span>
+												</label>
+												
+												<label class="input__radio">
+													<input class="input__choice" name="is_vkei" type="radio" value="-1" <?= $artist['is_vkei'] == -1 ? 'checked' : null; ?> />
+													<span class="symbol__unchecked">non-visual</span>
+												</label>
+												
+											</div>
+											
+											<div class="input__group">
+												
+												<label class="input__label">Likelihood</label>
+												
+												<div class="any--weaken" style="padding:0 0.5rem;box-shadow:inset 0 0 0 1px currentcolor;border-radius:3px;line-height:2rem;"><?= $vkei_ness['meta']['likelihood']; ?></div>
+											
+												<span style="line-height:2rem;" class="any--weaken">&nbsp;
+												<?= $vkei_ness['musicians']['percent_vkei'].'% of musicians were in other vkei bands.'; ?>
+												<?= $vkei_ness['lives']['percent_vkei'].'% of lives had other vkei bands.'; ?>
+												<?= $vkei_ness['tags']['non_vkei_score'] || $vkei_ness['tags']['non_vkei_mod_score'] ?'Tagged non-visual by '.$vkei_ness['tags']['non_vkei_score'].' user(s) and '.$vkei_ness['tags']['non_vkei_mod_score'].' mod(s).' : null; ?>
+												</span>
+											
+											</div>
+												
+											<div class="input__note">
+												This flag determines whether or not the artist can appear on the front page. The first time an artist is tagged non-visual, this flag will be automatically flipped.
+											</div>
+											
+										</li>
+										
 										<!-- Years -->
-										<li>
+										<?php /*<li>
 											
 											<a class="symbol__edit" href="#" @click.prevent="showYears=1;$refs.years.value=$refs.years.dataset.value" x-show="!showYears">years active</a>
 											
@@ -180,7 +221,7 @@
 												</div>
 											</div>
 											
-										</li>
+										</li>*/ ?>
 										
 									</ul>
 									

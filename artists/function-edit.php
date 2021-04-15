@@ -34,6 +34,20 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 		$update_values[$key] = $value;
 	}
 	
+	// Only change is_vkei if moderator and set it
+	if( $_SESSION['can_approve_data'] ) {
+		
+		$is_vkei = in_array($_POST['is_vkei'], [-1, 0, 1]) ? $_POST['is_vkei'] : null; 
+		
+		if( is_numeric($is_vkei) ) {
+			
+			$update_keys[] = 'is_vkei';
+			$update_values['is_vkei'] = $is_vkei;
+			
+		}
+		
+	}
+	
 	// For some stats, do specific cleaning
 	$update_values['type'] = is_numeric($update_values["type"]) ? $update_values["type"] : 0;
 	$update_values['active'] = is_numeric($update_values["active"]) ? $update_values["active"] : 0;
@@ -212,8 +226,8 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 											$as_romaji = $as_name_match[2] ? $as_name_match[1] : null;
 										}
 
-										$sql_add_link = "INSERT INTO artists_musicians (artist_id, musician_id, position, position_name, as_name, as_romaji, unique_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-										$values_add_link = [ $band_in_db_id, sanitize($musician['id']), $position, $position_name, $as_name, $as_romaji, $band_in_db_id.'-'.sanitize($musician['id']) ];
+										$sql_add_link = "INSERT INTO artists_musicians (artist_id, musician_id, position, position_name, as_name, as_romaji) VALUES (?, ?, ?, ?, ?, ?)";
+										$values_add_link = [ $band_in_db_id, sanitize($musician['id']), $position, $position_name, $as_name, $as_romaji ];
 										$stmt_add_link = $pdo->prepare($sql_add_link);
 										$stmt_add_link->execute($values_add_link);
 
@@ -529,7 +543,8 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 	// If *not* successful, send error
 	if(!$update_successful) {
 		$output['status'] = 'error';
-		$output['result'] = print_r($pdo->errorInfo(), true);
+		$output['result'] = 'An error occurred when updating the artist.';
+		//$output['result'] = sql_artist.print_r($update_values, true);
 	}
 	
 }
