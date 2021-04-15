@@ -831,23 +831,6 @@
 		// ======================================================
 		function access_artist($args = []) {
 			
-			// PRE-SELECT
-			if($args['vkei_only']) {
-				
-				// Get list of non-vkei artists and exclude these IDs from the search
-				$sql_non_vkei = '
-					SELECT artists_tags.artist_id AS id
-					FROM tags_artists
-					LEFT JOIN artists_tags ON artists_tags.tag_id=tags_artists.id
-					WHERE tags_artists.friendly=? AND ((artists_tags.score>? AND artists_tags.mod_score>?) OR artists_tags.mod_score>?)
-				';
-				$stmt_non_vkei = $this->pdo->prepare($sql_non_vkei);
-				$stmt_non_vkei->execute([ 'non-visual', 0, -1, 0 ]);
-				$rslt_non_vkei = $stmt_non_vkei->fetchAll(PDO::FETCH_COLUMN);
-				$args['exclude'] = $rslt_non_vkei;
-				
-			}
-			
 			// SELECT
 			$sql_select = [];
 			switch($args["get"]) {
@@ -873,15 +856,45 @@
 			
 			if( $args['get'] === 'basics' || $args['get'] === 'all' ) {
 				$sql_select[] = 'GROUP_CONCAT(artists_years.year) AS years_active';
+				$sql_group[] = 'artists.id';
 			}
 			
 			if($args['get'] === 'artist_list') {
 				$sql_select[] = 'artists.description';
 				$sql_select[] = 'artists.pronunciation';
 				$sql_select[] = 'artists.active';
-				$sql_select[] = 'GROUP_CONCAT(tags_artists.name) AS tag_names';
+				/*$sql_select[] = 'GROUP_CONCAT(tags_artists.name) AS tag_names';
 				$sql_select[] = 'GROUP_CONCAT(tags_artists.romaji) AS tag_romajis';
-				$sql_select[] = 'GROUP_CONCAT(tags_artists.friendly) AS tag_friendlys';
+				$sql_select[] = 'GROUP_CONCAT(tags_artists.friendly) AS tag_friendlys';*/
+				
+				// Approximate formation year
+				$sql_select[] = 'MIN(date_occurred.year) AS date_occurred';
+				$sql_group[] = 'artists.id';
+				$sql_join[] = 'LEFT JOIN artists_years date_occurred ON date_occurred.artist_id=artists.id';
+				
+				
+				
+				///
+				// The below makes the query too slow and I haven't figured out a workaround yet so let's just disable formation sorting for now
+				//
+				//
+				
+				
+				/*// Approximate formation date
+				$sql_select[] = 'MIN(artists_bio.date_occurred) AS date_formed';
+				$sql_join[] = 'LEFT JOIN artists_bio ON artists_bio.artist_id=artists.id AND artists_bio.type LIKE CONCAT("%(10)%")';
+				
+				
+				
+				
+				//$sql_select[] = 'MIN(date_occurred.year) AS aa';
+				$sql_select[] = 'IF( MIN(artists_bio.date_occurred)>1, MIN(artists_bio.date_occurred), IF( MIN(date_occurred.year)>1, CONCAT(MIN(date_occurred.year),"-00-00"), "0000-00-00" ) ) AS date_formed';*/
+				
+			}
+			
+			// Select: count
+			if( $args['get'] === 'count' ) {
+				$sql_select[] = 'COUNT(DISTINCT artists.id) AS num_artists';
 			}
 			
 			//
@@ -1062,9 +1075,26 @@
 				
 				$sql_values[] = friendly($args["friendly"]);
 			}
-			if(is_numeric($args['active'])) {
+			
+			// Where: active=?
+			if( is_numeric($args['active']) ) {
+				
 				$sql_where[] = 'artists.active=?';
 				$sql_values[] = $args['active'];
+				
+				if( $args['active'] == 1 ) {
+					
+					$this_year = date('Y');
+					$last_year = $this_year - 1;
+					
+					$year_join = 'artists_years.year='.$this_year;
+					$year_join = date('n') < 6 ? '('.$year_join.' OR artists_years.year='.$last_year.')' : $year_join;
+					
+					$sql_join[] = 'LEFT JOIN artists_years ON artists_years.artist_id=artists.id AND '.$year_join;
+					$sql_where[] = 'artists_years.year IS NOT NULL';
+					
+				}
+				
 			}
 			
 			// Where: year
@@ -1075,6 +1105,12 @@
 				$sql_where[] = 'artists_years.year=?';
 				$sql_values[] = $args['year'];
 				
+			}
+			
+			// Where: is_vkei
+			if( $args['vkei_only'] || $args['is_vkei'] ) {
+				$sql_where[] = 'artists.is_vkei>?';
+				$sql_values[] = -1;
 			}
 			
 			// Where: years
@@ -1200,6 +1236,11 @@
 				$sql_group[] = 'artists.id';
 			}
 			
+			//
+			// ORDER
+			//
+			$sql_order = $args['order'] ? [ $args['order'] ] : $sql_order;
+			
 			// DEFAULTS
 			$sql_select = $sql_select ?: [];
 			$sql_from = $sql_from ?: 'artists';
@@ -1208,6 +1249,7 @@
 			$sql_values = $sql_values ?: [];
 			$sql_order = $sql_order ?: ["artists.friendly ASC"];
 			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : ($sql_limit ?: null);
+			$sql_group = is_array($sql_group) ? array_unique($sql_group) : null;
 			
 			// QUERY
 			if(is_numeric($args["id"]) && $args["get"] !== "all" && is_array($this->indexed_artists) && !empty($this->indexed_artists[$args["id"]])) {
@@ -1216,16 +1258,104 @@
 			else {
 				if(!empty($sql_select)) {
 					
+					
 					$sql_artist = "SELECT ".implode(", ", $sql_select)." FROM ".$sql_from.' '.$sql_join.' '.(!empty($sql_where) ? "WHERE (".implode(") AND (", $sql_where).")" : null).($sql_group ? ' GROUP BY '.implode(', ', $sql_group) : null)." ORDER BY ".implode(", ", $sql_order)." ".$sql_limit;
 					$stmt = $this->pdo->prepare($sql_artist);
+						
+						/*if($_SESSION['username'] === 'inartistic') {
+							
+							echo $sql_artist;
+							
+							echo '<pre>'.print_r($sql_values, true).'</pre>';
+							
+						}*/
 					
+						
 					if($stmt) {
 						
 						$stmt->execute($sql_values);
 						$artists = $stmt->fetchAll();
 						$num_artists = count($artists);
-						
+					
 						if(is_array($artists)) {
+							
+							// Get tags
+							if( $args['get'] === 'artist_list' ) {
+								
+								include_once('../php/class-tag.php');
+								$access_tag = new tag($this->pdo);
+								
+								for( $i=0; $i<$num_artists; $i++ ) {
+									
+									$artists[$i]['tags'] = $access_tag->access_tag([ 'item_type' => 'artist', 'item_id' => $artists[$i]['id'], 'get' => 'basics', 'flat' => true ]);
+									
+								}
+								
+							}
+							
+							//
+							// This whole thing doesn't work because we need the formation included in the original query or else we can't sort by it, duh
+							//
+							// Get formation date
+							/*if( $args['get'] === 'artist_list' && $_SESSION['username'] === 'inartistic') {
+								
+								// Save list of artist ids
+								for($i=0; $i<$num_artists; $i++) {
+									$artist_ids[] = $artists[$i]['id'];
+								}
+								
+								// Get formation date
+								$sql_formation = '
+									SELECT
+										aa.artist_id,
+										IF( MAX(aa.date_occurred)>"1", MAX(aa.date_occurred), IF( MAX(aa.year_occurred)>"1", CONCAT(MAX(aa.year_occurred),"-00-00"), "0000-00-00" ) ) AS date_formed
+									FROM (
+										(
+											SELECT
+												artists_years.artist_id,
+												"" AS date_occurred,
+												MIN(artists_years.year) AS year_occurred
+											FROM
+												artists_years
+											WHERE
+												artists_years.artist_id IN ('.implode(',',$artist_ids).')
+											GROUP BY
+												artists_years.artist_id
+										) 
+										UNION
+										(
+											SELECT
+												artists_bio.artist_id,
+												MIN(date_occurred) AS date_occurred,
+												"" AS year_occurred
+											FROM
+												artists_bio
+											WHERE
+												artists_bio.artist_id IN ('.implode(',',$artist_ids).')
+												AND
+												artists_bio.type LIKE CONCAT("%","(10)","%")
+											GROUP BY
+												artists_bio.artist_id
+										) 
+									) aa
+									GROUP BY aa.artist_id
+								';
+								$stmt_formation = $this->pdo->prepare($sql_formation);
+								$stmt_formation->execute();
+								$rslt_formation = $stmt_formation->fetchAll();
+								
+								if( is_array($rslt_formation) && !empty($rslt_formation) ) {
+									foreach( $rslt_formation as $formation ) {
+										
+										$artist_key = array_search( $formation['artist_id'], $artist_ids );
+										$artists[$artist_key]['date_formed'] = $formation['date_formed'];
+										
+									}
+								}
+								
+								echo '<br /><br />**************************<pre>'.print_r($rslt_formation, true).'</pre>===========================<br /><br />';
+								
+							}*/
 							
 							// If getting all artist info or basics, grab musician data, then compile into lineup string
 							if($args["get"] === "all" || $args["get"] === "basics" || $args['get'] === 'profile') {
@@ -1234,21 +1364,30 @@
 								for($i=0; $i<$num_artists; $i++) {
 									$lineup = [];
 									$musicians = $access_musician->access_musician([ 'artist_id' => $artists[$i]['id'], 'get' => ($args['get'] === 'all' ? 'all' : 'list') ]);
-									$num_musicians = count($musicians);
-									$musicians = array_values($musicians);
 									
-									for($n=0; $n<$num_musicians; $n++) {
-										if($musicians[$n]['to_end'] && $musicians[$n]['position'] != 7 && $musicians[$n]['position_name'] != 'roadie') {
-											$lineup[] = 
-												($musicians[$n]['position'] ? 
-												['O', 'V', 'G', 'B', 'D', 'K', 'O', 'S'][$musicians[$n]['position']] : 
-												(substr($musicians[$n]['position_romaji'], 0, 1) ?: (substr($musicians[$n]['position_name'], 0, 1) ?: 'O'))).
-												'. '.($musicians[$n]['as_quick_name'] ?: $musicians[$n]['quick_name']);
+									if( is_array($musicians) ) {
+										
+										$num_musicians = count($musicians);
+										$musicians = array_values($musicians);
+
+										for($n=0; $n<$num_musicians; $n++) {
+											if($musicians[$n]['to_end'] && $musicians[$n]['position'] != 7 && $musicians[$n]['position_name'] != 'roadie') {
+												$lineup[] = 
+													($musicians[$n]['position'] ? 
+													['O', 'V', 'G', 'B', 'D', 'K', 'O', 'S'][$musicians[$n]['position']] : 
+													(substr($musicians[$n]['position_romaji'], 0, 1) ?: (substr($musicians[$n]['position_name'], 0, 1) ?: 'O'))).
+													'. '.($musicians[$n]['as_quick_name'] ?: $musicians[$n]['quick_name']);
+											}
 										}
+
+										$artists[$i]['musicians'] = $musicians;
+										$artists[$i]['lineup'] = !empty($lineup) ? implode(' / ', $lineup) : null;
+									
+									}
+									else {
+										$artists[$i]['musicians'] = [];
 									}
 									
-									$artists[$i]['musicians'] = $musicians;
-									$artists[$i]['lineup'] = !empty($lineup) ? implode(' / ', $lineup) : null;
 								}
 							}
 							
@@ -1399,6 +1538,11 @@
 							// If only one artist expected, return only first elem of artists array
 							if(!empty($args["friendly"]) || is_numeric($args["id"])) {
 								$artists = reset($artists);
+							}
+							
+							// If only returning count, get first entry
+							if( $args['get'] === 'count' ) {
+								$artists = reset( reset( $artists ) );
 							}
 							
 							return $artists;
@@ -1775,6 +1919,135 @@
 
 				}
 
+			}
+			
+		}
+		
+		
+		
+		// ======================================================
+		// Helper function to help calculate “vkei-ness”
+		// ======================================================
+		function calculate_vkei_ness($artist_id) {
+			
+			if( is_numeric($artist_id) ) {
+				
+				// Check tags
+				$sql_tags = 'SELECT artists_tags.score, artists_tags.mod_score FROM artists_tags WHERE artist_id=? AND tag_id=?';
+				$stmt_tags = $this->pdo->prepare($sql_tags);
+				$stmt_tags->execute([ $artist_id, 16 ]);
+				$rslt_tags = $stmt_tags->fetch();
+				
+				$tags = [
+					'non_vkei_score' => !empty($rslt_tags) && is_numeric($rslt_tags['score']) ? $rslt_tags['score'] : 0,
+					'non_vkei_mod_score' => !empty($rslt_tags) && is_numeric($rslt_tags['mod_score']) ? $rslt_tags['mod_score'] : 0,
+				];
+				
+				// Check members
+				$sql_musicians = '
+					SELECT
+						COUNT(artists.id) AS num_connections,
+						COALESCE(SUM(artists.is_vkei),0) AS is_vkei_sum
+					FROM
+						artists_musicians
+					LEFT JOIN
+						artists_musicians xx ON xx.musician_id=artists_musicians.musician_id AND xx.artist_id!=artists_musicians.artist_id
+					LEFT JOIN
+						artists ON artists.id=xx.artist_id
+					WHERE
+						artists_musicians.artist_id=?
+					GROUP BY
+						xx.musician_id
+				';
+				$stmt_musicians = $this->pdo->prepare($sql_musicians);
+				$stmt_musicians->execute([ $artist_id ]);
+				$rslt_musicians = $stmt_musicians->fetchAll();
+				
+				if( is_array($rslt_musicians) && !empty($rslt_musicians) ) {
+					foreach( $rslt_musicians as $musician ) {
+						if( $musician['is_vkei_sum'] ) {
+							$num_vkei_musicians++;
+						}
+					}
+				}
+				
+				$musicians = [
+					'num_musicians' => count($rslt_musicians),
+					'num_vkei_musicians' => $num_vkei_musicians ?: 0,
+				];
+				
+				$musicians['percent_vkei'] = round( ( $musicians['num_musicians'] ? $musicians['num_vkei_musicians'] / $musicians['num_musicians'] : 0 ) * 100 );
+				
+				// Check lives
+				$sql_lives = '
+					SELECT
+						COUNT(1) AS num_lives,
+						SUM(yy.has_vkei_artist>0) AS num_vkei_lives
+					FROM (
+						SELECT
+							SUM(artists.is_vkei) AS has_vkei_artist
+						FROM
+							lives_artists
+						LEFT JOIN
+							lives_artists xx ON xx.live_id=lives_artists.live_id AND xx.artist_id!=lives_artists.artist_id
+						LEFT JOIN
+							artists ON artists.id=xx.artist_id
+						WHERE
+							lives_artists.artist_id=?
+							AND
+							artists.id IS NOT NULL
+						GROUP BY
+							lives_artists.live_id
+					) yy
+				';
+				$stmt_lives = $this->pdo->prepare($sql_lives);
+				$stmt_lives->execute([ $artist_id ]);
+				$rslt_lives = $stmt_lives->fetch();
+				
+				$lives = [
+					'num_lives' => $rslt_lives['num_lives'] ?: 0,
+					'num_vkei_lives' => $rslt_lives['num_vkei_lives'] ?: 0
+				];
+				
+				$lives['percent_vkei'] = round( ( $lives['num_lives'] ? $lives['num_vkei_lives'] / $lives['num_lives'] : 0 ) * 100 );
+				
+				// Let's start to set up a meta array with an arbitrary-ish total score and confidence level
+				$meta['is_confident'] = true;
+				
+				// If we have data for musicians and lives, we can be confident-ish
+				if( $musicians['num_musicians'] && $lives['num_lives'] ) {
+					$meta['total_percent'] = ( $musicians['percent_vkei'] + $lives['percent_vkei'] ) / 2;
+				}
+				
+				// If we only have data for musicians, confident if over three
+				elseif( $musicians['num_musicians'] >= 4 ) {
+					$meta['total_percent'] = $musicians['percent_vkei'];
+				}
+				
+				// If we only have data for lives, confident if over five
+				elseif( $lives['num_lives'] >= 5 ) {
+					$meta['total_percent'] = $lives['precent_vkei'];
+				}
+				
+				// Otherwise, we're not really confident
+				else {
+					$meta['is_confident'] = false;
+				}
+				
+				// Turn the score into a word
+				if( $meta['is_confident'] ) {
+					switch(true) {
+						case $meta['total_percent'] > 85: $meta['likelihood'] = 'high'; break;
+						case $meta['total_percent'] > 65: $meta['likelihood'] = 'medium'; break;
+						default: $meta['likelihood'] = 'low';
+					}
+				}
+				else {
+					$meta['likelihood'] = 'unknown';
+				}
+				
+				return [ 'meta' => $meta, 'musicians' => $musicians, 'lives' => $lives, 'tags' => $tags ];
+				
 			}
 			
 		}
