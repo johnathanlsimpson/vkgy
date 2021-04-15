@@ -36,8 +36,9 @@ function paginate($input = []) {
 	// Set defaults
 	$limit = is_numeric($input['limit']) ? $input['limit'] : 1;
 	$num_items = is_numeric($input['num_items']) ? $input['num_items'] : 0;
-	$num_pages = is_numeric($input['num_pages']) ? $input['num_pages'] : 1;
+	$num_pages = is_numeric($input['num_pages']) ? $input['num_pages'] : ( ceil( $num_items / $limit ) );
 	$current_page = is_numeric($input['current_page']) ? $input['current_page'] : 1;
+	$pages = [];
 	
 	// If requested page > num pages, clamp it to last possible page
 	$current_page = $current_page <= $num_pages ? $current_page : $num_pages;
@@ -132,5 +133,48 @@ function paginate($input = []) {
 	];
 	
 	return $pages;
+	
+}
+
+// Render links
+function render_pagination($pagination) {
+	
+	ob_start();
+	
+	if( is_array($pagination) && !empty($pagination) ) {
+		
+		foreach($pagination as $page) {
+			
+			// Set classes for pagination links
+			$page['classes'] = implode(' ', array_filter([
+				($page['is_active']                                            ? 'a--outlined'          : null),
+				($page['is_previous']                                          ? 'symbol__previous'     : null),
+				($page['is_next']                                              ? 'symbol__next'         : null),
+				($page['is_previous'] || $page['is_next']                      ? 'pagination__arrow'    : 'pagination__num'),
+				($page['is_active']                                            ? 'pagination--active'   : null),
+				($page['is_first']                                             ? 'pagination--first'    : null),
+				($page['is_last']                                              ? 'pagination--last'     : null),
+				($page['show_ellipsis_before'] || $page['show_ellipsis_after'] ? 'pagination--ellipsis' : null),
+				($page['is_disabled']                                          ? 'pagination--disabled' : null),
+				'a--padded',
+				'pagination__link',
+			]));
+			
+			// Render pagination links
+			?>
+				<a class="<?= $page['classes']; ?>" href="<?= $page['url']; ?>">
+					<?= $page['is_previous'] ? '<span class="any--hidden">Previous page</span>' : null; ?>
+					<?= $page['is_next'] ? '<span class="any--hidden">Next page</span>' : null; ?>
+					<?= $page['page_num']; ?>
+				</a>
+			<?php
+			
+		}
+		
+	}
+	
+	$rendered_pagination = ob_get_clean();
+	
+	return $rendered_pagination;
 	
 }
