@@ -42,15 +42,14 @@
 						$stmt_musician = $pdo->prepare($sql_musician);
 						
 						if($stmt_musician->execute([ $history, $rslt_musicians[$i]["id"] ])) {
-							$sql_link = "INSERT INTO artists_musicians (artist_id, musician_id, position, to_end, unique_id) VALUES (?, ?, ?, ?, ?)";
+							$sql_link = "INSERT INTO artists_musicians (artist_id, musician_id, position, to_end) VALUES (?, ?, ?, ?)";
 							$stmt_link = $pdo->prepare($sql_link);
 							
 							$val_link = [
 								$artist_id, 
 								$rslt_musicians[$i]["id"], 
 								($rslt_musicians[$i]["usual_position"] ?: 6), 
-								1, 
-								$artist_id."-".$rslt_musicians[$i]["id"]
+								1
 							];
 							
 							if($stmt_link->execute($val_link)) {
