@@ -48,7 +48,7 @@ class tag {
 		$sql_select = $sql_join = $sql_where = $sql_values = $sql_order = [];
 		
 		// PRE -------------------------------------------------
-		$args['hide_tags'] = isset($args['hide_tags']) ? $args['hide_tags'] : ( is_numeric($args['item_id']) && $args['get'] != 'all' ? true : false );
+		$args['hide_tags'] = isset($args['hide_tags']) ? $args['hide_tags'] : ( is_numeric($args['item_id']) && $args['get'] != 'all' ? true : false ); // This is used to show only tags that have been applied vs all possible options
 		$items_table       = self::item_type_tables[ $args['item_type'] ] ?: $args['item_type'].'s';
 		$tags_table        = 'tags_'.$items_table;      // e.g. tags_artists
 		$items_tags_table  = $items_table.'_tags';      // e.g. artists_tags
@@ -164,7 +164,7 @@ class tag {
 							$tag_id = $items_tags_ids[ $items_tags_id ];
 							
 							// If we want tags with low scores to be filtered out, do that here
-							if( $args['hide_tags'] && !$score && !$tags[$tag_id]['mod_score'] ) {
+							if( $args['hide_tags'] && !$tags[$tag_id]['score'] && !$tags[$tag_id]['mod_score'] ) {
 								
 								unset( $tags[$tag_id] );
 								
@@ -339,7 +339,7 @@ class tag {
 			
 			// Get tag attributes
 			$sql_check = '
-				SELECT tags.type, tags.requires_permission, IF(items_tags.date_occurred, 1, 0) AS is_tagged, tags.is_votable, items_tags.id AS items_tags_id, items_tags.mod_score
+				SELECT tags.friendly, tags.type, tags.requires_permission, IF(items_tags.date_occurred, 1, 0) AS is_tagged, tags.is_votable, items_tags.id AS items_tags_id, items_tags.mod_score
 				FROM '.$tags_table.' tags
 				LEFT JOIN '.$items_tags_table.' items_tags ON items_tags.tag_id=tags.id AND items_tags.'.$item_id_column.'=?
 				WHERE tags.id=?
@@ -454,6 +454,19 @@ class tag {
 						}
 						else {
 							$output['result'] = 'Couldn\'t delete.';
+						}
+						
+					}
+					
+					// Set artist is_vkei flag if necessary
+					if( $item_type === 'artist' && $rslt_check['friendly'] === 'non-visual' ) {
+						
+						if( $action == 'add' ) {
+							
+							$sql_artist_is_vkei = 'UPDATE artists SET is_vkei=? WHERE id=? LIMIT 1';
+							$stmt_artist_is_vkei = $this->pdo->prepare($sql_artist_is_vkei);
+							$stmt_artist_is_vkei->execute([ -1, $item_id ]);
+							
 						}
 						
 					}

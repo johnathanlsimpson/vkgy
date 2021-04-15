@@ -558,8 +558,8 @@ summary::after {
 }
 .video__thumbnail::after {
 	background: rgba(0,0,0, 0.5);
-	background: hsla(var(--vkgy-red),0.5);
-	background-image: radial-gradient(at top left, hsla(var(--vkgy-red),1), hsla(var(--vkgy-red),0));
+	background: hsla(var(--brand-color),0.5);
+	background-image: radial-gradient(at top left, hsla(var(--brand-color),1), hsla(var(--brand-color),0));
 	border-radius: 5px;
 	color: #fff;
 	content: "▶";

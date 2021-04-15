@@ -110,10 +110,10 @@
 												$as_romaji = $as_name_match[2] ? $as_name_match[1] : null;
 											}
 											
-											$sql_link = "INSERT INTO artists_musicians (artist_id, musician_id, position, position_name, as_name, as_romaji, to_end, unique_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+											$sql_link = "INSERT INTO artists_musicians (artist_id, musician_id, position, position_name, as_name, as_romaji, to_end) VALUES (?, ?, ?, ?, ?, ?, ?)";
 											$stmt_link = $pdo->prepare($sql_link);
 											
-											if($stmt_link->execute([ $band_in_db_id, $_POST_id, $link_position, $position_name, $as_name, $as_romaji, 1, $band_in_db_id."-".$_POST_id ])) {
+											if($stmt_link->execute([ $band_in_db_id, $_POST_id, $link_position, $position_name, $as_name, $as_romaji, 1 ])) {
 												$output["status"] = "success";
 												$linked_artists[] = $band_in_db_id;
 											}

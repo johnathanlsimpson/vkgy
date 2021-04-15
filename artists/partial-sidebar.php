@@ -7,6 +7,10 @@ style([
 // Images
 // ============================================
 
+// For now let's just make a copy with all artist images so they can all be used as profile images--this will need to be changed later
+// but we need to change how the image section in the sidebar is handled anyway
+$images = $artist['images'];
+
 // Pull out default image from array of other images
 if( !empty($artist['images']) && is_numeric($artist['image_id']) ) {
 	

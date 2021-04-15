@@ -5,7 +5,7 @@
 **/
 :root {
 	--accent:                 340, 73%,  25%;
-	--vkgy-red:               340, 73%,  25%;
+	--brand-color:            340, 73%,  25%;
 
 	--attention--secondary:   146, 65%,  25%;
 	--attention:              147, 50%,  47%;
@@ -15,6 +15,9 @@
 
 	--text:                   0,   5%,   25%;
 	--text--secondary:        0,   0%,   50%;
+	--text--error:            0,   52%,  47%;
+	--text--caution:          44,  56%,  51%;
+	--text--success:          154, 60%,  36%;
 
 	--background--secondary:  20,  0%,   90%;
 	--background:             18,  0%,   82%;

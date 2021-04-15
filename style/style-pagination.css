@@ -2,6 +2,9 @@
 	align-items: center;
 	display: flex;
 }
+.pagination--disabled {
+	display: none;
+}
 .pagination--first {
 	margin-right: auto;
 }
@@ -14,6 +17,7 @@
 }
 .pagination__arrow {
 	background: hsl(var(--background));
+	border: 1px solid hsl(var(--background));
 	border-radius: 3px;
 }
 .pagination__arrow:first-of-type {

@@ -18,15 +18,22 @@
 
 	if(is_array($flyer) && !empty($flyer)) {
 		
+		// Get actual file type
+		list($width, $height, $file_type) = getimagesize('../images/image_files_queued/'.$flyer['id'].'.'.$flyer['extension']);
+		
 		// Move flyer from queued_flyers database to images database
-		$sql_unqueue = "INSERT INTO images (extension, is_exclusive, user_id, description, friendly) VALUES (?, ?, ?, ?, ?)";
+		$sql_unqueue = "INSERT INTO images (extension, is_exclusive, user_id, description, friendly, width, height, item_type, image_content) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		$stmt_unqueue = $pdo->prepare($sql_unqueue);
 		$input_unqueue = [
 			$flyer["extension"],
 			"1",
 			$flyer["user_id"],
 			($flyer["description"] ?: "flyer"),
-			($flyer["friendly"] ?: "flyer")
+			($flyer["friendly"] ?: "flyer"),
+			$width,
+			$height,
+			'artist',
+			3
 		];
 		
 		if($stmt_unqueue->execute($input_unqueue)) {
