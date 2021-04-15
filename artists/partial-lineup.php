@@ -4,13 +4,14 @@
 include_once('../images/function-calculate_face_box.php');
 
 // Kind of dumb but since our array of images is flat, let's make a map of image ids and their key in the array
-if( is_array($artist['images']) && !empty($artist['images']) ) {
+// Since we created that temporary $images array that is associative, don't need this
+/*if( is_array($artist['images']) && !empty($artist['images']) ) {
  foreach( $artist['images'] as $image_key => $image ) {
 		
 		$image_keys[ $image['id'] ] = $image_key;
 		
 	}
-}
+}*/
 
 // Collect ids of all musicians, who don't have images, in a flat array
 foreach( $artist['musicians'] as $group_key => $musicians_group ) {
@@ -157,8 +158,7 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 								
 								if( is_numeric($musicians[$a]['image_id']) ) {
 									
-									$image_key = $image_keys[ $musicians[$a]['image_id'] ];
-									$image = $artist['images'][ $image_key ];
+									$image = $images[ $musicians[$a]['image_id'] ];
 									
 									// If the image is a musician image, we just show it how it is
 									if( $image['image_content'] == 2 ) {
@@ -182,7 +182,7 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 													$face_box = calculate_face_box([ 'image_height' => $image['height'], 'image_width' => $image['width'], 'face' => $face_boundaries, 'desired_width' => 75, 'desired_height' => 100 ]);
 													
 													$musician_has_image = true;
-													$thumbnail = $image['small_url'];
+													$thumbnail = $image['medium_url'];
 													$face_styles = $face_box['css'];
 													
 												}
@@ -197,7 +197,7 @@ foreach($artist["musicians"] as $musicians_type => $musicians) {
 								
 								// If musician still has image after checks, display it
 								if( $musician_has_image ) {
-									echo '<a class="musician__thumbnail lazy" data-src="'.$thumbnail.'" href="/'.$artist['friendly'].'/images/" style="'.$face_styles.'"></a>';
+									echo '<a class="musician__thumbnail lazy" data-src="'.$thumbnail.'" href="/musicians/'.$musicians[$a]['id'].'/'.$musicians[$a]['friendly'].'/" style="'.$face_styles.'"></a>';
 								}
 								
 								unset($musician_has_image, $thumbnail, $face_styles);
