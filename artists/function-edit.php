@@ -54,7 +54,6 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 	$update_values['friendly'] = $update_values["friendly"] ? friendly($update_values["friendly"]) : (friendly($update_values["romaji"] ?: $update_values["name"]));
 	$update_values['description'] = $update_values["description"] ? sanitize($markdown_parser->validate_markdown($update_values["description"])) : null;
 	$update_values['is_exclusive'] = $update_values['is_exclusive'] ? 1 : 0;
-	//$update_values['official_links'] = $access_artist->clean_websites( $update_values['official_links'] );
 	$update_values['id'] = $artist_id;
 	
 	// Try artist update, if at least name provided
@@ -72,8 +71,9 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 		}
 	}
 	
+	// This is now handled separately
 	// Update URLs
-	if($update_successful) {
+	/*if($update_successful) {
 		if(is_array($_POST['url_id'])) {
 			
 			foreach($_POST['url_id'] as $url_key => $url_id) {
@@ -87,7 +87,7 @@ if(is_numeric($_POST['id']) && $_SESSION['is_signed_in']) {
 			}
 			
 		}
-	}
+	}*/
 	
 	// Update musicians
 	if($update_successful) {
