@@ -37,7 +37,7 @@
 		// ======================================================
 		// Clean artist websites
 		// ======================================================
-		function clean_websites($website_urls) {
+		/*function clean_websites($website_urls) {
 			
 			// Make sure we're working with array
 			$website_urls = is_array($website_urls) ? $website_urls : explode("\n", $website_urls);
@@ -72,14 +72,14 @@
 			}
 			
 			return $output ?: null;
-		}
+		}*/
 		
 		
 		
 		// ======================================================
 		// Add artist website
 		// ======================================================
-		function update_url($artist_id, $url) {
+		/*function update_url($artist_id, $url) {
 		//function add_website($artist_id, $website_urls) {
 			
 			// Check that URL provided, make sure array if so
@@ -139,7 +139,7 @@
 				}
 				
 			}
-		}
+		}*/
 		
 		
 		
