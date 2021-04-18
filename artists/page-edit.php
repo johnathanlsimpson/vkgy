@@ -243,59 +243,79 @@ include_once('../php/class-link.php');
 										<?php
 											ob_start();
 											?>
-												<li class="input__row links__link">
+												<li class="links__link" x-data="{ showEdits:0 }" x-bind:class="{ 'links--closed': !showEdits }">
 													
-													<div class="input__group any--flex-grow">
-														<label class="input__label">
-															URL
-														</label>
-														<input class="input any--flex-grow" form="form__links" name="url_content[]" placeholder="https://website.com/" value="{content}" />
-													</div>
-													
-													<div class="input__group" style="width:200px;">
-														<label class="input__label">
-															Type
-														</label>
-														<select class="input" form="form__links" name="url_type[]">
-															{type}
-															<?php
-																foreach($url_types as $type_key => $type) {
-																	echo '<option value="'.$type_key.'">'.$type.'</option>';
-																}
-															?>
-														</select>
-													</div>
-													
-													<div class="input__group" style="width:200px;">
-														<label class="input__label">
-															Member
-														</label>
-														<select class="input" data-source="musicians" form="form__links" name="url_musician_id[]">
-															<option value="">all</option>
-															{musician_id}
-														</select>
-													</div>
-													
-													<div class="input__group">
-														<label class="input__label">
-															Active?
-														</label>
+													<div class="link__container any--flex any--weaken" x-show="!showEdits">
 														
-														<label class="input__checkbox">
-															<input class="input__choice" form="form__links" name="url_is_active[{id}]" type="checkbox" value="1" {checked_is_active:1} />
-															<span class="symbol__unchecked">active</span>
-														</label>
+														<a class="link__url {link_class}" href="{content}" target="_blank">{pretty_content}</a>
+														
+														<a class="link__edit symbol__edit a--inherit" href="#" x-on:click.prevent="showEdits=1">edit</a>
+														
+														<span class="link__musician">{musician_name}</span>
+														
+														<span class="link__type any__note">{type_name}</span>
 														
 													</div>
 													
-													<?php if($_SESSION['can_delete_data']): ?>
-														<!-- Delete -->
-														<div class="input__group">
-															<button class="symbol__trash link__delete" data-link-id="{id}" type="button"></button>
+													<div class="input__row" x-show="showEdits">
+														
+														<!-- URL -->
+														<div class="input__group any--flex-grow">
+															<label class="input__label">
+																URL
+															</label>
+															<input class="input any--flex-grow" form="form__links" name="url_content[]" placeholder="https://website.com/" value="{content}" />
 														</div>
-													<?php endif; ?>
-													
-													<input class="any--hidden" form="form__links" name="url_id[]" type="hidden" value="{id}" hidden />
+														
+														<!-- Type -->
+														<div class="input__group" style="width:200px;">
+															<label class="input__label">
+																Type
+															</label>
+															<select class="input" form="form__links" name="url_type[]">
+																{type}
+																<?php
+																	foreach(link::$allowed_link_types as $type_key => $type) {
+																		echo '<option value="'.$type_key.'">'.$type.'</option>';
+																	}
+																?>
+															</select>
+														</div>
+														
+														<!-- Musician -->
+														<div class="input__group" style="width:200px;">
+															<label class="input__label">
+																Musician
+															</label>
+															<select class="input" data-source="musicians" form="form__links" name="url_musician_id[]">
+																<option value="">all</option>
+																{musician_id}
+															</select>
+														</div>
+														
+														<!-- Active -->
+														<div class="input__group">
+															<label class="input__label">
+																Active?
+															</label>
+
+															<label class="input__checkbox">
+																<input class="input__choice" form="form__links" name="url_is_active[{id}]" type="checkbox" value="1" {checked_is_active:1} />
+																<span class="symbol__unchecked">active</span>
+															</label>
+
+														</div>
+														
+														<?php if($_SESSION['can_delete_data']): ?>
+															<!-- Delete -->
+															<div class="input__group">
+																<button class="symbol__trash link__delete" data-link-id="{id}" type="button"></button>
+															</div>
+														<?php endif; ?>
+														
+														<input class="any--hidden" form="form__links" name="url_id[]" type="hidden" value="{id}" hidden />
+														
+													</div>
 													
 												</li>
 											<?php
@@ -312,42 +332,54 @@ include_once('../php/class-link.php');
 										
 										// Render each URL element
 										for($i=0; $i<$num_websites; $i++) {
+											
+											$prettified_url = link::prettify_url($artist['urls'][$i]['content']);
+											
 											echo render_component($url_template, [
 												'id'                => $artist['urls'][$i]['id'],
 												'content'           => $artist['urls'][$i]['content'],
+												'pretty_content'    => $prettified_url['url'],
+												'link_class'        => $prettified_url['class'],
 												'type'              => is_numeric($artist['urls'][$i]['type']) ? '<option value="'.$artist['urls'][$i]['type'].'" selected>'.link::$allowed_link_types[ $artist['urls'][$i]['type'] ].'</option>' : null,
+												'type_name'         => is_numeric($artist['urls'][$i]['type']) ? link::$allowed_link_types[ $artist['urls'][$i]['type'] ] : null,
 												'musician_id'       => is_numeric($artist['urls'][$i]['musician_id']) ? '<option value="'.$artist['urls'][$i]['musician_id'].'" selected></option>' : null,
+												'musician_name'     => is_numeric($artist['urls'][$i]['musician_id']) ? $musician_list[ $artist['urls'][$i]['musician_id'] ][2] : null,
 												'checked_is_active' => $artist['urls'][$i]['is_active'],
 											]);
+											
 										}
 									?>
 									
-									<!-- Add -->
-									<li class="input__row">
-										<div class="input__group any--flex-grow">
-											
-											<label class="input__label">
-												Paste links
-											</label>
-											
-											<textarea class="autoresize input__textarea any--flex-grow links__add" name="add_links" placeholder="https://url.com" form="form__links"></textarea>
-											
+									<li>
+										
+										<!-- Add -->
+										<div class="input__row">
+											<div class="input__group any--flex-grow">
+												
+												<label class="input__label">
+													Paste links
+												</label>
+												
+												<textarea class="autoresize input__textarea any--flex-grow links__add" name="add_links" placeholder="https://url.com" form="form__links"></textarea>
+												
+											</div>
 										</div>
-									</li>
-									
-									<!-- Save -->
-									<li class="input__row">
-										<div class="input__group any--flex-grow">
-											
-											<button class="links__save" type="button">
-												Save
-											</button>
-											
-											<span class="links__status"></span>
-											
-											<div class="input__note links__result text text--outlined text--compact text--error"></div>
-											
+										
+										<!-- Save -->
+										<div class="input__row">
+											<div class="input__group any--flex-grow">
+												
+												<button class="links__save" type="button">
+													Save
+												</button>
+												
+												<span class="links__status"></span>
+												
+												<div class="input__note links__result text text--outlined text--compact text--error"></div>
+												
+											</div>
 										</div>
+										
 									</li>
 									
 								</ul>

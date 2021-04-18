@@ -152,7 +152,7 @@ function addLinks() {
 					
 					// Grab URL template as HTML, filter out {attributes}
 					let urlTemplate = document.querySelector('#template-url').innerHTML;
-					urlTemplate = urlTemplate.replace(/{.+?}/g, '');
+					urlTemplate = urlTemplate.replace(/{[^ ]+?}/g, '');
 					
 					// Create div so we can turn URL template into node
 					let newUrl = document.createElement('div');
@@ -168,6 +168,7 @@ function addLinks() {
 					linkElem.querySelector('[name="url_is_active[]"]').checked = true;
 					linkElem.querySelector('[name="url_is_active[]"]').name = 'url_is_active[' + link.id + ']';
 					linkElem.querySelector('.link__delete').dataset.linkId = link.id;
+					linkElem.setAttribute('x-data', '{ showEdits:1 }');
 					
 					// Initialize deletion
 					initLinkDeleteElem( linkElem.querySelector('.link__delete') );
