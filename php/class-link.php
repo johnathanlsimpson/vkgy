@@ -6,12 +6,12 @@ class link {
 	
 	// Link types
 	static public $allowed_link_types = [
-		0 => 'official',
-		1 => 'other',
+		0 => 'other',
+		1 => 'official website',
 		2 => 'webshop',
 		3 => 'blog',
 		4 => 'fansite',
-		5 => 'sns',
+		5 => 'SNS',
 		6 => 'music',
 		7 => 'video',
 	];

@@ -1,6 +1,7 @@
 <?php
 	include('../artists/head.php');
 	include_once('../php/function-render_component.php');
+include_once('../php/class-link.php');
 	
 	script([
 		'/scripts/external/script-alpine.js',
@@ -35,6 +36,8 @@
 			if(!empty($artist)) {
 				$artist['images'] = is_array($artist['images']) ? array_values($artist['images']) : [];
 				?>
+					<form action="/artists/function-update_links.php" enctype="multipart/form-data" id="form__links" method="post" name="form__links"></form>
+					
 					<form action="" class="col c1 any--margin" enctype="multipart/form-data" id="form__edit" method="post" name="form__edit" x-data="{ showAdvanced:0,showYears:0 }" >
 						<?php
 							include_once('../php/function-render_json_list.php');
@@ -234,28 +237,26 @@
 								<h2>
 									<?= lang('Links', 'リンク', 'div'); ?>
 								</h2>
-								<div class="text text--outlined url__wrapper">
+								<ul class="text text--outlined links__container">
 									
 									<template id="template-url">
 										<?php
-											$url_types = ['other', 'official website', 'official shop', 'blog', 'fansite', 'SNS'];
 											ob_start();
 											?>
-												<div class="input__row url__container">
+												<li class="input__row links__link">
 													
 													<div class="input__group any--flex-grow">
 														<label class="input__label">
 															URL
 														</label>
-														<input class="any--hidden" name="url_id[]" type="hidden" value="{id}" hidden />
-														<input class="input any--flex-grow" name="url_content[]" placeholder="https://website.com/" value="{content}" />
+														<input class="input any--flex-grow" form="form__links" name="url_content[]" placeholder="https://website.com/" value="{content}" />
 													</div>
 													
 													<div class="input__group" style="width:200px;">
 														<label class="input__label">
 															Type
 														</label>
-														<select class="input" name="url_type[]">
+														<select class="input" form="form__links" name="url_type[]">
 															{type}
 															<?php
 																foreach($url_types as $type_key => $type) {
@@ -269,7 +270,7 @@
 														<label class="input__label">
 															Member
 														</label>
-														<select class="input" data-source="musicians" name="url_musician_id[]">
+														<select class="input" data-source="musicians" form="form__links" name="url_musician_id[]">
 															<option value="">all</option>
 															{musician_id}
 														</select>
@@ -277,15 +278,26 @@
 													
 													<div class="input__group">
 														<label class="input__label">
-															Retired?
+															Active?
 														</label>
-														<label class="input__checkbox" {retired}>
-															<input class="input__choice url__retired" type="checkbox" {is_retired_dummy} /><span class="symbol__checkbox--unchecked">retired</span>
-															<input class="any--hidden" name="url_is_retired[]" type="hidden" value="{is_retired}" hidden />
+														
+														<label class="input__checkbox">
+															<input class="input__choice" form="form__links" name="url_is_active[{id}]" type="checkbox" value="1" {checked_is_active:1} />
+															<span class="symbol__unchecked">active</span>
 														</label>
+														
 													</div>
 													
-												</div>
+													<?php if($_SESSION['can_delete_data']): ?>
+														<!-- Delete -->
+														<div class="input__group">
+															<button class="symbol__trash link__delete" data-link-id="{id}" type="button"></button>
+														</div>
+													<?php endif; ?>
+													
+													<input class="any--hidden" form="form__links" name="url_id[]" type="hidden" value="{id}" hidden />
+													
+												</li>
 											<?php
 											
 											$url_template = ob_get_clean();
@@ -296,26 +308,49 @@
 									<?php
 										
 										// Number of URL elements shown should be all extant + 1 empty spot, or the minimum of empty spots
-										$num_websites = is_array($artist['urls']) && count($artist['urls']) ? count($artist['urls']) + 1 : 3;
+										$num_websites = is_array($artist['urls']) && count($artist['urls']) ? count($artist['urls']) : 0;
 										
 										// Render each URL element
 										for($i=0; $i<$num_websites; $i++) {
 											echo render_component($url_template, [
-												'id'               => $artist['urls'][$i]['id'],
-												'content'          => $artist['urls'][$i]['content'],
-												'type'             => is_numeric($artist['urls'][$i]['type']) ? '<option value="'.$artist['urls'][$i]['type'].'" selected>'.$url_types[$artist['urls'][$i]['type']].'</option>' : null,
-												'musician_id'      => is_numeric($artist['urls'][$i]['musician_id']) ? '<option value="'.$artist['urls'][$i]['musician_id'].'" selected></option>' : null,
-												'is_retired'       => $artist['urls'][$i]['is_retired'],
-												'is_retired_dummy' => $artist['urls'][$i]['is_retired'] ? 'checked' : null,
+												'id'                => $artist['urls'][$i]['id'],
+												'content'           => $artist['urls'][$i]['content'],
+												'type'              => is_numeric($artist['urls'][$i]['type']) ? '<option value="'.$artist['urls'][$i]['type'].'" selected>'.link::$allowed_link_types[ $artist['urls'][$i]['type'] ].'</option>' : null,
+												'musician_id'       => is_numeric($artist['urls'][$i]['musician_id']) ? '<option value="'.$artist['urls'][$i]['musician_id'].'" selected></option>' : null,
+												'checked_is_active' => $artist['urls'][$i]['is_active'],
 											]);
 										}
 									?>
 									
-									<button class="symbol__plus url__add" type="button">
-										Add
-									</button>
+									<!-- Add -->
+									<li class="input__row">
+										<div class="input__group any--flex-grow">
+											
+											<label class="input__label">
+												Paste links
+											</label>
+											
+											<textarea class="autoresize input__textarea any--flex-grow links__add" name="add_links" placeholder="https://url.com" form="form__links"></textarea>
+											
+										</div>
+									</li>
 									
-								</div>
+									<!-- Save -->
+									<li class="input__row">
+										<div class="input__group any--flex-grow">
+											
+											<button class="links__save" type="button">
+												Save
+											</button>
+											
+											<span class="links__status"></span>
+											
+											<div class="input__note links__result text text--outlined text--compact text--error"></div>
+											
+										</div>
+									</li>
+									
+								</ul>
 							</div>
 						</div>
 						
