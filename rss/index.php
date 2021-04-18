@@ -11,9 +11,12 @@ ob_start();
 // Development log
 if( $_GET['template'] === 'development' ) {
 	
-	$sql_dev = 'SELECT development.*, CONCAT("https://vk.gy/", development.id, "/") AS url, users.username FROM development LEFT JOIN users ON users.id=development.user_id WHERE development.is_issue=? ORDER BY development.date_occurred DESC LIMIT 10';
+	// Only get posts older than one hour
+	$time = date('Y-m-d H:i:s', strtotime('-1 hour'));
+	
+	$sql_dev = 'SELECT development.*, CONCAT("https://vk.gy/", development.id, "/") AS url, users.username FROM development LEFT JOIN users ON users.id=development.user_id WHERE development.is_issue=? AND development.date_occurred<? ORDER BY development.date_occurred DESC LIMIT 10';
 	$stmt_dev = $pdo->prepare($sql_dev);
-	$stmt_dev->execute([ 0 ]);
+	$stmt_dev->execute([ 0, $time ]);
 	$entries = $stmt_dev->fetchAll();
 	
 	include('../rss/page-development.php');
