@@ -2,6 +2,7 @@
 	include_once("../artists/function-sort_musicians.php");
 	include_once("../php/class-access_user.php");
 	include_once('../php/class-access_video.php');
+include_once('../php/class-link.php');
 	
 	breadcrumbs([
 		"Artists" => "/artists/"
@@ -200,8 +201,14 @@
 		
 		// Clean up links for display
 		if(is_array($artist['urls']) && !empty($artist['urls'])) {
-			include('function-format_artist_urls.php');
-			$artist['urls'] = format_artist_urls($artist['urls']);
+			foreach($artist['urls'] as $link_key => $link) {
+				
+				$link = link::prettify_url($link['content']);
+				
+				$artist['urls'][$link_key]['display_name'] = $link['short_url'] ?: $link['url'];
+				$artist['urls'][$link_key]['class'] = $link['class'];
+				
+			}
 		}
 		
 		// Remove empty arrays

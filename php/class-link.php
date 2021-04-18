@@ -63,6 +63,48 @@ class link {
 	
 	
 	// =======================================================
+	// Make url pretty
+	// =======================================================
+	static function prettify_url( $url ) {
+		
+		// Strip beginning
+		$url = preg_replace('/'.'^((?:https?:)?(?:\/\/)?(?:www\.)?)'.'/', '', $url);
+		
+		// Remove trailing slash
+		$url = preg_replace( '/'.'(\/)$'.'/', '', $url );
+		
+		// Twitter
+		if( strpos( $url, 'twitter' ) !== false ) {
+			$url = str_replace('twitter.com/', '', $url);
+			$class = 'symbol__twitter';
+		}
+		
+		// Instagram
+		if( strpos( $url, 'instagram' ) !== false ) {
+			$url = str_replace('instagram.com/', '', $url);
+			$class = 'symbol__instagram';
+		}
+		
+		// YouTube
+		if( strpos( $url, 'youtube' ) !== false ) {
+			$url = str_replace('youtube.com/channel/', '', $url);
+			$short_url = 'YouTube (...'.substr($url, -3).')';
+			$class = 'symbol__youtube';
+		}
+		
+		$output = [
+			'url' => $url,
+			'short_url' => $short_url,
+			'class' => $class
+		];
+		
+		return $output;
+		
+	}
+	
+	
+	
+	// =======================================================
 	// Guess link type
 	// =======================================================
 	function guess_link_data( $url, $artist_id ) {
@@ -71,7 +113,7 @@ class link {
 		// Order sort of matters--prob want more generic matches last
 		$possible_slugs = [
 			
-			'sns' => [
+			'SNS' => [
 				'twitter',
 				'facebook',
 				'instagram',
@@ -177,7 +219,7 @@ class link {
 				
 				// If we have musicians, and link type is SNS, blog, or official, try to determine if it's for musician or band
 				if( is_array($musicians) && !empty($musicians) ) {
-					if( $output['type'] === 'blog' || $output['type'] === 'sns' || $output['type'] === 'official' ) {
+					if( $output['type'] === 'blog' || $output['type'] === 'SNS' || $output['type'] === 'official' ) {
 						
 						foreach( $musicians as $musician_id => $musician_names ) {
 							foreach($musician_names as $musician_name) {
@@ -247,8 +289,9 @@ class link {
 					// Add the link to the database
 					$sql_add = 'INSERT INTO artists_urls (user_id, artist_id, musician_id, content, type, is_active) VALUES (?, ?, ?, ?, ?, ?)';
 					$stmt_add = $this->pdo->prepare($sql_add);
+					$values_add = [ $_SESSION['user_id'], $link['artist_id'], $link['musician_id'], $link['url'], $link['type'], $link['is_active'] ];
 					
-					if( $stmt_add->execute([ $_SESSION['user_id'], $link['artist_id'], $link['musician_id'], $link['url'], $link['type'], $link['is_active'] ]) ) {
+					if( $stmt_add->execute($values_add) ) {
 						
 						$link['id'] = $this->pdo->lastInsertId();
 						$output['link'] = $link;
