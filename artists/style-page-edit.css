@@ -9,9 +9,47 @@
 	margin-bottom: 3rem;
 	max-height: 16rem;
 }
-.url__container + .url__container .input__label {
+
+.links--closed {
+	padding-bottom: 0.5rem;
+	padding-top: 0.5rem;
+}
+.links__add {
+	white-space: nowrap;
+}
+.links__add:placeholder-shown {
+}
+.links__status {
+	margin: 0 0 0.25rem 0.5rem;
+}
+.links__result {
+	margin-bottom: 0;
+}
+.links__result:empty {
 	display: none;
 }
-.url__add {
-	margin-top: 1rem;
+
+.link__container {
+	align-items: flex;
+	gap: 1rem;
+	white-space: nowrap;
+}
+.link__edit {
+	order: 10;
+}
+@media(min-width:600px) {
+	.link__edit {
+		order: initial;
+	}
+}
+.link__url {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.link__musician {
+	margin-left: auto;
+	max-width: 100px;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }

@@ -1,5 +1,7 @@
 <?php
 
+include_once('../php/class-link.php');
+
 style([
 	'/blog/style-page-entry.css',
 ]);
@@ -141,12 +143,20 @@ if(is_array($entry) && !empty($entry)) {
 	style(['/blog/style-page-interview.css']);
 	
 	if($entry['artist']) {
+		
 		// Get additional artist info
 		$entry['artist'] = $access_artist->access_artist([ 'id' => $entry['artist']['id'], 'get' => 'profile' ]);
+		
+		// Prettify urls
+		foreach($entry['artist']['urls'] as $link_key => $link) {
 
-		// Clean up URLs
-		include_once('../artists/function-format_artist_urls.php');
-		$entry['artist']['urls'] = format_artist_urls($entry['artist']['urls']);
+			$link = link::prettify_url($link['content']);
+
+			$entry['artist']['urls'][$link_key]['display_name'] = $link['short_url'] ?: $link['url'];
+			$entry['artist']['urls'][$link_key]['class'] = $link['class'];
+
+		}
+		
 	}
 
 	// Get sources
@@ -637,7 +647,7 @@ if(is_array($entry) && !empty($entry)) {
 															foreach($entry['artist']['urls'] as $url) {
 																if($url['musician_id'] === $musician['id'] && $url['platform']) {
 																	echo '<a class="" href="'.$url['content'].'" rel="nofollow" target="_blank">';
-																	echo '<span class="symbol--standalone symbol__'.$url['platform'].'"></span>';
+																	echo '<span class="symbol--standalone '.$url['class'].'"></span>';
 																	echo '</a>';
 																}
 															}

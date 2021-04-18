@@ -71,49 +71,177 @@ $(".edit__history").on("change", function(event) {
 // Look for dropdowns, apply selectize() when appropriate
 lookForSelectize();
 
-// Add URL on click
-let urlContainer = document.querySelector('.url__wrapper');
-let urlAddButton = document.querySelector('.url__add');
-urlAddButton.addEventListener('click', function(event) {
+
+// ========================================================
+// Links
+// ========================================================
+
+// Set up URL elems
+let linksForm = document.querySelector('#form__links');
+let linksElem = document.querySelector('.links__container');
+let addLinksElem = linksElem.querySelector('.links__add');
+let linksStatusElem = linksElem.querySelector('.links__status');
+let linksResultElem = linksElem.querySelector('.links__result');
+
+// When pasting link into textarea, trigger change so we can easily grab it
+addLinksElem.addEventListener('paste', function(event) {
 	
-	// Grab URL template as HTML, filter out {attributes}
-	let urlTemplate = document.querySelector('#template-url').innerHTML;
-	urlTemplate = urlTemplate.replace(/{.+?}/g, '');
+	// Get pasted text, set it to the textarea's value then trigger change, so we can access the value easily
+	let pastedText = event.clipboardData.getData('Text');
+	event.preventDefault();
+	addLinksElem.value = pastedText;
+	addLinksElem.dispatchEvent(new Event('change', {bubbles:true}));
 	
-	// Create div so we can turn URL template into node
-	let newUrl = document.createElement('div');
-	newUrl.innerHTML = urlTemplate;
-	
-	// Insert new node before last element (add button) of parent wrapper
-	urlContainer.insertBefore(newUrl.firstElementChild, urlContainer.lastElementChild);
-	
-	// Init selectize on new URL container and url_is_retired dummy checkboxes
-	lookForSelectize();
-	initUrlRetiredDummies();
 });
 
-// Since 'url_is_retired' won't return data if checked, we use a dummy element
-// so we need to init that when dummy element is checked, actual url_is_retired
-// shows 1 and otherwise 0
-function initUrlRetiredDummies() {
+// Listen for any link changes
+linksElem.addEventListener('change', function(event) {
 	
-	// Get dummy checkboxes
-	let dummyElems = document.querySelectorAll('.url__retired:not(.url__retired--active)');
-	dummyElems.forEach(function(dummyElem) {
-		
-		// Add active class so we don't init these again
-		dummyElem.classList.add('url__retired--active');
-		
-		// Get dummy siblings (text box containing actual value)
-		let dummySibling = dummyElem.nextSibling;
-		
-		// On change dummy checkbox, update actual value to 0 or 1
-		dummyElem.addEventListener('change', function(event) {
-			dummySibling.value = dummyElem.checked ? '1' : '0';
-		});
-		
+	// If change was adding link, trigger that function
+	if( event.target.classList.contains('links__add') ) {
+		addLinks();
+	}
+	
+	// If something else changed, save whole form
+	else {
+		updateLinks();
+	}
+	
+});
+
+// Save button to manually trigger update and add any new links in textarea
+let saveLinksElem = document.querySelector('.links__save');
+saveLinksElem.addEventListener('click', function() {
+	
+	// Update old links
+	updateLinks();
+	saveLinksElem.blur();
+	
+	// If textarea has anything, also add it
+	if( addLinksElem.innerHTML && addLinksElem.innerHTML.length > 0 ) {
+		addLinks();
+	}
+	
+});
+
+// Handle deletion
+let deleteLinkElems = document.querySelectorAll('.link__delete');
+deleteLinkElems.forEach(function(deleteLinkElem) {
+	initLinkDeleteElem( deleteLinkElem );
+});
+
+// Grab links from textarea, insert into database, then chuck back out into form
+function addLinks() {
+	
+	// Clear result from last time
+	linksResultElem.innerHTML = '';
+	
+	initializeInlineSubmit( $(linksForm), '/artists/function-update_links.php', {
+		'preparedFormData': {
+			'action': 'add',
+			'artist_id': document.querySelector('[name="id"]').value,
+			'add_links': addLinksElem.value,
+		},
+		'statusContainer': $(linksStatusElem),
+		'resultContainer': $(linksResultElem),
+		'callbackOnSuccess': function(formElem, returnedData) {
+			
+			// Loop through links and add to page
+			if( returnedData.links && returnedData.links.length > 0 ) {
+				returnedData.links.forEach(function(link) {
+					
+					// Grab URL template as HTML, filter out {attributes}
+					let urlTemplate = document.querySelector('#template-url').innerHTML;
+					urlTemplate = urlTemplate.replace(/{[^ ]+?}/g, '');
+					
+					// Create div so we can turn URL template into node
+					let newUrl = document.createElement('div');
+					newUrl.innerHTML = urlTemplate;
+					
+					// Get node
+					let linkElem = newUrl.firstElementChild;
+					
+					// Set values
+					linkElem.querySelector('[name="url_content[]"]').value = link.url;
+					linkElem.querySelector('[name="url_id[]"]').value = link.id;
+					linkElem.querySelector('[name="url_type[]"] option[value="' + link.type + '"]').selected = true;
+					linkElem.querySelector('[name="url_is_active[]"]').checked = true;
+					linkElem.querySelector('[name="url_is_active[]"]').name = 'url_is_active[' + link.id + ']';
+					linkElem.querySelector('.link__delete').dataset.linkId = link.id;
+					linkElem.setAttribute('x-data', '{ showEdits:1 }');
+					
+					// Initialize deletion
+					initLinkDeleteElem( linkElem.querySelector('.link__delete') );
+					
+					// Musician may or may not be set
+					if( link.musician_id && link.musician_id > -1 ) {
+						linkElem.querySelector('[name="url_musician_id[]"]').innerHTML += '<option value="' + link.musician_id + '" selected>(tagged)</option>';
+					}
+					
+					// Make fade in
+					linkElem.classList.add('any--fade-in');
+					
+					// Insert new node before last element (add button) of parent wrapper
+					linksElem.insertBefore(linkElem, addLinksElem.closest('li'));
+					
+					// Init selectize on new URL container and url_is_retired dummy checkboxes
+					lookForSelectize();
+					
+				});
+			}
+			
+			// Clear textarea
+			addLinksElem.value = '';
+			
+			// Clear status after a sec
+			setTimeout(function() {
+				linksStatusElem.classList.remove('symbol__success', 'symbol__error', 'loading');
+			}, 1000);
+			
+		},
+		'callbackOnError': function(formElem, returnedData) {
+		}
 	});
+	
 }
 
-// Init url_is_retired dummy checkboxes
-initUrlRetiredDummies();
+// Update links
+function updateLinks() {
+	
+	initializeInlineSubmit( $(linksForm), '/artists/function-update_links.php', {
+		'statusContainer': $(linksStatusElem),
+		'resultContainer': $(linksResultElem),
+		'callbackOnSuccess': function(formElem, returnedData) {
+			
+			console.log('success');
+			console.log(returnedData);
+			
+			// Clear status after a sec
+			setTimeout(function() {
+				linksStatusElem.classList.remove('symbol__success', 'symbol__error', 'loading');
+			}, 2500);
+			
+		},
+		'callbackOnError': function(formElem, returnedData) {
+			console.log('error');
+			console.log(returnedData);
+		}
+	});
+
+}
+
+// Initialize link deletion buttons
+function initLinkDeleteElem( deleteLinkElem ) {
+	
+	initDelete( $(deleteLinkElem), '/artists/function-update_links.php', { 'action': 'delete', 'link_id': deleteLinkElem.dataset.linkId, }, function() {
+		
+		// Fade out link then remove
+		deleteLinkElem.closest('li').classList.add('any--fade-out');
+		
+		setTimeout(function() {
+			deleteLinkElem.closest('li').remove();
+		}, 300);
+		
+	});
+	
+}

@@ -1,6 +1,7 @@
 <?php
 	include_once('../php/include.php');
 	include_once('../php/class-access_comment.php');
+	include_once('../php/class-link.php');
 	
 	class access_video {
 		private $curl_handler;
@@ -21,6 +22,7 @@
 			// Access user
 			$this->access_user = new access_user($this->pdo);
 			$this->access_comment = new access_comment($this->pdo);
+			$this->access_link = new link($this->pdo);
 			
 			// Video types
 			$this->video_types = [
@@ -131,7 +133,9 @@
 								$this->access_artist = new access_artist($this->pdo);
 							}
 							
-							$this->access_artist->update_url($artist_id, 'https://youtube.com/channel/'.$video_data['channel_id']);
+							$link_output = $this->access_link->add_link( 'https://youtube.com/channel/'.$video_data['channel_id'], $artist_id );
+							
+							//$this->access_artist->update_url($artist_id, 'https://youtube.com/channel/'.$video_data['channel_id']);
 						}
 						
 						$values_video = [

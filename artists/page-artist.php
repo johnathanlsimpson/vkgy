@@ -336,7 +336,7 @@ if($artist_is_removed) {
 									foreach($artist["urls"] as $url) {
 										?>
 											<li class="obscure__item">
-												<a class="<?= $url['platform'] ? 'symbol__'.$url['platform'] : null; ?>" href="<?= $url['content']; ?>" target="_blank"><?= $url['display_name']; ?></a>
+												<a class="<?= $url['class'] ?: null; ?>" href="<?= $url['content']; ?>" target="_blank"><?= $url['display_name']; ?></a>
 												<a class="a--inherit" href="http://web.archive.org/web/1/<?= $url['content']; ?>" target="_blank">(saved)</a>
 												<?php
 													if(is_array($url['musician']) && !empty($url['musician'])) {
