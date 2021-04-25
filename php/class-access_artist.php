@@ -5,6 +5,17 @@
 	class access_artist {
 		private $live_parser;
 		private $indexed_artists;
+	
+		// Activity types
+		static public $activity_types = [
+			[ 'unknown',     '不明' ],
+			[ 'active',      '現在活動' ],
+			[ 'disbanded',   '解散' ],
+			[ 'paused',      '休止' ],
+			[ 'semi-active', '時々活動' ],
+		];
+		
+		
 		
 		// ======================================================
 		// Connect

@@ -1,17 +1,37 @@
 <?php
 
+include_once('../php/function-choose_page_images.php');
+
+// Default title
 $page_title = $page_title ?: $pageTitle;
 $page_title = $page_title ? $page_title.' | vkgy (ブイケージ)' : 'vkgy (ブイケージ) | visual kei library (V系ライブラリ)';
 
+// Default description
 $page_description = $page_description ? $page_description." | vkgy (ブイケージ)" : "vkgy is a visual kei library maintained by overseas fans. vkgy（ブイケージ）はビジュアル系のファンサイトとライブラリです。関連するアーティストのメンバープロフィールや活動やリリース情報などがあります。";
 
+// Body class
 $body_class = $_SESSION["is_signed_in"] ? "body--signed-in" : "body--signed-out";
 
-include_once('../php/function-choose_page_images.php');
-
+// Set critical page styles
 style([
-	"../style/style-tooltips.css"
+	'/style/style-colors-'.( is_numeric($_SESSION['site_theme']) ? $_SESSION['site_theme'] : 0 ).'.css',
+	'/style/style-critical.css',
+	'/style/external/style-simplebar.css',
+], 'top');
+
+// Set other page styles
+style([
+	'/style/style-shared.css',
+	'/style/style-tooltips.css',
 ]);
+
+// Set scripts
+script([
+	'/scripts/external/script-debounceX.js',
+	'/scripts/external/script-simplebar.js',
+	'/scripts/script-switchLanguage.js',
+	'/scripts/script-quickSearch.js',
+], 'top');
 
 ?>
 <!doctype html>
@@ -23,25 +43,18 @@ style([
 		'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 		})(window,document,'script','dataLayer','GTM-5KZPGP8');</script>
 		
-		<title><?php echo $page_title; ?></title>
+		<title><?= $page_title; ?></title>
 		
-		<link rel="stylesheet" id="stylesheet_theme" href="<?php echo '/style/style-colors-'.(is_numeric($_SESSION['site_theme']) ? $_SESSION['site_theme'] : 0).'.css'; ?>" />
-		<link rel="stylesheet" href="/style/style-critical.css<?php echo '?'.date('YmdHis', filemtime('../style/style-critical.css')); ?>" />
-		<?php
-			if(is_array($GLOBALS["styles"])) {
-				array_unshift($GLOBALS["styles"], "/style/style-shared.css");
-			}
-			else {
-				$GLOBALS["styles"] = ["/style/style-shared.css"];
-			}
-		?>
+		<!-- Display critical styles -->
+		<?= display_styles( 'top', true, false ); ?>
 		
+		<!-- RSS -->
 		<link rel="alternate" href="https://vk.gy/rss/" title="RSS feed | vk.gy (ブイケージ)" type="application/rss+xml" />
 		
 		<meta charset="utf-8" />
 		<meta content="initial-scale=1, width=device-width" name="viewport" />
-		<meta content="<?php echo $page_description; ?>" name="description" />
-		<meta content="<?php echo $page_title; ?>" name="title" />
+		<meta content="<?= $page_description; ?>" name="description" />
+		<meta content="<?= $page_title; ?>" name="title" />
 		
 		<meta property="og:site_name" content="vk.gy (ブイケージ)" />
 		<meta property="og:description" content="<?php echo $page_description; ?>" />
@@ -64,22 +77,23 @@ style([
 		<meta name="msapplication-TileImage" content="/mstile-310x310.png">
 		<meta name="theme-color" content="#6f1131">
 		
-		<?php display_scripts("top"); ?>
+		<?php display_scripts( 'top' ); ?>
 		
-		<?php display_styles(); ?>
+		<!-- Other styles -->
+		<?= display_styles( 'bottom' ); ?>
 		
 		<?= !$_SESSION['is_vip'] || $_SESSION['username'] === 'inartistic' ? '<script data-ad-client="ca-pub-5797371558296978" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>' : null; ?>
 	</head>
-	<body class="<?php echo $body_class; ?>">
+	<body class="<?= $body_class; ?>">
 		
 		<?php
 			include_once("../style/symbols.php");
 		?>
 		
-		<!--<input class="any--hidden" id="language-en" name="language" type="radio" value="en" <?php echo !isset($_SESSION['site_lang']) || $_SESSION['site_lang'] == 0 ? 'checked' : null; ?> />
-		<input class="any--hidden" id="language-ja" name="language" type="radio" value="ja" <?php echo $_SESSION['site_lang'] == 1 ? 'checked' : null; ?> />-->
 		<input class="any--hidden" id="language-en" name="language" type="radio" value="en" <?= !isset($translate->language) || $translate->language === 'en' ? 'checked' : null; ?> />
 		<input class="any--hidden" id="language-ja" name="language" type="radio" value="ja" <?= $translate->language === 'ja' ? 'checked' : null; ?> />
+		
+		<!-- Google Tag manager -->
 		<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5KZPGP8" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		
 		<?php
@@ -93,74 +107,6 @@ style([
 		<nav class="col c1 secondary-nav__wrapper">
 			<div class="flex any--weaken-color">
 				<a class="secondary-nav__home" href="/"></a>
-				
-				<style>
-					/* Visible language elements */
-					.language__container {
-						color: hsl(var(--accent));
-						cursor: pointer;
-						font-family: var(--font--secondary);
-						font-size: 0.9rem;
-					}
-					.language__switch {
-						padding: 0 1rem;
-						padding: 0 1ch;
-						user-select: none;
-					}
-					.language__symbol::before {
-						font-size: 1.25rem;
-						margin-top: -2px;
-						vertical-align: middle;
-					}
-					
-					/* Show/hide states for caret and dropdown */
-					.language__caret {
-						opacity: 0;
-					}
-					.language__switch:hover .language__caret,
-					.language--open .language__caret {
-						opacity: 1;
-					}
-					.language--open .language__switch:hover .language__caret::before {
-						clip-path: url(#symbol__up-caret);
-						-webkit-clip-path: url(#symbol__up-caret);
-						-moz-clip-path: url(#symbol__up-caret);
-					}
-					.language__dropdown {
-						display: none;
-					}
-					.language--open .language__dropdown {
-						display: flex;
-					}
-					
-					/* Dropdown styling */
-					.language__dropdown {
-						background: hsl(var(--background--bold));
-						border: 2px solid hsl(var(--accent));
-						border-top-width: 0;
-						border-radius: 0 0 3px 3px;
-						flex-direction: column;
-						left: -2px;
-						min-width: 100%;
-						position: absolute;
-						z-index: 101;
-					}
-					.language__choice, .language__help {
-						background: none;
-						border: 0 solid transparent;
-						border-width: 0.5rem 1rem;
-						border-width: 0.5rem 2ch;
-						line-height: 1;
-					}
-					.language__help:last-of-type {
-						border-bottom-width: 1rem;
-					}
-					.language__choice:hover, .language__help:hover {
-						background: none;
-						border-color: transparent;
-						text-decoration: underline;
-					}
-				</style>
 				
 				<span class="language__container secondary-nav__lang">
 					<div class="language__switch">
@@ -182,56 +128,8 @@ style([
 					</div>
 				</span>
 				
-				<script>
-					// Get language switch button and container
-					let languageSwitchContainer = document.querySelector('.language__container');
-					let languageSwitchElem = languageSwitchContainer.querySelector('.language__switch');
-					
-					// When language switch clicked, toggle open class on container
-					languageSwitchElem.addEventListener('click', function(event) {
-						
-						if(languageSwitchContainer.classList.contains('language--open')) {
-							languageSwitchContainer.classList.remove('language--open');
-						}
-						else {
-							languageSwitchContainer.classList.add('language--open');
-						}
-						
-					});
-					
-					// Get language choices
-					let languageChoiceElems = languageSwitchContainer.querySelectorAll('.language__choice');
-					
-					// When language choice clicked, pass to function to set session/cookie, then refresh
-					languageChoiceElems.forEach(function(languageChoiceElem) {
-						languageChoiceElem.addEventListener('click', function(event) {
-							
-							// Prevent default
-							event.preventDefault();
-							
-							// Send chosen language to switcher function
-							initializeInlineSubmit($(languageSwitchContainer), '/translations/function-switch_language.php', {
-								
-								preparedFormData: { language: languageChoiceElem.dataset.language },
-								
-								// Refresh page to change language
-								callbackOnSuccess: function(event, returnedData) {
-									location.reload();
-								},
-								
-								callbackOnError: function(event, returnedData) {
-								}
-								
-							});
-							
-						});
-					});
-				</script>
-				
 				<?php
 					$promo_links = [
-						//['Follow vkgy on {{Twitter}}'  => 'https://twitter.com/vkgy_'],
-						//['Like vkgy on {{Facebook}}'   => 'https://facebook.com/vkgy.official'],
 						['Grab some {{vkgy merch}}'    => 'https://vkgy.myshopify.com'],
 						['Support vkgy on {{Patreon}}' => 'https://patreon.com/vkgy'],
 						['Join our {{Discord}}'        => 'https://discord.gg/jw8jzXn']
@@ -242,44 +140,21 @@ style([
 						break;
 					}
 				?>
-					<style>
-						.secondary-nav__hi {
-							font-size: 0;
-							margin: 0 auto;
-						}
-						.secondary-nav__hi .show {
-							font-size: 1rem;
-						}
-						@media(min-width:800px) {
-							.secondary-nav__hi {
-								font-size: 1rem;
-							}
-						}
-					</style>
-				<!--<a class="secondary-nav__social secondary-nav__twitter  a--inherit symbol__twitter" href="https://twitter.com/vkgy_/" target="_blank"></a>
-				<a class="secondary-nav__social secondary-nav__facebook a--inherit symbol__facebook" href="https://facebook.com/vkgy.official/" target="_blank"></a>
-				<a class="secondary-nav__social secondary-nav__youtube  a--inherit symbol__youtube" href="https://youtube.com/c/vkgyofficial" target="_blank"></a>
-				<a class="secondary-nav__social secondary-nav__discord  a--inherit symbol__discord" href="https://discord.gg/jw8jzXn" target="_blank"></a>
-				<a class="secondary-nav__social secondary-nav__patreon  a--inherit symbol__patreon" href="https://patreon.com/vkgy" target="_blank"></a>-->
 				
-				<a class="head__link secondary-nav__link secondary-nav__sign-out a--inherit symbol__exit     any--signed-in-only"  href="/sign-out/"><?php echo lang('Sign out', 'サインアウト', ['secondary_class' => 'any--hidden']); ?></a>
-				<a class="head__link secondary-nav__link secondary-nav__register a--inherit symbol__register any--signed-out-only" href="/account/"><?php echo lang('Register', 'アカウントの作成', ['secondary_class' => 'any--hidden']); ?></a>
-				<a class="head__link secondary-nav__link secondary-nav__sign-in  a--inherit symbol__sign-in  any--signed-out-only" href="/account/"><?php echo lang('Sign in', 'サインイン', ['secondary_class' => 'any--hidden']); ?></a>
+				<a class="head__link secondary-nav__link secondary-nav__sign-out a--inherit symbol__exit     any--signed-in-only"  href="/sign-out/"><?= lang('Sign out', 'サインアウト', 'hidden'); ?></a>
+				<a class="head__link secondary-nav__link secondary-nav__register a--inherit symbol__register any--signed-out-only" href="/account/"><?= lang('Register', 'アカウントの作成', 'hidden'); ?></a>
+				<a class="head__link secondary-nav__link secondary-nav__sign-in  a--inherit symbol__sign-in  any--signed-out-only" href="/account/"><?= lang('Sign in', 'サインイン', 'hidden'); ?></a>
 			</div>
 		</nav>
-			
-		<link rel="stylesheet" href="/style/external/style-simplebar.css" />
-		<script src="/scripts/external/script-simplebar.js"></script>
 		
 		<nav class="col c1 primary-nav__wrapper">
 			<div class="primary-nav__container any--flex">
-					<a href="/" class="primary-nav__home">
-						<!--<svg x="0px" y="0px" width="0" height="0" viewBox="0 0 105 164" class="primary-nav__cage" fill="none" stroke="hsl(var(--accent))" stroke-width="5">
-							<path d="M52.5,161.5c-27.6,0-50-8.3-50-16v-88c0-24.4,17.6-44.7,40.8-49c1.5-3.5,5.1-6,9.2-6c4.1,0,7.6,2.5,9.2,6 c23.3,4.3,40.9,24.6,40.9,49v88C102.5,153.2,80.1,161.5,52.5,161.5z" /><path d="M42.5,107.7c0,4.6,0,8.8,0,12.2 M52.5,7.5c-5.5,0-10,13.9-10,41" /><path d="M22.5,101.5c0,16.1,0,56.1,0,56.1 M52.5,7.5c-16.6,0-30,20.9-30,48" /><path d="M62.5,107.9c0,16.3,0,30.5,0,37.7 M52.5,7.5c5.5,0,10,13.9,10,41" /><path d="M82.5,136.5L82.5,136.5 M82.5,100.6c0,8.9,0,17.9,0,26.2 M52.5,7.5c16.6,0,30,20.9,30,48" /><path d="M52.5,108.1c-22.4,0-41.6-12.3-50-30c8.4-17.7,27.6-30,50-30c22.4,0,41.6,12.3,50,30C94.1,95.7,74.8,108.1,52.5,108.1z" /><path d="M82.5,57.5 c0,16.7-13.3,30.3-30,30.3s-30-13.5-30-30.3" />
-						</svg>-->
-					</a>
-				<div class="primary-nav__links any--flex" data-simplebar data-simplebar-force-visible="true">
-					
+				
+				<!-- Home logo -->
+				<a href="/" class="primary-nav__home"></a>
+				
+				<!-- Main nav links -->
+				<div class="primary-nav__links any--flex" data-simplebar data-simplebar-force-visible="true">	
 					<?php
 						$nav_links = [
 							'news' => '/blog/',
@@ -294,11 +169,15 @@ style([
 					?>
 				</div>
 				
+				<!-- Search -->
 				<input class="primary-nav__search" form="form__search" name="q" placeholder="search" size="6" />
 				<span class="primary-nav__search-symbol any--weaken-color symbol--standalone symbol__search"></span>
 				
-				<button class="primary-nav__search-button" form="form__search" name="submit" type="submit"><?php echo lang('search', 'サーチ', ['primary_container' => 'span', 'secondary_container' => 'span', 'secondary_class' => 'any--hidden']); ?></button>
+				<button class="primary-nav__search-button" form="form__search" name="submit" type="submit"><?= lang('search', 'サーチ', ['primary_container' => 'span', 'secondary_container' => 'span', 'secondary_class' => 'any--hidden']); ?></button>
 				
+				<div class="quick-search__wrapper quick-search--hidden"><div class="quick-search__container symbol__loading"></div></div>
+				
+				<!-- Quick links -->
 				<div class="primary-nav__right any--flex any--weaken-color">
 					<a class="head__link primary-nav__add a--inherit any--signed-in-only" href="/blog/add/" title="Add Blog Post"><span class="symbol__news symbol--standalone"></span></a>
 					<a class="head__link primary-nav__add a--inherit any--signed-in-only" title="Add Artist" href="/artists/add/"><span class="symbol__artist symbol--standalone"></span></a>
@@ -324,9 +203,7 @@ style([
 			
 			<div class="header__container lazy any--flex">
 				<div class="header__header" style="flex-grow:1;">
-					<h1>
-						<?php echo $GLOBALS['page_header'] ?: ($page_header ?: null); ?>
-					</h1>
+					<h1><?= $GLOBALS['page_header'] ?: ($page_header ?: null); ?></h1>
 					
 					<div class="header__supplement" style="z-index:1;">
 						<?= $GLOBALS['page_header_supplement']; ?>
@@ -585,32 +462,6 @@ style([
 		</div>
 		
 		<?php display_scripts("bottom"); ?>
-		
-		<style>
-			.user[data-is-vip="1"]::after {
-				border-radius: 3px;
-				box-shadow: inset 0 0 0 1px;
-				content: "VIP";
-				font-weight: normal;
-				margin-left: 3px;
-				padding: 0 2px;
-			}
-			.user[data-icon="crown"]::before {
-				clip-path: url(#symbol__user-crown); -webkit-clip-path: url(#symbol__user-crown); -moz-clip-path: url(#symbol__user-crown);
-			}
-			.user[data-icon="flower"]::before {
-				clip-path: url(#symbol__user-flower); -webkit-clip-path: url(#symbol__user-flower); -moz-clip-path: url(#symbol__user-flower);
-			}
-			.user[data-icon="heart"]::before {
-				clip-path: url(#symbol__user-heart); -webkit-clip-path: url(#symbol__user-heart); -moz-clip-path: url(#symbol__user-heart);
-			}
-			.user[data-icon="star"]::before {
-				clip-path: url(#symbol__user-star); -webkit-clip-path: url(#symbol__user-star); -moz-clip-path: url(#symbol__user-star);
-			}
-			.user[data-icon="moon"]::before {
-				clip-path: url(#symbol__user-moon); -webkit-clip-path: url(#symbol__user-moon); -moz-clip-path: url(#symbol__user-moon);
-			}
-		</style>
 		
 		<script language="javascript" type="text/javascript">
 			var sc_project=7964501;

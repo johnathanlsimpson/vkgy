@@ -256,10 +256,6 @@ echo '<ul class="text artist__list">';
 
 </details>
 
-<style>
-
-</style>
-
 <?php
 
 foreach( $artists as $artist ) {

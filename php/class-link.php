@@ -124,6 +124,7 @@ class link {
 				'store',
 				'shop',
 				'thebase',
+				'bandcamp',
 			],
 			
 			'music' => [
@@ -150,18 +151,33 @@ class link {
 				'visunavi',
 				'vkdb',
 				'visulog',
+				'wikipedia',
+				'okmusic',
+				'realsound',
+				'jrocknroll',
+				'/articles/',
+				'/news/',
 			],
 			
-			'official' => [
+			'official website' => [
 				'offi',
 				'wix',
 				'syncl',
+				'home',
+				'eonet',
+				'fc2web',
+				'aremond',
+				'pksp',
+				'sound.jp',
 			],
 			
 		];
 		
 		// Make sure URL provided
 		if( strlen($url) ) {
+			
+			// Make url lowercase to help comparisons
+			$url = strtolower($url);
 			
 			// Make sure artist provided
 			if( is_numeric($artist_id) ) {
@@ -173,7 +189,8 @@ class link {
 				$artist_friendly = $stmt_artist->fetchColumn();
 				
 				// Push friendly name onto possible website slugs
-				$possible_slugs['official'][] = $artist_friendly;
+				$possible_slugs['official website'][] = $artist_friendly;
+				$possible_slugs['official website'][] = str_replace('-', '', $artist_friendly);
 				
 				// Get musicians' names
 				$sql_musicians = 'SELECT musicians.id, IF( artists_musicians.as_name IS NOT NULL, COALESCE(artists_musicians.as_romaji, artists_musicians.as_name), musicians.friendly ) AS name FROM artists_musicians LEFT JOIN musicians ON musicians.id=artists_musicians.musician_id WHERE artist_id=?';
@@ -219,7 +236,7 @@ class link {
 				
 				// If we have musicians, and link type is SNS, blog, or official, try to determine if it's for musician or band
 				if( is_array($musicians) && !empty($musicians) ) {
-					if( $output['type'] === 'blog' || $output['type'] === 'SNS' || $output['type'] === 'official' ) {
+					if( $output['type'] === 'blog' || $output['type'] === 'SNS' || $output['type'] === 'official website' ) {
 						
 						foreach( $musicians as $musician_id => $musician_names ) {
 							foreach($musician_names as $musician_name) {

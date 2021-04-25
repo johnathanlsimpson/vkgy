@@ -6,26 +6,39 @@
 .artist__status + .any--weaken {
 	margin-left: 1rem;
 }
-/*.artist__status::before {
+.status--active,
+.status--disbanded,
+.status--other {
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: 0.5ch;
+}
+.status--active {
 	background: currentcolor;
 	border-radius: 50%;
-	content: "";
-	display: inline-block;
-	height: 0.6rem;
-	margin-right: 0.5ch;
-	top: -1px;
-	width: 0.6rem;
-	vertical-align: middle;
+	color: hsl(var(--text--success));
+	height: 0.5em;
+	width: 0.5em;
 }
-.artist--active::before {
-	background: green;
+.status--disbanded {
+	background-image: linear-gradient( currentcolor, currentcolor ), linear-gradient( currentcolor, currentcolor );
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 2px 100%, 100% 2px;
+	color: hsl(var(--text--error));
+	height: 0.65em;
+	transform: rotate(45deg);
+	width: 0.65em;
 }
-.artist--disbanded::before {
-	background: red;
+.status--other {
+	border: 0.3rem solid transparent;
+	border-bottom-width: 0.42em;
+	border-bottom-color: currentcolor;
+	border-top-width: 0;
+	color: hsl(var(--text--caution));
+	height: 0;
+	width: 0;
 }
-.artist--paused::before {
-	background: yellow;
-}*/
 .header__supplement .lists__open {
 	background: none;
 	border: none;
