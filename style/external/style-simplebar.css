@@ -1,6 +1,6 @@
 [data-simplebar] {
   position: relative;
-  flex-direction: column;
+  flex-direction: row;
   flex-wrap: wrap;
   justify-content: flex-start;
   align-content: flex-start;
