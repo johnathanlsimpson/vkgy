@@ -266,13 +266,15 @@ function get_image($input, $pdo) {
 			}
 			
 			// If returned path is set, and image isn't queued (or is queued but being viewed by uploader), show the image
-			if(
+			/*if(
 				($returned_image_path && !$rslt_image['is_queued'])
 				||
 				($returned_image_path && $rslt_image['is_queued'] && !$input['is_hotlinked'])
 				||
 				($returned_image_path && $rslt_image['is_queued'] && $rslt_image['user_id'] === $_SESSION['user_id'])
-			) {
+			) {*/
+			// Disabling the is_queued check for now because it's causing so many problems
+			if( $returned_image_path ) {
 				
 				// Return image path only
 				if($input["image_path_only"]) {
