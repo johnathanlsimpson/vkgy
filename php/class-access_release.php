@@ -75,22 +75,18 @@
 				if( is_array($release_data) && strlen($release_data['name']) ) {
 					
 					if( $store_name === 'amazon' ) {
-						$url  = 'https://www.amazon.co.jp/s/ref=as_li_ss_tl?k=';
-						$url .= urlencode(html_entity_decode($release_data['artist']['name'].' '.$release_data['name']));
-						$url .= '&tag=vkgy0c-22';
+						$tracking_link_name = $release_data['artist']['name'].' '.$release_data['name'];
 					}
 					
 					elseif( $store_name === 'cdjapan' ) {
-						$url  = 'https://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/searches?term.media_format=&amp;f=all&amp;q=';
-						$url .= $release_data['upc'] ? preg_replace('/'.'-0+'.'/', '-', $release_data['upc']) : str_replace(' ', '+', $release_data['quick_name'] ?: $release_data['name']);
+						$tracking_link_name = $release_data['quick_name'] ?: $release_data['name'];
 					}
 					
 					elseif( $store_name === 'rarezhut' ) {
-						$url  = 'https://magento.rarezhut.net/catalogsearch/result/?q=';
-						$url .= html_entity_decode($release_data['artist']['name'].' '.$release_data['name']);
+						$tracking_link_name = $release_data['artist']['name'].' '.$release_data['name'];
 					}
 					
-					return $url;
+					return tracking_link( $store_name, [ $release_data['upc'] ?: $tracking_link_name, $tracking_link_name ], 'release card' );
 					
 				}
 				

@@ -162,6 +162,8 @@ RewriteRule  ^releases/([\w\-]*)/(\d+)/[\w\-]*/edit/?(?:\&prev_next_artist=(\d+)
 
 RewriteRule  ^tag-source  /releases/page-tag-source.php
 
+RewriteRule  ^track/.*$  /php/page-track.php
+
 RewriteRule  ^videos/(\d+)/?  /?videos/&id=$1
 
 RewriteRule  ^vip/?$                /?vip/
