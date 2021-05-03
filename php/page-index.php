@@ -16,12 +16,12 @@ $body_class = $_SESSION["is_signed_in"] ? "body--signed-in" : "body--signed-out"
 style([
 	'/style/style-colors-'.( is_numeric($_SESSION['site_theme']) ? $_SESSION['site_theme'] : 0 ).'.css',
 	'/style/style-critical.css',
+	'/style/style-shared.css',
 	'/style/external/style-simplebar.css',
 ], 'top');
 
 // Set other page styles
 style([
-	'/style/style-shared.css',
 	'/style/style-tooltips.css',
 ]);
 
@@ -98,8 +98,9 @@ script([
 		
 		<?php
 			$user_link = $_SESSION['username'] ? '/users/'.$_SESSION['username'].'/' : '/account/';
-			$avatar_url = '/usericons/avatar-'.$_SESSION['username'].'.png';
-			$avatar_url = file_exists('..'.$avatar_url) ? $avatar_url : '/usericons/avatar-anonymous.png';
+			$avatar_url  = '/usericons/avatar-'.$_SESSION['username'].'.png';
+			$avatar_url  = file_exists('..'.$avatar_url) ? $avatar_url : '/usericons/avatar-anonymous.png';
+			$avatar_url .= '?'.date( 'YmdHis', filemtime('..'.$avatar_url) );
 		?>
 		
 		<img class="any--hidden" src="/style/sprite-cage.png" />
