@@ -228,12 +228,27 @@
 				elseif(in_array('mini-album', $formats)) {
 					$format = 'mini-album';
 				}
-				elseif(is_array($media) && !empty($media) && count($media) < 3) {
-					$format = implode('+', $media);
+				
+				// If no format specified in release, guess
+				if( !$format ) {
+					
+					// If digital release, make sure we don't just call it "a digital"
+					if( is_array($media) && in_array( 'digital', $media ) ) {
+						$format = 'digital release';
+					}
+					
+					// Otherwise, if only a couple of physical media are specified, assume that's the format
+					elseif( is_array($media) && !empty($media) && count($media) < 3 ) {
+						$format = implode('+', $media);
+					}
+					
+					// Otherwise just default to 'release'
+					else {
+						$format = 'release';
+					}
+					
 				}
-				else {
-					$format = 'release';
-				}
+				
 			}
 			
 			return $format;
@@ -332,10 +347,15 @@
 							$user_id = is_numeric($_SESSION["user_id"]) ? $_SESSION["user_id"] : '0';
 							$edit_history = date('Y-m-d H:i:s').' ('.$user_id.')'."\n";
 							
+							// Set queued by default
+							$is_queued = 1;
+							
 							// Create post
-							$sql_add = "INSERT INTO blog (title, friendly, content, image_id, user_id) VALUES (?, ?, ?, ?, ?)";
+							$sql_add = "INSERT INTO blog (title, friendly, content, image_id, user_id, is_queued, artist_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 							$stmt_add = $this->pdo->prepare($sql_add);
-							if($stmt_add->execute([ $title, $friendly, $post, $image_id, $user_id ])) {
+							if($stmt_add->execute([ $title, $friendly, $post, $image_id, $user_id, $is_queued, $artist_id ])) {
+								
+								// ID of new blog
 								$blog_id = $this->pdo->lastInsertId();
 								
 								// Associate blog with image
@@ -357,6 +377,7 @@
 								
 								// Return URL if successful
 								return [ 'title' => $title, 'url' => 'https://vk.gy/blog/'.$friendly.'/', 'id' => $blog_id, 'entry_is_new' => true ];
+								
 							}
 						}
 					}
