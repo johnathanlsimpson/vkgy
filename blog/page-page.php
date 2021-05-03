@@ -9,6 +9,17 @@ if($artist) {
 
 ?>
 
+<?php
+if($_SESSION['can_access_drafts']) {
+	
+	$sql_queued_entries = 'SELECT title, friendly, date_occurred FROM blog WHERE is_queued=? AND date_occurred>? ORDER BY id DESC';
+	$stmt_queued_entries = $pdo->prepare($sql_queued_entries);
+	$stmt_queued_entries->execute([ 1, date('Y-m-d', strtotime('last month')) ]);
+	$queued_entries = $stmt_queued_entries->fetchAll();
+	
+}
+?>
+
 <div class="col c1">
 	<div>
 		<?php
@@ -138,22 +149,24 @@ if($artist) {
 
 	<div>
 		<?php
-			if(is_array($queued_entries) && !empty($queued_entries)) {
+			if( $_SESSION['can_access_drafts'] ) {
 				?>
 					<h3>
-						<div class="h5">
-							Admin
-						</div>
-						<?php echo lang('Queued entries', '出す予定', ['container' => 'div']); ?>
+						<?= lang('Queued entries', '出す予定', ['container' => 'div']); ?>
 					</h3>
 					<ul class="text text--outlined ul--compact">
 						<?php
-							foreach($queued_entries as $entry) {
-								?>
-									<li>
-										<a href="<?php echo '/blog/'.$entry['friendly'].'/'; ?>"><?php echo $entry['title']; ?></a>
-									</li>
-								<?php
+							if(is_array($queued_entries) && !empty($queued_entries)) {
+								foreach($queued_entries as $entry) {
+									?>
+										<li>
+											<a href="<?php echo '/blog/'.$entry['friendly'].'/'; ?>"><?php echo $entry['title']; ?></a>
+										</li>
+									<?php
+								}
+							}
+							else {
+								echo '<em>No queued entries from the past month.';
 							}
 						?>
 					</ul>
@@ -161,7 +174,7 @@ if($artist) {
 			}
 		?>
 		
-		<h3>
+		<?php /*<h3>
 			<?php echo lang('Popular', 'おすすめ', [ 'container' => 'div' ]); ?>
 		</h3>
 		<ul class="text text--outlined ul--compact">
@@ -181,7 +194,7 @@ if($artist) {
 					<?php
 				}
 			?>
-		</ul>
+		</ul><?php */ ?>
 
 		<h3>
 			<?php echo lang('Browse by tag', 'タグ', [ 'container' => 'div' ]); ?>
