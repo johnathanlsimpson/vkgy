@@ -1,545 +1,508 @@
 <?php
 
+$access_video = new access_video($pdo);
+
 style([
 	'/blog/style-page-entry.css',
 ]);
 
-// Auto-style translation button
-//$entry['content'] = str_replace('>&#9888; &#26085;&#26412;&#35486;&#29256;&#12408;&#12371;&#12385;&#12425;&#12290;</a>', ' class="symbol__error a--outlined a--padded">&#26085;&#26412;&#35486;&#29256;&#12408;&#12371;&#12385;&#12425;&#12290;</a>', $entry['content']);
-//$entry['content'] = str_replace('>&#9888; The English version is here.</a>', ' class="symbol__error a--outlined a--padded">The English version is here.</a>', $entry['content']);
+// Separate first sentence as summary, just in case we want to display it differently later
+$entry['summary'] = explode("\n", $entry['content'])[0];
+$entry['content'] = implode("\n", array_slice( explode("\n", $entry['content']), 1 ) );
 
-// Legacy	
-// Check if entry contains translation link; if so, remove from entry but save URL and language for later
-$translation_pattern = '<a href="((?:https:\/\/vk\.gy)?\/blog\/[A-z0-9-]+\/?)">'.'&#9888; ([A-z0-9 \.\&\#\;]+)<\/a>';
-if(preg_match('/'.$translation_pattern.'/', $entry['content'], $translation_match)) {
-	$entry['content'] = str_replace($translation_match[0], '', $entry['content']);
-	$translation_link = $translation_match[1];
-	$translation_text = $translation_match[2];
-	$translation_type = strpos($translation_match[2], 'English') !== false ? 'en' : 'ja';
+// Check for Twitter account associated with user to set as page author
+$sql_twitter = "SELECT twitter FROM users WHERE username=? LIMIT 1";
+$stmt_twitter = $pdo->prepare($sql_twitter);
+$stmt_twitter->execute([ $entry['user']['username'] ]);
+$rslt_twitter = $stmt_twitter->fetchColumn();
+$page_creator = $rslt_twitter && preg_match('/'.'^[A-z0-9_]+$'.'/', $rslt_twitter) ? $rslt_twitter : null;
+
+// Set page description to cleaned, truncated first line of content
+$page_description = strip_tags( substr( $entry['summary'], 140 ) ).' (continued…)';
+
+// If images were successfully gotten, assign them to page (assumes images are arranged by id)
+if( is_array($entry['images']) && !empty($entry['images']) ) {
+	
+	// Set main image to page image, and also separate it into its own part of the $entry array to make later queries easier
+	$entry['image'] = $entry['images'][ $entry['image_id'] ];
+	$page_image = $entry['image']['url'];
+	
+	// If a second image was specified for social media posts, then the post's default image should actually be background image, and the social image should be page image
+	if( is_numeric($entry['sns_image_id']) ) {
+		$background_image = $page_image;
+		$page_image = $entry['images'][ $entry['sns_image_id'] ]['url'];
+	}
+	
 }
 
-if(is_array($entry) && !empty($entry)) {
+// Set previous/next navigation
+if( $entry['prev_next'][0]['type'] === 'prev' ) {
+	subnav([
+		[
+			'text' => $entry['prev_next'][0]['title'],
+			'url' => '/blog/'.$entry['prev_next'][0]['friendly'].'/',
+			'position' => 'left',
+		]
+	], 'directional');
+}
+if( isset($entry['prev_next'][1]) ) {
+	subnav([
+		[
+			'text' => $entry['prev_next'][1]['title'],
+			'url' => '/blog/'.$entry['prev_next'][1]['friendly'].'/',
+			'position' => 'right',
+		]
+	], 'directional');
+}
 	
-	$entry['images'] = is_array($entry['images']) ? $entry['images'] : [];
-	
-	if( !empty($entry['images']) && ( is_numeric($entry['image_id']) || is_numeric($entry['sns_image_id']) ) ) {
-		
-		// If special image set for SNS, user that
-		if(is_numeric($entry['sns_image_id'])) {
-			$entry['image'] = $entry['images'][$entry['sns_image_id']];
-		}
-		// Otherwise use header image
-		else {
-			$entry['image'] = $entry['images'][$entry['image_id']];
-		}
-		
-		$page_image = "https://vk.gy".str_replace('.', '.large.', $entry['image']['url']);
-		
-		$entry_has_image = true;
-	}
-	
-	// Loop through tags and see if featured article; if so, upsize images
-	if(is_array($entry['tags']) && !empty($entry['tags'])) {
-		foreach($entry['tags'] as $tag) {
-			if($tag['friendly'] === 'interview') {
-				$entry_is_feature = true;
-				
-				break;
-			}
+// If article is a tagged 'featured' or 'interview', the styling will change a bit, so set a flag
+if( is_array($entry['tags']) && !empty($entry['tags']) ) {
+	foreach( $entry['tags'] as $tag ) {
+		if( $tag['friendly'] === 'interview' || $tag['friendly'] == 'feature' ) {
+			$entry_is_feature = true;
+			break;
 		}
 	}
-	
-	// Make blog entries show large versions of images
-	$entry['content'] = str_replace('.medium.', '.large.', $entry['content']);
-	
-	$sql_twitter = "SELECT twitter FROM users WHERE username=? LIMIT 1";
-	$stmt_twitter = $pdo->prepare($sql_twitter);
-	$stmt_twitter->execute([ $entry['user']['username'] ]);
-	$rslt_twitter = $stmt_twitter->fetchColumn();
-	
-	if(!empty($rslt_twitter) && preg_match("/"."^[A-z0-9_]+$"."/", $rslt_twitter)) {
-		$page_creator = $rslt_twitter;
-	}
+}
 
-	$page_description = preg_replace("/"."<.*?>"."/", "", strtok($entry["content"], "\n"))." (Continued…)";
+// Not sure if we still needthis
+/*// Make blog entries show large versions of images
+$entry['content'] = str_replace('.medium.', '.large.', $entry['content']);*/
 	
-	// Related: entries with same tag
-	if(is_array($entry['tags']) && !empty($entry['tags'])) {
-		foreach($entry['tags'] as $tag) {
-			if(strpos($tag['friendly'], 'release') !== 0 && strpos($tag['friendly'], 'live') !== 0 && strpos($tag['friendly'], 'auto') !== 0) {
-				$tag_types_to_search[] = $tag['id'];
+// Get related entries about same artist
+if( is_numeric($entry['artist_id']) ) {
+	$sql_related = '
+		SELECT
+			CONCAT( "/blog/", blog.friendly, "/" ) AS url,
+			blog.title,
+			blog.date_occurred,
+			IF( images.id IS NOT NULL, CONCAT( "/images/", images.id, ".", images.extension ), "" ) AS image_url,
+			IF( images.id IS NOT NULL, CONCAT( "/images/", images.id, ".thumbnail.", images.extension ), "" ) AS image_thumbnail_url
+		FROM
+			blog_artists
+			LEFT JOIN blog ON blog.id=blog_artists.blog_id
+			LEFT JOIN images ON images.id=blog.image_id
+		WHERE
+			blog.id!=?
+			AND
+			blog_artists.artist_id=?
+			AND
+			blog.is_queued=?
+		ORDER BY blog.date_occurred DESC
+		LIMIT 4';
+	$stmt_related = $pdo->prepare($sql_related);
+	$stmt_related->execute([ $entry['id'], $entry['artist_id'], 0 ]);
+	$entry['related_entries'] = $stmt_related->fetchAll();
+}
+	
+// Get user info for contributors
+if( $entry['contributor_ids'] ) {
+	
+	$contributor_ids = json_decode($entry['contributor_ids'], true);
+	
+	if( is_array($contributor_ids) && !empty($contributor_ids) ) {
+		foreach( $contributor_ids as $contributor_id ) {
+			if( is_numeric($contributor_id) ) {
 				
-				// Related: features
-				if($tag['friendly'] === 'interview') {
-					$sql_related_entries[] = 'SELECT blog_id, "feature" AS relation_type FROM blog_tags WHERE blog_id != ? AND tag_id=? ORDER BY id DESC LIMIT 12';
-					$values_related_entries[] = [$entry['id'], $tag['id']];
-				}
+				$entry['contributors'][] = $access_user->access_user([ 'id' => $contributor_id, 'get' => 'name', 'limit' => 1 ]);
+				
 			}
 		}
-		
-		if(is_array($tag_types_to_search) && !empty($tag_types_to_search)) {
-			$sql_related_entries[] = 'SELECT blog_id, "same-tag" AS relation_type FROM blog_tags WHERE blog_id != ? AND ('.substr(str_repeat('tag_id=? OR ', count($tag_types_to_search)), 0, -4).') ORDER BY id DESC LIMIT 12';
-			
-			array_unshift($tag_types_to_search, $entry['id']);
-			$values_related_entries[] = $tag_types_to_search;
-		}
 	}
 	
-	// Related: entries by same artist(s)
-	if(is_array($entry['tags_artists']) && !empty($entry['tags_artists'])) {
-		foreach($entry['tags_artists'] as $tag) {
-			$artist_tags_to_search[] = $tag['id'];
-		}
+}
+	
+// Get artist info for sidebar
+if( is_numeric( $entry['artist']['id'] ) ) {
+	
+	// Basic info
+	$entry['artist'] = $access_artist->access_artist([ 'id' => $entry['artist']['id'], 'get' => 'profile' ]);
+	
+	// Latest video
+	$sql_video = 'SELECT videos.* FROM videos WHERE videos.artist_id=? ORDER BY videos.date_occurred DESC LIMIT 1';
+	$stmt_video = $pdo->prepare($sql_video);
+	$stmt_video->execute([ $entry['artist']['id'] ]);
+	$entry['artist']['video'] = $stmt_video->fetch();
+	
+}
+	
+// Format sources and supplements
+foreach([ 'sources', 'supplemental' ] as $supplement_type) {
+	
+	$supplement = $entry[ $supplement_type ];
+	
+	if( strlen( $supplement ) ) {
 		
-		if(is_array($artist_tags_to_search) && !empty($artist_tags_to_search)) {
-			$sql_related_entries[] = 'SELECT blog_id, "same-artist" AS relation_type FROM blog_artists WHERE blog_id != ? AND ('.substr(str_repeat('artist_id=? OR ', count($artist_tags_to_search)), 0, -4).') ORDER BY id DESC LIMIT 12';
-			
-			array_unshift($artist_tags_to_search, $entry['id']);
-			$values_related_entries[] = $artist_tags_to_search;
-		}
+		// Format Twitter usernames into links
+		$supplement = preg_replace('/'.'^@([A-z0-9-_]+)(?:\s|$)'.'/m', '[$1](https://twitter.com/$1)', $supplement);
+		
+		// Make sure is formatted as Markdown list
+		$supplement = preg_replace('/'.'^'.'/m', '* ', $supplement);
+		
+		// Parse markdown
+		$supplement = $markdown_parser->parse_markdown($supplement);
+		
+		// Make some changes to the way Markdown parsed elements
+		$supplement = str_replace('href="https://twitter', 'class="symbol__twitter" target="_blank" href="https://twitter', $supplement);
+		$supplement = str_replace('class="ul--bulleted"', '', $supplement);
+		$supplement = str_replace('<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>', '', $supplement);
+		
 	}
 	
-	// Related: entries by related artists
-	if(is_array($entry['tags_artists']) && !empty($entry['tags_artists'])) {
-		foreach($entry['tags_artists'] as $tag) {
-			$artists_mentioned_in_entry[] = $tag['id'];
-		}
-		
-		$related_artists = $access_artist->get_related_artists($artists_mentioned_in_entry, 'label');
-		
-		if(is_array($related_artists) && !empty($related_artists)) {
-			foreach($related_artists as $artist) {
-				$related_artist_tags_to_search[] = $artist['id'];
-			}
-		}
-		
-		if(is_array($related_artist_tags_to_search) && !empty($related_artist_tags_to_search)) {
-			$sql_related_entries[] = 'SELECT blog_id, "related-artist" AS relation_type FROM blog_artists WHERE blog_id != ? AND ('.substr(str_repeat('artist_id=? OR ', count($related_artist_tags_to_search)), 0, -4).') ORDER BY id DESC LIMIT 12';
-			
-			array_unshift($related_artist_tags_to_search, $entry['id']);
-			$values_related_entries[] = $related_artist_tags_to_search;
-		}
-	}
+	// Return
+	$entry[ $supplement_type ] = $supplement;
 	
-	// Get related entries: merge sql queries and values, then randomize and return
-	if(is_array($sql_related_entries) && is_array($values_related_entries) && count($sql_related_entries) === count($values_related_entries)) {
-		$values_ids_of_related_entries = [];
-		
-		foreach($values_related_entries as $values_set) {
-			$values_ids_of_related_entries = array_merge($values_ids_of_related_entries, $values_set);
-		}
-		
-		$sql_ids_of_related_entries = '
-			SELECT blog_id, relation_type FROM
-			(('.implode(') UNION (', $sql_related_entries).')) possibilities ORDER BY RAND()
-		';
-		$stmt_ids_of_related_entries = $pdo->prepare($sql_ids_of_related_entries);
-		$stmt_ids_of_related_entries->execute($values_ids_of_related_entries);
-		$rslt_ids_of_related_entries = $stmt_ids_of_related_entries->fetchAll();
-		
-		// For ids of related entries, go back and get actual entry info
-		if(is_array($rslt_ids_of_related_entries) && !empty($rslt_ids_of_related_entries)) {
-			foreach($rslt_ids_of_related_entries as $related_entry_id) {
-				$related_entry_ids[] = $related_entry_id['blog_id'];
-			}
-			$related_entry_ids = array_values(array_unique($related_entry_ids));
-			
-			$sql_related_entries = 'SELECT blog.title, blog.friendly, blog.image_id, images.extension FROM blog LEFT JOIN images ON images.id=blog.image_id WHERE ('.substr(str_repeat('blog.id=? OR ', count($related_entry_ids)), 0, -4).') AND blog.is_queued=0 ORDER BY RAND() LIMIT 6';
-			$stmt_related_entries = $pdo->prepare($sql_related_entries);
-			$stmt_related_entries->execute($related_entry_ids);
-			$entry['related'] = $stmt_related_entries->fetchAll();
-		}
-	}
+}
+
+// If entry has a main artist, try to get cover art of their last release to put into CDJ ad
+if( strlen($entry['artist_id']) ) {
+	$sql_artist_cover = 'SELECT CONCAT("/images/", images.id, ".thumbnail.", images.extension) AS thumbnail_url FROM releases LEFT JOIN images ON images.id=releases.image_id WHERE releases.artist_id=? AND releases.image_id IS NOT NULL AND images.id IS NOT NULL ORDER BY releases.date_occurred DESC LIMIT 1';
+	$stmt_artist_cover = $pdo->prepare($sql_artist_cover);
+	$stmt_artist_cover->execute([ $entry['artist_id'] ]);
+	$rslt_artist_cover = $stmt_artist_cover->fetchColumn();
+}
+
+// Set images that appear in CDJ ad
+$cdj_jackets = [
+	'/images/68232.thumbnail.jpg', // KAMIJO
+	'/images/62969.thumbnail.jpg', // the GazettE
+	( $rslt_artist_cover ?: '/images/68564.thumbnail.jpg' ), // BabyKingdom
+];
+
+// Set error message
+if( $entry['is_queued'] ) {
+	$error = 'You are viewing an unpublished article.';
+}
+
+?>
+
+<div class="col c1">
 	
-	?>
-		<article class="row <?= $entry_has_image ? null : 'entry--no-image'; ?> ">
+	<div class="entry__wrapper any--margin">
+		
+		<!-- Main article area (left) -->
+		<article class="entry__article">
 			
-			<?= $entry['is_queued'] ? '<div class="col c1"><div class="text text--outlined text--error symbol__error">You are viewing an unpublished article.</div></div>' : null; ?>
+			<!-- Error message -->
+			<?= $error ? '<div class="article__error text text--outlined text--error symbol__error any--margin">'.$error.'</div>' : null; ?>
 			
-			<div class="col c4-ABBC entry__head">
-				<div class="entry__side">
-					<?php
-						if($entry['prev_next'][0]['type'] === 'prev') {
-							subnav([
-								[
-									'text' => $entry['prev_next'][0]['title'],
-									'url' => '/blog/'.$entry['prev_next'][0]['friendly'].'/',
-									'position' => 'left',
-								]
-							], 'directional');
-						}
-					?>
-				</div>
-				
-				<header class="entry__main-column">
-					<time class="h5 entry__date" datetime="<?php echo $entry['date_occurred']; ?>">
-						<?php echo $entry['date_occurred']; ?>
-					</time>
-					<h1 class="entry__title">
-						<a class="a--inherit" href="/blog/<?php echo $entry['friendly']; ?>/"><?php echo $entry['title']; ?></a>
-					</h1>
-				</header>
-				
-				<div class="entry__side">
-					<?php
-						if(isset($entry['prev_next'][1])) {
-							subnav([
-								[
-									'text' => $entry['prev_next'][1]['title'],
-									'url' => '/blog/'.$entry['prev_next'][1]['friendly'].'/',
-									'position' => 'right',
-								]
-							], 'directional');
-						}
-					?>
-				</div>
+			<!-- Image -->
+			<?php if($entry['image']): ?>
+				<a class="article__image <?= $entry['image']['width'] && $entry['image']['height'] / $entry['image']['width'] > 1.2 ? 'article__image--portrait' : null; ?> any--margin">
+					<img alt="<?= $entry['title']; ?>" src="<?= $entry['image']['url']; ?>" height="<?= $entry['image']['height']; ?>" width="<?= $entry['image']['width']; ?>" />
+				</a>
+			<?php endif; ?>
+			
+			<!-- Date and translation -->
+			<div class="article__date h5">
+				<?php
+					echo substr( $entry['date_occurred'], 0, 10 );
+					
+					if( $entry['translations'] && count($entry['translations']) > 1 ) {
+						echo ' &middot; ';
+						echo [ 'en' => 'English ver', 'ja' => '日本語版' ][ $entry['language'] ];
+					}
+				?>
 			</div>
 			
-			<style>
-				.entry--interview > .ul--bulleted,
-				.entry--interview > .ul--bulleted li {
-					width: 100%;
-				}
-				.entry--interview > .ul--bulleted li {
-					padding-bottom: 1.5rem;
-					padding-top: 1.5rem;
-				}
-				.entry--interview > .ul--bulleted li::before {
-					opacity: 0;
-				}
-				.entry--interview h2 {
-					line-height: 1.6;
-					padding: 0 2rem 0 1rem;
-					width: calc(600px + 2rem);
-				}
-				.entry--interview h2::before {
-					background: hsl(var(--attention--secondary));
-					background-clip: content-box;
-					bottom: 0;
-					content: "";
-					display: inline-block;
-					left: 0;
-					position: absolute;
-					top: 0;
-					width: 4px;
-				}
-				.entry--interview h2 + p {
-					margin-top: 1.5rem;
-				}
-			</style>
+			<!-- Title -->
+			<h1 class="article__title">
+				<a href="<?= $entry['url']; ?>"><?= $entry['title']; ?></a>
+			</h1>
 			
-			<div class="col c4-ABBC">
-				<aside class="entry__details entry__side">
-					<div class="text text--outlined">
-						<ul>
-							<li class="any--flex">
-								<a class="entry__avatar lazy" data-src="<?= '/usericons/avatar-'.$entry['user']['username'].'.png'; ?>" href="<?= $entry['user']['url']; ?>"></a>
-								<div>
-									<h5>
-										Written by
-									</h5>
-									<a class="user" data-icon="<?= $entry['user']['icon']; ?>" data-is-vip="<?= $entry['user']['is_vip']; ?>" href="<?= $entry['user']['url']; ?>"><?= $entry['user']['username']; ?></a>
-								</div>
-							</li>
-							<?php
-								if($entry['contributor_ids']) {
-									$access_user = new access_user($pdo);
-									$contributor_ids = json_decode($entry['contributor_ids'], true);
-									
-									if(is_array($contributor_ids) && !empty($contributor_ids)) {
-										?>
-											<li>
-												<h5>
-													<?= lang('Contributors', '寄稿家', 'hidden'); ?>
-												</h5>
-												<?php
-													foreach($contributor_ids as $contributor_id) {
-														$contributor = $access_user->access_user([ 'id' => $contributor_id, 'get' => 'name', 'limit' => 1 ]);
-														?>
-															<span>
-																<a class="entry__avatar lazy" data-src="<?= '/usericons/avatar-'.$contributor['username'].'.png'; ?>" href="<?= $contributor['url']; ?>"></a>
-															</span>
-														<?php
-													}
-												?>
-											</li>
-										<?php
-									}
-								}
-								
-								// Show available translations
-								if($entry['translations'] && count($entry['translations']) > 1) {
-									?>
-										<li>
-											<div class="h5">
-												<?= lang('Translations', '翻訳', 'hidden'); ?>
-											</div>
-											<?php
-												foreach($entry['translations'] as $translation) {
-													if($translation['language'] != $entry['language']) {
-														echo '<a href="/blog/'.$translation['friendly'].'/">'.[ 'en' => 'The English version is here.', 'ja' => '日本語版へこちら。' ][ $translation['language'] ].'</a>';
-													}
-												}
-											?>
-										</li>
-									<?php
-								}
-								/*if(is_array($entry['edit_history']) && !empty($entry['edit_history'])) {
-									foreach($entry['edit_history'] as $edit) {
-										if($edit['user']['username'] != $entry['user']['username']) {
-											$show_edits = true;
-											break;
-										}
-									}
-									
-									if($show_edits) {
-										?>
-											<li>
-												<h5>
-													Contributors
-												</h5>
-												<?php
-													$shown_users = [];
-													
-													foreach($entry['edit_history'] as $edit) {
-														if(!in_array($edit['user']['username'], $shown_users)) {
-															?>
-																<span>
-																	<a class="entry__avatar lazy" data-src="<?= '/usericons/avatar-'.$edit['user']['username'].'.png'; ?>" href="<?= $edit['user']['url']; ?>"></a>
-																</span>
-															<?php
-														}
-														
-														$shown_users[] = $edit['user']['username'];
-													}
-												?>
-											</li>
-										<?php
-									}
-								}*/
-							?>
-					</div>
-					
-					<?php
-						if((is_array($entry['tags']) && !empty($entry['tags'])) || (is_array($entry['tags_artists']) && !empty($entry['tags_artists']))) {
-							?>
-								<div class="text text--outlined">
-									<ul>
-										<?php
-											if(is_array($entry["tags"]) && !empty($entry["tags"])) {
-												?>
-													<li>
-														<h5>
-															Tags
-														</h5>
-														<?php
-															foreach($entry["tags"] as $tag) {
-																if($tag['friendly'] === 'auto-generated') {
-																	$is_auto_generated = true;
-																}
-																?>
-																	<a class="tag symbol__tag" href="/blog/tag/<?php echo $tag["friendly"]; ?>/"><?php echo $tag["name"]; ?></a>
-																<?php
-															}
-														?>
-													</li>
-												<?php
-											}
-											
-											if(is_array($entry["tags_artists"]) && !empty($entry["tags_artists"])) {
-												?>
-													<li>
-														<h5>
-															Tagged artists
-														</h5>
-														<?php
-															foreach($entry["tags_artists"] as $tag) {
-																?>
-																	<a class="tag symbol__tag" href="/blog/artist/<?php echo $tag["friendly"]; ?>/"><?php echo $tag["quick_name"]; ?></a>
-																<?php
-															}
-														?>
-													</li>
-												<?php
-											}
-											
-											if($is_auto_generated) {
-												?>
-													<li class="any--weaken-color">
-														<span class="symbol__error"></span>
-														This post was automatically generated. Feel free to note any inaccuracies in the comments.
-													</li>
-												<?php
-											}
-										?>
-									</ul>
-								</div>
-							<?php
-						}
-					?>
-				</aside>
+			<!-- Details (author, tags) -->
+			<div class="article__details data__container">
 				
-				<div class="entry__content entry__main-column">
-					<a class="entry__image-link lazy" data-src="<?php echo str_replace('.', '.thumbnail.', $entry['image']['url']); ?>" href="<?php echo $entry['image']['url']; ?>">
-						<img class="entry__image webfeedsFeaturedVisual" src="<?= $entry_is_feature ? $entry['image']['url'] : str_replace('.', '.large.', $entry['image']['url']); ?>" />
-					</a>
-					
-					<div class="text text--centered <?= $entry_is_feature ? 'entry--interview' : null; ?> ">
+				<!-- Author -->
+				<div class="data__item">
+
+					<h5>
+						Author
+					</h5>
+
+					<?php if( $entry['user']['avatar_url'] && file_exists( '..'.$entry['user']['avatar_url'] ) ): ?>
+						<a class="article__avatar" href="<?= $entry['user']['url']; ?>">
+							<img alt="<?= $entry['user']['username']; ?>" src="<?= $entry['user']['avatar_url']; ?>" />
+						</a>
+					<?php endif; ?>
+
+					<?= $access_user->render_username($entry['user']); ?>
+
+				</div>
+
+				<!-- Contributors -->
+				<?php if( is_array($entry['contributors']) && !empty($entry['contributors']) ): ?>
+					<div class="data__item">
+
+						<h5>
+							<?= lang('Contributors', '寄稿家', 'hidden'); ?>
+						</h5>
+
+						<?php foreach( $entry['contributors'] as $contributor ): ?>
+
+							<?php if( $contributor['avatar_url'] && file_exists( '..'.$contributor['avatar_url'] ) ): ?>
+								<a class="article__avatar" href="<?= $contributor['url']; ?>">
+									<img alt="<?= $contributor['username']; ?>" src="<?= $contributor['avatar_url']; ?>" />
+								</a>
+							<?php endif; ?>
+
+							<?= $access_user->render_username($contributor); ?>
+
+						<?php endforeach; ?>
+
+					</div>
+				<?php endif; ?>
+
+				<!-- Translations -->
+				<?php if( $entry['translations'] && count($entry['translations']) > 1 ): ?>
+					<div class="data__item">
+
+						<div class="h5">
+							<?= lang('Translations', '翻訳', 'hidden'); ?>
+						</div>
+
 						<?php
-							echo $entry['content'];
-							
-							if($entry['sources']) {
-								preg_match_all('/'.'^(@([A-z0-9-_]+))(?:\s|$)'.'/m', $entry['sources'], $twitter_matches);
-								
-								if(is_array($twitter_matches) && !empty($twitter_matches)) {
-									for($i=0; $i<count($twitter_matches[0]); $i++) {
-										$entry['sources'] = str_replace($twitter_matches[1][$i], '['.$twitter_matches[1][$i].'](https://twitter.com/'.$twitter_matches[2][$i].'/)', $entry['sources']);
-									}
+							foreach($entry['translations'] as $translation) {
+								if($translation['language'] != $entry['language']) {
+									echo '<a class="symbol__random" href="/blog/'.$translation['friendly'].'/">';
+									echo [ 'en' => 'English', 'ja' => '日本語版' ][ $translation['language'] ];
+									echo '</a>';
 								}
-								
-								$sources = $entry['sources'];
-								$sources = explode("\n", $sources);
-								$sources = array_filter($sources);
-								$sources = (count($sources) > 1 ? '* ' : null).implode("\n* ", $sources);
-								$sources = $markdown_parser->parse_markdown($sources);
-								$sources = str_replace('<ul class="ul--bulleted">', '<ul class="text text--outlined text--notice entry__sources">', $sources);
-								
-								?>
-									<h5 style="margin-top: 3rem; width: 100%;">
-										Sources
-									</h5>
-									<?= $sources; ?>
-								<?php
-							}
-							
-							if($entry['supplemental']) {
-								preg_match_all('/'.'^(@([A-z0-9-_]+))(?:\s|$)'.'/m', $entry['supplemental'], $twitter_matches);
-								
-								if(is_array($twitter_matches) && !empty($twitter_matches)) {
-									for($i=0; $i<count($twitter_matches[0]); $i++) {
-										$entry['supplemental'] = str_replace($twitter_matches[1][$i], '['.$twitter_matches[1][$i].'](https://twitter.com/'.$twitter_matches[2][$i].'/)', $entry['supplemental']);
-									}
-								}
-								
-								$supplemental = $entry['supplemental'];
-								$supplemental = explode("\n", $supplemental);
-								$supplemental = array_filter($supplemental);
-								$supplemental = implode("\n", $supplemental);
-								$supplemental = preg_replace('/'.'^([^*])'.'/m', '* $1', $supplemental);
-								$supplemental = $markdown_parser->parse_markdown($supplemental);
-								$supplemental = str_replace('<ul class="ul--bulleted">', '<ul class="text text--outlined text--notice entry__sources">', $supplemental);
-								?>
-									<h5 style="margin-top: 3rem; width: 100%;">
-										Links 
-									</h5>
-									<?= $supplemental; ?>
-								<?php
 							}
 						?>
+
 					</div>
+				<?php endif; ?>
+
+				<!-- Tags -->
+				<?php if( is_array($entry['tags']) && !empty($entry['tags']) ): ?>
+					<div class="data__item">
+
+						<h5>
+							Tags
+						</h5>
+
+						<?php foreach($entry['tags'] as $tag): ?>
+							<a class="any__tag symbol__tag" href="<?= '/blog/tag/'.$tag['friendly'].'/'; ?>"><?= $tag['name']; ?></a>
+						<?php endforeach; ?>
+
+					</div>
+				<?php endif; ?>
+
+			</div>
+			
+			<!-- Content -->
+			<div class="article__content text text--prose any--margin">
+				
+				<!-- Main text -->
+				<?= $entry['summary']."\n".$entry['content']; ?>
+				
+				<!-- Sources and other stuff -->
+				<?php if( $entry['sources'] || $entry['supplemental'] ): ?>
+				<div class="article__supplemental text">
 					
+					<?php if( $entry['supplemental'] ): ?>
+						<details class="ul">
+							<summary class="h2">Details</summary>
+							<?= $entry['supplemental']; ?>
+						</details>
+					<?php endif; ?>
+					
+					<?php if( $entry['sources'] ): ?>
+						<details class="ul">
+							<summary class="h2">Sources</summary>
+							<?= $entry['sources']; ?>
+						</details>
+					<?php endif; ?>
+					
+				</div>
+				<?php endif; ?>
+				
+			</div>
+			
+			<!-- Sidebar -->
+			<?php if( is_array($entry['artist']) && !empty($entry['artist']) ): ?>
+			<aside class="article__sidebar any--margin">
+				
+				<h2>
+					<?= lang('Profile', 'プロフィール', 'div'); ?>
+				</h2>
+				
+				<div class="any--sticky">
 					<?php
-						// If entry has associated images, see if we need a separate image gallery
-						if(is_array($entry['images']) && !empty($entry['images'])) {
-							
-							// Copy images array and reset keys
-							$image_gallery = array_values($entry['images']);
-							$num_images = count($entry['images']);
-							
-							// For each image, if already used in blog, unset from image gallery
-							for($i=0; $i<$num_images; $i++) {
-								if(strpos($entry['content'], '/images/'.$image_gallery[$i]['id']) !== false || $entry['image_id'] === $image_gallery[$i]['id']) {
-									unset($image_gallery[$i]);
-								}
-							}
-							
-							// If any images remain in image gallery, display them
-							if(is_array($image_gallery) && !empty($image_gallery)) {
-								?>
-									<h3>
-										<?= lang('Other images', 'イメージギャラリー', 'div'); ?>
-									</h3>
-									<div class="text text--outlined">
-										<div class="entry__thumbnails">
-											<?php
-												foreach($image_gallery as $image) {
-													?>
-														<a class="entry__thumbnail-link" href="<?= '/images/'.$image['id'].'.'.$image['extension']; ?>" target="_blank">
-															<img class="entry__thumbnail" src="<?= '/images/'.$image['id'].'.thumbnail.'.$image['extension']; ?>" />
-														</a>
-													<?php
-												}
-											?>
-										</div>
-									</div>
+						
+						// Render artist card
+						$access_artist->artist_card($entry['artist']);
+						
+						// Description
+						echo $entry['artist']['description'] ? '<div class="any--weaken any--small-margin">'.$markdown_parser->parse_markdown($entry['artist']['description']).'</div>' : null;
+						
+						// Musicians
+						if( is_array($entry['artist']['musicians']) && !empty($entry['artist']['musicians']) ): ?>
+							<ul class="any--weaken ul--compact any--small-margin">
+								<?php foreach( $entry['artist']['musicians'] as $musician ): ?>
+									<?php if( $musician['to_end'] ): ?>
+										
+										<!-- Musician -->
+										<li style="line-height:1rem;">
+											
+											<!-- Musician SNS -->
+											<div style="float:right;">
+												<?php
+													// Loop through artist's links and echo out musician's sns
+													if(is_array($entry['artist']['urls']) && !empty($entry['artist']['urls'])) {
+														foreach($entry['artist']['urls'] as $url) {
+															if( $url['musician_id'] == $musician['id'] ) {
+																
+																// If link is SNS--let's clean this up later to use link object
+																if( $url['type'] == 5 ) {
+																	
+																	// Only care if Twitter or Instagram--let's also clean this up later by making links store SNS platform?
+																	if( strpos( $url['content'], 'twitter' ) !== false ) {
+																		echo '<a style="line-height:1rem;font-size:1rem;padding:0.5rem;margin:-0.5rem -0.5rem 0 0.5rem;display:inline-block;" href="'.$url['content'].'" rel="nofollow" target="_blank"><span class="symbol--standalone symbol__twitter" style="vertical-align:middle;"></span></a>';
+																	}
+																	elseif( strpos( $url['content'], 'instagram' ) !== false ) {
+																		echo '<a style="line-height:1rem;font-size:1rem;padding:0.5rem;margin:-0.5rem -0.5rem 0 0.5rem;display:inline-block;" href="'.$url['content'].'" rel="nofollow" target="_blank"><span class="symbol--standalone symbol__instagram" style="vertical-align:middle;"></span></a>';
+																	}
+																	
+																}
+																
+															}
+														}
+													}
+												?>
+											</div>
+											
+											<!-- Musician position -->
+											<span>
+												<?= strpos( $musician['position_name'], 'support' ) !== false ? 'Sp ' : null; ?>
+												<?= ['O', 'V', 'G', 'B', 'D', 'K', 'O', 'S'][ $musician['position'] ].'. '; ?>
+											</span>
+											
+											<!-- Musician name -->
+											<a class="a--inherit" href="<?= '/musicians/'.$musician['id'].'/'.$musician['friendly'].'/'; ?>">
+												<?= strlen($musician['as_name']) ? ( $musician['as_romaji'] ? lang( $musician['as_romaji'], $musician['as_name'], 'parentheses' ) : $musician['as_name'] ) : null; ?>
+												<?= !strlen($musician['as_name']) ? ( $musician['romaji'] ? lang( $musician['romaji'], $musician['name'], 'parentheses' ) : $musician['name'] ) : null; ?>
+											</a>
+											
+										</li>
+										
+									<?php endif; ?>
+								<?php endforeach; ?>
+							</ul>
+						<?php endif;
+						
+						// Artist links
+						if( is_array($entry['artist']['urls']) && !empty($entry['artist']['urls']) ): ?>
+							<div class="any--flex">
 								<?php
-							}
-						}
+									foreach( $entry['artist']['urls'] as $url ) {
+										if( $url['is_active'] && !is_numeric($url['musician_id']) ) {
+											
+											// Official site
+											if( $url['type'] == 1 && !$num_official_sites ) {
+												echo '<a class="a--padded a--outlined" href="'.$url['content'].'" rel="nofollow" target="_blank">'.lang('website', 'オフィシャル', 'hidden').'</a>';
+												$num_official_sites++;
+											}
+											
+											// Official shop
+											elseif( $url['type'] == 2 && !$num_official_shops ) {
+												echo '<a class="a--padded" href="'.$url['content'].'" rel="nofollow" target="_blank">'.lang('shop', 'ショップ', 'hidden').'</a>';
+												$num_official_shops++;
+											}
+											
+											// SNS
+											elseif( $url['type'] == 5 && strpos( $url['content'], 'twitter' ) !== false ) {
+												echo '<a class="a--padded" href="'.$url['content'].'" rel="nofollow" target="_blank">';
+												echo '<span class="symbol--standalone symbol__twitter"></span>';
+												echo '</a>';
+											}
+											
+										}
+									}
+								?>
+							</div>
+						<?php endif;
+						
+						// Artist video
+						if( is_array( $entry['artist']['video'] ) && !empty( $entry['artist']['video'] ) ): ?>
+							<div class="article__video">
+								<a class="lazy video__thumbnail" data-src="<?= 'https://img.youtube.com/vi/'.$entry['artist']['video']['youtube_id'].'/hqdefault.jpg'; ?>" href="<?= '/videos/'.$entry['artist']['video']['id'].'/'; ?>"></a>
+								<a class="a--cutout any--weaken-size" href="<?= '/videos/'.$entry['artist']['video']['id'].'/'; ?>"><?= $access_video->clean_title($entry['artist']['video']['youtube_name'], $entry['artist']); ?></a>
+							</div>
+						<?php endif;
+						
 					?>
 				</div>
 				
-				<aside class="entry__supplements entry__side">
-					<?php
-						if(is_array($entry["tags_artists"]) && !empty($entry["tags_artists"])) {
-							?>
-								<h3>
-									<div class="any--en">
-										Mentioned artists
-									</div>
-									<div class="any--jp any--weaken">
-										<?php echo sanitize('関連アーティスト'); ?>
-									</div>
-								</h3>
-								
-								<div class="card--small">
-									<?php
-										rsort($entry['tags_artists']);
-										$i = 0;
-										foreach($entry["tags_artists"] as $artist) {
-											if(is_array($artist) && !empty($artist) && is_numeric($artist["id"]) && $i < 4) {
-												$artist = $access_artist->access_artist(["id" => $artist["id"], "get" => "name"]);
-												$access_artist->artist_card($artist);
-												$i++;
-											}
-										}
-									?>
-								</div>
-							<?php
-						}
-					?>
-					
-					<?php
-						if(is_array($entry['related']) && !empty($entry['related'])) {
-							?>
-								<h3>
-									<div class="any--en">
-										Other stories
-									</div>
-									<div class="any--jp any--weaken">
-										<?php echo sanitize('関連ニュース'); ?>
-									</div>
-								</h3>
-								<div class="any--flex" style="flex-wrap: wrap; margin: -0.5rem; margin-bottom: 2.5rem;">
-									<?php
-										foreach($entry['related'] as $related) {
-											?>
-												<a class="text text--outlined" href="/blog/<?php echo $related['friendly']; ?>/" style="align-self: flex-start; flex-grow: 1; flex-basis: 150px; margin: 0.5rem; <?php echo $related['image_id'] ? 'padding-top: calc(100px + 1rem); background-size: auto 100px; background-repeat: no-repeat; background-position: top center; background-image: url(/images/'.$related['image_id'].'.small.'.$related['extension'].'), linear-gradient(hsl(var(--background)), hsl(var(--background)));' : null; ?>">
-													<?php
-														echo $related['title'];
-													?>
-												</a>
-											<?php
-										}
-									?>
-								</div>
-							<?php
-						}
-					?>
-				</aside>
-			</div>
+			</aside>
+			<?php endif; ?>
+			
 		</article>
-	<?php
+		
+		<!-- Promoted stories -->
+		<div class="entry__supplemental any--margin">
+
+			<!-- CDJapan -->
+			<div class="entry__ad" style="flex-grow:1;">
+				<a class="callout any--sticky any--margin" href="https://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/music%2Fj-pop%2Fvisualkei%2F" target="_blank">
+					
+					<div class="callout__image">
+						<?php foreach( $cdj_jackets as $cdj_jacket ): ?>
+							<img class="entry__cdjapan" src="<?= $cdj_jacket; ?>" />
+						<?php endforeach; ?>
+					</div>
+					
+					<div class="callout__text">
+						Preorder vkei releases at CDJapan
+					</div>
+					
+				</a>
+			</div>
+			
+			<!--<div class="entry__ad" style="flex-grow:1;">
+				<a class="callout any--sticky any--margin" href="" style="">
+					<div class="callout__text">
+						Buy rare vkei at RarezHut
+					</div>
+				</a>
+			</div>-->
+			
+			<!-- Related entries -->
+			<?php if( is_array($entry['related_entries']) && !empty($entry['related_entries']) ): ?>
+				<div>
+					
+					<h3>
+						<?= lang('Related', '関連ニュース', 'div'); ?>
+					</h3>
+					
+					<ul>
+						<?php foreach( $entry['related_entries'] as $related_entry ): ?>
+							<li class="entry__related card__container">
+								
+								<a class="card__link" href="<?= $related_entry['url']; ?>"></a>
+								
+								<div class="related__image <?= $related_entry['image_url'] ? null : 'any--crossed-out'; ?> card--subject lazy" data-src="<?= $related_entry['image_thumbnail_url']; ?>"></div>
+								
+								<span class="card--subject"><?= $related_entry['title']; ?></span>
+								
+							</li>
+						<?php endforeach; ?>
+					</ul>
+					
+				</div>
+			<?php endif; ?>
+			
+		</div>
+		
+		<!-- Comments -->
+		<div class="entry__comments">
+			<?php
+				include('../comments/partial-comments.php');
+				render_default_comment_section('blog', $entry['id'], $entry['comments'], $markdown_parser);
+			?>
+		</div>
+		
+	</div>
 	
-	include('../comments/partial-comments.php');
-	render_default_comment_section('blog', $entry['id'], $entry['comments'], $markdown_parser);
-}
+</div>
