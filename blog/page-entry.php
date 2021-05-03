@@ -6,6 +6,9 @@ style([
 	'/blog/style-page-entry.css',
 ]);
 
+// Active page
+$active_page = '/blog/';
+
 // Separate first sentence as summary, just in case we want to display it differently later
 $entry['summary'] = explode("\n", $entry['content'])[0];
 $entry['content'] = implode("\n", array_slice( explode("\n", $entry['content']), 1 ) );
@@ -18,7 +21,7 @@ $rslt_twitter = $stmt_twitter->fetchColumn();
 $page_creator = $rslt_twitter && preg_match('/'.'^[A-z0-9_]+$'.'/', $rslt_twitter) ? $rslt_twitter : null;
 
 // Set page description to cleaned, truncated first line of content
-$page_description = strip_tags( substr( $entry['summary'], 140 ) ).' (continued…)';
+$page_description = substr( strip_tags( $entry['summary'] ), 0, 140 ).' (continued…)';
 
 // If images were successfully gotten, assign them to page (assumes images are arranged by id)
 if( is_array($entry['images']) && !empty($entry['images']) ) {
@@ -175,6 +178,20 @@ if( $entry['is_queued'] ) {
 }
 
 ?>
+
+<!-- Fix a bug with the minimizer -->
+<style>
+	@media(min-width:900px) {
+		.entry__wrapper {
+			--spacer: ;
+		}
+	}
+	@media (min-width: 1300px) {
+		.entry__wrapper {
+			--spacer: [spacer-start] minmax(200px,20%);
+		}
+	}
+</style>
 
 <div class="col c1">
 	
