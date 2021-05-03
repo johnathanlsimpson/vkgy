@@ -26,6 +26,7 @@ include_once('../php/class-parse_markdown.php');
 include_once('../php/function-parse_edit_history.php');
 include_once('../php/function-image_exists.php');
 include_once('../php/function-lang.php');
+include_once('../php/function-tracking_link.php');
 include_once('../translations/class-translate.php');
 include_once('../translations/function-init_translate.php');
 include_once('../translations/function-tr.php');

@@ -20,7 +20,10 @@ usort($patrons, function($a, $b) { return strtolower($a['username']) <=> strtolo
 // Make sure icons exist
 $num_patrons = count($patrons);
 for($i=0; $i<$num_patrons; $i++) {
-	if(!file_exists('..'.$patrons[$i]['avatar_url'])) {
+	if(file_exists('..'.$patrons[$i]['avatar_url'])) {
+		$patrons[$i]['avatar_url'] .= '?'.date( 'YmdHis', filemtime('..'.$patrons[$i]['avatar_url']) );
+	}
+	else {
 		$patrons[$i]['avatar_url'] = '/usericons/avatar-anonymous.png';
 	}
 }

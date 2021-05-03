@@ -67,8 +67,8 @@ let quickSearch = debounceX(function() {
 	
 	searchElem.addEventListener( eventType , function() {
 		
-		// Show and search if value not empty
-		if( searchElem.value && searchElem.value.length > 0 ) {
+		// Show and search if value not empty (or if pasted)
+		if( eventType === 'paste' || ( searchElem.value && searchElem.value.length > 0 ) ) {
 			showQuickSearch();
 			quickSearch();
 		}
