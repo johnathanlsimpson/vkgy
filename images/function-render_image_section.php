@@ -119,7 +119,7 @@ function render_image_section($images, $args = []) {
 				'id'                 => $image['id'],
 				'item_type'          => $args['item_type'],
 				'item_id'            => $args['item_id'],
-				'description'        => sanitize( str_replace("&#39;", '\&#39;', $image['description']), 'alpine' ),
+				'description'        => sanitize( $image['description'], 'alpine' ),
 				'credit'             => $image['credit'],
 				'is_exclusive'       => $image['is_exclusive'] ? 'checked' : null,
 				'is_default'         => $image['id'] == $args['default_id'] ? 'checked' : null,

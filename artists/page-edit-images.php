@@ -91,7 +91,7 @@ if( is_array($artist['images']) && !empty($artist['images']) ) {
 				'item_type' => 'artist',
 				'item_id' => $artist['id'],
 				'item_name' => $artist['quick_name'],
-				'description' => $artist['quick_name'].' group photo',
+				'description' => sanitize( $artist['quick_name'].' group photo', 'alpine' ),
 				'default_id' => $artist['image_id'],
 				'hide_blog' => true,
 				'hide_labels' => true,
