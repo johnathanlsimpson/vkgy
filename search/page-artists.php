@@ -58,7 +58,7 @@
 	
 	$access_artist = new access_artist($pdo);
 	$artists = $access_artist->access_artist($artist_query);
-	$num_artists = count($artists);
+	$num_artists = is_array($artists) && !empty($artists) ? count($artists) : 0;
 ?>
 
 <div class="col c1 any--margin">
