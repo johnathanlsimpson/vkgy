@@ -125,33 +125,49 @@
 /* Prose image styling */
 .module--image {
 	overflow: hidden;
+	text-align: center;
 }
 .module--image a {
+	display: inline-block;
+	margin-left: auto;
+	margin-right: auto;
+	vertical-align: bottom;
 	width: 100%;
 }
-.module--image::after {
+.module--image a::after {
 	background: linear-gradient(hsla(var(--background),0), hsla(var(--background),1));
 	content: "";
 	display: block;
-	height: 1.5rem;
+	height: 2rem;
 	position: absolute;
-	top: calc(500px - 1.5rem);
+	top: calc(600px - 2rem);
 	width: 100%;
 }
+.text--prose .module--image a::after {
+	background-image: linear-gradient( hsla(var(--background--secondary),0), hsla(var(--background--secondary),1) 2rem);
+}
+.module--portrait a::after {
+	top: calc(700px - 2rem);
+}
+.text--prose .module--portrait a::after {
+	background-image: linear-gradient( hsla(var(--background--secondary),0), hsla(var(--background--secondary),1) 2rem);
+	height: 3rem;
+	top: calc(700px - 2rem);
+}
 .module--image img {
-	max-height: 500px;
+	display: inline-block;
+	height: auto;
+	max-height: 600px;
+	max-width: 100%;
 	object-fit: cover;
 	vertical-align: middle;
 	width: 100%;
 }
-.module--portrait {
-	/*width: calc(550px + 2rem);*/
-}
-.module--portrait::after {
-	top: calc(700px - 1.5rem);
-}
 .module--portrait img {
 	max-height: 700px;
+}
+.module--image .h5:not(:empty) {
+	margin-top: 1rem;
 }
 
 /* Gallery base styling */
@@ -524,24 +540,6 @@ summary::after {
 }
 .module--compact {
 	padding: 0.5rem;
-}
-.module--image {
-	text-align: center;
-}
-.module--image a {
-	display: inline-block;
-	margin-left: auto;
-	margin-right: auto;
-	vertical-align: bottom;
-}
-.module--image img {
-	display: inline-block;
-	height: auto;
-	max-height: 600px;
-	max-width: 100%;
-}
-.module--image .h5:not(:empty) {
-	margin-top: 1rem;
 }
 .module--twitter > * {
 	display: block;

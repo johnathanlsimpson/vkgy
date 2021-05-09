@@ -96,18 +96,22 @@
 	* RESETS
 	* ========================================================
 	*/
-	* {
-		box-sizing: border-box;
-		margin: 0;
-		padding: 0;
-		position: relative;
-	}
-	img[src=""] {
-		display: none;
-	}
-	body {
-		overflow-y: scroll;
-	}
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	position: relative;
+}
+img {
+overflow: hidden;
+}
+img[src=""] {
+	display: none;
+	overflow: hidden;
+}
+body {
+	overflow-y: scroll;
+}
 
 /**
 	* =======================================================
