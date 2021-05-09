@@ -1,5 +1,7 @@
 <?php
 
+$page_title = 'Edit images';
+
 include_once('../artists/head.php');
 include_once('../php/function-render_component.php');
 include_once('../php/function-render_json_list.php');
@@ -34,38 +36,42 @@ render_json_list('musician', $artist['musicians']);
 render_json_list('release', $artist['id'], 'artist_id');
 
 // Loop through images and make note of which musicians are tagged in them
-foreach( $artist['images'] as $image) {
+if( is_array($artist['images']) && !empty($artist['images']) ) {
 		
-	// If this is an image of a single musician, let's check for plainly tagged musicians (i.e. let's not show a group image in which one dude is tagged but we're not sure where he is in the photo)
-	if( $image['image_content'] == 2 ) {
+	foreach( $artist['images'] as $image) {
+		
+		// If this is an image of a single musician, let's check for plainly tagged musicians (i.e. let's not show a group image in which one dude is tagged but we're not sure where he is in the photo)
+		if( $image['image_content'] == 2 ) {
 			
-		// Explode and clean a list of plain musician ids
-		$plainly_tagged_musicians = explode(',', $image['musician_ids']);
-		$plainly_tagged_musicians = array_filter($plainly_tagged_musicians, function($x) { return is_numeric($x); });
-		
-		if( is_array($plainly_tagged_musicians) && !empty($plainly_tagged_musicians) ) {
-			foreach($plainly_tagged_musicians as $musician_id) {
-				
-				$musicians_images[ $musician_id ][] = [ 'image_id' => $image['id'] ];
-				
+			// Explode and clean a list of plain musician ids
+			$plainly_tagged_musicians = explode(',', $image['musician_ids']);
+			$plainly_tagged_musicians = array_filter($plainly_tagged_musicians, function($x) { return is_numeric($x); });
+			
+			if( is_array($plainly_tagged_musicians) && !empty($plainly_tagged_musicians) ) {
+				foreach($plainly_tagged_musicians as $musician_id) {
+					
+					$musicians_images[ $musician_id ][] = [ 'image_id' => $image['id'] ];
+					
+				}
 			}
+			
 		}
 		
-	}
-	
-	// Otherwise if the image is a group image or a flyer, let's look for musicians tagged by their face
-	elseif( $image['image_content'] == 1 || $image['image_content'] == 3 ) {
-		
-		// Get any fully tagged musicians that have boundaries specified
-		$fully_tagged_musicians = $image['musicians'];
-		$fully_tagged_musicians = array_filter($fully_tagged_musicians, function($x) { return is_array($x) && is_numeric($x['musician_id']) && strlen($x['face_boundaries']); });
-		
-		if( is_array($fully_tagged_musicians) && !empty($fully_tagged_musicians) ) {
-			foreach($fully_tagged_musicians as $musician) {
-				
-				$musicians_images[ $musician['musician_id'] ][] = [ 'image_id' => $musician['image_id'], 'face_boundaries' => $musician['face_boundaries'] ];
-				
+		// Otherwise if the image is a group image or a flyer, let's look for musicians tagged by their face
+		elseif( $image['image_content'] == 1 || $image['image_content'] == 3 ) {
+			
+			// Get any fully tagged musicians that have boundaries specified
+			$fully_tagged_musicians = $image['musicians'];
+			$fully_tagged_musicians = array_filter($fully_tagged_musicians, function($x) { return is_array($x) && is_numeric($x['musician_id']) && strlen($x['face_boundaries']); });
+			
+			if( is_array($fully_tagged_musicians) && !empty($fully_tagged_musicians) ) {
+				foreach($fully_tagged_musicians as $musician) {
+					
+					$musicians_images[ $musician['musician_id'] ][] = [ 'image_id' => $musician['image_id'], 'face_boundaries' => $musician['face_boundaries'] ];
+					
+				}
 			}
+			
 		}
 		
 	}

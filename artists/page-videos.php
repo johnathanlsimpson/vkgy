@@ -172,10 +172,6 @@ style([
 	<!-- Sidebar -->
 	<div class="artist__right"><?php include('partial-sidebar.php'); ?></div>
 </div>
-
-<div class="col c1">
-	<?php include('partial-bottom.php'); ?>
-</div>
 	
 	<style>
 		.videos__thumbnail {

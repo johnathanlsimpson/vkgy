@@ -73,7 +73,7 @@
 	unset($q['limit'], $q['order']);
 	
 	// Set title and nav
-	if(is_numeric($q['id']) && count($lives) === 1) {
+	if(is_numeric($q['id']) && is_array($lives) && !empty($lives) && count($lives) === 1) {
 		$page_header = lang('Live info', 'ライブ情報', ['container' => 'div']);
 	}
 	else {
