@@ -1,7 +1,7 @@
 <?php
 
 // Returns a link built to track clicks to outbound affiliate links
-function tracking_link( $platform, $input, $location_in_page = null ) {
+function tracking_link( $platform, $input = null, $location_in_page = null ) {
 	
 	// Set up some defaults
 	$allowed_platforms = [
@@ -27,7 +27,7 @@ function tracking_link( $platform, $input, $location_in_page = null ) {
 	
 	// Make sure we have correct inputs set
 	if( strlen($platform) && in_array( $platform, $allowed_platforms ) ) {
-		if( strlen($default_term) ) {
+		//if( strlen($default_term) ) {
 			
 			// Clean some vars
 			$default_term     = substr( $default_term, 0, 100 );
@@ -46,7 +46,7 @@ function tracking_link( $platform, $input, $location_in_page = null ) {
 			// Output into template
 			$output = '/track/?'.http_build_query($url_data);
 			
-		}
+		//}
 	}
 	
 	return $output;
