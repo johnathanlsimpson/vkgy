@@ -82,7 +82,9 @@ script([
 		<!-- Other styles -->
 		<?= display_styles( 'bottom' ); ?>
 		
+		<?php if( strpos( $_SERVER['REQUEST_URI'], '/blog/' ) !== 0 ): ?>
 		<?= !$_SESSION['is_vip'] || $_SESSION['username'] === 'inartistic' ? '<script data-ad-client="ca-pub-5797371558296978" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>' : null; ?>
+		<?php endif; ?>
 	</head>
 	<body class="<?= $body_class; ?>">
 		
@@ -300,36 +302,38 @@ script([
 			</div>
 		</div>
 		
-		<?php if( !$_SESSION['is_vip'] || $_SESSION['username'] === 'inartistic' ): ?>
-		<div class="col c1 any--margin" style="max-width:100%;overflow:hidden;">
-			
-			<div class="any--weaken" style="background:hsl(var(--background));border-radius:3px 3px 0 0;line-height:1;padding:0.5rem;width:auto;">
-				<span class="h5">AD</span> | 
-				<span class=""><a href="https://patreon.com/vkgy" target="_blank">Please consider becoming a VIP member</a> to remove ads and support vkgy.</span>
+		
+		<?php if( strpos( $_SERVER['REQUEST_URI'], '/blog/' ) !== 0 ): ?>
+			<?php if( !$_SESSION['is_vip'] || $_SESSION['username'] === 'inartistic' ): ?>
+			<div class="col c1 any--margin" style="max-width:100%;overflow:hidden;">
+
+				<div class="any--weaken" style="background:hsl(var(--background));border-radius:3px 3px 0 0;line-height:1;padding:0.5rem;width:auto;">
+					<span class="h5">AD</span> | 
+					<span class=""><a href="https://patreon.com/vkgy" target="_blank">Please consider becoming a VIP member</a> to remove ads and support vkgy.</span>
+				</div>
+				<?php if($_SESSION['site_theme'] == 1): ?>
+					<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+					<ins class="adsbygoogle"
+										style="display:block"
+										data-ad-format="autorelaxed"
+										data-ad-client="ca-pub-5797371558296978"
+										data-ad-slot="8955090786"></ins>
+					<script>
+										(adsbygoogle = window.adsbygoogle || []).push({});
+					</script>
+				<?php else: ?>
+					<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+					<ins class="adsbygoogle"
+										style="display:block"
+										data-ad-format="autorelaxed"
+										data-ad-client="ca-pub-5797371558296978"
+										data-ad-slot="7921210718"></ins>
+					<script>
+										(adsbygoogle = window.adsbygoogle || []).push({});
+					</script>
+				<?php endif; ?>
 			</div>
-			
-			<?php if($_SESSION['site_theme'] == 1): ?>
-				<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-				<ins class="adsbygoogle"
-									style="display:block"
-									data-ad-format="autorelaxed"
-									data-ad-client="ca-pub-5797371558296978"
-									data-ad-slot="8955090786"></ins>
-				<script>
-									(adsbygoogle = window.adsbygoogle || []).push({});
-				</script>
-			<?php else: ?>
-				<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-				<ins class="adsbygoogle"
-									style="display:block"
-									data-ad-format="autorelaxed"
-									data-ad-client="ca-pub-5797371558296978"
-									data-ad-slot="7921210718"></ins>
-				<script>
-									(adsbygoogle = window.adsbygoogle || []).push({});
-				</script>
 			<?php endif; ?>
-		</div>
 		<?php endif; ?>
 		
 		<div class="footer__container">
