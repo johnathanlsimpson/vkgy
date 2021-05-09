@@ -53,3 +53,41 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
+
+/* Bio preview */
+.edit__biography .input__textarea .tribute__wrapper,
+.edit__biography .input__textarea .tribute__wrapper * {
+	line-height: inherit;
+	margin-bottom: 0;
+	vertical-align: top;
+}
+.edit__biography .input__textarea,
+.preview__item.preview__item,
+.preview__date,
+.preview__type {
+	--bio-line-height: 1.8rem;
+	line-height: var(--bio-line-height);
+}
+.preview__item.preview__item {
+	padding-bottom: calc( var(--bio-line-height) / 2 );
+	padding-top: calc( ( var(--bio-line-height) / 2 ) - 2px );
+}
+.preview__date,
+.preview__type {
+	color: hsl(var(--text--secondary));
+	display: inline-block;
+	padding-bottom: 0;
+	padding-top: 0;
+	vertical-align: middle;
+	z-index: 1;
+}
+.preview__date {
+	float: left;
+	margin-right: 1ch;
+}
+.preview__type {
+	float: right;
+	line-height: 1.4rem;
+	margin-left: 1ch;
+	margin-top: calc( ( var(--bio-line-height) - 1.4rem ) / 2 );
+}
