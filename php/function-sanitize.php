@@ -50,6 +50,17 @@ function sanitize($input, $modifier = NULL) {
 	$search = [ "?", "\\", "<", ">", "\"", "'", '﻿' ];
 	$replace = [ "&#63;", "&#92;", "&#60;", "&#62;", "&#34;", "&#39;", '' ];
 	
+	
+	if( $modifier === 'alpine' ) {
+		
+		$search[] = '{';
+		$replace[] = '&#123;';
+		
+		$search[] = '}';
+		$replace[] = '&#125;';
+		
+	}
+	
 	if($modifier != "allowhtml") {
 		$input = str_replace($search, $replace, $input);
 	}

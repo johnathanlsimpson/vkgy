@@ -35,8 +35,12 @@ function render_component($component_template, $replacement_data = []) {
 				
 			}
 			
+			// Replace any curly brackets in value so we don't wreck alpine
+			$value = str_replace( ['{', '}'], ['&#123;', '&#125;'], $value );
+			
 			$replacement_data['{'.$key.'}'] = $value;
 			unset($replacement_data[$key]);
+			
 		}
 		
 		echo str_replace(
@@ -46,7 +50,6 @@ function render_component($component_template, $replacement_data = []) {
 		);
 		
 		$output = ob_get_clean();
-		//$output = preg_replace('/'.'{.+?}'.'/', '', $output);
 		$output = clean_template($output);
 		$output = preg_replace('/'.'<!--.+?-->'.'/', '', $output);
 		

@@ -200,6 +200,11 @@ function getDescription(targetElem) {
 		description += ' for ' + releaseName;
 	}
 	
+	// Replace hyphens and brackets
+	description.replace(/\{/, '&#123;');
+	description.replace(/\}/, '&#125;');
+	description.replace(/\'/, '\\&#39;');
+	
 	return description;
 	
 }
