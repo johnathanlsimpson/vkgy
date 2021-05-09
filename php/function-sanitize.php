@@ -59,6 +59,9 @@ function sanitize($input, $modifier = NULL) {
 		$search[] = '}';
 		$replace[] = '&#125;';
 		
+		$search[] = '&#39;';
+		$replace[] = '&#92;&#39;';
+		
 	}
 	
 	if($modifier != "allowhtml") {
