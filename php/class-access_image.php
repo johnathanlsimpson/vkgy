@@ -524,6 +524,8 @@
 				$sql_select[] = 'images.extension';
 				$sql_select[] = 'images.friendly';
 				$sql_select[] = 'CONCAT("/images/", images.id, "-", COALESCE(images.friendly, "image"), ".", images.extension) AS url';
+				$sql_select[] = 'images.height';
+				$sql_select[] = 'images.width';
 			}
 			
 			// From

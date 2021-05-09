@@ -236,7 +236,7 @@
 							display: inline-flex;
 							font-size: 1.25rem;
 							font-weight: bold;
-							padding-top: 50%;
+							padding-top: 40%;
 							width: 100%;
 						}
 						.callout--height {
@@ -328,11 +328,6 @@
 						}
 						.text--prose .module--portrait img {
 							max-height: 700px;
-						}
-						.text--prose .module--portrait::after {
-							background-image: linear-gradient( hsla(var(--background--secondary),0), hsla(var(--background--secondary),1) 2rem);
-							height: 3rem;
-							top: calc(700px - 2rem);
 						}
 						
 						

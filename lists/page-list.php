@@ -94,7 +94,7 @@ $markdown_parser = new parse_markdown($pdo);
 					<h5>
 						Num items
 					</h5>
-					<?= count($list['items']); ?>
+					<?= is_array($list['items']) && !empty($list['items']) ? count($list['items']) : 0; ?>
 				</li>
 				
 			</ul>

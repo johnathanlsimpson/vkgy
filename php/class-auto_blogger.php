@@ -155,17 +155,6 @@
 					$user_id = $_SESSION['user_id'];
 					$url = $post['url'];
 					
-					// Create social media post and queue
-					$post['artist'] = $this->access_artist->access_artist([ 'get' => 'name', 'id' => $content['artist_id'] ]);
-					$social_post = $this->access_social_media->build_post([
-						'title'     => $title,
-						'id'        => $id,
-						'artist_id' => $artist_id,
-						'user_id'   => $user_id,
-						'url'       => $url,
-					], $post_type);
-					$social_result = $this->access_social_media->queue_post($social_post, 'both', date('Y-m-d H:i:s', strtotime('+ 30 minutes')));
-					
 					return ($post["url"] ?: false);
 				}
 			}

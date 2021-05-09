@@ -13,7 +13,7 @@ function previewBio(inputElem, targetElem, artistId) {
 		formData.append("artist", artistId);
 		
 		$.ajax({
-			url:         "/artists/function-preview_bio.php",
+			url:         "/artists/get-bio_preview.php",
 			data:        formData,
 			processData: false,
 			contentType: false,

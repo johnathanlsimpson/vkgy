@@ -205,7 +205,7 @@ if( $entry['is_queued'] ) {
 			
 			<!-- Image -->
 			<?php if($entry['image']): ?>
-				<a class="article__image <?= $entry['image']['width'] && $entry['image']['height'] / $entry['image']['width'] > 1.2 ? 'article__image--portrait' : null; ?> any--margin">
+				<a class="article__image <?= $entry['image']['width'] && $entry['image']['height'] / $entry['image']['width'] > 1.2 ? 'article__image--portrait' : null; ?> any--margin" href="<?= $entry['image']['url']; ?>">
 					<img alt="<?= $entry['title']; ?>" src="<?= $entry['image']['url']; ?>" height="<?= $entry['image']['height']; ?>" width="<?= $entry['image']['width']; ?>" />
 				</a>
 			<?php endif; ?>
@@ -429,10 +429,11 @@ if( $entry['is_queued'] ) {
 											}
 											
 											// SNS
-											elseif( $url['type'] == 5 && strpos( $url['content'], 'twitter' ) !== false ) {
+											elseif( $url['type'] == 5 && strpos( $url['content'], 'twitter' ) !== false && !$num_official_sns ) {
 												echo '<a class="a--padded" href="'.$url['content'].'" rel="nofollow" target="_blank">';
 												echo '<span class="symbol--standalone symbol__twitter"></span>';
 												echo '</a>';
+												$num_official_sns++;
 											}
 											
 										}
@@ -462,7 +463,7 @@ if( $entry['is_queued'] ) {
 
 			<!-- CDJapan -->
 			<div class="entry__ad" style="flex-grow:1;">
-				<a class="callout any--sticky any--margin" href="https://www.cdjapan.co.jp/aff/click.cgi/PytJTGW7Lok/6128/A549875/music%2Fj-pop%2Fvisualkei%2F" target="_blank">
+				<a class="callout any--sticky any--margin" href="<?= tracking_link('cdjapan'); ?>" target="_blank">
 					
 					<div class="callout__image">
 						<?php foreach( $cdj_jackets as $cdj_jacket ): ?>

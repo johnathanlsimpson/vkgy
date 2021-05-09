@@ -22,6 +22,7 @@
 		private $youtube_pattern = "(?:<iframe[^>]+)?(?<=\s|\"|^)(?:https?:\/\/)?(?:[A-z]+\.)?youtu\.?be.*?[\/|=]([\-\w]{11})(?=\s|$|\")(?:\".+<\/iframe>)?";
 		private $twitter_pattern = "(?<!\()(?:<blockquote class=\"twitter.+)?(?:(?:https?:\/\/(?:\w+\.)?)?twitter\.com\/(\w+)\/status\/(\d{10,20}))(?:[^\s]+)?(?:.+twitter\.com.+\/script>)?(?!\))";
 		private $image_pattern = "\[?!\[([^\]]*)\]\(([^\)\s]+)\)(?:\]\((.+)?\))?";
+		private $inhouse_image_pattern = '(?:^|https:\/\/vk\.gy|https:\/\/jrock\.gy)\/images\/(\d+)';
 		private $user_pattern = "(?<=^| )(@[A-z0-9-]+)(?=$|[\.,;\/ :\s\']|&#39;)";
 		private $spotify_pattern = '(https:\/\/open\.spotify\.com\/)((?:artist|track|album|playlist)\/[A-z0-9]{22})(?:\?si=[\-\w]+)?';
 		private $linkcore_pattern = '(https:\/\/linkco\.re\/)([A-z0-9]{8})(?:\?[A-z0-9\=\&]*)?';
@@ -32,6 +33,9 @@
 		// ======================================================
 		function __construct($pdo) {
 			$this->pdo = $pdo;
+			
+			$this->access_image = new access_image($this->pdo);
+			
 		}
 		
 		
@@ -943,13 +947,35 @@
 					
 					if( strlen($match[2]) && image_exists($match[2], $this->pdo) ) {
 						
-						list($width, $height) = getimagesize($match[2]);
+						// See if the image is an inhouse image--and if so, get the height and width for it from the database
+						if( preg_match('/'.$this->inhouse_image_pattern.'/', $match[2], $image_id) ) {
+							
+							// Get image info from the database
+							$image_id = $image_id[1];
+							$image = $this->access_image->access_image([ 'id' => $image_id, 'get' => 'name', 'limit' => 1 ]);
+							
+							// Set dimensions
+							$width = $image[0]['width'];
+							$height = $image[0]['height'];
+							
+						}
+						
+						elseif( file_exists($match[2]) ) {
+							list($width, $height) = getimagesize($match[2]);
+						}
+						
 						$image_class = $width > $height ? 'module--landscape' : 'module--portrait';
 						
 						$image_src = $match[2];
 						$image_src = preg_replace('/'.'(^(?:https?:)?(?:\/\/)?(?:vk\.gy)?\/images\/\d+(?:-[A-z0-9-]*)?)(\.[A-z]+)$'.'/', '$1.medium$2', $image_src);
 						
-						return '<div class="module module--image '.$image_class.' any--weaken any--align-center"><a href="'.($match[3] ?: $match[2]).'"><img alt="'.strip_tags($match[1]).'" class="lazy" data-src="'.$image_src.'" /></a><p>'.$match[1].'</p></div>';
+						return
+							'<div class="module module--image '.$image_class.' any--weaken any--align-center">'.
+							'<a href="'.($match[3] ?: $match[2]).'">'.
+							'<img alt="'.strip_tags($match[1]).'" class="lazy" data-src="'.$image_src.'" '.($height ? 'height="'.$height.'"' : null).' '.($width ? 'width="'.$width.'"' : null).' />'.
+							'</a>'.
+							'<p>'.$match[1].'</p>'.
+							'</div>';
 						
 					}
 					
