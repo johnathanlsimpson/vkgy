@@ -489,6 +489,26 @@ document.addEventListener('click', function(event) {
 // Replaces initImageEditElems
 document.addEventListener('change', function(event) {
 	
+	// We need some special behavior for the 'no default image' element since it's not within an image template
+	if( event.target.name == 'image_is_default' ) {
+		
+		// When changing the default to 'no default', no change will be triggered on the is_default element of the previously-default image
+		// i.e. the default won't be set to null. So let's use [checked] as an approximation of the previously-default image (since [checked]
+		// is set in the html) and trigger a change on that element to save value of is_default. Then let's remove [checked]
+		let previouslyCheckedElem = event.target.closest('.image__results').querySelector('[name="image_is_default"][checked]');
+		previouslyCheckedElem.removeAttribute('checked');
+		
+		// Then on the is_default element that we switched to, make sure to add [checked] so that it's seen as the previous value if we change it again
+		let currentlyCheckedElem = event.target;
+		currentlyCheckedElem.setAttribute('checked', true);
+		
+		// Make sure to only trigger the change to is_default with value of 0 ('no default') otherwise you'll cause an infinite loop
+		if( currentlyCheckedElem.value == 0 ) {
+			triggerChange(previouslyCheckedElem);
+		}
+		
+	}
+	
 	let eventName = event.target.name;
 	
 	if( eventName.startsWith('image_') && event.target.closest('.image__template') ) {
