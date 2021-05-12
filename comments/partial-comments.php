@@ -60,7 +60,7 @@
 			</div>
 			
 			<div class="col c2">
-				<div style="position:sticky;top:5rem;">
+				<div class="comments__left">
 					<!-- Add comment -->
 					<?php
 						echo render_comment_component($comment_thread_template, [
