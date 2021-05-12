@@ -16,6 +16,7 @@ function initDelete(deleteButton, processorUrl, data, callbackFn = function() {}
 	$(deleteButton).off('click');
 	
 	$(deleteButton).on("click", function(event) {
+		
 		event.preventDefault();
 		
 		var buttonState = $(deleteButton).attr("data-state");
@@ -43,8 +44,9 @@ function initDelete(deleteButton, processorUrl, data, callbackFn = function() {}
 			}
 		}
 	});
-		
-	if(triggerClick) {
+	
+	if(triggerClick && !$(deleteButton).attr('data-state')) {
 		$(deleteButton).triggerHandler("click");
 	}
+	
 }
