@@ -50,7 +50,7 @@
 							<div class="input__group">
 								
 								<!-- Copy code -->
-								<button class="image__copy input__button symbol__copy" data-tippy-content="Code copied." x-on:click.prevent="copyMarkdown($refs.markdown)">Copy code</button>
+								<button class="image__copy input__button symbol__copy" data-tippy-content="Code copied." type="button" x-on:click.prevent="copyMarkdown($refs.markdown)">Copy code</button>
 								
 							</div>
 							
@@ -59,7 +59,7 @@
 								if($_SESSION['can_delete_data']) {
 									?>
 										<div class="input__group">
-											<button class="input__button symbol__hide image__unlink">Unlink</button>
+											<button class="input__button symbol__hide image__unlink" type="button">Unlink</button>
 										</div>
 									<?php
 								}
@@ -270,7 +270,7 @@
 										<div class="input__row">
 											<div class="input__group">
 												<label class="input__label">Permanently delete image</label>
-												<button class="input__button symbol__trash image__delete {delete_class}">Delete</button>
+												<button class="input__button symbol__trash image__delete {delete_class}" type="button">Delete</button>
 											</div>
 										</div>
 									<?php
