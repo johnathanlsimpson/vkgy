@@ -21,14 +21,14 @@ $affiliate_tokens = [
 $product_templates = [
 	'amazon' => 'https://www.amazon.co.jp/s/ref=as_li_ss_tl?k={default_term}&tag={affiliate_token}',
 	'cdjapan' => 'https://www.cdjapan.co.jp/aff/click.cgi/{affiliate_token}/searches?term.media_format=&f=all&q={favored_term}',
-	'rarezhut' => 'https://rarezhut.net/catalogsearch/result/?q={default_term}&utm_source={affiliate_token}',
+	'rarezhut' => 'https://magento.rarezhut.net/catalogsearch/result/?q={default_term}&utm_source={affiliate_token}',
 ];
 
 // Templates for links to homepage
 $homepage_templates = [
 	'amazon' => 'https://www.amazon.co.jp/s/ref=as_li_ss_tl?k=DIR+EN+GREY&tag={affiliate_token}',
 	'cdjapan' => 'https://www.cdjapan.co.jp/aff/click.cgi/{affiliate_token}/music%2Fj-pop%2Fvisualkei%2F',
-	'rarezhut' => 'https://rarezhut.net/?utm_source={affiliate_token}',
+	'rarezhut' => 'https://magento.rarezhut.net/?utm_source={affiliate_token}',
 ];
 
 // Get possible variables and clean
