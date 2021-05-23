@@ -18,8 +18,14 @@ $background_image = str_replace('../', '/', $background_image);
 
 // Unset page image if needed
 if( image_exists($page_image, $pdo) ) {
-	$page_image = 'https://vk.gy'.str_replace('.', '.opengraph.', $page_image);
+	
+	// Append last update time of image so Twitter et al will get correct card image
+	//$update_string = '?'.date( 'YmdHis', filemtime('..'.$page_image) );
+	$page_image = 'https://vk.gy'.$page_image;
+	
 }
+
+// Default to card
 else {
 	$page_image = 'https://vk.gy/style/card.png';
 }
