@@ -7,7 +7,12 @@ style([
 ]);
 
 // Active page
-$active_page = '/blog/';
+if( $entry_is_feature ) {
+	$active_page = '/interview/';
+}
+else {
+	$active_page = '/blog/';
+}
 
 // Separate first sentence as summary, just in case we want to display it differently later
 $entry['summary'] = explode("\n", $entry['content'])[0];
@@ -28,12 +33,28 @@ if( is_array($entry['images']) && !empty($entry['images']) ) {
 	
 	// Set main image to page image, and also separate it into its own part of the $entry array to make later queries easier
 	$entry['image'] = $entry['images'][ $entry['image_id'] ];
-	$page_image = $entry['image']['url'];
+	
+	// Try to set page image to styled card image if possible
+	$card_image = '/images/blog_images/'.$entry['id'].'.webp';
+	
+	if( file_exists('..'.$card_image) ) {
+		$page_image = $card_image;
+		$background_image = $entry['image']['url'];
+	}
+	else {
+		$page_image = $entry['image']['url'];
+	}
 	
 	// If a second image was specified for social media posts, then the post's default image should actually be background image, and the social image should be page image
 	if( is_numeric($entry['sns_image_id']) ) {
 		$background_image = $page_image;
 		$page_image = $entry['images'][ $entry['sns_image_id'] ]['url'];
+	}
+	
+	if( $entry_is_feature ) {
+		$large_header = true;
+		$extra_large_header = true;
+		$plain_header = true;
 	}
 	
 }
@@ -195,7 +216,7 @@ if( $entry['is_queued'] ) {
 
 <div class="col c1">
 	
-	<div class="entry__wrapper any--margin">
+	<div class="entry__wrapper <?= $entry_is_feature ? 'entry--feature' : null; ?> any--margin">
 		
 		<!-- Main article area (left) -->
 		<article class="entry__article">
@@ -204,7 +225,7 @@ if( $entry['is_queued'] ) {
 			<?= $error ? '<div class="article__error text text--outlined text--error symbol__error any--margin">'.$error.'</div>' : null; ?>
 			
 			<!-- Image -->
-			<?php if($entry['image']): ?>
+			<?php if( $entry['image'] && !$entry_is_feature ): ?>
 				<a class="article__image <?= $entry['image']['width'] && $entry['image']['height'] / $entry['image']['width'] > 1.2 ? 'article__image--portrait' : null; ?> any--margin" href="<?= $entry['image']['url']; ?>">
 					<img alt="<?= $entry['title']; ?>" src="<?= $entry['image']['url']; ?>" height="<?= $entry['image']['height']; ?>" width="<?= $entry['image']['width']; ?>" />
 				</a>
@@ -217,14 +238,14 @@ if( $entry['is_queued'] ) {
 					
 					if( $entry['translations'] && count($entry['translations']) > 1 ) {
 						echo ' &middot; ';
-						echo [ 'en' => 'English ver', 'ja' => '日本語版' ][ $entry['language'] ];
+						echo [ 'en' => 'English ver', 'ja' => '日本語版', 'fr' => 'français' ][ $entry['language'] ];
 					}
 				?>
 			</div>
 			
 			<!-- Title -->
 			<h1 class="article__title">
-				<a href="<?= $entry['url']; ?>"><?= $entry['title']; ?></a>
+				<a href="<?= '/blog/'.$entry['friendly'].'/'; ?>"><?= $entry['title']; ?></a>
 			</h1>
 			
 			<!-- Details (author, tags) -->
@@ -282,8 +303,8 @@ if( $entry['is_queued'] ) {
 							foreach($entry['translations'] as $translation) {
 								if($translation['language'] != $entry['language']) {
 									echo '<a class="symbol__random" href="/blog/'.$translation['friendly'].'/">';
-									echo [ 'en' => 'English', 'ja' => '日本語版' ][ $translation['language'] ];
-									echo '</a>';
+									echo [ 'en' => 'English', 'ja' => '日本語版', 'fr' => 'français' ][ $translation['language'] ];
+									echo '</a> ';
 								}
 							}
 						?>
@@ -460,10 +481,14 @@ if( $entry['is_queued'] ) {
 		
 		<!-- Promoted stories -->
 		<div class="entry__supplemental any--margin">
-
+			
+			<!-- Switch between two ads -->
+			<?php if( rand(0,1) ): ?>
+			
 			<!-- CDJapan -->
 			<div class="entry__ad" style="flex-grow:1;">
-				<a class="callout any--sticky any--margin" href="<?= tracking_link('cdjapan'); ?>" target="_blank">
+				<?php if( !$entry_is_feature ): ?>
+				<a class="callout any--sticky any--margin" href="<?= tracking_link('cdjapan', null, 'blog-sidebar'); ?>" target="_blank">
 					
 					<div class="callout__image">
 						<?php foreach( $cdj_jackets as $cdj_jacket ): ?>
@@ -476,15 +501,33 @@ if( $entry['is_queued'] ) {
 					</div>
 					
 				</a>
+				<?php endif; ?>
 			</div>
 			
-			<!--<div class="entry__ad" style="flex-grow:1;">
-				<a class="callout any--sticky any--margin" href="" style="">
-					<div class="callout__text">
-						Buy rare vkei at RarezHut
+			<?php else: ?>
+			
+			<!-- RarezHut -->
+			<div class="entry__ad" style="flex-grow:1;">
+				<?php if( !$entry_is_feature ): ?>
+				<a class="callout any--sticky any--margin" href="<?= tracking_link('rarezhut', $entry['artist']['romaji'] ?: $entry['artist']['name'], 'blog-sidebar'); ?>" target="_blank" <?= $entry['artist'] ? 'style="background-image:url(/artists/'.$entry['artist']['friendly'].'/main.jpg);"' : null; ?>>
+					
+					<?php if( !$entry['artist'] ): ?>
+					<div class="callout__image">
+						<?php foreach( $cdj_jackets as $cdj_jacket ): ?>
+							<img class="entry__cdjapan" src="<?= $cdj_jacket; ?>" />
+						<?php endforeach; ?>
 					</div>
+					<?php endif; ?>
+					
+					<div class="callout__text">
+						<?= $entry['artist'] ? lang( 'Buy '.($entry['artist']['romaji'] ?: $entry['artist']['name']).' releases at RarezHut', 'RarezHutで'.$entry['artist']['name'].'を検索する', 'hidden' ) : null; ?>
+					</div>
+					
 				</a>
-			</div>-->
+				<?php endif; ?>
+			</div>
+			
+			<?php endif; ?>
 			
 			<!-- Related entries -->
 			<?php if( is_array($entry['related_entries']) && !empty($entry['related_entries']) ): ?>

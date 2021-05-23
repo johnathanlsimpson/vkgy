@@ -63,12 +63,8 @@ if(!empty($_GET["entry"]) && !$_GET["action"]) {
 			}
 		}
 		
-		if($entry_is_feature) {
-			include('../blog/page-interview.php');
-		}
-		else {
-			include('../blog/page-entry.php');
-		}
+		include('../blog/page-entry.php');
+		
 	}
 	else {
 		$error = 'Sorry, the requested entry doesn\'t exist, or is restricted. Showing latest news instead.';
