@@ -109,7 +109,8 @@
 	max-width: calc(var(--prose-padding) + 100% + var(--prose-padding));
 	padding: 0;
 }
-.text--prose .module--release {
+.text--prose .module--release,
+.text--prose .module--spotify {
 	width: calc(var(--prose-padding) + var(--prose-width) + var(--prose-padding));
 }
 .text--prose .release-card__container {
@@ -147,12 +148,12 @@
 	background-image: linear-gradient( hsla(var(--background--secondary),0), hsla(var(--background--secondary),1) 2rem);
 }
 .module--portrait a::after {
-	top: calc(700px - 2rem);
+	top: calc(850px - 2rem);
 }
 .text--prose .module--portrait a::after {
 	background-image: linear-gradient( hsla(var(--background--secondary),0), hsla(var(--background--secondary),1) 2rem);
 	height: 3rem;
-	top: calc(700px - 2rem);
+	top: calc(850px - 2rem);
 }
 .module--image img {
 	display: inline-block;
