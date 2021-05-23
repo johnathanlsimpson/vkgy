@@ -121,7 +121,7 @@
 		function access_blog($args = []) {
 			
 			// If searching by friendly, and friendly ends in language code, get translation and original entry
-			if( strlen($args['friendly']) && preg_match('/'.'-(ja|jp)$'.'/', $args['friendly'], $language_match) ) {
+			if( strlen($args['friendly']) && preg_match('/'.'-(ja|jp|fr)$'.'/', $args['friendly'], $language_match) ) {
 				
 				// Get translations
 				$sql_translation = 'SELECT * FROM blog_translations WHERE friendly=? LIMIT 1';
