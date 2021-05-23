@@ -578,7 +578,7 @@
 				$sql_where[] = 'images.is_exclusive=?';
 				$sql_values[] = 1;
 			}
-			if(!$args['show_queued']) {
+			if($args['show_queued'] === false) {
 				$sql_where[] = 'images.is_queued=?';
 				$sql_values[] = 0;
 			}

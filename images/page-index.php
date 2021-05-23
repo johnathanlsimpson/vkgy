@@ -11,7 +11,7 @@
 	$limit_images = (($search_page * $limit_num) - $limit_num).', '.$limit_num;
 	
 	$access_image = $access_image ?: new access_image($pdo);
-	$rslt_images = $access_image->access_image([ 'type' => $search_type, 'get' => 'all', 'order' => 'images.id '.$search_order, 'limit' => $limit_images ]);
+	$rslt_images = $access_image->access_image([ 'type' => $search_type, 'get' => 'all', 'order' => 'images.id '.$search_order, 'limit' => $limit_images, 'show_queued' => false ]);
 	
 	if($search_type === 'all') {
 		$sql_num_images = 'SELECT COUNT(*) FROM images';
