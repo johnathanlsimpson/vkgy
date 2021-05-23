@@ -1,5 +1,3 @@
-<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
-
 <?php if($_SESSION["is_signed_in"]) { ?>
 
 <?php
@@ -77,44 +75,6 @@
 	$entry['sns_overrides'] = $entry['sns_overrides'] ? json_decode($entry['sns_overrides'], true) : [];
 ?>
 
-<style>
-	/* Fix anchor margin */
-	* {
-		scroll-snap-margin-top: 4rem;
-		scroll-margin-top: 4rem;
-	}
-	
-	/* Fix other options */
-	.documentation__link {
-		display: inline-block;
-	}
-	.documentation__link:focus {
-		outline: none;
-	}
-	.documentation__link:hover {
-		cursor: pointer;
-	}
-	
-	/* Preview elements */
-	.preview__note {
-		display: none;
-	}
-	.preview__summary:not(:empty) ~ .preview__note {
-		display: block;
-		margin-top: 1rem;
-	}
-	.preview__summary:not(:empty) ~ .update__preview:not(:empty) {
-		border-top: 1px dotted hsl(var(--background--bold));
-		margin-top: 1rem;
-		padding-top: 1rem;
-	}
-	
-	/* Swap between titles */
-	.entry__title:not(:empty) + .entry__default-title {
-		display: none;
-	}
-</style>
-
 <!-- Rest of the fucking owl -->
 <form action="/blog/function-update.php" class="row" enctype="multipart/form-data" method="post" name="form__update">
 	
@@ -123,7 +83,7 @@
 			?>
 				<div class="col c1">
 					<div class="text text--outlined text--notice symbol__error">
-						Currently editing <?= ['ja' => 'Japanese'][$entry['language']]; ?> translation. Most article options must be changed in the <a href="#translations">original English article</a>.
+						Currently editing <?= ['ja' => 'Japanese', 'fr' => 'French'][$entry['language']]; ?> translation. Most article options must be changed in the <a href="#translations">original English article</a>.
 					</div>
 				</div>
 			<?php
@@ -235,10 +195,6 @@
 		<!-- Images and tags -->
 		<div class="col c2">
 			<div>
-				
-				<!--<h3>
-					<?= lang('Images', '写真', 'div'); ?>
-				</h3>-->
 				<?php
 					include('../images/function-render_image_section.php');
 					render_image_section($entry['images'], [
@@ -255,9 +211,6 @@
 			</div>
 			
 			<div>
-				<!--<h3>
-					<?= lang('Tags', 'タッグ', 'div'); ?>
-				</h3>-->
 				<div class="text text--outlined <?= $is_translation ? 'any--hidden' : null; ?> " style="padding-top:0.5rem;">
 					<?php
 						if(is_array($tags)) {
@@ -282,19 +235,6 @@
 						}
 					?>
 				</div>
-				
-				<style>
-					.translation__result {
-						margin-bottom: 0;
-						margin-top: 1rem;
-					}
-					.translation__result:empty {
-						display: none;
-					}
-				</style>
-				
-				<script>
-				</script>
 				
 			</div>
 		</div>
@@ -430,6 +370,24 @@
 				</div>
 			</details>
 			
+			<!-- Regenerate card image -->
+			<details id="card-image">
+				<summary class="h3 documentation__link">📸 Regenerate SNS image</summary>
+				<div class="text text--outlined">
+					<div class="input__row">
+						<div class="input__group">
+							
+							<label class="input__label">Regenerate SNS image</label>
+							
+							<a class="card__regen symbol__random" href="#">click to regenerate</a>
+							
+							<div class="symbol__help any--weaken input__note">This will update the text and image that appears when the link to this entry is pasted into Twitter or Facebook.</div>
+							
+						</div>
+					</div>
+				</div>
+			</details>
+			
 			<!-- Schedule article -->
 			<details class="<?= $is_translation ? 'any--hidden' : null; ?>" <?= $entry['date_scheduled'] ? 'open' : null; ?> id="scheduling">
 				<summary class="h3 documentation__link">📆 Scheduling</summary>
@@ -508,7 +466,7 @@
 										if(is_array($entry['translations']) && !empty($entry['translations'])) {
 											echo '[EN] https://vk.gy/blog/'.$entry['friendly'].'/';
 											foreach($entry['translations'] as $translation) {
-												echo "\n\n".'['.[ 'ja' => '日本語版' ][ $translation['language'] ].'] https://vk.gy/blog/'.$translation['friendly'].'/';
+												echo "\n\n".'['.[ 'ja' => '日本語版', 'fr' => 'français ' ][ $translation['language'] ].'] https://vk.gy/blog/'.$translation['friendly'].'/';
 											}
 										}
 									?></div>
@@ -641,7 +599,7 @@
 				<ul class="text text--outlined translation__container">
 					<?php
 						// Possible language options
-						$language_options = [ 'en' => 'English', 'ja' => '日本語' ];
+						$language_options = [ 'en' => 'English', 'ja' => '日本語', 'fr' => 'français' ];
 						
 						// Make sure translations array has at least English entry (i.e. making brand new article)
 						if(!is_array($entry['translations']) || empty($entry['translations'])) {
@@ -704,13 +662,7 @@
 
 			<div class="input__row" data-role="submit-container">
 				<div class="save__group input__group any--flex-grow">
-
-					<!-- Display controls -->
-					<?php /* 
-					<input name="is_published" value="<?= $entry['is_published'] ? 1 : 0; ?>" hidden />
-					<input name="is_saved" value="<?= $entry['is_saved'] ? 1 : 0; ?>" hidden />
-					<input name="is_scheduled" value="<?= $entry['date_scheduled'] ? 1 : 0; ?>" hidden /> */ ?>
-
+					
 					<!-- Save area -->
 					<button class="save__button" name="submit" type="submit">
 						<m1>Save draft</m1>
@@ -749,7 +701,6 @@
 						<m4>Automatically saved article as a draft.</m4>
 					</div>
 				</div>
-
 				
 			</div>
 
@@ -764,445 +715,5 @@
 
 	</div>
 </form>
-
-
-<style>
-	
-	[name="delete"] {
-		margin-left: 0;
-		margin-right: 0.5rem;
-		margin-top: 0;
-	}
-	[name="delete"]:empty::before {
-		margin-right: 0;
-	}
-	
-	details:last-of-type:not([open]) {
-		margin-bottom: 3rem;
-	}
-</style>
-
-
-	
-<style>
-	.drafts__container {
-		display: grid;
-		grid-gap: 1rem;
-		grid-template-columns: repeat(3, minmax(0, 33%));
-	}
-	.drafts__container li {
-		border: none;
-		padding: 0;
-	}
-	.drafts__container li:nth-of-type(n + 4) {
-		display: none;
-	}
-</style>
-				
-<style>
-	.artist__nav {
-		flex-wrap: wrap;
-		justify-content: space-between;
-		margin-top: -1rem;
-		padding: 1rem 0;
-		position: -webkit-sticky;
-		position: sticky;
-		top: 3rem;
-		z-index: 3;
-	}
-	.artist__nav .li {
-		display: block;
-	}
-	@media(max-width:799.9px) {
-		.artist__nav {
-			background-image: linear-gradient(hsl(var(--background--secondary)), hsl(var(--background--secondary)));
-			background-position: 0 -1rem;
-			background-repeat: no-repeat;
-			padding: 0.5rem 0 1rem 0;
-			text-align: center;
-			grid-column: 1 / -1;
-		}
-		.artist__nav::after {
-			bottom: 0;
-			box-shadow: inset 0 1.5rem 1rem -1rem hsl(var(--background--secondary));
-			content: "";
-			display: block;
-			height: 1rem;
-			left: 0;
-			position: absolute;
-			right: 0;
-		}
-		.artist__nav .li {
-			border: none;
-			margin: 0;
-			padding: 0;
-		}
-		.artist__nav [href*='former'], .artist__nav [href*='staff'], .artist__nav [href*='schedule'] {
-			display: none;
-		}
-	}
-	@media(min-width:800px) {
-		.artist__nav.artist__nav {
-			flex-direction: column;
-			margin-right: var(--gutter);
-			width: auto;
-		}
-	}
-</style>
-	
-	
-
-							<style>
-								.sns__component {
-									border: none;
-									display: flex;
-									flex-wrap: wrap;
-									padding-bottom: 0;
-								}
-								.sns__text:not(:empty) {
-									margin-bottom: 1.5rem;
-								}
-								
-								/* Show/hide SNS headings */
-								.sns__text:empty + .sns__label {
-									display: none;
-								}
-								.sns__label {
-									height: auto;
-									margin-bottom: 0.5rem;
-									order: -1;
-									width: 100%;
-								}
-								.sns__label::before {
-									content: attr(data-heading);
-								}
-								.sns__edit {
-									margin-left: 1ch;
-								}
-								.sns__edit::after {
-									content: "edit";
-								}
-								.sns__text {
-									white-space: pre;
-								}
-								/*.tweet__authors .sns__text:not(:empty)::before {
-									background: url(https://abs-0.twimg.com/emoji/v2/svg/270d.svg);
-									content: "";
-									display: inline-block;
-									height: 1rem;
-									margin-right: 1ch;
-									width: 1rem;
-								}
-								.tweet__mentions .sns__text:not(:empty)::before {
-									background: url(https://abs-0.twimg.com/emoji/v2/svg/1f30e.svg);
-									content: "";
-									display: inline-block;
-									height: 1rem;
-									margin-right: 1ch;
-									width: 1rem;
-								}*/
-								
-								/*.sns__edit,
-								.sns__label {
-									display: none;
-								}
-								.sns__text:not(:empty) ~ .sns__label {
-									display: block;
-									margin-bottom: 0.5rem;
-									order: -1;
-									width: 100%;
-								}
-								.sns__text:not(:empty) ~ .sns__edit {
-									display: block;
-									margin-left: 0.5rem;
-								}
-								.sns__edit::after {
-									content: "edit";
-								}
-								.sns__label::after {
-									content: attr(data-heading);
-								}*/
-								.sns__image {
-									align-items: center;
-									background-color: hsl(var(--background));
-									background-position: center;
-									background-repeat: no-repeat;
-									background-size: contain;
-									display: flex;
-									justify-content: space-around;
-									height: 150px;
-									margin: -1rem;
-									margin-top: 0;
-								}
-								.sns__image:not([style^="background-image"])::before {
-									content: "no image";
-								}
-
-								/*.sns__length {
-									margin-bottom: 1rem;
-									margin-top: -0.5rem;
-								}
-								.sns__length::before {
-									content: "length: ";
-								}
-								.sns__length::after {
-									content: attr(data-length);
-								}*/
-								.sns__length {
-									background: hsl(var(--background--alt));
-									border-radius: 3px 3px 0 0;
-									display: inline-block;
-									line-height: 1;
-									padding: 0.5rem;
-								}
-								.sns__length::after {
-									content: attr(data-length);
-								}
-								.sns__length::before {
-									display: none;
-								}
-								.sns--long {
-									color: hsl(var(--accent));
-								}
-								.sns--long::before {
-									display: inline-block;
-								}
-
-								/*.tweet__mentions .sns__text:not(:empty)::before,
-								.tweet__authors .sns__text:not(:empty)::before {
-									content: "";
-									display: inline-block;
-									height: 1rem;
-									margin-right: 1ch;
-									width: 1rem;
-								}
-								.tweet__mentions .sns__text:not(:empty)::before {
-									background-image: url('https://abs-0.twimg.com/emoji/v2/svg/27a1.svg');
-								}
-								.tweet__authors .sns__text:not(:empty)::before {
-									background-image: url('https://abs-0.twimg.com/emoji/v2/svg/270d.svg');
-								}*/
-							</style>
-
-						<style>
-						</style>
-	
-
-
-					<style>
-						/*.content__row {
-							margin: 0 0 3rem 0;
-						}
-						.content__wrapper {
-							background:hsl(var(--background--alt));
-							padding:1rem !important;
-						}*/
-						.obscure__input:checked + .content__row {
-							max-height: 16rem !important;
-						}
-					</style>
-	
-	
-							
-							<style>
-								/* Alignment */
-								.save__group {
-									align-items: center;
-								}
-								.save__button, .save__draft {
-									margin-top: 0;
-								}
-								.save__status[class*="symbol"] {
-									margin-right: -4px;
-								}
-								.save__state:not(:empty) {
-									margin-left: 0.5rem;
-								}
-								.save__draft, .save__scheduled {
-									margin-left: auto;
-								}
-								
-								/* By default, hide message states */
-								.save__draft, .save__scheduled, .save__link, .save__notice,
-								.save__button > *, .save__link > *, .save__state > *, .save__notice > * {
-									display: none;
-								}
-								
-								/* When entry is live, make it extra clear */
-								[data-is-published="1"] {
-									border-color: hsl(var(--accent));
-								}
-								[data-is-published="1"] .save__notice {
-									border-color: currentColor;
-									color: hsl(var(--accent));
-								}
-								
-								/* Style success messages */
-								.symbol__success + .save__state {
-									color: hsl(var(--attention--secondary));
-								}
-								
-								/* Save button text */
-								[data-is-queued="1"][data-is-published="0"]                .save__button m1,
-								[data-is-queued="1"][data-is-published="1"]                .save__button m2,
-								[data-is-queued="0"][data-is-published="1"]                .save__button m3,
-								[data-is-queued="0"][data-is-published="0"]                .save__button m4,
-								
-								/* Draft checkbox and scheduled notice */
-								[data-is-scheduled="1"]                                    .save__scheduled,
-								[data-is-scheduled="0"]                                    .save__draft,
-								
-								/* View link text */
-								[data-is-published="1"]                                    .save__link,
-								[data-is-saved="1"]                                        .save__link,
-								[data-is-edit="1"]                                         .save__link,
-								[data-is-queued="1"]                                       .save__link   m1,
-								[data-is-queued="0"]                                       .save__link   m2,
-								
-								/* State of save */
-								[data-is-saved="0"] .save__status:not([class*="symbol"]) + .save__state  m1,
-								.symbol__loading +                                         .save__state  m2,
-								[data-is-queued="1"] .symbol__success +                    .save__state  m3,
-								[data-is-published="1"] .symbol__success +                 .save__state  m4,
-								.symbol__error +                                           .save__state  m5,
-								
-								/* Alerts */
-								[data-is-queued="0"][data-is-published="0"]                .save__notice,
-								[data-is-queued="0"][data-is-published="0"]                .save__notice m1,
-								[data-is-queued="1"][data-is-published="1"]                .save__notice,
-								[data-is-queued="1"][data-is-published="1"]                .save__notice m2,
-								[data-is-queued="0"][data-is-published="1"]                .save__notice,
-								[data-is-queued="0"][data-is-published="1"]                .save__notice m3,
-								[data-is-first-autosave="1"]                                   .save__notice,
-								[data-is-first-autosave="1"]                                   .save__notice m4 {
-									display: initial;
-								}
-
-								/* Checkbox styling */
-								.save__choice:checked ~ .save__draft {
-									color: inherit;
-								}
-								.save__choice:checked ~ .save__draft::before {
-									-moz-clip-path: url(#symbol__checkbox--checked);
-									-webkit-clip-path: url(#symbol__checkbox--checked);
-									clip-path: url(#symbol__checkbox--checked);
-									color: inherit;
-									opacity: 1;
-								}
-
-								/* Special notices */
-								.save__notice {
-									border-color: hsl(var(--text--secondary));
-									margin: 1rem 0 0 0;
-									width: 100%;
-								}
-								.save__notice:empty {
-									display: none;
-								}
-								.save__notice.symbol__help {
-								}
-							</style>
-	
-	
-	
-			
-			<style>
-				.artist__link,
-				.artist--none,
-				.artist__edit {
-					line-height: 2rem;
-				}
-				.artist__edit {
-					cursor: pointer;
-					margin-left: 1ch;
-				}
-				.artist--none,
-				.artist__link[data-id=""] {
-					display: none;
-				}
-				.artist__link[data-id=""] + .artist--none {
-					display: inline-block;
-				}
-			</style>
-	
-	
-	
-
-					<style>
-						.friendly__toggle:checked ~ .friendly__show {
-							display: none;
-						}
-						.friendly__toggle:not(:checked) ~ .friendly__edit {
-							display: none;
-						}
-						.friendly__slug:empty::before {
-							content: "…";
-						}
-						.friendly__slug:empty + .friendly__edit-link {
-							display: none;
-						}
-						.friendly__edit-button {
-							cursor: pointer;
-						}
-						.friendly__preview {
-							margin-top: 0.5rem;
-						}
-						[name="name"]:placeholder-shown + .friendly__preview {
-							display: none;
-						}
-
-						.preview__stats {
-							display: flex;
-							justify-content: space-between;
-							overflow: hidden;
-							margin-bottom: 0.5rem;
-							max-width: 100%;
-						}
-						.preview__username {
-							max-width: 100%;
-							overflow: hidden;
-							text-overflow: ellipsis;
-							white-space: nowrap;
-						}
-						.preview__title {
-							padding-bottom: 0;
-						}
-						.preview__summary:not(:empty) {
-							margin-top: 1rem;
-						}
-					</style>
-
-					<style>
-						/* To fix issue with negative margin making border weird--will have to see how affects performance */
-						li.input__row {
-							clip-path: polygon(0.5rem 0, 100% 0, 100% 100%, 0 100%);
-						}
-					</style>
-
-<script>
-	/* Smooth scroll anchors */
-	document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-		anchor.addEventListener('click', function (e) {
-			
-			// Update URL
-			let hash = this.getAttribute('href');
-			e.preventDefault();
-			history.pushState('', '', hash);
-			
-			// Open details element if applicable
-			let targetElem = document.getElementById(hash.substring(1));
-			if(targetElem && targetElem.open !== undefined) {
-				targetElem.open = true;
-			}
-			
-			// Scroll to element
-			if(targetElem) {
-				document.querySelector(this.getAttribute('href')).scrollIntoView({
-					behavior: 'smooth'
-				});
-			}
-		});
-	});
-</script>
 	
 <?php } ?>

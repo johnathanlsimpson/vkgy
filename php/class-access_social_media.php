@@ -120,6 +120,8 @@
 							Info: https://vk.gy/artists/'.$input['artist']['friendly'].'/
 							Past flyers: https://vk.gy/images/&type=flyer&order=desc
 							
+							#ヴィジュアル系フライヤー
+							
 							'.($user['twitter'] && $user['twitter'] != '@vkgy_' ? '✍️ '.($user['twitter'] ?: $user['username']) : null).'
 							'.(true ? null : '🔎 '.$input['url']).'
 							'.(true ? null : '👑 '.$this->patreon_url).'

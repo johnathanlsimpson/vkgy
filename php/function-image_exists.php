@@ -4,7 +4,7 @@ include_once('../php/include.php');
 function image_exists($input_string, $pdo, $return_dimensions = false) {
 	
 	// /images/123-dali-group.jpg
-	if(preg_match('/'.'\/images\/(\d+)(?:-[\-\w]*)?(?:\.[a-z]+)?\.(jpg|jpeg|gif|png)$'.'/', $input_string, $match)) {
+	if(preg_match('/'.'\/images\/(\d+)(?:-[\-\w]*)?(?:\.[a-z]+)?\.(jpg|jpeg|gif|png|webp)$'.'/', $input_string, $match)) {
 		if(is_array($match)) {
 			$check_file = strtolower('/images/image_files/'.$match[1].'.'.$match[2]);
 		}
@@ -22,6 +22,11 @@ function image_exists($input_string, $pdo, $return_dimensions = false) {
 				$check_file = '/images/image_files/'.$image['id'].'.'.strtolower($image['extension']);
 			}
 		}
+	}
+	
+	// /images/blog_images/123.webp
+	elseif( preg_match('/'.'^\/images\/[0-9a-z\-\/\_]+\.(?:jpg|jpeg|gif|png|webp)$'.'/', $input_string) ) {
+		$check_file = strtolower($input_string);
 	}
 	
 	if(strlen($check_file)) {

@@ -166,7 +166,7 @@ if($_SESSION['can_access_drafts']) {
 								}
 							}
 							else {
-								echo '<em>No queued entries from the past month.';
+								echo '<em>No queued entries from the past month.</em>';
 							}
 						?>
 					</ul>

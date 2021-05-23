@@ -1,3 +1,6 @@
+// Helpers
+// ========================================================
+
 // When main artist is set, automatically grab artist's image
 
 // JS version of friendly
@@ -48,6 +51,30 @@ let datePreviewElem  = formElem.querySelector('.preview__datetime');
 let dateOccurredElem = formElem.querySelector('[name="date_occurred"]');
 let sourcesElem = document.querySelector('[name="sources"]');
 let supplementalElem = document.querySelector('[name="supplemental"]');
+
+/* Smooth scroll anchors */
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+	anchor.addEventListener('click', function (e) {
+
+		// Update URL
+		let hash = this.getAttribute('href');
+		e.preventDefault();
+		history.pushState('', '', hash);
+
+		// Open details element if applicable
+		let targetElem = document.getElementById(hash.substring(1));
+		if(targetElem && targetElem.open !== undefined) {
+			targetElem.open = true;
+		}
+
+		// Scroll to element
+		if(targetElem) {
+			document.querySelector(this.getAttribute('href')).scrollIntoView({
+				behavior: 'smooth'
+			});
+		}
+	});
+});
 
 
 // Author
@@ -519,11 +546,35 @@ function saveEntry() {
 			// Updating showing entry was saved
 			saveContainerElem.dataset.isSaved = '1';
 			
+			// If publishing article (is_queued deselected but is_published flag not yet set), generate card image
+			if( saveContainerElem.dataset.isQueued == '0' && saveContainerElem.dataset.isPublished == '0' ) {
+				
+				console.log('Notice: Publishing article for the first time.');
+				
+			}
+			
 			// Update 'is published' flag, and also update nav links based on state
 			if(saveContainerElem.dataset.isQueued == '0') {
 				saveContainerElem.dataset.isPublished = '1';
 				editNavLinkElem.innerHTML = 'Edit article';
 				viewNavLinkElem.innerHTML = 'View article';
+				
+				// If we're publishing the article, let's just make sure any images still marked queued are reset to unqueued
+				// Theoretically this should be happening by itself, but in some cases it's not (seems to be when people upload images)
+				let wronglyQueuedImages = document.querySelectorAll('[name="image_is_queued"][value="1"]');
+				if( wronglyQueuedImages && wronglyQueuedImages.length > 0 ) {
+					
+					console.log('Error: Wrongly queued images detected. Attempting to resolve.');
+					
+					wronglyQueuedImages.forEach(function(wronglyQueuedImage) {
+						
+						wronglyQueuedImage.value = 0;
+						wronglyQueuedImage.dispatchEvent(new Event('change', {bubbles:true}));
+						
+					});
+					
+				}
+				
 			}
 			else {
 				saveContainerElem.dataset.isPublished = '0';
@@ -843,6 +894,104 @@ friendlyElem.addEventListener('change', function() {
 	previewLinkElem.innerHTML = previewURL;
 	
 });
+
+
+// Generate card image
+// ========================================================
+
+// Allow manual regeneration of card image
+let regenCardElem = document.querySelector('.card__regen');
+
+regenCardElem.addEventListener('click', function(event) {
+	
+	event.preventDefault();
+	
+	regenCard();
+	
+	// Let's pretend we're actually checking the state (and update this at a later point to actually get the state)
+	regenCardElem.classList.add('loading');
+	
+	setTimeout(function() {
+		regenCardElem.classList.remove('loading', 'symbol__random');
+		regenCardElem.classList.add('symbol__success');
+	}, 600);
+	
+	setTimeout(function() {
+		regenCardElem.classList.remove('symbol__success');
+		regenCardElem.classList.add('symbol__random');
+	}, 2000);
+	
+});
+
+// Regenerate card when title changes
+titleElem.addEventListener('change', function(event) {
+	regenCard();
+});
+
+// Regenerate card when main image changes
+document.addEventListener('change', function(event) {
+	if( event.target.name === 'image_is_default' ) {
+		regenCard();
+	}
+});
+
+// Regenerate card when feature tag changes
+let featureTagElem = document.querySelector('[name="tags[]"][data-friendly="feature"]');
+featureTagElem.addEventListener('change', function(event) {
+	regenCard();
+});
+
+regenCard();
+
+// Regenerate card image
+function regenCard() {
+	
+	// Get elements
+	let cardElem = document.querySelector('#card');
+	let cardTitleElem = document.querySelector('.card__title');
+	let cardSupertitleElem = document.querySelector('.card__supertitle');
+	
+	// Set card ID
+	let cardID = idElem.value;
+	
+	// Set card image
+	let cardImageElem = document.querySelector('[name="image_is_default"][value="1"]:checked');
+	let cardImage = 'none';
+	if(cardImageElem) {
+		cardImage = cardImageElem.closest('.image__template').querySelector('.image__image').getAttribute('href');
+	}
+	
+	// Set card feature status
+	let cardIsFeature = featureTagElem.checked ? 1 : 0;
+	
+	// Set card title
+	let cardTitle = titleElem.value;
+
+	// Set up url to card generator
+	let friendly = friendlyElem.value;
+	let cardURL = 'https://vk.gy/blog/page-card.php?id=' + cardID + '&is_feature=' + cardIsFeature + '&image=' + cardImage + '&title=' + cardTitle;
+	cardURL = encodeURI(cardURL);
+
+	// Remove previous iframe
+	let prevIframe = document.querySelector('.card__iframe');
+	if( prevIframe ) {
+		prevIframe.remove();
+	}
+
+	// Create new iframe
+	let iframeElem = document.createElement('iframe');
+	iframeElem.classList.add('card__iframe');
+	iframeElem.src = cardURL;
+
+	// Make iframe invisible--can't use display none or canvas won't render
+	iframeElem.style.height = 0;
+	iframeElem.style.opacity = 0;
+	iframeElem.style.width = 0;
+
+	// Append iframe
+	document.body.appendChild(iframeElem);
+
+}
 
 
 // Generate translation

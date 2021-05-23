@@ -186,7 +186,7 @@ if($artist_is_removed) {
 															}
 														}
 														
-														$item['content'] = str_replace('class="symbol__release" href="/releases/magazine/', 'class="a--inherit" href="/releases/magazine"', $item['content']);
+														$item['content'] = str_replace('class="symbol__release" href="/releases/magazine/', 'class="a--inherit" href="/releases/magazine/', $item['content']);
 
 														if( count($item['type']) === 1 && $item['type'][0] === 'note' ) {
 															$span_classes[] = 'any--weaken';
