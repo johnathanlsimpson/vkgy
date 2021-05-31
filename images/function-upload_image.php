@@ -116,7 +116,7 @@ function upload_image($image, $pdo) {
 						if($extension) {
 							
 							// If uploading on release, assume image contents are release
-							if( $item_type === 'release' ) {
+							if( $item_type === 'release' || $item_type === 'issue' ) {
 								
 								$image_content_name = 'release';
 								

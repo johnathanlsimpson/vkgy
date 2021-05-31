@@ -19,11 +19,10 @@ foreach($_POST as $key => $value) {
 }
 
 if(is_numeric($_POST['id'])) {
-	$allowed_item_types = ['artist', 'blog', 'label', 'musician', 'release', 'other'];
 	
 	// Clean data about image itself
 	$id           = sanitize($_POST['id']);
-	$item_type    = in_array($_POST['item_type'], $allowed_item_types) ? $_POST['item_type'] : 'other';
+	$item_type    = in_array($_POST['item_type'], access_image::$allowed_item_types) ? $_POST['item_type'] : 'other';
 	$item_id      = is_numeric($_POST['item_id']) ? $_POST['item_id'] : null;
 	$image_type   = is_numeric($_POST['type']) ? $_POST['type'] : 0;
 	
@@ -36,7 +35,7 @@ if(is_numeric($_POST['id'])) {
 	$is_queued    = $_POST['is_queued'] ? 1 : 0;
 	
 	// If default image for artist/label/release, update accordingly
-	if(in_array($item_type, ['artist', 'blog', 'label', 'release'])) {
+	if( $item_type != 'other' && in_array($item_type, access_image::$allowed_item_types) ) {
 		
 		if($is_default) {
 			$sql_make_default = 'UPDATE '.$item_type.($item_type != 'blog' ? 's' : null).' SET image_id=? WHERE id=? LIMIT 1';
@@ -103,7 +102,8 @@ if(is_numeric($_POST['id'])) {
 			'blog'      => $_POST['blog_id'],
 			'labels'    => $_POST['label_id'],
 			'musicians' => $_POST['musician_id'],
-			'releases'  => $_POST['release_id']
+			'releases'  => $_POST['release_id'],
+			'issues'    => $_POST['issue_id'],
 		];
 		
 		// Standardize artist_ids (etc) into array of item IDs, since there may be an array of IDs or one ID as a string
@@ -283,8 +283,6 @@ if(is_numeric($_POST['id'])) {
 								$output['result'][] = 'Couldn\'t link image to '.$items_table.'.';
 							}
 							
-							
-							
 							// So now if we are linking a musician to the photo, and the photo is of the type musician body shot, or the photo is of type group or flyer and there is a face boundary set, then we can assume it's the default headshot for for that musician and band combo if there isn't one set already
 							
 							// If we're adding a musician to the image
@@ -311,8 +309,6 @@ if(is_numeric($_POST['id'])) {
 								}
 								
 							}
-							
-							
 							
 						}
 					}

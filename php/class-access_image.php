@@ -29,6 +29,17 @@
 			0 => 'uncategorized',
 		];
 		
+		// Image contents
+		static public $allowed_item_types = [
+			'other',
+			'artist',
+			'blog',
+			'label',
+			'musician',
+			'release',
+			'issue',
+		];
+		
 		// Image format ratios (short side / long side)
 		static public $image_ratios = [
 			'0.65' => 'musician',
@@ -528,11 +539,15 @@
 				$sql_select[] = 'images.width';
 			}
 			
-			// From
+			// FROM ------------------------------------------------
+			
+			// Flyers
 			if($args['flyer_of_day']) {
 				$sql_from = 'queued_fod';
 			}
-			foreach(['artist_id' => 'artists', 'blog_id' => 'blog', 'label_id' => 'labels', 'musician_id' => 'musicians', 'release_id' => 'releases'] as $id_type => $id_table) {
+			
+			// Items (images_artists, etc)
+			foreach(['artist_id' => 'artists', 'blog_id' => 'blog', 'label_id' => 'labels', 'musician_id' => 'musicians', 'release_id' => 'releases', 'issue_id' => 'issues'] as $id_type => $id_table) {
 				if(is_array($args[$id_type]) || strlen($args[$id_type])) {
 					$args[$id_type] = is_array($args[$id_type]) ? $args[$id_type] : [ $args[$id_type] ];
 					
@@ -546,28 +561,39 @@
 					$sql_values = array_merge($sql_values, $args[$id_type]);
 				}
 			}
+			
+			// Artists specifically(?)
 			if($args['type'] === 'artist') {
 				$sql_from = '(SELECT image_id FROM images_artists'.($args['order'] ? ' ORDER BY '.str_replace('images.', 'images_artists.', $args['order']) : null).($args['limit'] ? ' LIMIT '.$args['limit'] : null).') inner_join';
 			}
+			
+			// Releases specifically(?)
 			if($args['type'] === 'release') {
 				$sql_from = '(SELECT image_id FROM images_releases'.($args['order'] ? ' ORDER BY '.str_replace('images.', 'images_releases.', $args['order']) : null).($args['limit'] ? ' LIMIT '.$args['limit'] : null).') inner_join';
 			}
+			
+			// Default
 			if(!$sql_from) {
 				$sql_from = 'images';
 			}
 			
-			// Join
+			// JOIN ------------------------------------------------
+			
 			if($args['flyer_of_day']) {
 				$sql_join[] = 'LEFT JOIN images ON images.id=queued_fod.image_id';
 			}
+			
+			// If we're doing inner join (i.e. selecting from images_artists), join actual image table
 			if(substr($sql_from, -10) === 'inner_join') {
 				$sql_join[] = 'INNER JOIN images ON images.id=inner_join.image_id';
 			}
+			
 			if($args['get'] === 'all' || $args['get'] === 'most') {
 				$sql_join[] = 'LEFT JOIN images_artists ON images_artists.image_id=images.id';
 				$sql_join[] = 'LEFT JOIN images_blog ON images_blog.image_id=images.id';
 				$sql_join[] = 'LEFT JOIN images_labels ON images_labels.image_id=images.id';
 				$sql_join[] = 'LEFT JOIN images_releases ON images_releases.image_id=images.id';
+				$sql_join[] = 'LEFT JOIN images_issues ON images_issues.image_id=images.id';
 			}
 			
 			// Where
