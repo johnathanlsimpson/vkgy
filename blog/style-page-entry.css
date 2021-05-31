@@ -188,25 +188,6 @@
 	/* General fixes */
 	
 	
-	.any--sticky {
-		position: sticky;
-		top: 4rem;
-	}
-	.any--crossed-out::before { /* Need to standardize this somewhere--also used in quick search */
-		--line-color: hsl(var(--text--secondary));
-		--line-width: 1px;
-		background-image: linear-gradient( var(--line-color), var(--line-color) ), linear-gradient( var(--line-color), var(--line-color) );
-		background-position: center;
-		background-repeat: no-repeat;
-		background-size: var(--line-width) 100%, 100% var(--line-width);
-		bottom: 0;
-		content: "";
-		left: 0;
-		position: absolute;
-		right: 0;
-		top: 0;
-		transform: rotate(45deg);
-	}
 	
 	.module--spotify iframe {
 		width: 100%;

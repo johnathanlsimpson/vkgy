@@ -373,6 +373,29 @@ opacity: 1;
 	background: transparent;
 }
 
+/* Sticky elements */
+.any--sticky {
+	position: sticky;
+	top: 4rem;
+}
+
+/* Make that little x in boxes */
+.any--crossed-out::before {
+	--line-color: hsl(var(--text--secondary));
+	--line-width: 1px;
+	background-image: linear-gradient( var(--line-color), var(--line-color) ), linear-gradient( var(--line-color), var(--line-color) );
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: var(--line-width) 100%, 100% var(--line-width);
+	bottom: 0;
+	content: "";
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	transform: rotate(45deg);
+}
+
 /* Summary elements */
 summary {
 	cursor: pointer;
