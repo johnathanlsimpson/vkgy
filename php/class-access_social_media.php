@@ -147,7 +147,7 @@
 							if(is_array($rslt_translations) && !empty($rslt_translations)) {
 								$translations[] = '[EN] '.$input['url'];
 								foreach($rslt_translations as $translation) {
-									$language = [ 'ja' => '日本語版' ][ $translation['language'] ];
+									$language = [ 'ja' => '日本語版', 'fr' => 'FR' ][ $translation['language'] ];
 									$translations[] = '['.$language.'] https://vk.gy/blog/'.$translation['friendly'].'/';
 								}
 							}
