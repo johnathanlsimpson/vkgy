@@ -156,6 +156,9 @@
 								<!-- Tag blog (hidden) -->
 								<select class="input any--hidden" name="image_blog_id">{blog_id}</select>
 								
+								<!-- Tag issue (hidden) -->
+								<input class="input any--hidden" name="image_issue_id" type="hidden" value="{issue_id}" />
+								
 							</div>
 							
 							<!-- Releases -->

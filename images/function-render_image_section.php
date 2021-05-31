@@ -127,6 +127,7 @@ function render_image_section($images, $args = []) {
 				'artist_id'          => $artist_id,
 				'artist_ids'         => render_options(($image['artist_ids'] ?: $default['artist']), $artist_list),
 				'blog_id'            => render_options(($image['blog_id'] ?: $default['blog']), $blog_list),
+				'issue_id'           => $image['issue_id'],
 				'musician_ids'       => render_options(($image['label_ids'] ?: $default['label']), $label_list),
 				'musician_id'        => $musician_id,
 				'musician_name'      => sanitize( $musician_name, 'alpine' ),

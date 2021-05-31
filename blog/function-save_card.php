@@ -2,8 +2,8 @@
 
 include_once('../php/include.php');
 
-$blog_id = sanitize($_POST['id']);
-$image_data = $_POST['image'];
+$blog_id = sanitize($_POST['blog_id']);
+$image_data = $_POST['image_data'];
 
 if( is_numeric($blog_id) && strlen($image_data) ) {
 	

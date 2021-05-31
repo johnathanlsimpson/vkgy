@@ -298,6 +298,7 @@ function getArtistImage(artistId) {
 				
 				// Get is_default and check it
 				document.querySelector('.image__template [name="image_is_default"]').checked = true;
+				document.querySelector('.image__template [name="image_is_default"]').dispatchEvent(new Event('change', {bubbles:true}));
 				
 			},
 			
@@ -549,7 +550,7 @@ function saveEntry() {
 			// If publishing article (is_queued deselected but is_published flag not yet set), generate card image
 			if( saveContainerElem.dataset.isQueued == '0' && saveContainerElem.dataset.isPublished == '0' ) {
 				
-				console.log('Notice: Publishing article for the first time.');
+				//console.log('Note: Publishing article for the first time.');
 				
 			}
 			
@@ -564,7 +565,7 @@ function saveEntry() {
 				let wronglyQueuedImages = document.querySelectorAll('[name="image_is_queued"][value="1"]');
 				if( wronglyQueuedImages && wronglyQueuedImages.length > 0 ) {
 					
-					console.log('Error: Wrongly queued images detected. Attempting to resolve.');
+					//console.log('Error: Wrongly queued images detected. Attempting to resolve.');
 					
 					wronglyQueuedImages.forEach(function(wronglyQueuedImage) {
 						
@@ -928,6 +929,11 @@ titleElem.addEventListener('change', function(event) {
 	regenCard();
 });
 
+// Regenerate card when ID changes
+document.addEventListener('item-id-updated', function(event) {
+	regenCard();
+});
+
 // Regenerate card when main image changes
 document.addEventListener('change', function(event) {
 	if( event.target.name === 'image_is_default' ) {
@@ -941,7 +947,7 @@ featureTagElem.addEventListener('change', function(event) {
 	regenCard();
 });
 
-regenCard();
+//regenCard();
 
 // Regenerate card image
 function regenCard() {
@@ -969,7 +975,7 @@ function regenCard() {
 
 	// Set up url to card generator
 	let friendly = friendlyElem.value;
-	let cardURL = 'https://vk.gy/blog/page-card.php?id=' + cardID + '&is_feature=' + cardIsFeature + '&image=' + cardImage + '&title=' + cardTitle;
+	let cardURL = 'https://vk.gy/blog/page-card.php?blog_id=' + cardID + '&is_feature=' + cardIsFeature + '&image_url=' + cardImage + '&title=' + cardTitle;
 	cardURL = encodeURI(cardURL);
 
 	// Remove previous iframe
@@ -984,13 +990,13 @@ function regenCard() {
 	iframeElem.src = cardURL;
 
 	// Make iframe invisible--can't use display none or canvas won't render
-	iframeElem.style.height = 0;
-	iframeElem.style.opacity = 0;
-	iframeElem.style.width = 0;
+	iframeElem.style.height = '100px';
+	iframeElem.style.opacity = 1;
+	iframeElem.style.width = '500px';
 
 	// Append iframe
 	document.body.appendChild(iframeElem);
-
+	
 }
 
 

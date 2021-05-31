@@ -6,18 +6,20 @@ include_once('../php/include.php');
 $image_pattern = '^\/images\/\d+\.[a-z]+$';
 
 // Make sure ID is numeric
-$id = $_GET['id'];
-$id = is_numeric($id) ? $id : null;
+$blog_id = $_GET['blog_id'];
+$blog_id = is_numeric($blog_id) ? $blog_id : null;
 
 // Make sure image matches pattern
-$image = urldecode( $_GET['image'] );
-$image = preg_match('/'.$image_pattern.'/', $image) ? $image : null;
+$image_url = urldecode( $_GET['image_url'] );
+$image_url = preg_match('/'.$image_pattern.'/', $image_url) ? $image_url : null;
 
 // Set other vars
 $title = sanitize( urldecode( $_GET['title'] ) );
 $supertitle = $_GET['is_feature'] ? 'feature' : 'news';
 
 ?>
+
+<input name="blog_id" type="hidden" value="<?= $blog_id; ?>" />
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.7/dist/html2canvas.min.js"></script>
 <script src="/scripts/external/script-jquery-3.2.1.js"></script>
@@ -34,7 +36,7 @@ $supertitle = $_GET['is_feature'] ? 'feature' : 'news';
 	?>
 </style>
 
-<div class="card callout" id="card" style="<?= $image ? 'background-image:url('.$image.');' : null; ?>">
+<div class="card callout" id="card" style="<?= $image_url ? 'background-image:url('.$image_url.');' : null; ?>">
 	
 	<div class="card__content callout__text">
 		
@@ -48,30 +50,4 @@ $supertitle = $_GET['is_feature'] ? 'feature' : 'news';
 	
 </div>
 
-<script type="text/javascript">
-	let cardElem = document.querySelector('#card');
-	
-	html2canvas(cardElem).then(function(canvas) {
-		
-		// Image to base64
-		let blogID = <?= $id; ?>;
-		let imageData = canvas.toDataURL('image/webp', 1);
-		
-		// Save image
-		initializeInlineSubmit( $(cardElem), '/blog/function-save_card.php', {
-			preparedFormData: {
-				'image': imageData,
-				'id': blogID,
-			},
-			callbackOnSuccess: function(formElem, returnedData) {
-				//console.log('card image saved');
-				//console.log(returnedData);
-			},
-			callbackOnError: function(formElem, returnedData) {
-				//console.log('card image not saved');
-				//console.log(returnedData);
-			}
-		});
-		
-	});
-</script>
+<script src="/blog/script-page-card.js"></script>

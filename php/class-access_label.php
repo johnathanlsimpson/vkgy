@@ -30,70 +30,120 @@
 		// Build and return 'release(s)' object(s)
 		// ======================================================
 		function access_label($args = []) {
-			// SELECT
-			switch($args["get"]) {
-				case "name" :
-					$sql_select = "id, COALESCE(romaji, name) AS quick_name, name, romaji, friendly";
-					break;
-				case "list" :
-					$sql_select = "id, COALESCE(romaji, name) AS quick_name, name, romaji, friendly";
-					break;
-				case "all"  :
-					$sql_select = "*, COALESCE(romaji, name) AS quick_name";
-					break;
+		
+			// SELECT ----------------------------------------------
+			
+			if( $args['get'] === 'all' ) {
+				$sql_select[] = 'labels.*';
 			}
 			
-			// WHERE
-			if($args["friendly"]) {
-				$sql_where[] = "friendly=?";
-				$sql_values = [friendly($args["friendly"])];
+			if( $args['get'] === 'all' || $args['get'] === 'name' || $args['get'] === 'list' ) {
+				$sql_select[] = 'COALESCE( labels.romaji, labels.name ) AS quick_name';
+				$sql_select[] = 'CONCAT_WS("/", "", "labels", labels.friendly, "") AS url';
 			}
+			
+			if( $args['get'] === 'name' || $args['get'] === 'list' ) {
+				$sql_select[] = 'labels.id';
+				$sql_select[] = 'labels.name';
+				$sql_select[] = 'labels.romaji';
+				$sql_select[] = 'labels.friendly';
+			}
+			
+			// FROM ------------------------------------------------
+			
+			// Get label by magazine
+			if( is_numeric($args['magazine_id']) ) {
+				$sql_from = 'magazines_labels';
+			}
+			
+			// Default
+			else {
+				$sql_from = 'labels';
+			}
+			
+			// JOIN ------------------------------------------------
+			
+			// Get by magazine
+			if( is_numeric($args['magazine_id']) ) {
+				$sql_join[] = 'LEFT JOIN labels ON labels.id=magazines_labels.label_id';
+			}
+			
+			// WHERE -----------------------------------------------
+			
+			// Friendly
+			if($args["friendly"]) {
+				$sql_where[] = "labels.friendly=?";
+				$sql_values[] = friendly($args["friendly"]);
+			}
+			
 			// Fuzzy name
 			if($args["name"]) {
-				$sql_where[] = "name LIKE CONCAT('%', ?, '%') OR romaji LIKE CONCAT('%', ?, '%') OR friendly LIKE CONCAT('%', ?, '%')";
-				$sql_values = [
-					sanitize($args["name"]),
-					sanitize($args["name"]),
-					( friendly($args["friendly"]) !== '-' ? friendly($args["friendly"]) : (friendly($args["name"]) !== '-' ? friendly($args["name"]) : sanitize($args["name"])) )
-				];
+				$sql_where[] = "labels.name LIKE CONCAT('%', ?, '%') OR labels.romaji LIKE CONCAT('%', ?, '%') OR labels.friendly LIKE CONCAT('%', ?, '%')";
+				$sql_values[] = sanitize($args["name"]);
+				$sql_values[] = sanitize($args["name"]);
+				$sql_values[] = friendly($args["friendly"]) !== '-' ? friendly($args["friendly"]) : (friendly($args["name"]) !== '-' ? friendly($args["name"]) : sanitize($args["name"]));
 			}
+			
 			// Exact name
-			if($args["exact_name"]) {
-				$sql_where[] = "name=? OR romaji=? OR friendly=?";
-				$sql_values = [
-					sanitize($args["exact_name"]),
-					sanitize($args["exact_name"]),
-					friendly($args["friendly"] ?: $args["exact_name"])
-				];
+			if( strlen($args["exact_name"]) ) {
+				$sql_where[] = "labels.name=? OR labels.romaji=? OR labels.friendly=?";
+				$sql_values[] = sanitize($args["exact_name"]);
+				$sql_values[] = sanitize($args["exact_name"]);
+				$sql_values[] = friendly($args["friendly"] ?: $args["exact_name"]);
 			}
-			if(is_numeric($args["president_id"])) {
-				$sql_where[] = "president_id=?";
-				$sql_values[] = sanitize($args["president_id"]);
+			
+			// President
+			if( is_numeric($args["president_id"]) ) {
+				$sql_where[] = "labels.president_id=?";
+				$sql_values[] = $args["president_id"];
 			}
-			if(is_numeric($args["parent_label_id"])) {
-				$sql_where[] = "parent_label_id=?";
-				$sql_values[] = sanitize($args["parent_label_id"]);
+			
+			// Parent label
+			if( is_numeric($args["parent_label_id"]) ) {
+				$sql_where[] = "labels.parent_label_id=?";
+				$sql_values[] = $args["parent_label_id"];
 			}
+			
+			// Label ID
 			if(is_numeric($args["id"])) {
-				$sql_where[] = "id=?";
-				$sql_values = [sanitize($args["id"])];
+				$sql_where[] = "labels.id=?";
+				$sql_values[] = $args["id"];
 			}
+			
+			// Array of label IDs
 			if(is_array($args['ids'])) {
 				$sql_where[] = substr(str_repeat('labels.id=? OR ', count($args['ids'])), 0, -4);
-				$sql_values = array_merge((is_array($sql_values) ? $sql_values : []), $args['ids']);
+				foreach( $args['ids'] as $id ) {
+					$sql_values[] = $id;
+				}
 			}
 			
-			// ORDER
-			$sql_order = is_array($sql_order) ? $sql_order : ["friendly ASC"];
+			// Magazine ID
+			if( is_numeric($args['magazine_id']) ) {
+				$sql_where[] = 'magazines_labels.magazine_id=? AND labels.id IS NOT NULL';
+				$sql_values[] = $args['magazine_id'];
+			}
 			
+			// ORDER -----------------------------------------------
+			$sql_order = is_array($sql_order) ? $sql_order : ["labels.friendly ASC"];
 			
-			// LIMIT
+			// LIMIT -----------------------------------------------
 			$sql_limit = preg_match("/"."[\d ,]+"."/", $args["limit"]) ? "LIMIT ".$args["limit"] : ($sql_limit ?: null);
-			
 			
 			// QUERY
 			if($sql_select) {
-				$sql_label = "SELECT ".$sql_select." FROM labels ".($sql_where ? "WHERE (".implode(") AND (", $sql_where).")" : "")." ORDER BY ".implode(", ", $sql_order)." ".$sql_limit;
+				
+				// BUILD QUERY ----------------------------------------
+				
+				$sql_label = '
+					SELECT '.implode(', ', $sql_select).'
+					FROM '.$sql_from.' '.
+					(is_array($sql_join) && !empty($sql_join) ? implode(' ', $sql_join) : null).' '.
+					(is_array($sql_where) && !empty($sql_where) ? 'WHERE ('.implode(') AND (', $sql_where).')' : null).' '.
+					(is_array($sql_group) && !empty($sql_group) ? 'GROUP BY '.implode(', ', $sql_group) : null).' 
+					ORDER BY '.implode(', ', $sql_order).' '.$sql_limit.'
+				';
+				
 				$stmt = $this->pdo->prepare($sql_label);
 				$stmt->execute($sql_values);
 				

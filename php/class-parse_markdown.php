@@ -245,6 +245,8 @@
 						}
 						else {
 							$artist = $access_artist->access_artist(["name" => $name, "get" => "name"]);
+							$artist = is_array($artist) && !empty($artist) && isset($artist[0]) ? $artist[0] : $artist;
+							$id = $artist['id'];
 						}
 						
 						if(is_array($artist)) {
@@ -268,6 +270,9 @@
 							$output["quick_name"] = $romaji ?: $name;
 							$output["friendly"] = $artist["friendly"];
 							$output["id"] = $id;
+							
+							$output['artist'] = $artist;
+							
 						}
 						else {
 							$output["name"] = $name;
