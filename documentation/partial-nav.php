@@ -2,6 +2,7 @@
 	General documentation
 </h2>
 <ul class="text ul--bulleted">
+	<li><a href="/documentation/rules/">Rules</a></li>
 	<li><a href="/documentation/contributing/">Contributing to vkgy</a></li>
 	<li><a href="/documentation/romanization/">Romanizing Japanese</a></li>
 	<li><a href="/documentation/markdown/">Formatting text and linking pages</a></li>
