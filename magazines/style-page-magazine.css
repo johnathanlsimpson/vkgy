@@ -1,0 +1,33 @@
+/* Issues */
+.issue__thumbnail {
+	background-color: hsl(var(--background));
+	border-radius: var(--border-radius);
+	display: inline-block;
+	float: left;
+	height: 4rem;
+	object-fit: cover;
+	object-position: center;
+	margin-right: 1rem;
+	overflow: hidden;
+	width: 3rem;
+}
+.issue__date {
+	float: right;
+	margin: 0.25rem 0 0.5rem 0.5rem;
+}
+.issue__symbol {
+	float: left;
+}
+.issue__clear {
+	clear: both;
+	height: 0;
+	width: 100%;
+}
+
+/* Issue volume decoration */
+#language-en:checked~* .magazine__issue .any--ja .any__note {
+	background: inherit;
+	color: inherit;
+	font: inherit;
+	padding: 0;
+}

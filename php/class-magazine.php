@@ -5,6 +5,16 @@ include_once('../php/class-issue.php');
 
 class magazine {
 	
+	
+	
+	public static $attribute_types = [
+		'format',
+		'page size',
+		'num pages',
+	];
+	
+	
+	
 	// =======================================================
 	// Connect
 	// =======================================================
@@ -23,6 +33,22 @@ class magazine {
 	
 	
 	// ======================================================
+	// Get attributes
+	// ======================================================
+	public function get_attributes() {
+		
+		$sql_attributes = 'SELECT type, name, romaji, friendly, id, is_default, type FROM magazines_attributes ORDER BY type ASC, friendly ASC';
+		$stmt_attributes = $this->pdo->prepare($sql_attributes);
+		$stmt_attributes->execute();
+		$attributes = $stmt_attributes->fetchAll(PDO::FETCH_GROUP);
+		
+		return $attributes;
+		
+	}
+	
+	
+	
+	// ======================================================
 	// Core function
 	// ======================================================
 	public function access_magazine($args = []) {
@@ -32,6 +58,10 @@ class magazine {
 		// SELECT ----------------------------------------------
 		if( $args['get'] === 'all' ) {
 			$sql_select[] = 'magazines.*';
+			$sql_select[] = 'magazine_type.name AS type_name';
+			$sql_select[] = 'magazine_type.romaji AS type_romaji';
+			$sql_select[] = 'magazine_size.name AS size_name';
+			$sql_select[] = 'magazine_size.romaji AS size_romaji';
 		}
 		
 		if( $args['get'] === 'all' || $args['get'] === 'basics' ) {
@@ -66,6 +96,12 @@ class magazine {
 		}
 		
 		// JOIN ------------------------------------------------
+		
+		// Type and size
+		if( $args['get'] === 'all' ) {
+			$sql_join[] = 'LEFT JOIN magazines_attributes AS magazine_type ON magazine_type.id=magazines.type';
+			$sql_join[] = 'LEFT JOIN magazines_attributes AS magazine_size ON magazine_size.id=magazines.size';
+		}
 		
 		// Get by label
 		if( is_numeric($args['label_id']) ) {
@@ -192,17 +228,18 @@ class magazine {
 	public function update_magazine( $magazine ) {
 		
 		// Whitelist of columns allowed in update
-		$allowed_columns = [ 'id', 'name', 'romaji', 'friendly', 'volume_name_pattern', 'volume_romaji_pattern', 'num_volume_digits', 'parent_magazine_id', 'default_price', 'notes' ];
+		$allowed_columns = [ 'id', 'name', 'romaji', 'friendly', 'volume_name_pattern', 'volume_romaji_pattern', 'num_volume_digits', 'parent_magazine_id', 'default_price', 'notes', 'type', 'size' ];
 		
 		if( is_array($magazine) && !empty($magazine) ) {
 			
 			// Clean normal vars
 			foreach( $magazine as $key => $value ) {
-				$magazine[$key] = is_array($value) ? $value : ( sanitize($value) ?: null );
+				$value = is_array($value) ? $value : sanitize($value);
+				$magazine[$key] = is_array($value) || strlen($value) ? $value : null;
 			}
 			
 			// Clean numbers
-			foreach( [ 'id', 'parent_magazine_id' ] as $key ) {
+			foreach( [ 'id', 'parent_magazine_id', 'type', 'size' ] as $key ) {
 				$magazine[$key] = is_numeric($magazine[$key]) ? $magazine[$key] : null;
 			}
 			
@@ -227,6 +264,12 @@ class magazine {
 			$keys_update = array_keys($magazine);
 			$values_update = array_values($magazine);
 			
+			// Unset ID from array of values that will be inserted
+			$index_of_id_in_array = array_search('id', $keys_update);
+			unset( $keys_update[$index_of_id_in_array], $values_update[$index_of_id_in_array] );
+			$keys_update = array_values($keys_update);
+			$values_update = array_values($values_update);
+			
 			// Make sure name is specified
 			if( strlen($magazine['name']) ) {
 				
@@ -247,12 +290,6 @@ class magazine {
 					// Make sure name (friendly name) is unique
 					if( !$this->friendly_is_taken($magazine['friendly']) ) {
 						
-						// Unset ID from array of values that will be inserted
-						$index_of_id_in_array = array_search('id', $keys_update);
-						unset( $keys_update[$index_of_id_in_array], $values_update[$index_of_id_in_array] );
-						$keys_update = array_values($keys_update);
-						$values_update = array_values($values_update);
-						
 						// Set query
 						$sql_update = 'INSERT INTO magazines ('.implode( ',', $keys_update ).') VALUES ('.substr( str_repeat( '?,', count($keys_update) ), 0, -1 ).')';
 						
@@ -271,7 +308,7 @@ class magazine {
 						
 						// Set output
 						$output['status'] = 'success';
-						$output['result'] = 'Updated <a href="/magazines/'.$magazine['friendly'].'/">'.( $magazine['romaji'] ? lang($magazine['romaji'], $magazine['name'], 'hidden') : $magazine['name'] ).'</a>.';
+						$output['result'] = ( $is_edit ? 'Updated' : 'Added' ).' <a class="symbol__magazine" href="/magazines/'.$magazine['friendly'].'/">'.( $magazine['romaji'] ? lang($magazine['romaji'], $magazine['name'], 'hidden') : $magazine['name'] ).'</a>.';
 						
 						// Update labels
 						$this->update_magazine_labels( $magazine['id'], $magazine_labels );
@@ -283,7 +320,7 @@ class magazine {
 					
 				}
 				else {
-					$output['result'] = $output['result'] ?: 'Couldn\'t generate query.';
+					$output['result'] = $output['result'] ?: 'Couldn\'t generate magazine query.';
 				}
 				
 			}
@@ -296,6 +333,182 @@ class magazine {
 		}
 		else {
 			$output['result'] = 'Data empty.';
+		}
+		
+		$output['status'] = $output['status'] ?: 'error';
+		return $output;
+		
+	}
+	
+	
+	
+	// =======================================================
+	// Delete magazine
+	// =======================================================
+	public function delete_magazine( $magazine_id ) {
+		
+		if( $_SESSION['can_delete_data'] ) {
+			
+			if( is_numeric( $magazine_id ) ) {
+				
+				$sql_delete = 'DELETE FROM magazines WHERE id=? LIMIT 1';
+				$stmt_delete = $this->pdo->prepare($sql_delete);
+				
+				if( $stmt_delete->execute([ $magazine_id ]) ) {
+					$output['status'] = 'success';
+					$output['result'] = 'Magazine deleted.';
+				}
+				else {
+					$output['result'] = 'Couldn\'t delete magazine.';
+				}
+				
+			}
+			else {
+				$output['result'] = 'That magazine doesn\'t exist.';
+			}
+			
+		}
+		else {
+			$output['result'] = 'Sorry, you don\'t have permission to delete magazines.';
+		}
+		
+		$output['status'] = $output['status'] ?: 'error';
+		return $output;
+		
+	}
+	
+	
+	
+	// =======================================================
+	// Update attribute
+	// =======================================================
+	public function update_attribute( $attribute ) {
+		
+		// Whitelist of columns allowed in update
+		$allowed_columns = [ 'id', 'name', 'romaji', 'friendly', 'type', 'is_default' ];
+		
+		if( is_array($attribute) && !empty($attribute) ) {
+			
+			// Clean normal vars
+			foreach( $attribute as $key => $value ) {
+				$value = sanitize($value);
+				$attribute[$key] = strlen($value) ? $value : null;
+			}
+			
+			// Clean other vars
+			$attribute['id']         = is_numeric($attribute['id']) ? $attribute['id'] : null;
+			$attribute['is_default'] = $attribute['is_default'] ? 1 : 0;
+			$attribute['type']       = is_numeric($attribute['type']) ? $attribute['type'] : null;
+			$attribute['friendly']   = friendly( $attribute['friendly'] ?: ( $attribute['romaji'] ?: $attribute['name'] ) );
+			
+			// Set flag
+			$is_edit = is_numeric($attribute['id']);
+			
+			// Remove disallowed columns before setting up keys/values
+			$attribute = array_filter( $attribute, function ($column) use ($allowed_columns) { return in_array($column, $allowed_columns); }, ARRAY_FILTER_USE_KEY );
+			
+			// Set up keys and values
+			$keys_update = array_keys($attribute);
+			$values_update = array_values($attribute);
+			
+			// Unset ID from array of values that will be inserted
+			$index_of_id_in_array = array_search('id', $keys_update);
+			unset( $keys_update[$index_of_id_in_array], $values_update[$index_of_id_in_array] );
+			$keys_update = array_values($keys_update);
+			$values_update = array_values($values_update);
+			
+			// Make sure name is specified
+			if( strlen($attribute['name']) && is_numeric($attribute['type']) ) {
+				
+				// If updating existing
+				if( $is_edit ) {
+					
+					// Add ID to values
+					$values_update[] = $attribute['id'];
+					
+					// Set query
+					$sql_update = 'UPDATE magazines_attributes SET '.implode('=?,', $keys_update).'=? WHERE id=? LIMIT 1';
+					
+				}
+				
+				// If adding new
+				else {
+					
+					// Set query
+					$sql_update = 'INSERT INTO magazines_attributes ('.implode( ',', $keys_update ).') VALUES ('.substr( str_repeat( '?,', count($keys_update) ), 0, -1 ).')';
+					
+				}
+				
+				// If nothing went wrong while generating the query, run it
+				if( $sql_update ) {
+					
+					$stmt_update = $this->pdo->prepare($sql_update);
+					if( $stmt_update->execute( $values_update ) ) {
+						
+						// Set output
+						$output['status'] = 'success';
+						
+						// Only need message if added attribute
+						if( !$is_edit ) {
+							$output['result'] = 'Updated attribute.';
+						}
+						
+					}
+					else {
+						$output['result'] = 'Couldn\'t update &ldquo;'.( $attribute['romaji'] ?: $attribute['name'] ).'&rdquo;';
+					}
+					
+				}
+				else {
+					$output['result'] = $output['result'] ?: 'Couldn\'t generate attribute query.';
+				}
+				
+			}
+			else {
+				if( $is_edit ) {
+					$output['result'] = 'The attribute needs a name and type.';
+				}
+			}
+			
+		}
+		else {
+			$output['result'] = 'Data empty.';
+		}
+		
+		$output['status'] = $output['status'] ?: 'error';
+		return $output;
+		
+	}
+	
+	
+	
+	// =======================================================
+	// Delete attribute
+	// =======================================================
+	public function delete_attribute( $attribute_id ) {
+		
+		if( $_SESSION['can_delete_data'] ) {
+			
+			if( is_numeric($attribute_id) ) {
+				
+				$sql_delete = 'DELETE FROM magazines_attributes WHERE id=? LIMIT 1';
+				$stmt_delete = $this->pdo->prepare($sql_delete);
+				
+				if( $stmt_delete->execute([ $attribute_id ]) ) {
+					$output['status'] = 'success';
+				}
+				else {
+					$output['result'] = 'Couldn\'t delete attribute.';
+				}
+				
+			}
+			else {
+				$output['result'] = 'That attribute doesn\'t exist.';
+			}
+			
+		}
+		else {
+			$output['result'] = 'Sorry, you don\'t have permission to delete attributes.';
 		}
 		
 		$output['status'] = $output['status'] ?: 'error';

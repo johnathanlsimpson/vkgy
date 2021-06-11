@@ -5,21 +5,6 @@ include_once('../php/class-issue.php');
 $access_issue = new issue($pdo);
 $access_magazine = new magazine($pdo);
 
-subnav([
-	lang('All magazines', '雑誌の一覧', 'hidden') => '/magazines/',
-]);
-
-// Need to change this to a more generic permission
-if( $_SESSION['can_add_livehouses'] ) {
-	subnav([
-		lang('Add magazine', '叢書を追加', 'hidden') => '/magazines/add/',
-	], 'interact', true);
-}
-
-subnav([
-	lang('Add issue', '雑誌を追加', 'hidden') => '/magazines/add-issue/',
-], 'interact', true);
-
 // ========================================================
 // Clean variables
 // ========================================================
@@ -88,6 +73,32 @@ if( !$issue && !$magazine ) {
 	$magazines = $access_magazine->access_magazine([ 'get' => 'basics' ]);
 	
 }
+
+// List of attributes (if adding/editing magazine)
+if( $action === 'update' ) {
+	
+	$magazine_attributes = $access_magazine->get_attributes();
+	
+}
+
+// ========================================================
+// Page setup
+// ========================================================
+
+subnav([
+	lang('All magazines', '雑誌の一覧', 'hidden') => '/magazines/',
+]);
+
+// Need to change this to a more generic permission
+if( $_SESSION['can_add_livehouses'] ) {
+	subnav([
+		lang('Add magazine', '叢書を追加', 'hidden') => '/magazines/add/',
+	], 'interact', true);
+}
+
+subnav([
+	lang('Add issue', '雑誌を追加', 'hidden') => '/magazines/add-issue/'.( $magazine['friendly'] || $issue['friendly'] ? '&magazine='.$magazine['friendly'].$issue['friendly'] : null ),
+], 'interact', true);
 
 // ========================================================
 // Display page

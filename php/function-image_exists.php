@@ -11,7 +11,7 @@ function image_exists($input_string, $pdo, $return_dimensions = false) {
 	}
 	
 	// /artists/dali/main.jpg
-	elseif(preg_match('/'.'\/artists\/([\-\w]+)\/main(?:\.(?:small|medium|large))?.jpg'.'/', $input_string, $match)) {
+	elseif(preg_match('/'.'\/artists\/([\-\w]+)\/main(?:\.(?:small|medium|large|thumbnail))?.jpg'.'/', $input_string, $match)) {
 		if(is_array($match)) {
 			$sql_check_default = 'SELECT images.id, images.extension FROM artists LEFT JOIN images ON images.id=artists.image_id WHERE artists.friendly=? LIMIT 1';
 			$stmt_check_default = $pdo->prepare($sql_check_default);

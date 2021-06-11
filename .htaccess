@@ -147,13 +147,13 @@ RewriteRule  ^lives/livehouses/?$                          /?lives/&page=livehou
 
 RewriteRule  ^lists/(\d+)/?[A-z0-9-\/]*$  /?lists/&id=$1
 
-RewriteRule  ^magazines/?$                                     /?magazines/&action=view
-RewriteRule  ^magazines/add/?$                                 /?magazines/&action=update
-RewriteRule  ^magazines/add-issue/?$                           /?magazines/&action=update-issue
-RewriteRule  ^magazines/([A-z0-9\-]+)/?$                       /?magazines/&action=view&friendly=$1
-RewriteRule  ^magazines/([A-z0-9\-]+)/edit/?$                  /?magazines/&action=update&friendly=$1
-RewriteRule  ^magazines/[A-z0-9\-]+/(\d+)/[A-z0-9\-]+/?$       /?magazines/&action=view&issue_id=$1
-RewriteRule  ^magazines/[A-z0-9\-]+/(\d+)/[A-z0-9\-]+/edit/?$  /?magazines/&action=update-issue&issue_id=$1
+RewriteRule  ^magazines/?$                                        /?magazines/&action=view
+RewriteRule  ^magazines/add/?$                                    /?magazines/&action=update
+RewriteRule  ^magazines/add-issue/?(?:\&magazine=([a-z0-9-]+))?$  /?magazines/&action=update-issue&magazine=$1
+RewriteRule  ^magazines/([A-z0-9\-]+)/?$                          /?magazines/&action=view&friendly=$1
+RewriteRule  ^magazines/([A-z0-9\-]+)/edit/?$                     /?magazines/&action=update&friendly=$1
+RewriteRule  ^magazines/([A-z0-9\-]+)/(\d+)/[A-z0-9\-]+/?$        /?magazines/&action=view&issue_id=$2&friendly=$1
+RewriteRule  ^magazines/([A-z0-9\-]+)/(\d+)/[A-z0-9\-]+/edit/?$   /?magazines/&action=update-issue&issue_id=$2&friendly=$1
 
 RewriteRule  ^musicians/add/?$           /?musicians/&action=add
 RewriteRule  ^musicians/(\d+)/edit/?$    /?musicians/&action=edit&id=$1

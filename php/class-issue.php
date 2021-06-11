@@ -43,13 +43,13 @@ class issue {
 		}
 		
 		if( $args['get'] === 'all' || $args['get'] === 'basics' ) {
+			$sql_select[] = 'magazines.id AS magazine_id';
 			$sql_select[] = 'magazines.name';
 			$sql_select[] = 'magazines.romaji';
 			$sql_select[] = 'magazines.friendly';
-			$sql_select[] = 'REPLACE( magazines.volume_name_pattern, "{volume}", issues.volume_name ) AS full_volume_name';
-			$sql_select[] = 'IF( issues.volume_romaji IS NOT NULL OR magazines.volume_romaji_pattern IS NOT NULL, REPLACE( COALESCE( magazines.volume_romaji_pattern, magazines.volume_name_pattern ), "{volume}", COALESCE( issues.volume_romaji, issues.volume_name ) ), "" ) AS full_volume_romaji';
 			$sql_select[] = 'CONCAT_WS("/", "", "magazines", magazines.friendly, issues.id, issues.friendly, "" ) AS url';
 			$sql_select[] = 'CONCAT_WS("/", "", "magazines", magazines.friendly, "") AS magazine_url';
+			$sql_select[] = 'issues.friendly AS issue_friendly';
 		}
 		
 		if( $args['get'] === 'basics' ) {
@@ -109,7 +109,7 @@ class issue {
 		
 		// Default order
 		else {
-			$sql_order = [ 'magazines.friendly ASC, issues.friendly ASC' ];
+			$sql_order = [ 'magazines.friendly ASC, issues.volume_order ASC, issues.date_represented ASC, issues.date_occurred ASC' ];
 		}
 		
 		// BUILD QUERY -----------------------------------------
@@ -156,13 +156,36 @@ class issue {
 							
 							// Then attach back to issue in array based on group type (is_cover)
 							foreach( $this->allowed_groups as $group_name ) {
+								
+								// Let's make an arbitrary key so we can force the artists groups in a certain order later
+								$group_key = [ 'is_cover' => 0, 'is_large' => 1, 'is_normal' => 2, 'is_flyer' => 3 ][ $group_name ];
+								
 								if( $issue_artist[ $group_name ] ) {
-									$issues[$i]['artists'][ $group_name ][] = $artist;
-									$issues[$i]['artists_text'][ $group_name ] .= '('.$artist['id'].')/'.$artist['friendly'].'/ ';
+									$issues[$i]['artists'][ $group_key.$group_name ][] = $artist;
+									$issues[$i]['artists_text'][ $group_key.$group_name ] .= '('.$artist['id'].')/'.$artist['friendly'].'/ ';
 								}
+								
 							}
 							
 						}
+					}
+					
+					// Now if we were able to get some artists for this issue, let's make sure the groups are ordered in the correct way
+					if( is_array($issues[$i]['artists']) && !empty($issues[$i]['artists']) ) {
+						
+						ksort($issues[$i]['artists']);
+						ksort($issues[$i]['artists_text']);
+						
+						// Now loop back through and remove that number from the beginning of the names--this is dumb but can't think of a better way to do it atm
+						foreach( $issues[$i]['artists'] as $group_name => $group ) {
+							$issues[$i]['artists'][ substr($group_name,1) ] = $group;
+							unset($issues[$i]['artists'][$group_name]);
+						}
+						foreach( $issues[$i]['artists_text'] as $group_name => $group ) {
+							$issues[$i]['artists_text'][ substr($group_name,1) ] = $group;
+							unset($issues[$i]['artists_text'][$group_name]);
+						}
+						
 					}
 					
 				}
@@ -208,7 +231,7 @@ class issue {
 	public function update_issue( $issue ) {
 		
 		// Whitelist of columns allowed in update
-		$allowed_columns = [ 'id', 'magazine_id', 'date_represented', 'date_occurred', 'volume_name', 'volume_romaji', 'volume_is_custom', 'image_id', 'friendly', 'product_number', 'jan_code', 'notes', 'price' ];
+		$allowed_columns = [ 'id', 'magazine_id', 'date_represented', 'date_occurred', 'volume_name', 'volume_romaji', 'volume_is_custom', 'volume_order', 'image_id', 'friendly', 'product_number', 'jan_code', 'notes', 'price' ];
 		
 		if( is_array($issue) && !empty($issue) ) {
 			
@@ -251,6 +274,9 @@ class issue {
 					$issue['volume_romaji'] = $magazine['volume_romaji_pattern'] || $issue['volume_romaji'] ? str_replace( '{volume}', ($issue['volume_romaji'] ?: $issue['volume_name']), ($magazine['volume_romaji_pattern'] ?: $magazine['volume_name_pattern']) ) : null;
 					
 				}
+				
+				// Need a separate volume order so issues can be sorted properly (soukangou before 2, 10 after 3, etc)
+				$issue['volume_order'] = is_numeric($issue['volume_order']) ? $issue['volume_order'] : ( strtolower($issue['volume_romaji']) == 'soukangou' ? 1 : preg_replace('/\D/', '', html_entity_decode($issue['volume_name'])) );
 				
 				// Clean friendly (now that full volume name is set)
 				$issue['friendly'] = friendly( $issue['friendly'] ) ?: friendly( $issue['volume_romaji'] ?: $issue['volume_name'] );
@@ -352,6 +378,43 @@ class issue {
 	
 	
 	// =======================================================
+	// Delete issue
+	// =======================================================
+	public function delete_issue( $issue_id ) {
+		
+		if( $_SESSION['can_delete_data'] ) {
+			
+			if( is_numeric($issue_id) ) {
+				
+				$sql_delete = 'DELETE FROM issues WHERE id=? LIMIT 1';
+				$stmt_delete = $this->pdo->prepare($sql_delete);
+				
+				if( $stmt_delete->execute([ $issue_id ]) ) {
+					$output['status'] = 'success';
+					$output['result'] = 'Issue deleted.';
+				}
+				else {
+					$output['result'] = 'Couldn\'t delete issue.';
+				}
+				
+			}
+			else {
+				$output['result'] = 'That issue doesn\'t exist.';
+			}
+			
+		}
+		else {
+			$output['result'] = 'Sorry, you don\'t have permission to delete issues.';
+		}
+		
+		$output['status'] = $output['status'] ?: 'error';
+		return $output;
+		
+	}
+	
+	
+	
+	// =======================================================
 	// Update issue artists
 	// =======================================================
 	public function update_issue_artists( $issue_id, $artist_groups = [] ) {
@@ -381,9 +444,6 @@ class issue {
 									$artist_id = $reference_in_group['id'];
 									
 									if( is_numeric($artist_id) ) {
-										
-										/*// Get the column for this particular group
-										$flag_column = array_search( $artist_group, $this->allowed_groups );*/
 										
 										// Save each artist id into an array of artists, setting a flag that represents the group they're in
 										$artists[ $artist_id ]['id'] = $artist_id;
