@@ -273,7 +273,7 @@
 										<div class="input__row">
 											<div class="input__group">
 												<label class="input__label">Permanently delete image</label>
-												<button class="input__button symbol__trash image__delete {delete_class}" type="button">Delete</button>
+												<button class="input__button symbol__delete image__delete {delete_class}" type="button">Delete</button>
 											</div>
 										</div>
 									<?php

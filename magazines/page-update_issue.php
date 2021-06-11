@@ -40,6 +40,7 @@ script([
 	'/scripts/external/script-tribute.js',
 	'/scripts/script-initTribute.js',
 	'/scripts/script-initSelectize.js',
+	'/scripts/script-initDelete.js',
 	'/scripts/script-triggerChange.js',
 	'/magazines/script-page-update_issue.js',
 ]);
@@ -61,6 +62,38 @@ $page_title = $is_edit ? $edit_text_en.' ('.$edit_text_ja.')' : $add_text_en.' (
 // ========================================================
 // Get additional data
 // ========================================================
+
+// Previous issue
+$sql_prev = 'SELECT * FROM issues WHERE magazine_id=? AND friendly<? ORDER BY friendly DESC, date_represented DESC, id DESC LIMIT 1';
+$stmt_prev = $pdo->prepare($sql_prev);
+$stmt_prev->execute([ $issue['magazine_id'], $issue['issue_friendly'] ]);
+$rslt_prev = $stmt_prev->fetch();
+
+if( $rslt_prev ) {
+	subnav([
+		[
+			'text' => $issue['romaji'] || $rslt_prev['volume_romaji'] ? lang( ($issue['romaji'] ?: $issue['name']).' '.($rslt_prev['volume_romaji'] ?: $rslt_prev['volume_name']), $issue['name'].' '.$rslt_prev['volume_name'], 'hidden' ) : $issue['name'].' '.$rslt_prev['volume_name'],
+			'url' => $issue['magazine_url'].$rslt_prev['id'].'/'.$rslt_prev['friendly'].'/edit/',
+			'position' => 'left',
+		],
+	], 'directional');
+}
+
+// Next issue
+$sql_next = 'SELECT * FROM issues WHERE magazine_id=? AND friendly>? ORDER BY friendly ASC, date_represented ASC, id ASC LIMIT 1';
+$stmt_next = $pdo->prepare($sql_next);
+$stmt_next->execute([ $issue['magazine_id'], $issue['issue_friendly'] ]);
+$rslt_next = $stmt_next->fetch();
+
+if( $rslt_next ) {
+	subnav([
+		[
+			'text' => $issue['romaji'] || $rslt_next['volume_romaji'] ? lang( ($issue['romaji'] ?: $issue['name']).' '.($rslt_next['volume_romaji'] ?: $rslt_next['volume_name']), $issue['name'].' '.$rslt_next['volume_name'], 'hidden' ) : $issue['name'].' '.$rslt_next['volume_name'],
+			'url' => $issue['magazine_url'].$rslt_next['id'].'/'.$rslt_next['friendly'].'/edit/',
+			'position' => 'right',
+		],
+	], 'directional');
+}
 
 // Get list of all magazines
 $magazines = $access_magazine->access_magazine([ 'get' => 'basics' ]);
@@ -99,15 +132,28 @@ foreach($magazines as $magazine) {
 	if( $magazine['id'] == $issue['magazine_id'] && !$issue['volume_is_custom'] ) {
 		
 		// Remove tail first, otherwise length will be off
-		$issue['volume_name'] = substr_replace( $issue['volume_name'], '', ( -1 * strlen($after_num) ), strlen($after_num) );
-		$issue['volume_name'] = substr_replace( $issue['volume_name'], '', 0, strlen($before_num) );
+		if( strlen($issue['volume_name']) - strlen($after_num) == strrpos($issue['volume_name'],$after_num) ) {
+			$issue['volume_name'] = substr_replace( $issue['volume_name'], '', ( -1 * strlen($after_num) ), strlen($after_num) );
+		}
+		if( strpos($issue['volume_name'], $before_num) === 0 ) {
+			$issue['volume_name'] = substr_replace( $issue['volume_name'], '', 0, strlen($before_num) );
+		}
 		
 		// Then do same for romaji
 		if( $issue['volume_romaji'] ) {
-			$issue['volume_romaji'] = substr_replace( $issue['volume_romaji'], '', ( -1 * strlen($after_num_romaji ?: $after_num) ), strlen($after_num_romaji ?: $after_num) );
-			$issue['volume_romaji'] = substr_replace( $issue['volume_romaji'], '', 0, strlen($before_num_romaji ?: $before_num) );
+			if( strlen($issue['volume_romaji']) - strlen($after_num_romaji ?: $after_num) == strrpos($issue['volume_romaji'],($after_num_romaji ?: $after_num)) ) {
+				$issue['volume_romaji'] = substr_replace( $issue['volume_romaji'], '', ( -1 * strlen($after_num_romaji ?: $after_num) ), strlen($after_num_romaji ?: $after_num) );
+			}
+			if( strpos($issue['volume_name'], ($before_num_romaji ?: $before_num)) === 0 ) {
+				$issue['volume_romaji'] = substr_replace( $issue['volume_romaji'], '', 0, strlen($before_num_romaji ?: $before_num) );
+			}
 		}
 		
+	}
+	
+	// If this is the magazine referenced in the URL, set a flag to say so
+	if( $magazine['friendly'] == $_GET['magazine'] ) {
+		$issue['magazine_id'] = $magazine['id'];
 	}
 	
 }
@@ -127,7 +173,7 @@ foreach($magazines as $magazine) {
 	<ul class="text" x-data="{
 		showVolume:<?= strlen($issue['magazine_id']) ? 1 : 0; ?>,
 		customVolume:<?= $issue['volume_is_custom'] ? 1 : 0; ?>,
-		magazine:'<?= $issue['magazine_id']; ?>',
+		magazine:'<?= is_numeric($issue['magazine_id']) ? $issue['magazine_id'] : null; ?>',
 		patterns:'',
 		volume:'<?= $issue['volume_name']; ?>',
 		volumeRomaji:'<?= $issue['volume_romaji']; ?>'
@@ -145,7 +191,7 @@ foreach($magazines as $magazine) {
 				<select class="input any--flex-grow" data-persist-on-dupe name="magazine_id" placeholder="magazine" x-on:change="showVolume=magazine.length;" x-model="magazine">
 					<option value=""></option>
 					<?php foreach($magazines as $magazine): ?>
-					<option value="<?= $magazine['id']; ?>" <?= $magazine['id'] == $issue['magazine_id'] ? 'selected' : null;?> ><?= $magazine['romaji'] ? $magazine['romaji'].' ('.$magazine['name'].')' : $magazine['name']; ?></option>
+					<option value="<?= $magazine['id']; ?>" <?= $magazine['id'] == $issue['magazine_id'] || $magazine['id'] == $_GET['magazine'] ? 'selected' : null;?> ><?= $magazine['romaji'] ? $magazine['romaji'].' ('.$magazine['name'].')' : $magazine['name']; ?></option>
 					<?php endforeach; ?>
 				</select>
 				
@@ -165,7 +211,7 @@ foreach($magazines as $magazine) {
 				<span style="line-height:2rem;white-space:pre;" x-text="!customVolume && magazine ? patterns[magazine][1] : null"></span>
 				
 				<!-- Volume -->
-				<input name="volume_name" value="<?= $issue['volume_name']; ?>" :class="{ 'volume--number': !customVolume && magazine && patterns[magazine][0] }" :placeholder="!customVolume && magazine && patterns[magazine][0] > 0 ? '123456'.substr(0,patterns[magazine][0]) : 'volume'" :size="!customVolume && magazine && patterns[magazine][0] > 0 ? patterns[magazine][0] : 6" x-model="volume" />
+				<input name="volume_name" value="<?= $issue['volume_name']; ?>" :class="{ 'volume--number': !customVolume && magazine && patterns[magazine][0] }" :placeholder="!customVolume && magazine && patterns[magazine][0] > 0 ? '123456'.substr(0,patterns[magazine][0]) : 'volume'" :size="!customVolume && magazine && patterns[magazine][0] > 0 ? 4 : 6" x-model="volume" />
 				<input class="input--secondary" name="volume_romaji" placeholder="(romaji)" value="<?= $issue['volume_romaji']; ?>" x-show="customVolume || !(magazine && patterns[magazine][0] > 0)" x-model="volumeRomaji" />
 				
 				<!-- After volume -->
@@ -229,6 +275,10 @@ foreach($magazines as $magazine) {
 		<?= lang('Images', '画像', 'div'); ?>
 	</h3>
 	
+	<div class="text text--outlined symbol__error" style="margin-bottom:1rem;">
+		Please do not upload interviews or features&mdash;only covers and flyers are allowed.
+	</div>
+	
 	<?php
 		include('../images/function-render_image_section.php');
 		render_image_section( $issue['images'], [
@@ -273,7 +323,7 @@ foreach($magazines as $magazine) {
 			<!-- Normal -->
 			<div class="input__group" style="flex-basis:400px;align-self:flex-start;flex-grow:1;">
 				
-				<label class="input__label">normal features (1 page or less)</label>
+				<label class="input__label">other appearances (1 page or less)</label>
 				<textarea class="input__textarea autosize any--tributable any--flex-grow" name="is_normal" placeholder="other artists"><?= $issue['artists_text']['is_normal']; ?></textarea>
 				
 			</div>
@@ -310,7 +360,7 @@ foreach($magazines as $magazine) {
 			<div class="input__group any--flex-grow">
 				
 				<label class="input__label"><?= lang('Friendly', 'スラッグ', 'hidden'); ?></label>
-				<input name="friendly" placeholder="friendly url" value="<?= $issue['friendly']; ?>" />
+				<input name="friendly" placeholder="friendly url" value="<?= $issue['issue_friendly']; ?>" />
 				
 			</div>
 			
@@ -334,6 +384,28 @@ foreach($magazines as $magazine) {
 		</li>
 		
 	</ul>
+		
+	<!-- Delete -->
+	<?php if( $is_edit && $_SESSION['can_delete_data'] ): ?>
+		<h3>
+			<?= lang('Admin', 'アドミン', 'div'); ?>
+		</h3>
+		<div class="text text--outlined">
+			<div class="input__row">
+				
+				<div class="input__group">
+					<label class="input__label"><?= lang('Order', '順', 'hidden'); ?></label>
+					<input name="volume_order" placeholder="123" size="4" value="<?= $issue['volume_order']; ?>" />
+				</div>
+				
+				<div class="input__group">
+					<label class="input__label"><?= lang('Delete', '消す', 'hidden'); ?></label>
+					<button class="symbol__delete symbol--standalone" name="delete" type="button"></button>
+				</div>
+				
+			</div>
+		</div>
+	<?php endif; ?>
 	
 	<style>
 		.volume--number.volume--number {
@@ -366,6 +438,7 @@ foreach($magazines as $magazine) {
 				<button class="any--flex-grow" data-add-text="<?= sanitize( lang($add_text_en, $add_text_ja, 'hidden') ); ?>" data-edit-text="<?= sanitize( lang($edit_text_en, $edit_text_ja, 'hidden') ); ?>" data-role="submit" name="submit" type="submit">
 					<?= $is_edit ? lang($edit_text_en, $edit_text_ja, 'hidden') : lang($add_text_en, $add_text_ja, 'hidden'); ?>
 				</button>
+				<?= $is_edit ? '<a class="symbol__magazine" href="'.$issue['url'].'" style="line-height:2rem;margin-left:0.5rem;">'.( $issue['volume_romaji'] ? lang($issue['volume_romaji'], $issue['volume_name'], 'hidden') : $issue['volume_name'] ).'</a>' : null; ?>
 				<span data-role="status"></span>
 				
 			</div>

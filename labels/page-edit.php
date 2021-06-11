@@ -103,7 +103,7 @@
 								<span data-role="status"></span>
 							</div>
 							<div class="input__group <?= $_SESSION['can_delete_data'] ? null : 'any--hidden'; ?>">
-								<label class="input__radio symbol__trash symbol--standalone" name="delete"></label>
+								<label class="input__radio symbol__delete symbol--standalone" name="delete"></label>
 							</div>
 						</div>
 						<div class="any--hidden text text--outlined text--notice edit__result" data-role="result"></div>

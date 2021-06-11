@@ -111,7 +111,7 @@ style([
 								
 								<!-- Text -->
 								<span class="accepted__en"><?= $string['content']; ?><?= $_SESSION['is_boss'] ? ' <span class="any--weaken"><a class="accepted__edit symbol__edit a--inherit"></a></span>' : null; ?></span>
-								<span class="accepted__more"><a class="symbol__down-caret" x-on:click="open=!open">view</a></span>
+								<span class="accepted__more"><a class="symbol__triangle symbol--down" x-on:click="open=!open">view</a></span>
 								<?php
 									foreach($translate->allowed_languages as $language_key => $language) {
 										if($language_key != 'en') {
@@ -146,14 +146,14 @@ style([
 																<span class="tag__voting any--weaken-color">
 																	<label class="tag__vote tag__upvote" data-vote="upvote" data-id="{id}">
 																	<input class="tag__choice input__choice" type="checkbox" {upvote_is_checked} />
-																	<span class="tag__status symbol__up-caret symbol--standalone"></span>
+																	<span class="tag__status symbol__triangle symbol--up symbol--standalone"></span>
 																	</label>
 																	
 																	<span class="tag__num any--weaken-size" data-id="{id}" data-num-tags="{num_votes}"></span>
 																	
 																	<label class="tag__vote tag__status tag__downvote" data-vote="downvote" data-id="{id}">
 																		<input class="tag__choice input__choice" type="checkbox" {downvote_is_checked} />
-																		<span class="symbol__down-caret symbol--standalone"></span>
+																		<span class="symbol__triangle symbol--down symbol--standalone"></span>
 																	</label>
 																</span>
 																

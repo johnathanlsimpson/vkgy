@@ -10,6 +10,7 @@ initializeInlineSubmit($('[name=form__main-signin]'), "/account/function-sign_in
 
 // Show password
 function togglePassword() {
+	
 	var passwordElem = document.querySelector('[name=register_password]');
 	
 	if(passwordElem.type === 'password') {
@@ -18,4 +19,5 @@ function togglePassword() {
 	else {
 		passwordElem.type = 'password';
 	}
+	
 }

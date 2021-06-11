@@ -60,6 +60,11 @@ function entityDecode(input) {
 
 // Get shared elements
 let issueForm = document.querySelector('[name="update-issue"]');
+let resultElem = issueForm.querySelector('[data-role="result"]');
+
+// Get ID
+let idElem = issueForm.querySelector('[name="id"]');
+let isEdit = idElem.value && idElem.value.length > 0 ? 1 : 0;
 
 // ========================================================
 // Submit
@@ -90,7 +95,6 @@ let editContainer = issueForm.querySelector('[data-role="edit-container"]');
 
 // Get elems
 let statusElem = issueForm.querySelector('[data-role="status"]');
-let resultElem = issueForm.querySelector('[data-role="result"]');
 let editElem = document.querySelector('[data-role="edit"]');
 let duplicateElem = document.querySelector('[data-role="duplicate"]');
 
@@ -176,6 +180,22 @@ editElem.addEventListener('click', function(event) {
 duplicateElem.addEventListener('click', function(event) {
 	event.preventDefault();
 	changePageState('add');
+});
+
+// ========================================================
+// Delete
+// ========================================================
+initDelete( $('[name="delete"]'), '/magazines/function-delete_issue.php', { 'issue_id': idElem.value }, function(formElem, returnedData) {
+	
+	document.body.classList.add('any--pulse');
+	
+	resultElem.innerHTML = returnedData.result;
+	resultElem.classList.remove('any--hidden');
+	
+	setTimeout(function() {
+		window.location = '/magazines/';
+	}, 1500);
+	
 });
 
 // ========================================================

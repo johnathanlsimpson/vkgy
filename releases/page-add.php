@@ -388,7 +388,7 @@
 					<input class="input--secondary" name="romaji" placeholder="(romaji)" value="<?php echo $release["romaji"]; ?>" />
 				</div>
 				<div class="input__group">
-					<button class="symbol__down-caret <?php echo $release["press_name"] || $release["type_name"] ? "any--hidden" : ""; ?>" data-show="add__press-container" type="button">
+					<button class="symbol__triangle symbol--down <?php echo $release["press_name"] || $release["type_name"] ? "any--hidden" : ""; ?>" data-show="add__press-container" type="button">
 						Type/Press
 					</button>
 				</div>
@@ -446,7 +446,7 @@
 					</select>
 				</div>
 				<div class="input__group magazine--hide">
-					<button class="symbol__down-caret <?php echo $release["artist"]["display_name"] ? "any--hidden" : ""; ?>" data-show="add__display-name" type="button">
+					<button class="symbol__triangle symbol--down <?php echo $release["artist"]["display_name"] ? "any--hidden" : ""; ?>" data-show="add__display-name" type="button">
 						Display name
 					</button>
 				</div>
@@ -985,7 +985,7 @@
 					</button>
 				</div>
 				<div class="input__group <?= $_SESSION['can_delete_data'] ? null : 'any--hidden'; ?>">
-					<span class="<?= !is_numeric($release["id"]) ? "any--hidden" : ""; ?> input__radio symbol__trash" data-role="delete"></span>
+					<span class="<?= !is_numeric($release["id"]) ? "any--hidden" : ""; ?> input__radio symbol__delete" data-role="delete"></span>
 				</div>
 				<span data-role="status"></span>
 			</div>

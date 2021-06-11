@@ -50,6 +50,6 @@
 .header__supplement .lists__open:hover {
 	color: hsl(var(--interactive));
 }
-.header__supplement .lists__open .symbol__down-caret {
+.header__supplement .lists__open .symbol__triangle {
 	display: none;
 }

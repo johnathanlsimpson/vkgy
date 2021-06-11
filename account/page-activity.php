@@ -40,7 +40,7 @@
 		?>
 		
 		<div class="filter__container">
-			<a class="input__radio input__radio--selected <?= ($url_query['order'] === 'asc' ? 'symbol__up-caret' : 'symbol__down-caret'); ?>" href="<?= $canon_url.$canon_filter.'&order='.($url_query['order'] === 'asc' ? 'desc' : 'asc').'#activity'; ?>"><?= tr('date', ['ja' => '年月日']); ?></a>
+			<a class="input__radio input__radio--selected <?= ($url_query['order'] === 'asc' ? 'symbol__triangle symbol--up' : 'symbol__triangle symbol--down'); ?>" href="<?= $canon_url.$canon_filter.'&order='.($url_query['order'] === 'asc' ? 'desc' : 'asc').'#activity'; ?>"><?= tr('date', ['ja' => '年月日']); ?></a>
 			<div>
 				<span class="symbol__filter symbol--standalone"></span>
 				<a href="<?= $canon_url.$canon_order.'#activity'; ?>"                   class="label search__filter input__radio <?= !in_array($url_query['filter'], ['discussion', 'additions', 'edits', 'other']) ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>"><?= tr('all', ['ja'=>'全て']); ?></a>

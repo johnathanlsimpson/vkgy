@@ -90,7 +90,7 @@ $page_description =
 						?>
 							<div class="col c1">
 								<div>
-									<div class="text text--outlined text--error symbol__vip">
+									<div class="text text--outlined text--error symbol__lock">
 										This article has been locked, and is only viewable to VIP members. Please use discretion.
 									</div>
 								</div>
@@ -268,22 +268,24 @@ $page_description =
 											</div>
 											
 											<div class="input__row">
-												<div class="input__group data__item">
+													
+													<input class="list__choice input__choice symbol--orphan-a" id="release-owned" type="checkbox" <?= $release['is_owned'] ? 'checked' : null; ?> />
+													<input class="list__choice input__choice symbol--orphan-b" id="release-wanted" type="checkbox" <?= $release['is_wanted'] ? 'checked' : null; ?> />
+													<input class="list__choice input__choice symbol--orphan-c" id="release-sold" type="checkbox" <?= $release['is_for_sale'] ? 'checked' : null; ?> />
+												
+												<div class="input__group data__item symbol--parent">
 													<label class="input__label">Lists</label>
 													
-													<input class="list__choice input__choice" id="release-owned" type="checkbox" <?= $release['is_owned'] ? 'checked' : null; ?> />
-													<label class="input__checkbox" data-list-id="-1" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-owned">
-														<span class="symbol__checkbox--unchecked" data-role="status">own</span>
+													<label class="input__checkbox symbol--orphan-a" data-list-id="-1" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-owned">
+														<span class="symbol__unchecked" data-role="status">own</span>
 													</label>
 													
-													<input class="list__choice input__choice" id="release-wanted" type="checkbox" <?= $release['is_wanted'] ? 'checked' : null; ?> />
-													<label class="input__checkbox" data-list-id="-2" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-wanted">
-														<span class="symbol__checkbox--unchecked" data-role="status">want</span>
+													<label class="input__checkbox symbol--orphan-b" data-list-id="-2" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-wanted">
+														<span class="symbol__unchecked" data-role="status">want</span>
 													</label>
 													
-													<input class="list__choice input__choice" id="release-sold" type="checkbox" <?= $release['is_for_sale'] ? 'checked' : null; ?> />
-													<label class="input__checkbox" data-list-id="-3" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-sold">
-														<span class="symbol__checkbox--unchecked" data-role="status">sell</span>
+													<label class="input__checkbox symbol--orphan-c" data-list-id="-3" data-item-id="<?= $release['id']; ?>" data-item-type="release" for="release-sold">
+														<span class="symbol__unchecked" data-role="status">sell</span>
 													</label>
 													
 													<span style="top: -5px;">
@@ -874,7 +876,7 @@ $page_description =
 					?>
 						<div class="col c1">
 							<div>
-								<div class="text text--outlined text--error symbol__vip">
+								<div class="text text--outlined text--error symbol__lock">
 									Sorry, this article has been removed.
 								</div>
 							</div>

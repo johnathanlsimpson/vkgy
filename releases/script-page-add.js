@@ -88,7 +88,9 @@ swapTemplate(formElem, artistElem.value);
 
 $(artistElem).on('change', function() {
 	let artistId = $(this).val();
-	swapTemplate(formElem, artistId);
+	if( artistId != magazineId ) {
+		swapTemplate(formElem, artistId);
+	}
 });
 
 

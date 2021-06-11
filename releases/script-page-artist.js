@@ -15,7 +15,7 @@ $(document).on("click", "[data-sort]", function(event) {
 		sortDir = oppDir;
 		
 		$(this).data("dir", oppDir);
-		$(this).removeClass("symbol__" + direction + "-caret").addClass("symbol__" + oppDirection + "-caret");
+		$(this).removeClass("symbol--" + direction).addClass("symbol--" + oppDirection);
 	}
 	
 	$("[data-sort]").removeClass("input__radio--selected");

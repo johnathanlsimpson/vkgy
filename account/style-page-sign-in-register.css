@@ -27,9 +27,9 @@
 .register__show:checked + .register__show-label {
 	color: hsl(var(--text));
 }
-.register__show:checked + .register__show-label::before {
+/*.register__show:checked + .register__show-label::before {
 	clip-path: url(#symbol__checked);
-}
+}*/
 .register__face {
 	background: url('/main/avback.gif');
 	background-position: center;

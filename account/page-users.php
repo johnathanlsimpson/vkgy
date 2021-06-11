@@ -34,23 +34,23 @@
 			}
 		?>
 		
-		<div class="any--flex any--flex-space-between any--margin">
+		<input class="input__choice symbol--orphan-a" name="filter" id="all" type="radio" checked />
+		<input class="input__choice symbol--orphan-b" name="filter" id="editor" type="radio" />
+		<input class="input__choice symbol--orphan-c" name="filter" id="moderator" type="radio" />
+		<input class="input__choice symbol--orphan-d" name="filter" id="vip" type="radio" />
+		
+		<div class="any--flex any--flex-space-between any--margin symbol--parent">
 			<div>
-				<a class="release__control input__radio input__radio--selected symbol__down-caret" data-sort="date" data-dir="desc" href="">Join date</a>
-				<a class="release__control input__radio symbol__up-caret" data-sort="username" data-dir="asc" href="">A-Z</a>
+				<a class="release__control input__radio input__radio--selected symbol__triangle symbol--down" data-sort="date" data-dir="desc" href="">join date</a>
+				<a class="release__control input__radio symbol__triangle symbol--up" data-sort="username" data-dir="asc" href="">A-Z</a>
 			</div>
 			<div>
-				<label class="release__control input__radio input__radio--selected" data-filter for="all">All</label>
-				<label class="release__control input__radio" data-filter for="editor">Editor</label>
-				<label class="release__control input__radio" data-filter for="moderator">Moderator</label>
-				<label class="release__control input__radio" data-filter for="vip">VIP</label>
+				<label class="release__control input__radio symbol--orphan-a" data-filter for="all"><span class="symbol__unchecked">all</span></label>
+				<label class="release__control input__radio symbol--orphan-b" data-filter for="editor"><span class="symbol__unchecked">editor</span></label>
+				<label class="release__control input__radio symbol--orphan-c" data-filter for="moderator"><span class="symbol__unchecked">moderator</span></label>
+				<label class="release__control input__radio symbol--orphan-d" data-filter for="vip"><span class="symbol__unchecked">VIP</span></label>
 			</div>
 		</div>
-		
-		<input class="input__choice" name="filter" id="all" type="radio" />
-		<input class="input__choice" name="filter" id="editor" type="radio" />
-		<input class="input__choice" name="filter" id="moderator" type="radio" />
-		<input class="input__choice" name="filter" id="vip" type="radio" />
 		
 		<style>
 			.users__container {

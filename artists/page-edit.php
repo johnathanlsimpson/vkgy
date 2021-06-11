@@ -84,8 +84,10 @@ include_once('../php/class-link.php');
 														foreach(["unknown", "band", "session", "alter-ego", "solo", "special project"] as $key) {
 															$n++;
 															?>
-																<input class="input__choice" id="type<?php echo $key; ?>" name="type" type="radio" value="<?php echo $n; ?>" <?php echo $artist["type"] === "".$n ? "checked" : null; ?> />
-																<label class="input__radio symbol__unchecked" for="type<?php echo $key; ?>"><?php echo $key; ?></label>
+																<label class="input__radio" for="type<?php echo $key; ?>">
+																	<input class="input__choice" id="type<?php echo $key; ?>" name="type" type="radio" value="<?php echo $n; ?>" <?php echo $artist["type"] === "".$n ? "checked" : null; ?> />
+																	<span class="symbol__unchecked"><?= $key; ?></span>
+																</label>
 															<?php
 														}
 													?>
@@ -100,8 +102,10 @@ include_once('../php/class-link.php');
 														foreach(["unknown", "active", "disbanded", "paused", "semi-active"] as $key) {
 															$n++;
 															?>
-																<input class="input__choice" id="status<?php echo $key; ?>" name="active" type="radio" value="<?php echo $n; ?>" <?php echo $artist["active"] === "".$n ? "checked" : null; ?> />
-																<label class="input__radio symbol__unchecked" for="status<?php echo $key; ?>"><?php echo $key; ?></label>
+																<label class="input__radio" for="status<?php echo $key; ?>">
+																	<input class="input__choice" id="status<?php echo $key; ?>" name="active" type="radio" value="<?php echo $n; ?>" <?php echo $artist["active"] === "".$n ? "checked" : null; ?> />
+																	<span class="symbol__unchecked"><?php echo $key; ?></span>
+																</label>
 															<?php
 														}
 													?>
@@ -309,7 +313,7 @@ include_once('../php/class-link.php');
 														<?php if($_SESSION['can_delete_data']): ?>
 															<!-- Delete -->
 															<div class="input__group">
-																<button class="symbol__trash link__delete" data-link-id="{id}" type="button"></button>
+																<button class="symbol__delete link__delete" data-link-id="{id}" type="button"></button>
 															</div>
 														<?php endif; ?>
 														
@@ -440,7 +444,7 @@ include_once('../php/class-link.php');
 										Images have moved to their own section.
 									</p>
 									
-									<a class="a--padded a--outlined symbol__arrow-right-circled" href="<?= '/artists/'.$artist['friendly'].'/images/edit/'; ?>">add/edit images</a>
+									<a class="a--padded a--outlined symbol__arrow" href="<?= '/artists/'.$artist['friendly'].'/images/edit/'; ?>">add/edit images</a>
 									<a class="a--padded" href="<?= '/artists/'.$artist['friendly'].'/images/edit/#musicians'; ?>">edit musician defaults</a>
 									
 								</div>
@@ -492,8 +496,10 @@ include_once('../php/class-link.php');
 																			foreach($access_artist->positions as $pos_num => $pos_name) {
 																				$y++;
 																				?>
-																					<input class="input__choice" id="<?php echo $y; ?>" name="musicians[<?php echo $m; ?>][position]" type="radio" value="<?php echo $pos_num; ?>" <?php echo $musician["position"] == $pos_num ? "checked" : null; ?> />
-																					<label class="input__radio symbol__unchecked" for="<?php echo $y; ?>"><?php echo strtolower($pos_name); ?></label>
+																					<label class="input__radio" for="<?php echo $y; ?>">
+																						<input class="input__choice" id="<?php echo $y; ?>" name="musicians[<?php echo $m; ?>][position]" type="radio" value="<?php echo $pos_num; ?>" <?php echo $musician["position"] == $pos_num ? "checked" : null; ?> />
+																						<span class="symbol__unchecked"><?php echo strtolower($pos_name); ?></span>
+																					</label>
 																				<?php
 																			}
 																		?>
@@ -509,8 +515,10 @@ include_once('../php/class-link.php');
 																	</div>
 																	
 																	<div class="input__group">
-																		<input class="input__choice" id="<?php $y++; echo $y; ?>" name="musicians[<?php echo $musician["id"]; ?>][to_end]" type="checkbox" value="1" <?php echo $musician["to_end"] ? "checked" : null; ?> />
-																		<label class="input__radio symbol__unchecked" for="<?php echo $y; ?>">Part of final lineup?</label>
+																		<label class="input__checkbox">
+																			<input class="input__choice" id="<?php $y++; echo $y; ?>" name="musicians[<?php echo $musician["id"]; ?>][to_end]" type="checkbox" value="1" <?php echo $musician["to_end"] ? "checked" : null; ?> />
+																			<span class="symbol__unchecked">part of final lineup?</span>
+																		</label>
 																	</div>
 																</div>
 															</li>
@@ -536,7 +544,7 @@ include_once('../php/class-link.php');
 																		<input name="musicians[<?php echo $m; ?>][friendly]" placeholder="friendly name" value="<?php echo $musician["friendly"]; ?>" />
 																	</div>
 																	<div class="input__group <?= $_SESSION['can_delete_data'] ? null : 'any--hidden'; ?>">
-																		<label class="input__radio symbol__trash symbol--standalone edit__delete-musician" data-id="<?= $musician["id"]; ?>"></label>
+																		<label class="input__radio symbol__delete symbol--standalone edit__delete-musician" data-id="<?= $musician["id"]; ?>"></label>
 																	</div>
 																</div>
 															</li>
@@ -549,8 +557,10 @@ include_once('../php/class-link.php');
 																			foreach($access_artist->positions as $pos_num => $pos_name) {
 																				$y++;
 																				?>
-																					<input class="input__choice" id="<?php echo $y; ?>" name="musicians[<?php echo $m; ?>][usual_position]" type="radio" value="<?php echo $pos_num; ?>" <?php echo $musician["usual_position"] == $pos_num ? "checked" : null; ?> />
-																					<label class="input__radio symbol__unchecked" for="<?php echo $y; ?>"><?php echo strtolower($pos_name); ?></label>
+																					<label class="input__radio" for="<?php echo $y; ?>">
+																						<input class="input__choice" id="<?php echo $y; ?>" name="musicians[<?php echo $m; ?>][usual_position]" type="radio" value="<?php echo $pos_num; ?>" <?php echo $musician["usual_position"] == $pos_num ? "checked" : null; ?> />
+																						<span class="symbol__unchecked"><?php echo strtolower($pos_name); ?></span>
+																					</label>
 																				<?php
 																			}
 																		?>
@@ -567,8 +577,10 @@ include_once('../php/class-link.php');
 																				$n++;
 																				$y++;
 																				?>
-																					<input class="input__choice" id="<?php echo $y; ?>" name="musicians[<?php echo $m; ?>][gender]" type="radio" value="<?php echo $n; ?>" <?php echo $musician["gender"] === "".$n ? "checked" : null; ?> />
-																					<label class="input__radio symbol__unchecked" for="<?php echo $y; ?>"><?php echo $key; ?></label>
+																					<label class="input__radio" for="<?php echo $y; ?>">
+																						<input class="input__choice" id="<?php echo $y; ?>" name="musicians[<?php echo $m; ?>][gender]" type="radio" value="<?php echo $n; ?>" <?php echo $musician["gender"] === "".$n ? "checked" : null; ?> />
+																						<span class="symbol__unchecked"><?php echo $key; ?></span>
+																					</label>
 																				<?php
 																			}
 																		?>
@@ -637,7 +649,7 @@ include_once('../php/class-link.php');
 									</a>
 								</div>
 								<div class="input__group <?= $_SESSION['can_delete_data'] ? null : 'any--hidden'; ?>">
-									<label class="input__radio symbol__trash symbol--standalone" name="delete"></label>
+									<label class="input__radio symbol__delete symbol--standalone" name="delete"></label>
 								</div>
 								<span data-role="status" style="margin-top:1rem;"></span>
 							</div>

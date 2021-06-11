@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+  <defs>
+    <style>
+      .cls-1 {
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <path id="caret_copy" data-name="caret copy" class="cls-1" d="M35.045,272.835a26.452,26.452,0,0,0,38.294,24.35L250.3,173.691a26.465,26.465,0,0,0,0-47.4L73.339,2.8A26.455,26.455,0,0,0,37.827,14.65,27.475,27.475,0,0,0,35.031,28Z"/>
+</svg>

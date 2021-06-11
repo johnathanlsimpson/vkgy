@@ -53,7 +53,7 @@ if( strlen($search_term) ) {
 		$output['result'] .= '
 			<div class="any--weaken-color">
 				No vkei artists found.
-				<a class="symbol__arrow-right-circled" href="'.$search_url.'">search everything</a>
+				<a class="symbol__arrow" href="'.$search_url.'">search everything</a>
 			</div>
 		';
 		

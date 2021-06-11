@@ -55,7 +55,7 @@ $access_artist = new access_artist($pdo);
 					
 					<!-- Delete -->
 					<div class="input__group">
-						<button class="moderation__button input__button symbol__trash" data-id="<?= $video['id']; ?>" value="delete">delete video</button>
+						<button class="moderation__button input__button symbol__delete" data-id="<?= $video['id']; ?>" value="delete">delete video</button>
 					</div>
 					
 				</div>
@@ -163,7 +163,7 @@ $access_artist = new access_artist($pdo);
 						Moderate
 					</h5>
 					<?php if( $_SESSION['can_approve_data'] ): ?>
-						<button class="moderation__button input__button symbol__trash" data-id="<?= $video['id']; ?>" value="delete">delete video</button>
+						<button class="moderation__button input__button symbol__delete" data-id="<?= $video['id']; ?>" value="delete">delete video</button>
 					<?php endif; ?>
 				
 					<?php if( $video['is_flagged'] == 0 ): ?>

@@ -6,7 +6,7 @@
 
 $page_header = lang('About '.($magazine['romaji'] ?: $magazine['name']), $magazine['name'].'の詳細', 'div');
 
-$page_title = $magazine['romaji'] ? $magazine['romaji'].' ('.$magazine['name'].')' : $magazine['name'];
+$page_title = ( $magazine['romaji'] ? $magazine['romaji'].' ('.$magazine['name'].')' : $magazine['name'] ).' | vkei magazine (V系 雑誌)';
 
 subnav([
 	lang('Magazine', '叢書の情報', 'hidden') => $magazine['url'],
@@ -19,7 +19,49 @@ if( $_SESSION['can_add_livehouses'] ) {
 	], 'interact', true);
 }
 
+style([
+	'/magazines/style-page-magazine.css',
+]);
+
+// ========================================================
+// Get additional data
+// ========================================================
+
+// Previous magazine
+$sql_prev = 'SELECT * FROM magazines WHERE friendly<? ORDER BY friendly DESC LIMIT 1';
+$stmt_prev = $pdo->prepare($sql_prev);
+$stmt_prev->execute([ $magazine['friendly'] ]);
+$rslt_prev = $stmt_prev->fetch();
+
+if( $rslt_prev ) {
+	subnav([
+		[
+			'text' => $rslt_prev['romaji'] ? lang( $rslt_prev['romaji'], $rslt_prev['name'], 'hidden' ) : $rslt_prev['name'],
+			'url' => '/magazines/'.$rslt_prev['friendly'].'/',
+			'position' => 'left',
+		],
+	], 'directional');
+}
+
+// Next magazine
+$sql_next = 'SELECT * FROM magazines WHERE friendly>? ORDER BY friendly ASC LIMIT 1';
+$stmt_next = $pdo->prepare($sql_next);
+$stmt_next->execute([ $magazine['friendly'] ]);
+$rslt_next = $stmt_next->fetch();
+
+if( $rslt_next ) {
+	subnav([
+		[
+			'text' => $rslt_next['romaji'] ? lang( $rslt_next['romaji'], $rslt_next['name'], 'hidden' ) : $rslt_next['name'],
+			'url' => '/magazines/'.$rslt_next['friendly'].'/',
+			'position' => 'right',
+		],
+	], 'directional');
+}
+
 ?>
+
+<?= $error ? '<div class="col c1"><div class="text text--outlined text--error symbol__error">'.$error.'</div></div>' : null; ?>
 
 <div class="col c1">
 	
@@ -31,10 +73,17 @@ if( $_SESSION['can_add_livehouses'] ) {
 		
 		<div class="data__container">
 			
-			<?php if($_SESSION['can_approve_data']): ?>
+			<?php if($magazine['type_name']): ?>
 				<div class="data__item">
-					<div class="h5">ID</div>
-					<?= $magazine['id']; ?>
+					<div class="h5"><?= lang('Format', '形式', 'hidden'); ?></div>
+					<?= $magazine['type_romaji'] ? lang($magazine['type_romaji'], $magazine['type_name'], 'parentheses') : $magazine['type_name']; ?></a>
+				</div>
+			<?php endif; ?>
+			
+			<?php if($magazine['size_name']): ?>
+				<div class="data__item">
+					<div class="h5"><?= lang('Size', '判型', 'hidden'); ?></div>
+					<?= $magazine['size_romaji'] ? lang($magazine['size_romaji'], $magazine['size_name'], 'hidden') : $magazine['size_name']; ?></a>
 				</div>
 			<?php endif; ?>
 			
@@ -55,7 +104,7 @@ if( $_SESSION['can_add_livehouses'] ) {
 			<?php if( is_array($magazine['labels']) && !empty($magazine['labels']) ): ?>
 				<div class="data__item">
 					
-					<div class="h5"><?= lang('Companies', '関係会社', 'hidden'); ?></div>
+					<div class="h5"><?= lang('Publishers', '関係会社', 'hidden'); ?></div>
 					<?php foreach($magazine['labels'] as $index => $label): ?>
 						
 						<a class="a--inherit symbol__company" href="<?= $label['url']; ?>"><?= $label['romaji'] ? lang($label['romaji'], $label['name'], 'parentheses') : $label['name']; ?></a>
@@ -80,41 +129,36 @@ if( $_SESSION['can_add_livehouses'] ) {
 			<?php foreach($magazine['issues'] as $issue): ?>
 				<li class="magazine__issue">
 					
+					<?= $_SESSION['can_add_data'] ? '<a class="symbol__edit" href="'.$issue['url'].'edit/" style="padding:0 0.5rem 0 0.25rem;margin-left:0.25rem;float:right;z-index:1;"></a>' : null; ?>
+					
 					<a href="<?= $issue['url']; ?>">
 						
 						<?php if($issue['image']): ?>
-							<img alt="<?= $issue['romaji'] ?: $issue['name']; ?>" src="<?= $issue['image']['thumbnail_url']; ?>" style="height:100%;width:100%;object-fit:cover;object-position:center;float:left;margin-right:1rem;width:3rem;height:3rem;display:inline-block;border-radius:var(--border-radius);overflow:hidden;" />
+							<img class="issue__thumbnail" alt="<?= $issue['romaji'] ?: $issue['name']; ?>" src="<?= $issue['image']['thumbnail_url']; ?>" />
 						<?php else: ?>
-							<span class="any--crossed-out" style="float:left;margin-right:1rem;background:hsl(var(--background));height:3rem;width:3rem;display:inline-block;border-radius:var(--border-radius);"></span>
+							<span class="issue__thumbnail any--crossed-out"></span>
 						<?php endif; ?>
 						
-						<span class="h5" style="float:right;margin: 0.25rem 0 0.5rem 0.5rem;"><?= substr($issue['date_represented'], 0, 7); ?></span>
+						<span class="h5 issue__date"><?= substr($issue['date_represented'], 0, 7); ?></span>
+						
+						<span class="symbol__magazine issue__symbol"></span>
 						
 						<?php
-							$issue_name   = $magazine['name'].' <span class="any__note">'.$issue['full_volume_name'].'</span>';
-							$issue_romaji = $magazine['romaji'] || $issue['full_volume_romaji'] ? ($magazine['romaji'] ?: $magazine['name']).' <span class="any__note">'.($issue['full_volume_romaji'] ?: $issue['full_volume_name']).'</span>' : null;
+							$issue_name   = $magazine['name'].' <span class="any__note">'.$issue['volume_name'].'</span>';
+							$issue_romaji = $magazine['romaji'] || $issue['volume_romaji'] ? ($magazine['romaji'] ?: $magazine['name']).' <span class="any__note">'.($issue['volume_romaji'] ?: $issue['volume_name']).'</span>' : null;
 							echo $issue_romaji ? lang($issue_romaji, $issue_name, 'div') : $issue_name;
 						?>
 						
 					</a>
 					
-					<div style="clear:both;width:100%;height:0;"></div>
+					<div class="issue__clear"></div>
 					
 				</li>
 			<?php endforeach; ?>
 		<?php else: ?>
-			<span class="symbol__error">This magazine doesn't have any issues.</span> <?= $_SESSION['can_add_data'] ? '<a class="" href="/magazines/add-issue/">Add issue?</a>' : null; ?>
+			<span class="symbol__error">This magazine doesn't have any issues.</span> <?= $_SESSION['can_add_data'] ? '<a class="symbol__plus" href="/magazines/add-issue/&magazine='.$magazine['friendly'].'">Add issue?</a>' : null; ?>
 		<?php endif; ?>
 		
 	</ul>
 	
 </div>
-
-<style>
-	#language-en:checked~* .magazine__issue .any--ja .any__note {
-		background: inherit;
-		color: inherit;
-		font: inherit;
-		padding: 0;
-	}
-</style>

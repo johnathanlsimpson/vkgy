@@ -55,8 +55,8 @@
 	
 	<div class="col c2 images__controls">
 		<div>
-			<a href="/images/&type=<?php echo $search_type; ?>&order=desc" class="input__radio symbol__down-caret <?php echo strtolower($search_order) === 'desc' ? 'input__radio--selected' : null; ?>">Date uploaded</a>
-			<a href="/images/&type=<?php echo $search_type; ?>&order=asc" class="input__radio symbol__up-caret <?php echo strtolower($search_order) === 'asc' ? 'input__radio--selected' : null; ?>">Date uploaded</a>
+			<a href="/images/&type=<?php echo $search_type; ?>&order=desc" class="input__radio symbol__triangle symbol--down <?php echo strtolower($search_order) === 'desc' ? 'input__radio--selected' : null; ?>">Date uploaded</a>
+			<a href="/images/&type=<?php echo $search_type; ?>&order=asc" class="input__radio symbol__triangle symbol--up <?php echo strtolower($search_order) === 'asc' ? 'input__radio--selected' : null; ?>">Date uploaded</a>
 		</div>
 		<div>
 			<a href="/images/&type=all&order=<?php echo strtolower($search_order); ?>" class="input__radio <?php echo $_GET['type'] === 'all' ? 'symbol__checked input__radio--selected' : 'symbol__unchecked'; ?>">All</a>
@@ -131,7 +131,7 @@
 										if($image['is_exclusive']) {
 											?>
 												<div class="data__item any--weaken-color image__vip">
-													<span class="symbol__vip">VIP</span>
+													<span class="symbol__lock">VIP</span>
 													<a href="https://patreon.com/vkgy" target="_blank">Become VIP</a> for high-res, unwatermarked version.
 												</div>
 											<?php

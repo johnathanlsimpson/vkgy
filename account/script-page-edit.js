@@ -18,14 +18,14 @@ $(":input").inputmask();
 // --------------------------------------------------------
 var themeZeroButton = document.getElementById('site_theme_0');
 var themeOneButton = document.getElementById('site_theme_1');
-var themeCSSLink = document.getElementById('stylesheet_theme');
+var themeCSSLink = document.querySelector('link[rel="stylesheet"][href^="/style/style-colors"]');
 
 // This button may not exist if only editing user roles
 if(themeZeroButton) {
-	themeZeroButton.onclick = function(event) {
+	themeZeroButton.onclick = function(event) { console.log(themeCSSLink);
 		themeCSSLink.setAttribute('href', '/style/style-colors-0.css');
 	};
-	themeOneButton.onclick = function(event) {
+	themeOneButton.onclick = function(event) { console.log(themeCSSLink);
 		themeCSSLink.setAttribute('href', '/style/style-colors-1.css');
 	};
 }

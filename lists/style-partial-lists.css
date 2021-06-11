@@ -28,7 +28,7 @@
 	color: hsl(var(--text));
 	display: inline-flex !important;
 }
-.lists__open .symbol__down-caret {
+.lists__open .symbol__triangle {
 	color: hsl(var(--text--secondary));
 	justify-content: space-around;
 	margin: 0;
@@ -39,11 +39,8 @@
 .lists__choice:checked ~ .lists__open {
 	color: hsl(var(--interactive));
 }
-.lists__choice:checked ~ .lists__open .symbol__down-caret {
+.lists__choice:checked ~ .lists__open .symbol__triangle {
 	color: inherit;
-}
-.lists__open .symbol__down-caret::before {
-	transform: translateX(-1px) translateY(-1px);
 }
 .lists__open .symbol__list::before {
 	margin-right: 3px !important;

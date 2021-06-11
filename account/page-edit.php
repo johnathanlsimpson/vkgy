@@ -173,6 +173,10 @@
 							<?= tr('Social Media',['context'=>'Profile option','lang'=>true,'lang_args'=>'div']); ?>
 						</h3>
 						
+						<div class="text text--outlined symbol__error any--small-margin">
+							Trading is not allowed at vkgy. Please do not allude to trading in your motto or link to trading accounts in your social media. Any references to trading on your profile will be removed.
+						</div>
+						
 						<ul class="text">
 							<li class="input__row">
 								<div class="input__group any--flex-grow">
@@ -205,13 +209,6 @@
 								</div>
 							</li>
 							
-							<li class="input__row">
-								<div class="input__group any--flex-grow">
-									<label class="input__label"><?= tr('Monochrome Heaven username', ['context'=>'Profile option']); ?></label>
-									<span class="social__prefix">m-h.com/profile/</span>
-									<input class="any--flex-grow" name="mh" placeholder="123-username" style="padding-left:calc(0rem + 15ch);" value="<?= $user['mh']; ?>" />
-								</div>
-							</li>
 						</ul>
 						
 						<script>
@@ -253,11 +250,16 @@
 										<div class="input__group">
 											<label class="input__label"><?= tr('Site theme', ['context'=>'Profile option','ja'=>'背景画像']); ?></label>
 											
-											<input class="input__choice any--hidden" id="site_theme_0" name="site_theme" type="radio" value="0" <?php echo $user['site_theme'] == 0 ? 'checked' : null; ?> />
-											<label class="input__radio symbol__unchecked " for="site_theme_0"><?= tr('default', ['context'=>'site theme option']); ?></label>
+											<label class="input__radio">
+												<input class="input__choice any--hidden" id="site_theme_0" name="site_theme" type="radio" value="0" <?php echo $user['site_theme'] == 0 ? 'checked' : null; ?> />
+												<span class="symbol__unchecked"><?= tr('default', ['context'=>'site theme option']); ?></span>
+											</label>
 											
-											<input class="input__choice any--hidden" id="site_theme_1" name="site_theme" type="radio" value="1" <?php echo $user['site_theme'] == 1 ? 'checked' : null; ?> />
-											<label class="input__radio symbol__unchecked " for="site_theme_1"><?= tr('dark', ['context'=>'site theme option']); ?></label>
+											<label class="input__radio">
+												<input class="input__choice any--hidden" id="site_theme_1" name="site_theme" type="radio" value="1" <?php echo $user['site_theme'] == 1 ? 'checked' : null; ?> />
+												<span class="symbol__unchecked"><?= tr('dark', ['context'=>'site theme option']); ?></span>
+											</label>
+											
 										</div>
 									</div>
 								</li>
@@ -328,7 +330,7 @@
 														echo '<span style="line-height:2rem;margin-right:0.5rem;">';
 													}
 													
-													echo '<span class="symbol__user-'.$icon_name.' symbol--standalone" style="margin-right:5px;"></span>'.$user['username'];
+													echo '<span class="symbol__'.$icon_name.' symbol--standalone" style="margin-right:5px;"></span>'.$user['username'];
 													
 													if( $user['icon'] === $icon_name || $_SESSION['is_vip'] ) {
 														?>
@@ -371,7 +373,7 @@
 										</div>
 									</div>
 									
-									<?= !$_SESSION['is_vip'] ? '<span class="symbol__vip" style="display:block;margin-top:1rem;">'.tr('This feature is limited to VIP members.').'.</span>' : null; ?>
+									<?= !$_SESSION['is_vip'] ? '<span class="symbol__lock" style="display:block;margin-top:1rem;">'.tr('This feature is limited to VIP members.').'.</span>' : null; ?>
 								</li>
 						</ul>
 					</div>

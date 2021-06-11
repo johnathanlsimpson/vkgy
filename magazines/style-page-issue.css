@@ -1,0 +1,52 @@
+/* Outline on magazine title */
+#language-en:checked~* .issue__title .any--ja .a--outlined {
+	background: inherit;
+	border: inherit;
+	box-shadow: inherit;
+	color: inherit;
+	font: inherit;
+	padding: 0;
+}
+
+/* Issue cover */
+.issue__image {
+	float: left;
+	height: auto;
+	margin-right: 1rem;
+	max-height: 400px;
+	max-width: 300px;
+}
+
+/* Artists */
+.issue__artists {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: repeat( auto-fit, minmax(250px, 1fr) );
+}
+.issue__artist {
+	display: inline-flex;
+}
+.issue__artist-title {
+	grid-column: 1 / -1;
+	margin-bottom: -0.5rem;
+}
+.issue__artist-thumbnail {
+	background: hsl(var(--background));
+	border-radius: var(--border-radius);
+	display: inline-block;
+	flex: none;
+	height: 3rem;
+	margin-right: 1rem;
+	overflow: hidden;
+	width: 3rem;
+}
+.issue--cover .issue__artist-thumbnail {
+	height: 6rem;
+	width: 6rem;
+}
+.issue__artist-image {
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	width: 100%;
+}

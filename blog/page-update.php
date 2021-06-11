@@ -686,9 +686,9 @@
 					
 					<!-- Delete -->
 					<?php $delete_button_class = $_SESSION['can_delete_data'] || $_SESSION['user_id'] === $entry['user_id'] ? null : 'any--hidden'; ?>
-					<label class="input__radio symbol__trash symbol--standalone <?= $delete_button_class; ?>" data-get="id" data-get-into="data-id" data-id="<?= $entry["id"]; ?>" data-is-translation="<?= $entry['is_translation'] ? 1 : 0 ;?>" name="delete"></label>
+					<label class="input__radio symbol__delete symbol--standalone <?= $delete_button_class; ?>" data-get="id" data-get-into="data-id" data-id="<?= $entry["id"]; ?>" data-is-translation="<?= $entry['is_translation'] ? 1 : 0 ;?>" name="delete"></label>
 					
-					<a class="save__link symbol__arrow-right-circled" href="<?= $entry_url; ?>" target="_blank">
+					<a class="save__link symbol__arrow" href="<?= $entry_url; ?>" target="_blank">
 						<m1>Preview draft</m1>
 						<m2>View entry</m2>
 					</a>

@@ -1,0 +1,249 @@
+	
+		
+		/* This should be updated from function-generate_symbols */
+		/* ====================================================== */
+		
+		/* Hide disallowed symbols */
+		[class*="symbol__"]::before {
+			visibility: hidden;
+		}
+		
+		/* All symbols */
+		[class*="symbol__"]::before, .symbol__arrow::before, .symbol__artist::before, .artist:not(.artist--no-symbol)::before, .symbol__caret::before, .symbol__next::before, .symbol__previous::before, .symbol__checkbox--checked::before, .input__checkbox .input__choice:checked + .symbol__unchecked::before, .symbol--orphan:checked   ~ .symbol--parent .symbol--orphan.input__checkbox   .symbol__unchecked::before, .symbol--orphan-a:checked ~ .symbol--parent .symbol--orphan-a.input__checkbox .symbol__unchecked::before, .symbol--orphan-b:checked ~ .symbol--parent .symbol--orphan-b.input__checkbox .symbol__unchecked::before, .symbol__checkbox::before, .input__checkbox .symbol__unchecked::before, .symbol__connection::before, .symbol__copy::before, .symbol__crown::before, .user::before, .symbol__user::before, .user[data-icon="crown"]::before, .symbol__delete::before, .symbol__discord::before, .symbol__edit::before, .symbol__error::before, .symbol__facebook::before, .symbol__filter::before, .symbol__flower::before, .user[data-icon="flower"]::before, .symbol__forward::before, .symbol__heart::before, .user[data-icon="heart"]::before, .symbol__help::before, .symbol__info::before, .symbol__hidden::before, .symbol__instagram::before, .symbol__label::before, .symbol__company::before, .symbol__language::before, .symbol__like::before, .symbol__link::before, .symbol__list::before, .symbol__live::before, .symbol__livehouse::before, .symbol__loading::before, .symbol__loading.symbol__loading.symbol__loading.symbol__loading.symbol__loading.symbol__loading.symbol__loading::before, .symbol__lock::before, .symbol__magazine::before, .symbol__moon::before, .user[data-icon="moon"]::before, .symbol__musician::before, .symbol__news::before, .symbol__patreon::before, .symbol__pin::before, .symbol__plus::before, .symbol__point::before, .symbol__radio--checked::before, .success::before, .symbol__success::before, .input__radio .input__choice:checked + .symbol__unchecked::before, .symbol--orphan:checked   ~ .symbol--parent .symbol--orphan.input__radio   .symbol__unchecked::before, .symbol--orphan-a:checked ~ .symbol--parent .symbol--orphan-a.input__radio .symbol__unchecked::before, .symbol--orphan-b:checked ~ .symbol--parent .symbol--orphan-b.input__radio .symbol__unchecked::before, .symbol--orphan-c:checked ~ .symbol--parent .symbol--orphan-c.input__radio .symbol__unchecked::before, .symbol--orphan-d:checked ~ .symbol--parent .symbol--orphan-d.input__radio .symbol__unchecked::before, .symbol__radio::before, .input__radio .symbol__unchecked::before, .symbol__release::before, .symbol__search::before, .symbol__section::before, .symbol__shuffle::before, .symbol__random::before, .symbol__star--empty::before, .symbol__star--half::before, .symbol__star::before, .user[data-icon="star"]::before, .symbol__star--full::before, .symbol__tag::before, .symbol__triangle::before, .symbol__twitter::before, .symbol__video::before, .symbol__youtube::before {
+			background: currentcolor;
+			content: "";
+			display: inline-block;
+			height: var(--symbol-size);
+			margin-right: 0.3ch;
+			-webkit-mask-size: var(--symbol-size);
+			mask-size: var(--symbol-size);
+			opacity: 0.5;
+			width: var(--symbol-size);
+		}
+		
+		/* Utilities */
+		.symbol--standalone::before {
+			margin-right: 0;
+			opacity: 1;
+		}
+		.symbol--down::before {
+			transform: rotate(90deg);
+		}
+		.symbol--left::before, .symbol__previous::before {
+			transform: rotate(180deg);
+		}
+		.symbol--up::before {
+			transform: rotate(270deg);
+		}
+		
+		/* Un-hide allowed symbols */
+		.symbol__arrow::before, .symbol__artist::before, .artist:not(.artist--no-symbol)::before, .symbol__caret::before, .symbol__next::before, .symbol__previous::before, .symbol__checkbox--checked::before, .input__checkbox .input__choice:checked + .symbol__unchecked::before, .symbol--orphan:checked   ~ .symbol--parent .symbol--orphan.input__checkbox   .symbol__unchecked::before, .symbol--orphan-a:checked ~ .symbol--parent .symbol--orphan-a.input__checkbox .symbol__unchecked::before, .symbol--orphan-b:checked ~ .symbol--parent .symbol--orphan-b.input__checkbox .symbol__unchecked::before, .symbol__checkbox::before, .input__checkbox .symbol__unchecked::before, .symbol__connection::before, .symbol__copy::before, .symbol__crown::before, .user::before, .symbol__user::before, .user[data-icon="crown"]::before, .symbol__delete::before, .symbol__discord::before, .symbol__edit::before, .symbol__error::before, .symbol__facebook::before, .symbol__filter::before, .symbol__flower::before, .user[data-icon="flower"]::before, .symbol__forward::before, .symbol__heart::before, .user[data-icon="heart"]::before, .symbol__help::before, .symbol__info::before, .symbol__hidden::before, .symbol__instagram::before, .symbol__label::before, .symbol__company::before, .symbol__language::before, .symbol__like::before, .symbol__link::before, .symbol__list::before, .symbol__live::before, .symbol__livehouse::before, .symbol__loading::before, .symbol__loading.symbol__loading.symbol__loading.symbol__loading.symbol__loading.symbol__loading.symbol__loading::before, .symbol__lock::before, .symbol__magazine::before, .symbol__moon::before, .user[data-icon="moon"]::before, .symbol__musician::before, .symbol__news::before, .symbol__patreon::before, .symbol__pin::before, .symbol__plus::before, .symbol__point::before, .symbol__radio--checked::before, .success::before, .symbol__success::before, .input__radio .input__choice:checked + .symbol__unchecked::before, .symbol--orphan:checked   ~ .symbol--parent .symbol--orphan.input__radio   .symbol__unchecked::before, .symbol--orphan-a:checked ~ .symbol--parent .symbol--orphan-a.input__radio .symbol__unchecked::before, .symbol--orphan-b:checked ~ .symbol--parent .symbol--orphan-b.input__radio .symbol__unchecked::before, .symbol--orphan-c:checked ~ .symbol--parent .symbol--orphan-c.input__radio .symbol__unchecked::before, .symbol--orphan-d:checked ~ .symbol--parent .symbol--orphan-d.input__radio .symbol__unchecked::before, .symbol__radio::before, .input__radio .symbol__unchecked::before, .symbol__release::before, .symbol__search::before, .symbol__section::before, .symbol__shuffle::before, .symbol__random::before, .symbol__star--empty::before, .symbol__star--half::before, .symbol__star::before, .user[data-icon="star"]::before, .symbol__star--full::before, .symbol__tag::before, .symbol__triangle::before, .symbol__twitter::before, .symbol__video::before, .symbol__youtube::before {
+			visibility: visible;
+		}
+		
+		/* Each symbol */
+		.symbol__arrow::before {
+		-webkit-mask-image: url(/style/symbols/arrow.svg?20210610223638);
+		mask-image: url(/style/symbols/arrow.svg?20210610223638);
+	}
+.symbol__artist::before, .artist:not(.artist--no-symbol)::before {
+		-webkit-mask-image: url(/style/symbols/artist.svg?20210610223638);
+		mask-image: url(/style/symbols/artist.svg?20210610223638);
+	}
+.symbol__caret::before, .symbol__next::before, .symbol__previous::before {
+		-webkit-mask-image: url(/style/symbols/caret.svg?20210610223641);
+		mask-image: url(/style/symbols/caret.svg?20210610223641);
+	}
+.symbol__checkbox--checked::before, .input__checkbox .input__choice:checked + .symbol__unchecked::before, .symbol--orphan:checked   ~ .symbol--parent .symbol--orphan.input__checkbox   .symbol__unchecked::before, .symbol--orphan-a:checked ~ .symbol--parent .symbol--orphan-a.input__checkbox .symbol__unchecked::before, .symbol--orphan-b:checked ~ .symbol--parent .symbol--orphan-b.input__checkbox .symbol__unchecked::before {
+		-webkit-mask-image: url(/style/symbols/checkbox--checked.svg?20210610223637);
+		mask-image: url(/style/symbols/checkbox--checked.svg?20210610223637);
+	}
+.symbol__checkbox::before, .input__checkbox .symbol__unchecked::before {
+		-webkit-mask-image: url(/style/symbols/checkbox.svg?20210610223637);
+		mask-image: url(/style/symbols/checkbox.svg?20210610223637);
+	}
+.symbol__connection::before {
+		-webkit-mask-image: url(/style/symbols/connection.svg?20210610223633);
+		mask-image: url(/style/symbols/connection.svg?20210610223633);
+	}
+.symbol__copy::before {
+		-webkit-mask-image: url(/style/symbols/copy.svg?20210610223636);
+		mask-image: url(/style/symbols/copy.svg?20210610223636);
+	}
+.symbol__crown::before, .user::before, .symbol__user::before, .user[data-icon="crown"]::before {
+		-webkit-mask-image: url(/style/symbols/crown.svg?20210610223626);
+		mask-image: url(/style/symbols/crown.svg?20210610223626);
+	}
+.symbol__delete::before {
+		-webkit-mask-image: url(/style/symbols/delete.svg?20210610223627);
+		mask-image: url(/style/symbols/delete.svg?20210610223627);
+	}
+.symbol__discord::before {
+		-webkit-mask-image: url(/style/symbols/discord.svg?20210610223636);
+		mask-image: url(/style/symbols/discord.svg?20210610223636);
+	}
+.symbol__edit::before {
+		-webkit-mask-image: url(/style/symbols/edit.svg?20210610223640);
+		mask-image: url(/style/symbols/edit.svg?20210610223640);
+	}
+.symbol__error::before {
+		-webkit-mask-image: url(/style/symbols/error.svg?20210610223644);
+		mask-image: url(/style/symbols/error.svg?20210610223644);
+	}
+.symbol__facebook::before {
+		-webkit-mask-image: url(/style/symbols/facebook.svg?20210610223636);
+		mask-image: url(/style/symbols/facebook.svg?20210610223636);
+	}
+.symbol__filter::before {
+		-webkit-mask-image: url(/style/symbols/filter.svg?20210610223635);
+		mask-image: url(/style/symbols/filter.svg?20210610223635);
+	}
+.symbol__flower::before, .user[data-icon="flower"]::before {
+		-webkit-mask-image: url(/style/symbols/flower.svg?20210610223641);
+		mask-image: url(/style/symbols/flower.svg?20210610223641);
+	}
+.symbol__forward::before {
+		-webkit-mask-image: url(/style/symbols/forward.svg?20210610223631);
+		mask-image: url(/style/symbols/forward.svg?20210610223631);
+	}
+.symbol__heart::before, .user[data-icon="heart"]::before {
+		-webkit-mask-image: url(/style/symbols/heart.svg?20210610223639);
+		mask-image: url(/style/symbols/heart.svg?20210610223639);
+	}
+.symbol__help::before, .symbol__info::before {
+		-webkit-mask-image: url(/style/symbols/help.svg?20210610223635);
+		mask-image: url(/style/symbols/help.svg?20210610223635);
+	}
+.symbol__hidden::before {
+		-webkit-mask-image: url(/style/symbols/hidden.svg?20210610223635);
+		mask-image: url(/style/symbols/hidden.svg?20210610223635);
+	}
+.symbol__instagram::before {
+		-webkit-mask-image: url(/style/symbols/instagram.svg?20210610223634);
+		mask-image: url(/style/symbols/instagram.svg?20210610223634);
+	}
+.symbol__label::before, .symbol__company::before {
+		-webkit-mask-image: url(/style/symbols/label.svg?20210610223639);
+		mask-image: url(/style/symbols/label.svg?20210610223639);
+	}
+.symbol__language::before {
+		-webkit-mask-image: url(/style/symbols/language.svg?20210610223634);
+		mask-image: url(/style/symbols/language.svg?20210610223634);
+	}
+.symbol__like::before {
+		-webkit-mask-image: url(/style/symbols/like.svg?20210610223634);
+		mask-image: url(/style/symbols/like.svg?20210610223634);
+	}
+.symbol__link::before {
+		-webkit-mask-image: url(/style/symbols/link.svg?20210610223632);
+		mask-image: url(/style/symbols/link.svg?20210610223632);
+	}
+.symbol__list::before {
+		-webkit-mask-image: url(/style/symbols/list.svg?20210610223632);
+		mask-image: url(/style/symbols/list.svg?20210610223632);
+	}
+.symbol__live::before {
+		-webkit-mask-image: url(/style/symbols/live.svg?20210610223628);
+		mask-image: url(/style/symbols/live.svg?20210610223628);
+	}
+.symbol__livehouse::before {
+		-webkit-mask-image: url(/style/symbols/livehouse.svg?20210610223633);
+		mask-image: url(/style/symbols/livehouse.svg?20210610223633);
+	}
+.symbol__loading::before, .symbol__loading.symbol__loading.symbol__loading.symbol__loading.symbol__loading.symbol__loading.symbol__loading::before {
+		-webkit-mask-image: url(/style/symbols/loading.svg?20210610223632);
+		mask-image: url(/style/symbols/loading.svg?20210610223632);
+	}
+.symbol__lock::before {
+		-webkit-mask-image: url(/style/symbols/lock.svg?20210610223631);
+		mask-image: url(/style/symbols/lock.svg?20210610223631);
+	}
+.symbol__magazine::before {
+		-webkit-mask-image: url(/style/symbols/magazine.svg?20210610223640);
+		mask-image: url(/style/symbols/magazine.svg?20210610223640);
+	}
+.symbol__moon::before, .user[data-icon="moon"]::before {
+		-webkit-mask-image: url(/style/symbols/moon.svg?20210610223639);
+		mask-image: url(/style/symbols/moon.svg?20210610223639);
+	}
+.symbol__musician::before {
+		-webkit-mask-image: url(/style/symbols/musician.svg?20210610223640);
+		mask-image: url(/style/symbols/musician.svg?20210610223640);
+	}
+.symbol__news::before {
+		-webkit-mask-image: url(/style/symbols/news.svg?20210610223631);
+		mask-image: url(/style/symbols/news.svg?20210610223631);
+	}
+.symbol__patreon::before {
+		-webkit-mask-image: url(/style/symbols/patreon.svg?20210610223630);
+		mask-image: url(/style/symbols/patreon.svg?20210610223630);
+	}
+.symbol__pin::before {
+		-webkit-mask-image: url(/style/symbols/pin.svg?20210610223630);
+		mask-image: url(/style/symbols/pin.svg?20210610223630);
+	}
+.symbol__plus::before {
+		-webkit-mask-image: url(/style/symbols/plus.svg?20210610223642);
+		mask-image: url(/style/symbols/plus.svg?20210610223642);
+	}
+.symbol__point::before {
+		-webkit-mask-image: url(/style/symbols/point.svg?20210610223630);
+		mask-image: url(/style/symbols/point.svg?20210610223630);
+	}
+.symbol__radio--checked::before, .success::before, .symbol__success::before, .input__radio .input__choice:checked + .symbol__unchecked::before, .symbol--orphan:checked   ~ .symbol--parent .symbol--orphan.input__radio   .symbol__unchecked::before, .symbol--orphan-a:checked ~ .symbol--parent .symbol--orphan-a.input__radio .symbol__unchecked::before, .symbol--orphan-b:checked ~ .symbol--parent .symbol--orphan-b.input__radio .symbol__unchecked::before, .symbol--orphan-c:checked ~ .symbol--parent .symbol--orphan-c.input__radio .symbol__unchecked::before, .symbol--orphan-d:checked ~ .symbol--parent .symbol--orphan-d.input__radio .symbol__unchecked::before {
+		-webkit-mask-image: url(/style/symbols/radio--checked.svg?20210610223627);
+		mask-image: url(/style/symbols/radio--checked.svg?20210610223627);
+	}
+.symbol__radio::before, .input__radio .symbol__unchecked::before {
+		-webkit-mask-image: url(/style/symbols/radio.svg?20210610223626);
+		mask-image: url(/style/symbols/radio.svg?20210610223626);
+	}
+.symbol__release::before {
+		-webkit-mask-image: url(/style/symbols/release.svg?20210610223641);
+		mask-image: url(/style/symbols/release.svg?20210610223641);
+	}
+.symbol__search::before {
+		-webkit-mask-image: url(/style/symbols/search.svg?20210610223629);
+		mask-image: url(/style/symbols/search.svg?20210610223629);
+	}
+.symbol__section::before {
+		-webkit-mask-image: url(/style/symbols/section.svg?20210610223629);
+		mask-image: url(/style/symbols/section.svg?20210610223629);
+	}
+.symbol__shuffle::before, .symbol__random::before {
+		-webkit-mask-image: url(/style/symbols/shuffle.svg?20210610223629);
+		mask-image: url(/style/symbols/shuffle.svg?20210610223629);
+	}
+.symbol__star--empty::before {
+		-webkit-mask-image: url(/style/symbols/star--empty.svg?20210610223643);
+		mask-image: url(/style/symbols/star--empty.svg?20210610223643);
+	}
+.symbol__star--half::before {
+		-webkit-mask-image: url(/style/symbols/star--half.svg?20210610223643);
+		mask-image: url(/style/symbols/star--half.svg?20210610223643);
+	}
+.symbol__star::before, .user[data-icon="star"]::before, .symbol__star--full::before {
+		-webkit-mask-image: url(/style/symbols/star.svg?20210610223642);
+		mask-image: url(/style/symbols/star.svg?20210610223642);
+	}
+.symbol__tag::before {
+		-webkit-mask-image: url(/style/symbols/tag.svg?20210610223628);
+		mask-image: url(/style/symbols/tag.svg?20210610223628);
+	}
+.symbol__triangle::before {
+		-webkit-mask-image: url(/style/symbols/triangle.svg?20210610233911);
+		mask-image: url(/style/symbols/triangle.svg?20210610233911);
+	}
+.symbol__twitter::before {
+		-webkit-mask-image: url(/style/symbols/twitter.svg?20210610223627);
+		mask-image: url(/style/symbols/twitter.svg?20210610223627);
+	}
+.symbol__video::before {
+		-webkit-mask-image: url(/style/symbols/video.svg?20210610223638);
+		mask-image: url(/style/symbols/video.svg?20210610223638);
+	}
+.symbol__youtube::before {
+		-webkit-mask-image: url(/style/symbols/youtube.svg?20210610223643);
+		mask-image: url(/style/symbols/youtube.svg?20210610223643);
+	}		
+	

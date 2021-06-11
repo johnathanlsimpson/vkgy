@@ -143,7 +143,7 @@
 }
 
 /* Hide 'for sale' option if release isn't marked 'owned' */
-#release-owned:not(:checked) ~ [for="release-sold"] {
+#release-owned:not(:checked) ~ .symbol--parent [for="release-sold"] {
 	display: none;
 }
 

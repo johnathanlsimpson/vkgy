@@ -13,7 +13,7 @@ $(document).on("click", "[data-sort]", function(event) {
 	
 	dir = !isChecked ? dir : oppDir[dir];
 	
-	$(this).find("span").removeClass("symbol__" + dir + "-caret" + " " + "symbol__" + oppDir[dir] + "-caret").addClass("symbol__" + dir + "-caret");
+	$(this).find("span").removeClass("symbol--" + dir + " " + "symbol--" + oppDir[dir]).addClass("symbol--" + dir);
 	$(this).data("dir", dir);
 	
 	tinysort(target, {

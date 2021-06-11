@@ -42,7 +42,7 @@ function insert_lives_into_history($history, $lives) {
 						foreach($schedule_lines as $schedule_key => $schedule_line) {
 							$schedule_content .=
 								($schedule_key ? ', ' : null).
-								'<a class="a--inherit symbol__company" href="/lives/&id='.$schedule_line['id'].'">'.
+								'<a class="a--inherit symbol__live" href="/lives/&id='.$schedule_line['id'].'">'.
 								lang(($schedule_line['area_romaji'] ?: $schedule_line['area_name']), $schedule_line['area_name'], 'hidden').
 								' '.
 								lang(($schedule_line['livehouse_romaji'] ?: $schedule_line['livehouse_name']), $schedule_line['livehouse_name'], 'hidden').
