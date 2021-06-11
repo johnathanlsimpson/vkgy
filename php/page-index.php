@@ -17,6 +17,7 @@ style([
 	'/style/style-colors-'.( is_numeric($_SESSION['site_theme']) ? $_SESSION['site_theme'] : 0 ).'.css',
 	'/style/style-critical.css',
 	'/style/style-shared.css',
+	'/style/style-symbols.css',
 	'/style/external/style-simplebar.css',
 ], 'top');
 
@@ -88,10 +89,6 @@ script([
 	</head>
 	<body class="<?= $body_class; ?>">
 		
-		<?php
-			include_once("../style/symbols.php");
-		?>
-		
 		<input class="any--hidden" id="language-en" name="language" type="radio" value="en" <?= !isset($translate->language) || $translate->language === 'en' ? 'checked' : null; ?> />
 		<input class="any--hidden" id="language-ja" name="language" type="radio" value="ja" <?= $translate->language === 'ja' ? 'checked' : null; ?> />
 		
@@ -115,7 +112,7 @@ script([
 					<div class="language__switch">
 						<span class="language__symbol symbol__language symbol--standalone"></span>
 						<span class="language__current"><?= ($translate->language_name ?: 'English').($translate->language_name != 'English' ? ' (&beta;)' : null); ?></span>
-						<span class="language__caret symbol__down-caret symbol--standalone"></span>
+						<span class="language__caret symbol__caret symbol--down symbol--standalone"></span>
 					</div>
 					
 					<div class="language__dropdown">
@@ -382,7 +379,7 @@ script([
 									<?php
 										foreach($breadcrumbs as $num => $breadcrumb) {
 											?>
-												<li class="breadcrumb__item symbol symbol__caret-right" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+												<li class="breadcrumb__item symbol symbol__caret" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
 													<a class="a--padded a--inherit" href="<?php echo $breadcrumb["url"]; ?>" itemprop="item">
 														<span itemprop="name">
 															<?php
@@ -409,7 +406,7 @@ script([
 				</div>
 				
 				<div class="any--weaken footer__right">
-					<a class="a--outlined a--padded footer__top" href="#">&#9650; TOP</a>
+					<a class="a--outlined a--padded footer__top symbol__triangle symbol--up" href="#">TOP</a>
 					<ul>
 						<li>
 							<h5>

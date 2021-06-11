@@ -14,6 +14,8 @@
 	--light--primary:   0, 0%, 100%;
 	--light--secondary: 0, 0%, 80%;
 	--border-radius:    3px;
+	
+	--symbol-size: 1.4ex;
 }
 .col {
 	align-items: flex-start;
@@ -555,11 +557,6 @@ body {
 	.language__switch:hover .language__caret,
 	.language--open .language__caret {
 		opacity: 1;
-	}
-	.language--open .language__switch:hover .language__caret::before {
-		clip-path: url(#symbol__up-caret);
-		-webkit-clip-path: url(#symbol__up-caret);
-		-moz-clip-path: url(#symbol__up-caret);
 	}
 	.language__dropdown {
 		display: none;
