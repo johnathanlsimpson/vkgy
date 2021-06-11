@@ -7,7 +7,7 @@
 				ob_start();
 				?>
 					<div class="face__container">
-						<a class="face__delete symbol__trash" href="#" x-on:click.prevent="removeFace($event.target)"></a>
+						<a class="face__delete symbol__delete" href="#" x-on:click.prevent="removeFace($event.target)"></a>
 						<div class="face__image" style="background-image:url({image_url});background-position:{background_position};background-size:{background_size};height:{height};width:{width};"></div>
 						<select class="input" data-populate-on-click="true" data-source="musicians{source_attr_suffix}" data-face='{face_coordinates}' name='image_musician_id[{face_coordinates}]' placeholder="musician">
 							<option value="{musician_id}" selected>{musician_name}</option>

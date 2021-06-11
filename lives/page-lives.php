@@ -139,7 +139,7 @@
 								echo '</code>';
 								echo $key != end(array_keys($q)) ? ', ' : null;
 							}
-							echo '&nbsp;&nbsp;&nbsp;<a class="symbol__arrow-right-circled" href="/lives/">'.lang('Show all lives', '全てのライブ', 'hidden').'</a>';
+							echo '&nbsp;&nbsp;&nbsp;<a class="symbol__arrow" href="/lives/">'.lang('Show all lives', '全てのライブ', 'hidden').'</a>';
 						?>
 					</div>
 				<?php
@@ -149,7 +149,7 @@
 				?>
 					<div class="senary-nav__container any--margin">
 						<div class="senary-nav__left">
-							<a class="input__radio input__radio--selected <?php echo $_GET['order'] === 'asc' ? 'symbol__up-caret' : 'symbol__down-caret'; ?>" href="<?php echo '&order='.($_GET['order'] === 'asc' ? 'desc' : 'asc').'&'.http_build_query($q); ?>">Date</a>
+							<a class="input__radio input__radio--selected <?php echo $_GET['order'] === 'asc' ? 'symbol__triangle symbol--up' : 'symbol__triangle symbol--down'; ?>" href="<?php echo '&order='.($_GET['order'] === 'asc' ? 'desc' : 'asc').'&'.http_build_query($q); ?>">Date</a>
 						</div>
 						
 						<div class="senary-nav__center">

@@ -30,7 +30,7 @@ ob_start();
 		<label class="report__open input__button input__checkbox" for="report-open">
 			<input class="input__choice" id="report-open" type="checkbox" />
 			<span class="symbol__error">report</span>
-			<span class="symbol__down-caret symbol--standalone"></span>
+			<span class="symbol__triangle symbol--down symbol--standalone"></span>
 		</label>
 		
 		<!-- Container with dropdown template for tippy -->

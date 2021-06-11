@@ -134,7 +134,7 @@
 										</div>
 									</div>
 									
-									<label class="input__button obscure__button symbol__down-caret" for="obscure-livehouse-<?php echo $i; ?>">More options</label>
+									<label class="input__button obscure__button symbol__triangle symbol--down" for="obscure-livehouse-<?php echo $i; ?>">More options</label>
 								</div>
 							<?php
 						}

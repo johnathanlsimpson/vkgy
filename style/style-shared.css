@@ -1230,7 +1230,7 @@ li > .input__checkbox:last-of-type {
 .input__checkbox:not(.symbol--standalone)::before,
 .input__checkbox > [class*="symbol"]:not(.symbol--standalone):first-of-type::before {
 	font-size: 1rem;
-	margin-right: 1rem;
+	margin-right: 1rem !important;
 }
 /* For checked checkbox/radio inputs, make sure symbol/text is normal color */
 .input__radio--selected,
@@ -1241,7 +1241,7 @@ li > .input__checkbox:last-of-type {
 	color: hsl(var(--text));
 }
 /* For checked checkbox/radio inputs, make sure symbol is normal opacity */
-.input__radio--selected::before,
+/*.input__radio--selected::before,
 .input__checkbox--selected::before,
 .input__choice:checked + .input__checkbox::before,
 .input__choice:checked + .input__radio::before,
@@ -1250,16 +1250,16 @@ li > .input__checkbox:last-of-type {
 .input__choice:checked + [class*="symbol"]::before,
 .input__choice:checked + [class*="symbol"]::before {
 	opacity: 1;
-}
+}*/
 /* For checked radio inputs, make sure checked radio symbol is shown */
-.input__radio--selected::before,
+/*.input__radio--selected::before,
 .input__choice:checked + [class*="symbol__unchecked"]::before {
 	-moz-clip-path:    url(#symbol__checked);
 	-webkit-clip-path: url(#symbol__checked);
 	clip-path:         url(#symbol__checked);
-}
+}*/
 /* For checked checkbox inputs (even if using wrong symbol class), make sure checked checkbox symbol is shown */
-.input__checkbox--selected::before,
+/*.input__checkbox--selected::before,
 .input__choice:checked + [class*="symbol__checkbox"]::before,
 .input__choice:checked + .input__checkbox [class*="symbol__checkbox"]::before,
 .input__choice:checked + [class*="input__checkbox"][class*="symbol__unchecked"]::before,
@@ -1267,14 +1267,14 @@ li > .input__checkbox:last-of-type {
 	-moz-clip-path:    url(#symbol__checkbox--checked);
 	-webkit-clip-path: url(#symbol__checkbox--checked);
 	clip-path:         url(#symbol__checkbox--checked);
-}
+}*/
 /* For unchecked checkbox inputs (even if using wrong symbol class), make sure unchecked checkbox symbol is shown */
-.input__checkbox.symbol__unchecked::before,
+/*.input__checkbox.symbol__unchecked::before,
 .input__checkbox .symbol__unchecked::before {
 	-moz-clip-path:    url(#symbol__checkbox--unchecked);
 	-webkit-clip-path: url(#symbol__checkbox--unchecked);
 	clip-path:         url(#symbol__checkbox--unchecked);
-}
+}*/
 /* Fix for awkward margins in checkbox/radio inputs */
 .input__checkbox [class*="symbol"],
 .input__radio [class*="symbol"] {

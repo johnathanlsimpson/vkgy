@@ -142,7 +142,7 @@
 								</button>
 							</div>
 							<div class="input__group">
-								<!--<span class="input__radio symbol__trash" data-role="delete"></span>-->
+								<!--<span class="input__radio symbol__delete" data-role="delete"></span>-->
 							</div>
 							<span data-role="status"></span>
 						</div>

@@ -40,8 +40,8 @@ ob_start();
 					'hidden' ); ?>
 			</p>
 			<div class="home-head__more">
-				<a class="symbol__arrow-right-circled" href=""><?= lang('About vkgy', 'vkgyとは', 'hidden'); ?></a>
-				<a class="symbol__arrow-right-circled" href=""><?= lang('What\'s vkei?', 'ビジュアル系とは', 'hidden'); ?></a>
+				<a class="symbol__arrow" href=""><?= lang('About vkgy', 'vkgyとは', 'hidden'); ?></a>
+				<a class="symbol__arrow" href=""><?= lang('What\'s vkei?', 'ビジュアル系とは', 'hidden'); ?></a>
 			</div>
 			
 		</div>
@@ -659,8 +659,8 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 		<div class="any--flex col c2 register__wrapper">
 			<form action="/account/function-register.php" class="text register__container register__section" enctype="multipart/form-data" method="post" name="register__form" autocomplete="off">
 				<ul>
-					<input class="any--hidden" id="register__radio--bat" name="register_avatar" type="radio" value="bat" checked />
-					<input class="any--hidden" id="register__radio--gecko" name="register_avatar" type="radio" value="gecko" />
+					<input class="any--hidden symbol--orphan-a" id="register__radio--bat" name="register_avatar" type="radio" value="bat" checked />
+					<input class="any--hidden symbol--orphan-b" id="register__radio--gecko" name="register_avatar" type="radio" value="gecko" />
 					
 					<li>
 						<div class="input__row">
@@ -682,18 +682,20 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 								<input autocomplete="new-password" class="any--flex-grow symbol__locked" name="register_password" placeholder="password (パスワード)" type="password" />
 							</div>
 							<div class="input__group">
-								<input class="register__show any--hidden" id="register__show" type="checkbox" />
-								<label class="input__radio symbol__unchecked register__show-label" onclick="togglePassword()" for="register__show">Show?</label>
+								<label class="input__radio register__show-label" for="register__show">
+									<input class="input__choice register__show any--hidden" id="register__show" onclick="togglePassword()" type="checkbox" />
+									<span class="symbol__unchecked">show?</span>
+								</label>
 							</div>
 						</div>
 					</li>
 					
-					<li class="register__avatar-container">
+					<li class="register__avatar-container symbol--parent">
 						<div class="input__row">
 							<div class="input__group" style="align-self: center;">
 								<label class="input__label"><?php echo lang('Avatar eyes', 'アバター', ['secondary_class' => 'any--hidden']); ?></label>
-								<label class="input__radio symbol__unchecked register__bat" for="register__radio--bat"><?php echo lang('bat', 'メークⅠ', ['secondary_class' => 'any--hidden']); ?></label>
-								<label class="input__radio symbol__unchecked register__gecko" for="register__radio--gecko"><?php echo lang('gecko', 'メークⅡ', ['secondary_class' => 'any--hidden']); ?></label>
+								<label class="input__radio register__bat symbol--orphan-a" for="register__radio--bat"><span class="symbol__unchecked"><?php echo lang('bat', 'メークⅠ', ['secondary_class' => 'any--hidden']); ?></span></label>
+								<label class="input__radio register__gecko symbol--orphan-b" for="register__radio--gecko"><span class="symbol__unchecked"><?php echo lang('gecko', 'メークⅡ', ['secondary_class' => 'any--hidden']); ?></span></label>
 							</div>
 							<div class="input__group">
 								<div class="register__face"></div>

@@ -23,7 +23,7 @@ $allowed_item_types = array_keys(access_list::$allowed_item_types);
 					<input class="list__choice input__choice" type="checkbox" {checked} />
 					<span class="symbol__unchecked" data-role="status">{list_name}</span>
 				</label>
-				<a class="list__arrow symbol__arrow-right-circled" href="{list_url}"></a>
+				<a class="list__arrow symbol__arrow" href="{list_url}"></a>
 			<?php
 			$list_button_template = ob_get_clean();
 			echo preg_replace('/'.'\{.+?\}'.'/', '', $list_button_template);
@@ -162,7 +162,7 @@ $allowed_item_types = array_keys(access_list::$allowed_item_types);
 					<input class="lists__choice input__choice" type="checkbox" />
 					<label class="lists__open input__button input__checkbox">
 						<span class="symbol__list">add to list</span>
-						<span class="symbol__down-caret symbol--standalone"></span>
+						<span class="symbol__triangle symbol--down symbol--standalone"></span>
 					</label>
 					
 					<!-- Container with dropdown template for tippy -->

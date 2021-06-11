@@ -142,7 +142,7 @@ if($artist_is_viewable) {
 						<?php
 						if($period_key + 1 < count($artist["labels"])) {
 							?>
-								<span class="symbol__down-caret label__next"></span>
+								<span class="symbol__triangle symbol--down label__next"></span>
 							<?php
 						}
 					}

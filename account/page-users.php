@@ -36,8 +36,8 @@
 		
 		<div class="any--flex any--flex-space-between any--margin">
 			<div>
-				<a class="release__control input__radio input__radio--selected symbol__down-caret" data-sort="date" data-dir="desc" href="">Join date</a>
-				<a class="release__control input__radio symbol__up-caret" data-sort="username" data-dir="asc" href="">A-Z</a>
+				<a class="release__control input__radio input__radio--selected symbol__triangle symbol--down" data-sort="date" data-dir="desc" href="">Join date</a>
+				<a class="release__control input__radio symbol__triangle symbol--up" data-sort="username" data-dir="asc" href="">A-Z</a>
 			</div>
 			<div>
 				<label class="release__control input__radio input__radio--selected" data-filter for="all">All</label>

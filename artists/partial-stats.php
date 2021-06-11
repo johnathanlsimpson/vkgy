@@ -80,7 +80,7 @@
 			<?php echo lang('Pronunciation', '発音', ['secondary_class' => 'any--hidden']); ?>
 		</h5>
 		<?php echo $artist['pronunciation']; ?>
-		<button class="symbol--standalone symbol__caret-right" data-pronunciation="<?php echo html_entity_decode($artist['pronunciation'], ENT_NOQUOTES, "UTF-8"); ?>" type="button"></button>
+		<button class="symbol--standalone symbol__triangle" data-pronunciation="<?php echo html_entity_decode($artist['pronunciation'], ENT_NOQUOTES, "UTF-8"); ?>" type="button"></button>
 	</div>
 	
 	<div class="data__item <?php echo $artist['concept_name'] ? null : 'any--hidden'; ?>">

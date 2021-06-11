@@ -300,11 +300,11 @@
 .register__show:checked + .register__show-label {
 	color: hsl(var(--text));
 }
-.register__show:checked + .register__show-label::before {
+/*.register__show:checked + .register__show-label::before {
 	-moz-clip-path: url(#symbol__checked);
 	-webkit-clip-path: url(#symbol__checked);
 	clip-path: url(#symbol__checked);
-}
+}*/
 .register__container {
 	flex-basis: 400px;
 }

@@ -371,7 +371,7 @@
 										</div>
 									</div>
 									
-									<?= !$_SESSION['is_vip'] ? '<span class="symbol__vip" style="display:block;margin-top:1rem;">'.tr('This feature is limited to VIP members.').'.</span>' : null; ?>
+									<?= !$_SESSION['is_vip'] ? '<span class="symbol__lock" style="display:block;margin-top:1rem;">'.tr('This feature is limited to VIP members.').'.</span>' : null; ?>
 								</li>
 						</ul>
 					</div>

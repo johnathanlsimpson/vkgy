@@ -38,23 +38,24 @@ $page_description =
 			<div class="col c1">
 				
 				<div>
-					<div class="any--flex release__control-container any--margin">
+					
+					<input class="any--hidden symbol--orphan-a" id="all" name="filter" value="all" type="radio" checked />
+					<input class="any--hidden symbol--orphan-b" id="cd" name="filter" value="cd" type="radio" />
+					<input class="any--hidden symbol--orphan-c" id="dvd" name="filter" value="dvd" type="radio" />
+					<input class="any--hidden symbol--orphan-d" id="other" name="filter" value="other" type="radio" />
+					
+					<div class="any--flex release__control-container any--margin symbol--parent">
 						<div>
-							<a class="release__control input__radio input__radio--selected symbol__down-caret" data-sort="date" data-dir="desc" href="">Date</a>
-							<a class="release__control input__radio symbol__up-caret" data-sort="name" data-dir="asc" href="">A-Z</a>
+							<a class="release__control input__radio input__radio--selected symbol__triangle symbol--down" data-sort="date" data-dir="desc" href="">Date</a>
+							<a class="release__control input__radio symbol__triangle symbol--up" data-sort="name" data-dir="asc" href="">A-Z</a>
 						</div>
 						<div>
-							<label class="release__control input__radio input__radio--selected" data-filter for="all"><?= lang('all', '全て', 'hidden'); ?></label>
-							<label class="release__control input__radio" data-filter for="cd">CD</label>
-							<label class="release__control input__radio" data-filter for="dvd"><?= lang('video', '映像', 'hidden'); ?></label>
-							<label class="release__control input__radio" data-filter for="other"><?= lang('others', 'その他', 'hidden'); ?></label>
+							<label class="release__control input__radio symbol--orphan-a input__radio--selected" data-filter for="all"><span class="symbol__unchecked"><?= lang('all', '全て', 'hidden'); ?></span></label>
+							<label class="release__control input__radio symbol--orphan-b" data-filter for="cd"><span class="symbol__unchecked">CD</span></label>
+							<label class="release__control input__radio symbol--orphan-c" data-filter for="dvd"><span class="symbol__unchecked"><?= lang('video', '映像', 'hidden'); ?></span></label>
+							<label class="release__control input__radio symbol--orphan-d" data-filter for="other"><span class="symbol__unchecked"><?= lang('others', 'その他', 'hidden'); ?></span></label>
 						</div>
 					</div>
-					
-					<input class="any--hidden" id="all" name="filter" value="all" type="radio" checked />
-					<input class="any--hidden" id="cd" name="filter" value="cd" type="radio" />
-					<input class="any--hidden" id="dvd" name="filter" value="dvd" type="radio" />
-					<input class="any--hidden" id="other" name="filter" value="other" type="radio" />
 					
 					<?php
 						foreach($releases as $release) {
@@ -308,7 +309,6 @@ $page_description =
 													<img src="/releases/rh.gif" style="height:1rem;vertical-align:middle;" />
 												</a>
 											</div>
-											<!--<a class="a--outlined a--padded symbol__arrow-right-circled" href="/releases/<?php echo $artist["friendly"]."/".$release["id"]."/".$release["friendly"]; ?>/">Details</a>-->
 										</div>
 								</div>
 							</div>

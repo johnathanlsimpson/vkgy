@@ -178,7 +178,7 @@ render_json_list('area', $areas);
 				</div>
 				
 				<!-- Link -->
-				<a class="a--padded any--weaken-size symbol__arrow-right-circled" href="<?= '/musicians/'.$musician['id'].'/'.$musician['friendly'].'/'; ?>" target="_blank"><?= $musician['romaji'] ? lang($musician['romaji'], $musician['name'], 'hidden') : $musician['name']; ?></a>
+				<a class="a--padded any--weaken-size symbol__arrow" href="<?= '/musicians/'.$musician['id'].'/'.$musician['friendly'].'/'; ?>" target="_blank"><?= $musician['romaji'] ? lang($musician['romaji'], $musician['name'], 'hidden') : $musician['name']; ?></a>
 
 				<!-- Status -->
 				<span data-role="status" style="margin-top:1rem;"></span>
@@ -186,7 +186,7 @@ render_json_list('area', $areas);
 				<!-- Delete -->
 				<?php if( $_SESSION['can_delete_data'] ): ?>
 					<div class="input__group">
-						<label class="input__radio symbol__trash symbol--standalone" data-id="<?= $musician['id']; ?>" name="delete"></label>
+						<label class="input__radio symbol__delete symbol--standalone" data-id="<?= $musician['id']; ?>" name="delete"></label>
 					</div>
 				<?php endif; ?>
 

@@ -545,7 +545,7 @@ if(is_array($entry) && !empty($entry)) {
 															}
 														?>
 													</ol>
-													<!--<a class="symbol__arrow-right-circled" href="<?= $cdjapan_link; ?>" target="_blank"><?= ($reference_datum['date_occurred'] > date('Y-m-d') ? 'Preorder' : 'Order').' at CDJapan'; ?></a>-->
+													<!--<a class="symbol__arrow" href="<?= $cdjapan_link; ?>" target="_blank"><?= ($reference_datum['date_occurred'] > date('Y-m-d') ? 'Preorder' : 'Order').' at CDJapan'; ?></a>-->
 
 													<a class="release__buy" href="<?= $cdjapan_link; ?>" target="_blank">
 														<img src="/releases/cdj.gif" style="height:1rem;" /> CDJapan

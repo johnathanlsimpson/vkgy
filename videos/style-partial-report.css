@@ -29,7 +29,7 @@
 	color: hsl(var(--text));
 	display: inline-flex !important;
 }
-.report__open .symbol__down-caret {
+.report__open .symbol__triangle {
 	color: hsl(var(--text--secondary));
 	justify-content: space-around;
 	margin: 0;
@@ -40,16 +40,6 @@
 .report__open .input__choice:checked ~ span {
 	color: hsl(var(--interactive));
 }
-/*.report__open:checked ~ .report__button .symbol__down-caret {
-	color: inherit;
-}*/
-.report__open .symbol__down-caret::before {
-	transform: translateX(-1px) translateY(-1px);
-}
-/*.report__open .symbol__list::before {
-	margin-right: 3px !important;
-	margin-top: -1px;
-}*/
 
 .report__container {
 	background: hsl(var(--background));

@@ -38,7 +38,7 @@
 							<button class="any__note comment__like symbol__star--empty" type="button">Like</button>
 							<button class="any__note comment__approve symbol__like" type="button">Approve</button>
 							<button class="any__note comment__edit symbol__edit" type="button">Edit</button>
-							<button class="any__note comment__delete symbol__trash" type="button">Delete</button>
+							<button class="any__note comment__delete symbol__delete" type="button">Delete</button>
 						</div>
 					</div>
 					
@@ -54,7 +54,7 @@
 					<div class="comment__content" data-markdown="{markdown}">{content}</div>
 					
 					<!-- Bottom, reply link -->
-					<a class="a--padded a--outlined comment__reply symbol__arrow-right-circled" rel="nofollow"><?php echo lang('Reply', 'リプライ', ['secondary_class' => 'any--hidden']); ?></a>
+					<a class="a--padded a--outlined comment__reply symbol__arrow" rel="nofollow"><?php echo lang('Reply', 'リプライ', ['secondary_class' => 'any--hidden']); ?></a>
 					
 					<!-- Bottom, view link -->
 					<a class="a--padded comment__view" href="{item_url}" rel="nofollow">View page</a>

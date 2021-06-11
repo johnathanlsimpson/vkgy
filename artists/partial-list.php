@@ -155,7 +155,7 @@ echo '<ul class="text artist__list">';
 			<a class="symbol__search filters__link" href="/search/artists/">advanced search</a>
 			
 			<?php if( $args_are_active || $args['page'] > 1 ): ?>
-				<a class="symbol__trash filters__link" href="/artists/">reset</a>
+				<a class="symbol__delete filters__link" href="/artists/">reset</a>
 			<?php endif; ?>
 			
 		</div>
@@ -248,7 +248,7 @@ echo '<ul class="text artist__list">';
 		<div class="input__group">
 			
 			<label class="input__label">Reset</label>
-			<button class="input__button symbol__trash" name="reset" type="button">Clear filters</button>
+			<button class="input__button symbol__delete" name="reset" type="button">Clear filters</button>
 			
 		</div>
 

@@ -20,14 +20,14 @@ script([
 			
 			<label class="vote__label vote--upvote input__checkbox">
 				<input class="vote__vote input__choice" type="checkbox" {upvote_is_checked} />
-				<span class="vote__arrow symbol__up-caret symbol--standalone"></span>
+				<span class="vote__arrow symbol__triangle symbol--up symbol--standalone"></span>
 			</label>
 			
 			<span class="vote__score any--weaken-size" data-score="{score}"></span>
 			
 			<label class="vote__label vote--downvote input__checkbox">
 				<input class="vote__vote input__choice" type="checkbox" {downvote_is_checked} />
-				<span class="vote__arrow symbol__down-caret symbol--standalone"></span>
+				<span class="vote__arrow symbol__triangle symbol--down symbol--standalone"></span>
 			</label>
 			
 		</span>

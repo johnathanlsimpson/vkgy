@@ -434,13 +434,13 @@
 				
 				<div>
 					<a href="?order=<?php echo ($search['order'] === 'date_occurred_desc' ? 'date_occurred_asc' : 'date_occurred_desc').$base_url; ?>">
-						<label class="search__sort input__radio <?php echo substr($search['order'], 0, 4) === 'date' || !$search['order'] ? 'input__radio--selected' : null; ?> <?php echo $search['order'] === 'date_occurred_asc' ? 'symbol__up-caret' : 'symbol__down-caret'; ?>">Date</label>
+						<label class="search__sort input__radio <?php echo substr($search['order'], 0, 4) === 'date' || !$search['order'] ? 'input__radio--selected' : null; ?> <?php echo $search['order'] === 'date_occurred_asc' ? 'symbol__triangle symbol--up' : 'symbol__triangle symbol--down'; ?>">Date</label>
 					</a>
 					<a href="?order=<?php echo ($search['order'] === 'name_asc' ? 'name_desc' : 'name_asc').$base_url; ?>">
-						<label class="search__sort input__radio <?php echo substr($search['order'], 0, 4) === 'name' ? 'input__radio--selected' : null; ?> <?php echo $search['order'] === 'name_desc' ? 'symbol__down-caret' : 'symbol__up-caret'; ?>">A-Z</label>
+						<label class="search__sort input__radio <?php echo substr($search['order'], 0, 4) === 'name' ? 'input__radio--selected' : null; ?> <?php echo $search['order'] === 'name_desc' ? 'symbol__triangle symbol--down' : 'symbol__triangle symbol--up'; ?>">A-Z</label>
 					</a>
 					<a href="?order=<?php echo ($search['order'] === 'upc_asc' ? 'upc_desc' : 'upc_asc').$base_url; ?>">
-						<label class="search__sort input__radio <?php echo substr($search['order'], 0, 3) === 'upc' ? 'input__radio--selected' : null; ?> <?php echo $search['order'] === 'upc_desc' ? 'symbol__down-caret' : 'symbol__up-caret'; ?>">UPC</label>
+						<label class="search__sort input__radio <?php echo substr($search['order'], 0, 3) === 'upc' ? 'input__radio--selected' : null; ?> <?php echo $search['order'] === 'upc_desc' ? 'symbol__triangle symbol--down' : 'symbol__triangle symbol--up'; ?>">UPC</label>
 					</a>
 					
 					<input class="input__choice" id="filter--all" name="filter" type="radio" checked />

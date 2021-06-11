@@ -81,7 +81,7 @@
 										Submit
 									</button>
 									<span data-role="status"></span>
-									<button class="symbol__trash" data-role="delete" name="delete" type="button" style="margin-left:1ch;"></button>
+									<button class="symbol__delete" data-role="delete" name="delete" type="button" style="margin-left:1ch;"></button>
 								</div>
 								
 								<div class="input__group any--flex-grow any--flex any--hidden" data-role="edit-container">
