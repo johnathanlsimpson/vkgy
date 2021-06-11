@@ -1,17 +1,26 @@
-## Which artists are allowed
+## Is this band allowed on vkgy?
 
-[vkgy](https://vk.gy/) is for visual kei. However, the following may be added under certain conditions:
+[vkgy](https://vk.gy/) is for visual kei. In some cases, bands that are not explicitly vkei may be added:
 
 ---
 
-* ''non-visual,, must play at vk lives, and/or appear in vk omnibuses, and/or connect to a vk band/label.
-* ''proto-visual,, must connect to a vk band/label, and/or have played with early vk bands, and/or be *demonstrabily* influential to vk.
-* ''foreign,, must self-declare as vk, *and* appear somewhat visual, *and* be tangibly active (live concerts, paid releases).
-* ''doujin,, must self-declare as vk, *and* have vk-esque artwork, *and* be tangibly active (paid releases).
+* ''non-visual,, bands must play at vkei lives, or appear in vkei omnibuses, or connect to a vkei band, or be part of a vkei label.
+* ''proto-visual,, bands (seemingly vkei but existed before the term was coined) must connect to a vkei band, or belong to a vkei label, or have played with early vkei bands, or be *demonstrabily* influential to vkei.
+* ''foreign,, bands (not based in Japan) must call themselves vkei, *and* appear somewhat visual, *and* have had live concerts, *and* have had paid releases.
+* ''doujin,, bands must call themselves vkei, *and* have vkei-esque artwork, *and* have paid releases.
+* ''parody,, bands must have official photography, *and* appear visual, *and* have paid releases. 
 
 ---
 
 In all cases, please use artist tags and descriptions appropriately. [Ask us](https://discord.gg/jw8jzXn) if you have questions.
+
+
+
+## I disagree with a band's classification as vkei or non-vkei
+
+* Please navigate to the artist's profile, enter the “tags” section, and add or upvote/downvote tags as you see fit. If enough people tag a band as “non-vkei”, that band will no longer appear on the front page. Their data will not be deleted.
+
+* Please do *not* leave comments on blog posts or artist profiles about whether or not a band is vkei. It almost never leads to constructive conversation, and almost always results in fighting. Such comments will be deleted.
 
 
 
