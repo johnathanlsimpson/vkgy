@@ -10,7 +10,7 @@
 		<lastBuildDate><?= date(DATE_RSS, time()); ?></lastBuildDate>
 		<managingEditor>johnathan.l.simpson@gmail.com (John Simpson)</managingEditor>
 		<webMaster>johnathan.l.simpson@gmail.com (John Simpson)</webMaster>
-		<webfeeds:cover image="https://vk.gy/style/header.png" />
+		<webfeeds:cover image="https://vk.gy/style/card.png" />
 		<webfeeds:icon>https://vk.gy/style/logomark-eye.svg</webfeeds:icon>
 		<webfeeds:logo>https://vk.gy/style/logomark-eye.svg</webfeeds:logo>
 		<webfeeds:accentColor>9b476a</webfeeds:accentColor>
