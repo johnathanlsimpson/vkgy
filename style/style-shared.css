@@ -1237,7 +1237,12 @@ li > .input__checkbox:last-of-type {
 .input__checkbox--selected,
 .input__choice:checked + .input__checkbox,
 .input__choice:checked + .input__radio,
-.input__choice:checked + [class*="symbol"] {
+.input__choice:checked + [class*="symbol"],
+.input__choice.symbol--orphan:checked   ~ .symbol--parent .symbol--orphan,
+.input__choice.symbol--orphan-a:checked ~ .symbol--parent .symbol--orphan-a,
+.input__choice.symbol--orphan-b:checked ~ .symbol--parent .symbol--orphan-b,
+.input__choice.symbol--orphan-c:checked ~ .symbol--parent .symbol--orphan-c,
+.input__choice.symbol--orphan-d:checked ~ .symbol--parent .symbol--orphan-d {
 	color: hsl(var(--text));
 }
 /* For checked checkbox/radio inputs, make sure symbol is normal opacity */
