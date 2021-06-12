@@ -2,11 +2,79 @@
 	include_once('../php/include.php');
 	
 	class access_user {
+		
 		public  $pdo;
-		public  $permissions;
-		public  $allowed_permissions;
-		public  $allowed_icons;
 		private $user_list;
+		
+		// Set icon choices
+		public static $allowed_icons = [
+			'crown',
+			'heart',
+			'star',
+			'flower',
+			'moon',
+		];
+		
+		// Permissions
+		public static $allowed_permissions = [
+			
+			// Participation
+			'can_comment',
+			'can_add_profile_links',
+			'can_access_beta_features',
+			
+			// Editing
+			'can_add_articles',
+			'can_access_drafts',
+			'can_add_data',
+			'can_add_livehouses',
+			'can_bypass_video_approval',
+			
+			// Moderation
+			'can_approve_data',
+			'can_delete_data',
+			'can_edit_roles',
+			'can_edit_permissions',
+			'can_edit_attributes',
+			
+		];
+		
+		// Default permissions
+		public static $default_permissions = [
+			
+			'can_comment' => 1,
+			'can_add_profile_links' => 1,
+			
+		];
+		
+		// Roles
+		public static $allowed_roles = [
+			
+			'is_editor' => [
+				'can_add_data',
+			],
+			
+			'is_writer' => [
+				'can_add_articles',
+				'can_access_drafts',
+			],
+			
+			'is_moderator' => [
+				'can_approve_data',
+				'can_delete_data',
+				'can_edit_roles',
+			],
+			
+			'is_admin' => [
+				'can_edit_permissions',
+				'can_edit_attributes',
+			],
+			
+			'is_vip' => [
+				'can_access_beta_features',
+			],
+			
+		];
 		
 		
 		
@@ -21,65 +89,10 @@
 			}
 			$this->pdo = $pdo;
 			
-			// Set icon choices
-			$this->allowed_icons = [
-				'crown',
-				'heart',
-				'star',
-				'flower',
-				'moon',
-			];
-			
 			// Setup empty user list array
 			$this->user_list = [
 				'by_id' => [],
 				'by_username' => []
-			];
-			
-			// Permissions
-			$this->permissions = [
-				'participation' => [
-					'can_comment',
-					'can_access_beta_features',
-				],
-				
-				'editing' => [
-					'can_add_data',
-					'can_add_livehouses',
-					'can_access_drafts',
-					'can_bypass_video_approval',
-				],
-				
-				'moderation' => [
-					'can_approve_data',
-					'can_delete_data',
-					'can_edit_roles',
-					'can_edit_permissions',
-				],
-			];
-			
-			// Quick list of allowed permissions
-			$this->allowed_permissions = [];
-			foreach($this->permissions as $permission_group) {
-				
-				$this->allowed_permissions = array_merge($this->allowed_permissions, $permission_group);
-				
-			}
-			
-			// Roles
-			$this->allowed_roles = [
-				'editor' => [
-					'can_add_data',
-				],
-				'moderator' => [
-					'can_approve_data',
-					'can_delete_data',
-					'can_edit_roles',
-				],
-				'vip' => [
-					'can_access_drafts',
-					'can_access_beta_features',
-				],
 			];
 			
 		}
@@ -93,38 +106,104 @@
 			
 			if( is_numeric($user_id) ) {
 				
-				// Get user's data (eventually we'll just get the is_xxx and permissions columns, but
-				// for now we have to deal with legacy users that had columns for each permissions)
-				$sql_user = '
-					SELECT
-						permissions,
-						can_add_data,
-						can_add_livehouses,
-						can_delete_data,
-						can_approve_data,
-						can_comment,
-						can_access_drafts,
-						can_edit_roles,
-						can_edit_permissions,
-						is_vip,
-						is_editor,
-						is_moderator,
-						is_boss
-					FROM users WHERE id=? LIMIT 1';
-				$stmt_user = $this->pdo->prepare($sql_user);
-				$stmt_user->execute([ $user_id ]);
-				$rslt_user = $stmt_user->fetch();
+				// Get permissions JSON and decode it
+				$sql_permissions = 'SELECT permissions FROM users WHERE id=? LIMIT 1';
+				$stmt_permissions = $this->pdo->prepare($sql_permissions);
+				$stmt_permissions->execute([ $user_id ]);
+				$permissions = $stmt_permissions->fetchColumn();
 				
-				// Get permissions string
-				$permissions = json_decode($rslt_user['permissions'], true);
-				$permissions = is_array($permissions) && !empty($permissions) ? $permissions : [];
-				unset($rslt_user['permissions']);
+				// If we have some permissions, decode them into array
+				if( strlen($permissions) ) {
+					$permissions = json_decode( $permissions, true );
+				}
 				
-				// Return roles and permissions
-				$roles_and_permissions = array_merge($rslt_user, $permissions);
-				return $roles_and_permissions;
+				// Make sure we have array, even if it's empty
+				$permissions = is_array($permissions) ? $permissions : [];
+				
+				// If permissions/roles in JSON don't encompass all available ones, make sure the user's JSON is updated
+				$num_permissions = count($permissions);
+				$num_allowed_permissions = count(self::$allowed_permissions) + count(self::$allowed_roles);
+				
+				// If necessary, regenerate the user's permissions JSON and fill in gaps
+				if( $num_permissions != $num_allowed_permissions ) {
+					$permissions = $this->regenerate_permissions( $user_id, $permissions );
+				}
 				
 			}
+			
+			return $permissions;
+			
+		}
+		
+		
+		
+		// ======================================================
+		// Regenerate user's permissions JSON
+		// ======================================================
+		function regenerate_permissions( $user_id, $current_permissions ) {
+			
+			if( is_numeric($user_id) ) {
+				
+				// Make sure we have array, even if it's empty
+				$current_permissions = is_array($current_permissions) ? $current_permissions : [];
+				
+				// Loop through allowed roles first and make sure they're set (some permissions rely on role)
+				foreach( self::$allowed_roles as $role => $role_permissions ) {
+					
+					// If currently set, keep same value
+					if( strlen( $current_permissions[ $role ] ) ) {
+						$new_permissions[ $role ] = $current_permissions[ $role ];
+					}
+					
+					// If not set, default to false
+					else {
+						$new_permissions[ $role ] = 0;
+					}
+					
+					// If the user has this role, then let's default all associated permissions to true, and revise these in the next step
+					if( $new_permissions[ $role ] ) {
+						foreach( $role_permissions as $permission ) {
+							$new_permissions[ $permission ] = 1;
+						}
+					}
+					
+				}
+				
+				// Next, loop through allowed permissions and make sure they're set
+				foreach( self::$allowed_permissions as $permission ) {
+					
+					// If currently set in database, keep same value (this will overwrite values auto set by associated roles)
+					if( isset( $current_permissions[ $permission ] ) ) {
+						$new_permissions[ $permission ] = $current_permissions[ $permission ];
+					}
+					
+					// If not set, check if there's a default and set it
+					else {
+						
+						// If default is set, use that
+						if( isset( self::$default_permissions[ $permission ] ) ) {
+							$new_permissions[ $permission ] = self::$default_permissions[ $permission ];
+						}
+						
+						// Otherwise assume permission is false
+						else {
+							$new_permissions[ $permission ] = 0;
+						}
+						
+					}
+					
+				}
+				
+				// Now save the new permissions back to JSON and update the DB
+				$sql_update = 'UPDATE users SET permissions=? WHERE id=? LIMIT 1';
+				$stmt_update = $this->pdo->prepare($sql_update);
+				$stmt_update->execute([ json_encode( $new_permissions ), $user_id ]);
+				
+			}
+			
+			// Make sure we return an array
+			$new_permissions = is_array($new_permissions) ? $new_permissions : [];
+			return $new_permissions;
 			
 		}
 		
@@ -135,21 +214,31 @@
 		// ======================================================
 		public function change_permission( $user_id, $permission_name, $give_permission = false ) {
 			
-			if( is_numeric($user_id) && in_array($permission_name, $this->allowed_permissions) ) {
+			if( is_numeric($user_id) && ( in_array($permission_name, self::$allowed_permissions) || in_array($permission_name, array_keys(self::$allowed_roles) ) ) ) {
 				
 				// Get current permissions
 				$current_permissions = $this->check_permissions($user_id);
 				
 				// Change specified permissions
 				$new_permissions = $current_permissions;
-				$new_permissions[$permission_name] = $give_permission ? 1 : 0;
+				$new_permissions[ $permission_name ] = $give_permission ? 1 : 0;
 				
 				// Save permissions
 				$sql_new = 'UPDATE users SET permissions=? WHERE id=? LIMIT 1';
 				$stmt_new = $this->pdo->prepare($sql_new);
-				$stmt_new->execute([ json_encode($new_permissions), $user_id ]);
+				if( $stmt_new->execute([ json_encode($new_permissions), $user_id ]) ) {
+					$output['status'] = 'success';
+				}
+				else {
+					$output['result'] = tr('Couldn\'t update permission.');
+				}
 				
 			}
+			else {
+				$output['result'] = tr('Permission information is missing.');
+			}
+			
+			return $output;
 			
 		}
 		

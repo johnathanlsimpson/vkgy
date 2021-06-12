@@ -516,7 +516,7 @@ if(strlen($next_users['rand1'])) {
 			if($_SESSION['username'] === $user['username']) {
 				?>
 					<input class="input__choice" id="show-management" type="checkbox" />
-					<label class="collection__control input__checkbox symbol__checkbox--unchecked" for="show-management" style="float: none;margin: 0 auto 0.5rem 0;">manage</label>
+					<label class="collection__control input__checkbox symbol__unchecked" for="show-management" style="float: none;margin: 0 auto 0.5rem 0;">manage</label>
 					
 					<a class="symbol__download collection__download" href="<?= '/users/'.$_SESSION['username'].'/&action=download'; ?>" style="float:none;margin:0 0.5rem 0 0;top:0.5rem;vertical-align:top;">CSV</a>
 					<a class="symbol__download collection__download" href="<?= '/users/'.$_SESSION['username'].'/&action=download&limit=selling'; ?>" style="float:none;margin:0 0.5rem 0 0;top:0.5rem;vertical-align:top;">CSV (for sale)</a>
@@ -589,12 +589,12 @@ if(strlen($next_users['rand1'])) {
 										?>
 											<label class="input__checkbox" data-item-id="<?= $collection[$i]['id']; ?>" data-item-type="release" data-list-id="0" style="margin:0 0 0 auto;">
 												<input class="input__choice" type="checkbox" checked />
-												<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">own</span>
+												<span class="symbol__unchecked" data-role="status" style="margin-left:0;">own</span>
 											</label>
 											
 											<label class="input__checkbox" data-item-id="<?= $collection[$i]['id']; ?>" data-item-type="release" data-list-id="2" style="margin:0 0 0 0.5rem;">
 												<input class="input__choice" type="checkbox" <?= $collection[$i]['is_for_sale'] ? 'checked' : null; ?> />
-												<span class="symbol__checkbox--unchecked" data-role="status" style="margin-left:0;">sell</span>
+												<span class="symbol__unchecked" data-role="status" style="margin-left:0;">sell</span>
 											</label>
 										<?php
 									}

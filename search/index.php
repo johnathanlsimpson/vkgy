@@ -2,10 +2,10 @@
 $search_type = in_array($_GET['search_type'], ['releases', 'artists', 'musicians']) ? $_GET['search_type'] : 'all';
 
 subnav([
-	lang('All',       '全て',           [ 'primary_class' => 'symbol__search', 'secondary_class' => 'any--hidden symbol__search' ]) => '/search/',
-	lang('Artists',   'アーティスト',   [ 'primary_class' => 'symbol__search', 'secondary_class' => 'any--hidden symbol__search' ]) => '/search/artists/',
-	lang('Releases',  'リリース',       [ 'primary_class' => 'symbol__search', 'secondary_class' => 'any--hidden symbol__search' ]) => '/search/releases/',
-	lang('Musicians', 'ミュージシャン', [ 'primary_class' => 'symbol__search', 'secondary_class' => 'any--hidden symbol__search' ]) => '/search/musicians/',
+	lang('All',       '全て',           'hidden') => '/search/',
+	lang('Artists',   'アーティスト',   'hidden') => '/search/artists/',
+	lang('Releases',  'リリース',       'hidden') => '/search/releases/',
+	lang('Musicians', 'ミュージシャン', 'hidden') => '/search/musicians/',
 ]);
 	
 if(!$error) {

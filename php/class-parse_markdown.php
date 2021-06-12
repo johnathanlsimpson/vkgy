@@ -813,7 +813,7 @@
 											
 											<label class="release-card__list list__button card--clickable input__checkbox" data-list-id="-2" data-item-id="<?= $reference_datum['id']; ?>" data-item-type="release" style="margin:0;margin-top:1rem;align-self:stretch;">
 												<input class="list__choice input__choice" type="checkbox" <?= $reference_datum['is_wanted'] ? 'checked' : null; ?> />
-												<span class="symbol__checkbox--unchecked" data-role="status">wishlist</span>
+												<span class="symbol__unchecked" data-role="status">wishlist</span>
 											</label>
 											
 										</div>

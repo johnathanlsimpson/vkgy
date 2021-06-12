@@ -24,6 +24,7 @@ style([
 // Set other page styles
 style([
 	'/style/style-tooltips.css',
+	'/style/style-point.css',
 ]);
 
 // Set scripts
@@ -462,6 +463,8 @@ script([
 				</div>
 			</div>
 		</div>
+		
+		<?php include('../php/partial-point.php'); ?>
 		
 		<?php display_scripts("bottom"); ?>
 		

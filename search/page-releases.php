@@ -170,7 +170,7 @@
 						<label class="input__label">
 							Catalog number
 						</label>
-						<input name="upc" placeholder="Catalog number" value="<?php echo sanitize($search["upc"]); ?>" />
+						<input name="upc" placeholder="catalog number" value="<?php echo sanitize($search["upc"]); ?>" />
 					</div>
 					<div class="input__group any--flex-grow">
 						<label class="input__label">
@@ -208,32 +208,46 @@
 				</div>
 				<div class="input__row">
 					<div class="input__group">
-						<input class="input__choice" id="any" name="label_involvement" type="radio" value="" <?php echo (empty($search["label_involvement"]) || $search["label_involvement"] === "" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="any">Any involvement</label>
+						<label class="input__radio" for="any">
+							<input class="input__choice" id="any" name="label_involvement" type="radio" value="" <?php echo (empty($search["label_involvement"]) || $search["label_involvement"] === "" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">any involvement</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="label" name="label_involvement" type="radio" value="label" <?php echo ($search["label_involvement"] === "label" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="label">Management</label>
+						<label class="input__radio" for="label">
+							<input class="input__choice" id="label" name="label_involvement" type="radio" value="label" <?php echo ($search["label_involvement"] === "label" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">management</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="publisher" name="label_involvement" type="radio" value="publisher" <?php echo ($search["label_involvement"] === "publisher" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="publisher">Publisher</label>
+						<label class="input__radio" for="publisher">
+							<input class="input__choice" id="publisher" name="label_involvement" type="radio" value="publisher" <?php echo ($search["label_involvement"] === "publisher" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">publisher</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="distributor" name="label_involvement" type="radio" value="distributor" <?php echo ($search["label_involvement"] === "distributor" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="distributor">Distributor</label>
+						<label class="input__radio" for="distributor">
+							<input class="input__choice" id="distributor" name="label_involvement" type="radio" value="distributor" <?php echo ($search["label_involvement"] === "distributor" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">distributor</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="marketer" name="label_involvement" type="radio" value="marketer" <?php echo ($search["label_involvement"] === "marketer" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="marketer">Marketer</label>
+						<label class="input__radio" for="marketer">
+							<input class="input__choice" id="marketer" name="label_involvement" type="radio" value="marketer" <?php echo ($search["label_involvement"] === "marketer" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">marketer</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="manufacturer" name="label_involvement" type="radio" value="manufacturer" <?php echo ($search["label_involvement"] === "manufacturer" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="manufacturer">Manufacturer</label>
+						<label class="input__radio" for="manufacturer">
+							<input class="input__choice" id="manufacturer" name="label_involvement" type="radio" value="manufacturer" <?php echo ($search["label_involvement"] === "manufacturer" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">manufacturer</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="organizer" name="label_involvement" type="radio" value="organizer" <?php echo ($search["label_involvement"] === "organizer" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="organizer">Organizer</label>
+						<label class="input__radio" for="organizer">
+							<input class="input__choice" id="organizer" name="label_involvement" type="radio" value="organizer" <?php echo ($search["label_involvement"] === "organizer" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">organizer</span>
+						</label>
 					</div>
 				</div>
 				<div class="any--weaken-color symbol__help search__note">
@@ -368,8 +382,10 @@
 							<label class="input__label">
 								Search releases by tag
 							</label>
-							<input class="input__choice" id="tag[0]" name="tag" type="radio" value="" <?php echo (empty($search["tag"]) || $search["tag"] === "" ? "checked" : null); ?> />
-							<label class="symbol__unchecked input__radio" for="tag[0]">any tag</label>
+							<label class="input__radio" for="tag[0]">
+								<input class="input__choice" id="tag[0]" name="tag" type="radio" value="" <?php echo (empty($search["tag"]) || $search["tag"] === "" ? "checked" : null); ?> />
+								<span class="symbol__unchecked">any tag</span>
+							</label>
 						</div>
 						<?php
 							include_once('../php/class-tag.php');
@@ -379,8 +395,10 @@
 							foreach($tags as $i => $tag) {
 								?>
 									<div class="input__group">
-										<input class="input__choice" id="tag[<?php echo $i+1; ?>]" name="tag" type="radio" value="<?php echo $tag["friendly"]; ?>" <?php echo ($search["tag"] === $tag["friendly"] ? "checked" : null); ?> />
-										<label class="symbol__unchecked input__radio" for="tag[<?php echo $i+1; ?>]"><?php echo $tag["name"]; ?></label>
+										<label class="input__radio" for="tag[<?php echo $i+1; ?>]">
+											<input class="input__choice" id="tag[<?php echo $i+1; ?>]" name="tag" type="radio" value="<?php echo $tag["friendly"]; ?>" <?php echo ($search["tag"] === $tag["friendly"] ? "checked" : null); ?> />
+											<span class="symbol__unchecked"><?= $tag["name"]; ?></span>
+										</label>
 									</div>
 								<?php
 							}

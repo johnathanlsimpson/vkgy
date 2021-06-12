@@ -115,7 +115,7 @@ style([
 								<?php
 									foreach($translate->allowed_languages as $language_key => $language) {
 										if($language_key != 'en') {
-											echo '<span class="accepted__lang '.(is_numeric($string[$language_key.'_id']) ? 'symbol__checkbox--checked' : 'symbol__checkbox--unchecked red').'" data-language="'.$language_key.'"></span>';
+											echo '<span class="accepted__lang '.(is_numeric($string[$language_key.'_id']) ? 'symbol__checkbox--checked' : 'symbol__checkbox red').'" data-language="'.$language_key.'"></span>';
 										}
 									}
 								?>
