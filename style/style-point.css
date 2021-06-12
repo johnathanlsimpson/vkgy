@@ -1,0 +1,90 @@
+.point__container {
+	align-items: center;
+	background: hsla(var(--attention), 0.3);
+	border-radius: 5px;
+	color: hsl(var(--attention--secondary));
+	display: flex;
+	font-size: 1rem;
+	font-weight: bold;
+	line-height: 0;
+	opacity: 0;
+	padding: 0.5rem;
+	pointer-events: none;
+	vertical-align: middle;
+	transform: translateY(30px);
+}
+.point__container:hover {
+	animation: none;
+	opacity: 1;
+	pointer-events: initial;
+	transform: translateY(0px);
+}
+.point__container::before {
+	content: "+";
+	margin-right: 4px;
+	opacity: 0.5;
+}
+.point--animate {
+	animation-name: fadePoint;
+	animation-duration: 2s;
+	animation-timing-function: ease-in-out;
+}
+.point__symbol {
+	font-size: 1.75rem;
+	margin-left: 5px;
+	opacity: 1;
+	top: -1px;
+}
+.point__symbol::before {
+	opacity: 1;
+}
+.point__tippy {
+	background: none;
+	padding: 0;
+}
+.point__tippy .tippy-arrow {
+	display: none;
+}
+.point--hovered:not(:hover) {
+	animation-name: fadePointFromHalf;
+	animation-duration: 1s;
+	animation-timing-function: ease-out;
+}
+@keyframes fadePoint {
+	0% { 
+		display: none;
+		opacity: 0;
+		pointer-events: none;
+		transform: translateY(30px);
+	}
+	10% {
+		display: block;
+		opacity: 1;
+		pointer-events: none;
+		transform: translateY(0px);
+	}
+	50% { 
+		opacity: 1;
+		transform: translateY(0px);
+		display: block;
+		pointer-events: initial;
+	}
+	100% { 
+		opacity: 0;
+		pointer-events: none;
+		transform: translateY(-60px);
+	}
+}
+@keyframes fadePointFromHalf {
+	0% { 
+		display: block;
+		opacity: 1;
+		pointer-events: initial;
+		transform: translateY(0px);
+	}
+	100% { 
+		opacity: 0;
+		pointer-events: none;
+		transform: translateY(-60px);
+	}
+}
