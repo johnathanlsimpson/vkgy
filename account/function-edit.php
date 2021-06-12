@@ -4,34 +4,29 @@ include_once('../php/include.php');
 
 $access_user = new access_user($pdo);
 
-// Edit user's role
-if($_SESSION['can_edit_roles'] && is_numeric($_POST['id']) && $_SESSION['user_id'] != $_POST['id']) {
+$user_id = is_numeric( $_POST['id'] ) ? $_POST['id'] : null;
+
+// Make sure ID provided, user is allowed to edit permissions, and not editing own permissions
+if( $_SESSION['can_edit_roles'] && is_numeric( $user_id ) && $_SESSION['user_id'] != $user_id ) {
 	
-	$user_id = sanitize($_POST['id']);
-	$sql_check_boss = 'SELECT is_boss FROM users WHERE id=? LIMIT 1';
-	$stmt_check_boss = $pdo->prepare($sql_check_boss);
-	$stmt_check_boss->execute([ sanitize($_POST['id']) ]);
-	$rslt_check_boss = $stmt_check_boss->fetchColumn();
+	// Get user's current permissions/roles
+	$current_permissions = $access_user->check_permissions( $user_id );
 	
 	// Make sure no one can edit permissions of user with boss role
-	if(!$rslt_check_boss) {
+	if( !$current_permissions['is_boss'] ) {
 		
-		// Get current roles and permissions, so we can compare
-		$sql_current = 'SELECT * FROM users WHERE id=?';
-		$stmt_current = $pdo->prepare($sql_current);
-		$stmt_current->execute([ $user_id ]);
-		$rslt_current = $stmt_current->fetch();
-		
-		// Set roles
-		foreach($access_user->allowed_roles as $role => $role_permissions) {
+		// Note any newly changed roles
+		foreach( access_user::$allowed_roles as $role => $role_permissions ) {
 			
-			// Update columns for each role
-			$values_user[ 'is_'.$role ] = $_POST[ 'is_'.$role ] == 1 ? 1 : 0;
-			
-			// Save default permissions from any assigned roles
-			foreach($role_permissions as $role_permission) {
+			if( $current_permissions[ $role ] != $_POST[ $role ] ) {
 				
-				$new_permissions[ $role_permission ] = $values_user[ 'is_'.$role ];
+				// Note new role status
+				$new_permissions[ $role ] = $_POST[ $role ] ? 1 : 0;
+				
+				// When changing role, enable/disable any associated permissions (can overwrite in next step)
+				foreach( $role_permissions as $role_permission ) {
+					$new_permissions[ $role_permission ] = $new_permissions[ $role ] ? 1 : 0;
+				}
 				
 			}
 			
@@ -40,36 +35,34 @@ if($_SESSION['can_edit_roles'] && is_numeric($_POST['id']) && $_SESSION['user_id
 		// If editor is allowed to set individual permissions, get those as well
 		if( $_SESSION['can_edit_permissions'] ) {
 			
-			foreach($access_user->allowed_permissions as $permission) {
+			foreach(access_user::$allowed_permissions as $permission) {
 				
-				$new_permissions[ $permission ] = $_POST[ $permission ] ? 1 : 0;
+				if( $_POST[ $permission ] != $current_permissions[ $permission ] || $_POST[ $permission ] != $new_permissions[ $permission ] ) {
+					
+					$new_permissions[ $permission ] = $_POST[ $permission ] ? 1 : 0;
+					
+				}
 				
 			}
 			
 		}
 		
-		// If we have any permissions to change, merge them with current permissions JSON
+		//print_r($new_permissions);
+		
+		// If we have any changes to permissions, make them now
 		if( is_array($new_permissions) && !empty($new_permissions) ) {
 			
-			$current_permissions = json_decode($rslt_current['permissions'], true);
-			$current_permissions = is_array($current_permissions) && !empty($current_permissions) ? $current_permissions : [];
+			foreach( $new_permissions as $permission => $has_permission ) {
+				
+				if( $access_user->change_permission( $user_id, $permission, $has_permission ) ) {
+					$output['status'] = 'success';
+				}
+				else {
+					$output['result'] = tr('Couldn\'t update user permissions.');
+				}
+				
+			}
 			
-			$values_user['permissions'] = json_encode( array_merge($current_permissions, $new_permissions) );
-			
-		}
-		
-		// Separate keys and values, add value for id=?
-		$keys_user = array_keys($values_user);
-		$values_user = array_values($values_user);
-		$values_user[] = $user_id;
-		
-		$sql_user = 'UPDATE users SET '.implode('=?, ', $keys_user).'=? WHERE id=? LIMIT 1';
-		$stmt_user = $pdo->prepare($sql_user);
-		if($stmt_user->execute( $values_user )) {
-			$output['status'] = 'success';
-		}
-		else {
-			$output['result'] = tr('Couldn\'t update user permissions.');
 		}
 		
 	}

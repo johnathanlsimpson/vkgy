@@ -18,6 +18,12 @@
 	$access_artist = new access_artist($pdo);
 	
 	$page_header = tr('Change account settings', ['ja'=>'アカウント', 'lang'=>true,'lang_args'=>'div']);
+
+// Separate permissions into groups for easier editing
+foreach(access_user::$allowed_permissions as $key => $permission) {
+	$permission_group = $key < 3 ? 'participation' : ( $key < 8 ? 'editing' : 'moderation' );
+	$permission_groups[ $permission_group ][] = $permission;
+}
 	
 	if(is_array($user) && !empty($user)) {
 		$user['fan_since'] = is_numeric($user['fan_since']) ? $user['fan_since'] : date('Y');
@@ -57,14 +63,14 @@
 							<li>
 								<label class="input__checkbox">
 									<input class="input__choice" name="is_editor" type="checkbox" value="1" <?= $user['is_editor'] ? 'checked' : null; ?> />
-									<span class="symbol__unchecked"><?= tr('Editor'); ?></span>
+									<span class="symbol__unchecked"><?= tr('editor'); ?></span>
 								</label>
 								<?= tr('Can add/edit data.'); ?>
 							</li>
 							<li>
 								<label class="input__checkbox">
 									<input class="input__choice" name="is_moderator" type="checkbox" value="1" <?= $user['is_moderator'] ? 'checked' : null; ?> />
-									<span class="symbol__unchecked"><?= tr('Moderator'); ?></span>
+									<span class="symbol__unchecked"><?= tr('moderator'); ?></span>
 								</label>
 								<?= tr('Can approve/delete data and assign user roles.'); ?>
 							</li>
@@ -81,7 +87,7 @@
 						</h3>
 						
 						<ul class="text text--outlined user__permissions">
-							<?php foreach($access_user->permissions as $permission_group => $permissions): ?>
+							<?php foreach($permission_groups as $permission_group => $permissions): ?>
 								<li class="input__row">
 									<div class="input__group any--flex-grow">
 										
@@ -161,10 +167,12 @@
 											</select>
 											<input class="input input--secondary any--hidden" name="custom_pronouns" placeholder="<?= tr('your pronouns', ['context'=>'Profile option']); ?>" value="<?= !in_array($user['pronouns'], ['prefer not to say', 'she/her', 'he/him', 'they/them', 'custom']) ? $user['pronouns'] : null; ?>" />
 										</div>
+										<?php if($_SESSION['can_add_profile_links']): ?>
 										<div class="input__group any--flex-grow">
 											<label class="input__label"><?= tr('Motto', ['context'=>'Profile option']); ?></label>
 											<input class="any--flex-grow" name="motto" placeholder="<?= tr('Motto', ['context'=>'Profile option']); ?>" value="<?php echo $user["motto"]; ?>" />
 										</div>
+										<?php endif; ?>
 									</div>
 								</li>
 							</ul>
@@ -173,43 +181,48 @@
 							<?= tr('Social Media',['context'=>'Profile option','lang'=>true,'lang_args'=>'div']); ?>
 						</h3>
 						
-						<div class="text text--outlined symbol__error any--small-margin">
-							Trading is not allowed at vkgy. Please do not allude to trading in your motto or link to trading accounts in your social media. Any references to trading on your profile will be removed.
-						</div>
-						
-						<ul class="text">
-							<li class="input__row">
-								<div class="input__group any--flex-grow">
-									<label class="input__label"><?= tr('Website', ['context'=>'Profile option']); ?></label>
-									<input class="any--flex-grow" name="website" placeholder="https://yoursite.com" value="<?= $user['website']; ?>" />
-								</div>
-							</li>
-							
-							<li class="input__row">
-								<div class="input__group any--flex-grow">
-									<label class="input__label"><?= tr('Twitter username', ['context'=>'Profile option']); ?></label>
-									<span class="social__prefix">@</span>
-									<input class="any--flex-grow" name="twitter" placeholder="<?= tr('username', ['context'=>'Profile option']); ?>" style="padding-left:calc(0rem + 3ch);" value="<?= $user['twitter']; ?>" />
-								</div>
-							</li>
-							
-							<li class="input__row">
-								<div class="input__group any--flex-grow">
-									<label class="input__label"><?= tr('Facebook username', ['context'=>'Profile option']); ?></label>
-									<span class="social__prefix">fb.com/</span>
-									<input class="any--flex-grow" name="facebook" placeholder="<?= tr('username', ['context'=>'Profile option']); ?>" style="padding-left:calc(0rem + 8ch);" value="<?= $user['facebook']; ?>" />
-								</div>
-							</li>
-							
-							<li class="input__row">
-								<div class="input__group any--flex-grow">
-									<label class="input__label"><?= tr('last.fm username', ['context'=>'Profile option']); ?></label>
-									<span class="social__prefix">last.fm/user/</span>
-									<input class="any--flex-grow" name="lastfm" placeholder="<?= tr('username', ['context'=>'Profile option']); ?>" style="padding-left:calc(0rem + 12ch);" value="<?= $user['lastfm']; ?>" />
-								</div>
-							</li>
-							
-						</ul>
+						<?php if($_SESSION['can_add_profile_links']): ?>
+							<div class="text text--outlined symbol__error any--small-margin">
+								Trading is not allowed at vkgy. Please do not allude to trading in your motto or link to trading accounts in your social media. Any references to trading on your profile will be removed.
+							</div>
+							<ul class="text">
+								<li class="input__row">
+									<div class="input__group any--flex-grow">
+										<label class="input__label"><?= tr('Website', ['context'=>'Profile option']); ?></label>
+										<input class="any--flex-grow" name="website" placeholder="https://yoursite.com" value="<?= $user['website']; ?>" />
+									</div>
+								</li>
+
+								<li class="input__row">
+									<div class="input__group any--flex-grow">
+										<label class="input__label"><?= tr('Twitter username', ['context'=>'Profile option']); ?></label>
+										<span class="social__prefix">@</span>
+										<input class="any--flex-grow" name="twitter" placeholder="<?= tr('username', ['context'=>'Profile option']); ?>" style="padding-left:calc(0rem + 3ch);" value="<?= $user['twitter']; ?>" />
+									</div>
+								</li>
+
+								<li class="input__row">
+									<div class="input__group any--flex-grow">
+										<label class="input__label"><?= tr('Facebook username', ['context'=>'Profile option']); ?></label>
+										<span class="social__prefix">fb.com/</span>
+										<input class="any--flex-grow" name="facebook" placeholder="<?= tr('username', ['context'=>'Profile option']); ?>" style="padding-left:calc(0rem + 8ch);" value="<?= $user['facebook']; ?>" />
+									</div>
+								</li>
+
+								<li class="input__row">
+									<div class="input__group any--flex-grow">
+										<label class="input__label"><?= tr('last.fm username', ['context'=>'Profile option']); ?></label>
+										<span class="social__prefix">last.fm/user/</span>
+										<input class="any--flex-grow" name="lastfm" placeholder="<?= tr('username', ['context'=>'Profile option']); ?>" style="padding-left:calc(0rem + 12ch);" value="<?= $user['lastfm']; ?>" />
+									</div>
+								</li>
+
+							</ul>
+						<?php else: ?>
+							<div class="text text--outlined text--error symbol__error">
+								Your profile has been temporarily restricted. Please do not link to websites or social media platforms with the sole intention of trading.
+							</div>
+						<?php endif; ?>
 						
 						<script>
 							let socialElems = document.querySelectorAll('[class^="social__"] + input');
