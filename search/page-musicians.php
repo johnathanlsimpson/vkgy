@@ -60,20 +60,28 @@
 				</h3>
 				<div class="input__row">
 					<div class="input__group">
-						<input class="input__choice" id="gender_any" name="gender" type="radio" value="" <?php echo (empty($search["gender"]) || $search["gender"] === "" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="gender_any">Any</label>
+						<label class="input__radio" for="gender_any">
+							<input class="input__choice" id="gender_any" name="gender" type="radio" value="" <?php echo (empty($search["gender"]) || $search["gender"] === "" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">Any</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="gender_male" name="gender" type="radio" value="1" <?php echo ($search["gender"] === "1" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="gender_male">Male</label>
+						<label class="input__radio" for="gender_male">
+							<input class="input__choice" id="gender_male" name="gender" type="radio" value="1" <?php echo ($search["gender"] === "1" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">Male</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="gender_female" name="gender" type="radio" value="2" <?php echo ($search["gender"] === "2" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="gender_female">Female</label>
+						<label class="input__radio" for="gender_female">
+							<input class="input__choice" id="gender_female" name="gender" type="radio" value="2" <?php echo ($search["gender"] === "2" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">Female</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="gender_other" name="gender" type="radio" value="3" <?php echo ($search["gender"] === "3" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="gender_other">Other/unknown</label>
+						<label class="input__radio" for="gender_other">
+							<input class="input__choice" id="gender_other" name="gender" type="radio" value="3" <?php echo ($search["gender"] === "3" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">Other/unknown</span>
+						</label>
 					</div>
 				</div>
 				
@@ -84,32 +92,46 @@
 				</h3>
 				<div class="input__row">
 					<div class="input__group">
-						<input class="input__choice" id="position_0" name="position" type="radio" value="" <?php echo (empty($search["position"]) || $search["position"] === "" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="position_0">Any</label>
+						<label class="input__radio" for="position_0">
+							<input class="input__choice" id="position_0" name="position" type="radio" value="" <?php echo (empty($search["position"]) || $search["position"] === "" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">Any</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="position_1" name="position" type="radio" value="1" <?php echo ($search["position"] === "1" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="position_1">Vocals</label>
+						<label class="input__radio" for="position_1">
+							<input class="input__choice" id="position_1" name="position" type="radio" value="1" <?php echo ($search["position"] === "1" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">Vocals</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="position_2" name="position" type="radio" value="2" <?php echo ($search["position"] === "2" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="position_2">Guitar</label>
+						<label class="input__radio" for="position_2">
+							<input class="input__choice" id="position_2" name="position" type="radio" value="2" <?php echo ($search["position"] === "2" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">Guitar</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="position_3" name="position" type="radio" value="3" <?php echo ($search["position"] === "3" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="position_3">Bass</label>
+						<label class="input__radio" for="position_3">
+							<input class="input__choice" id="position_3" name="position" type="radio" value="3" <?php echo ($search["position"] === "3" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">Bass</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="position_4" name="position" type="radio" value="4" <?php echo ($search["position"] === "4" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="position_4">Drums</label>
+						<label class="input__radio" for="position_4">
+							<input class="input__choice" id="position_4" name="position" type="radio" value="4" <?php echo ($search["position"] === "4" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">Drums</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="position_5" name="position" type="radio" value="5" <?php echo ($search["position"] === "5" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="position_5">Keys</label>
+						<label class="input__radio" for="position_5">
+							<input class="input__choice" id="position_5" name="position" type="radio" value="5" <?php echo ($search["position"] === "5" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">Keys</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="position_6" name="position" type="radio" value="6" <?php echo ($search["position"] === "6" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="position_6">Other</label>
+						<label class="input__radio" for="position_6">
+							<input class="input__choice" id="position_6" name="position" type="radio" value="6" <?php echo ($search["position"] === "6" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">Other</span>
+						</label>
 					</div>
 				</div>
 				
@@ -120,28 +142,40 @@
 				</h3>
 				<div class="input__row">
 					<div class="input__group">
-						<input class="input__choice" id="blood_type_any" name="blood_type" type="radio" value="" <?php echo (empty($search["blood_type"]) || $search["blood_type"] === "" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="blood_type_any">Any</label>
+						<label class="input__radio" for="blood_type_any">
+							<input class="input__choice" id="blood_type_any" name="blood_type" type="radio" value="" <?php echo (empty($search["blood_type"]) || $search["blood_type"] === "" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">Any</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="blood_type_a" name="blood_type" type="radio" value="a" <?php echo ($search["blood_type"] === "a" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="blood_type_a">A</label>
+						<label class="input__radio" for="blood_type_a">
+							<input class="input__choice" id="blood_type_a" name="blood_type" type="radio" value="a" <?php echo ($search["blood_type"] === "a" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">A</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="blood_type_b" name="blood_type" type="radio" value="b" <?php echo ($search["blood_type"] === "b" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="blood_type_b">B</label>
+						<label class="input__radio" for="blood_type_b">
+							<input class="input__choice" id="blood_type_b" name="blood_type" type="radio" value="b" <?php echo ($search["blood_type"] === "b" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">B</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="blood_type_ab" name="blood_type" type="radio" value="ab" <?php echo ($search["blood_type"] === "ab" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="blood_type_ab">AB</label>
+						<label class="input__radio" for="blood_type_ab">
+							<input class="input__choice" id="blood_type_ab" name="blood_type" type="radio" value="ab" <?php echo ($search["blood_type"] === "ab" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">AB</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="blood_type_o" name="blood_type" type="radio" value="o" <?php echo ($search["blood_type"] === "o" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="blood_type_o">O</label>
+						<label class="input__radio" for="blood_type_o">
+							<input class="input__choice" id="blood_type_o" name="blood_type" type="radio" value="o" <?php echo ($search["blood_type"] === "o" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">O</span>
+						</label>
 					</div>
 					<div class="input__group">
-						<input class="input__choice" id="blood_type_other" name="blood_type" type="radio" value="other" <?php echo ($search["blood_type"] === "other" ? "checked" : null); ?> />
-						<label class="symbol__unchecked input__radio" for="blood_type_other">Other</label>
+						<label class="input__radio" for="blood_type_other">
+							<input class="input__choice" id="blood_type_other" name="blood_type" type="radio" value="other" <?php echo ($search["blood_type"] === "other" ? "checked" : null); ?> />
+							<span class="symbol__unchecked">Other</span>
+						</label>
 					</div>
 				</div>
 					
