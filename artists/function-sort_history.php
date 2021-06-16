@@ -96,11 +96,17 @@ function link_activity_area($history, $artist_areas) {
 			if(in_array('start', $history[$i]['type']) || in_array('activity', $history[$i]['type'])) {
 				foreach($artist_areas as $active_area) {
 					if($active_area['romaji']) {
+						
+						
+						$replace_area = $active_area['romaji'].' ('.$active_area['name'].')';
+						$active_area['romaji'] = $active_area['romaji'] == '(overseas)' ? 'overseas' : $active_area['romaji'];
+						
 						$history[$i]['content'] = str_replace(
-							$active_area['romaji'].' ('.$active_area['name'].')',
-							'<a href="/search/artists/&area='.$active_area['romaji'].'#result">'.lang($active_area['romaji'].' ('.$active_area['name'].')', $active_area['name'], 'hidden').'</a>',
+							$replace_area,
+							'<a href="/search/artists/&area='.($active_area['romaji']).'#result">'.lang($active_area['romaji'].' ('.$active_area['name'].')', $active_area['name'], 'hidden').'</a>',
 							$history[$i]['content']
 						);
+						
 					}
 				}
 			}
