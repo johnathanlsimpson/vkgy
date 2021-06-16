@@ -161,9 +161,9 @@ $page_description =
 														foreach($disc['sections'] as $section_num => $section) {
 															
 															// Show section title
-															if(count($disc['sections']) > 1) {
+															if( count($disc['sections']) > 1 && strlen($section['section_name']) ) {
 																echo render_component($template_section, [
-																	'section_name' => strlen($section['section_name']) ? lang($section['section_romaji'], $section['section_name'], 'conditional_div') : 'Section '.$section_num
+																	'section_name' => lang($section['section_romaji'], $section['section_name'], 'conditional_div'),
 																]);
 															}
 															

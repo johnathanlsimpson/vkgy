@@ -52,7 +52,7 @@
 
  You can also manually set the tags for each entry (see **[Biography tags](/documentation/edit-artist/#biography-tags)**) by typing, at the end of the line, a hyphen followed by comma-separated tag(s).
 
- {1999-06-18 /Dali/ forms. -formation\n\n1999-06-17 Guitarist JUN joins, but sprains his ankle. -member,trouble}
+ {1999-06-18 /Dali/ forms. -start\n\n1999-06-17 Guitarist JUN joins, but sprains his ankle. -member,trouble}
 
 * Entries do *not* have to be in a certain order; the system will auto-organize them based on ''-tag,, and date.
 
@@ -68,9 +68,27 @@
 
 
 
+## How do I set an artist's area?
+
+* The area of activity is set via specific language in the artist's bio. It can be set in bio entries tagged either ''-start,, or ''-activity,,.
+
+* For **Japanese artists**, see the format below. If you've formatted the line correctly, the system will automatically insert the full Japanese name.
+
+ ''/dali/ forms in tokyo. -start,, ''→,, [Dali](/artists/dali/) forms in [Tokyo (東京)](https://vk.gy/search/artists/&area=tokyo#result).
+
+ ''/dali/ moves to osaka. -start,, ''→,, [Dali](/artists/dali/) moves to [Osaka (大阪)](https://vk.gy/search/artists/&area=osaka#result).
+
+* The format is slightly different for **non-Japanese artists**. In this case, the system will automatically transform “overseas” into a link but will not do anything with the specific country (so make sure your spelling is correct).
+
+ ''/bataar/ forms oversease in Sweden. -start,, ''→,, [BatAAr](/artists/bataar/) forms [overseas (海外)](https://vk.gy/search/artists/&area=overseas#result) in Sweden.
+
+ ''/bataar/ moves overseas to France. -activity,, ''→,, [BatAAr](/artists/bataar/) moves [overseas (海外)](https://vk.gy/search/artists/&area=overseas#result) to France.
+
+
+
 ## Biography tags
 
-### Normal tags
+#### Normal tags
 
 * ''-label,, The band joins, leaves, or starts a label.
 
@@ -80,7 +98,7 @@
 
 * ''-name,, A member *or* the artist itself changes its name.
 
- For band name changes, pronunciation will be pulled from entries with this tag. Like with ''-formation,,, type the pronunciation in katakana/hiragana in parentheses after the band link.
+ For band name changes, pronunciation will be pulled from entries with this tag. Like with ''-start,,, type the pronunciation in katakana/hiragana in parentheses after the band link.
 
  ''2018-01-06 Guitarist JUN changes his name to JUNNA. -name\n\n2018-02-13 /Dali/ changes its name to /LAREINE/ (ラレーヌ). -name,,
 
@@ -94,7 +112,7 @@
 
 ---
 
-### Special tags
+#### Special tags
 
 * ''-start,, When the band forms, revives, or resumes activity. Will be highlighted on the artist page.
 
@@ -137,6 +155,16 @@
  Note that every release must be added to the database, even if information about it is unknown or it was cancelled. Theoretically, there should never be a released mention in the artist's biography that isn't in the database.
 
 * ''-schedule,, or ''-s,, A special tag that allows you to edit the band's live schedule directly from the biography. See **[Editing live schedule](/documentation/edit-artist/#editing-live-schedule)**.
+
+---
+
+#### Deprecated tags
+
+The following tags should not be used and are subject to removal.
+
+* ''-formation,, Replaced with the more generic ''-start,,.
+
+* ''-disbandment,, Replaced with the more generic ''-end,,.
 
 
 

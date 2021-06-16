@@ -466,26 +466,40 @@
 						
 						// Activity area
 						if(is_array($line_type) && (in_array(10, $line_type) || in_array(1, $line_type))) {
-							$active_area_pattern = '(in|to) ([A-z0-9&#;]+)(?: \(([A-z0-9&#;]+)\))?';
+							
+							$active_area_pattern = '(\(?overseas\)?|\(?'.sanitize(海外).'\)?)?( \(&[A-z0-9&#;]+\))? (in|to) ([A-z0-9&#;]+)( \([A-z0-9&#;]+\))?';
 							
 							if(preg_match('/'.$active_area_pattern.'/', $line, $active_area_match)) {
-								if(strlen($active_area_match[3])) {
-									$area_name = $active_area_match[3];
-									$area_romaji = $active_area_match[2];
+								
+								// Overseas
+								if( $active_area_match[1] ) {
+									$area_name = '(overseas)';
 								}
-								elseif(strlen($active_area_match[2])) {
-									$area_name = $active_area_match[2];
+								// Area name & romaji
+								elseif( $active_area_match[4] ) {
+									$area_name = $active_area_match[4];
 								}
 								
 								$sql_check_area = 'SELECT * FROM areas WHERE name=? OR romaji=? LIMIT 1';
 								$stmt_check_area = $this->pdo->prepare($sql_check_area);
-								$stmt_check_area->execute([ $area_name, ($area_romaji ?: $area_name) ]);
+								$stmt_check_area->execute([ $area_name, $area_name ]);
 								$rslt_check_area = $stmt_check_area->fetch();
 								
 								if(is_numeric($rslt_check_area['id'])) {
-									$line = str_replace($active_area_match[0], $active_area_match[1].' '.$rslt_check_area['romaji'].' ('.$rslt_check_area['name'].')', $line);
+									
+									// Overseas
+									if( $active_area_match[1] ) {
+										$line = str_replace( ( $active_area_match[2] ? $active_area_match[1].$active_area_match[2] : $active_area_match[1] ), $rslt_check_area['romaji'].' ('.$rslt_check_area['name'].')', $line );
+									}
+									// Everything else
+									else {
+										$line = str_replace( ( $active_area_match[5] ? $active_area_match[4].$active_area_match[5] : $active_area_match[4] ), $rslt_check_area['romaji'].' ('.$rslt_check_area['name'].')', $line );
+									}
+									
 									$area_id = $rslt_check_area['id'];
+									
 								}
+								
 							}
 						}
 						

@@ -228,25 +228,38 @@
 					$mv_position = mb_strpos( $name, $mv_matches[0][0], 0, 'UTF-8' );
 					$mv_length = mb_strlen( $mv_matches[0][0], 'UTF-8' );
 					
-					$char_before = mb_substr($name, $mv_position - 1, 1, 'UTF-8');
-					$char_after = mb_substr($name, $mv_position + $mv_length, 1, 'UTF-8');
+					$name = mb_substr( $name, 0, $mv_position, 'UTF-8' ).mb_substr( $name, $mv_position + $mv_length, null, 'UTF-8' );
 					
 					$bracket_pairs = [
 						'[]',
 						'()',
 						'【】',
 						'--',
+						'「」',
+						'『』',
+						' -',
+						'- ',
 					];
 					
+					// Loop through bracket pairs and make sure any empty ones are removed from the beginning and end
 					foreach($bracket_pairs as $bracket_pair) {
-						if( $char_before.$char_after === $bracket_pair ) {
-							$mv_position--;
-							$mv_length = $mv_length + 2;
-							break;
+						if( mb_strpos( $name, $bracket_pair ) === 0 ) {
+							$name = mb_substr( $name, 2 );
+						}
+						elseif( mb_substr( $name, -2 ) == $bracket_pair ) {
+							$name = mb_substr( $name, 0, -2 );
 						}
 					}
 					
-					$name = mb_substr( $name, 0, $mv_position, 'UTF-8' ).mb_substr( $name, $mv_position + $mv_length, null, 'UTF-8' );
+					$char_before = mb_substr($name, 0, 1, 'UTF-8');
+					$char_after = mb_substr($name, -1, 1, 'UTF-8');
+					
+					foreach($bracket_pairs as $bracket_pair) {
+						if( $char_before.$char_after === $bracket_pair ) {
+							$name = mb_substr( $name, 1, -1 );
+							break;
+						}
+					}
 					
 				}
 				
@@ -272,12 +285,6 @@
 			// Strings to search for
 			$search_strings = [
 				
-				'cm' => [
-					'clip',
-					'spot',
-					'teaser',
-				],
-				
 				'lyric' => [
 					'lyric video',
 					'lyrics',
@@ -285,18 +292,33 @@
 					'リリックビデオ',
 				],
 				
+				'trailer' => [
+					'trailer',
+					'全曲',
+					'視聴',
+					'試聴',
+				],
+				
+				'cm-1' => [
+					'mv spot',
+					'music video spot',
+					'pv spot',
+				],
+				
 				'mv' => [
 					'mv',
 					'music video',
 					'musicvideo',
 					'official video',
+					'full spot',
+					'spot full',
 					'pv',
 				],
 				
-				'trailer' => [
-					'trailer',
-					'全曲',
-					'視聴',
+				'cm-2' => [
+					'clip',
+					'spot',
+					'teaser',
 				],
 				
 				'live' => [
@@ -311,7 +333,11 @@
 				foreach( $strings as $string ) {
 					
 					if( strpos($name, $string) !== false ) {
+						
+						// Allows multiple passes
+						$type_name = preg_replace('/'.'\-\d'.'/', '', $type_name);
 						return $this->video_types[$type_name];
+						
 					}
 					
 				}

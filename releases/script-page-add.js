@@ -130,6 +130,7 @@ $(document).on("click", "[data-add]", function(event) {
 	var controlContainer = $(this).parents(".track");
 	
 	if(component === "disc") {
+		
 		var firstTrack           = $(this).parents(".text").find(".track:first-of-type");
 		var nextTrackContainer   = controlContainer.next(".track");
 		
@@ -140,7 +141,7 @@ $(document).on("click", "[data-add]", function(event) {
 		}
 		
 		if(nextTrackContainer.hasClass("track--show-section")) {
-			controlContainer.nextUntil(".track--show-disc").last().after(
+			controlContainer.nextUntil(".track--show-disc", '.track').last().after(
 				trackTemplate("disc"),
 				trackTemplate("song", 5),
 				trackTemplate("controls")
@@ -153,6 +154,7 @@ $(document).on("click", "[data-add]", function(event) {
 				trackTemplate("controls")
 			);
 		}
+		
 	}
 	
 	if(component === "section") {

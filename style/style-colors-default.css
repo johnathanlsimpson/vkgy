@@ -1,0 +1,59 @@
+/**
+	* ========================================================
+	* COLORS (HSL): DEFAULT
+	* ========================================================
+**/
+:root {
+	color-scheme: light;
+	
+	--accent:                 340, 73%,  25%;
+	--brand-color:            340, 73%,  25%;
+
+	--attention--secondary:   146, 65%,  25%;
+	--attention:              147, 50%,  47%;
+
+	--interactive--secondary: 211, 100%, 22%;
+	--interactive:            207, 24%,  56%;
+
+	--text:                   0,   5%,   25%;
+	--text--secondary:        0,   0%,   50%;
+	--text--error:            0,   52%,  47%;
+	--text--caution:          44,  56%,  51%;
+	--text--success:          154, 60%,  36%;
+
+	--background--secondary:  20,  0%,   90%;
+	--background:             18,  0%,   82%;
+	--background--bold:       18,  0%,   74%;
+	--background--alt:        146, 10%,  85%;
+}
+
+/**
+	* ========================================================
+	* COLORS (HSL): DARK
+	* ========================================================
+**/
+@media (prefers-color-scheme: dark) {
+	:root {
+		color-scheme: dark;
+		
+		--accent:                 344, 37%,  50%;
+		--brand-color:            340, 73%,  25%;
+		
+		--attention--secondary:   154, 32%,  50%;
+		--attention:              154, 32%,  45%;
+		
+		--interactive--secondary: 227, 12%,  55%;
+		--interactive:            227, 12%,  45%;
+		
+		--text:                   0,   5%,   70%;
+		--text--secondary:        0,   0%,   40%;
+		--text--error:            0,   52%,  47%;
+		--text--caution:          44,  56%,  51%;
+		--text--success:          154, 60%,  36%;
+		
+		--background--secondary:  240, 9%,   7%;
+		--background:             240, 9%,   13%;
+		--background--bold:       240, 9%,   23%;
+		--background--alt:        196, 27%,  10%;
+	}
+}
