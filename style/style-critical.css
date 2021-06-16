@@ -1110,7 +1110,7 @@ body {
 	}
 }
 .quick-search__container:not(:empty)::before {
-	display: none;
+	display: none !important;
 }
 
 /* Results list */

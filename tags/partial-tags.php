@@ -53,7 +53,7 @@ style([
 													if( $tag['requires_permission'] != 'can_approve_data' ) {
 														?><label class="tag__moderation tag--hide input__checkbox" data-direction="hide" data-items-tags-id="<?= $tag['items_tags_id']; ?>" data-item-type="<?= $item_type.'s_tags'; ?>">
 															<input class="tag__hide input__choice" type="checkbox" <?= $tag['mod_score'] < 0 ? 'checked' : null; ?> />
-															<span class="symbol__hide tag__status"></span>
+															<span class="symbol__hidden tag__status"></span>
 														</label><?php
 													}
 													
@@ -98,7 +98,7 @@ style([
 													if( $tag['requires_permission'] != 'can_approve_data' ) {
 														?><label class="tag__moderation tag--hide input__checkbox" data-direction="hide" data-items-tags-id="<?= $tag['items_tags_id']; ?>" data-item-type="<?= $item_type.'s_tags'; ?>">
 															<input class="tag__hide input__choice" type="checkbox" <?= $tag['mod_score'] < 0 ? 'checked' : null; ?> />
-															<span class="symbol__hide tag__status"></span>
+															<span class="symbol__hidden tag__status"></span>
 														</label><?php
 													}
 													
