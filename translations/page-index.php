@@ -29,7 +29,7 @@ style([
 	<div>
 		
 		<div class="text text--outlined text--notice symbol__error">
-			<?= tr('This feature is currently in alpha. Editors may add translations for any available language, but the ability to view vkgy in that language won\'t come until the beta.'); ?>
+			<?= tr('This feature is currently in beta.'); ?>
 		</div>
 		
 	</div>
