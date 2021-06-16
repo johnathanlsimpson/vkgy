@@ -1,6 +1,6 @@
 ## How to translate vkgy
 
-* Translations are in alpha mode―currently, only VIP users may access the *change language* function or contribute translations.
+* Translations are in beta mode―currently, only editors may access the *change language* function or contribute translations.
 
 * To help translate vkgy, navigate to the [translations section](/translations/) via the language dropdown at the top of the page. Once there, browse the English strings and click “more” to add a translation for that string.
 
