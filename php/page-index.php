@@ -14,7 +14,7 @@ $body_class = $_SESSION["is_signed_in"] ? "body--signed-in" : "body--signed-out"
 
 // Set critical page styles
 style([
-	'/style/style-colors-'.( is_numeric($_SESSION['site_theme']) ? $_SESSION['site_theme'] : 0 ).'.css',
+	'/style/style-colors-'.( is_numeric($_SESSION['site_theme']) ? $_SESSION['site_theme'] : 'default' ).'.css',
 	'/style/style-critical.css',
 	'/style/style-shared.css',
 	'/style/style-symbols.css',
