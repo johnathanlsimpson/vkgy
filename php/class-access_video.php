@@ -483,7 +483,7 @@
 				$sql_select[] = 'videos.type';
 				$sql_select[] = 'videos.date_occurred';
 				$sql_select[] = 'videos.date_added';
-				$sql_select[] = 'views_daily_videos.num_views';
+				$sql_select[] = 'views_videos_daily.num_views';
 				$sql_select[] = 'videos.length';
 				$sql_select[] = 'videos.is_flagged';
 				$sql_select[] = 'videos.artist_id';
@@ -499,7 +499,7 @@
 			
 			// JOIN ------------------------------------------------
 			if($args['get'] === 'all' || $args['get'] === 'basics') {
-				$sql_join[] = 'LEFT JOIN views_daily_videos ON views_daily_videos.video_id=videos.id';
+				$sql_join[] = 'LEFT JOIN views_videos_daily ON views_videos_daily.video_id=videos.id';
 			}
 			
 			// WHERE -----------------------------------------------

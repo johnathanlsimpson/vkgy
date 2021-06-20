@@ -157,16 +157,16 @@ if(is_array($image) && !empty($image) && file_exists("../images/image_files/".$i
 /* Artist rankings */
 $sql_rank = '
 	SELECT
-		views_weekly_artists.*,
-		(COALESCE(views_weekly_artists.past_views, 0) - COALESCE(views_weekly_artists.past_past_views, 0)) AS num_difference,
+		views_artists_weekly.*,
+		(COALESCE(views_artists_weekly.past_views, 0) - COALESCE(views_artists_weekly.past_past_views, 0)) AS num_difference,
 		artists.name,
 		artists.romaji,
 		artists.friendly,
 		COALESCE(artists.romaji, artists.name) AS quick_name
 	FROM
-		views_weekly_artists
+		views_artists_weekly
 	LEFT JOIN
-		artists ON artists.id=views_weekly_artists.artist_id
+		artists ON artists.id=views_artists_weekly.artist_id
 	ORDER BY
 		num_difference DESC,
 		past_views DESC

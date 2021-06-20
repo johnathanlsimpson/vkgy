@@ -302,7 +302,7 @@ include_once('../php/class-link.php');
 		// Record view
 		include('../php/class-views.php');
 		$views = new views($pdo);
-		$views->add('artist', $artist['id']);
+		$views->add_view('artist', $artist['id']);
 		
 		// Default video
 		$artist['video'] = $access_video->access_video([ 'artist_id' => $artist['id'], 'is_approved' => true, 'get' => 'basics', 'limit' => 1 ])[0];

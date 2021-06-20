@@ -4,7 +4,19 @@ include_once('../php/include.php');
 
 class views {
 	
-	public $allowed_item_types;
+	// Items we can record views for
+	public static $allowed_items = [
+		'artist',
+		'blog',
+		'video',
+	];
+	
+	// Frequencies we can archive
+	public static $allowed_time_periods = [
+		'daily',
+		'weekly',
+		'monthly',
+	];
 	
 	
 	
@@ -21,13 +33,6 @@ class views {
 		}
 		$this->pdo = $pdo;
 		
-		// Set allowed item types and associated tables
-		$this->allowed_item_types = [
-			'artist' => 'artists',
-			'blog'   => 'blog',
-			'video'  => 'videos',
-		];
-		
 	}
 	
 	
@@ -37,21 +42,26 @@ class views {
 	// ======================================================
 
 	// Add view
-	public function add($item_type=null, $item_id=null) {
+	public function add_view($item_type, $item_id) {
 		
-		// Make sure item type is allowed
-		$table_name = 'views_daily_'.$this->allowed_item_types[$item_type];
-		$id_name = $item_type.'_id';
+		// Set up item names
+		$item_table     = $item_type.'s';
+		$item_id_column = $item_type.'_id';
 		
-		if( strlen($item_type) && in_array($item_type, array_keys($this->allowed_item_types)) ) {
+		// Set up views names
+		$views_table    = 'views_'.$item_table.'_daily';
+		
+		// Make sure item is allowed
+		if( strlen($item_type) && in_array($item_type, self::$allowed_items) ) {
 			
 			// Make sure item ID is specified
 			if( is_numeric($item_id) ) {
 				
 				// Add the view
-				$sql_view = 'INSERT INTO '.$table_name.' ('.$id_name.') VALUES (?) ON DUPLICATE KEY UPDATE num_views=num_views+1';
+				$sql_view = 'INSERT INTO '.$views_table.' ('.$item_id_column.') VALUES (?) ON DUPLICATE KEY UPDATE num_views=num_views+1';
 				$stmt_view = $this->pdo->prepare($sql_view);
-				$stmt_view = $this->pdo->prepare($sql_view);
+				
+				// Run query
 				if($stmt_view->execute([ $item_id ])) {
 					return true;
 				}
@@ -69,57 +79,76 @@ class views {
 	// ======================================================
 	
 	// Archive current views and restart table
-	public function archive($item_type=null, $archive_type='daily') {
+	public function archive_views( $item_type, $time_period='daily' ) {
 		
-		// Set vars
-		$allowed_archive_types = [
-			'daily'   => 'weekly',
-			'weekly'  => '',
-			'monthly' => 'weekly'
-		];
-		$id_column = $item_type.'_id';
-		$current_table_name = 'views_'.$archive_type.'_'.$this->allowed_item_types[$item_type];
-		$archived_table_name = 'views_'.$allowed_archive_types[$archive_type].'_'.$this->allowed_item_types[$item_type];
+		// Set up item names
+		$item_table          = $item_type.'s';
+		$item_id_column      = $item_type.'_id';
+		
+		// Set source and destination periods based on type of archive we're running
+		switch ($time_period) {
+			
+			case 'daily':
+				$source_period      = 'daily';
+				$destination_period = 'weekly';
+				break;
+				
+			case 'weekly':
+				$source_period      = 'weekly';
+				$destination_period = 'weekly';
+				break;
+				
+			case 'monthly':
+				$source_period      = 'weekly';
+				$destination_period = 'monthly';
+				break;
+			
+		}
+		
+		// Set up views tables
+		$source_table      = 'views_'.$item_table.'_'.$source_period;
+		$destination_table = 'views_'.$item_table.'_'.$destination_period;
+		
+		// Month will be needed if performing monthly archive
 		$date_occurred = date('Y-m').'-01';
 		
-		// Make sure archive type is allowed
-		if( in_array($archive_type, array_keys($allowed_archive_types)) ) {
+		// Make sure time period is allowed
+		if( in_array( $time_period, self::$allowed_time_periods ) ) {
 			
 			// Make sure item type provided and allowed
-			if( strlen($item_type) && in_array($item_type, array_keys($this->allowed_item_types)) ) {
+			if( strlen($item_type) && in_array($item_type, self::$allowed_items) ) {
 				
-				// Daily aggregation
-				if($archive_type === 'daily') {
+				// From daily to weekly--daily views are summed and added to num_views (a.k.a. current week) column of weekly
+				// Truncate the table to start fresh every day
+				if($time_period === 'daily') {
 					$sql_archive = "
-						INSERT INTO $archived_table_name ($id_column, num_views)
-						SELECT $id_column, num_views FROM $current_table_name
-						ON DUPLICATE KEY UPDATE $archived_table_name.num_views = $archived_table_name.num_views + $current_table_name.num_views
+						INSERT INTO $destination_table ($item_id_column, num_views)
+						SELECT $item_id_column, num_views FROM $source_table
+						ON DUPLICATE KEY UPDATE $destination_table.num_views = $destination_table.num_views + $source_table.num_views
 					";
-					$sql_delete = "TRUNCATE $current_table_name";
+					$sql_delete = "TRUNCATE $source_table";
 				}
 				
-				// Permanent archive
-				elseif($archive_type === 'monthly') {
+				// From weekly to weekly--last week is summed into two weeks ago, this week is summed into last week, this week is reset to 0
+				// We basically keep a rolling tally so we can see which artists have gained attention compared to their previous week's performance
+				// (Used to delete any rows w/ 2 consecutive weeks of 0 views but that's v rare and the table can only be as large as artists anyway...)
+				elseif($time_period === 'weekly') {
 					$sql_archive = "
-						INSERT INTO $current_table_name ($id_column, num_views, date_occurred)
-						SELECT $id_column, num_views, '$date_occurred' AS date_occurred FROM $archived_table_name WHERE num_views > 0 OR past_views > 0 OR past_past_views > 0
-						ON DUPLICATE KEY UPDATE $current_table_name.num_views = $current_table_name.num_views + $archived_table_name.num_views
-					";
-					echo $sql_archive;
-				}
-				
-				// Weekly aggregation
-				elseif($archive_type === 'weekly') {
-					$sql_archive = "
-						UPDATE $current_table_name
+						UPDATE $source_table
 						SET past_past_views = past_views, past_views = num_views, num_views = 0
 					";
-					$sql_delete = "
-						DELETE FROM $current_table_name
-						WHERE num_views = 0 AND past_views = 0 AND past_past_views = 0
+				}
+				
+				// From weekly to monthly
+				elseif($time_period === 'monthly') {
+					$sql_archive = "
+						INSERT INTO $destination_table ($item_id_column, num_views, date_occurred)
+						SELECT $item_id_column, num_views, '$date_occurred' AS date_occurred FROM $source_table
+						ON DUPLICATE KEY UPDATE $destination_table.num_views = $destination_table.num_views + $source_table.num_views
 					";
 				}
 				
+				// Archive views
 				if($sql_archive) {
 					$stmt_archive = $this->pdo->prepare($sql_archive);
 					$stmt_archive->execute();

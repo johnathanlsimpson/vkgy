@@ -109,7 +109,7 @@ else {
 				$order = 'videos.date_added DESC';
 			}
 			elseif( $value === 'num_views' ) {
-				$order = 'views_daily_videos.num_views DESC';
+				$order = 'views_videos_daily.num_views DESC';
 			}
 			
 		}
