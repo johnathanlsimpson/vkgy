@@ -585,7 +585,7 @@
 								</div>
 								<div class="input__note any--weaken symbol__help">By default, set to the “default image” for the entry.</div>
 							</li>
-
+							
 						</ul>
 					</div>
 				</div>
@@ -655,6 +655,24 @@
 				</ul>
 			</details>
 			
+			<?php if( $_SESSION['can_delete_data'] || $_SESSION['user_id'] == $entry['user_id'] ): ?>
+			<!-- Delete -->
+			<details id="delete">
+				
+				<summary class="h3 documentation__link">❌ Delete</summary>
+				
+				<ul class="text text--outlined">
+					<li class="input__row">
+						<div class="input__group">
+							<label class="input__label">Delete</label>
+							<button class="symbol__delete symbol--standalone" data-get="id" data-get-into="data-id" data-id="<?= $entry["id"]; ?>" data-is-translation="<?= $entry['is_translation'] ? 1 : 0 ;?>" name="delete"></button>
+						</div>
+					</li>
+				</ul>
+				
+			</details>
+			<?php endif; ?>
+			
 		</div>
 		
 		<!-- Submit area -->
@@ -682,16 +700,32 @@
 					<!-- Draft area -->
 					<span  class="save__scheduled any--weaken">Will be published <span class="any__note"><?= $entry['date_scheduled']; ?></span></span>
 					<input class="save__choice input__choice" id="is_queued" name="is_queued" type="checkbox" <?= $is_queued ? 'checked' : null; ?> />
-					<label class="save__draft input__checkbox symbol__unchecked" for="is_queued">Save as draft?</label>
 					
-					<!-- Delete -->
-					<?php $delete_button_class = $_SESSION['can_delete_data'] || $_SESSION['user_id'] === $entry['user_id'] ? null : 'any--hidden'; ?>
-					<label class="input__radio symbol__delete symbol--standalone <?= $delete_button_class; ?>" data-get="id" data-get-into="data-id" data-id="<?= $entry["id"]; ?>" data-is-translation="<?= $entry['is_translation'] ? 1 : 0 ;?>" name="delete"></label>
-					
-					<a class="save__link symbol__arrow" href="<?= $entry_url; ?>" target="_blank">
-						<m1>Preview draft</m1>
-						<m2>View entry</m2>
+					<a class="save__link a--outlined a--padded" href="<?= $entry_url; ?>" target="_blank">
+						<m1 class="">preview draft</m1>
+						<m2 class="">view entry</m2>
 					</a>
+					
+					<div class="input__note" style="margin-top:0;">
+						<label class="save__draft a symbol__shuffle" for="is_queued">switch to <m1>draft</m1><m2>published</m2></label>
+					</div>
+					
+					<style>
+						[name="is_queued"]:checked       ~ .input__note .save__draft m1,
+						[name="is_queued"]:not(:checked) ~ .input__note .save__draft m2,
+						[name="is_queued"]:checked       ~ .input__note .any__note   m1,
+						[name="is_queued"]:not(:checked) ~ .input__note .any__note   m2 {
+							display: none;
+						}
+						.save__draft {
+							user-select: none;
+							line-height: 1rem;
+							margin-top: -0.5rem;
+						}
+						[data-is-scheduled="0"] .save__draft {
+							display: inline-block;
+						}
+					</style>
 					
 					<!-- Notices -->
 					<div class="save__notice any--weaken-size text text--compact symbol__help">
@@ -700,8 +734,8 @@
 						<m3>You are editing a published (live) entry. Changes must be saved manually.</m3>
 						<m4>Automatically saved article as a draft.</m4>
 					</div>
+					
 				</div>
-				
 			</div>
 
 			<div class="any--flex any--hidden" data-role="edit-container">
