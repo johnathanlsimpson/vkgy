@@ -116,70 +116,6 @@ details:last-of-type:not([open]) {
 	margin-bottom: 3rem;
 }
 
-/* Drafts container--don't think this is used anymore */
-/*.drafts__container {
-	display: grid;
-	grid-gap: 1rem;
-	grid-template-columns: repeat(3, minmax(0, 33%));
-}
-.drafts__container li {
-	border: none;
-	padding: 0;
-}
-.drafts__container li:nth-of-type(n + 4) {
-	display: none;
-}*/
-
-/* Artist nav--don't think this is used */
-/*.artist__nav {
-	flex-wrap: wrap;
-	justify-content: space-between;
-	margin-top: -1rem;
-	padding: 1rem 0;
-	position: -webkit-sticky;
-	position: sticky;
-	top: 3rem;
-	z-index: 3;
-}
-.artist__nav .li {
-	display: block;
-}
-@media(max-width:799.9px) {
-	.artist__nav {
-		background-image: linear-gradient(hsl(var(--background--secondary)), hsl(var(--background--secondary)));
-		background-position: 0 -1rem;
-		background-repeat: no-repeat;
-		padding: 0.5rem 0 1rem 0;
-		text-align: center;
-		grid-column: 1 / -1;
-	}
-	.artist__nav::after {
-		bottom: 0;
-		box-shadow: inset 0 1.5rem 1rem -1rem hsl(var(--background--secondary));
-		content: "";
-		display: block;
-		height: 1rem;
-		left: 0;
-		position: absolute;
-		right: 0;
-	}
-	.artist__nav .li {
-		border: none;
-		margin: 0;
-		padding: 0;
-	}
-	.artist__nav [href*='former'], .artist__nav [href*='staff'], .artist__nav [href*='schedule'] {
-		display: none;
-	}
-}
-@media(min-width:800px) {
-	.artist__nav.artist__nav {
-		flex-direction: column;
-		margin-right: var(--gutter);
-		width: auto;
-	}
-}*/
-
 /* SNS */
 .sns__component {
 	border: none;
@@ -256,17 +192,33 @@ details:last-of-type:not([open]) {
 .save__group {
 	align-items: center;
 }
-.save__button, .save__draft {
+.save__button/*, .save__draft*/ {
 	margin-top: 0;
 }
 .save__status[class*="symbol"] {
 	margin-right: -4px;
 }
-.save__state:not(:empty) {
+/*.save__state:not(:empty) {
 	margin-left: 0.5rem;
+}*/
+/*.save__draft,*/ .save__scheduled, .save__state {
+	margin-right: auto;
 }
-.save__draft, .save__scheduled {
-	margin-left: auto;
+.save__status {
+	margin-bottom: 1rem;
+	margin-right: 0.5rem !important;
+}
+.save__button {
+	margin-bottom: 1rem;
+	margin-right: 0.5rem;
+}
+.save__state {
+	margin-left: 0;
+	margin-bottom: 1rem;
+}
+.save__link {
+	line-height: 1rem;
+	margin-bottom: 1rem;
 }
 
 /* By default, hide message states */
@@ -297,7 +249,6 @@ details:last-of-type:not([open]) {
 
 /* Draft checkbox and scheduled notice */
 [data-is-scheduled="1"]                                    .save__scheduled,
-[data-is-scheduled="0"]                                    .save__draft,
 
 /* View link text */
 [data-is-published="1"]                                    .save__link,
@@ -326,7 +277,7 @@ details:last-of-type:not([open]) {
 }
 
 /* Checkbox styling */
-.save__choice:checked ~ .save__draft {
+/*.save__choice:checked ~ .save__draft {
 	color: inherit;
 }
 .save__choice:checked ~ .save__draft::before {
@@ -335,7 +286,7 @@ details:last-of-type:not([open]) {
 	clip-path: url(#symbol__checkbox--checked);
 	color: inherit;
 	opacity: 1;
-}
+}*/
 
 /* Special notices */
 .save__notice {

@@ -60,10 +60,21 @@
 .track__disc-label::after {
 	content: "#" counter(disc_count);
 }
+
+
+.track--show-disc,
+.track--show-controls,
+.track--show-song:first-of-type {
+	counter-reset: tracks;
+}
+.track--show-song {
+	counter-increment: tracks;
+}
+
 .track__num::before {
 	box-sizing: border-box;
 	color: hsl(var(--text--secondary));
-	content: attr(data-count) ".";
+	content: counter(tracks) ".";
 	display: inline-block;
 	height: 2rem;
 	left: -2rem;
@@ -109,27 +120,78 @@
 .add__cover[src=""] {
 	display: none;
 }
-/*.image__template:nth-of-type(2) {
-	margin-top: 1rem;
-}
-.image__image {
-	align-items: center;
-	background-clip: content-box;
-	background-position: top center;
-	background-repeat: no-repeat;
-	background-size: contain;
-	display: flex;
-	justify-content: space-around;
-	min-width: 100px;
-	padding-right: 0.5rem;
-	text-align: center;
-	width: 100px;
-}
-.image__image img {
-	align-self: flex-start;
-	max-height: 100px;
-	max-width: 100px;
-}
-.image__data {
-	oveflow-x: hidden;
-}*/
+
+	@media(max-width:599.99px) {
+		.track__num {
+			width: 100%;
+		}
+		.track__num::before {
+			bottom: auto;
+			top: 0;
+		}
+		.track__song .input, .track__disc .input, .track__section .input {
+			height 2rem;
+			min-height: 2rem;
+			line-height: 2rem;
+			margin-bottom: 0.5rem;
+			padding-bottom: 0;
+			padding-top: 0;
+			border-radius: 3px 3px 0 0 !important;
+			width: 100%;
+		}
+		.track__song .input--secondary, .track__disc .input--secondary, .track__section .input--secondary {
+			border-radius: 0 0 3px 3px !important;
+			width: 100%;
+		}
+		.track__song, .track__disc, .track__section {
+			flex-direction: column;
+		}
+		.track__disc, .track__disc .input__group {
+			flex-direction: column;
+			flex-wrap: wrap;
+		}
+		.track__artist {
+			flex-grow: 1;
+			margin-bottom: 1rem;
+			width: 100%;
+		}
+		.track {
+		}
+		.add__tracklist {
+			padding-left: 0;
+			padding-right: 0;
+		}
+	}
+
+
+				.input__select-placeholder {
+					background: hsl(var(--background--bold));
+					background-clip: content-box;
+					color: transparent;
+					left: 0.5rem;
+					line-height: 1.5rem;
+					padding: 0.25rem 0 0.25rem 0.5rem;
+					pointer-events: none;
+					position: absolute;
+					right: 0;
+				}
+				.input__select-placeholder::after {
+					border: 5px solid transparent;
+					border-top-color: hsl(var(--text--secondary));
+					content: "";
+					display: block;
+					height: 0;
+					margin-top: -3px;
+					pointer-events: none;
+					position: absolute;
+					right: 0.5rem;
+					top: 50%;
+					width: 0;
+				}
+				select[multiple] + .input__select-placeholder,
+				select[data-populate-on-click="true"] + .input__select-placeholder {
+					color: hsl(var(--text--secondary));
+				}
+				.selectize-control.input.single + .input__select-placeholder::after {
+					border-color: transparent;
+				}

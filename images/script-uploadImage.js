@@ -88,7 +88,7 @@ function updateJsonLists(artistElem) {
 	// If musician list not already gotten (and presumably release list isn't either), let's get them
 	if( !musicianListElem ) {
 		
-		renderJsonList(artistId);
+		getJsonLists(artistId, [ 'musicians', 'releases' ]);
 		
 	}
 	
@@ -495,8 +495,11 @@ document.addEventListener('change', function(event) {
 		// When changing the default to 'no default', no change will be triggered on the is_default element of the previously-default image
 		// i.e. the default won't be set to null. So let's use [checked] as an approximation of the previously-default image (since [checked]
 		// is set in the html) and trigger a change on that element to save value of is_default. Then let's remove [checked]
+		// Note: This elem may or may not exist, esp if you deleted the previously-checked elem
 		let previouslyCheckedElem = event.target.closest('.image__results').querySelector('[name="image_is_default"][checked]');
-		previouslyCheckedElem.removeAttribute('checked');
+		if( previouslyCheckedElem ) {
+			previouslyCheckedElem.removeAttribute('checked');
+		}
 		
 		// Then on the is_default element that we switched to, make sure to add [checked] so that it's seen as the previous value if we change it again
 		let currentlyCheckedElem = event.target;
@@ -1444,7 +1447,7 @@ function updateDefaultImageArtist(artistId, artistName) {
 	let imageTemplate = document.querySelector('#image-template');
 	if(imageTemplate) {
 		
-		renderJsonList(artistId);
+		getJsonLists(artistId, [ 'musicians', 'releases' ]);
 		
 		imageTemplate.innerHTML = imageTemplate.innerHTML.replace(/(data-source="artists".+?>)(<\/select>)/, '$1<option value="' + artistId + '" selected>' + artistName + '</option>$2');
 		imageTemplate.innerHTML = imageTemplate.innerHTML.replace("artistIsSet: ''", "artistIsSet: '1'");

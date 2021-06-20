@@ -21,7 +21,6 @@ $functions = [
 	'page_header',
 	"subnav",
 	"image_exists",
-	"update_views"
 ];
 
 foreach($functions as $function) {

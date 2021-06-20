@@ -1,6 +1,17 @@
 <?php
 
+// ========================================================
+// Inclusions
+// ========================================================
+
+include_once('../php/class-views.php');
+
 $access_video = new access_video($pdo);
+$access_view = new views($pdo);
+
+// ========================================================
+// Page setup
+// ========================================================
 
 style([
 	'/blog/style-page-entry.css',
@@ -13,6 +24,9 @@ if( $entry_is_feature ) {
 else {
 	$active_page = '/blog/';
 }
+
+// Record view
+$access_view->add_view('blog', $entry['id']);
 
 // Separate first sentence as summary, just in case we want to display it differently later
 $entry['summary'] = explode("\n", $entry['content'])[0];
@@ -89,9 +103,9 @@ if( is_array($entry['tags']) && !empty($entry['tags']) ) {
 	}
 }
 
-// Not sure if we still needthis
-/*// Make blog entries show large versions of images
-$entry['content'] = str_replace('.medium.', '.large.', $entry['content']);*/
+// ========================================================
+// Get additional data
+// ========================================================
 	
 // Get related entries about same artist
 if( is_numeric($entry['artist_id']) ) {

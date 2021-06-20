@@ -11,7 +11,7 @@ script([
 	'/scripts/external/script-alpine.js',
 	'/scripts/script-initSelectize.js',
 	'/scripts/script-initDelete.js',
-	'/scripts/script-renderJsonList.js',
+	'/scripts/script-getJsonLists.js',
 	'/images/script-uploadImage.js',
 ]);
 

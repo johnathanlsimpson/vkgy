@@ -14,7 +14,7 @@ if( strlen($youtube_id) ) {
 	$id = $stmt_id->fetchColumn();
 	
 	if( is_numeric($id) ) {
-		$views->add('video', $id);
+		$views->add_view('video', $id);
 	}
 	
 }

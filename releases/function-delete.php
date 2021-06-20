@@ -19,13 +19,13 @@
 					if($stmt->execute([$_POST["id"]])) {
 						$sql_delete_tracks = "DELETE FROM releases_tracklists WHERE release_id=?";
 						$stmt = $pdo->prepare($sql_delete_tracks);
-						if($stmt->execute([$_POST["id"]])) {
+						//if($stmt->execute([$_POST["id"]])) {
 							$output["status"] = "success";
 							$output["result"] = "Release successfully deleted.";
-						}
-						else {
-							$output["result"] = "The release's tracklist could not be deleted.";
-						}
+						//}
+						//else {
+							//$output["result"] = "The release's tracklist could not be deleted.";
+						//}
 					}
 					else {
 						$output["result"] = "The release could not be deleted.";

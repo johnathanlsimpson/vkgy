@@ -26,8 +26,6 @@
 	
 	$active_page = '/releases/add/';
 
-	$magazine_id = 8767;
-	
 	script([
 		"/scripts/external/script-autosize.js",
 		"/scripts/external/script-selectize.js",
@@ -35,16 +33,19 @@
 		"/scripts/external/script-inputmask.js",
 		"/scripts/external/script-easyautocomplete.js",
 		'/scripts/external/script-tribute.js',
-
+		
+		'/scripts/script-triggerChange.js',
+		'/scripts/script-updateAlpineValue.js',
 		"/scripts/script-initDelete.js",
 		"/scripts/script-initSelectize.js",
 		'/scripts/script-initTribute.js',
 		"/scripts/script-showElem.js",
 		"/scripts/script-initEasyAutocomplete.js",
+		'/scripts/script-getJsonLists.js',
 
 		"/releases/script-resetTrackNums.js",
 		"/releases/script-trackTemplate.js",
-		"/releases/script-page-add.js"
+		"/releases/script-page-update.js"
 	]);
 
 	style([
@@ -54,7 +55,7 @@
 		
 		"/style/style-selectize.css",
 		"/style/style-easyautocomplete.css",
-		"/releases/style-page-add.css"
+		"/releases/style-page-update.css"
 	]);
 	
 	if(is_numeric($_GET["release"])) {
@@ -158,76 +159,7 @@
 		$access_preselected_artist = new access_artist($pdo);
 		$release['artist'] = $access_preselected_artist->access_artist([ 'friendly' => sanitize($_GET['artist']), 'get' => 'name' ]);
 	}
-	
-	// If adding magazine, auto set medium and format
-	if(!strlen($release['id']) && $release['artist']['friendly'] === 'magazine') {
-		$medium_id = 14;
-		$format_id = 53;
-		$release['medium'][] = 14;
-		$release['format'][] = 53;
-	}
-	
-	// If editing magazine, format the magazine-specific fields
-	if($release['artist']['friendly'] === 'magazine') {
-		
-		$release['magazine_name'] = '<option value="'.($release['romaji'] ?: $release['name']).'" selected>'.($release['romaji'] ? $release['romaji'].' ('.$release['name'].')' : $release['name']).'</option>';
-		$release['magazine_volume_name'] = $release['press_name'];
-		$release['magazine_volume_romaji'] = $release['press_romaji'];
-		
-		// Unset certain fields so they're not doubled by regular release form
-		unset( $release['name'], $release['romaji'], $release['press_name'], $release['press_romaji'] );
-		
-		// Format tracklist into contents textareas
-		if(is_array($release) && is_array($release['tracklist']) && is_array($release['tracklist']['discs']['']['sections']['']['tracks'])) {
-			foreach($release['tracklist']['discs']['']['sections']['']['tracks'] as $track_key => $track) {
-				
-				// Decide which type of feature the artist has, based on the note
-				switch($track['notes'][0]['name']) {
-					case 'small feature':
-						$feature_type = 'magazine_normal';
-						break;
-					case 'large feature':
-						$feature_type = 'magazine_large';
-						break;
-					case 'cover':
-						$feature_type = 'magazine_cover';
-						break;
-					case 'flyer':
-						$feature_type = 'magazine_flyer';
-						break;
-				}
-				
-				// Take care of non-DB artists first (their ID is same as magazine, and only have display name)
-				if($track['artist']['id'] === $release['artist']['id']) {
-					$release[$feature_type] .= "\n".( $track['artist']['display_romaji'] ? $track['artist']['display_romaji'].' ('.$track['artist']['display_name'].')' : $track['artist']['display_name'] )."\n";
-				}
-				
-				// For artists in DB, format as Markdown
-				else {
-					$release[$feature_type] .=
-						'('.$track['artist']['id'].')'.
-						'/'.$track['artist']['friendly'].'/'.
-						( strlen($track['artist']['display_name']) ? '['.( $track['artist']['display_romaji'] ? $track['artist']['display_romaji'].' ('.$track['artist']['display_name'].')' : $track['artist']['display_name'] ).']' :  null ).
-						' ';
-				}
-				
-				// Empty track so it's not populated in hidden part of form
-				foreach([ 'notes', 'artist', 'name', 'romaji', 'artist_display_name', 'artist_display_romaji' ] as $track_part) {
-					unset($release['tracklist']['discs']['']['sections']['']['tracks'][$track_key][$track_part]);
-				}
-				
-			}
-		}
-		
-		// Clean up double spaces from features
-		foreach([ 'normal', 'large', 'cover', 'flyer' ] as $feature_type) {
-			$release[ 'magazine_'.$feature_type ] = trim(str_replace("\n\n", "\n", $release[ 'magazine_'.$feature_type ]));
-		}
-		
-	}
-	
-	
-	
+
 	$pageTitle = !empty($release["quick_name"]) ? "Edit: ".$release["quick_name"]." - ".$release["artist"]["quick_name"] : "Add release";
 ?>
 
@@ -238,13 +170,6 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	.release--release .magazine--show,
-	.release--magazine .magazine--hide {
-		display: none;
-	}
-</style>
 
 <div class="col c1 any--signed-in-only any--margin">
 	<template data-contains="types"><?= json_encode([
@@ -282,25 +207,10 @@
 		render_json_list('artist', null, null, null, $release['artist']['id']);
 		render_json_list('label');
 		render_json_list('song', []);
-		
-		// Grab possible magazine names
-		$sql_magazine_names = 'SELECT name, romaji FROM magazines ORDER BY friendly ASC';
-		$stmt_magazine_names = $pdo->prepare($sql_magazine_names);
-		$stmt_magazine_names->execute();
-		$rslt_magazine_names = $stmt_magazine_names->fetchAll();
-		
-		foreach($rslt_magazine_names as $magazine) {
-			$magazine_names[] = [
-				$magazine['romaji'] ?: $magazine['name'],
-				'',
-				$magazine['romaji'] ? $magazine['romaji'].' ('.$magazine['name'].')' : $magazine['name']
-			];
-		}
-		
-		echo '<template data-contains="magazines">'.sanitize(json_encode($magazine_names)).'</template>';
+	
 	?>
 
-	<form action="" class="<?= $release['artist']['friendly'] === 'magazine' ? 'release--magazine' : 'release--release'; ?>" enctype="multipart/form-data" method="post" name="add">
+	<form action="" class="release--release" enctype="multipart/form-data" method="post" name="add">
 		<input data-get="id" data-get-into="value" name="id" type="hidden" value="<?php echo $release["id"]; ?>" />
 		<?php
 			if($release["artist"]) {
@@ -355,31 +265,17 @@
 			}
 		?>
 		
-		<h2 class="magazine--show">
-			<?= lang('Add magazine', '雑誌を追加する', 'div'); ?>
-		</h2>
-		
-		<h2 class="magazine--hide">
+		<h2>
 			<?= lang((empty($release) ? 'Add' : 'Edit').' release', 'リリースを追加する', 'div'); ?>
 		</h2>
 		
-		<div class="text">
+		<div class="text" x-data="{
+																												showPress:<?= $release['press_name'] || $release['type_name'] ? 1 : 0; ?>,
+																												showDisplayName:<?= $release['artist_display_name'] ? 1 : 0; ?>
+																												}">
 			
-			<!-- Magazine: name -->
-			<div class="input__row magazine--show">
-				<div class="input__group any--flex-grow">
-					<label class="input__label">
-						<?= lang('Magazine name', '雑誌の名', 'hidden'); ?>
-					</label>
-					<select class="input any--flex-grow" data-source="magazines" name="magazine_name" placeholder="magazine name">
-						<option></option>
-						<?= $release['magazine_name']; ?>
-					</select>
-				</div>
-			</div>
-			
-			<!-- Release: name -->
-			<div class="input__row magazine--hide">
+			<!-- Name -->
+			<div class="input__row">
 				<div class="input__group any--flex-grow">
 					<div class="input__label">
 						Release name
@@ -387,32 +283,22 @@
 					<input class="input" name="name" placeholder="release name" value="<?php echo $release["name"]; ?>" />
 					<input class="input--secondary" name="romaji" placeholder="(romaji)" value="<?php echo $release["romaji"]; ?>" />
 				</div>
-				<div class="input__group">
-					<button class="symbol__triangle symbol--down <?php echo $release["press_name"] || $release["type_name"] ? "any--hidden" : ""; ?>" data-show="add__press-container" type="button">
-						Type/Press
-					</button>
+				
+				<!-- Show press/type -->
+				<div class="input__group" x-show="!showPress">
+					<button class="symbol__triangle symbol--down" type="button" @click="showPress=1">Type/Press</button>
 				</div>
+				
 			</div>
 			
-			<!-- Magazine: edition -->
-			<div class="input__row magazine--show">
-				<div class="input__group any--flex-grow">
-					<div class="input__label">
-						<?= lang('Volume/edition', '巻・号', 'hidden'); ?>
-					</div>
-					<input class="input" name="magazine_volume_name" placeholder="volume" value="<?= $release['magazine_volume_name']; ?>" />
-					<input class="input--secondary" name="magazine_volume_romaji" placeholder="(romaji)" value="<?= $release['magazine_volume_romaji']; ?>" />
-				</div>
-			</div>
-			
-			<!-- Release: press/type -->
-			<div class="input__row magazine--hide <?= !$release["press_name"] && !$release["type_name"] ? "any--hidden" : ""; ?> add__press-container">
+			<!-- Press/type -->
+			<div class="input__row" x-show="showPress">
 				<div class="input__group any--flex-grow">
 					<div class="input__label">
 						<?= lang('Press name', 'プレス', 'hidden'); ?>
 					</div>
 					<input class="input" name="press_name" placeholder="press name" value="<?= $release["press_name"]; ?>" />
-					<input class="input--secondary" name="press_romaji" placeholder="(romaji)" value="<?php echo $release["press_romaji"]; ?>" />
+					<input class="input--secondary" name="press_romaji" placeholder="(romaji)" value="<?= $release["press_romaji"]; ?>" />
 				</div>
 				
 				<div class="input__group any--flex-grow">
@@ -420,11 +306,11 @@
 						Type name
 					</div>
 					<input class="input" name="type_name" placeholder="type name" value="<?= $release['type_name']; ?>" data-easyautocomplete data-src="types" data-get-value="quick_name" data-open="true" />
-					<input class="input--secondary" name="type_romaji" placeholder="(romaji)" value="<?php echo $release["type_romaji"]; ?>" />
+					<input class="input--secondary" name="type_romaji" placeholder="(romaji)" value="<?= $release["type_romaji"]; ?>" />
 				</div>
 			</div>
 			
-			<!-- Magazine/Release: artist -->
+			<!-- Artist -->
 			<div class="input__row">
 				<div class="input__group any--flex-grow">
 					<div class="input__label">
@@ -445,42 +331,53 @@
 						?>
 					</select>
 				</div>
-				<div class="input__group magazine--hide">
-					<button class="symbol__triangle symbol--down <?php echo $release["artist"]["display_name"] ? "any--hidden" : ""; ?>" data-show="add__display-name" type="button">
-						Display name
-					</button>
+				
+				<!-- Show display name -->
+				<div class="input__group" x-show="!showDisplayName">
+					<a class="symbol__edit" href="#" style="line-height:2rem;" @click.prevent="showDisplayName=1">display as</a>
 				</div>
-				<div class="input__group magazine--hide any--flex-grow <?php echo !$release["artist"]["display_name"] ? "any--hidden" : "";?> add__display-name">
+				
+				<!-- Display name -->
+				<div class="input__group any--flex-grow" x-show="showDisplayName">
 					<div class="input__label">
 						Artist display name
 					</div>
-					<input class="input" name="artist_display_name" placeholder="artist display name" value="<?php echo $release["artist"]["display_name"]; ?>" />
-					<input class="input--secondary" name="artist_display_romaji" placeholder="(romaji)" value="<?php echo $release["artist"]["display_romaji"]; ?>" />
+					<input class="input" name="artist_display_name" placeholder="artist display name" value="<?= $release["artist"]["display_name"]; ?>" />
+					<input class="input--secondary" name="artist_display_romaji" placeholder="(romaji)" value="<?= $release["artist"]["display_romaji"]; ?>" />
 				</div>
+				
 			</div>
 			
-			<!-- Magazine/Release: date/price/UPC -->
+			<!-- Date/price/UPC -->
 			<div class="input__row">
 				<div class="input__group">
-					<label class="input__label magazine--hide">
+					<label class="input__label">
 						<?= lang('Date', '発売日', 'hidden'); ?>
 					</label>
-					<label class="input__label magazine--show">
-						<?= lang('Date', '発行日', 'hidden'); ?>
-					</label>
-					<input class="input" data-inputmask="'alias': 'yyyy-mm-dd'" max-length="10" name="date_occurred" placeholder="yyyy-mm-dd" size="10" value="<?php echo $release["date_occurred"] !== "0000-00-00" ? $release["date_occurred"] : null; ?>" />
+					<input data-inputmask="'alias': 'yyyy-mm-dd'" max-length="10" name="date_occurred" placeholder="yyyy-mm-dd" size="10" value="<?= $release["date_occurred"] !== "0000-00-00" ? $release["date_occurred"] : null; ?>" />
 				</div>
-				<div class="input__group any--flex-grow">
+				
+				<!-- Price -->
+				<div class="input__group">
 					<div class="input__label">
 						Price
 					</div>
-					<input class="input" name="price" placeholder="eg. 1,000 yen" value="<?php echo $release["price"]; ?>" />
+					<input name="price" placeholder="eg. 1,000 yen" size="10" value="<?= $release["price"]; ?>" />
 				</div>
-				<div class="input__group any--flex-grow">
+				
+				<!-- Tax -->
+				<div class="input__group">
+					<label class="input__checkbox">
+						<input class="input__choice" name="is_tax_in" type="checkbox" value="1" <?= $release['is_tax_in'] ? 'checked' : null; ?> />
+						<span class="symbol__unchecked">tax in?</span>
+					</label>
+				</div>
+				
+				<div class="input__group">
 					<div class="input__label">
 						Catalog num
 					</div>
-					<input class="input" name="upc" placeholder="eg. UCCD-001" value="<?php echo $release["upc"]; ?>" />
+					<input name="upc" placeholder="eg. UCCD-001" size="10" value="<?= $release["upc"]; ?>" />
 				</div>
 			</div>
 		</div>
@@ -488,8 +385,13 @@
 		<h3>
 			<?= lang('Details', '詳細', 'div'); ?>
 		</h3>
-		<div class="text text--outlined">
+		<div class="text text--outlined" x-data="{
+																																											showFormat:<?= strlen($release['format_name']) ? 1 : 0; ?>,
+																																											showMoreLabels:0
+																																											}">
 			<div class="input__row">
+				
+				<!-- Medium -->
 				<div class="input__group any--flex-grow">
 					<div class="input__label">
 						Physical medium
@@ -508,6 +410,8 @@
 					</select>
 					<label class="input__select-placeholder" for="medium" tabindex="-1">medium</label>
 				</div>
+				
+				<!-- Format -->
 				<div class="input__group any--flex-grow">
 					<div class="input__label">
 						Format
@@ -526,27 +430,31 @@
 					</select>
 					<label class="input__select-placeholder" for="format" tabindex="-1">format</label>
 				</div>
-				<div class="input__group magazine--hide">
-					<button class="<?php echo $release["format_name"] ? "any--hidden" : ""; ?>" data-show="add__custom-format" type="button">
-						Custom format
-					</button>
+				
+				<!-- Show custom format -->
+				<div class="input__group" x-show="!showFormat">
+					<a class="symbol__edit" href="#" style="line-height:2rem;" @click.prevent="showFormat=1">display as</a>
 				</div>
+				
 			</div>
 			
-			<div class="input__row magazine--hide <?php echo !$release["format_name"] ? "any--hidden" : ""; ?> add__custom-format">
+			<!-- Custom format -->
+			<div class="input__row" x-show="showFormat">
 				<div class="input__group any--flex-grow">
 					<div class="input__label">
 						Custom format
 					</div>
-					<input class="input" name="format_name" placeholder="eg. super best album" value="<?php echo $release["format_name"]; ?>" />
-					<input class="input--secondary" name="format_romaji" placeholder="(romaji)" value="<?php echo $release["format_romaji"]; ?>" />
+					<input name="format_name" placeholder="eg. super best album" value="<?= $release["format_name"]; ?>" />
+					<input class="input--secondary" name="format_romaji" placeholder="(romaji)" value="<?= $release["format_romaji"]; ?>" />
 				</div>
 			</div>
 			
-			<hr class="magazine--hide" />
+			<hr />
 			
-			<!-- Release: venue/limitation -->
-			<div class="input__row magazine--hide">
+			<!-- Venue/limitation -->
+			<div class="input__row">
+				
+				<!-- Venue -->
 				<div class="input__group any--flex-grow">
 					<div class="input__label">
 						Venue
@@ -564,12 +472,13 @@
 					</select>
 					<label class="input__select-placeholder" for="venue" tabindex="-1">venue(s)</label>
 				</div>
+				
+				<!-- Marketed as -->
 				<div class="input__group any--flex-grow">
 					<div class="input__label">
-						Pressing type
+						Marketed as
 					</div>
 					<select class="input" name="press_limitation_name" placeholder="pressing type">
-						
 						<?php
 							foreach($release_attributes as $attribute) {
 								if($attribute['type'] === 'press_limitation_name') {
@@ -581,28 +490,27 @@
 						?>
 					</select>
 				</div>
+				
+				<!-- Num copies -->
 				<div class="input__group any--flex-grow">
 					<div class="input__label">
 						Copies made
 					</div>
-					<input class="input" name="press_limitation_num" placeholder="eg. 1000" size="6" value="<?php echo $release["press_limitation_num"]; ?>" />
+					<input class="input" name="press_limitation_num" placeholder="eg. 1,000" size="6" value="<?= $release["press_limitation_num"]; ?>" />
 				</div>
 			</div>
 			
 			<hr />
 			
-			<!-- Magazine/Release: labels involved -->
+			<!-- Labels involved -->
 			<div class="input__row">
 				<?php
 					$company_types = [ 'label' => '事務所', 'publisher' => '発売元', 'distributor' => '販売元', 'marketer' => 'マーケター', 'manufacturer' => '製造元', 'organizer' => '企画元'  ];
 					
 					foreach($company_types as $company_type => $company_type_jp) {
 						?>
-							<div class="input__group any--flex-grow <?= $company_type != 'label' ? 'magazine--hide' : null; ?> ">
-								<?php
-									echo '<label class="input__label magazine--hide">'.lang($company_type, $company_type_jp, 'hidden').'</label>';
-									echo $company_type === 'label' ? '<label class="input__label magazine--show">'.lang('publisher', '編集・発行', 'hidden').'</label>' : null;
-								?>
+							<div class="input__group any--flex-grow" <?= in_array($company_type, ['marketer','manufacturer','organizer']) ? 'x-show="showMoreLabels"' : null; ?> >
+								<label class="input__label"><?= lang($company_type, $company_type_jp, 'hidden'); ?></label>
 								<select class="input" data-source="labels" id="<?= $company_type; ?>" name="<?php echo $company_type; ?>_id[]" placeholder="<?= $company_type; ?>" multiple data-multiple="true">
 									<?php
 										if(is_array($release[$company_type])) {
@@ -624,107 +532,24 @@
 						<?php
 					}
 				?>
-			</div>
-			<style>
-				.input__select-placeholder {
-					background: hsl(var(--background--bold));
-					background-clip: content-box;
-					color: transparent;
-					left: 0.5rem;
-					line-height: 1.5rem;
-					padding: 0.25rem 0 0.25rem 0.5rem;
-					pointer-events: none;
-					position: absolute;
-					right: 0;
-				}
-				.input__select-placeholder::after {
-					border: 5px solid transparent;
-					border-top-color: hsl(var(--text--secondary));
-					content: "";
-					display: block;
-					height: 0;
-					margin-top: -3px;
-					pointer-events: none;
-					position: absolute;
-					right: 0.5rem;
-					top: 50%;
-					width: 0;
-				}
-				select[multiple] + .input__select-placeholder,
-				select[data-populate-on-click="true"] + .input__select-placeholder {
-					color: hsl(var(--text--secondary));
-				}
-				.selectize-control.input.single + .input__select-placeholder::after {
-					border-color: transparent;
-				}
 				
-				.release--magazine .track__artist.track__artist {
-					display: flex;
-					flex-grow: 1;
-					max-width: none;
-					order: -1;
-				}
-				.release--release .magazine--show:first-of-type + .magazine--hide {
-					margin-top: -0.5rem;
-				}
-			</style>
+				<!-- Show more label options -->
+				<div class="input__group">
+					<a class="symbol__plus" href="#" style="line-height:2rem;" @click.prevent="showMoreLabels=1" x-show="!showMoreLabels">other companies</a>
+				</div>
+				
+			</div>
 		</div>
 		
-		<h3 class="magazine--show">
-			<?= lang('Contents', 'コンテンツ', 'div'); ?>
-		</h3>
-		<div class="text magazine--show">
-			
-			<div class="symbol__help">
-				In each section below, write any artists which have that kind of feature within the magazine. Put a linebreak before each band that isn't in the database.
-			</div>
-			
-			<hr />
-			
-			<div class="input__row">
-				<div class="input__group any--flex-grow">
-					<label class="input__label">Normal features (&lt;2 pages)</label>
-					<textarea class="input input__textarea any--tributable autosize" name="magazine_normal" placeholder="bands appearing"><?= $release['magazine_normal']; ?></textarea>
-				</div>
-			</div>
-			
-			<hr />
-			
-			<div class="input__row">
-				<div class="input__group any--flex-grow">
-					<label class="input__label">Large features (2+ pages)</label>
-					<textarea class="input input__textarea any--tributable autosize" name="magazine_large" placeholder="bands in large features"><?= $release['magazine_large']; ?></textarea>
-				</div>
-			</div>
-			
-			<hr />
-			
-			<div class="input__row">
-				<div class="input__group any--flex-grow">
-					<label class="input__label"><?= lang('Cover artist', 'カバー', 'hidden'); ?></label>
-					<textarea class="input input__textarea any--tributable autosize" name="magazine_cover" placeholder="bands on cover"><?= $release['magazine_cover']; ?></textarea>
-				</div>
-			</div>
-			
-			<hr />
-			
-			<div class="input__row">
-				<div class="input__group any--flex-grow">
-					<label class="input__label">Flyers</label>
-					<textarea class="input input__textarea any--tributable autosize" name="magazine_flyer" placeholder="bands in flyers"><?= $release['magazine_flyer']; ?></textarea>
-				</div>
-			</div>
-			
-		</div>
-		
-		<h3 class="magazine--hide">
+		<h3>
 			<?= lang('Tracklist', 'トラックリスト', 'div'); ?>
 		</h3>
-		<div class="text add__tracklist magazine--hide">
+		<div class="text add__tracklist">
 			<?php
 				ob_start();
 					?>
-						<div class="track ?class">
+						<div class="track ?class" x-data="{ showControls:1, showArtistDisplay:1 }">
+							
 							<div class="input__row track__disc">
 								<div class="input__group any--flex-grow">
 									<span class="input__label track__disc-label">
@@ -749,18 +574,6 @@
 									<input class="input"             value="?name"  name="tracklist[name][]" placeholder="song name" data-easyautocomplete data-src="songs" data-get-value="quick_name" />
 									<input class="input--secondary"  value="?romaji"  name="tracklist[romaji][]"             placeholder="(romaji)" />
 								</div>
-								<div class="input__group track__artist">
-									<label class="input__label">Artist</label>
-									<select class="input" data-populate-on-click="true" name="tracklist[artist_id][]"               placeholder="artist(s)"  data-source="artists" data-multiple="true">
-										<option value=""></option>
-										?artist
-									</select>
-								</div>
-								<div class="input__group track__display-name">
-									<label class="input__label">Display artist name as</label>
-									<input class="input"             value="?artist_display_name"  name="tracklist[artist_display_name][]"    placeholder="artist name" />
-									<input class="input--secondary"  value="?artist_display_romaji"  name="tracklist[artist_display_romaji][]"  placeholder="(romaji)" />
-								</div>
 								
 								<div class="track__song-controls input__group">
 									<button class="track__song-control track__reorder" tabindex="-1" type="button">⇅</button>
@@ -770,33 +583,73 @@
 								</div>
 							</div>
 							
-							<div class="input__row track__tracklist-controls">
+							<!-- Link track to song -->
+							<?php if($_SESSION['username'] === 'inartistic'): ?>
+							<div class="input__row track__song-container" style="margin-top:0;">
+								
 								<div class="input__group">
-									<button class="track__control" data-add="disc" type="button">
-										Add disc
-									</button>
+									<label class="input__label">Linked song</label>
+									<input name="tracklist[song_id][]" value="?song_id" />
+									<!--<select class="input">
+										<option>Cruel Crucible</option>
+									</select>-->
 								</div>
+								
 								<div class="input__group">
-									<button class="track__control" data-add="section" type="button">
-										Add section
-									</button>
+									<label class="input__checkbox">
+										<input class="input__choice" type="checkbox" value="1" />
+										<span class="symbol__unchecked">allow custom name?</span>
+									</label>
 								</div>
-								<div class="input__group">
-									<button class="track__control" data-add="songs" type="button">
-										Add tracks
-									</button>
-								</div>
-								<div class="input__group">
-									<button class="track__control" data-show="track--show-artist" type="button">
-										Show artists
-									</button>
-								</div>
-								<div class="input__group">
-									<button class="track__control" data-show="track--show-artist track--show-display-name" type="button">
-										Show artist display names
-									</button>
-								</div>
+								
 							</div>
+							<?php endif; ?>
+							
+							<!-- Song artist -->
+							<div class="input__row track__song-container" style="margin-top:0;">
+								
+								<!-- Artist -->
+								<div class="input__group track__artist">
+									
+									<label class="input__label">Artist</label>
+									<select class="input" data-populate-on-click="true" name="tracklist[artist_id][]"               placeholder="artist(s)"  data-source="artists" data-multiple="true">
+										<option value=""></option>
+										?artist
+									</select>
+									
+									<a class="symbol__edit" href="#" @click.prevent="showArtistDisplay=1" x-show="!showArtistDisplay">as...</a>
+									
+								</div>
+								
+								<!-- Artist display name -->
+								<div class="input__group track__display-name" x-show="showArtistDisplay">
+									
+									<label class="input__label" x-show="showArtistDisplay">Display artist as</label>
+									<input                          name="tracklist[artist_display_name][]"    placeholder="artist name" value="?artist_display_name" x-show="showArtistDisplay" />
+									<input class="input--secondary" name="tracklist[artist_display_romaji][]"  placeholder="(romaji)"    value="?artist_display_romaji" x-show="showArtistDisplay" />
+									
+								</div>
+								
+							</div>
+							
+							<div class="input__row track__tracklist-controls">
+								
+								<a class="symbol__plus" href="#" @click.prevent="showControls=1" x-show="!showControls">add...</a>
+								
+								<div class="input__group" x-show="showControls">
+									<button class="track__control symbol__release" data-add="disc" type="button">disc</button>
+								</div>
+								
+								<div class="input__group" x-show="showControls">
+									<button class="track__control symbol__section" data-add="section" type="button">section</button>
+								</div>
+								
+								<div class="input__group" x-show="showControls">
+									<button class="track__control symbol__song" data-add="songs" type="button">tracks</button>
+								</div>
+								
+							</div>
+							
 						</div>
 					<?php
 				$template = ob_get_clean();
@@ -836,7 +689,8 @@
 									"romaji" => str_replace(["&#40;", "&#41;"], ["\&#40;", "\&#41;"], $track["romaji"]),
 									"artist" => '<option value="'.$track["artist"]["id"].'" '.($track["artist"]["i7d"] !== $release["artist"]["id"] ? "selected" : null).'>'.$track["artist"]["quick_name"].'</option>',
 									"artist_display_name" => $track["artist"]["display_name"],
-									"artist_display_romaji" => $track["artist"]["display_romaji"]
+									"artist_display_romaji" => $track["artist"]["display_romaji"],
+									'song_id' => $track['song_id'],
 								]);
 							}
 
@@ -861,40 +715,29 @@
 				}
 			?>
 			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			<hr />
-			
-			<div class="symbol__help any--weaken-color" style="margin-bottom: 1rem;">
-				Note: for faster entry, you can copy + paste a list of song titles separated by line breaks.
+			<!-- Whole release controls -->
+			<div style="background:hsl(var(--background--secondary));border-radius:0 0 inherit inherit;margin:-1rem;margin-top:1rem;padding:1rem;" x-data="{ showControls:0 }">
+				
+				<a class="symbol__plus" href="#" @click.prevent="showControls=1" x-show="!showControls">other options</a>
+				
+				<div class="input__row" x-show="showControls">
+					
+					<div class="input__group">
+						<button class="track__control symbol__close" type="button" data-clear>clear</button>
+					</div>
+					
+					<div class="input__group">
+						<button class="track__control symbol__artist" data-show="track--show-artist" type="button">show artists</button>
+					</div>
+					
+					<div class="input__group">
+						<button class="track__control symbol__language" data-show="track--show-artist track--show-display-name" type="button">show display names</button>
+					</div>
+					
+				</div>
+				
 			</div>
 			
-			<button class="track__control" type="button" data-clear>Clear tracklist</button>
 		</div>
 		<div class="any--hidden track__template">
 			<?php
@@ -944,7 +787,7 @@
 				</div>
 			</div>
 
-			<div class="input__row magazine--hide">
+			<div class="input__row">
 				<div class="input__group any--flex-grow">
 					<span class="input__label">
 						Booklet credits
@@ -960,7 +803,7 @@
 				</div>
 			</div>
 
-			<div class="input__row magazine--hide">
+			<div class="input__row">
 				<div class="input__group any--flex-grow">
 					<label class="input__label">
 						Concept/tagline
@@ -977,15 +820,24 @@
 			</div>
 		</div>
 		
+		<!-- Admin -->
+		<?php if( $_SESSION['can_delete_data'] && is_numeric($release['id']) ): ?>
+		<div class="text text--outlined">
+			<div class="input__row">
+				<div class="input__group">
+					<label class="input__label">Delete</label>
+					<button class="symbol__delete" data-role="delete" type="button">Delete</button>
+				</div>
+			</div>
+		</div>
+		<?php endif; ?>
+		
 		<div class="text text--docked">
 			<div class="any--flex input__row" data-role="submit-container">
 				<div class="input__group any--flex-grow">
 					<button class="any--flex-grow" data-role="submit" name="submit" type="submit">
 						Submit
 					</button>
-				</div>
-				<div class="input__group <?= $_SESSION['can_delete_data'] ? null : 'any--hidden'; ?>">
-					<span class="<?= !is_numeric($release["id"]) ? "any--hidden" : ""; ?> input__radio symbol__delete" data-role="delete"></span>
 				</div>
 				<span data-role="status"></span>
 			</div>
@@ -1000,52 +852,6 @@
 		</div>
 	</form>
 </div>
-
-<style>
-	<?php if($_SESSION['username'] === 'inartistic'): ?>
-	@media(max-width:599.99px) {
-		.track__num {
-			width: 100%;
-		}
-		.track__num::before {
-			bottom: auto;
-			top: 0;
-		}
-		.track__song .input, .track__disc .input, .track__section .input {
-			height 2rem;
-			min-height: 2rem;
-			line-height: 2rem;
-			margin-bottom: 0.5rem;
-			padding-bottom: 0;
-			padding-top: 0;
-			border-radius: 3px 3px 0 0 !important;
-			width: 100%;
-		}
-		.track__song .input--secondary, .track__disc .input--secondary, .track__section .input--secondary {
-			border-radius: 0 0 3px 3px !important;
-			width: 100%;
-		}
-		.track__song, .track__disc, .track__section {
-			flex-direction: column;
-		}
-		.track__disc, .track__disc .input__group {
-			flex-direction: column;
-			flex-wrap: wrap;
-		}
-		.track__artist {
-			flex-grow: 1;
-			margin-bottom: 1rem;
-			width: 100%;
-		}
-		.track {
-		}
-		.add__tracklist {
-			padding-left: 0;
-			padding-right: 0;
-		}
-	}
-	<?php endif; ?>
-</style>
 
 <?php
 $documentation_page = 'releases';

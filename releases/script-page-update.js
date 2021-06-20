@@ -1,12 +1,31 @@
+// If click to show song details, make sure we have appropriate lists
+function checkLists() {
+	
+	// artistid = xxx
+	
+	let x = document.querySelector('[data-contains="songs_' + artistId + '_list"]');
+	
+}
+
+
+
+
+
+let xx = document.querySelector('.track--show-song');
+let trackArtistId = xx.querySelector('[name="tracklist[artist_id][]"]').value;
+
+getJsonLists( trackArtistId, [ 'songs' ] );
+
+
+
 // Set track numbers on initial load
-resetTrackNums();
+//resetTrackNums();
 
 // Attach showElem() to any "show element" buttons
 $(document).on("click", "[data-show]", function(event) {
 	event.preventDefault();
 	showElem($(this));
 });
-
 
 // When editing release, if main artist changed, change all track artists
 var idElem = document.querySelector('[name="id"]');
@@ -29,80 +48,27 @@ if(idElem.value.length) {
 	});
 }
 
-// Show/hide certain elements if artist is omnibus or magazine
-let bodyElem = document.querySelector('body');
+// Show/hide certain elements if artist is omnibus
 let formElem = document.querySelector('[name=add]');
 let artistElem = document.querySelector('[name=artist_id]');
 let omnibusId = 0;
-let magazineId = 8767;
-let mediumId = 14;
-let formatId = 53;
 
 function swapTemplate(formElem, artistId) {
+	
 	if(artistId == omnibusId) {
 		showElem({
 			'data_show': 'track--show-artist'
 		});
 	}
 	
-	// Changing *to* magazine
-	if(artistId == magazineId) {
-		if(formElem.classList.contains('release--release')) {
-			
-			bodyElem.classList.remove('any--pulse');
-			setTimeout(function() {
-				bodyElem.classList.add('any--pulse');
-			}, 0);
-			
-			formElem.classList.add('release--magazine');
-			formElem.classList.remove('release--release');
-			
-			// Auto-set format and medium
-			var mediumElem = document.querySelector('[name="medium[]"]').selectize;
-			mediumElem.setValue(mediumId);
-			
-			var formatElem = document.querySelector('[name="format[]"]').selectize;
-			formatElem.setValue(formatId);
-			
-			// Auto-select magazine name elem
-			document.querySelector('[name="magazine_name"]').selectize.focus();
-		}
-	}
-	
-	// Changing back to normal release
-	else {
-		if(formElem.classList.contains('release--magazine')) {
-			
-			bodyElem.classList.remove('any--pulse');
-			setTimeout(function() {
-				bodyElem.classList.add('any--pulse');
-			}, 0);
-			
-			formElem.classList.remove('release--magazine');
-			formElem.classList.add('release--release');
-		}
-	}
 }
 
 swapTemplate(formElem, artistElem.value);
 
 $(artistElem).on('change', function() {
 	let artistId = $(this).val();
-	if( artistId != magazineId ) {
-		swapTemplate(formElem, artistId);
-	}
+	swapTemplate(formElem, artistId);
 });
-
-
-// Set showElem() to fire on artist options if release artist is omnibus
-/*if($("[name=artist_id]").val() === "0") {
-	showElem({ "data_show" : "track--show-artist" });
-}
-$("[name=artist_id]").on("change", function(event) {
-	if($(this).val() === "0") {
-		showElem({ "data_show" : "track--show-artist" });
-	}
-});*/
 
 // Look for dropdowns, apply selectize() when appropriate
 lookForSelectize();
@@ -114,7 +80,7 @@ var el = document.getElementsByClassName("add__tracklist")[0];
 var sortable = new Sortable(el, {
 	handle    : ".track__reorder",
 	draggable : ".track--show-song",
-	onEnd     : function(evt) { resetTrackNums(); },
+	//onEnd     : function(evt) { resetTrackNums(); },
 	delay : 0,
 	scroll    : true,
 	scrollSensitivity : 60,
@@ -186,7 +152,7 @@ $(document).on("click", "[data-add]", function(event) {
 		);
 	}
 	
-	resetTrackNums();
+	//resetTrackNums();
 	lookForSelectize();
 	
 	let eacElems = document.querySelectorAll('[data-easyautocomplete]:not([data-easyautocompleted])');
@@ -221,7 +187,7 @@ submitButton.addEventListener('submit', function(event) {
 	} 
 
 	// Use the initInlineSubmit function, set to fire immediately
-	initializeInlineSubmit($("[name=add]"), "/releases/function-add.php",{
+	initializeInlineSubmit($("[name=add]"), "/releases/function-update.php",{
 		showEditLink : true,
 		callbackOnSuccess : function(formElement, returnedData) {
 			var e = new Event('item-id-updated');
@@ -234,23 +200,29 @@ submitButton.addEventListener('submit', function(event) {
 	
 });
 
+
+// ========================================================
 // Delete
-$(document).on("click", "[data-role=delete]", function(event) {
-	event.preventDefault();
+// ========================================================
+let deleteButton = document.querySelector('[data-role="delete"]');
+
+if( deleteButton ) {
 	
-	$(this).html("Delete?");
+	let deleteContainerElem = deleteButton.closest('.text');
+	let resultElem = document.querySelector('[data-role="result"]');
 	
-	initializeInlineSubmit($("[name=add]"), "/releases/function-delete_release.php", {
-		submitButton : $("[data-role=delete]"),
-		submitOnEvent : "click",
-		callbackOnSuccess : function(formElement, returnedData) {
-			
-			setTimeout(function() {
-				changePageState("add");
-			}, 2000);
-		}
+	initDelete( $(deleteButton), '/releases/function-delete.php', { 'id': document.querySelector('[name="id"]').value }, function(formElem, returnedData) {
+		
+		resultElem.innerHTML = returnedData.result;
+		resultElem.classList.remove('any--hidden');
+		
+		setTimeout(function() {
+			changePageState("add");
+		}, 2000);
+		
 	});
-});
+	
+}
 
 // Reset to "add" state
 function changePageState(state) {
@@ -262,7 +234,7 @@ function changePageState(state) {
 	if(state === "add") {
 		$("h1").addClass(hideClass);
 		$("h2").html("Add release");
-		$("[data-role=delete]").addClass(hideClass);
+		deleteContainerElem.classList.add(hideClass);
 		$("[data-role=status]").removeClass();
 		$("[data-role=result").html("");
 		$("[data-role=submit-container]").removeClass(hideClass);
@@ -288,7 +260,7 @@ function changePageState(state) {
 	else if(state === "edit") {
 		$("h1").removeClass(hideClass);
 		$("h2").html("Edit release");
-		$("[data-role=delete]").removeClass(hideClass);
+		deleteContainerElem.classList.remove(hideClass);
 		$("[data-role=status]").removeClass();
 		$("[data-role=result").html("");
 		$("[data-role=submit-container]").removeClass(hideClass);

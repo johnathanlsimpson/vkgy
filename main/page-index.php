@@ -57,7 +57,7 @@ ob_start();
 	</div>
 	
 	<!-- Featured cards -->
-	<div class="col c1">
+	<div class="col c1 intro__cards-container any--scrollbar any--permanent-scrollbar">
 		<div class="intro__cards">
 			
 			<?php foreach($latest_items as $item_key => $latest_item): ?>

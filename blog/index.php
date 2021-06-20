@@ -52,8 +52,6 @@ if(!empty($_GET["entry"]) && !$_GET["action"]) {
 		
 		subnav(["Edit article" => "/blog/".$entry["friendly"]."/edit/"], 'interact', true);
 		
-		update_views("blog", $entry["id"], $pdo);
-		
 		if(is_array($entry['tags']) && !empty($entry['tags'])) {
 			foreach($entry['tags'] as $tag) {
 				if($tag['friendly'] === 'interview') {

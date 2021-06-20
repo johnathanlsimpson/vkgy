@@ -50,6 +50,10 @@ script([
 		<!-- Display critical styles -->
 		<?= display_styles( 'top', true, false ); ?>
 		
+		<!-- Fonts -->
+		<link rel="preconnect" href="https://fonts.gstatic.com">
+		<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+		
 		<!-- RSS -->
 		<link rel="alternate" href="https://vk.gy/rss/" title="RSS feed | vk.gy (ブイケージ)" type="application/rss+xml" />
 		
