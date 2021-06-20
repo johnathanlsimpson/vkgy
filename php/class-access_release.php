@@ -1,5 +1,6 @@
 <?php
 	include_once("../php/include.php");
+include_once('../php/class-song.php');
 	
 	class access_release {
 		private $artists = [];
@@ -22,6 +23,7 @@
 			$this->access_user = new access_user($this->pdo);
 			$this->access_comment = new access_comment($this->pdo);
 			$this->access_artist = new access_artist($this->pdo);
+			$this->access_song = new song($this->pdo);
 		}
 		
 		
@@ -99,6 +101,7 @@
 		// ======================================================
 		// Extract notes from track
 		// ======================================================
+		// Eventually we should move this into a newer function in the songs class
 		function get_notes_from_track($input_track) {
 			if(!empty($input_track["name"]) || $input_track["name"] === "0") {	
 				$note_pattern = "\((.+?)\)";
@@ -204,6 +207,136 @@
 				return (is_array($output_tracklist) ? $output_tracklist : []);
 			}
 		}
+	
+	
+	
+	// =======================================================
+	// Update tracklist
+	// =======================================================
+	public function update_tracklist( $release_id, $tracklist ) {
+		
+		// Make sure we have release
+		if( is_numeric($release_id) ) {
+			
+			// Make sure we have tracklist
+			if( is_array($tracklist) && !empty($tracklist) ) {
+				
+				// Get keys and count as a helper
+				$track_keys = array_keys( $tracklist[0] );
+				$num_tracks = count( $tracklist );
+				$num_extant_tracks = 0;
+				
+				// Loop through tracks and get associated songs if necessary
+				foreach( $tracklist as $track_key => $track ) {
+					
+					// If no song ID and title not custom, attempt to find song from custom title
+					if( !is_numeric( $track['song_id'] ) && !$track['is_custom'] ) {
+						
+						// Try to guess song--will automatically create song if necessary
+						$song_id = $this->access_song->get_song_from_track([
+							'name' => $track['name'],
+							'romaji' => $track['romaji'],
+							'artist_id' => $track['artist_id'],
+							'release_id' => $track['release_id'],
+							'date_occurred' => $track['date_occurred'],
+						]);
+						
+						// If we found a song, then update track with it--unnecessary titles will be removed in next step
+						if( is_numeric($song_id) ) {
+							$track['song_id'] = $song_id;
+						}
+						
+					}
+					
+					// If has song ID but title not custom, remove custom title
+					if( is_numeric( $track['song_id'] ) && !$track['is_custom'] ) {
+						//$track['name'] = null;
+						//$track['romaji'] = null;
+					}
+					
+					// Update master tracklist
+					$tracklist[ $track_key ] = $track;
+					
+				}
+				
+				// Get extant tracks on release
+				$sql_extant = 'SELECT id FROM releases_tracklists WHERE release_id=?';
+				$stmt_extant = $this->pdo->prepare($sql_extant);
+				if( $stmt_extant->execute([ $release_id ]) ) {
+					$extant_track_ids = $stmt_extant->fetchAll(PDO::FETCH_COLUMN);
+					$num_extant_tracks = count( $extant_track_ids );
+				}
+				else {
+					$output['result'] = 'Couldn\'t get extant tracklist.';
+				}
+				
+				// If we have extant tracks, we'll either need to update them w/ new info or delete them (if release now has fewer tracks)
+				if( is_array($extant_track_ids) && !empty($extant_track_ids) ) {
+					foreach( $extant_track_ids as $track_index => $extant_track_id ) {
+						
+						// Update extant track
+						if( isset( $tracklist[ $track_index ] ) ) {
+							$sql_tracks[] = 'UPDATE releases_tracklists SET '.implode( '=?, ', $track_keys ).'=? WHERE id=? LIMIT 1';
+							$values_tracks[] = array_merge( $tracklist[ $track_index ], [ $extant_track_id ] );
+						}
+						
+						// Delete unneeded track
+						else {
+							$sql_tracks[] = 'DELETE FROM releases_tracklists WHERE id=? LIMIT 1';
+							$values_tracks[] = [ $extant_track_id ];
+						}
+						
+					}
+				}
+				
+				// Now we have to see if there are any tracks we have to create (if more tracks in the new tracklist than were in extant tracks)
+				if( $num_tracks > $num_extant_tracks ) {
+					foreach( array_slice( $tracklist, $num_extant_tracks ) as $track ) {
+						$sql_tracks[] = 'INSERT INTO releases_tracklists ('.implode( ', ', $track_keys ).', release_id) VALUES ('.str_repeat( '?, ', count($track_keys) ).'?)';
+						$values_tracks[] = array_merge( $track, [ $release_id ] );
+					}
+				}
+				
+				// Now if we have some queries to run, run them
+				if( is_array($sql_tracks) && !empty($sql_tracks) && count($sql_tracks) === count($values_tracks) ) {
+					foreach( $sql_tracks as $sql_index => $sql_track ) {
+						
+						// Attempt to prepare
+						if( $stmt_track = $this->pdo->prepare( $sql_track ) ) {
+							
+							// Make sure values aren't associative
+							$values_track = array_values( $values_tracks[ $sql_index ] );
+							
+							// Attempt to run query
+							if( $stmt_track->execute( $values_track ) ) {
+								$output['status'] = 'success';
+							}
+							else {
+								$output['result'] = 'Couldn\'t run track query.'.$sql_track.print_r($values_track,true);
+							}
+							
+						}
+						else {
+							$output['result'] = 'Couldn\'t prepare track query.'.$sql_track;
+						}
+						
+					}
+				}
+				
+			}
+			else {
+				$output['result'] = 'Tracklist can\'t be empty.';
+			}
+			
+		}
+		else {
+			$output['result'] = 'Release is missing.';
+		}
+		
+		$output['status'] = $output['status'] ?: 'error';
+		return $output;
+		
+	}
 		
 		
 		
@@ -720,7 +853,7 @@
 				
 				// Check if tracklist needed, get tracklist, append to release
 				if($args["get"] === "basics" || $args["get"] === "all") {
-					$sql_tracklist = "SELECT release_id, name, romaji, disc_num, disc_name, disc_romaji, section_num, section_name, section_romaji, track_num, artist_id, artist_display_name, artist_display_romaji FROM releases_tracklists WHERE release_id IN (".str_repeat("?,", count((is_array($args["release_id"]) ? $args["release_id"] : [$args["release_id"]])) - 1)."?".") ORDER BY release_id ASC, id ASC, disc_num ASC, section_num ASC, track_num ASC";
+					$sql_tracklist = "SELECT release_id, song_id, name, romaji, disc_num, disc_name, disc_romaji, section_num, section_name, section_romaji, track_num, artist_id, artist_display_name, artist_display_romaji FROM releases_tracklists WHERE release_id IN (".str_repeat("?,", count((is_array($args["release_id"]) ? $args["release_id"] : [$args["release_id"]])) - 1)."?".") ORDER BY release_id ASC, id ASC, disc_num ASC, section_num ASC, track_num ASC";
 					$stmt_tracklist = $this->pdo->prepare($sql_tracklist);
 					$stmt_tracklist->execute(is_array($args["release_id"]) ? $args["release_id"] : [$args["release_id"]]);
 					$rslt_tracklist = $stmt_tracklist->fetchAll();

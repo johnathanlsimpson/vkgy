@@ -50,7 +50,6 @@ function sanitize($input, $modifier = NULL) {
 	$search = [ "?", "\\", "<", ">", "\"", "'", '﻿' ];
 	$replace = [ "&#63;", "&#92;", "&#60;", "&#62;", "&#34;", "&#39;", '' ];
 	
-	
 	if( $modifier === 'alpine' ) {
 		
 		$search[] = '{';
