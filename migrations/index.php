@@ -2,6 +2,7 @@
 
 include_once('../php/include.php');
 
+$migration = '20210618-blogs_and_views.php';
 //$migration = '20201115-development.php';
 //$migration = '20210326-artist_years.php';
 
@@ -21,15 +22,20 @@ if($_SESSION['username'] === 'inartistic') {
 				
 				foreach($sql as $sql_line) {
 					
-					$stmt = $pdo->prepare($sql_line);
-					
-					if($stmt->execute()) {
-						echo $sql_line.'<br />';
-						echo 'Migration completed.<br /><br />';
+					if( $stmt = $pdo->prepare($sql_line) ) {
+						
+						if($stmt->execute()) {
+							echo $sql_line.'<br />';
+							echo 'Migration completed.<br /><br />';
+						}
+						else {
+							echo $sql_line.'<br />';
+							echo 'Something went wrong.<br /><br />';
+						}
+						
 					}
 					else {
-						echo $sql_line.'<br />';
-						echo 'Something went wrong.<br /><br />';
+						echo 'Couldn\'t prepare.<br />'.$sql_line.'<br /><br />';
 					}
 					
 				}
