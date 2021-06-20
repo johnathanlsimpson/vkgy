@@ -161,10 +161,15 @@ RewriteRule  ^musicians/(\d+)/[\w-]+/?$  /?musicians/&id=$1
 
 RewriteRule  ^php/?$  / [R=permanent,L]
 
-RewriteRule  ^releases/add(?:/([\w-]+))?/?$              /?releases/page-add&artist=$1$2
-RewriteRule  ^releases/([\w\-]+)/?$                   /?releases/&artist=$1
+RewriteRule  ^releases/add(?:/([\w-]+))?/?$                                          /?releases/page-update&artist=$1$2
+RewriteRule  ^releases/([\w\-]+)/?$                                                  /?releases/&artist=$1
 RewriteRule  ^releases/([\w\-]*)/(\d+)/[\w\-]*/?(?:\&prev_next_artist=(\d+))?$       /?releases/&id=$2&artist=$1&prev_next_artist=$3
-RewriteRule  ^releases/([\w\-]*)/(\d+)/[\w\-]*/edit/?(?:\&prev_next_artist=(\d+))?$  /?releases/page-add&release=$2&artist=$1&prev_next_artist=$3
+RewriteRule  ^releases/([\w\-]*)/(\d+)/[\w\-]*/edit/?(?:\&prev_next_artist=(\d+))?$  /?releases/page-update&release=$2&artist=$1&prev_next_artist=$3
+
+RewriteRule  ^songs/add(?:/([\w-]+))?/?$             /?songs/page-update&artist=$1
+RewriteRule  ^songs/([\w\-]+)/?$                     /?songs/&artist=$1
+RewriteRule  ^songs/([\w\-]*)/(\d+)/[\w\-]*/?$       /?songs/&song_id=$2
+RewriteRule  ^songs/([\w\-]*)/(\d+)/[\w\-]*/edit/?$  /?songs/page-update&song_id=$2
 
 RewriteRule  ^tag-source  /releases/page-tag-source.php
 
