@@ -5,7 +5,7 @@
 **/
 :root {
 	--font--primary: "brackets", tahoma, "Noto Sans JP", メイリオ, Meiryo, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
-	--font--secondary: monospace, "brackets", メイリオ, Meiryo, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "ＭＳ Ｐゴシック", "MS PGothic", serif;
+	--font--secondary: 'brackets', 'IBM Plex Mono', monospace, メイリオ, Meiryo, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "ＭＳ Ｐゴシック", "MS PGothic", serif;
 	--gutter: 2vw;
 	--negative-gutter: -2vw;
 	--page-max-width: 1800px;
@@ -348,17 +348,17 @@ body {
 	* LINKS
 	* ========================================================
 	*/
-	a {
+	a, .a {
 		border-color: hsl(var(--interactive--secondary));
 		color: hsl(var(--interactive--secondary));
 		text-decoration: none;
 	}
-	a:hover {
+	a:hover, .a:hover {
 		border-color: hsl(var(--interactive));
 		color: hsl(var(--interactive));
 		cursor: pointer;
 	}
-	a:hover img {
+	a:hover img, .a:hover img {
 		opacity: 0.75;
 	}
 	.a--inherit {
@@ -495,7 +495,8 @@ body {
 	.h5, h5, .input__label {
 		color: hsl(var(--text--secondary));
 		font-family: var(--font--secondary);
-		font-size: 0.8rem;
+		font-size: 0.75rem;
+		font-weight: 500;
 		letter-spacing: 1px;
 		text-transform: uppercase;
 	}
@@ -1357,6 +1358,7 @@ body {
 	/* PAGE HEADER: TEXT */
 	.header__header {
 		margin-right: auto;
+		max-width: 100%;
 		width: auto;
 	}
 

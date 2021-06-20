@@ -353,8 +353,12 @@ opacity: 1;
 
 /* Scrollbars */
 .any--scrollbar {
+	--scrollbar-resting-opacity: 0.5;
 	scrollbar-width: 10px;
 	scrollbar-color: black transparent;
+}
+.any--scrollbar:not(.any--permanent-scrollbar) {
+	--scrollbar-resting-opacity: 0.0;
 }
 .any--scrollbar::-webkit-scrollbar {
 	height: 10px;
@@ -362,12 +366,12 @@ opacity: 1;
 }
 .any--scrollbar::-webkit-scrollbar-thumb {
 	border-radius: 5px;
-	background-color: rgba(0,0,0,0);
+	background-color: hsla(var(--text),var(--scrollbar-resting-opacity));
 	opacity: 0;
 	transition: background-color 0.1s linear;
 }
 .any--scrollbar:hover::-webkit-scrollbar-thumb {
-	background-color: rgba(0,0,0,0.5);
+	background-color: hsla(var(--text),0.5);
 }
 .any--scrollbar::-webkit-scrollbar-track {
 	background: transparent;
@@ -1220,6 +1224,14 @@ input {
 .input__checkbox {
 	margin-top: 0.5rem;
 	margin-right: 0.5rem;
+}
+.input__radio:first-of-type:last-of-type,
+.input__checkbox:first-of-type:last-of-type {
+	margin-right: 0;
+}
+.input__radio:active, .input__radio:focus, .input__radio:focus-within,
+.input__checkbox:active, .input__checkbox:focus, .input__checkbox:focus-within {
+	box-shadow: inset 0 -14px 0 -12px hsl(var(--interactive--secondary)); /* Weird values are to overcome the border radius so the bottom line looks straight */
 }
 li > .input__radio:last-of-type,
 li > .input__checkbox:last-of-type {
