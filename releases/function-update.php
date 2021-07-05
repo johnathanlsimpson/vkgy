@@ -4,15 +4,17 @@ include_once("../php/include.php");
 include_once("../php/class-parse_markdown.php");
 include_once("../php/class-auto_blogger.php");
 include_once("../php/class-song.php");
+
 $auto_blogger = new auto_blogger($pdo);
 $markdown_parser = new parse_markdown($pdo);
 $access_song = new song($pdo);
 $access_release = new access_release($pdo);
+$sanitizer = new sanitizer();
 
 // Grab all vars and remove ones that are unnecessary/will be processed separately
 $release = $_POST;
 foreach([ 'submit', 'post', 'medium', 'format', 'venue_limitation', 'press_limitation_name' ] as $key) {
-	unset($_POST[$key]);
+	unset($release[$key]);
 }
 
 if( is_array($release) && !empty($release) ) {
@@ -24,9 +26,9 @@ if( is_array($release) && !empty($release) ) {
 			if( strlen( $release['name'] ) ) {
 				
 				$is_edit = is_numeric($release["id"]) ? true : false;
-
+				
 				// Format certain fields
-				$release['romaji']        = $access_song->match_japanese($release['name'], $release['romaji']);
+				$release['romaji']        = $sanitizer->match_romaji_to_japanese($release['name'], $release['romaji']);
 				$release["user_id"]       = $_SESSION["user_id"];
 				$release["friendly"]      = friendly($release["friendly"] ?: ($release["romaji"] ?: $release["name"])." ".($release["press_romaji"] ?: $release["press_name"])." ".($release["type_romaji"] ?: $release["type_name"]));
 				$release["date_occurred"] = str_replace(["y", "m", "d"], "0", $release["date_occurred"]) ?: "0000-00-00";
@@ -78,8 +80,8 @@ if( is_array($release) && !empty($release) ) {
 					$release[$company_type] = (!empty($release[$company_type][0]) ? "(".implode(")(", $release[$company_type]).")" : null);
 				}
 
-				// Build tracklist
-				foreach(["disc_name", "disc_romaji", "section_name", "section_romaji", "name", "romaji", 'song_id', "artist_id", "artist_display_name", "artist_display_romaji"] as $key) {
+				// Build tracklist with allowed keys
+				foreach(["disc_name", "disc_romaji", "section_name", "section_romaji", "name", "romaji", 'notes_name', 'notes_romaji', 'song_id', 'is_custom', "artist_id", "artist_display_name", "artist_display_romaji"] as $key) {
 					for($i = 0; $i < count(reset($release["tracklist"])); $i++) {
 						$tmp_tracklist[$i][$key] = $release["tracklist"][$key][$i];
 					}
@@ -110,9 +112,9 @@ if( is_array($release) && !empty($release) ) {
 							$track_num++;
 
 							// Clean values
-							$line['disc_romaji'] = $access_song->match_japanese($line['disc_name'], $line['disc_romaji']);
-							$line['section_romaji'] = $access_song->match_japanese($line['section_name'], $line['section_romaji']);
-							$line['romaji'] = $access_song->match_japanese($line['name'], $line['romaji']);
+							$line['disc_romaji'] = $sanitizer->match_romaji_to_japanese($line['disc_name'], $line['disc_romaji']);
+							$line['section_romaji'] = $sanitizer->match_romaji_to_japanese($line['section_name'], $line['section_romaji']);
+							$line['romaji'] = $sanitizer->match_romaji_to_japanese($line['name'], $line['romaji']);
 
 							$tracklist[] = [
 								"track_num" => $track_num ?: null,
@@ -127,8 +129,12 @@ if( is_array($release) && !empty($release) ) {
 								"artist_id" => is_numeric($line["artist_id"]) ? $line["artist_id"] : $release["artist_id"],
 								"artist_display_name" => $line["artist_display_name"] ?: null,
 								"artist_display_romaji" => $line["artist_display_romaji"] ?: null,
-								'song_id' => $line['song_id'],
+								'song_id'               => $line['song_id'],
+								'is_custom'             => $line['is_custom'] ? 1 : 0,
+								'notes_name'            => $line['notes_name'],
+								'notes_romaji'          => $line['notes_romaji'],
 							];
+							
 						}
 					}
 				}
@@ -139,8 +145,36 @@ if( is_array($release) && !empty($release) ) {
 
 					// Had a special cleaner for release variables, but I think sanitize does all of this now?
 					// May need to change back to clean_values
-					array_walk_recursive( $release, 'sanitize' );
-
+					
+					// I used to use array_walk_recursive for this and it worked fine, but something's gone wrong
+					// Thought maybe it was due to changing sanitize to be part of a sanitizer class,
+					// but even if I separate the function back out into a temp function and call it, the walk
+					// does nothing... so idk. This will just force each value to be sanitized, but only
+					// to the second level. The tracklist is handled separately anyway so it should work for now
+					foreach( $release as $temp_key => $temp_value ) {
+						
+						if( !is_array($temp_value) ) {
+							
+							$release[ $temp_key ] = $sanitizer->sanitize( $temp_value );
+							
+						}
+						
+						else {
+							
+							foreach( $temp_value as $temp_temp_key => $temp_temp_value ) {
+								
+								if( !is_array( $temp_temp_value ) ) {
+									
+									$release[ $temp_key ][ $temp_temp_key ] = $sanitizer->sanitize( $temp_value );
+									
+								}
+								
+							}
+							
+						}
+						
+					}
+					
 					// Get remaining fields
 					foreach($release as $key => $value) {
 						if(!in_array($key, ["id", "tracklist"]) && strpos($key, "image_") !== 0) {
@@ -157,7 +191,7 @@ if( is_array($release) && !empty($release) ) {
 					else {
 						$sql_release = "INSERT INTO releases (".implode(", ", $sql_keys).") VALUES(".implode(", ", array_fill(0, count($sql_values), "?")).")";
 					}
-
+					
 					if($stmt = $pdo->prepare($sql_release)) {
 
 						// Run main query
@@ -206,14 +240,14 @@ if( is_array($release) && !empty($release) ) {
 										}
 									}
 								}
-
+								
 								// Check current release/attribute connections
 								$values_del_attributes = [];
 								$sql_extant_attributes = 'SELECT * FROM releases_releases_attributes WHERE release_id=?';
 								$stmt_extant_attributes = $pdo->prepare($sql_extant_attributes);
 								$stmt_extant_attributes->execute([ $release['id'] ]);
 								$rslt_extant_attributes = $stmt_extant_attributes->fetchAll();
-
+								
 								foreach($rslt_extant_attributes as $extant_attribute_key => $extant_attribute) {
 
 									// If already set, remove from query
@@ -257,7 +291,7 @@ if( is_array($release) && !empty($release) ) {
 								}
 								
 								// Update tracklist
-								$tracklist_output = $access_release->update_tracklist( $release['id'], $release['tracklist'] );
+								$tracklist_output = $access_release->update_tracklist( $release['id'], $release['tracklist'], $release['date_occurred'] );
 								
 								// If tracklist was ok, output final result
 								

@@ -1,32 +1,39 @@
 <?php
-	function clean_values(&$value, $key) {
-		$value = sanitize($value);
+	/*function clean_values(&$value, $key) {
 		
-		// Sanitize seems to be replacing spaces with &nbsp; *sometimes*, which we don't really want
-		// but rather than modify sanitize which is used across the site, let's start here
-		$value = str_replace('&nbsp;', ' ', $value);
-		
-		foreach([
-			"&#92;("     => "\\(",
-			"&#92;)"     => "\\)",
-			"\'"         => "&#39;",
-			"&#92;&#39;" => "&#39;",
-			"'"          => "&#39;",
-			"&#65374;"   => "~",
-			"&#65378;"   => "&#12300;",
-			"&#65379;"   => "&#12301;",
-			"&#12288;"   => " ",
-		] as $search => $replace) {
-			$value = str_replace($search, $replace, $value);
+		if( !is_array($value) ) {
+			
+			$value = sanitize($value);
+
+			// Sanitize seems to be replacing spaces with &nbsp; *sometimes*, which we don't really want
+			// but rather than modify sanitize which is used across the site, let's start here
+			$value = str_replace('&nbsp;', ' ', $value);
+
+			foreach([
+				"&#92;("     => "\\(",
+				"&#92;)"     => "\\)",
+				"\'"         => "&#39;", // apostrophe
+				"&#92;&#39;" => "&#39;", // apostrophe
+				"'"          => "&#39;", // apostrophe
+				"&#65374;"   => "~", // tilde
+				"&#65378;"   => "&#12300;", // bracket
+				"&#65379;"   => "&#12301;", // bracket
+				"&#12288;"   => " ", // wide space
+			] as $search => $replace) {
+				$value = str_replace($search, $replace, $value);
+			}
+
+			$value = trim($value);
+			$value = preg_replace('/'.'\h+'.'/', ' ', $value); // remove whitespace
+			$value = mb_strlen($value, 'utf-8') > 0 ? $value : null; // make null
+			
 		}
 		
-		$value = trim($value);
-		$value = preg_replace('/'.'\h+'.'/', ' ', $value);
-		$value = mb_strlen($value, 'utf-8') > 0 ? $value : null;
-	}
+	}*/
 	
+	// This is in songs class now
 	// Compare romaji to Japanese and correct "translations" of symbols
-	function match_japanese($japanese, $romaji) {
+	/*function match_japanese($japanese, $romaji) {
 		
 		// Standardize (but undo entity transform)
 		$japanese = html_entity_decode(sanitize($japanese), ENT_QUOTES, 'utf-8');
@@ -102,5 +109,5 @@
 		}
 		
 		return $romaji;
-	}
+	}*/
 ?>
