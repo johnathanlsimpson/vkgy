@@ -1,55 +1,18 @@
-/* Get songs */
-function getSongs() {
-	var artistId     = $("[name=artist_id]").val();
-	var dataElem     = $("[data-contains=songs]");
-	var data         = { "artist_id" : artistId };
-	var processorUrl = "/releases/function-get_song_list.php";
-	
-	$(dataElem).load(processorUrl, data);
-}
-
-
-
-/* Fire getSongs() if artist selected on load, or if artist changed */
-var artistIdElem = $("[name=artist_id]");
-
-if(artistIdElem.val().length > 0) {
-	getSongs();
-}
-
-artistIdElem.on("change", function() {
-	getSongs();
-	resetEasyAutocomplete();
-});
-
-
-
-/* Split name and romaji */
-function splitNameAndRomaji(inputText) {
-	inputText = inputText.replace(/\\\(/g, "&#92;&#40;").replace(/\\\)/g, "&#92;&#41;");
-
-	var match = inputText.match(/^(.+?)(?: \((.+)\))?$/);
-	var output = { "name" : (match[2] ? match[2] : match[1]), "romaji" : (match[2] ? match[1] : null) };
-	
-	return output;
-}
-
-
-
 // Given a tracklist name element, take name+romaji string and insert each into its appropriate field
-function insertNameAndRomaji(targetElem, nameAndRomaji) {
+function insertSong( targetElem, songId, name, romaji ) {
 	
-	// Split string into name and romaji
-	var name = nameAndRomaji.name || '';
+	// Undo html entities
 	name = name.replace("&#92;&#41;", "\\)").replace("&#92;&#40;", "\\(");
-	
-	var romaji = nameAndRomaji.romaji || '';
 	romaji = romaji.replace("&#92;&#41;", "\\)").replace("&#92;&#40;", "\\(");
 	
 	// Find parent of name element (given plain JS element), then get romaji element
 	var parentElem = targetElem.parentElement;
 	parentElem = parentElem.classList.contains('input__group') ? parentElem : parentElem.parentElement;
 	var siblingElem = parentElem.querySelector('[name="tracklist[romaji][]"]');
+	
+	// Update song ID
+	let songIdElem = targetElem.closest('.track').querySelector('[name="tracklist[song_id][]"]');
+	songIdElem.value = songId;
 	
 	// Set value of both elements, then focus the romaji element
 	targetElem.value = name;
@@ -76,29 +39,29 @@ function initEasyAutocomplete(targetElem) {
 				let srcType = targetElem.dataset.src;
 				
 				// For now we'll just make assumptions based on data source
-				if(srcType == 'songs') {
+				if( srcType.includes('songs') ) {
 					
-					let nameAndRomaji = splitNameAndRomaji($(targetElem).val());
-					insertNameAndRomaji($(targetElem)[0], nameAndRomaji);
+					let name = $(targetElem).getSelectedItemData()[1];
+					let romaji = $(targetElem).getSelectedItemData()[2];
+					
+					insertSong( $(targetElem)[0], $(targetElem).getSelectedItemData()[0], name, romaji );
 					
 				}
 				
 				else if(srcType == 'types') {
 					
-					let typeAndRomaji = splitNameAndRomaji($(targetElem).val());
+					let typeName = $(targetElem).getSelectedItemData().name;
+					let typeRomaji = $(targetElem).getSelectedItemData().romaji;
 					
-					// Split string into name and romaji
-					let name = typeAndRomaji.name || '';
-					name = name.replace("&#92;&#41;", "\\)").replace("&#92;&#40;", "\\(");
+					// Undo encoding
+					typeName = typeName.replace("&#92;&#41;", "\\)").replace("&#92;&#40;", "\\(");
+					typeRomaji = typeRomaji.replace("&#92;&#41;", "\\)").replace("&#92;&#40;", "\\(");
 					
-					let romaji = typeAndRomaji.romaji || '';
-					romaji = romaji.replace("&#92;&#41;", "\\)").replace("&#92;&#40;", "\\(");
-					
-					document.querySelector('[name="type_name"]').value = name;
-					document.querySelector('[name="type_romaji"]').value = romaji;
+					document.querySelector('[name="type_name"]').value = typeName;
+					document.querySelector('[name="type_romaji"]').value = typeRomaji;
 					
 					// If romaji included, focus on that elem
-					if(romaji && romaji.length) {
+					if(typeRomaji && typeRomaji.length) {
 						document.querySelector('[name="type_romaji"]').focus();
 					}
 					else {
