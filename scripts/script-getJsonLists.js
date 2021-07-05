@@ -48,3 +48,21 @@ function getJsonLists( artistId, listTypes ) {
 	}
 	
 }
+
+// Update dropdowns to use new lists
+function updateDropdownList( artist_id, dropdownElem ) {
+	
+	// Decide what the new data-source will be--assumes that the item type is only one word
+	// Both data-source="musicians" and "musicians_123" need to go to "musicians_456"
+	let dataSourceKey = dropdownElem.getAttribute('data-source');
+	dataSourceKey = dataSourceKey.split('_')[0] + '_' + artist_id;
+	
+	// Update data-source attribute
+	dropdownElem.setAttribute('data-source', dataSourceKey);
+
+	// If no value set but selectize active, destroy it
+	if( !dropdownElem.value.length && dropdownElem.classList.contains('selectized') ) {
+		dropdownElem.selectize.destroy();
+	}
+	
+}
