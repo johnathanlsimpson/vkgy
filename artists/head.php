@@ -101,6 +101,10 @@ subnav([
 	'Tags'                => '/artists/'.$artist['friendly'].'/tags/',
 ]);
 	
+	subnav([
+		lang('Songs', '曲の一覧', 'hidden') => '/songs/'.$artist['friendly'].'/',
+	]);
+	
 if( $rslt_count['news'] ) {
 	subnav([
 		$nav_text['news'] => '/blog/artist/'.$artist['friendly'].'/',
