@@ -1,0 +1,9 @@
+.song__edit {
+	align-self: flex-start;
+	background-clip: content-box;
+	border: 0 solid;
+	border-width: 0 0 0 0.5rem;
+}
+.song__edit, .song__edit:hover {
+	border-color: transparent;
+}
