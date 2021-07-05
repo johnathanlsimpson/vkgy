@@ -74,6 +74,8 @@
 				'can_access_beta_features',
 			],
 			
+			'is_boss' => [],
+			
 		];
 		
 		
@@ -150,8 +152,13 @@
 				// Loop through allowed roles first and make sure they're set (some permissions rely on role)
 				foreach( self::$allowed_roles as $role => $role_permissions ) {
 					
+					// If user we're checking is_boss, give all permissions
+					if( $current_permissions['is_boss'] == 1 ) {
+						$new_permissions[ $role ] = 1;
+					}
+					
 					// If currently set, keep same value
-					if( strlen( $current_permissions[ $role ] ) ) {
+					elseif( strlen( $current_permissions[ $role ] ) ) {
 						$new_permissions[ $role ] = $current_permissions[ $role ];
 					}
 					
@@ -172,8 +179,13 @@
 				// Next, loop through allowed permissions and make sure they're set
 				foreach( self::$allowed_permissions as $permission ) {
 					
+					// If user we're checking is_boss, give all permissions
+					if( $current_permissions['is_boss'] == 1 ) {
+						$new_permissions[ $permission ] = 1;
+					}
+					
 					// If currently set in database, keep same value (this will overwrite values auto set by associated roles)
-					if( isset( $current_permissions[ $permission ] ) ) {
+					elseif( isset( $current_permissions[ $permission ] ) ) {
 						$new_permissions[ $permission ] = $current_permissions[ $permission ];
 					}
 					
@@ -194,10 +206,14 @@
 					
 				}
 				
-				// Now save the new permissions back to JSON and update the DB
+				// Now sort new permissions and put back to JSON
+				ksort( $new_permissions );
+				$new_permissions = json_encode( $new_permissions );
+				
+				// Then save in DB
 				$sql_update = 'UPDATE users SET permissions=? WHERE id=? LIMIT 1';
 				$stmt_update = $this->pdo->prepare($sql_update);
-				$stmt_update->execute([ json_encode( $new_permissions ), $user_id ]);
+				$stmt_update->execute([ $new_permissions, $user_id ]);
 				
 			}
 			
