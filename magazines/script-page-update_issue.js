@@ -14,9 +14,16 @@ function clearInputs(elemsToClear) {
 				elemToClear.selectedIndex = -1;
 			}
 			
-			// Clear checkbox
+			// Clear textarea
 			else if( elemToClear.nodeName == 'TEXTAREA' ) {
+				
 				elemToClear.value = '';
+				
+				// Trigger change if textarea is connected to rich editor
+				if( elemToClear.classList.contains('any--tributable') ) {
+					triggerChange(elemToClear);
+				}
+				
 			}
 			
 			// Clear checkbox
@@ -24,8 +31,9 @@ function clearInputs(elemsToClear) {
 				elemToClear.checked = false;
 			}
 			
-			// Clear checkbox
-			else if( elemToClear.nodeName == 'INPUT' && elemToClear.type == 'text' ) {
+			// Clear text inputs
+			// Making this more generic to also clear type="hidden"--will have to see if this causes problems
+			else if( elemToClear.nodeName == 'INPUT' && ( elemToClear.type == 'text' || elemToClear.type == 'hidden' ) ) {
 				
 				// Idk something weird is going on with Alpine if I don't clear actual value
 				if( elemToClear.getAttribute('x-model') ) {
@@ -113,8 +121,20 @@ function changePageState(state) {
 	// Duplicate or add new issue
 	if( state == 'add' ) {
 		
+		// Remove images if necessary
+		let images = document.querySelectorAll('.image__results .image__template');
+		if(images && images.length) {
+			images.forEach(function(image) {
+				image.remove();
+			});
+		}
+		
 		// Clear inputs unless marked otherwise
-		clearInputs( issueForm.querySelectorAll('[name]:not([data-persist-on-dupe])') );
+		clearInputs( issueForm.querySelectorAll('[name]:not([data-persist-on-dupe]):not([name^="image_"])') );
+		
+		// Leave all but year for date
+		let dateElem = document.querySelector('[name="date_represented"]');
+		dateElem.value = dateElem.value && dateElem.value.length > 0 ? dateElem.value.substring(0, 4) : '';
 		
 		// Clear status and results (this is handled by inlineSubmit for edits but not dupes)
 		statusElem.classList.remove('success', 'loading', 'error', 'symbol__success', 'symbol__loading', 'symbol__error');
@@ -125,17 +145,9 @@ function changePageState(state) {
 		editContainer.classList.add('any--hidden');
 		
 		// Come back to this after we add images
-		/*// Reset defaults for image uploading
+		// Reset defaults for image uploading
 		document.querySelector('[name=image_item_id]').value = null;
 		document.querySelector('[name=image_item_name]').value = null;
-		
-		// Remove images if necessary
-		let images = document.querySelectorAll('.image__results .image__template');
-		if(images && images.length) {
-			images.forEach(function(image) {
-				image.remove();
-			});
-		}*/
 		
 	}
 	

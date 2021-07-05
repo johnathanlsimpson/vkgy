@@ -107,8 +107,11 @@ if( deleteAttributeElems && deleteAttributeElems.length > 0 ) {
 }
 
 // ========================================================
-// On page load
+// Inits
 // ========================================================
+
+// Init inputmask
+$(':input').inputmask();
 
 // Look for dropdowns
 lookForSelectize();
