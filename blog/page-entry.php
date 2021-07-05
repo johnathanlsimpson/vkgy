@@ -376,15 +376,21 @@ if( $entry['is_queued'] ) {
 			<?php if( is_array($entry['artist']) && !empty($entry['artist']) ): ?>
 			<aside class="article__sidebar any--margin">
 				
-				<h2>
-					<?= lang('Profile', 'プロフィール', 'div'); ?>
-				</h2>
+				<?php if( image_exists('/artists/'.$entry['artist']['friendly'].'/main.jpg', $pdo) ): ?>
+					<a href="<?= '/artists/'.$entry['artist']['friendly'].'/'; ?>">
+						<img src="<?= '/artists/'.$entry['artist']['friendly'].'/main.medium.jpg'; ?>" style="height:auto;margin:-1rem -1rem 1rem -1rem;width:calc(100% + 2rem);" />
+					</a>
+				<?php endif; ?>
 				
 				<div class="any--sticky">
+					
+					<h2>
+						<a href="<?= '/artists/'.$entry['artist']['friendly'].'/'; ?>">
+							<?= $entry['artist']['romaji'] ? lang($entry['artist']['romaji'], $entry['artist']['name'], 'div') : $entry['artist']['name']; ?>
+						</a>
+					</h2>
+					
 					<?php
-						
-						// Render artist card
-						$access_artist->artist_card($entry['artist']);
 						
 						// Description
 						echo $entry['artist']['description'] ? '<div class="any--weaken any--small-margin">'.$markdown_parser->parse_markdown($entry['artist']['description']).'</div>' : null;
@@ -479,7 +485,8 @@ if( $entry['is_queued'] ) {
 						
 						// Artist video
 						if( is_array( $entry['artist']['video'] ) && !empty( $entry['artist']['video'] ) ): ?>
-							<div class="article__video">
+							<br /><h5 style="margin-top:1rem;">latest mv</h5>
+							<div class="article__video" style="margin-top:0;bottom:-1rem;">
 								<a class="lazy video__thumbnail" data-src="<?= 'https://img.youtube.com/vi/'.$entry['artist']['video']['youtube_id'].'/hqdefault.jpg'; ?>" href="<?= '/videos/'.$entry['artist']['video']['id'].'/'; ?>"></a>
 								<a class="a--cutout any--weaken-size" href="<?= '/videos/'.$entry['artist']['video']['id'].'/'; ?>"><?= $access_video->clean_title($entry['artist']['video']['youtube_name'], $entry['artist']); ?></a>
 							</div>

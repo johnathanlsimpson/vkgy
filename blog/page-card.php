@@ -25,6 +25,9 @@ $supertitle = $_GET['is_feature'] ? 'feature' : 'news';
 <script src="/scripts/external/script-jquery-3.2.1.js"></script>
 <script src="/scripts/script-inlineSubmit.js"></script>
 
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+
 <style>
 	<?php
 		// Since this page will be viewed individually, need to manually include styles
