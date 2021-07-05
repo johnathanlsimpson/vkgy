@@ -757,3 +757,9 @@ $GLOBALS['page_header_supplement'] = ob_get_clean();
 	
 	<div></div>
 </div>
+
+<style>
+.main__middle-left + .google-auto-placed {
+    display: none !important;
+}
+</style>
