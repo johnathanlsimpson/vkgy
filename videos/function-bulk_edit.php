@@ -30,12 +30,13 @@ if($_SESSION['can_approve_data']) {
 		
 		// Values
 		$values_edit[] = $action === 'approve' ? 0 : ( $action === 'change_type' ? $type : null );
+		$values_edit[] = $action === 'approve' ? 'set flag of video from videos/function-bulk_edit'.print_r($_SESSION,true).print_r($_SERVER,true) : null;
 		$values_edit = array_merge($values_edit, $ids);
 		
 		// Query
 		$sql_edit =
 			'UPDATE videos '.
-			'SET '.($action === 'approve' ? 'is_flagged=?' : null).($action === 'change_type' ? 'type=?' : null).' '.
+			'SET '.($action === 'approve' ? 'is_flagged=?' : null).($action === 'change_type' ? 'type=?' : null).', test=? '.
 			'WHERE ('.substr(str_repeat('id=? OR ', count($ids)), 0, -4).')';
 		$stmt_edit = $pdo->prepare($sql_edit);
 		

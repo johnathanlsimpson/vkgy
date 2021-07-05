@@ -28,7 +28,9 @@ $access_artist = new access_artist($pdo);
 	<!-- Center content -->
 	<div>
 		
-		<a class="video__thumbnail" data-id="<?= $video['youtube_id']; ?>" href="<?= $video['url']; ?>" style="background-image:url(<?= str_replace('mqdefault', 'hqdefault', $video['thumbnail_url']); ?>);"></a>
+		<div class="any--margin">
+			<a class="video--main video__thumbnail" data-id="<?= $video['youtube_id']; ?>" style="background-image:url(<?= str_replace('mqdefault', 'hqdefault', $video['thumbnail_url']); ?>);"></a>
+		</div>
 		
 		<?php if($video['is_flagged']): ?>
 			<div class="moderation__container text text--outlined text--error symbol__error">
@@ -70,7 +72,7 @@ $access_artist = new access_artist($pdo);
 				<!-- Name -->
 				<h2 class="video__name">
 					<div class="h5"><?= $access_video->video_type_descriptions[ $video['type'] ] ?: $video['type']; ?></div>
-					<?= $access_video->clean_title($video['youtube_name'], $video['artist']); ?>
+					<?= $video['romaji'] ? lang($video['romaji'], $video['name'], 'parentheses') : $access_video->clean_title($video['name'], $video['artist']); ?>
 				</h2>
 				
 				<?php /*if($_SESSION['username'] === 'inartistic'): ?>
@@ -82,6 +84,48 @@ $access_artist = new access_artist($pdo);
 					<!-- List -->
 					<?= render_lists_dropdown([ 'item_id' => $video['id'], 'item_type' => 'video' ]); ?>
 				</div>
+				
+				<?php if($_SESSION['username'] === 'inartistic'): ?>
+				
+				<div class="data__container" style="margin-top:3rem;">
+					
+					<!-- Song -->
+					<?php if( $video['song'] ): ?>
+						<div class="data__item">
+							
+							<h5>
+								Featured song
+							</h5>
+							
+							<a class="symbol__song" href="<?= $video['song']['url']; ?>"><?= $video['song']['romaji'] ? lang($video['song']['romaji'], $video['song']['name'], 'parentheses') : $video['song']['name']; ?></a>
+							
+						</div>
+					<?php endif; ?>
+					
+					<!-- Original title -->
+					<div class="data__item any--weaken-color">
+						<h5>Original Title</h5>
+						<?= $video['youtube_name']; ?>
+					</div>
+					
+					<!-- Description -->
+					<input class="obscure__input" id="obscure-description" type="checkbox" <?= substr_count($video['youtube_content'], '<br />') > 6 ? 'checked' : null; ?> />
+					
+					<div class="data__item any--margin obscure__container obscure--height obscure--faint" style="min-height:6rem;">
+						
+						<h5>
+							Description
+						</h5>
+						
+						<div class="any--weaken">
+							<?= $video['youtube_content'] ?: '<span class="symbol__error">No description.</span>'; ?>
+						</div>
+						
+						<label class="input__button obscure__button" for="obscure-description">show description</label>
+						
+					</div>
+				</div>
+				<?php endif; ?>
 				
 				<!-- Description -->
 				<input class="obscure__input" id="obscure-description" type="checkbox" <?= substr_count($video['youtube_content'], '<br />') > 12 ? 'checked' : null; ?> />
@@ -123,19 +167,12 @@ $access_artist = new access_artist($pdo);
 		<div class="text text--outlined">
 			<div class="data__container">
 				
-				<div class="data__item">
+				<!--<div class="data__item">
 					<h5>
-						Views
+						vkgy Views
 					</h5>
 					<?= $video['num_views'] ?: 1; ?>
-				</div>
-				
-				<div class="data__item">
-					<h5>
-						Length
-					</h5>
-					<?= $video['length'] > 0 ? substr($video['length'], 3) : '?'; ?>
-				</div>
+				</div>-->
 				
 				<div class="data__item">
 					<h5>
@@ -206,6 +243,10 @@ $access_artist = new access_artist($pdo);
 </div>
 
 <style>
+	#obscure-description:checked + .obscure__container br {
+		display: none;
+		width: 1rem;
+	}
 	/*.video__thumbnail {
 		background: hsl(var(--background));
 		max-height: none;
@@ -277,3 +318,16 @@ $access_artist = new access_artist($pdo);
 		margin: 0 0 1rem 0;
 	}
 </style>
+
+<?php
+	if( $_GET['autoplay'] ) {
+		?>
+			<script>
+				let videoElem = document.querySelector('.video--main');
+				setTimeout(function() {
+					videoElem.click();
+				},100);
+			</script>
+		<?php
+	}
+?>
