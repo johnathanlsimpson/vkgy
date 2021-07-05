@@ -23,9 +23,24 @@ $dupe_selectors = [
 	'help'              => [ '.symbol__info', ],
 	'loading'           => [ '.symbol__loading.symbol__loading.symbol__loading.symbol__loading.symbol__loading.symbol__loading.symbol__loading' ],
 	'checkbox'          => [ '.input__checkbox .symbol__unchecked' ],
-	'checkbox--checked' => [ '.input__checkbox .input__choice:checked + .symbol__unchecked', '.symbol--orphan:checked   ~ .symbol--parent .symbol--orphan.input__checkbox   .symbol__unchecked', '.symbol--orphan-a:checked ~ .symbol--parent .symbol--orphan-a.input__checkbox .symbol__unchecked', '.symbol--orphan-b:checked ~ .symbol--parent .symbol--orphan-b.input__checkbox .symbol__unchecked', '.symbol--orphan-c:checked ~ .symbol--parent .symbol--orphan-c.input__checkbox .symbol__unchecked', ],
+	'checkbox--checked' => [
+		'.input__checkbox .input__choice:checked + .symbol__unchecked',
+		'.symbol--orphan:checked   ~ .symbol--parent .symbol--orphan.input__checkbox   .symbol__unchecked',
+		'.symbol--orphan-a:checked ~ .symbol--parent .symbol--orphan-a.input__checkbox .symbol__unchecked',
+		'.symbol--orphan-b:checked ~ .symbol--parent .symbol--orphan-b.input__checkbox .symbol__unchecked',
+		'.symbol--orphan-c:checked ~ .symbol--parent .symbol--orphan-c.input__checkbox .symbol__unchecked',
+	],
 	'radio'             => [ '.input__radio .symbol__unchecked' ],
-	'radio--checked'    => [ '.success', '.symbol__success', '.input__radio .input__choice:checked + .symbol__unchecked', '.symbol--orphan:checked   ~ .symbol--parent .symbol--orphan.input__radio   .symbol__unchecked', '.symbol--orphan-a:checked ~ .symbol--parent .symbol--orphan-a.input__radio .symbol__unchecked', '.symbol--orphan-b:checked ~ .symbol--parent .symbol--orphan-b.input__radio .symbol__unchecked', '.symbol--orphan-c:checked ~ .symbol--parent .symbol--orphan-c.input__radio .symbol__unchecked', '.symbol--orphan-d:checked ~ .symbol--parent .symbol--orphan-d.input__radio .symbol__unchecked', ],
+	'radio--checked'    => [
+		'.success', 
+		'.symbol__success', 
+		'.input__radio .input__choice:checked + .symbol__unchecked', 
+		'.symbol--orphan:checked   ~ .symbol--parent .symbol--orphan.input__radio    .symbol__unchecked',
+		'.symbol--orphan-a:checked ~ .symbol--parent .symbol--orphan-a.input__radio  .symbol__unchecked',
+		'.symbol--orphan-b:checked ~ .symbol--parent .symbol--orphan-b.input__radio  .symbol__unchecked',
+		'.symbol--orphan-c:checked ~ .symbol--parent .symbol--orphan-c.input__radio  .symbol__unchecked',
+		'.symbol--orphan-d:checked ~ .symbol--parent .symbol--orphan-d.input__radio  .symbol__unchecked',
+	],
 ];
 
 // Auto apply direction transforms to these
@@ -82,7 +97,7 @@ ob_start();
 			content: "";
 			display: inline-block;
 			height: var(--symbol-size);
-			margin-right: 0.3ch;
+			margin-right: 0.5ch;
 			-webkit-mask-size: var(--symbol-size);
 			mask-size: var(--symbol-size);
 			opacity: 0.5;
@@ -91,7 +106,7 @@ ob_start();
 		
 		/* Utilities */
 		.symbol--standalone::before {
-			margin-right: 0;
+			margin-right: 0 !important;
 			opacity: 1;
 		}
 		.symbol--down::before {
