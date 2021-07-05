@@ -43,8 +43,8 @@ style([
 					<select class="input" name="sort">
 						<?php
 							foreach([
-								'date_occurred' => 'date uploaded',
 								'date_added' => 'date added',
+								'date_occurred' => 'date uploaded',
 								'num_views' => 'most views'
 							] as $key => $string) {
 								echo '<option value="'.$key.'" '.($key == $_GET['order'] ? 'checked' : null).' >'.$string.'</option>';

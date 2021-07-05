@@ -13,7 +13,7 @@ foreach( views::$allowed_items as $item_type ) {
 	
 	// Every Sunday, save past week's views in permanent monhtly archive
 	// then move weekly views down and reset to 0 for upcoming week
-	//if(date('D') === 'Sun') {
+	if(date('D') === 'Sun') {
 		
 		// Montly archive--run this first since it relies on current week's views
 		$views->archive_views($item_type, 'monthly');
@@ -21,6 +21,6 @@ foreach( views::$allowed_items as $item_type ) {
 		// Weekly archive
 		$views->archive_views($item_type, 'weekly');
 		
-	//}
+	}
 	
 }

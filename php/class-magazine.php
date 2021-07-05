@@ -5,12 +5,11 @@ include_once('../php/class-issue.php');
 
 class magazine {
 	
-	
-	
 	public static $attribute_types = [
 		'format',
 		'page size',
 		'num pages',
+		'frequencies',
 	];
 	
 	
@@ -58,6 +57,7 @@ class magazine {
 		// SELECT ----------------------------------------------
 		if( $args['get'] === 'all' ) {
 			$sql_select[] = 'magazines.*';
+			$sql_select[] = 'REPLACE(magazines.date_occurred, "-00", "") AS date_occurred';
 			$sql_select[] = 'magazine_type.name AS type_name';
 			$sql_select[] = 'magazine_type.romaji AS type_romaji';
 			$sql_select[] = 'magazine_size.name AS size_name';
@@ -73,6 +73,7 @@ class magazine {
 			$sql_select[] = 'magazines.name';
 			$sql_select[] = 'magazines.romaji';
 			$sql_select[] = 'magazines.friendly';
+			$sql_select[] = 'REPLACE(magazines.date_occurred, "-00", "") AS date_occurred';
 			$sql_select[] = 'magazines.volume_name_pattern';
 			$sql_select[] = 'magazines.volume_romaji_pattern';
 			$sql_select[] = 'magazines.num_volume_digits';
@@ -228,7 +229,7 @@ class magazine {
 	public function update_magazine( $magazine ) {
 		
 		// Whitelist of columns allowed in update
-		$allowed_columns = [ 'id', 'name', 'romaji', 'friendly', 'volume_name_pattern', 'volume_romaji_pattern', 'num_volume_digits', 'parent_magazine_id', 'default_price', 'notes', 'type', 'size' ];
+		$allowed_columns = [ 'id', 'name', 'romaji', 'friendly', 'volume_name_pattern', 'volume_romaji_pattern', 'num_volume_digits', 'parent_magazine_id', 'default_price', 'notes', 'type', 'frequency', 'date_occurred', 'size' ];
 		
 		if( is_array($magazine) && !empty($magazine) ) {
 			
@@ -239,13 +240,24 @@ class magazine {
 			}
 			
 			// Clean numbers
-			foreach( [ 'id', 'parent_magazine_id', 'type', 'size' ] as $key ) {
+			foreach( [ 'id', 'parent_magazine_id', 'type', 'size', 'frequency' ] as $key ) {
 				$magazine[$key] = is_numeric($magazine[$key]) ? $magazine[$key] : null;
 			}
 			
 			// Clean other vars
 			$magazine['friendly'] = strlen($magazine['friendly']) ? $magazine['friendly'] : friendly( $magazine['romaji'] ?: $magazine['name'] );
 			$magazine['num_volume_digits'] = $magazine['num_volume_digits'] ?: 0;
+			
+			// Date might have underscores from inputmask
+			$magazine['date_occurred'] = str_replace( [ '-__', '__' ], '', $magazine['date_occurred'] );
+			
+			// Make sure date is correct format and add -00 if necessary
+			if( preg_match('/'.'\d{4}(?:-\d{2})?(?:-\d{2})?'.'/', $magazine['date_occurred']) ) {
+				$magazine['date_occurred'] .= str_repeat( '-00', ( 10 - strlen( $magazine['date_occurred'] ) ) / 3 );
+			}
+			else {
+				$magazine['date_occurred'] = null;
+			}
 			
 			// Create full volume patterns, then unset before/after parts
 			$magazine['volume_name_pattern']   = sanitize($magazine['before_number']) . '{volume}' . sanitize($magazine['after_number']);

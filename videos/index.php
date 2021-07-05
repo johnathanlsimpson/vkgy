@@ -88,7 +88,7 @@ else {
 	
 	// Default filters
 	$type = null;
-	$order = null;
+	$order = 'date_added DESC';
 	$is_flagged = $_SESSION['can_approve_data'] ? -1 : 0;
 	$user_id = null;
 	
@@ -107,6 +107,9 @@ else {
 			
 			if( $value === 'date_added' ) {
 				$order = 'videos.date_added DESC';
+			}
+			if( $value === 'date_occurred' ) {
+				$order = 'videos.date_occurred DESC';
 			}
 			elseif( $value === 'num_views' ) {
 				$order = 'views_videos_daily.num_views DESC';

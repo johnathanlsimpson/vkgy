@@ -42,14 +42,14 @@
 		<?php if( !$video['is_flagged'] || $_SESSION['can_approve_data'] ): ?>
 		<div class="videos__video <?= $video['is_flagged'] ? 'video--flagged' : null; ?>" data-flagged-reason="<?= $video['flagged_reason']; ?>">
 			
-			<input class="input__choice videos__checkbox" id="<?= 'ids-'.$video['id']; ?>" name="ids[]" type="checkbox" value="<?= $video['id']; ?>" />
+			<input class="input__choice symbol--orphan videos__checkbox" id="<?= 'ids-'.$video['id']; ?>" name="ids[]" type="checkbox" value="<?= $video['id']; ?>" />
 			
 			<div class="videos__thumbnail any--weaken module module--youtube">
 				<a class="videos__bg" data-id="<?= $video['youtube_id']; ?>" href="<?= '/videos/'.$video['id'].'/'; ?>" style="background-image:url(<?= $video['thumbnail_url']; ?>);"></a>
 			</div>
 			
-			<div class="videos__select moderation--show">
-				<label class="input__checkbox" for="<?= 'ids-'.$video['id']; ?>">
+			<div class="videos__select symbol--parent moderation--show">
+				<label class="input__checkbox symbol--orphan" for="<?= 'ids-'.$video['id']; ?>">
 					<span class="symbol__unchecked symbol--standalone" />
 				</label>
 			</div>
@@ -73,7 +73,7 @@
 				</span>
 				
 				<a href="<?= '/videos/'.$video['id'].'/'; ?>">
-					<?= $access_video->clean_title($video['youtube_name'], $video['artist']); ?>
+					<?= $video['romaji'] ? lang($video['romaji'], $video['name'], 'parentheses') : ( is_numeric($video['song_id']) ? $video['name'] : $access_video->clean_title($video['name'], $video['artist']) ); ?>
 				</a>
 				
 			</div>
@@ -217,7 +217,7 @@
 	.video--flagged .videos__thumbnail {
 		opacity: 0.75;
 	}
-	.videos__checkbox:checked ~ .videos__select .symbol__unchecked::before {
+	/*.videos__checkbox:checked ~ .videos__select .symbol__unchecked::before {
 		-moz-clip-path: url(#symbol__checkbox--checked);
 		-webkit-clip-path: url(#symbol__checkbox--checked);
 		clip-path: url(#symbol__checkbox--checked);
@@ -226,7 +226,7 @@
 	.videos__checkbox:checked + .videos__thumbnail .videos__bg {
 		border: 3px solid hsl(var(--interactive));
 		box-shadow: inset 0 0 0 1px hsl(var(--background--secondary));
-	}
+	}*/
 	
 	.videos__thumbnail {
 		margin: 0;

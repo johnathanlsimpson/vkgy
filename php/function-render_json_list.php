@@ -1,5 +1,6 @@
 <?php
 include_once('../php/include.php');
+include_once('../php/class-song.php');
 
 // Given song title, clean up and escape for output in a json list
 function clean_song_title($input) {
@@ -26,11 +27,12 @@ $access_label = $access_label ?: new access_label($pdo);
 $access_musician = $access_musician ?: new access_musician($pdo);
 $access_release = $access_release ?: new access_release($pdo);
 $access_user = $access_user ?: new access_user($pdo);
+$access_song = $access_song ?: new song($pdo);
 
 // Grab data of a certain type and output it as a json object
 function render_json_list($input_type, $input = null, $input_id_type = null, $include_friendly = null, $first_option_id = null, $args = []) {
 	global $pdo;
-	global $access_artist, $access_label, $access_musician, $access_release, $access_user;
+	global $access_artist, $access_label, $access_musician, $access_release, $access_user, $access_song;
 	global $artist_list, $label_list, $musician_list, $release_list, $user_list;
 	global $list_is_rendered;
 	
@@ -41,25 +43,48 @@ function render_json_list($input_type, $input = null, $input_id_type = null, $in
 	if( !$list_is_rendered[ $data_contains_name ] ) {
 		$list_is_rendered[ $data_contains_name ] = true;
 		
-		// If provided array of data, do nothing, and format it later
-		if(is_array($input)) {
+		// If provided array of data, or asked to leave empty, do nothing
+		if( is_array($input) || $args['leave_empty'] ) {
 		}
 		
 		// If given ID and data type, get data for that ID
 		elseif(!is_array($input) && is_numeric($input) && strlen($input_type)) {
 			
-			// If given artist ID and type is songs, do a manual search for all tracks by that artist
-			if($input_type === 'song') {
-				$sql_songs = 'SELECT id, name, romaji FROM releases_tracklists WHERE artist_id=? GROUP BY COALESCE(romaji, name) ORDER BY COALESCE(romaji, name) ASC';
-				$stmt_songs = $pdo->prepare($sql_songs);
-				$stmt_songs->execute([ sanitize($input) ]);
-				$input = $stmt_songs->fetchAll();
+			/* Temporary */
+			// If getting songs, let's also get all tracks from that artist, since all tracks aren't in DB yet
+			if($input_type === 'song' ) {
+				
+				// Get all tracks
+				$sql_tracks = 'SELECT id, name, romaji FROM releases_tracklists WHERE artist_id=? AND song_id IS NULL GROUP BY COALESCE(romaji, name) ORDER BY COALESCE(romaji, name) ASC';
+				$stmt_tracks = $pdo->prepare($sql_tracks);
+				$stmt_tracks->execute([ $input ]);
+				$tracks = $stmt_tracks->fetchAll();
+				
+				// If we got all tracks, loop through, do a rough name cleaning, and attempt to remove dupes/notes
+				if( is_array($tracks) && !empty($tracks) ) {
+					foreach( $tracks as $track ) {
+						
+						// Clean name and get friendly
+						// May be better to replace this with the cleaning/flattening function from songs
+						$name = clean_song_title( $track['name'] );
+						$romaji = clean_song_title( $track['romaji'] );
+						$friendly = friendly( $romaji ?: $name );
+						$quick_name = $romaji ? $romaji.' ('.$name.')' : $name;
+						
+						// Add to array to eliminate dupes
+						$temp_songs[ $friendly ] = [ '', $name, $romaji, $friendly, $quick_name ];
+						
+					}
+				}
+				
+				// Make sure we have an array
+				$temp_songs = is_array($temp_songs) ? array_values( $temp_songs ) : [];
+				
 			}
 			
-			// Otherwise do a generic search
-			else {
-				$input = ${'access_' . $input_type}->{'access_' . $input_type}([ $input_id_type => $input, 'get' => 'name' ]);
-			}
+			// Get results from search
+			$input = ${'access_' . $input_type}->{'access_' . $input_type}([ $input_id_type => $input, 'get' => 'name' ]);
+			
 		}
 		
 		// If given name, do generic search for name
@@ -141,10 +166,12 @@ function render_json_list($input_type, $input = null, $input_id_type = null, $in
 			
 			// Song
 			elseif($input_type === 'song') {
-				$input_chunk['name'] = clean_song_title( $input[$i]['name'] );
-				$input_chunk['romaji'] = clean_song_title( $input[$i]['romaji'] );
-				$input_chunk['friendly'] = strtolower( preg_replace( '/'.'[^A-z0-9]'.'/', '', html_entity_decode($input_chunk['romaji'] ?: $input_chunk['name'], ENT_QUOTES, 'UTF-8') ) );
-				$input_chunk['quick_name'] = $input[$i]['romaji'] ? clean_song_title($input[$i]['romaji']).' ('.clean_song_title($input[$i]['name']).')' : clean_song_title($input[$i]['name']);
+				
+				$input_chunk[] = $input[$i]['name'];
+				$input_chunk[] = $input[$i]['romaji'];
+				$input_chunk[] = $input[$i]['friendly'];
+				$input_chunk[] = ( $input[$i]['romaji'] ? $input[$i]['romaji'].' ('.$input[$i]['name'].')' : $input[$i]['name'] ).( strlen($input[$i]['hint']) ? ' ('.$input[$i]['hint'].')' : null );
+				
 			}
 			
 			// Year
@@ -164,39 +191,10 @@ function render_json_list($input_type, $input = null, $input_id_type = null, $in
 			unset($input_chunk);
 		}
 		
-		// If getting song list, do some additional cleaning to remove duplicates (but allow different JP names with same romaji)
-		if($input_type === 'song') {
-			$new_output = [];
-			
-			// Loop through and remove blanks and dupes
-			if(is_array($output_list)) {
-				foreach($output_list as $output_key => $output_chunk) {
-					
-					// Skip if no name provided
-					if(strlen($output_chunk['name'])) {
-						
-						// If already have one song with same romaji, ignore if duplicate name
-						if(isset( $new_output[$output_chunk['friendly']] )) {
-							
-							$prev_name = strtolower( str_replace( ' ', '', html_entity_decode( $new_output[$output_chunk['friendly']]['name'], ENT_QUOTES, 'UTF-8' ) ) );
-							$this_name = strtolower( str_replace( ' ', '', html_entity_decode( $output_chunk['name'], ENT_QUOTES, 'UTF-8' ) ) );
-							
-							if($prev_name != $this_name) {
-								$new_output[ $output_chunk['friendly'].$output_chunk['name'] ] = $output_chunk;
-							}
-							
-						}
-						else {
-							$new_output[ $output_chunk['friendly'] ] = $output_chunk;
-						}
-						
-					}
-					
-				}
-			}
-			
-			// Undo associative keys
-			$output_list = array_values($new_output);
+		/* Temporary */
+		// If getting songs, be sure to add potential songs from query of tracks
+		if( $input_type === 'song' ) {
+			$output_list = array_merge( $output_list, $temp_songs );
 		}
 		
 		// Clean output and save associative version to external variable

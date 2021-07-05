@@ -467,7 +467,7 @@
 						// Activity area
 						if(is_array($line_type) && (in_array(10, $line_type) || in_array(1, $line_type))) {
 							
-							$active_area_pattern = '(\(?overseas\)?|\(?'.sanitize(海外).'\)?)?( \(&[A-z0-9&#;]+\))? (in|to) ([A-z0-9&#;]+)( \([A-z0-9&#;]+\))?';
+							$active_area_pattern = '(\(?overseas\)?|\(?'.sanitize('海外').'\)?)?( \(&[A-z0-9&#;]+\))? (in|to) ([A-z0-9&#;]+)( \([A-z0-9&#;]+\))?';
 							
 							if(preg_match('/'.$active_area_pattern.'/', $line, $active_area_match)) {
 								
@@ -1286,16 +1286,7 @@
 					
 					$sql_artist = "SELECT ".implode(", ", $sql_select)." FROM ".$sql_from.' '.$sql_join.' '.(!empty($sql_where) ? "WHERE (".implode(") AND (", $sql_where).")" : null).($sql_group ? ' GROUP BY '.implode(', ', $sql_group) : null)." ORDER BY ".implode(", ", $sql_order)." ".$sql_limit;
 					$stmt = $this->pdo->prepare($sql_artist);
-						
-						/*if($_SESSION['username'] === 'inartistic') {
-							
-							echo $sql_artist;
-							
-							echo '<pre>'.print_r($sql_values, true).'</pre>';
-							
-						}*/
 					
-						
 					if($stmt) {
 						
 						$stmt->execute($sql_values);
@@ -1317,70 +1308,6 @@
 								}
 								
 							}
-							
-							//
-							// This whole thing doesn't work because we need the formation included in the original query or else we can't sort by it, duh
-							//
-							// Get formation date
-							/*if( $args['get'] === 'artist_list' && $_SESSION['username'] === 'inartistic') {
-								
-								// Save list of artist ids
-								for($i=0; $i<$num_artists; $i++) {
-									$artist_ids[] = $artists[$i]['id'];
-								}
-								
-								// Get formation date
-								$sql_formation = '
-									SELECT
-										aa.artist_id,
-										IF( MAX(aa.date_occurred)>"1", MAX(aa.date_occurred), IF( MAX(aa.year_occurred)>"1", CONCAT(MAX(aa.year_occurred),"-00-00"), "0000-00-00" ) ) AS date_formed
-									FROM (
-										(
-											SELECT
-												artists_years.artist_id,
-												"" AS date_occurred,
-												MIN(artists_years.year) AS year_occurred
-											FROM
-												artists_years
-											WHERE
-												artists_years.artist_id IN ('.implode(',',$artist_ids).')
-											GROUP BY
-												artists_years.artist_id
-										) 
-										UNION
-										(
-											SELECT
-												artists_bio.artist_id,
-												MIN(date_occurred) AS date_occurred,
-												"" AS year_occurred
-											FROM
-												artists_bio
-											WHERE
-												artists_bio.artist_id IN ('.implode(',',$artist_ids).')
-												AND
-												artists_bio.type LIKE CONCAT("%","(10)","%")
-											GROUP BY
-												artists_bio.artist_id
-										) 
-									) aa
-									GROUP BY aa.artist_id
-								';
-								$stmt_formation = $this->pdo->prepare($sql_formation);
-								$stmt_formation->execute();
-								$rslt_formation = $stmt_formation->fetchAll();
-								
-								if( is_array($rslt_formation) && !empty($rslt_formation) ) {
-									foreach( $rslt_formation as $formation ) {
-										
-										$artist_key = array_search( $formation['artist_id'], $artist_ids );
-										$artists[$artist_key]['date_formed'] = $formation['date_formed'];
-										
-									}
-								}
-								
-								echo '<br /><br />**************************<pre>'.print_r($rslt_formation, true).'</pre>===========================<br /><br />';
-								
-							}*/
 							
 							// If getting all artist info or basics, grab musician data, then compile into lineup string
 							if($args["get"] === "all" || $args["get"] === "basics" || $args['get'] === 'profile') {

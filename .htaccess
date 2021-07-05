@@ -166,16 +166,18 @@ RewriteRule  ^releases/([\w\-]+)/?$                                             
 RewriteRule  ^releases/([\w\-]*)/(\d+)/[\w\-]*/?(?:\&prev_next_artist=(\d+))?$       /?releases/&id=$2&artist=$1&prev_next_artist=$3
 RewriteRule  ^releases/([\w\-]*)/(\d+)/[\w\-]*/edit/?(?:\&prev_next_artist=(\d+))?$  /?releases/page-update&release=$2&artist=$1&prev_next_artist=$3
 
-RewriteRule  ^songs/add(?:/([\w-]+))?/?$             /?songs/page-update&artist=$1
+RewriteRule  ^songs/add(?:/([\w-]+))?/?$             /?songs/&artist=$1&action=add
 RewriteRule  ^songs/([\w\-]+)/?$                     /?songs/&artist=$1
-RewriteRule  ^songs/([\w\-]*)/(\d+)/[\w\-]*/?$       /?songs/&song_id=$2
-RewriteRule  ^songs/([\w\-]*)/(\d+)/[\w\-]*/edit/?$  /?songs/page-update&song_id=$2
+RewriteRule  ^songs/([\w\-]*)/(\d+)/[\w\-]*/?$       /?songs/&song_id=$2&artist=$1
+RewriteRule  ^songs/([\w\-]*)/(\d+)/[\w\-]*/edit/?$  /?songs/&song_id=$2&action=edit
 
 RewriteRule  ^tag-source  /releases/page-tag-source.php
 
 RewriteRule  ^track/.*$  /php/page-track.php
 
-RewriteRule  ^videos/(\d+)/?  /?videos/&id=$1
+/?(?:\&magazine=([a-z0-9-]+))?$
+
+RewriteRule  ^videos/(\d+)/?(?:\&autoplay=(\d))?$  /?videos/&id=$1&autoplay=$2
 
 RewriteRule  ^vip/?$                /?vip/
 RewriteRule  ^vip/add/?$            /?vip/&action=update

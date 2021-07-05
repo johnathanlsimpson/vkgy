@@ -1,6 +1,7 @@
 <?php
 	include_once('../php/include.php');
 	include_once('../php/class-access_comment.php');
+	include_once('../php/class-song.php');
 	include_once('../php/class-link.php');
 	
 	class access_video {
@@ -23,6 +24,7 @@
 			$this->access_user = new access_user($this->pdo);
 			$this->access_comment = new access_comment($this->pdo);
 			$this->access_link = new link($this->pdo);
+			$this->access_song = new song($pdo);
 			
 			// Video types
 			$this->video_types = [
@@ -60,6 +62,46 @@
 			if(preg_match('/'.$id_pattern.'/', $input_url, $id_match)) {
 				return $id_match[1];
 			}
+		}
+		
+		
+		
+		// ======================================================
+		// Guess song associated with video
+		// ======================================================
+		public function guess_song( $video_id ) {
+			
+			if( is_numeric($video_id) ) {
+				
+				// Get video and artist
+				$video = $this->access_video([ 'id' => $video_id, 'get' => 'basics' ]);
+				
+				// Get possible songs
+				$songs = $this->access_song->access_song([ 'artist_id' => $video['artist']['id'], 'get' => 'name' ]);
+				
+				// Order songs by longest flat name so we're less likely to get incorrect songs
+				usort($songs, function($a, $b) {
+					return mb_strlen( html_entity_decode( $b['flat_name'] ) ) - mb_strlen( html_entity_decode( $a['flat_name'] ) );
+				});
+				
+				// Clean name as much as possible for best result
+				$cleaned_youtube_name = $this->clean_title( $video['youtube_name'], $video['artist'] );
+				
+				// Then flatten cleaned name
+				$flattened_youtube_name = $this->access_song->flatten_song_title( $cleaned_youtube_name );
+				
+				// Then loop through each song and if that song's flat title is within the flattend YT name, assume it's the right song
+				foreach($songs as $song) {
+					if( strpos( $flattened_youtube_name, $song['flat_name'] ) !== false ) {
+						$matched_song = $song;
+						break;
+					}
+				}
+				
+			}
+			
+			return $matched_song;
+			
 		}
 		
 		
@@ -123,36 +165,62 @@
 					// If artist was provided, or was found by searching links, go ahead
 					if(is_numeric($artist_id)) {
 						
+						// Get artist class
+						if(!$this->access_artist) {
+							include_once('../php/class-access_artist.php');
+							$this->access_artist = new access_artist($this->pdo);
+						}
+						
 						// If user is an admin (who can approve channel anyway), approve and add channel to artist's links
 						if($is_flagged && $_SESSION['can_bypass_video_approval'] ) {
+							
 							$is_flagged = false;
-							
-							// Get artist class
-							if(!$this->access_artist) {
-								include_once('../php/class-access_artist.php');
-								$this->access_artist = new access_artist($this->pdo);
-							}
-							
 							$link_output = $this->access_link->add_link( 'https://youtube.com/channel/'.$video_data['channel_id'], $artist_id );
 							
 							//$this->access_artist->update_url($artist_id, 'https://youtube.com/channel/'.$video_data['channel_id']);
 						}
 						
+						// Get artist
+						$artist = $this->access_artist->access_artist([ 'id' => $artist_id, 'get' => 'name' ]);
+						
+						// Do quick cleanup of name
+						$youtube_name = $video_data['name'];
+						$cleaned_name = $this->clean_title( $youtube_name, $artist );
+						
+						// Try to find matching song in DB
+						$song = $this->access_song->guess_song([ 'name' => $cleaned_name, 'artist_id' => $artist_id, 'type' => 'fuzzy' ]);
+						
+						// If we found a song, let's update the clean name, set romaji, and set song ID
+						if( is_array($song) && !empty($song) ) {
+							$song_id = $song['id'];
+						}
+						
+						// If we didn't find a song, let's save the cleaned name
+						// Actually, let's *not* save it for now until our cleaning algorithm is a little better
+						else {
+						}
+						
+						// Set up values
 						$values_video = [
-							$artist_id,
-							is_numeric($release_id) ? $release_id : null,
-							$_SESSION['user_id'],
-							$video_id,
-							sanitize($video_data['name']),
-							sanitize($video_data['content']),
-							$this->guess_video_type($video_data['name']),
-							sanitize($video_data['date_occurred']),
-							$is_flagged ? 1 : 0,
+							'artist_id'       => $artist_id,
+							'youtube_id'      => $video_id,
+							'song_id'         => is_numeric($song_id) ? $song_id : null,
+							'type'            => $this->guess_video_type( $youtube_name ),
+							'youtube_name'    => sanitize( $youtube_name ),
+							'youtube_content' => sanitize($video_data['content']),
+							'name'            => $cleaned_name,
+							'image_url'       => sanitize( $video_data['image_url'] ) ?: null,
+							'date_occurred'   => sanitize($video_data['date_occurred']),
+							'user_id'         => $_SESSION['user_id'],
+							'is_flagged'      => $is_flagged ? 1 : 0,
 						];
 						
-						$sql_video = 'INSERT INTO videos (artist_id, release_id, user_id, youtube_id, youtube_name, youtube_content, type, date_occurred, is_flagged) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+						// Prepare query
+						$sql_video = 'INSERT INTO videos ('.implode( ',', array_keys($values_video) ).') VALUES ('.substr( str_repeat( '?,', count($values_video) ), 0, -1 ).')';
 						$stmt_video = $this->pdo->prepare($sql_video);
-						if($stmt_video->execute($values_video)) {
+						
+						// Run query
+						if( $stmt_video->execute( array_values( $values_video ) ) ) {
 							
 							$output = array_merge($video_data, [
 								'approval_notice_class' => $is_flagged ? null : 'any--hidden',
@@ -203,11 +271,11 @@
 					' ?(: |\- )?(\| ?|\/ ?)?'. // hyphen or slash before title
 					'';
 				
-				if( preg_match('/'.$artist_pattern.'/u', $name) ) {
-					$name = preg_replace('/'.$artist_pattern.'/u', '', $name, 1);
+				if( preg_match('/'.$artist_pattern.'/ui', $name) ) {
+					$name = preg_replace('/'.$artist_pattern.'/ui', '', $name, 1);
 				}
 				elseif( strlen($artist_romaji) ) {
-					$name = preg_replace('/'.$romaji_pattern.'/u', '', $name, 1);
+					$name = preg_replace('/'.$romaji_pattern.'/ui', '', $name, 1);
 				}
 				
 				$mv_pattern =
@@ -223,6 +291,7 @@
 				'(cm|spot|trailer)?'.
 				')';
 				
+				// If complex MV pattern matched, remove it
 				if( preg_match('/'.$mv_pattern.'/ui', $name, $mv_matches, PREG_OFFSET_CAPTURE) ) {
 					
 					$mv_position = mb_strpos( $name, $mv_matches[0][0], 0, 'UTF-8' );
@@ -230,35 +299,80 @@
 					
 					$name = mb_substr( $name, 0, $mv_position, 'UTF-8' ).mb_substr( $name, $mv_position + $mv_length, null, 'UTF-8' );
 					
-					$bracket_pairs = [
-						'[]',
-						'()',
-						'【】',
-						'--',
-						'「」',
-						'『』',
-						' -',
-						'- ',
-					];
-					
-					// Loop through bracket pairs and make sure any empty ones are removed from the beginning and end
-					foreach($bracket_pairs as $bracket_pair) {
-						if( mb_strpos( $name, $bracket_pair ) === 0 ) {
-							$name = mb_substr( $name, 2 );
-						}
-						elseif( mb_substr( $name, -2 ) == $bracket_pair ) {
-							$name = mb_substr( $name, 0, -2 );
-						}
+				}
+				
+				// Replace 'full album' 'nth single' etc
+				$nth_release_pattern = '((?:first )?(?:\d+(?:th|nd|rd|st))? ?(?:maxi|mini|full|digital|new|concept|ミニ|フル|ニュー|コンセプト)?(?:\-|・)?(?:single|album|digital|EP|track|mini|シングル|アルバム))';
+				$name = preg_replace('/'.$nth_release_pattern.'/ui', '', $name);
+				
+				// Remove release date
+				$date_pattern = '(\d{4}(?:\.\d+){0,2} release)';
+				$name = preg_replace('/'.$date_pattern.'/ui', '', $name);
+				
+				// Now do simple search/replace for common strings
+				foreach([
+					'spot',
+					'live ver.',
+					'official audio',
+					'live clip',
+					'【Live】',
+					'(youtube mix)',
+					'hd',
+					'OFFICIAL LIVE',
+					'(hd)',
+					'【FULL】',
+					' full',
+					'(未発表デモテープ)',
+					'lyric',
+					'lylic',
+					'自主制作',
+					'デモ音源',
+					'promotion edit ver.',
+					'【無料公開】',
+					'【公式】',
+					'試聴Teaser',
+					'(Audio)',
+				] as $search) {
+					$name = str_ireplace($search, '', $name);
+				}
+				
+				// Do quick trim for next steps
+				$name = trim($name);
+				
+				// Now set a list of bracket pairs that we'll use
+				$bracket_pairs = [
+					'[]',
+					'()',
+					'【】',
+					'--',
+					'「」',
+					'『』',
+					' -',
+					'- ',
+				];
+				
+				// Loop through bracket pairs, remove empty pairs
+				foreach($bracket_pairs as $bracket_pair) {
+					if( mb_strpos( $name, $bracket_pair ) === 0 ) {
+						$name = mb_substr( $name, 2 );
 					}
+					elseif( mb_substr( $name, -2 ) == $bracket_pair ) {
+						$name = mb_substr( $name, 0, -2 );
+					}
+				}
+				
+				// Do quick trim for next steps
+				$name = trim($name);
+				
+				// Now loop through the pairs again and if they're surrounding the entire remaining string, remove
+				foreach($bracket_pairs as $bracket_pair) {
 					
 					$char_before = mb_substr($name, 0, 1, 'UTF-8');
 					$char_after = mb_substr($name, -1, 1, 'UTF-8');
 					
-					foreach($bracket_pairs as $bracket_pair) {
-						if( $char_before.$char_after === $bracket_pair ) {
-							$name = mb_substr( $name, 1, -1 );
-							break;
-						}
+					if( $char_before.$char_after === $bracket_pair ) {
+						$name = mb_substr( $name, 1, -1 );
+						break;
 					}
 					
 				}
@@ -290,6 +404,8 @@
 					'lyrics',
 					'lyric',
 					'リリックビデオ',
+					'デモ音源',
+					'audio',
 				],
 				
 				'trailer' => [
@@ -297,6 +413,8 @@
 					'全曲',
 					'視聴',
 					'試聴',
+					'全曲試聴',
+					'short',
 				],
 				
 				'cm-1' => [
@@ -389,14 +507,18 @@
 					$statistics = (array) $data_item->statistics;
 					$details = (array) $data_item->contentDetails;
 					
+					// In case we want to inspect data
+					//echo $_SESSION['username'] === 'inartistic' ? print_r($data_item,true) : null;
+					
 					$output[$data_item->id] = [
-						'name' => $snippet['title'],
-						'content' => $snippet['description'],
+						'name'          => $snippet['title'],
+						'content'       => $snippet['description'],
 						'date_occurred' => date('Y-m-d H:i:s', strtotime($snippet['publishedAt'])),
-						'channel_id' => $snippet['channelId'],
-						'num_likes' => number_format($statistics['likeCount'] ?: 0),
-						'num_views' => number_format($statistics['viewCount']),
-						'length' => preg_replace('/'.'PT(\d+)M(\d+)S'.'/', '00:$1:$2', $details['duration']),
+						'channel_id'    => $snippet['channelId'],
+						'channel_name'  => $snippet['channelTitle'],
+						'num_likes'     => number_format($statistics['likeCount'] ?: 0),
+						'num_views'     => number_format($statistics['viewCount']),
+						'image_url'     => end( $snippet['thumbnails'] )->url,
 					];
 				}
 			}
@@ -472,6 +594,14 @@
 			$sql_select = $sql_join = $sql_where = $sql_values = $sql_order = [];
 			
 			// SELECT ----------------------------------------------
+			
+			if( $args['get'] === 'all' || $args['get'] === 'basics' || $args['get'] === 'name' ) {
+				$sql_select[] = 'videos.song_id';
+				$sql_select[] = 'videos.image_url';
+				$sql_select[] = 'IF( videos.is_custom=0 AND songs.name IS NOT NULL, songs.name, COALESCE( videos.name, videos.youtube_name ) ) AS name';
+				$sql_select[] = 'IF( videos.is_custom=0 AND songs.romaji IS NOT NULL, songs.romaji, COALESCE( videos.romaji, "" ) ) AS romaji';
+			}
+			
 			if($args['get'] === 'basics' || $args['get'] === 'all') {
 				$sql_select[] = 'videos.id';
 				$sql_select[] = 'videos.youtube_id';
@@ -484,20 +614,24 @@
 				$sql_select[] = 'videos.date_occurred';
 				$sql_select[] = 'videos.date_added';
 				$sql_select[] = 'views_videos_daily.num_views';
-				$sql_select[] = 'videos.length';
 				$sql_select[] = 'videos.is_flagged';
 				$sql_select[] = 'videos.artist_id';
-				$sql_select[] = 'videos.release_id';
 				$sql_select[] = 'videos.user_id';
 			}
 			if($args['get'] === 'count') {
-				$sql_select[] = 'COUNT(*) AS num_videos';
+				$sql_select[] = 'COUNT(1) AS num_videos';
 			}
 			
 			// FROM ------------------------------------------------
 			$sql_from = 'videos';
 			
 			// JOIN ------------------------------------------------
+			
+			// Songs
+			if( $args['get'] === 'all' || $args['get'] === 'basics' || $args['get'] === 'name' ) {
+				$sql_join[] = 'LEFT JOIN songs ON songs.id=videos.song_id';
+			}
+			
 			if($args['get'] === 'all' || $args['get'] === 'basics') {
 				$sql_join[] = 'LEFT JOIN views_videos_daily ON views_videos_daily.video_id=videos.id';
 			}
@@ -524,11 +658,6 @@
 			if(is_numeric($args['artist_id'])) {
 				$sql_where[] = 'videos.artist_id=?';
 				$sql_values[] = $args['artist_id'];
-			}
-			// Release ID
-			if(is_numeric($args['release_id'])) {
-				$sql_where[] = 'videos.release_id=?';
-				$sql_values[] = $args['release_id'];
 			}
 			// Date published
 			if( preg_match('/'.'^\d{4}(-\d{2})?(-\d{2})?$'.'/', $args['date_occurred']) ) {
@@ -572,6 +701,11 @@
 				$sql_where[] = 'videos.youtube_id=?';
 				$sql_values[] = $args['youtube_id'];
 			}
+			// Song
+			if( is_numeric($args['song_id']) ) {
+				$sql_where[] = 'videos.song_id=?';
+				$sql_values[] = $args['song_id'];
+			}
 			
 			// ORDER -----------------------------------------------
 			$sql_order = $args['order'] ? (is_array($args['order']) && !empty($args['order']) ? $args['order'] : [ $args['order'] ]) : [ 'videos.date_occurred DESC' ];
@@ -583,10 +717,12 @@
 				
 				// Get page totals (considering any filters in use)
 				$sql_total = '
-					SELECT COUNT(id) AS num_items
+					SELECT COUNT(videos.id) AS num_items
 					FROM '.$sql_from.'
 					'.(is_array($sql_join) && !empty($sql_join) ? implode(' ', $sql_join) : null).'
 					'.(is_array($sql_where) && !empty($sql_where) ? 'WHERE ('.implode(') AND (', $sql_where).')' : null);
+				
+				
 				$stmt_total = $this->pdo->prepare($sql_total);
 				$stmt_total->execute($sql_values);
 				
@@ -658,30 +794,17 @@
 							$this->access_artist = new access_artist($this->pdo);
 						}
 						
-						// Get release class
-						if(!$this->access_release) {
-							include_once('../php/class-access_release.php');
-							$this->access_release = new access_release($this->pdo);
-						}
-						
 						// Save all returned artist/release IDs so we can get artists
 						for($i=0; $i<$num_videos; $i++) {
 							$artist_ids[] = $rslt_videos[$i]['artist_id'];
-							$release_ids[] = $rslt_videos[$i]['release_id'];
 						}
 						
 						// Remove duplicates and empties
 						$artist_ids = array_filter(array_unique($artist_ids));
-						$release_ids = array_filter(array_unique($release_ids));
 						
 						// Get artists
 						if(is_array($artist_ids) && !empty($artist_ids)) {
 							$artists = $this->access_artist->access_artist([ 'ids' => $artist_ids, 'get' => 'name', 'associative' => true ]);
-						}
-						
-						// Get releases
-						if(is_array($release_ids) && !empty($release_ids)) {
-							$releases = $this->access_release->access_release([ 'ids' => $release_ids, 'get' => 'name', 'associative' => true ]);
 						}
 						
 						for($i=0; $i<$num_videos; $i++) {
@@ -692,11 +815,6 @@
 							// Attach artists
 							if(is_numeric($rslt_videos[$i]['artist_id'])) {
 								$rslt_videos[$i]['artist'] = $artists[$rslt_videos[$i]['artist_id']];
-							}
-							
-							// Attach releases
-							if(is_numeric($rslt_videos[$i]['release_id'])) {
-								$rslt_videos[$i]['release'] = $releases[$rslt_videos[$i]['release_id']];
 							}
 							
 						}
@@ -711,42 +829,10 @@
 								// Get comments
 								$rslt_videos[$i]['comments'] = $this->access_comment->access_comment([ 'id' => $rslt_videos[$i]['id'], 'get_user_likes' => true, 'type' => 'video', 'get' => 'all' ]);
 								
-								/*// If don't have video name or description (legacy code), get it from YT and store it
-								//if( !strlen($rslt_videos[$i]['youtube_name']) || !strlen($rslt_videos[$i]['youtube_content']) ) {
-								if( !strlen($rslt_videos[$i]['youtube_content']) ) {
-									
-									// Get data
-									$youtube_data = $this->get_youtube_data($rslt_videos[$i]['youtube_id'], true);
-									$youtube_data = is_array($youtube_data) && !empty($youtube_data) ? reset($youtube_data) : [];
-									
-									// Save it
-									if( strlen($youtube_data['name']) ) {
-										
-										// Vars
-										$youtube_name = sanitize($youtube_data['name']);
-										$youtube_content = sanitize($youtube_data['content']);
-										$youtube_date_occurred = sanitize($youtube_data['date_occurred']);
-										$video_type = $this->guess_video_type($youtube_name);
-										$length = sanitize($youtube_data['length']);
-										
-										// Save
-										$sql_data = 'UPDATE videos SET youtube_name=?, youtube_content=?, date_occurred=?, type=?, length=? WHERE id=? LIMIT 1';
-										$stmt_data = $this->pdo->prepare($sql_data);
-										$stmt_data->execute([ $youtube_name, $youtube_content, $youtube_date_occurred, $video_type, $length, $rslt_videos[$i]['id'] ]);
-										
-										// Pass back to result
-										$rslt_videos[$i]['youtube_name'] = $youtube_name;
-										$rslt_videos[$i]['youtube_content'] = $youtube_content;
-										$rslt_videos[$i]['date_occurred'] = $youtube_date_occurred;
-										$rslt_videos[$i]['type'] = $video_type;
-										$rslt_videos[$i]['length'] = $length;
-										
-									}
-									
-									// Unset
-									unset($youtube_data, $youtube_name, $youtube_content, $youtube_date_occurred, $video_type);
-									
-								}*/
+								// Get song
+								if( is_numeric( $rslt_videos[$i]['song_id'] ) ) {
+									$rslt_videos[$i]['song'] = $this->access_song->access_song([ 'id' => $rslt_videos[$i]['song_id'], 'get' => 'basics' ]);
+								}
 								
 							}
 							
@@ -781,7 +867,7 @@
 				// FORMAT OUTPUT -------------------------------------
 				$rslt_videos = is_array($rslt_videos) ? $rslt_videos : [];
 				
-				if( is_numeric($args['id']) || strlen($args['youtube_id']) ) {
+				if( is_numeric($args['id']) || strlen($args['youtube_id']) || $args['limit'] == 1 ) {
 					$rslt_videos = reset($rslt_videos);
 				}
 				

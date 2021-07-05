@@ -1,33 +1,72 @@
+/* Container */
+.add__tracklist {
+	padding-left: 2rem;
+}
+
+/* Tracks */
+.track:first-of-type {
+	padding-top: 0;
+}
+
 .track:not(.track--show-disc)         .track__disc,
 .track:not(.track--show-section)      .track__section,
 .track:not(.track--show-song)         .track__song-container,
+.track:not(.track--show-song)         .track__artist-container,
 .track:not(.track--show-controls)     .track__tracklist-controls,
 .track:not(.track--show-artist)       .track__artist,
-.track:not(.track--show-display-name) .track__display-name {
+.track:not(.track--show-edit-song)    .track__edit-song {
 	display: none;
 }
-.track, .track .input__row, .track .input__group {
-	box-sizing: content-box;
-	margin: 0;
-	padding: 0;
+
+.track--show-disc:not(.track--show-reorder-discs)    .track__reorder-discs,
+.track--show-section:not(.track--show-reorder-discs) .track__reorder-discs {
+	display: none;
 }
-.track {
-	padding-left: 2rem;
-	padding-right: 2rem;
+
+/* Discs and sections */
+.track--show-disc {
+	background: hsl(var(--background));
+	box-shadow: 1rem 0 0 0 hsl(var(--background)), -2rem 0 0 0 hsl(var(--background));
+	margin-bottom: 2.5rem;
+	position: sticky;
+	top: 3rem;
+	z-index: 1;
 }
-.track .input__row {
-	margin-left: -0.5rem;
-	margin-top: -0.5rem;
+.track--show-disc + .track {
+	margin-top: -2.5rem;
 }
-.track .input__group {
-	margin-top: 0.5rem;
+@media(max-width:599.99px) {
+	.track--show-disc + .track {
+		margin-top: -2rem !important;
+	}
 }
-.track + .track::before {
-	content: "";
-	display: block;
-	height: 1rem;
-	opacity: 0.75;
-	width: 100%;
+.track--show-disc:first-of-type {
+	padding-top: 1rem;
+}
+.track--show-disc .input__label {
+	color: hsl(var(--accent));
+}
+.track--show-section .input__label {
+	color: hsl(var(--attention--secondary));
+}
+.track + .track--show-disc {
+	border-top: 1px dotted hsl(var(--accent)) !important;
+	margin-top: 1rem;
+	padding-top: 1rem;
+}
+.track + .track--show-section {
+	border-top: 1px dotted hsl(var(--attention--secondary)) !important;
+	margin-top: 1rem;
+	padding-top: 0rem;
+}
+.track--show-disc + .track--show-section {
+	margin-top: -2rem;
+}
+.track--show-disc, .track--show-section {
+	padding-bottom: 0.5rem;
+}
+.track--show-controls .track__handles {
+	display: none;
 }
 .track--show-disc + .track--show-song::before,
 .track--show-disc + .track--show-section::before,
@@ -39,7 +78,7 @@
 	background-position: left center;
 	background-repeat: repeat-x;
 	background-size: 3px 3px;
-	height: 2rem;
+	/*height: 2rem;*/
 }
 .track--show-controls + .track--show-disc::before {
 	background-clip: border-box;
@@ -47,47 +86,114 @@
 	background-position: left center;
 	background-repeat: repeat-x;
 	background-size: 3px 3px;
-	height: 6rem;
-	margin-left: -2rem;
-	width: calc(2rem + 100% + 2rem);
 }
 .track::first-of-type {
 	counter-reset: disc_count;
 }
 .track--show-disc {
 	counter-increment: disc_count;
+	counter-reset: section_count;
 }
 .track__disc-label::after {
 	content: "#" counter(disc_count);
 }
+.track--show-section {
+	counter-increment: section_count;
+}
+.track--show-section .input__label::after {
+	content: "#" counter(section_count);
+}
 
+/* Handle to reorder tracks*/
+.track__handles {
+	align-items: stretch;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	padding-left: 0.5rem;
+	padding-top: 1rem;
+}
+.track__song-control {
+	text-align: center;
+	width: 100%;
+}
+@media(max-width:599.99px) {
+	.track__song-control {
+		border-radius: var(--border-radius) var(--border-radius) 0 0;
+		box-sizing: border-box;
+		height: calc(2rem - 2px);
+	}
+	.track__song-controls + .track__song-controls {
+		margin-top: 5px;
+	}
+	.track__song-controls + .track__song-controls .track__song-control {
+		border-radius: 0 0 var(--border-radius) var(--border-radius);
+		height: 2rem;
+	}
+}
+@media(min-width:600px) {
+	.track__handles {
+		align-items: flex-start;
+		flex-direction: row;
+	}
+	.track__song-control {
+		border-radius: var(--border-radius);
+	}
+}
+.track--show-section .track__handles {
+	margin-top: 0.5rem;
+}
 
+/* Song */
+.track__song input {
+	align-self: flex-start;
+	box-sizing: border-box;
+	width: 100%;
+}
+@media(min-width:600px) {
+	.track__song input {
+		box-sizing: content-box;
+	}
+}
+
+/* Artist */
+.track__artist,
+.track__display-name {
+	flex-basis: 300px;
+	flex-grow: 1;
+	width: 50%;
+}
+
+/* Tracks */
 .track--show-disc,
 .track--show-controls,
 .track--show-song:first-of-type {
 	counter-reset: tracks;
 }
+.track--show-disc {
+	counter-reset: tracks section_count;
+}
 .track--show-song {
 	counter-increment: tracks;
 }
 
+.track__num {
+	display: block;
+	left: -1.5rem;
+	line-height: 2rem;
+	position: absolute;
+	text-align: right;
+	top: 0;
+	width: 2rem;
+}
 .track__num::before {
 	box-sizing: border-box;
 	color: hsl(var(--text--secondary));
-	content: counter(tracks) ".";
+	content: counter(tracks);
 	display: inline-block;
-	height: 2rem;
-	left: -2rem;
-	padding-right: 0.5rem;
-	position: absolute;
+	font-family: var(--font--secondary);
+	font-size: 0.8rem;
+	margin-right: 1ch;
 	text-align: right;
-	top: -2rem;
-	width: 2rem;
-}
-.track__artist {
-	max-width: 25vw;
-	min-width: 150px;
-	width: 25vw;
 }
 .track__ghost {
 	opacity: 0.5;
@@ -121,77 +227,97 @@
 	display: none;
 }
 
-	@media(max-width:599.99px) {
-		.track__num {
-			width: 100%;
-		}
-		.track__num::before {
-			bottom: auto;
-			top: 0;
-		}
-		.track__song .input, .track__disc .input, .track__section .input {
-			height 2rem;
-			min-height: 2rem;
-			line-height: 2rem;
-			margin-bottom: 0.5rem;
-			padding-bottom: 0;
-			padding-top: 0;
-			border-radius: 3px 3px 0 0 !important;
-			width: 100%;
-		}
-		.track__song .input--secondary, .track__disc .input--secondary, .track__section .input--secondary {
-			border-radius: 0 0 3px 3px !important;
-			width: 100%;
-		}
-		.track__song, .track__disc, .track__section {
-			flex-direction: column;
-		}
-		.track__disc, .track__disc .input__group {
-			flex-direction: column;
-			flex-wrap: wrap;
-		}
-		.track__artist {
-			flex-grow: 1;
-			margin-bottom: 1rem;
-			width: 100%;
-		}
-		.track {
-		}
-		.add__tracklist {
-			padding-left: 0;
-			padding-right: 0;
-		}
+/* Fix EAC width */
+.easy-autocomplete {
+	width: 100% !important;
+}
+@media(min-width:600px) {
+	.easy-autocomplete {
+		min-width: 50%;
 	}
+	.easy-autocomplete input {
+		border-top-right-radius: 0 !important;
+		border-bottom-right-radius: 0 !important;
+	}
+}
 
+/* Show borders between tracks */
+.track--show-artist:not(:first-of-type),
+.track--show-edit-song:not(:first-of-type) {
+	border-top: 1px dotted hsl(var(--background--bold));
+	margin-top: 1rem;
+}
+@media(max-width:599.99px) {
+	.track:not(:first-of-type) {
+		border-top: 1px dotted hsl(var(--background--bold));
+		margin-top: 1rem;
+	}
+}
 
-				.input__select-placeholder {
-					background: hsl(var(--background--bold));
-					background-clip: content-box;
-					color: transparent;
-					left: 0.5rem;
-					line-height: 1.5rem;
-					padding: 0.25rem 0 0.25rem 0.5rem;
-					pointer-events: none;
-					position: absolute;
-					right: 0;
-				}
-				.input__select-placeholder::after {
-					border: 5px solid transparent;
-					border-top-color: hsl(var(--text--secondary));
-					content: "";
-					display: block;
-					height: 0;
-					margin-top: -3px;
-					pointer-events: none;
-					position: absolute;
-					right: 0.5rem;
-					top: 50%;
-					width: 0;
-				}
-				select[multiple] + .input__select-placeholder,
-				select[data-populate-on-click="true"] + .input__select-placeholder {
-					color: hsl(var(--text--secondary));
-				}
-				.selectize-control.input.single + .input__select-placeholder::after {
-					border-color: transparent;
-				}
+/* Mobile fixes */
+@media(max-width:599.99px) {
+	.track__song .input, .track__disc .input, .track__section .input {
+		height: 2rem;
+		min-height: 2rem;
+		line-height: 2rem;
+		padding-bottom: 0;
+		padding-top: 0;
+		border-radius: 3px 3px 0 0 !important;
+		width: 100%;
+	}
+	.track__song .input--secondary, .track__disc .input--secondary, .track__section .input--secondary {
+		border-radius: 0 0 3px 3px !important;
+		width: 100%;
+	}
+	.track__song, .track__disc, .track__section {
+		flex-direction: column;
+	}
+	.track__disc .input__group, .track__section .input__group {
+		flex-direction: column;
+		flex-wrap: wrap;
+	}
+	.track__disc .input__label, .track__section .input__label {
+		height: 1rem;
+	}
+	.track__disc input, .track__section input {
+		box-sizing: border-box;
+	}
+}
+
+/* Artists */
+.track__artist {
+	flex-grow: 1;
+}
+
+/* Try to fix some placeholder issues */
+.input__select-placeholder {
+	background: hsl(var(--background--bold));
+	background-clip: content-box;
+	color: transparent;
+	left: 0.5rem;
+	line-height: 1.5rem;
+	padding: 0.25rem 0 0.25rem 0.5rem;
+	pointer-events: none;
+	position: absolute;
+	right: 0;
+}
+.input__select-placeholder::after {
+	border: 5px solid transparent;
+	border-top-color: hsl(var(--text--secondary));
+	content: "";
+	display: block;
+	height: 0;
+	margin-top: -3px;
+	pointer-events: none;
+	position: absolute;
+	right: 0.5rem;
+	top: 50%;
+	width: 0;
+}
+select[multiple] + .input__select-placeholder,
+select[data-populate-on-click="true"] + .input__select-placeholder {
+	color: hsl(var(--text--secondary));
+}
+.selectize-control.input.single + .input__select-placeholder::after {
+	border-color: transparent;
+}

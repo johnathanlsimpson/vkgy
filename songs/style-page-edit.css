@@ -1,0 +1,8 @@
+.song__title ::before {
+	font-size: 1.5rem;
+}
+
+/* Possibly expand to rest of site */
+.input__text {
+	line-height: 2rem;
+}

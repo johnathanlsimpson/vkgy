@@ -32,6 +32,7 @@ $subnav_url = $is_edit ? $magazine['url'].'edit/' : '/magazines/add/';
 script([
 	'/scripts/external/script-alpine.js',
 	'/scripts/external/script-selectize.js',
+	'/scripts/external/script-inputmask.js',
 	'/scripts/script-initSelectize.js',
 	'/scripts/script-initDelete.js',
 	'/magazines/script-page-update.js',
@@ -96,7 +97,7 @@ $volume_romaji_pattern = explode('{volume}', $magazine['volume_romaji_pattern'])
 $before_num_romaji = $volume_romaji_pattern[0] ?: null;
 $after_num_romaji = $volume_romaji_pattern[1] ?: null;
 
-// Get extant magazine magazine
+// Get other magazines
 $magazines = $access_magazine->access_magazine([ 'get' => 'basics' ]);
 
 // ========================================================
@@ -274,21 +275,53 @@ $magazine_attributes[-1] = [ [] ];
 						<!-- Default price -->
 						<div class="input__group">
 							
-							<label class="input__label"><?= lang('Default price', '', 'hidden'); ?></label>
+							<label class="input__label"><?= lang('Default price', '価格', 'hidden'); ?></label>
 							<input name="default_price[]" placeholder="e.g. 800 yen" size="12" value="<?= $magazine['default_price']; ?>" />
 							
 						</div>
 						
 						<!-- Labels -->
-						<div class="input__group">
+						<div class="input__group any--flex-grow">
 							
 							<label class="input__label"><?= lang('Publisher', '発行者', 'hidden'); ?></label>
-							<select class="input" data-multiple data-source="labels" name="labels[<?= $i; ?>][]" placeholder="publishers" multiple data-multiple="true">
+							<select class="input any--flex-grow" data-multiple data-source="labels" name="labels[<?= $i; ?>][]" placeholder="publishers" multiple data-multiple="true">
 								<option></option>
 								<?php
 									if( is_array($magazine['labels']) && !empty($magazine['labels']) ) {
 										foreach( $magazine['labels'] as $label ) {
 											echo '<option value="'.$label['id'].'" selected></option>';
+										}
+									}
+								?>
+							</select>
+							
+						</div>
+						
+					</li>
+					
+					<!-- Dates -->
+					<li class="input__row">
+						
+						<!-- Start date -->
+						<div class="input__group">
+							
+							<label class="input__label"><?= lang('Start date', '開始日', 'hidden'); ?></label>
+							<input class="input" data-inputmask="'alias': '9999[-99][-99]'" maxlength="10" name="date_occurred[]" placeholder="yyyy-mm-dd" size="10" value="<?= $magazine['date_occurred']; ?>" />
+							
+						</div>
+						
+						<!-- Frequency -->
+						<div class="input__group">
+							
+							<label class="input__label"><?= lang('Frequency', '発行', 'hidden'); ?></label>
+							<select class="input" name="frequency[]" placeholder="frequency">
+								<option value="" selected></option>
+								<?php
+									if( is_array($magazine_attributes[3]) && !empty($magazine_attributes[3]) ) {
+										foreach( $magazine_attributes[3] as $frequency ) {
+											echo '<option value="'.$frequency['id'].'" '.( $frequency['id'] == $magazine['frequency'] || ( !strlen($magazine['frequency']) && $frequency['is_default'] ) ? 'selected' : null ).'>';
+											echo $frequency['romaji'] ? $frequency['romaji'].' ('.$frequency['name'].')' : $frequency['name'];
+											echo '</option>';
 										}
 									}
 								?>

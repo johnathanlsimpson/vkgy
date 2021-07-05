@@ -1,5 +1,21 @@
 <?php
-	function friendly($input, $method = "return") {
+
+include_once('../php/class-sanitizer.php');
+$sanitizer = $sanitizer ?: new sanitizer();
+
+// For now, let's include this wrapper for the class since so many functions use it
+function friendly( $input, $method='return' ) {
+
+	global $sanitizer;
+	
+	$output = $sanitizer->friendly( $input, $method );
+	
+	return $output;
+	
+}
+
+
+/*function friendly($input, $method = "return") {
 		if(!empty($input)) {
 			$input = str_replace(array("&ldquo;", "&rdquo;"), "-", $input);
 			$input = html_entity_decode($input, ENT_QUOTES, "UTF-8");
@@ -17,5 +33,4 @@
 				return($input);
 			}
 		}
-	}
-?>
+	}*/

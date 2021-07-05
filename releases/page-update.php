@@ -1,4 +1,10 @@
 <?php
+
+// ========================================================
+// Inclusions
+// ========================================================
+
+include_once('../php/function-render_json_list.php');
 	
 	breadcrumbs([
 		'Releases' => '/releases/',
@@ -161,6 +167,28 @@
 	}
 
 	$pageTitle = !empty($release["quick_name"]) ? "Edit: ".$release["quick_name"]." - ".$release["artist"]["quick_name"] : "Add release";
+
+// ========================================================
+// Get additional data
+// ========================================================
+
+// Start list of all artist ids so we can get songs
+$artist_ids[ $release['artist']['id'] ] = $release['artist']['id'];
+
+// Loop through tracks and save each artist so that we can get all songs lists
+array_walk_recursive($release['tracklist'], function($value, $key) use(&$artist_ids) {
+	if( $key === 'id' ) {
+		$artist_ids[ $value ] = $value;
+	}
+});
+
+// Now for each artist id, get songs if necessary (for omnibus, get empty list)
+foreach( $artist_ids as $artist_id ) {
+	if( is_numeric($artist_id) ) {
+		render_json_list( 'song', $artist_id, 'artist_id', null, null, [ 'append_id' => true, 'leave_empty' => ( $artist_id ? false : true ) ] );
+	}
+}
+
 ?>
 
 <div class="col c1 any--signed-out-only">
@@ -330,6 +358,10 @@
 							}
 						?>
 					</select>
+					
+					<!-- Original artist (just used for JS) -->
+					<input name="original_artist_id" type="hidden" value="<?= $release['artist']['id']; ?>" disabled />
+					
 				</div>
 				
 				<!-- Show display name -->
@@ -366,12 +398,12 @@
 				</div>
 				
 				<!-- Tax -->
-				<div class="input__group">
+				<?php /*<div class="input__group">
 					<label class="input__checkbox">
 						<input class="input__choice" name="is_tax_in" type="checkbox" value="1" <?= $release['is_tax_in'] ? 'checked' : null; ?> />
 						<span class="symbol__unchecked">tax in?</span>
 					</label>
-				</div>
+				</div>*/ ?>
 				
 				<div class="input__group">
 					<div class="input__label">
@@ -548,8 +580,11 @@
 			<?php
 				ob_start();
 					?>
-						<div class="track ?class" x-data="{ showControls:1, showArtistDisplay:1 }">
+						<div class="track any--flex ?class" x-data="{ showControls:1, showArtistDisplay:0, showEditSong:0 }" x-ref="track">
 							
+							<!-- Container -->
+							<div class="any--flex-grow">
+								
 							<div class="input__row track__disc">
 								<div class="input__group any--flex-grow">
 									<span class="input__label track__disc-label">
@@ -561,7 +596,7 @@
 							</div>
 							<div class="input__row track__section">
 								<div class="input__group any--flex-grow">
-									<span class="input__label">
+									<span class="input__label h4">
 										Section
 									</span>
 									<input class="input"             value="?section_name"  name="tracklist[section_name][]"            placeholder="section name" />
@@ -571,53 +606,63 @@
 							<div class="input__row track__song-container">
 								<div class="input__group track__song any--flex-grow">
 									<span class="track__num"></span>
-									<input class="input"             value="?name"  name="tracklist[name][]" placeholder="song name" data-easyautocomplete data-src="songs" data-get-value="quick_name" />
+									
+									
+									<input class="input"             value="?name"  name="tracklist[name][]" placeholder="song name" data-easyautocomplete data-src="?song_data_src" data-get-value="4" />
 									<input class="input--secondary"  value="?romaji"  name="tracklist[romaji][]"             placeholder="(romaji)" />
-								</div>
-								
-								<div class="track__song-controls input__group">
-									<button class="track__song-control track__reorder" tabindex="-1" type="button">⇅</button>
-								</div>
-								<div class="track__song-controls input__group">
-									<button class="track__song-control" data-add="song" tabindex="-1" type="button">+</button>
+									
+									<a class="symbol__edit track__edit-song" href="#" style="line-height:2rem;margin-left:0.5rem;" @click.prevent="showEditSong=1;splitNotesFromTrack($refs.track);" x-show="!showEditSong">debug song</a>
+									
 								</div>
 							</div>
 							
 							<!-- Link track to song -->
-							<?php if($_SESSION['username'] === 'inartistic'): ?>
-							<div class="input__row track__song-container" style="margin-top:0;">
+							<div class="input__row track__song-container" x-show="showEditSong">
 								
 								<div class="input__group">
-									<label class="input__label">Linked song</label>
-									<input name="tracklist[song_id][]" value="?song_id" />
-									<!--<select class="input">
-										<option>Cruel Crucible</option>
-									</select>-->
+									<label class="input__label">Song ID</label>
+									<input name="tracklist[song_id][]" placeholder="123" size="4" value="?song_id" />
 								</div>
 								
 								<div class="input__group">
 									<label class="input__checkbox">
-										<input class="input__choice" type="checkbox" value="1" />
+										
+										<input name="tracklist[is_custom][]" type="hidden" value="?is_custom" />
+										<input class="input__choice track__is-custom" type="checkbox" ?is_custom_checked />
 										<span class="symbol__unchecked">allow custom name?</span>
+										
 									</label>
 								</div>
 								
+								<!-- Notes -->
+								<div class="input__group any--flex-grow">
+									
+									<label class="input__label">Track notes</label>
+									<input name="tracklist[notes_name][]" placeholder="e.g. (bonus track)" data-value="?notes_name" />
+									<input class="input--secondary" name="tracklist[notes_romaji][]" placeholder="(romaji)" data-value="?notes_romaji" />
+									
+								</div>
+								
+								<!-- Link -->
+								<div class="input__group">
+									?song_link
+								</div>
+								
 							</div>
-							<?php endif; ?>
 							
 							<!-- Song artist -->
-							<div class="input__row track__song-container" style="margin-top:0;">
+							<div class="input__row track__artist-container" >
 								
 								<!-- Artist -->
 								<div class="input__group track__artist">
 									
 									<label class="input__label">Artist</label>
-									<select class="input" data-populate-on-click="true" name="tracklist[artist_id][]"               placeholder="artist(s)"  data-source="artists" data-multiple="true">
+									<select class="input" data-populate-on-click="true" name="tracklist[artist_id][]"               placeholder="artist"  data-source="artists">
 										<option value=""></option>
 										?artist
 									</select>
 									
-									<a class="symbol__edit" href="#" @click.prevent="showArtistDisplay=1" x-show="!showArtistDisplay">as...</a>
+									<a class="symbol__edit" href="#" style="line-height:2rem;margin-left:0.5rem;" @click.prevent="showArtistDisplay=1" x-show="!showArtistDisplay">display as</a>
 									
 								</div>
 								
@@ -632,6 +677,7 @@
 								
 							</div>
 							
+							<!-- Bottom controls -->
 							<div class="input__row track__tracklist-controls">
 								
 								<a class="symbol__plus" href="#" @click.prevent="showControls=1" x-show="!showControls">add...</a>
@@ -646,6 +692,23 @@
 								
 								<div class="input__group" x-show="showControls">
 									<button class="track__control symbol__song" data-add="songs" type="button">tracks</button>
+								</div>
+								
+							</div>
+								
+							</div>
+							
+							<!-- Reorder/Add -->
+							<div class="track__handles input__row track__reorder-discs" style="width:auto;">
+								
+								<!-- Reorder -->
+								<div class="track__song-controls input__group">
+									<button class="track__song-control track__reorder" tabindex="-1" type="button">⇅</button>
+								</div>
+								
+								<!-- Add track -->
+								<div class="track__song-controls input__group">
+									<button class="track__song-control" data-add="song" tabindex="-1" type="button">+</button>
 								</div>
 								
 							</div>
@@ -684,13 +747,19 @@
 
 							foreach($section["tracks"] as $track) {
 								print_template($template, [
-									"class" => "track--show-song".($is_omnibus ? " track--show-artist" : ""),
-									"name" => str_replace(["&#40;", "&#41;"], ["\&#40;", "\&#41;"], $track["name"]),
-									"romaji" => str_replace(["&#40;", "&#41;"], ["\&#40;", "\&#41;"], $track["romaji"]),
-									"artist" => '<option value="'.$track["artist"]["id"].'" '.($track["artist"]["i7d"] !== $release["artist"]["id"] ? "selected" : null).'>'.$track["artist"]["quick_name"].'</option>',
-									"artist_display_name" => $track["artist"]["display_name"],
+									"class"                 => "track--show-song".($is_omnibus ? " track--show-artist" : ""),
+									"name"                  => str_replace(["&#40;", "&#41;"], ["\&#40;", "\&#41;"], $track["name"]),
+									'song_data_src'         => 'songs'.( is_numeric($track['artist']['id']) ? '_'.$track['artist']['id'] : null ),
+									"romaji"                => str_replace(["&#40;", "&#41;"], ["\&#40;", "\&#41;"], $track["romaji"]),
+									"artist"                => '<option value="'.$track["artist"]["id"].'" '.($track["artist"]["id"] !== $release["artist"]["id"] ? "selected" : null).'>'.$track["artist"]["quick_name"].'</option>',
+									"artist_display_name"   => $track["artist"]["display_name"],
 									"artist_display_romaji" => $track["artist"]["display_romaji"],
-									'song_id' => $track['song_id'],
+									'song_id'               => $track['song_id'],
+									'song_link'             => is_numeric($track['song_id']) ? '<a class="symbol__song" href="/songs/artist/'.$track['song_id'].'/song/" style="line-height:2rem;z-index:0;" target="_blank">view song</a>' : null,
+									'notes_name'            => $track['notes_name'],
+									'notes_romaji'          => $track['notes_romaji'],
+									'is_custom'             => $track['is_custom'] ? 1 : 0,
+									'is_custom_checked'     => $track['is_custom'] ? 'checked' : null,
 								]);
 							}
 
@@ -703,9 +772,11 @@
 				else {
 					for($i = 0; $i < 5; $i++) {
 						print_template($template, [
-							"class" => "track--show-song",
-							"name" => $track["name"],
-							"romaji" => $track["romaji"]
+							'class'         => "track--show-song",
+							'name'          => $track["name"],
+							'song_data_src' => 'songs'.( is_numeric($release['artist']['id']) ? '_'.$release['artist']['id'] : null ),
+							'romaji'        => $track["romaji"],
+							'is_custom'     => 0,
 						]);
 					}
 
@@ -716,23 +787,36 @@
 			?>
 			
 			<!-- Whole release controls -->
-			<div style="background:hsl(var(--background--secondary));border-radius:0 0 inherit inherit;margin:-1rem;margin-top:1rem;padding:1rem;" x-data="{ showControls:0 }">
+			<div style="background:hsl(var(--background--secondary));border-radius:0 0 inherit inherit;margin:1rem -1rem -1rem -2rem;padding:1rem;padding-left:2rem;" x-data="{ showControls:0 }">
 				
-				<a class="symbol__plus" href="#" @click.prevent="showControls=1" x-show="!showControls">other options</a>
+				<a class="symbol__plus" href="#" @click.prevent="showControls=1" x-show="!showControls">advanced options</a>
 				
 				<div class="input__row" x-show="showControls">
 					
 					<div class="input__group">
-						<button class="track__control symbol__close" type="button" data-clear>clear</button>
+						<button class="track__control symbol__close" type="button" data-clear>clear all</button>
 					</div>
 					
 					<div class="input__group">
 						<button class="track__control symbol__artist" data-show="track--show-artist" type="button">show artists</button>
 					</div>
 					
+					<?php /*
 					<div class="input__group">
 						<button class="track__control symbol__language" data-show="track--show-artist track--show-display-name" type="button">show display names</button>
-					</div>
+					</div>*/ ?>
+					
+					<?php if( $_SESSION['can_approve_data'] ): ?>
+						<div class="input__group">
+							<button class="symbol__search" data-show="track--show-edit-song" type="button">show song debug</button>
+						</div>
+					<?php endif; ?>
+					
+					<?php if( $_SESSION['can_approve_data'] ): ?>
+						<div class="input__group">
+							<button class="symbol__shuffle" data-show="track--show-reorder-discs" type="button">reorder discs</button>
+						</div>
+					<?php endif; ?>
 					
 				</div>
 				
@@ -742,7 +826,8 @@
 		<div class="any--hidden track__template">
 			<?php
 				print_template($template, [
-					"class" => "?class"
+					"class" => "?class",
+					'song_data_src' => 'songs'.( is_numeric($release['artist']['id']) ? '_'.$release['artist']['id'] : null ),
 				]);
 			?>
 		</div>

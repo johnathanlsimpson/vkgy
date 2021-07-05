@@ -56,7 +56,7 @@ if( is_array($artist['images']) && !empty($artist['images']) ) {
 			}
 			
 			// Solve an edge case where a musician was tagged by face in a solo image of them
-			elseif( is_array($image['musicians']) && count($image['musicians'] === 1) && strlen($image['musicians'][0]['musician_id']) ) {
+			elseif( is_array($image['musicians']) && count($image['musicians']) === 1 && strlen($image['musicians'][0]['musician_id']) ) {
 				
 				$musicians_images[ $image['musicians'][0]['musician_id'] ][] = [ 'image_id' => $image['id'] ];
 				

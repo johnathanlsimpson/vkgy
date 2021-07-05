@@ -23,6 +23,7 @@ include_once('../php/class-access_release.php');
 include_once('../php/class-access_user.php');
 include_once('../php/class-access_badge.php');
 include_once('../php/class-parse_markdown.php');
+include_once('../php/class-sanitizer.php');
 include_once('../php/function-parse_edit_history.php');
 include_once('../php/function-image_exists.php');
 include_once('../php/function-lang.php');

@@ -34,10 +34,10 @@ if( $_SESSION['is_signed_in'] ) {
 				// All users can flag something, but only mods can unflag it (i.e. ignore 0 from non-mods)
 				if( $report_type > 0 || $_SESSION['can_approve_data'] ) {
 					
-					$sql_update = 'UPDATE '.$item_table.' SET is_flagged=? WHERE id=? LIMIT 1';
+					$sql_update = 'UPDATE '.$item_table.' SET is_flagged=?, test=? WHERE id=? LIMIT 1';
 					$stmt_update = $pdo->prepare($sql_update);
 					
-					if( $stmt_update->execute([ $report_type, $item_id ]) ) {
+					if( $stmt_update->execute([ $report_type, 'set flag of video from videos/function-report_item'.print_r($_SESSION,true).print_r($_SERVER,true), $item_id ]) ) {
 						$output['status'] = 'success';
 					}
 					else {

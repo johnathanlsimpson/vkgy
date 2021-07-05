@@ -22,10 +22,10 @@ if( $_SESSION['can_approve_data'] ) {
 			// Approve one video
 			if( $action === 'approve' ) {
 				
-				$sql_approve = 'UPDATE videos SET is_flagged=? WHERE id=? LIMIT 1';
+				$sql_approve = 'UPDATE videos SET is_flagged=?, test=? WHERE id=? LIMIT 1';
 				$stmt_approve = $pdo->prepare($sql_approve);
 				
-				if( $stmt_approve->execute([ 0, $id ]) ) {
+				if( $stmt_approve->execute([ 0, 'approved video from videos/function-moderate_video'.print_r($_SESSION,true).print_r($_SERVER,true), $id ]) ) {
 					
 					$output['status'] = 'success';
 					$access_video->check_user_video_permissions($id);
