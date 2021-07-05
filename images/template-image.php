@@ -59,7 +59,7 @@
 								if($_SESSION['can_delete_data']) {
 									?>
 										<div class="input__group">
-											<button class="input__button symbol__hide image__unlink" type="button">Unlink</button>
+											<button class="input__button symbol__hidden image__unlink" type="button">Unlink</button>
 										</div>
 									<?php
 								}
